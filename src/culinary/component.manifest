@@ -649,7 +649,7 @@ entity ComponentComponent mixin TenantScoped, SoftDeletable {
   constraint nestedLineNotSelf: self.addedAt == null or self.componentId != self.childComponentId "A recipe cannot contain itself"
   constraint nestedLineQuantityPositive: self.addedAt == null or self.quantity > 0 "Nested recipe quantity must be positive"
 
-  default policy componentComponentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read nested recipe lines"
+  default policy componentComponentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see nested recipe lines"
   default policy componentComponentWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update nested recipe lines"
   default policy componentComponentExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change nested recipe lines"
 

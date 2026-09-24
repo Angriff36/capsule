@@ -71,7 +71,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
   // salesAccess: sales browses the published catalog for proposal menu
   // selection (sales/proposal-dish-selection.manifest).
   // Event managers compose package recipes as well as their event menu lines.
-  default policy dishRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, sales and managers may read dishes"
+  default policy dishRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, sales and managers may see dishes"
   default policy dishWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may update dishes"
   default policy dishExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may change dishes"
 
@@ -352,7 +352,7 @@ entity DishIngredient mixin TenantScoped, SoftDeletable {
   constraint dishLineQuantityPositive: self.addedAt == null or self.quantity > 0 "Dish ingredient quantity must be positive"
   constraint dishLineWasteFactorPositive: self.addedAt == null or self.wasteFactor == null or self.wasteFactor > 0 "Waste factor must be greater than 0"
 
-  default policy dishIngredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read dish ingredient lines"
+  default policy dishIngredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see dish ingredient lines"
   default policy dishIngredientWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update dish ingredient lines"
   default policy dishIngredientExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change dish ingredient lines"
 
@@ -607,7 +607,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
 
-  default policy dishTaskRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may read dish task templates"
+  default policy dishTaskRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may see dish task templates"
   default policy dishTaskWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may update dish task templates"
   default policy dishTaskExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may change dish task templates"
 
@@ -937,7 +937,7 @@ entity DishTaskMaterial mixin TenantScoped, SoftDeletable {
 
   constraint materialHasTarget: self.linkedAt == null or self.dishIngredientId != null or self.dishComponentId != null or self.dishContainerId != null "A task material must point at a requirement"
 
-  default policy dishTaskMaterialRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may read task materials"
+  default policy dishTaskMaterialRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may see task materials"
   default policy dishTaskMaterialWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may update task materials"
   default policy dishTaskMaterialExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may change task materials"
 

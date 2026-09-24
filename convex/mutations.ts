@@ -3977,7 +3977,7 @@ async function __runComponentComponentAdd(ctx: MutationCtx, { docId, componentId
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentComponent not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentComponent not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read nested recipe lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see nested recipe lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update nested recipe lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change nested recipe lines");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
@@ -4069,7 +4069,7 @@ export const ComponentComponent_createViaAdd = mutation({
       quantityBasis: args.quantityBasis,
       unit: args.unit
     };
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read nested recipe lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see nested recipe lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update nested recipe lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change nested recipe lines");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
@@ -4109,7 +4109,7 @@ async function __runComponentComponentAdjustQuantity(ctx: MutationCtx, { docId, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentComponent not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentComponent not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read nested recipe lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see nested recipe lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update nested recipe lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change nested recipe lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -4160,7 +4160,7 @@ async function __runComponentComponentRemove(ctx: MutationCtx, { docId, reason, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentComponent not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentComponent not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read nested recipe lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see nested recipe lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update nested recipe lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change nested recipe lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -8233,7 +8233,7 @@ async function __runDishClassifyAllergens(ctx: MutationCtx, { docId, allergenSum
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may read dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -8280,7 +8280,7 @@ async function __runDishClassifyKind(ctx: MutationCtx, { docId, kind, version }:
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may read dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -8326,7 +8326,7 @@ async function __runDishClearPrimaryImage(ctx: MutationCtx, { docId, version }: 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may read dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -8373,7 +8373,7 @@ async function __runDishIntroduce(ctx: MutationCtx, { docId, name, portionSize, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may read dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.introducedAt == null))) throw new Error("Guard 0 failed");
@@ -8470,7 +8470,7 @@ export const Dish_createViaIntroduce = mutation({
       portionUnit: args.portionUnit,
       serviceStyle: args.serviceStyle
     };
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may read dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((__draft.introducedAt == null))) throw new Error("Guard 0 failed");
@@ -8510,7 +8510,7 @@ async function __runDishLinkAsEdition(ctx: MutationCtx, { docId, sourceDishId, e
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may read dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.introducedAt != null))) throw new Error("Guard 0 failed");
@@ -8562,7 +8562,7 @@ async function __runDishMergeInto(ctx: MutationCtx, { docId, targetDishId, reaso
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may read dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -8629,7 +8629,7 @@ async function __runDishPurge(ctx: MutationCtx, { docId, version }: any, __creat
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may read dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -8690,7 +8690,7 @@ async function __runDishReinstate(ctx: MutationCtx, { docId, version }: any, __c
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may read dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "retired"))) throw new Error("Guard 0 failed");
@@ -8751,7 +8751,7 @@ async function __runDishRetire(ctx: MutationCtx, { docId, reason, version }: any
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may read dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -8814,7 +8814,7 @@ async function __runDishReviseDetails(ctx: MutationCtx, { docId, name, descripti
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may read dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -8872,7 +8872,7 @@ async function __runDishSaveRecipe(ctx: MutationCtx, { docId, instructions, sour
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may read dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -8925,7 +8925,7 @@ async function __runDishSaveServiceInstructions(ctx: MutationCtx, { docId, instr
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may read dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -8975,7 +8975,7 @@ async function __runDishSetPrimaryImage(ctx: MutationCtx, { docId, storageId, fi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may read dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -9025,7 +9025,7 @@ async function __runDishUpdatePortioning(ctx: MutationCtx, { docId, portionSize,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may read dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -9376,7 +9376,7 @@ async function __runDishContainerDefine(ctx: MutationCtx, { docId, dishId, name,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("DishContainer not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishContainer not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read dish containers");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see dish containers");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update dish containers");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish containers");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
@@ -9479,7 +9479,7 @@ export const DishContainer_createViaDefine = mutation({
       serviceMethod: args.serviceMethod,
       servingsPerContainer: args.servingsPerContainer
     };
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read dish containers");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see dish containers");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update dish containers");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish containers");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
@@ -9526,7 +9526,7 @@ async function __runDishContainerRefreshActiveKey(ctx: MutationCtx, { docId, ver
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("DishContainer not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishContainer not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read dish containers");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see dish containers");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update dish containers");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish containers");
     if (version !== undefined && (doc as any).version !== version) {
@@ -9565,7 +9565,7 @@ async function __runDishContainerReinstate(ctx: MutationCtx, { docId, version }:
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("DishContainer not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishContainer not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read dish containers");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see dish containers");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update dish containers");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish containers");
     if (!((doc.status === "retired"))) throw new Error("Guard 0 failed");
@@ -9636,7 +9636,7 @@ async function __runDishContainerRetire(ctx: MutationCtx, { docId, reason, versi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("DishContainer not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishContainer not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read dish containers");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see dish containers");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update dish containers");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish containers");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -9703,7 +9703,7 @@ async function __runDishContainerRevise(ctx: MutationCtx, { docId, name, service
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("DishContainer not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishContainer not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read dish containers");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see dish containers");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update dish containers");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish containers");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -9777,7 +9777,7 @@ async function __runDishIngredientAdd(ctx: MutationCtx, { docId, dishId, ingredi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("DishIngredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishIngredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read dish ingredient lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see dish ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update dish ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish ingredient lines");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
@@ -9891,7 +9891,7 @@ export const DishIngredient_createViaAdd = mutation({
       quantity: args.quantity,
       unit: args.unit
     };
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read dish ingredient lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see dish ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update dish ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish ingredient lines");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
@@ -9956,7 +9956,7 @@ async function __runDishIngredientAdjustQuantity(ctx: MutationCtx, { docId, quan
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("DishIngredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishIngredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read dish ingredient lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see dish ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update dish ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish ingredient lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -10034,7 +10034,7 @@ async function __runDishIngredientRemove(ctx: MutationCtx, { docId, reason, vers
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("DishIngredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishIngredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read dish ingredient lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see dish ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update dish ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish ingredient lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -10093,7 +10093,7 @@ async function __runDishTaskAdd(ctx: MutationCtx, { docId, dishId, name, categor
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishTask not found");
     const __rel_dish = await __resolveRelation(ctx, "dishes", [__auth.tenantId, doc.dishId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).dish = __rel_dish;
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read dish task templates");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see dish task templates");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dish task templates");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dish task templates");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -10205,7 +10205,7 @@ export const DishTask_createViaAdd = mutation({
       station: args.station
     };
     const __rel_dish = await __resolveRelation(ctx, "dishes", [__auth.tenantId, __draft.dishId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read dish task templates");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see dish task templates");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dish task templates");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dish task templates");
     if (!((__draft.status === "active"))) throw new Error("Guard 0 failed");
@@ -10252,7 +10252,7 @@ async function __runDishTaskBackfillActiveKey(ctx: MutationCtx, { docId, version
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("DishTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read dish task templates");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see dish task templates");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dish task templates");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dish task templates");
     if (version !== undefined && (doc as any).version !== version) {
@@ -10291,7 +10291,7 @@ async function __runDishTaskRetire(ctx: MutationCtx, { docId, reason, version }:
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("DishTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read dish task templates");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see dish task templates");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dish task templates");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dish task templates");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -10356,7 +10356,7 @@ async function __runDishTaskRevise(ctx: MutationCtx, { docId, name, category, ta
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishTask not found");
     const __rel_dish = await __resolveRelation(ctx, "dishes", [__auth.tenantId, doc.dishId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).dish = __rel_dish;
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read dish task templates");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see dish task templates");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dish task templates");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dish task templates");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -10427,7 +10427,7 @@ async function __runDishTaskSpecifyWork(ctx: MutationCtx, { docId, stage, resolu
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("DishTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read dish task templates");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see dish task templates");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dish task templates");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dish task templates");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -10488,7 +10488,7 @@ async function __runDishTaskMaterialLink(ctx: MutationCtx, { docId, dishTaskId, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("DishTaskMaterial not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishTaskMaterial not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read task materials");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see task materials");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update task materials");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change task materials");
     if (!((doc.linkedAt == null))) throw new Error("Guard 0 failed");
@@ -10571,7 +10571,7 @@ export const DishTaskMaterial_createViaLink = mutation({
       workQuantity: args.workQuantity,
       workUnit: args.workUnit
     };
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read task materials");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see task materials");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update task materials");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change task materials");
     if (!((__draft.linkedAt == null))) throw new Error("Guard 0 failed");
@@ -10608,7 +10608,7 @@ async function __runDishTaskMaterialUnlink(ctx: MutationCtx, { docId, reason, ve
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("DishTaskMaterial not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishTaskMaterial not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read task materials");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see task materials");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update task materials");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change task materials");
     if (!((doc.linkedAt != null))) throw new Error("Guard 0 failed");
@@ -15340,7 +15340,7 @@ async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dish
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read event dishes");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may update event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may change event dishes");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
@@ -15532,7 +15532,7 @@ export const EventDish_createViaAddToEvent = mutation({
       specialInstructions: args.specialInstructions
     };
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read event dishes");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may update event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may change event dishes");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
@@ -15672,7 +15672,7 @@ async function __runEventDishAdjustServings(ctx: MutationCtx, { docId, quantityS
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read event dishes");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may update event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may change event dishes");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
@@ -15738,7 +15738,7 @@ async function __runEventDishChangeCourse(ctx: MutationCtx, { docId, course, ser
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read event dishes");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may update event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may change event dishes");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
@@ -15791,7 +15791,7 @@ async function __runEventDishConfirmFromProposal(ctx: MutationCtx, { docId, even
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read event dishes");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may update event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may change event dishes");
     if (!((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")))) throw new Error("Guard 0 failed");
@@ -15913,7 +15913,7 @@ async function __runEventDishRefreshRecipeSync(ctx: MutationCtx, { docId, versio
     if (!doc) throw new Error("EventDish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read event dishes");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may update event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may change event dishes");
     if (version !== undefined && (doc as any).version !== version) {
@@ -15954,7 +15954,7 @@ async function __runEventDishRemove(ctx: MutationCtx, { docId, reason, version }
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read event dishes");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may update event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may change event dishes");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
@@ -16017,7 +16017,7 @@ async function __runEventDishReorder(ctx: MutationCtx, { docId, sortOrder, versi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventDish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read event dishes");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may update event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may change event dishes");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -16066,7 +16066,7 @@ async function __runEventDishRequestCatalogPacking(ctx: MutationCtx, { docId, ve
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read event dishes");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may update event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may change event dishes");
     if (!(((doc.deletedAt == null) && (doc.addedAt != null)))) throw new Error("Guard 0 failed");
@@ -16118,7 +16118,7 @@ async function __runEventDishRequestContainerPack(ctx: MutationCtx, { docId, pac
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventDish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read event dishes");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may update event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may change event dishes");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
@@ -16200,7 +16200,7 @@ async function __runEventDishSetHeadcountOverride(ctx: MutationCtx, { docId, hea
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read event dishes");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may update event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may change event dishes");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
@@ -16269,7 +16269,7 @@ async function __runEventDishSyncHeadcount(ctx: MutationCtx, { docId, previousHe
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read event dishes");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may update event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may change event dishes");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
@@ -16335,7 +16335,7 @@ async function __runEventDishUpdateInstructions(ctx: MutationCtx, { docId, speci
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read event dishes");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may update event dishes");
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may change event dishes");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
@@ -16703,7 +16703,7 @@ async function __runEventDishLineOverrideApply(ctx: MutationCtx, { docId, eventD
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventDishLineOverride not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDishLineOverride not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read event dish overrides");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see event dish overrides");
     if (!((checkRole(user, "manageAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Managers and kitchen staff may update event dish overrides");
     if (!((checkRole(user, "manageAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Managers and kitchen staff may change event dish overrides");
     if (!((doc.appliedAt == null))) throw new Error("Guard 0 failed");
@@ -16817,7 +16817,7 @@ export const EventDishLineOverride_createViaApply = mutation({
       targetDishTaskId: args.targetDishTaskId,
       unit: args.unit
     };
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read event dish overrides");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see event dish overrides");
     if (!((checkRole(user, "manageAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Managers and kitchen staff may update event dish overrides");
     if (!((checkRole(user, "manageAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Managers and kitchen staff may change event dish overrides");
     if (!((__draft.appliedAt == null))) throw new Error("Guard 0 failed");
@@ -16864,7 +16864,7 @@ async function __runEventDishLineOverrideRevoke(ctx: MutationCtx, { docId, reaso
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventDishLineOverride not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDishLineOverride not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read event dish overrides");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see event dish overrides");
     if (!((checkRole(user, "manageAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Managers and kitchen staff may update event dish overrides");
     if (!((checkRole(user, "manageAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Managers and kitchen staff may change event dish overrides");
     if (!((doc.appliedAt != null))) throw new Error("Guard 0 failed");
@@ -22711,7 +22711,7 @@ async function __runIngredientClassifyAllergens(ctx: MutationCtx, { docId, aller
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -22760,7 +22760,7 @@ async function __runIngredientClearPrimaryImage(ctx: MutationCtx, { docId, versi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -22807,7 +22807,7 @@ async function __runIngredientConfigureSubstitutes(ctx: MutationCtx, { docId, su
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.introducedAt != null))) throw new Error("Guard 0 failed");
@@ -22849,7 +22849,7 @@ async function __runIngredientDiscontinue(ctx: MutationCtx, { docId, reason, ver
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -22912,7 +22912,7 @@ async function __runIngredientIntroduce(ctx: MutationCtx, { docId, name, unit, c
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.introducedAt == null))) throw new Error("Guard 0 failed");
@@ -23003,7 +23003,7 @@ export const Ingredient_createViaIntroduce = mutation({
       preferredVendorId: args.preferredVendorId,
       unit: args.unit
     };
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((__draft.introducedAt == null))) throw new Error("Guard 0 failed");
@@ -23041,7 +23041,7 @@ async function __runIngredientLinkAsEdition(ctx: MutationCtx, { docId, sourceIng
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.introducedAt != null))) throw new Error("Guard 0 failed");
@@ -23093,7 +23093,7 @@ async function __runIngredientMergeInto(ctx: MutationCtx, { docId, targetIngredi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -23160,7 +23160,7 @@ async function __runIngredientPurge(ctx: MutationCtx, { docId, version }: any, _
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -23221,7 +23221,7 @@ async function __runIngredientReinstate(ctx: MutationCtx, { docId, version }: an
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "discontinued"))) throw new Error("Guard 0 failed");
@@ -23282,7 +23282,7 @@ async function __runIngredientSetNutrition(ctx: MutationCtx, { docId, caloriesPe
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -23354,7 +23354,7 @@ async function __runIngredientSetPreferredVendor(ctx: MutationCtx, { docId, pref
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.introducedAt != null))) throw new Error("Guard 0 failed");
@@ -23396,7 +23396,7 @@ async function __runIngredientSetPreferredVendors(ctx: MutationCtx, { docId, pre
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.introducedAt != null))) throw new Error("Guard 0 failed");
@@ -23440,7 +23440,7 @@ async function __runIngredientSetPrimaryImage(ctx: MutationCtx, { docId, storage
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -23490,7 +23490,7 @@ async function __runIngredientUpdateCosting(ctx: MutationCtx, { docId, costPerUn
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -23540,7 +23540,7 @@ async function __runIngredientUpdateDetails(ctx: MutationCtx, { docId, name, uni
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -27182,7 +27182,7 @@ async function __runItemUnitMappingRecord(ctx: MutationCtx, { docId, kind, unit,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ItemUnitMapping not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ItemUnitMapping not found");
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory and managers may read unit mappings");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory and managers may see unit mappings");
     if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory and managers may update unit mappings");
     if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory and managers may change unit mappings");
     if (!((doc.recordedAt == null))) throw new Error("Guard 0 failed");
@@ -27278,7 +27278,7 @@ export const ItemUnitMapping_createViaRecord = mutation({
       toBasis: args.toBasis,
       unit: args.unit
     };
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory and managers may read unit mappings");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory and managers may see unit mappings");
     if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory and managers may update unit mappings");
     if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory and managers may change unit mappings");
     if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
@@ -27319,7 +27319,7 @@ async function __runItemUnitMappingRetire(ctx: MutationCtx, { docId, reason, ver
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ItemUnitMapping not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ItemUnitMapping not found");
-    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory and managers may read unit mappings");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory and managers may see unit mappings");
     if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory and managers may update unit mappings");
     if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory and managers may change unit mappings");
     if (!((doc.recordedAt != null))) throw new Error("Guard 0 failed");
@@ -27844,7 +27844,7 @@ async function __runMenuArchive(ctx: MutationCtx, { docId, reason, version }: an
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Menu not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Menu not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may read menus");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may see menus");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update menus");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change menus");
     if (!(((doc.status === "draft") || (doc.status === "published")))) throw new Error("Guard 0 failed");
@@ -27907,7 +27907,7 @@ async function __runMenuDraft(ctx: MutationCtx, { docId, name, description, cate
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Menu not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Menu not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may read menus");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may see menus");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update menus");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change menus");
     if (!((doc.draftedAt == null))) throw new Error("Guard 0 failed");
@@ -28000,7 +28000,7 @@ export const Menu_createViaDraft = mutation({
       description: args.description,
       name: args.name
     };
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may read menus");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may see menus");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update menus");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change menus");
     if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
@@ -28040,7 +28040,7 @@ async function __runMenuMarkPublished(ctx: MutationCtx, { docId, version }: any,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Menu not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Menu not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may read menus");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may see menus");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update menus");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change menus");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
@@ -28101,7 +28101,7 @@ async function __runMenuRestore(ctx: MutationCtx, { docId, version }: any, __cre
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Menu not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Menu not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may read menus");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may see menus");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update menus");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change menus");
     if (!((doc.status === "archived"))) throw new Error("Guard 0 failed");
@@ -28163,7 +28163,7 @@ async function __runMenuReviseDetails(ctx: MutationCtx, { docId, name, descripti
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Menu not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Menu not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may read menus");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may see menus");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update menus");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change menus");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
@@ -28217,7 +28217,7 @@ async function __runMenuUnpublish(ctx: MutationCtx, { docId, reason, version }: 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Menu not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Menu not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may read menus");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may see menus");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update menus");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change menus");
     if (!((doc.status === "published"))) throw new Error("Guard 0 failed");
@@ -28279,7 +28279,7 @@ async function __runMenuUpdatePricing(ctx: MutationCtx, { docId, basePrice, pric
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Menu not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Menu not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may read menus");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may see menus");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update menus");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change menus");
     if (!(((doc.status === "draft") || (doc.status === "published")))) throw new Error("Guard 0 failed");
@@ -28337,7 +28337,7 @@ async function __runMenuDishAdd(ctx: MutationCtx, { docId, menuId, dishId, sortO
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("MenuDish not found");
     const __rel_menu = await __resolveRelation(ctx, "menus", [__auth.tenantId, doc.menuId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).menu = __rel_menu;
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may read menu dish lines");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may see menu dish lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update menu dish lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change menu dish lines");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
@@ -28426,7 +28426,7 @@ export const MenuDish_createViaAdd = mutation({
       specialInstructions: args.specialInstructions
     };
     const __rel_menu = await __resolveRelation(ctx, "menus", [__auth.tenantId, __draft.menuId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may read menu dish lines");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may see menu dish lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update menu dish lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change menu dish lines");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
@@ -28467,7 +28467,7 @@ async function __runMenuDishRemove(ctx: MutationCtx, { docId, reason, version }:
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("MenuDish not found");
     const __rel_menu = await __resolveRelation(ctx, "menus", [__auth.tenantId, doc.menuId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).menu = __rel_menu;
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may read menu dish lines");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may see menu dish lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update menu dish lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change menu dish lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -28519,7 +28519,7 @@ async function __runMenuDishUpdateDetails(ctx: MutationCtx, { docId, sortOrder, 
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("MenuDish not found");
     const __rel_menu = await __resolveRelation(ctx, "menus", [__auth.tenantId, doc.menuId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).menu = __rel_menu;
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may read menu dish lines");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may see menu dish lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update menu dish lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change menu dish lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -28575,7 +28575,7 @@ async function __runMenuDishUpdateSellingPrice(ctx: MutationCtx, { docId, sellin
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("MenuDish not found");
     const __rel_menu = await __resolveRelation(ctx, "menus", [__auth.tenantId, doc.menuId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).menu = __rel_menu;
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may read menu dish lines");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")))) throw new Error("Kitchen and sales staff may see menu dish lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update menu dish lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change menu dish lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");

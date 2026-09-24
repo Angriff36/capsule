@@ -134,7 +134,83 @@ describe("plain words on culinary manifests", () => {
     expect(visible).toContain("Kitchen staff may update dish recipes");
 
     // later leftovers stay as-is
-    expect(visible).toContain("Kitchen staff may read nested recipe lines");
+    expect(visible).toContain("Portion spec name is required");
+  });
+
+  it("keeps leftover culinary READ copy free of read jargon", () => {
+    const files = [
+      "src/culinary/component.manifest",
+      "src/culinary/component-import.manifest",
+      "src/culinary/dish.manifest",
+      "src/culinary/dish-container.manifest",
+      "src/culinary/event-dish.manifest",
+      "src/culinary/ingredient.manifest",
+      "src/culinary/menu.manifest",
+      "src/culinary/menu-dish.manifest",
+    ];
+    // strip // comments so developer notes are not treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "Kitchen staff may read nested recipe lines",
+      "Kitchen, sales and managers may read dishes",
+      "Kitchen staff may read dish ingredient lines",
+      "Kitchen staff and managers may read dish task templates",
+      "Kitchen staff and managers may read task materials",
+      "Kitchen staff may read dish containers",
+      "Kitchen staff may read ingredients",
+      "Kitchen, inventory and managers may read unit mappings",
+      "Kitchen and sales staff may read menus",
+      "Kitchen and sales staff may read menu dish lines",
+      "Employed staff may read event dishes",
+      "Employed staff may read event dish overrides",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Kitchen staff may see nested recipe lines",
+      "Kitchen, sales and managers may see dishes",
+      "Kitchen staff may see dish ingredient lines",
+      "Kitchen staff and managers may see dish task templates",
+      "Kitchen staff and managers may see task materials",
+      "Kitchen staff may see dish containers",
+      "Kitchen staff may see ingredients",
+      "Kitchen, inventory and managers may see unit mappings",
+      "Kitchen and sales staff may see menus",
+      "Kitchen and sales staff may see menu dish lines",
+      "Employed staff may see event dishes",
+      "Employed staff may see event dish overrides",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    // already-landed write leftovers must stay put
+    expect(visible).toContain("Kitchen staff may update nested recipe lines");
+    expect(visible).toContain("Kitchen staff and managers may update dishes");
+    expect(visible).toContain("Kitchen staff may update dish ingredient lines");
+    expect(visible).toContain("Kitchen staff may update ingredients");
+    expect(visible).toContain(
+      "Kitchen, inventory and managers may update unit mappings",
+    );
+    expect(visible).toContain("Kitchen staff may update menus");
+    expect(visible).toContain(
+      "Managers, sales and kitchen staff may update event dishes",
+    );
+    expect(visible).toContain(
+      "Managers and kitchen staff may update event dish overrides",
+    );
+
+    // already-landed READ leftovers must stay put
+    expect(visible).toContain("Kitchen staff may see recipes");
+    expect(visible).toContain("Kitchen staff may see dish recipes");
+    expect(visible).toContain("Kitchen staff may see portion sizes");
+
+    // leftover constraint stays as-is
     expect(visible).toContain("Portion spec name is required");
   });
 });

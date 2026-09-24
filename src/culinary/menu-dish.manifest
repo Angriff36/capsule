@@ -24,7 +24,7 @@ entity MenuDish mixin TenantScoped, SoftDeletable {
 
   // salesAccess: sales browses the published catalog for proposal menu
   // selection (sales/proposal-dish-selection.manifest).
-  default policy menuDishRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "salesAccess") "Kitchen and sales staff may read menu dish lines"
+  default policy menuDishRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "salesAccess") "Kitchen and sales staff may see menu dish lines"
   default policy menuDishWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update menu dish lines"
   default policy menuDishExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change menu dish lines"
 

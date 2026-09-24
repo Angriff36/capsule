@@ -69,7 +69,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   // reconciliation run under the initiating operator's auth. The shared
   // policy admits those paths; composition commands retain explicit manager
   // checks, and proposal confirmation retains its manager/sales check.
-  default policy eventDishRead read: roleAllows(user.role, "staffAccess") "Employed staff may read event dishes"
+  default policy eventDishRead read: roleAllows(user.role, "staffAccess") "Employed staff may see event dishes"
   // Kitchen catalog edits may request packing refresh; composition commands
   // retain their own manager/sales authority checks below.
   default policy eventDishWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "kitchenAccess") "Managers, sales and kitchen staff may update event dishes"
@@ -483,7 +483,7 @@ entity EventDishLineOverride mixin TenantScoped, SoftDeletable {
   constraint overrideReasonPresent: self.appliedAt == null or length(trim(self.reason)) > 0 "Override reason is required"
   constraint overridePortionsNonnegative: self.portionsAffected >= 0 "Portions affected cannot be negative"
 
-  default policy eventDishLineOverrideRead read: roleAllows(user.role, "staffAccess") "Employed staff may read event dish overrides"
+  default policy eventDishLineOverrideRead read: roleAllows(user.role, "staffAccess") "Employed staff may see event dish overrides"
   default policy eventDishLineOverrideWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "kitchenAccess") "Managers and kitchen staff may update event dish overrides"
   default policy eventDishLineOverrideExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "kitchenAccess") "Managers and kitchen staff may change event dish overrides"
 

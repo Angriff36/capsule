@@ -137,7 +137,7 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["discontinued"]
   transition status from "discontinued" to ["active"]
 
-  default policy ingredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read ingredients"
+  default policy ingredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see ingredients"
   default policy ingredientWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update ingredients"
   default policy ingredientExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change ingredients"
 
@@ -495,7 +495,7 @@ entity ItemUnitMapping mixin TenantScoped, SoftDeletable {
 
   constraint mappingQuantityPositive: self.recordedAt == null or self.equalsQuantity > 0 "Mapping quantity must be positive"
 
-  default policy itemUnitMappingRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Kitchen, inventory and managers may read unit mappings"
+  default policy itemUnitMappingRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Kitchen, inventory and managers may see unit mappings"
   default policy itemUnitMappingWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Kitchen, inventory and managers may update unit mappings"
   default policy itemUnitMappingExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Kitchen, inventory and managers may change unit mappings"
 
