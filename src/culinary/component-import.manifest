@@ -72,7 +72,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
   constraint importBatchPositive: self.parsedBatchMultiplier == null or self.parsedBatchMultiplier > 0 "Parsed batch multiplier must be positive when present"
   constraint importLineCountsNonnegative: self.parsedLineCount >= 0 and self.resolvedLineCount >= 0 "Import line counts cannot be negative"
   constraint importResolvedWithinParsed: self.resolvedLineCount <= self.parsedLineCount "Resolved line count cannot exceed parsed line count"
-  constraint importCompletionRequiresComponent: self.completedAt == null or self.resultingComponentId != null "Completed imports require a resulting component"
+  constraint importCompletionRequiresComponent: self.completedAt == null or self.resultingComponentId != null "Completed imports require a resulting recipe"
 
   transition status from "uploaded" to ["parsed", "failed", "cancelled"]
   transition status from "parsed" to ["reviewing", "failed", "cancelled"]

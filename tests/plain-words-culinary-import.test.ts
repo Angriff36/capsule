@@ -33,10 +33,19 @@ describe("plain words on leftover culinary import constraint copy", () => {
     expect(mutations).not.toContain("Reviewed component name is required");
     expect(mutations).toContain("Parsed recipe name is required");
     expect(mutations).toContain("Reviewed recipe name is required");
-    // Later leftovers keep their current wording.
-    expect(visible).toContain(
+    // The finished-import refusal now says recipe.
+    expect(visible).not.toContain(
       "Completed imports require a resulting component",
     );
+    expect(visible).toContain("Completed imports require a resulting recipe");
+    expectPlain("Completed imports require a resulting recipe");
+    // The generated summary carries the same recipe wording.
+    const summary = readFileSync("manifest-context-summary.json", "utf8");
+    expect(summary).not.toContain(
+      "Completed imports require a resulting component",
+    );
+    expect(summary).toContain("Completed imports require a resulting recipe");
+    // Later leftovers keep their current wording.
     expect(visible).toContain("Parsed line count cannot be negative");
     expect(visible).toContain(
       "Parsed yield quantity must be positive when present",
