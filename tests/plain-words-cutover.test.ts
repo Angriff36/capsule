@@ -269,4 +269,29 @@ describe("plain words on leftover cutover screen", () => {
     // function name stays
     expect(visible).toContain("evaluateProviderReadiness");
   });
+
+  it("keeps leftover never-synced status line in catering English", () => {
+    const source = readFileSync("convex/cutover.ts", "utf8");
+    // strip // comments so developer notes are not treated as user copy
+    const visible = source.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain("never synced on this connection");
+    expect(visible).toContain("connected, nothing synced yet");
+    expectPlain("connected, nothing synced yet");
+
+    // #386 proof phrases stay
+    for (const kept of [
+      "is connected but no sync has completed since it was connected",
+      "is connected but its latest sync failed",
+      "is connected but cannot accept charges",
+    ]) {
+      expect(visible).toContain(kept);
+    }
+
+    // function name stays
+    expect(visible).toContain("evaluateProviderReadiness");
+
+    // already-landed blocker stays
+    expect(visible).toContain("Sync it before you switch.");
+  });
 });

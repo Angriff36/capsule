@@ -261,7 +261,7 @@ async function evaluateProviderReadiness(
         blockers.push(
           `${label} is connected but no sync has completed since it was connected. Sync it before you switch.`,
         );
-        lines.push(`${label}: connected, never synced on this connection`);
+        lines.push(`${label}: connected, nothing synced yet`);
         continue;
       }
       const failed = ledger.lastReconcile.failed ?? 0;
