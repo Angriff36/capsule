@@ -2257,6 +2257,7 @@ export const PackListItemSchema = z.object({
   status: z.enum(["pending", "listed", "packed", "missing"]).default("pending"),
   listedAt: z.coerce.date().nullable().optional(),
   packedAt: z.coerce.date().nullable().optional(),
+  packedByPersonId: z.string().uuid().nullable().optional(),
   missingAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),

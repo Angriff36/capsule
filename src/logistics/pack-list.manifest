@@ -326,6 +326,9 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   property required status: PackListItemStatus = "pending"
   property listedAt: datetime?
   property packedAt: datetime?
+  // Last staff profile that saved a count on this line. Missing when that
+  // account is not linked to a profile. Saving a count is never blocked for that.
+  property packedByPersonId: uuid?
   property missingAt: datetime?
 
   belongsTo packList: PackList fields [tenantId, packListId] references [tenantId, id]
@@ -497,6 +500,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     constraint recordPackedCountShort: packedQuantity < self.requiredQuantity "This is the full amount. Mark the line packed."
     compute previousPacked = self.packedQuantity
     mutate packedQuantity = packedQuantity
+    mutate packedByPersonId = user.personId != null ? user.personId : self.packedByPersonId
     emit PackListItemCountRecorded {
       packListItemId: self.id
       tenantId: self.tenantId
@@ -526,6 +530,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     mutate packedQuantity = packedQuantity
     mutate status = "packed"
     mutate packedAt = now()
+    mutate packedByPersonId = user.personId != null ? user.personId : self.packedByPersonId
     emit PackListItemPacked {
       packListItemId: self.id
       tenantId: self.tenantId

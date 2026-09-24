@@ -16251,7 +16251,7 @@ async function __runEventDishRequestContainerPack(ctx: MutationCtx, { docId, pac
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","packListId","description","dishId","dishContainerId","eventDishId","followsDishServings","containerServings","productionBatchId","note","sentInstead","serviceStyleKitItemId","unitCorrectionSource","associationSource","requiredQuantity","packedQuantity","unit","status","listedAt","packedAt","missingAt","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","packListId","description","dishId","dishContainerId","eventDishId","followsDishServings","containerServings","productionBatchId","note","sentInstead","serviceStyleKitItemId","unitCorrectionSource","associationSource","requiredQuantity","packedQuantity","unit","status","listedAt","packedAt","packedByPersonId","missingAt","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("packListItems", __elseDoc as any);
@@ -30527,7 +30527,7 @@ async function __runPackListApplyServiceStyleKit(ctx: MutationCtx, { docId, serv
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","packListId","description","dishId","dishContainerId","eventDishId","followsDishServings","containerServings","productionBatchId","note","sentInstead","serviceStyleKitItemId","unitCorrectionSource","associationSource","requiredQuantity","packedQuantity","unit","status","listedAt","packedAt","missingAt","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","packListId","description","dishId","dishContainerId","eventDishId","followsDishServings","containerServings","productionBatchId","note","sentInstead","serviceStyleKitItemId","unitCorrectionSource","associationSource","requiredQuantity","packedQuantity","unit","status","listedAt","packedAt","packedByPersonId","missingAt","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("packListItems", __elseDoc as any);
@@ -30901,7 +30901,7 @@ async function __runPackListOpen(ctx: MutationCtx, { docId, eventId, name, purpo
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","packListId","description","dishId","dishContainerId","eventDishId","followsDishServings","containerServings","productionBatchId","note","sentInstead","serviceStyleKitItemId","unitCorrectionSource","associationSource","requiredQuantity","packedQuantity","unit","status","listedAt","packedAt","missingAt","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","packListId","description","dishId","dishContainerId","eventDishId","followsDishServings","containerServings","productionBatchId","note","sentInstead","serviceStyleKitItemId","unitCorrectionSource","associationSource","requiredQuantity","packedQuantity","unit","status","listedAt","packedAt","packedByPersonId","missingAt","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("packListItems", __elseDoc as any);
@@ -31018,7 +31018,7 @@ export const PackList_createViaOpen = mutation({
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","packListId","description","dishId","dishContainerId","eventDishId","followsDishServings","containerServings","productionBatchId","note","sentInstead","serviceStyleKitItemId","unitCorrectionSource","associationSource","requiredQuantity","packedQuantity","unit","status","listedAt","packedAt","missingAt","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","packListId","description","dishId","dishContainerId","eventDishId","followsDishServings","containerServings","productionBatchId","note","sentInstead","serviceStyleKitItemId","unitCorrectionSource","associationSource","requiredQuantity","packedQuantity","unit","status","listedAt","packedAt","packedByPersonId","missingAt","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("packListItems", __elseDoc as any);
@@ -31139,7 +31139,7 @@ async function __runPackListRequestDishContainers(ctx: MutationCtx, { docId, eve
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","packListId","description","dishId","dishContainerId","eventDishId","followsDishServings","containerServings","productionBatchId","note","sentInstead","serviceStyleKitItemId","unitCorrectionSource","associationSource","requiredQuantity","packedQuantity","unit","status","listedAt","packedAt","missingAt","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","packListId","description","dishId","dishContainerId","eventDishId","followsDishServings","containerServings","productionBatchId","note","sentInstead","serviceStyleKitItemId","unitCorrectionSource","associationSource","requiredQuantity","packedQuantity","unit","status","listedAt","packedAt","packedByPersonId","missingAt","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("packListItems", __elseDoc as any);
@@ -32009,6 +32009,7 @@ async function __runPackListItemMarkPacked(ctx: MutationCtx, { docId, packedQuan
       packedQuantity: packedQuantity,
       status: "packed",
       packedAt: Date.now(),
+      packedByPersonId: ((user.personId != null) ? user.personId : doc.packedByPersonId),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -32063,6 +32064,7 @@ async function __runPackListItemRecordPackedCount(ctx: MutationCtx, { docId, pac
     }
     const updates = {
       packedQuantity: packedQuantity,
+      packedByPersonId: ((user.personId != null) ? user.personId : doc.packedByPersonId),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
