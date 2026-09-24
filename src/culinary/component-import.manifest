@@ -384,7 +384,7 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
     guard self.import != null
     constraint stageImportMatch: importId == self.importId "This line is for a different recipe import. Pick the recipe import already on this line."
     constraint stageSourceLinePresent: length(trim(sourceLine)) > 0 "This line has no recipe text. Paste the original line from the recipe."
-    constraint stageOrderNonnegative: sourceOrder >= 0 "Source order cannot be negative"
+    constraint stageOrderNonnegative: sourceOrder >= 0 "This line's place in the recipe can't be negative. Use zero or more."
     mutate importId = importId
     mutate sourceOrder = sourceOrder
     mutate sourceLine = sourceLine

@@ -44,7 +44,9 @@ describe("plain words on leftover culinary import constraint copy", () => {
     expect(visible).toContain(
       "This line has no recipe text. Paste the original line from the recipe.",
     );
-    expect(visible).toContain("Source order cannot be negative");
+    expect(visible).toContain(
+      "This line's place in the recipe can't be negative. Use zero or more.",
+    );
     // Already-landed copy stays.
     expect(visible).toContain("Paste recipe text before parsing.");
   });

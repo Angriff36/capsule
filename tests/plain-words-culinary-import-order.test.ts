@@ -12,43 +12,44 @@ function expectPlain(text: string) {
 }
 
 describe("plain words on leftover culinary import constraint copy", () => {
-  it("keeps leftover culinary import source-fingerprint copy free of fingerprint jargon", () => {
+  it("keeps leftover culinary import source-order copy free of source-order jargon", () => {
     const manifest = readFileSync(
       "src/culinary/component-import.manifest",
       "utf8",
     );
     // Strip // comments the same way the culinary leftover tests do.
     const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
-    // The old source-fingerprint refusal is gone.
-    expect(visible).not.toContain("Source fingerprint is required");
+    // The old source-order refusal is gone.
+    expect(visible).not.toContain("Source order cannot be negative");
     // The refusal now speaks in plain catering words.
     expect(visible).toContain(
-      "This recipe isn't identified. Paste the recipe text first.",
+      "This line's place in the recipe can't be negative. Use zero or more.",
     );
-    expectPlain("This recipe isn't identified. Paste the recipe text first.");
+    expectPlain(
+      "This line's place in the recipe can't be negative. Use zero or more.",
+    );
     // The generated mutation file carries the same plain wording, at both
-    // upload sites.
+    // stage sites.
     const mutations = readFileSync("convex/mutations.ts", "utf8");
-    expect(mutations).not.toContain("Source fingerprint is required");
+    expect(mutations).not.toContain("Source order cannot be negative");
     expect(mutations).toContain(
-      "This recipe isn't identified. Paste the recipe text first.",
+      "This line's place in the recipe can't be negative. Use zero or more.",
     );
     expect(
       mutations.split(
-        "This recipe isn't identified. Paste the recipe text first.",
+        "This line's place in the recipe can't be negative. Use zero or more.",
       ).length - 1,
     ).toBe(2);
     // Later leftovers keep their current wording.
     expect(visible).toContain(
-      "This line has no recipe text. Paste the original line from the recipe.",
-    );
-    expect(visible).toContain(
-      "This line's place in the recipe can't be negative. Use zero or more.",
+      "Confirmed new lines link their created ingredient only after resolution",
     );
     // Already-landed copy stays.
     expect(visible).toContain(
-      "This recipe's size can't be negative. Use zero or more.",
+      "This line has no recipe text. Paste the original line from the recipe.",
     );
-    expect(visible).toContain("Paste recipe text before parsing.");
+    expect(visible).toContain(
+      "This recipe isn't identified. Paste the recipe text first.",
+    );
   });
 });
