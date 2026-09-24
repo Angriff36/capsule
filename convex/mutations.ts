@@ -7238,7 +7238,7 @@ async function __runCreditMemoIssue(ctx: MutationCtx, { docId, sourceInvoiceId, 
     ((doc as any) as any).sourceInvoice = __rel_sourceInvoice;
     ((doc as any) as any).client = __rel_client;
     ((doc as any) as any).targetInvoice = __rel_targetInvoice;
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read credit memos");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see credit memos");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update credit memos");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change credit memos");
     if (!((doc.issuedAt == null))) throw new Error("Guard 0 failed");
@@ -7374,7 +7374,7 @@ export const CreditMemo_createViaIssue = mutation({
     const __rel_sourceInvoice = await __resolveRelation(ctx, "invoices", [__auth.tenantId, __draft.sourceInvoiceId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, __draft.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_targetInvoice = await __resolveRelation(ctx, "invoices", [__auth.tenantId, __draft.targetInvoiceId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read credit memos");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see credit memos");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update credit memos");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change credit memos");
     if (!((__draft.issuedAt == null))) throw new Error("Guard 0 failed");
@@ -7446,7 +7446,7 @@ async function __runCreditMemoReassignClient(ctx: MutationCtx, { docId, version 
     const __rel_mergeTargetClient = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.mergeTargetClientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).clientMergeAuthorization = __rel_clientMergeAuthorization;
     ((doc as any) as any).mergeTargetClient = __rel_mergeTargetClient;
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read credit memos");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see credit memos");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update credit memos");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change credit memos");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -7501,7 +7501,7 @@ async function __runCreditMemoStageClientMerge(ctx: MutationCtx, { docId, client
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("CreditMemo not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("CreditMemo not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read credit memos");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see credit memos");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update credit memos");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change credit memos");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -32351,7 +32351,7 @@ async function __runPaymentBeginProcessing(ctx: MutationCtx, { docId, version }:
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Payment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Payment not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payments");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payments");
     if (!((doc.status === "pending"))) throw new Error("Guard 0 failed");
@@ -32410,7 +32410,7 @@ async function __runPaymentDisputeReconciliation(ctx: MutationCtx, { docId, reas
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Payment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Payment not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payments");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payments");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -32459,7 +32459,7 @@ async function __runPaymentFail(ctx: MutationCtx, { docId, reason, version }: an
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Payment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Payment not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payments");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payments");
     if (!(((doc.status === "pending") || (doc.status === "processing")))) throw new Error("Guard 0 failed");
@@ -32522,7 +32522,7 @@ async function __runPaymentMarkMatched(ctx: MutationCtx, { docId, source, extern
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Payment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Payment not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payments");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payments");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -32581,7 +32581,7 @@ async function __runPaymentReassignClient(ctx: MutationCtx, { docId, version }: 
     const __rel_mergeTargetClient = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.mergeTargetClientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).clientMergeAuthorization = __rel_clientMergeAuthorization;
     ((doc as any) as any).mergeTargetClient = __rel_mergeTargetClient;
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payments");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payments");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -32640,7 +32640,7 @@ async function __runPaymentRecord(ctx: MutationCtx, { docId, invoiceId, clientId
     const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).invoice = __rel_invoice;
     ((doc as any) as any).client = __rel_client;
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payments");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payments");
     if (!((doc.recordedAt == null))) throw new Error("Guard 0 failed");
@@ -32735,7 +32735,7 @@ export const Payment_createViaRecord = mutation({
     };
     const __rel_invoice = await __resolveRelation(ctx, "invoices", [__auth.tenantId, __draft.invoiceId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, __draft.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payments");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payments");
     if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
@@ -32777,7 +32777,7 @@ async function __runPaymentRefund(ctx: MutationCtx, { docId, reason, version }: 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Payment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Payment not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payments");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payments");
     if (!((doc.status === "completed"))) throw new Error("Guard 0 failed");
@@ -32839,7 +32839,7 @@ async function __runPaymentSettle(ctx: MutationCtx, { docId, version }: any, __c
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Payment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Payment not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payments");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payments");
     if (!(((doc.status === "pending") || (doc.status === "processing")))) throw new Error("Guard 0 failed");
@@ -32902,7 +32902,7 @@ async function __runPaymentStageClientMerge(ctx: MutationCtx, { docId, clientMer
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Payment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Payment not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payments");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payments");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -32955,7 +32955,7 @@ async function __runPaymentUpdateProviderTransactionIds(ctx: MutationCtx, { docI
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Payment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Payment not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payments");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payments");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -33002,7 +33002,7 @@ async function __runPaymentVerifyReconciliation(ctx: MutationCtx, { docId, notes
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Payment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Payment not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payments");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payments");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payments");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -33053,7 +33053,7 @@ async function __runPaymentMethodClearDefault(ctx: MutationCtx, { docId, version
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PaymentMethod not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PaymentMethod not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payment methods");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payment methods");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -33100,7 +33100,7 @@ async function __runPaymentMethodExpire(ctx: MutationCtx, { docId, version }: an
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PaymentMethod not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PaymentMethod not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payment methods");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payment methods");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -33159,7 +33159,7 @@ async function __runPaymentMethodInvalidate(ctx: MutationCtx, { docId, reason, v
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PaymentMethod not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PaymentMethod not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payment methods");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payment methods");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -33221,7 +33221,7 @@ async function __runPaymentMethodMakeDefault(ctx: MutationCtx, { docId, version 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PaymentMethod not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PaymentMethod not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payment methods");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payment methods");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -33268,7 +33268,7 @@ async function __runPaymentMethodReactivate(ctx: MutationCtx, { docId, version }
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PaymentMethod not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PaymentMethod not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payment methods");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payment methods");
     if (!((doc.status === "expired"))) throw new Error("Guard 0 failed");
@@ -33331,7 +33331,7 @@ async function __runPaymentMethodReassignClient(ctx: MutationCtx, { docId, versi
     const __rel_mergeTargetClient = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.mergeTargetClientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).clientMergeAuthorization = __rel_clientMergeAuthorization;
     ((doc as any) as any).mergeTargetClient = __rel_mergeTargetClient;
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payment methods");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payment methods");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -33388,7 +33388,7 @@ async function __runPaymentMethodRegister(ctx: MutationCtx, { docId, clientId, m
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PaymentMethod not found");
     const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).client = __rel_client;
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payment methods");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payment methods");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -33475,7 +33475,7 @@ export const PaymentMethod_createViaRegister = mutation({
       provider: args.provider
     };
     const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, __draft.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payment methods");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payment methods");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -33514,7 +33514,7 @@ async function __runPaymentMethodRemove(ctx: MutationCtx, { docId, version }: an
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PaymentMethod not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PaymentMethod not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payment methods");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payment methods");
     if (!((((doc.status === "active") || (doc.status === "expired")) || (doc.status === "invalid")))) throw new Error("Guard 0 failed");
@@ -33574,7 +33574,7 @@ async function __runPaymentMethodStageClientMerge(ctx: MutationCtx, { docId, cli
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PaymentMethod not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PaymentMethod not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read payment methods");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update payment methods");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payment methods");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -47845,7 +47845,7 @@ async function __runTaxRateDefine(ctx: MutationCtx, { docId, name, percentage, a
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("TaxRate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("TaxRate not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read tax rates");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see tax rates");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may maintain tax rates");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change tax rates");
     if (!((doc.configuredAt == null))) throw new Error("Guard 0 failed");
@@ -47926,7 +47926,7 @@ export const TaxRate_createViaDefine = mutation({
       name: args.name,
       percentage: args.percentage
     };
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read tax rates");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see tax rates");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may maintain tax rates");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change tax rates");
     if (!((__draft.configuredAt == null))) throw new Error("Guard 0 failed");
@@ -47964,7 +47964,7 @@ async function __runTaxRateRevise(ctx: MutationCtx, { docId, name, percentage, a
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("TaxRate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("TaxRate not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read tax rates");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see tax rates");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may maintain tax rates");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change tax rates");
     if (!((doc.configuredAt != null))) throw new Error("Guard 0 failed");
@@ -48022,7 +48022,7 @@ async function __runTaxRateSetActive(ctx: MutationCtx, { docId, active, version 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("TaxRate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("TaxRate not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read tax rates");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see tax rates");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may maintain tax rates");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change tax rates");
     if (!((doc.configuredAt != null))) throw new Error("Guard 0 failed");

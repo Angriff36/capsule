@@ -278,4 +278,47 @@ describe("plain words on sales screens", () => {
     expect(visible).toContain("Staff may add client notes");
     expect(visible).toContain("Staff may change client notes");
   });
+
+  it("keeps leftover sales finance READ copy free of read jargon", () => {
+    const files = [
+      "src/sales/payment.manifest",
+      "src/sales/payment-method.manifest",
+      "src/sales/tax-rate.manifest",
+      "src/sales/credit-memo.manifest",
+    ];
+    // strip // comments so developer notes are not treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "Finance staff may read payments",
+      "Finance staff may read payment methods",
+      "Finance staff may read tax rates",
+      "Finance staff may read credit memos",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Finance staff may see payments",
+      "Finance staff may see payment methods",
+      "Finance staff may see tax rates",
+      "Finance staff may see credit memos",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    // already-landed write leftovers must stay put
+    expect(visible).toContain("Finance staff may update payments");
+    expect(visible).toContain("Finance staff may change payments");
+    expect(visible).toContain("Finance staff may update payment methods");
+    expect(visible).toContain("Finance staff may change payment methods");
+    expect(visible).toContain("Finance staff may maintain tax rates");
+    expect(visible).toContain("Finance staff may change tax rates");
+    expect(visible).toContain("Finance staff may update credit memos");
+    expect(visible).toContain("Finance staff may change credit memos");
+  });
 });
