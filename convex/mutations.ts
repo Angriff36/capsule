@@ -48305,7 +48305,7 @@ async function __runTimeOffRequestSubmit(ctx: MutationCtx, { docId, personId, st
     if (!((user.id != null))) throw new Error("Guard 3 failed");
     if (!((((__rel_person != null) && (__rel_person.status === "active")) && (__rel_person.deletedAt == null)))) throw new Error("Guard 4 failed");
     if (!((((__rel_person.authSubjectId != null) && (__rel_person.authSubjectId === user.id)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 5 failed");
-    if (!((personId === doc.personId))) throw new Error("Time-off person must match the seeded staff profile");
+    if (!((personId === doc.personId))) throw new Error("This time-off request is for a different person. Pick the person already on this time-off request.");
     if (!((endsAt > startsAt))) throw new Error("Time-off end must be after its start");
     if (!((((reason).trim()).length > 0))) throw new Error("Tell your manager why you need the time off");
     if (version !== undefined && (doc as any).version !== version) {
@@ -48389,7 +48389,7 @@ export const TimeOffRequest_createViaSubmit = mutation({
     if (!((user.id != null))) throw new Error("Guard 3 failed");
     if (!((((__rel_person != null) && (__rel_person.status === "active")) && (__rel_person.deletedAt == null)))) throw new Error("Guard 4 failed");
     if (!((((__rel_person.authSubjectId != null) && (__rel_person.authSubjectId === user.id)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 5 failed");
-    if (!((personId === __draft.personId))) throw new Error("Time-off person must match the seeded staff profile");
+    if (!((personId === __draft.personId))) throw new Error("This time-off request is for a different person. Pick the person already on this time-off request.");
     if (!((endsAt > startsAt))) throw new Error("Time-off end must be after its start");
     if (!((((reason).trim()).length > 0))) throw new Error("Tell your manager why you need the time off");
     const doc: Record<string, any> = {

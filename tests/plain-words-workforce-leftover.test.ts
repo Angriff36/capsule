@@ -66,4 +66,29 @@ describe("plain words on leftover workforce schedule-notice and swap recipient c
       "Workforce staff or the linked person may see schedule notices",
     );
   });
+
+  it("keeps leftover time-off person match copy free of seeded-profile jargon", () => {
+    const visible = visibleCopy("src/workforce/availability.manifest");
+    // Old seeded-profile wording is gone from the manifest.
+    expect(visible).not.toContain(
+      "Time-off person must match the seeded staff profile",
+    );
+    // The refusal now says time-off request.
+    const timeOff =
+      "This time-off request is for a different person. Pick the person already on this time-off request.";
+    expect(visible).toContain(timeOff);
+    expectPlain(timeOff);
+    // The generated mutation file carries the same wording.
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    expect(mutations).not.toContain(
+      "Time-off person must match the seeded staff profile",
+    );
+    expect(mutations).toContain(timeOff);
+    // Already-landed leftover on the same file stays.
+    expect(visible).toContain(
+      "This availability is for a different person. Pick the person already on this availability.",
+    );
+    // Later leftovers keep their current wording.
+    expect(visible).toContain("Time-off end must be after its start");
+  });
 });

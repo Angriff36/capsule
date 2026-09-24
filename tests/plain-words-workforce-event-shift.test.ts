@@ -70,7 +70,7 @@ describe("plain words on leftover workforce and payroll event/shift match copy",
     );
     // The time-off person leftover keeps its wording, pinned from the generated file.
     expect(mutations).toContain(
-      "Time-off person must match the seeded staff profile",
+      "This time-off request is for a different person. Pick the person already on this time-off request.",
     );
     // Already-landed person match copy stays.
     expect(visible).toContain(
@@ -228,7 +228,7 @@ describe("plain words on leftover workforce and payroll event/shift match copy",
     );
     // Later leftovers keep their current wording.
     expect(mutations).toContain(
-      "Time-off person must match the seeded staff profile",
+      "This time-off request is for a different person. Pick the person already on this time-off request.",
     );
     expect(mutations).toContain(
       "Add item packListId must match the seeded pack list reference",
