@@ -44783,9 +44783,9 @@ async function __runShiftSwapRequestApprove(ctx: MutationCtx, { docId, reviewNot
     if (!(((doc.targetQualificationId == null) || (__rel_targetQualification.personId === doc.recipientPersonId)))) throw new Error("This certification is for a different person. Pick a certification that belongs to this person.");
     if (!(((doc.sourceQualificationId == null) || ((__rel_targetQualification.name === __rel_sourceQualification.name) && (__rel_targetQualification.certificationType === __rel_sourceQualification.certificationType))))) throw new Error("This person's certification doesn't match what the shift needs. Pick someone with the same certification.");
     if (!((((doc.targetQualificationId == null) || (__rel_targetQualification.expiresAt == null)) || (__rel_targetQualification.expiresAt >= __rel_shift.endsAt)))) throw new Error("This person's certification expires before the shift ends. Pick someone whose certification lasts through the shift.");
-    if (!((((doc.shiftTypeId == null) || (__rel_shiftType.requiredTrainingModuleId == null)) || (doc.targetTrainingCompletionId != null)))) throw new Error("The recipient needs the training required by this shift type");
-    if (!(((doc.targetTrainingCompletionId == null) || (__rel_targetTrainingCompletion.personId === doc.recipientPersonId)))) throw new Error("Training completion must belong to the recipient");
-    if (!(((doc.targetTrainingCompletionId == null) || (__rel_targetTrainingCompletion.trainingModuleId === __rel_shiftType.requiredTrainingModuleId)))) throw new Error("Recipient training must match the shift type requirement");
+    if (!((((doc.shiftTypeId == null) || (__rel_shiftType.requiredTrainingModuleId == null)) || (doc.targetTrainingCompletionId != null)))) throw new Error("This person needs the training this shift type requires. Pick someone who already has it.");
+    if (!(((doc.targetTrainingCompletionId == null) || (__rel_targetTrainingCompletion.personId === doc.recipientPersonId)))) throw new Error("This training is for a different person. Pick a training that belongs to this person.");
+    if (!(((doc.targetTrainingCompletionId == null) || (__rel_targetTrainingCompletion.trainingModuleId === __rel_shiftType.requiredTrainingModuleId)))) throw new Error("This person's training doesn't match what the shift type needs. Pick someone with the same training.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -44964,9 +44964,9 @@ async function __runShiftSwapRequestPropose(ctx: MutationCtx, { docId, shiftId, 
     if (!(((targetQualificationId == null) || (__rel_targetQualification.personId === recipientPersonId)))) throw new Error("This certification is for a different person. Pick a certification that belongs to this person.");
     if (!(((sourceQualificationId == null) || ((__rel_targetQualification.name === __rel_sourceQualification.name) && (__rel_targetQualification.certificationType === __rel_sourceQualification.certificationType))))) throw new Error("This person's certification doesn't match what the shift needs. Pick someone with the same certification.");
     if (!((((targetQualificationId == null) || (__rel_targetQualification.expiresAt == null)) || (__rel_targetQualification.expiresAt >= __rel_shift.endsAt)))) throw new Error("This person's certification expires before the shift ends. Pick someone whose certification lasts through the shift.");
-    if (!((((shiftTypeId == null) || (__rel_shiftType.requiredTrainingModuleId == null)) || (targetTrainingCompletionId != null)))) throw new Error("The recipient needs the training required by this shift type");
-    if (!(((targetTrainingCompletionId == null) || (__rel_targetTrainingCompletion.personId === recipientPersonId)))) throw new Error("Training completion must belong to the recipient");
-    if (!(((targetTrainingCompletionId == null) || (__rel_targetTrainingCompletion.trainingModuleId === __rel_shiftType.requiredTrainingModuleId)))) throw new Error("Recipient training must match the shift type requirement");
+    if (!((((shiftTypeId == null) || (__rel_shiftType.requiredTrainingModuleId == null)) || (targetTrainingCompletionId != null)))) throw new Error("This person needs the training this shift type requires. Pick someone who already has it.");
+    if (!(((targetTrainingCompletionId == null) || (__rel_targetTrainingCompletion.personId === recipientPersonId)))) throw new Error("This training is for a different person. Pick a training that belongs to this person.");
+    if (!(((targetTrainingCompletionId == null) || (__rel_targetTrainingCompletion.trainingModuleId === __rel_shiftType.requiredTrainingModuleId)))) throw new Error("This person's training doesn't match what the shift type needs. Pick someone with the same training.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -45088,9 +45088,9 @@ export const ShiftSwapRequest_createViaPropose = mutation({
     if (!(((targetQualificationId == null) || (__rel_targetQualification.personId === recipientPersonId)))) throw new Error("This certification is for a different person. Pick a certification that belongs to this person.");
     if (!(((sourceQualificationId == null) || ((__rel_targetQualification.name === __rel_sourceQualification.name) && (__rel_targetQualification.certificationType === __rel_sourceQualification.certificationType))))) throw new Error("This person's certification doesn't match what the shift needs. Pick someone with the same certification.");
     if (!((((targetQualificationId == null) || (__rel_targetQualification.expiresAt == null)) || (__rel_targetQualification.expiresAt >= __rel_shift.endsAt)))) throw new Error("This person's certification expires before the shift ends. Pick someone whose certification lasts through the shift.");
-    if (!((((shiftTypeId == null) || (__rel_shiftType.requiredTrainingModuleId == null)) || (targetTrainingCompletionId != null)))) throw new Error("The recipient needs the training required by this shift type");
-    if (!(((targetTrainingCompletionId == null) || (__rel_targetTrainingCompletion.personId === recipientPersonId)))) throw new Error("Training completion must belong to the recipient");
-    if (!(((targetTrainingCompletionId == null) || (__rel_targetTrainingCompletion.trainingModuleId === __rel_shiftType.requiredTrainingModuleId)))) throw new Error("Recipient training must match the shift type requirement");
+    if (!((((shiftTypeId == null) || (__rel_shiftType.requiredTrainingModuleId == null)) || (targetTrainingCompletionId != null)))) throw new Error("This person needs the training this shift type requires. Pick someone who already has it.");
+    if (!(((targetTrainingCompletionId == null) || (__rel_targetTrainingCompletion.personId === recipientPersonId)))) throw new Error("This training is for a different person. Pick a training that belongs to this person.");
+    if (!(((targetTrainingCompletionId == null) || (__rel_targetTrainingCompletion.trainingModuleId === __rel_shiftType.requiredTrainingModuleId)))) throw new Error("This person's training doesn't match what the shift type needs. Pick someone with the same training.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,

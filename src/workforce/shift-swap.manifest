@@ -87,9 +87,9 @@ entity ShiftSwapRequest mixin TenantScoped, SoftDeletable {
     constraint proposeTargetQualificationOwner: targetQualificationId == null or self.targetQualification.personId == recipientPersonId "This certification is for a different person. Pick a certification that belongs to this person."
     constraint proposeTargetQualificationName: sourceQualificationId == null or (self.targetQualification.name == self.sourceQualification.name and self.targetQualification.certificationType == self.sourceQualification.certificationType) "This person's certification doesn't match what the shift needs. Pick someone with the same certification."
     constraint proposeTargetQualificationValidity: targetQualificationId == null or self.targetQualification.expiresAt == null or self.targetQualification.expiresAt >= self.shift.endsAt "This person's certification expires before the shift ends. Pick someone whose certification lasts through the shift."
-    constraint proposeTrainingRequired: shiftTypeId == null or self.shiftType.requiredTrainingModuleId == null or targetTrainingCompletionId != null "The recipient needs the training required by this shift type"
-    constraint proposeTrainingOwner: targetTrainingCompletionId == null or self.targetTrainingCompletion.personId == recipientPersonId "Training completion must belong to the recipient"
-    constraint proposeTrainingModule: targetTrainingCompletionId == null or self.targetTrainingCompletion.trainingModuleId == self.shiftType.requiredTrainingModuleId "Recipient training must match the shift type requirement"
+    constraint proposeTrainingRequired: shiftTypeId == null or self.shiftType.requiredTrainingModuleId == null or targetTrainingCompletionId != null "This person needs the training this shift type requires. Pick someone who already has it."
+    constraint proposeTrainingOwner: targetTrainingCompletionId == null or self.targetTrainingCompletion.personId == recipientPersonId "This training is for a different person. Pick a training that belongs to this person."
+    constraint proposeTrainingModule: targetTrainingCompletionId == null or self.targetTrainingCompletion.trainingModuleId == self.shiftType.requiredTrainingModuleId "This person's training doesn't match what the shift type needs. Pick someone with the same training."
     mutate shiftId = shiftId
     mutate requesterPersonId = requesterPersonId
     mutate recipientPersonId = recipientPersonId
@@ -188,9 +188,9 @@ entity ShiftSwapRequest mixin TenantScoped, SoftDeletable {
     constraint approveTargetQualificationOwner: self.targetQualificationId == null or self.targetQualification.personId == self.recipientPersonId "This certification is for a different person. Pick a certification that belongs to this person."
     constraint approveTargetQualificationName: self.sourceQualificationId == null or (self.targetQualification.name == self.sourceQualification.name and self.targetQualification.certificationType == self.sourceQualification.certificationType) "This person's certification doesn't match what the shift needs. Pick someone with the same certification."
     constraint approveTargetQualificationValidity: self.targetQualificationId == null or self.targetQualification.expiresAt == null or self.targetQualification.expiresAt >= self.shift.endsAt "This person's certification expires before the shift ends. Pick someone whose certification lasts through the shift."
-    constraint approveTrainingRequired: self.shiftTypeId == null or self.shiftType.requiredTrainingModuleId == null or self.targetTrainingCompletionId != null "The recipient needs the training required by this shift type"
-    constraint approveTrainingOwner: self.targetTrainingCompletionId == null or self.targetTrainingCompletion.personId == self.recipientPersonId "Training completion must belong to the recipient"
-    constraint approveTrainingModule: self.targetTrainingCompletionId == null or self.targetTrainingCompletion.trainingModuleId == self.shiftType.requiredTrainingModuleId "Recipient training must match the shift type requirement"
+    constraint approveTrainingRequired: self.shiftTypeId == null or self.shiftType.requiredTrainingModuleId == null or self.targetTrainingCompletionId != null "This person needs the training this shift type requires. Pick someone who already has it."
+    constraint approveTrainingOwner: self.targetTrainingCompletionId == null or self.targetTrainingCompletion.personId == self.recipientPersonId "This training is for a different person. Pick a training that belongs to this person."
+    constraint approveTrainingModule: self.targetTrainingCompletionId == null or self.targetTrainingCompletion.trainingModuleId == self.shiftType.requiredTrainingModuleId "This person's training doesn't match what the shift type needs. Pick someone with the same training."
     compute previousStatus = self.status
     mutate status = "approved"
     mutate managerApprovedAt = now()

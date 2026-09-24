@@ -132,13 +132,15 @@ describe("plain words on leftover workforce and payroll event/shift match copy",
     expect(visible).toContain(
       "The shift certification requirement changed after this request was proposed",
     );
-    // Later leftovers keep their current wording.
-    expect(visible).toContain(
-      "The recipient needs the training required by this shift type",
-    );
-    expect(visible).toContain(
-      "Recipient training must match the shift type requirement",
-    );
+    // The training refusals are already in plain words.
+    for (const fresh of [
+      "This person needs the training this shift type requires. Pick someone who already has it.",
+      "This training is for a different person. Pick a training that belongs to this person.",
+      "This person's training doesn't match what the shift type needs. Pick someone with the same training.",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
   });
 
   it("keeps leftover shift-swap replacement-certification copy free of recipient jargon", () => {
@@ -168,15 +170,72 @@ describe("plain words on leftover workforce and payroll event/shift match copy",
     expect(visible).toContain(
       "This swap is for a different person. Pick the person already on this swap.",
     );
-    // Later leftovers keep their current wording.
-    expect(visible).toContain(
+    // The training refusals are already in plain words.
+    for (const fresh of [
+      "This person needs the training this shift type requires. Pick someone who already has it.",
+      "This training is for a different person. Pick a training that belongs to this person.",
+      "This person's training doesn't match what the shift type needs. Pick someone with the same training.",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+  });
+
+  it("keeps leftover shift-swap training copy free of recipient jargon", () => {
+    const visible = visibleCopy("src/workforce/shift-swap.manifest");
+    // Old recipient wording is gone from the three training refusals.
+    for (const old of [
       "The recipient needs the training required by this shift type",
-    );
-    expect(visible).toContain(
       "Training completion must belong to the recipient",
+      "Recipient training must match the shift type requirement",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+    // The refusals now say what is wrong and what to pick next.
+    for (const fresh of [
+      "This person needs the training this shift type requires. Pick someone who already has it.",
+      "This training is for a different person. Pick a training that belongs to this person.",
+      "This person's training doesn't match what the shift type needs. Pick someone with the same training.",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+    // The generated mutation file carries the same wording.
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    for (const old of [
+      "The recipient needs the training required by this shift type",
+      "Training completion must belong to the recipient",
+      "Recipient training must match the shift type requirement",
+    ]) {
+      expect(mutations).not.toContain(old);
+    }
+    for (const fresh of [
+      "This person needs the training this shift type requires. Pick someone who already has it.",
+      "This training is for a different person. Pick a training that belongs to this person.",
+      "This person's training doesn't match what the shift type needs. Pick someone with the same training.",
+    ]) {
+      expect(mutations).toContain(fresh);
+    }
+    // Already-landed copy stays.
+    expect(visible).toContain(
+      "This certification is for a different person. Pick a certification that belongs to this person.",
     );
     expect(visible).toContain(
-      "Recipient training must match the shift type requirement",
+      "This person needs a current matching certification for the shift. Pick someone who already has it.",
+    );
+    expect(visible).toContain(
+      "This swap is for a different person. Pick the person already on this swap.",
+    );
+    // Later leftovers keep their current wording.
+    expect(mutations).toContain(
+      "Time-off person must match the seeded staff profile",
+    );
+    expect(mutations).toContain("Parsed line count cannot be negative");
+    expect(mutations).toContain(
+      "Parsed yield quantity must be positive when present",
+    );
+    expect(mutations).toContain(
+      "Add item packListId must match the seeded pack list reference",
     );
   });
 });
