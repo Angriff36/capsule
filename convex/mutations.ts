@@ -5637,7 +5637,7 @@ async function __runComponentIngredientAdd(ctx: MutationCtx, { docId, componentI
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe ingredient lines");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((quantity > 0))) throw new Error("Component ingredient quantity must be positive");
+    if (!((quantity > 0))) throw new Error("Recipe ingredient quantity must be positive");
     if (!(((wasteFactor == null) || (wasteFactor > 0)))) throw new Error("Waste factor must be greater than 0");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -5730,7 +5730,7 @@ export const ComponentIngredient_createViaAdd = mutation({
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe ingredient lines");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((quantity > 0))) throw new Error("Component ingredient quantity must be positive");
+    if (!((quantity > 0))) throw new Error("Recipe ingredient quantity must be positive");
     if (!(((wasteFactor == null) || (wasteFactor > 0)))) throw new Error("Waste factor must be greater than 0");
     const doc: Record<string, any> = {
       ...__draft,
@@ -5774,7 +5774,7 @@ async function __runComponentIngredientAdjustQuantity(ctx: MutationCtx, { docId,
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe ingredient lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((quantity > 0))) throw new Error("Component ingredient quantity must be positive");
+    if (!((quantity > 0))) throw new Error("Recipe ingredient quantity must be positive");
     const previousQuantity = doc.quantity;
     const previousUnit = doc.unit;
     if (version !== undefined && (doc as any).version !== version) {
