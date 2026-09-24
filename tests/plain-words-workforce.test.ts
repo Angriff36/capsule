@@ -347,16 +347,16 @@ describe("plain words on workforce manifests", () => {
       "This schedule notice is for a different person. Pick the person already on this schedule notice.",
     );
     expect(visible).toContain(
-      "Assign eventId must match the seeded event reference",
+      "This assignment is for a different event. Pick the event already on this assignment.",
     );
     expect(visible).toContain(
-      "Schedule eventId must match the seeded event reference when provided",
+      "This shift is for a different event. Pick the event already on this shift.",
     );
     expect(visible).toContain(
-      "Prepare eventId must match the seeded event reference when both are set",
+      "This payroll input is for a different event. Pick the event already on this payroll input.",
     );
     expect(visible).toContain(
-      "Prepare shiftId must match the seeded shift reference when both are set",
+      "This payroll input is for a different shift. Pick the shift already on this payroll input.",
     );
   });
 });

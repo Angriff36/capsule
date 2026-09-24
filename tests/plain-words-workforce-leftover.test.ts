@@ -49,10 +49,10 @@ describe("plain words on leftover workforce schedule-notice and swap recipient c
     expect(mutations).toContain(swap);
     // Later leftovers keep their current wording.
     expect(visible).toContain(
-      "Swap shift must match the seeded shift reference",
+      "This swap is for a different shift. Pick the shift already on this swap.",
     );
     expect(visible).toContain(
-      "Schedule eventId must match the seeded event reference when provided",
+      "This shift is for a different event. Pick the event already on this shift.",
     );
     expect(visible).toContain(
       "Only the assigned staff member may propose this swap",

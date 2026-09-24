@@ -76,7 +76,7 @@ entity ShiftSwapRequest mixin TenantScoped, SoftDeletable {
     guard sourceQualificationId == null or (self.sourceQualification != null and self.sourceQualification.deletedAt == null and self.sourceQualification.status == "active")
     guard targetQualificationId == null or (self.targetQualification != null and self.targetQualification.deletedAt == null and self.targetQualification.status == "active")
     guard targetTrainingCompletionId == null or (self.targetTrainingCompletion != null and self.targetTrainingCompletion.deletedAt == null and self.targetTrainingCompletion.recordedAt != null)
-    constraint proposeShiftMatch: shiftId == self.shiftId "Swap shift must match the seeded shift reference"
+    constraint proposeShiftMatch: shiftId == self.shiftId "This swap is for a different shift. Pick the shift already on this swap."
     constraint proposeRequesterMatch: requesterPersonId == self.requesterPersonId and self.shift.personId == requesterPersonId "Only the assigned staff member may propose this swap"
     constraint proposeRecipientMatch: recipientPersonId == self.recipientPersonId "This swap is for a different person. Pick the person already on this swap."
     constraint proposeDifferentPeople: requesterPersonId != recipientPersonId "Choose another staff member for the swap"

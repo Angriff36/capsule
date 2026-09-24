@@ -14575,7 +14575,7 @@ async function __runEventAssignmentAssign(ctx: MutationCtx, { docId, eventId, pe
     if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 4 failed");
     if (!((checkRole(user, "workforceManageAccess") || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 5 failed");
-    if (!((eventId === doc.eventId))) throw new Error("Assign eventId must match the seeded event reference");
+    if (!((eventId === doc.eventId))) throw new Error("This assignment is for a different event. Pick the event already on this assignment.");
     if (!((personId === doc.personId))) throw new Error("This assignment is for a different person. Pick the person already on this assignment.");
     if (!((((role).trim()).length > 0))) throw new Error("Assignment role is required");
     if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("Assignment shift end must be after its start");
@@ -14669,7 +14669,7 @@ export const EventAssignment_createViaAssign = mutation({
     if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 4 failed");
     if (!((checkRole(user, "workforceManageAccess") || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 5 failed");
-    if (!((eventId === __draft.eventId))) throw new Error("Assign eventId must match the seeded event reference");
+    if (!((eventId === __draft.eventId))) throw new Error("This assignment is for a different event. Pick the event already on this assignment.");
     if (!((personId === __draft.personId))) throw new Error("This assignment is for a different person. Pick the person already on this assignment.");
     if (!((((role).trim()).length > 0))) throw new Error("Assignment role is required");
     if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("Assignment shift end must be after its start");
@@ -33768,8 +33768,8 @@ async function __runPayrollInputPrepare(ctx: MutationCtx, { docId, personId, per
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_person != null))) throw new Error("Guard 3 failed");
     if (!((personId === doc.personId))) throw new Error("This payroll input is for a different person. Pick the person already on this payroll input.");
-    if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("Prepare eventId must match the seeded event reference when both are set");
-    if (!((((shiftId == null) || (doc.shiftId == null)) || (shiftId === doc.shiftId)))) throw new Error("Prepare shiftId must match the seeded shift reference when both are set");
+    if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("This payroll input is for a different event. Pick the event already on this payroll input.");
+    if (!((((shiftId == null) || (doc.shiftId == null)) || (shiftId === doc.shiftId)))) throw new Error("This payroll input is for a different shift. Pick the shift already on this payroll input.");
     if (!((periodEnd >= periodStart))) throw new Error("Payroll period end must be at or after period start");
     if (!((((regularMinutes >= 0) && (overtimeMinutes >= 0)) && (totalMinutes >= 0)))) throw new Error("Payroll minutes cannot be negative");
     if (!((totalMinutes === (regularMinutes + overtimeMinutes)))) throw new Error("Total minutes must equal regular plus overtime");
@@ -33900,8 +33900,8 @@ export const PayrollInput_createViaPrepare = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_person != null))) throw new Error("Guard 3 failed");
     if (!((personId === __draft.personId))) throw new Error("This payroll input is for a different person. Pick the person already on this payroll input.");
-    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Prepare eventId must match the seeded event reference when both are set");
-    if (!((((shiftId == null) || (__draft.shiftId == null)) || (shiftId === __draft.shiftId)))) throw new Error("Prepare shiftId must match the seeded shift reference when both are set");
+    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("This payroll input is for a different event. Pick the event already on this payroll input.");
+    if (!((((shiftId == null) || (__draft.shiftId == null)) || (shiftId === __draft.shiftId)))) throw new Error("This payroll input is for a different shift. Pick the shift already on this payroll input.");
     if (!((periodEnd >= periodStart))) throw new Error("Payroll period end must be at or after period start");
     if (!((((regularMinutes >= 0) && (overtimeMinutes >= 0)) && (totalMinutes >= 0)))) throw new Error("Payroll minutes cannot be negative");
     if (!((totalMinutes === (regularMinutes + overtimeMinutes)))) throw new Error("Total minutes must equal regular plus overtime");
@@ -44381,7 +44381,7 @@ async function __runShiftSchedule(ctx: MutationCtx, { docId, personId, startsAt,
     if (!((((__rel_person != null) && (__rel_person.deletedAt == null)) && (__rel_person.status === "active")))) throw new Error("Guard 3 failed");
     if (!((checkRole(user, "workforceManageAccess") || (((((eventStaffingSourceIds != null) && ((eventStaffingSourceIds).length > 0)) && (doc.eventId != null)) && checkRole(user, "workforceSelfAccess")) && (checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))))) throw new Error("Guard 4 failed");
     if (!((personId === doc.personId))) throw new Error("This shift is for a different person. Pick the person already on this shift.");
-    if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("Schedule eventId must match the seeded event reference when provided");
+    if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("This shift is for a different event. Pick the event already on this shift.");
     if (!((((eventId == null) && (doc.eventId == null)) || ((__rel_event != null) && (__rel_event.deletedAt == null))))) throw new Error("Select an event in this workspace");
     if (!((endsAt > startsAt))) throw new Error("Shift end must be after its start");
     if (!(((shiftTypeId == null) || (((__rel_shiftType != null) && (__rel_shiftType.deletedAt == null)) && (__rel_shiftType.status === "active"))))) throw new Error("Selected shift type must be active");
@@ -44501,7 +44501,7 @@ export const Shift_createViaSchedule = mutation({
     if (!((((__rel_person != null) && (__rel_person.deletedAt == null)) && (__rel_person.status === "active")))) throw new Error("Guard 3 failed");
     if (!((checkRole(user, "workforceManageAccess") || (((((eventStaffingSourceIds != null) && ((eventStaffingSourceIds).length > 0)) && (__draft.eventId != null)) && checkRole(user, "workforceSelfAccess")) && (checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))))) throw new Error("Guard 4 failed");
     if (!((personId === __draft.personId))) throw new Error("This shift is for a different person. Pick the person already on this shift.");
-    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Schedule eventId must match the seeded event reference when provided");
+    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("This shift is for a different event. Pick the event already on this shift.");
     if (!((((eventId == null) && (__draft.eventId == null)) || ((__rel_event != null) && (__rel_event.deletedAt == null))))) throw new Error("Select an event in this workspace");
     if (!((endsAt > startsAt))) throw new Error("Shift end must be after its start");
     if (!(((shiftTypeId == null) || (((__rel_shiftType != null) && (__rel_shiftType.deletedAt == null)) && (__rel_shiftType.status === "active"))))) throw new Error("Selected shift type must be active");
@@ -44953,7 +44953,7 @@ async function __runShiftSwapRequestPropose(ctx: MutationCtx, { docId, shiftId, 
     if (!(((sourceQualificationId == null) || (((__rel_sourceQualification != null) && (__rel_sourceQualification.deletedAt == null)) && (__rel_sourceQualification.status === "active"))))) throw new Error("Guard 11 failed");
     if (!(((targetQualificationId == null) || (((__rel_targetQualification != null) && (__rel_targetQualification.deletedAt == null)) && (__rel_targetQualification.status === "active"))))) throw new Error("Guard 12 failed");
     if (!(((targetTrainingCompletionId == null) || (((__rel_targetTrainingCompletion != null) && (__rel_targetTrainingCompletion.deletedAt == null)) && (__rel_targetTrainingCompletion.recordedAt != null))))) throw new Error("Guard 13 failed");
-    if (!((shiftId === doc.shiftId))) throw new Error("Swap shift must match the seeded shift reference");
+    if (!((shiftId === doc.shiftId))) throw new Error("This swap is for a different shift. Pick the shift already on this swap.");
     if (!(((requesterPersonId === doc.requesterPersonId) && (__rel_shift.personId === requesterPersonId)))) throw new Error("Only the assigned staff member may propose this swap");
     if (!((recipientPersonId === doc.recipientPersonId))) throw new Error("This swap is for a different person. Pick the person already on this swap.");
     if (!((requesterPersonId !== recipientPersonId))) throw new Error("Choose another staff member for the swap");
@@ -45077,7 +45077,7 @@ export const ShiftSwapRequest_createViaPropose = mutation({
     if (!(((sourceQualificationId == null) || (((__rel_sourceQualification != null) && (__rel_sourceQualification.deletedAt == null)) && (__rel_sourceQualification.status === "active"))))) throw new Error("Guard 11 failed");
     if (!(((targetQualificationId == null) || (((__rel_targetQualification != null) && (__rel_targetQualification.deletedAt == null)) && (__rel_targetQualification.status === "active"))))) throw new Error("Guard 12 failed");
     if (!(((targetTrainingCompletionId == null) || (((__rel_targetTrainingCompletion != null) && (__rel_targetTrainingCompletion.deletedAt == null)) && (__rel_targetTrainingCompletion.recordedAt != null))))) throw new Error("Guard 13 failed");
-    if (!((shiftId === __draft.shiftId))) throw new Error("Swap shift must match the seeded shift reference");
+    if (!((shiftId === __draft.shiftId))) throw new Error("This swap is for a different shift. Pick the shift already on this swap.");
     if (!(((requesterPersonId === __draft.requesterPersonId) && (__rel_shift.personId === requesterPersonId)))) throw new Error("Only the assigned staff member may propose this swap");
     if (!((recipientPersonId === __draft.recipientPersonId))) throw new Error("This swap is for a different person. Pick the person already on this swap.");
     if (!((requesterPersonId !== recipientPersonId))) throw new Error("Choose another staff member for the swap");
