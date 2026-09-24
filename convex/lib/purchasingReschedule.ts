@@ -11,7 +11,8 @@ import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
  * week leaves its editable weekly draft and re-opens on the event's current
  * week, where the existing weekly routing consolidates it with that week's
  * other events. Needs already ordered or fulfilled keep their week: that
- * supply was bought for a real order and stays historical.
+ * supply was bought for a real order and stays historical. Live ingredient
+ * demand moves with the event. Fulfilled and superseded demand stays put.
  *
  * The week move is a consequence of the reschedule the caller was already
  * authorized to make, so it runs as the tenant's system role: event and
@@ -28,6 +29,7 @@ export async function moveEventPurchasingWeek(
   if (!event || event.tenantId !== tenantId || event.deletedAt != null) return;
   const weekStart = event.purchasingWeekStart;
   if (weekStart == null) return;
+  await alignLiveDemands(ctx, tenantId, eventId, weekStart);
   const needs = await ctx.db
     .query("purchaseNeeds")
     .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
@@ -48,6 +50,42 @@ export async function moveEventPurchasingWeek(
       const detail = error instanceof Error ? error.message : String(error);
       throw new Error(
         `Moving this event's purchasing to its new week did not complete, so the reschedule was not saved. ${detail}`,
+      );
+    }
+  }
+}
+
+async function alignLiveDemands(
+  ctx: MutationCtx,
+  tenantId: string,
+  eventId: Id<"events">,
+  weekStart: number,
+) {
+  const demands = await ctx.db
+    .query("ingredientDemands")
+    .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+    .collect();
+  const live = demands.filter(
+    (demand) =>
+      demand.tenantId === tenantId &&
+      demand.deletedAt == null &&
+      demand.purchasingWeekStart !== weekStart &&
+      (demand.status === "pending" ||
+        demand.status === "calculated" ||
+        demand.status === "confirmed"),
+  );
+  if (live.length === 0) return;
+  const purchasing = TenantSystemCommandRunner.forTenant(ctx, tenantId).context;
+  for (const demand of live) {
+    try {
+      await purchasing.runMutation(
+        api.mutations.IngredientDemand_alignPurchasingWeek,
+        { docId: demand._id, version: demand.version },
+      );
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error);
+      throw new Error(
+        `Moving this event's ingredient list to its new week did not complete, so the reschedule was not saved. ${detail}`,
       );
     }
   }
