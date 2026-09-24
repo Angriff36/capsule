@@ -53,7 +53,7 @@ export class CapsuleGeneratedCommandGateway {
     return new GeneratedWiringConsumer(
       contract,
       new WiringCommandExecutor({
-        baseUrl: this.auth.resolveConvexUrl(),
+        baseUrl: this.auth.resolveConvexSiteUrl(),
         bearerToken,
       }),
     );

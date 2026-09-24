@@ -1,4 +1,5 @@
 import { CapsuleAgentJwtSession } from "./CapsuleAgentJwtSession";
+import { ConvexSiteOrigin } from "./ConvexSiteOrigin";
 
 /**
  * Resolves a Clerk JWT for Convex agent calls. Fail-closed: no anonymous fallback.
@@ -44,5 +45,14 @@ export class CapsuleAgentAuthManager {
       );
     }
     return url;
+  }
+
+  /** Origin that serves `/api/manifest/...` command routes. */
+  resolveConvexSiteUrl(): string {
+    const explicit = this.env.CONVEX_SITE_URL?.trim();
+    if (explicit) {
+      return ConvexSiteOrigin.from(explicit);
+    }
+    return ConvexSiteOrigin.from(this.resolveConvexUrl());
   }
 }

@@ -20,7 +20,7 @@ export class CapsuleGeneratedWiringFacts {
     this.consumer = new GeneratedWiringConsumer(
       contract,
       new WiringCommandExecutor({
-        baseUrl: "http://127.0.0.1:3210",
+        baseUrl: "http://unused.invalid",
         bearerToken: "",
       }),
     );
