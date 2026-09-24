@@ -9175,7 +9175,7 @@ async function __runDishComponentAttach(ctx: MutationCtx, { docId, dishId, compo
     if (!((doc.attachedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_dish != null) && (__rel_dish.status === "active")))) throw new Error("Guard 2 failed");
-    if (!((dishId === doc.dishId))) throw new Error("Attach dishId must match the seeded dish reference");
+    if (!((dishId === doc.dishId))) throw new Error("This subrecipe is for a different dish. Pick the dish already on this subrecipe.");
     if (!((yieldQuantity > 0))) throw new Error("Attached component yield must be positive");
     if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("Attached component batch multiplier must be positive");
     if (version !== undefined && (doc as any).version !== version) {
@@ -9288,7 +9288,7 @@ export const DishComponent_createViaAttach = mutation({
     if (!((__draft.attachedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_dish != null) && (__rel_dish.status === "active")))) throw new Error("Guard 2 failed");
-    if (!((dishId === __draft.dishId))) throw new Error("Attach dishId must match the seeded dish reference");
+    if (!((dishId === __draft.dishId))) throw new Error("This subrecipe is for a different dish. Pick the dish already on this subrecipe.");
     if (!((yieldQuantity > 0))) throw new Error("Attached component yield must be positive");
     if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("Attached component batch multiplier must be positive");
     const doc: Record<string, any> = {

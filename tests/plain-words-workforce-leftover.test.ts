@@ -207,7 +207,7 @@ describe("plain words on leftover workforce schedule-notice and swap recipient c
     );
     // Later leftovers keep their current wording, pinned from their own files.
     expect(visibleCopy("src/culinary/dish.manifest")).toContain(
-      "Attach dishId must match the seeded dish reference",
+      "This subrecipe is for a different dish. Pick the dish already on this subrecipe.",
     );
     expect(visibleCopy("src/quality/allergen-check.manifest")).toContain(
       "Record dishId must match the seeded dish reference when provided",
