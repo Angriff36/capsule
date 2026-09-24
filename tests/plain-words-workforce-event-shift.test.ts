@@ -134,10 +134,46 @@ describe("plain words on leftover workforce and payroll event/shift match copy",
     );
     // Later leftovers keep their current wording.
     expect(visible).toContain(
-      "Replacement certification must belong to the recipient",
+      "The recipient needs the training required by this shift type",
     );
     expect(visible).toContain(
+      "Recipient training must match the shift type requirement",
+    );
+  });
+
+  it("keeps leftover shift-swap replacement-certification copy free of recipient jargon", () => {
+    const visible = visibleCopy("src/workforce/shift-swap.manifest");
+    // Old recipient wording is gone from the replacement-certification refusals.
+    expect(visible).not.toContain(
+      "Replacement certification must belong to the recipient",
+    );
+    // The refusal now says what is wrong and what to pick next.
+    const fresh =
+      "This certification is for a different person. Pick a certification that belongs to this person.";
+    expect(visible).toContain(fresh);
+    expectPlain(fresh);
+    // The generated mutation file carries the same wording.
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    expect(mutations).not.toContain(
+      "Replacement certification must belong to the recipient",
+    );
+    expect(mutations).toContain(fresh);
+    // Already-landed certification and person copy stays.
+    expect(visible).toContain(
+      "This person needs a current matching certification for the shift. Pick someone who already has it.",
+    );
+    expect(visible).toContain(
+      "This person's certification doesn't match what the shift needs. Pick someone with the same certification.",
+    );
+    expect(visible).toContain(
+      "This swap is for a different person. Pick the person already on this swap.",
+    );
+    // Later leftovers keep their current wording.
+    expect(visible).toContain(
       "The recipient needs the training required by this shift type",
+    );
+    expect(visible).toContain(
+      "Training completion must belong to the recipient",
     );
     expect(visible).toContain(
       "Recipient training must match the shift type requirement",
