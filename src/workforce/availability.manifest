@@ -32,7 +32,7 @@ entity TimeOffRequest mixin TenantScoped, SoftDeletable {
 
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
 
-  constraint timeOffRequestComplete: self.submittedAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.reason != null and length(trim(self.reason)) > 0) "Submitted time off requires a valid date range and reason"
+  constraint timeOffRequestComplete: self.submittedAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.reason != null and length(trim(self.reason)) > 0) "This time-off request is missing a start, an end, or a reason, or it ends before it starts. Pick a start, an end that's later than the start, and tell your manager why you need the time off."
 
   transition status from "pending" to ["approved", "denied"]
   transition status from "approved" to []

@@ -139,7 +139,7 @@ describe("plain words on leftover workforce schedule-notice and swap recipient c
     );
     // Later leftovers keep their current wording.
     expect(visible).toContain(
-      "Submitted time off requires a valid date range and reason",
+      "This time-off request is missing a start, an end, or a reason, or it ends before it starts. Pick a start, an end that's later than the start, and tell your manager why you need the time off.",
     );
   });
 
@@ -173,7 +173,44 @@ describe("plain words on leftover workforce schedule-notice and swap recipient c
     );
     // Later leftovers keep their current wording.
     expect(visible).toContain(
+      "This time-off request is missing a start, an end, or a reason, or it ends before it starts. Pick a start, an end that's later than the start, and tell your manager why you need the time off.",
+    );
+  });
+
+  it("keeps leftover submitted time-off range copy free of date-range jargon", () => {
+    const visible = visibleCopy("src/workforce/availability.manifest");
+    // Old date-range wording is gone from the manifest and the generated mutation file.
+    expect(visible).not.toContain(
       "Submitted time off requires a valid date range and reason",
+    );
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    expect(mutations).not.toContain(
+      "Submitted time off requires a valid date range and reason",
+    );
+    // The refusal now says what happened and what to do next.
+    const newString =
+      "This time-off request is missing a start, an end, or a reason, or it ends before it starts. Pick a start, an end that's later than the start, and tell your manager why you need the time off.";
+    expect(visible).toContain(newString);
+    expectPlain(newString);
+    // The generated context summary carries the same wording.
+    const summary = readFileSync("manifest-context-summary.json", "utf8");
+    expect(summary).toContain(newString);
+    // Already-landed leftovers on the same file stay.
+    expect(visible).toContain(
+      "This time-off request is for a different person. Pick the person already on this time-off request.",
+    );
+    expect(visible).toContain(
+      "This time-off request ends before it starts. Pick an end that's later than the start.",
+    );
+    expect(visible).toContain(
+      "This availability is missing a start or end, or it ends before it starts. Pick a start and an end that's later than the start.",
+    );
+    // Later leftovers keep their current wording, pinned from their own files.
+    expect(visibleCopy("src/culinary/dish.manifest")).toContain(
+      "Attach dishId must match the seeded dish reference",
+    );
+    expect(visibleCopy("src/quality/allergen-check.manifest")).toContain(
+      "Record dishId must match the seeded dish reference when provided",
     );
   });
 });
