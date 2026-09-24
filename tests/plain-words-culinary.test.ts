@@ -134,7 +134,7 @@ describe("plain words on culinary manifests", () => {
     expect(visible).toContain("Kitchen staff may update dish recipes");
 
     // later leftovers stay as-is
-    expect(visible).toContain("Portion spec name is required");
+    expect(visible).toContain("Piece quantity must be positive");
   });
 
   it("keeps leftover culinary READ copy free of read jargon", () => {
@@ -211,6 +211,26 @@ describe("plain words on culinary manifests", () => {
     expect(visible).toContain("Kitchen staff may see portion sizes");
 
     // leftover constraint stays as-is
-    expect(visible).toContain("Portion spec name is required");
+    expect(visible).toContain("Piece quantity must be positive");
+  });
+
+  it("keeps leftover culinary portion-size constraint copy free of spec jargon", () => {
+    // strip // comments so developer notes are not treated as user copy
+    const visible = readFileSync(
+      "src/culinary/component.manifest",
+      "utf8",
+    ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain("Portion spec name is required");
+    expect(visible).toContain("Portion size name is required");
+    expectPlain("Portion size name is required");
+
+    // already-landed portion-size leftovers must stay put
+    expect(visible).toContain("Kitchen staff may see portion sizes");
+    expect(visible).toContain("Kitchen staff may update portion sizes");
+    expect(visible).toContain("Kitchen staff may change portion sizes");
+
+    // later leftover, unchanged
+    expect(visible).toContain("Piece quantity must be positive");
   });
 });
