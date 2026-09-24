@@ -205,4 +205,54 @@ describe("plain words on the kitchen recipe book", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover kitchen import parser and save-error copy free of component jargon", () => {
+    const textParser = readFileSync(
+      "src/features/kitchen/import/ComponentTextParser.ts",
+      "utf8",
+    );
+    const csvParser = readFileSync(
+      "src/features/kitchen/import/ComponentCsvParser.ts",
+      "utf8",
+    );
+    const finalizer = readFileSync(
+      "src/features/kitchen/import/ComponentImportFinalizer.ts",
+      "utf8",
+    );
+    const repository = readFileSync(
+      "src/features/kitchen/import/ComponentImportRepository.ts",
+      "utf8",
+    );
+    const all = [textParser, csvParser, finalizer, repository].join("\n");
+
+    // The old leftover strings a kitchen person could read are gone.
+    // Identifiers, the component_sheet.csv / component_lines.csv file
+    // names, and the CSV header error messages are not this concern.
+    expect(all).not.toContain("Untitled component");
+    expect(all).not.toContain("Paste a component to begin.");
+    expect(all).not.toContain("Component name is required");
+    expect(all).not.toContain("Component yield quantity must be positive");
+    expect(all).not.toContain("Component yield unit is required");
+    expect(all).not.toContain("Component import not found");
+
+    expect(textParser).toContain('"Untitled recipe"');
+    expect(textParser).toContain("Paste a recipe to begin.");
+    expect(csvParser).toContain('"Untitled recipe"');
+    expect(csvParser).toContain('"Untitled import"');
+    expect(finalizer).toContain('"Recipe name is required"');
+    expect(finalizer).toContain('"Recipe yield quantity must be positive"');
+    expect(finalizer).toContain('"Recipe yield unit is required"');
+    expect(repository).toContain('"Recipe import not found"');
+
+    for (const fresh of [
+      "Untitled recipe",
+      "Paste a recipe to begin.",
+      "Recipe name is required",
+      "Recipe yield quantity must be positive",
+      "Recipe yield unit is required",
+      "Recipe import not found",
+    ]) {
+      expectPlain(fresh);
+    }
+  });
 });

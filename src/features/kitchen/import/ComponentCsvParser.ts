@@ -86,7 +86,7 @@ export class ComponentCsvParser {
       };
     }
 
-    const componentName = sheet[0]?.trim() || "Untitled component";
+    const componentName = sheet[0]?.trim() || "Untitled recipe";
     const parsedLines = lineRows
       .slice(1)
       .map((row, index) => {
