@@ -309,4 +309,54 @@ describe("plain words on workforce manifests", () => {
       "Corrected clock-out must be at or after clock-in",
     );
   });
+
+  it("keeps leftover workforce declare assign schedule prepare person match copy free of personId jargon", () => {
+    const files = [
+      "src/workforce/availability.manifest",
+      "src/workforce/assignment.manifest",
+      "src/workforce/shift.manifest",
+      "src/finance/payroll-input.manifest",
+    ];
+    // strip // comments so developer notes are not treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "Declare personId must match the seeded person reference",
+      "Assign personId must match the seeded person reference",
+      "Schedule personId must match the seeded person reference",
+      "Prepare personId must match the seeded person reference",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "This availability is for a different person. Pick the person already on this availability.",
+      "This assignment is for a different person. Pick the person already on this assignment.",
+      "This shift is for a different person. Pick the person already on this shift.",
+      "This payroll input is for a different person. Pick the person already on this payroll input.",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    // later leftovers, unchanged
+    expect(visible).toContain(
+      "Schedule recipient must match the seeded person reference",
+    );
+    expect(visible).toContain(
+      "Assign eventId must match the seeded event reference",
+    );
+    expect(visible).toContain(
+      "Schedule eventId must match the seeded event reference when provided",
+    );
+    expect(visible).toContain(
+      "Prepare eventId must match the seeded event reference when both are set",
+    );
+    expect(visible).toContain(
+      "Prepare shiftId must match the seeded shift reference when both are set",
+    );
+  });
 });

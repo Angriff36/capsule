@@ -73,7 +73,7 @@ entity PayrollInput mixin TenantScoped, SoftDeletable {
     guard self.preparedAt == null
     guard self.deletedAt == null
     guard self.person != null
-    constraint preparePersonMatch: personId == self.personId "Prepare personId must match the seeded person reference"
+    constraint preparePersonMatch: personId == self.personId "This payroll input is for a different person. Pick the person already on this payroll input."
     constraint prepareEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Prepare eventId must match the seeded event reference when both are set"
     constraint prepareShiftMatch: shiftId == null or self.shiftId == null or shiftId == self.shiftId "Prepare shiftId must match the seeded shift reference when both are set"
     constraint preparePeriodOrder: periodEnd >= periodStart "Payroll period end must be at or after period start"

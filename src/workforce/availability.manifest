@@ -199,7 +199,7 @@ entity AvailabilityWindow mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard user.id != null
     guard personId == user.personId or (user.personId == null and personId == user.id) or roleAllows(user.role, "workforceManageAccess")
-    constraint declarePersonMatch: personId == self.personId "Declare personId must match the seeded person reference"
+    constraint declarePersonMatch: personId == self.personId "This availability is for a different person. Pick the person already on this availability."
     constraint declareDates: endsAt > startsAt "Availability end must be after its start"
     mutate personId = personId
     mutate startsAt = startsAt
@@ -304,7 +304,7 @@ entity RecurringAvailability mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard user.id != null
     guard personId == user.personId or (user.personId == null and personId == user.id) or roleAllows(user.role, "workforceManageAccess")
-    constraint declarePersonMatch: personId == self.personId "Declare personId must match the seeded person reference"
+    constraint declarePersonMatch: personId == self.personId "This availability is for a different person. Pick the person already on this availability."
     constraint declareDayOfWeek: dayOfWeek >= 0 and dayOfWeek <= 6 "Day of week must be 0 (Sunday) through 6 (Saturday)"
     constraint declareMinutes: startMinute >= 0 and endMinute <= 1440 and endMinute > startMinute "Time band must fall within the day and end after it starts"
     mutate personId = personId

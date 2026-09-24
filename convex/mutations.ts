@@ -1194,7 +1194,7 @@ async function __runAvailabilityWindowDeclare(ctx: MutationCtx, { docId, personI
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
     if (!((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
-    if (!((personId === doc.personId))) throw new Error("Declare personId must match the seeded person reference");
+    if (!((personId === doc.personId))) throw new Error("This availability is for a different person. Pick the person already on this availability.");
     if (!((endsAt > startsAt))) throw new Error("Availability end must be after its start");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -1278,7 +1278,7 @@ export const AvailabilityWindow_createViaDeclare = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
     if (!((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
-    if (!((personId === __draft.personId))) throw new Error("Declare personId must match the seeded person reference");
+    if (!((personId === __draft.personId))) throw new Error("This availability is for a different person. Pick the person already on this availability.");
     if (!((endsAt > startsAt))) throw new Error("Availability end must be after its start");
     const doc: Record<string, any> = {
       ...__draft,
@@ -14576,7 +14576,7 @@ async function __runEventAssignmentAssign(ctx: MutationCtx, { docId, eventId, pe
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 4 failed");
     if (!((checkRole(user, "workforceManageAccess") || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 5 failed");
     if (!((eventId === doc.eventId))) throw new Error("Assign eventId must match the seeded event reference");
-    if (!((personId === doc.personId))) throw new Error("Assign personId must match the seeded person reference");
+    if (!((personId === doc.personId))) throw new Error("This assignment is for a different person. Pick the person already on this assignment.");
     if (!((((role).trim()).length > 0))) throw new Error("Assignment role is required");
     if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("Assignment shift end must be after its start");
     if (version !== undefined && (doc as any).version !== version) {
@@ -14670,7 +14670,7 @@ export const EventAssignment_createViaAssign = mutation({
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 4 failed");
     if (!((checkRole(user, "workforceManageAccess") || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 5 failed");
     if (!((eventId === __draft.eventId))) throw new Error("Assign eventId must match the seeded event reference");
-    if (!((personId === __draft.personId))) throw new Error("Assign personId must match the seeded person reference");
+    if (!((personId === __draft.personId))) throw new Error("This assignment is for a different person. Pick the person already on this assignment.");
     if (!((((role).trim()).length > 0))) throw new Error("Assignment role is required");
     if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("Assignment shift end must be after its start");
     const doc: Record<string, any> = {
@@ -33767,7 +33767,7 @@ async function __runPayrollInputPrepare(ctx: MutationCtx, { docId, personId, per
     if (!((doc.preparedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_person != null))) throw new Error("Guard 3 failed");
-    if (!((personId === doc.personId))) throw new Error("Prepare personId must match the seeded person reference");
+    if (!((personId === doc.personId))) throw new Error("This payroll input is for a different person. Pick the person already on this payroll input.");
     if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("Prepare eventId must match the seeded event reference when both are set");
     if (!((((shiftId == null) || (doc.shiftId == null)) || (shiftId === doc.shiftId)))) throw new Error("Prepare shiftId must match the seeded shift reference when both are set");
     if (!((periodEnd >= periodStart))) throw new Error("Payroll period end must be at or after period start");
@@ -33899,7 +33899,7 @@ export const PayrollInput_createViaPrepare = mutation({
     if (!((__draft.preparedAt == null))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_person != null))) throw new Error("Guard 3 failed");
-    if (!((personId === __draft.personId))) throw new Error("Prepare personId must match the seeded person reference");
+    if (!((personId === __draft.personId))) throw new Error("This payroll input is for a different person. Pick the person already on this payroll input.");
     if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Prepare eventId must match the seeded event reference when both are set");
     if (!((((shiftId == null) || (__draft.shiftId == null)) || (shiftId === __draft.shiftId)))) throw new Error("Prepare shiftId must match the seeded shift reference when both are set");
     if (!((periodEnd >= periodStart))) throw new Error("Payroll period end must be at or after period start");
@@ -41249,7 +41249,7 @@ async function __runRecurringAvailabilityDeclare(ctx: MutationCtx, { docId, pers
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
     if (!((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
-    if (!((personId === doc.personId))) throw new Error("Declare personId must match the seeded person reference");
+    if (!((personId === doc.personId))) throw new Error("This availability is for a different person. Pick the person already on this availability.");
     if (!(((dayOfWeek >= 0) && (dayOfWeek <= 6)))) throw new Error("Day of week must be 0 (Sunday) through 6 (Saturday)");
     if (!((((startMinute >= 0) && (endMinute <= 1440)) && (endMinute > startMinute)))) throw new Error("Time band must fall within the day and end after it starts");
     if (version !== undefined && (doc as any).version !== version) {
@@ -41334,7 +41334,7 @@ export const RecurringAvailability_createViaDeclare = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
     if (!((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
-    if (!((personId === __draft.personId))) throw new Error("Declare personId must match the seeded person reference");
+    if (!((personId === __draft.personId))) throw new Error("This availability is for a different person. Pick the person already on this availability.");
     if (!(((dayOfWeek >= 0) && (dayOfWeek <= 6)))) throw new Error("Day of week must be 0 (Sunday) through 6 (Saturday)");
     if (!((((startMinute >= 0) && (endMinute <= 1440)) && (endMinute > startMinute)))) throw new Error("Time band must fall within the day and end after it starts");
     const doc: Record<string, any> = {
@@ -44380,7 +44380,7 @@ async function __runShiftSchedule(ctx: MutationCtx, { docId, personId, startsAt,
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((((__rel_person != null) && (__rel_person.deletedAt == null)) && (__rel_person.status === "active")))) throw new Error("Guard 3 failed");
     if (!((checkRole(user, "workforceManageAccess") || (((((eventStaffingSourceIds != null) && ((eventStaffingSourceIds).length > 0)) && (doc.eventId != null)) && checkRole(user, "workforceSelfAccess")) && (checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))))) throw new Error("Guard 4 failed");
-    if (!((personId === doc.personId))) throw new Error("Schedule personId must match the seeded person reference");
+    if (!((personId === doc.personId))) throw new Error("This shift is for a different person. Pick the person already on this shift.");
     if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("Schedule eventId must match the seeded event reference when provided");
     if (!((((eventId == null) && (doc.eventId == null)) || ((__rel_event != null) && (__rel_event.deletedAt == null))))) throw new Error("Select an event in this workspace");
     if (!((endsAt > startsAt))) throw new Error("Shift end must be after its start");
@@ -44500,7 +44500,7 @@ export const Shift_createViaSchedule = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((((__rel_person != null) && (__rel_person.deletedAt == null)) && (__rel_person.status === "active")))) throw new Error("Guard 3 failed");
     if (!((checkRole(user, "workforceManageAccess") || (((((eventStaffingSourceIds != null) && ((eventStaffingSourceIds).length > 0)) && (__draft.eventId != null)) && checkRole(user, "workforceSelfAccess")) && (checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))))) throw new Error("Guard 4 failed");
-    if (!((personId === __draft.personId))) throw new Error("Schedule personId must match the seeded person reference");
+    if (!((personId === __draft.personId))) throw new Error("This shift is for a different person. Pick the person already on this shift.");
     if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Schedule eventId must match the seeded event reference when provided");
     if (!((((eventId == null) && (__draft.eventId == null)) || ((__rel_event != null) && (__rel_event.deletedAt == null))))) throw new Error("Select an event in this workspace");
     if (!((endsAt > startsAt))) throw new Error("Shift end must be after its start");

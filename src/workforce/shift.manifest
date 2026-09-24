@@ -83,7 +83,7 @@ entity Shift mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.person != null and self.person.deletedAt == null and self.person.status == "active" "Select an active staff member in this workspace"
     guard roleAllows(user.role, "workforceManageAccess") or (eventStaffingSourceIds != null and length(eventStaffingSourceIds) > 0 and self.eventId != null and roleAllows(user.role, "workforceSelfAccess") and (roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess")))
-    constraint schedulePersonMatch: personId == self.personId "Schedule personId must match the seeded person reference"
+    constraint schedulePersonMatch: personId == self.personId "This shift is for a different person. Pick the person already on this shift."
     constraint scheduleEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Schedule eventId must match the seeded event reference when provided"
     constraint scheduleEventPresent: (eventId == null and self.eventId == null) or (self.event != null and self.event.deletedAt == null) "Select an event in this workspace"
     constraint scheduleDates: endsAt > startsAt "Shift end must be after its start"

@@ -72,7 +72,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     guard self.person != null and self.person.status == "active"
     guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
     constraint assignEventMatch: eventId == self.eventId "Assign eventId must match the seeded event reference"
-    constraint assignPersonMatch: personId == self.personId "Assign personId must match the seeded person reference"
+    constraint assignPersonMatch: personId == self.personId "This assignment is for a different person. Pick the person already on this assignment."
     constraint assignRolePresent: length(trim(role)) > 0 "Assignment role is required"
     constraint assignShiftDates: startsAt == null or endsAt == null or endsAt > startsAt "Assignment shift end must be after its start"
     mutate eventId = eventId
