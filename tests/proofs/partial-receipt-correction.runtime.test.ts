@@ -222,5 +222,36 @@ describe("partial receipt correction", () => {
     expect(
       correctionsRepeated.map((row) => Number(row.delta)).sort((a, b) => a - b),
     ).toEqual([-8, -8, 8]);
+
+    const listed = (await roles.procurement.query(
+      api.queries.listReceiptCorrection,
+      {},
+    )) as Array<{
+      vendorOrderLineId: string;
+      reason: string;
+      priorReceivedQuantity: number;
+      correctedReceivedQuantity: number;
+      correctionSequence: number;
+    }>;
+    const lineHistory = listed
+      .filter((row) => row.vendorOrderLineId === seeded.lineAId)
+      .sort(
+        (left, right) => left.correctionSequence - right.correctionSequence,
+      );
+    expect(lineHistory.map((row) => row.reason)).toEqual([
+      REASON,
+      "The missing case was in the walk-in",
+      REASON,
+    ]);
+    expect(
+      lineHistory.map((row) => [
+        Number(row.priorReceivedQuantity),
+        Number(row.correctedReceivedQuantity),
+      ]),
+    ).toEqual([
+      [40, 32],
+      [32, 40],
+      [40, 32],
+    ]);
   });
 });
