@@ -20,6 +20,7 @@ import {
   useListServiceStyleKitItem,
   usePackListItemMarkMissing,
   usePackListItemMarkPacked,
+  usePackListItemRecordPackedCount,
   usePackListMarkLoaded,
   usePackListMarkPacked,
   usePackListStartPacking,
@@ -82,6 +83,7 @@ export function PackListDetailPage() {
   const serviceStyles = useListServiceStyle();
   const kitItems = useListServiceStyleKitItem();
   const markItemPacked = usePackListItemMarkPacked();
+  const recordPackedCount = usePackListItemRecordPackedCount();
   const markItemMissing = usePackListItemMarkMissing();
   const startPacking = usePackListStartPacking();
   const markPacked = usePackListMarkPacked();
@@ -374,6 +376,7 @@ export function PackListDetailPage() {
       _id: string;
       version: number;
       requiredQuantity: number;
+      packedQuantity: number;
       status: unknown;
       note?: string | null;
     },
@@ -414,29 +417,42 @@ export function PackListDetailPage() {
       return;
     }
     if (key === "markPacked") {
+      const alreadyPacked = Number(item.packedQuantity ?? 0);
+      const required = Number(item.requiredQuantity);
       const values = await prompt.askFields({
-        title: "Mark item packed",
-        description: "Enter the packed quantity for this load-sheet line.",
-        confirmLabel: "Mark packed",
+        title:
+          alreadyPacked > 0 ? "Update packed quantity" : "Mark item packed",
+        description:
+          "Enter the total packed so far. A short count stays on the list until the rest is packed.",
+        confirmLabel: "Save packed quantity",
         fields: [
           {
             name: "packedQuantity",
-            label: "Packed quantity",
+            label: "Total packed so far",
             inputType: "number",
             required: true,
-            defaultValue: String(item.requiredQuantity),
+            defaultValue: String(
+              alreadyPacked > 0 ? alreadyPacked : item.requiredQuantity,
+            ),
           },
         ],
       });
       if (!values) return;
+      const packedQuantity = Number(values.packedQuantity);
       void run(`${item._id}:${key}`, async () => {
         const started = await ensurePacking();
-        await markItemPacked({
+        const save =
+          packedQuantity < required ? recordPackedCount : markItemPacked;
+        await save({
           docId: item._id,
           version: item.version,
-          packedQuantity: Number(values.packedQuantity),
+          packedQuantity,
         });
-        setNotice(`Item marked packed.${started}`);
+        setNotice(
+          packedQuantity < required
+            ? `Recorded ${packedQuantity} of ${required}. This line stays open until the rest is packed.${started}`
+            : `Item marked packed.${started}`,
+        );
       });
       return;
     }
