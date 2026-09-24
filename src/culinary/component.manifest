@@ -386,8 +386,8 @@ entity ComponentStep mixin TenantScoped, SoftDeletable {
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
-    constraint addStepInstruction: length(trim(instruction)) > 0 "Component step instruction is required"
-    constraint addStepDuration: durationMinutes == null or durationMinutes >= 0 "Component step duration cannot be negative"
+    constraint addStepInstruction: length(trim(instruction)) > 0 "Recipe step instruction is required"
+    constraint addStepDuration: durationMinutes == null or durationMinutes >= 0 "Recipe step duration cannot be negative"
     mutate componentId = componentId
     mutate instruction = instruction
     mutate sortOrder = sortOrder != null ? sortOrder : 0
@@ -409,8 +409,8 @@ entity ComponentStep mixin TenantScoped, SoftDeletable {
   ) {
     guard self.addedAt != null
     guard self.deletedAt == null
-    constraint reviseStepInstruction: length(trim(instruction)) > 0 "Component step instruction is required"
-    constraint reviseStepDuration: durationMinutes == null or durationMinutes >= 0 "Component step duration cannot be negative"
+    constraint reviseStepInstruction: length(trim(instruction)) > 0 "Recipe step instruction is required"
+    constraint reviseStepDuration: durationMinutes == null or durationMinutes >= 0 "Recipe step duration cannot be negative"
     mutate instruction = instruction
     mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
     mutate durationMinutes = durationMinutes

@@ -250,7 +250,6 @@ describe("plain words on culinary manifests", () => {
     expect(mutations).toContain("Recipe name is required");
 
     // later leftovers, unchanged
-    expect(visible).toContain("Component step instruction is required");
     expect(visible).toContain("Piece quantity must be positive");
 
     // already-landed leftovers must stay put
@@ -285,7 +284,6 @@ describe("plain words on culinary manifests", () => {
     expect(mutations).toContain("Recipe batch multiplier must be positive");
 
     // later leftovers, unchanged
-    expect(visible).toContain("Component step instruction is required");
     expect(visible).toContain("Piece quantity must be positive");
 
     // already-landed leftovers must stay put
@@ -326,14 +324,48 @@ describe("plain words on culinary manifests", () => {
     expect(summary).toContain("Drafted recipes require a name");
 
     // later leftovers, unchanged
-    expect(visible).toContain("Component step instruction is required");
-    expect(visible).toContain("Component step duration cannot be negative");
     expect(visible).toContain("Piece quantity must be positive");
 
     // already-landed leftovers must stay put
     expect(visible).toContain("Recipe name is required");
     expect(visible).toContain("Recipe yield quantity must be positive");
     expect(visible).toContain("Recipe batch multiplier must be positive");
+    expect(visible).toContain("Portion size name is required");
+    expect(visible).toContain("Kitchen staff may see recipes");
+  });
+
+  it("keeps leftover culinary step-instruction-and-duration constraint copy free of component jargon", () => {
+    // strip // comments so developer notes are not treated as user copy
+    const visible = readFileSync(
+      "src/culinary/component.manifest",
+      "utf8",
+    ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain("Component step instruction is required");
+    expect(visible).not.toContain("Component step duration cannot be negative");
+    expect(visible).toContain("Recipe step instruction is required");
+    expect(visible).toContain("Recipe step duration cannot be negative");
+    expectPlain("Recipe step instruction is required");
+    expectPlain("Recipe step duration cannot be negative");
+
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    expect(mutations).not.toContain("Component step instruction is required");
+    expect(mutations).not.toContain(
+      "Component step duration cannot be negative",
+    );
+    expect(mutations).toContain("Recipe step instruction is required");
+    expect(mutations).toContain("Recipe step duration cannot be negative");
+
+    // later leftover, unchanged
+    expect(visible).toContain("Piece quantity must be positive");
+
+    // already-landed leftovers must stay put
+    expect(visible).toContain("Recipe name is required");
+    expect(visible).toContain("Recipe yield quantity must be positive");
+    expect(visible).toContain("Recipe batch multiplier must be positive");
+    expect(visible).toContain("Recipe ingredient quantity must be positive");
+    expect(visible).toContain("Recipe steps require an instruction");
+    expect(visible).toContain("Drafted recipes require a name");
     expect(visible).toContain("Portion size name is required");
     expect(visible).toContain("Kitchen staff may see recipes");
   });

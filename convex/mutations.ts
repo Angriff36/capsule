@@ -6289,8 +6289,8 @@ async function __runComponentStepAdd(ctx: MutationCtx, { docId, componentId, ins
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe steps");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((instruction).trim()).length > 0))) throw new Error("Component step instruction is required");
-    if (!(((durationMinutes == null) || (durationMinutes >= 0)))) throw new Error("Component step duration cannot be negative");
+    if (!((((instruction).trim()).length > 0))) throw new Error("Recipe step instruction is required");
+    if (!(((durationMinutes == null) || (durationMinutes >= 0)))) throw new Error("Recipe step duration cannot be negative");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -6364,8 +6364,8 @@ export const ComponentStep_createViaAdd = mutation({
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe steps");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((instruction).trim()).length > 0))) throw new Error("Component step instruction is required");
-    if (!(((durationMinutes == null) || (durationMinutes >= 0)))) throw new Error("Component step duration cannot be negative");
+    if (!((((instruction).trim()).length > 0))) throw new Error("Recipe step instruction is required");
+    if (!(((durationMinutes == null) || (durationMinutes >= 0)))) throw new Error("Recipe step duration cannot be negative");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -6447,8 +6447,8 @@ async function __runComponentStepRevise(ctx: MutationCtx, { docId, instruction, 
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe steps");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((instruction).trim()).length > 0))) throw new Error("Component step instruction is required");
-    if (!(((durationMinutes == null) || (durationMinutes >= 0)))) throw new Error("Component step duration cannot be negative");
+    if (!((((instruction).trim()).length > 0))) throw new Error("Recipe step instruction is required");
+    if (!(((durationMinutes == null) || (durationMinutes >= 0)))) throw new Error("Recipe step duration cannot be negative");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
