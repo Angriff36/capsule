@@ -38,6 +38,7 @@ import {
 } from "./proposalPdf";
 import { ProposalSignatureRevokeAction } from "../sales/ProposalSignatureRevokeAction";
 import { ProposalChangeAction } from "./ProposalChangeAction";
+import { ProposalChangeLabel } from "./ProposalChangeLabel";
 import { ProposalCreateForm } from "./ProposalCreateForm";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
 import { ProposalReadinessNotice } from "./ProposalReadinessNotice";
@@ -534,6 +535,9 @@ export function ProposalsPage() {
                         >
                           {row.title}
                         </Link>
+                        <ProposalChangeLabel
+                          replacesProposalId={row.replacesProposalId}
+                        />
                       </td>
                       <td>{clientDisplayName(row.clientId, clients)}</td>
                       <td className="supply-number">
