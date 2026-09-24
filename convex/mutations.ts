@@ -9176,8 +9176,8 @@ async function __runDishComponentAttach(ctx: MutationCtx, { docId, dishId, compo
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_dish != null) && (__rel_dish.status === "active")))) throw new Error("Guard 2 failed");
     if (!((dishId === doc.dishId))) throw new Error("This subrecipe is for a different dish. Pick the dish already on this subrecipe.");
-    if (!((yieldQuantity > 0))) throw new Error("Attached component yield must be positive");
-    if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("Attached component batch multiplier must be positive");
+    if (!((yieldQuantity > 0))) throw new Error("This subrecipe's yield must be more than zero.");
+    if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("When you enter a batch size on this subrecipe, it must be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -9289,8 +9289,8 @@ export const DishComponent_createViaAttach = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_dish != null) && (__rel_dish.status === "active")))) throw new Error("Guard 2 failed");
     if (!((dishId === __draft.dishId))) throw new Error("This subrecipe is for a different dish. Pick the dish already on this subrecipe.");
-    if (!((yieldQuantity > 0))) throw new Error("Attached component yield must be positive");
-    if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("Attached component batch multiplier must be positive");
+    if (!((yieldQuantity > 0))) throw new Error("This subrecipe's yield must be more than zero.");
+    if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("When you enter a batch size on this subrecipe, it must be more than zero.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,

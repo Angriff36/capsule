@@ -38,9 +38,9 @@ describe("plain words on leftover culinary dish task copy", () => {
       "This subrecipe is for a different dish. Pick the dish already on this subrecipe.",
     );
     // Later leftovers on this file are pinned: they must not change with this one.
-    expect(visible).toContain("Attached component yield must be positive");
+    expect(visible).toContain("This subrecipe's yield must be more than zero.");
     expect(visible).toContain(
-      "Attached component batch multiplier must be positive",
+      "When you enter a batch size on this subrecipe, it must be more than zero.",
     );
     expect(visible).toContain("Dish task name is required");
   });

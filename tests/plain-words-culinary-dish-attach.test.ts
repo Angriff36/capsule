@@ -47,9 +47,9 @@ describe("plain words on leftover culinary dish attach copy", () => {
     expect(visible).toContain(
       "This dish task is for a different dish. Pick the dish already on this dish task.",
     );
-    expect(visible).toContain("Attached component yield must be positive");
+    expect(visible).toContain("This subrecipe's yield must be more than zero.");
     expect(visible).toContain(
-      "Attached component batch multiplier must be positive",
+      "When you enter a batch size on this subrecipe, it must be more than zero.",
     );
   });
 });

@@ -466,8 +466,8 @@ entity DishComponent mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.dish != null and self.dish.status == "active"
     constraint attachDishMatch: dishId == self.dishId "This subrecipe is for a different dish. Pick the dish already on this subrecipe."
-    constraint attachYieldPositive: yieldQuantity > 0 "Attached component yield must be positive"
-    constraint attachBatchPositive: batchMultiplier == null or batchMultiplier > 0 "Attached component batch multiplier must be positive"
+    constraint attachYieldPositive: yieldQuantity > 0 "This subrecipe's yield must be more than zero."
+    constraint attachBatchPositive: batchMultiplier == null or batchMultiplier > 0 "When you enter a batch size on this subrecipe, it must be more than zero."
     mutate dishId = dishId
     mutate componentId = componentId
     mutate yieldQuantity = yieldQuantity
