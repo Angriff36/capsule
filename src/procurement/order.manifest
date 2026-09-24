@@ -1141,7 +1141,7 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
     guard self.linkedAt != null
     guard self.deletedAt == null
     guard self.vendorOrder != null and self.vendorOrder.status == "draft"
-    constraint retireReasonPresent: length(trim(reason)) > 0 "Demand link retirement reason is required"
+    constraint retireReasonPresent: length(trim(reason)) > 0 "This order-to-need link needs a reason before you retire it. Write why you're taking it off."
     mutate removedAt = now()
     mutate deletedAt = now()
     emit VendorOrderLineDemandRetired {

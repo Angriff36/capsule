@@ -54062,7 +54062,7 @@ async function __runVendorOrderLineDemandRetire(ctx: MutationCtx, { docId, reaso
     if (!((doc.linkedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Demand link retirement reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("This order-to-need link needs a reason before you retire it. Write why you're taking it off.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
