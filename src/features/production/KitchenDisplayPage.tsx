@@ -105,7 +105,7 @@ export function KitchenDisplayPage() {
   const eventName = (id: string | null) =>
     (id && events?.find((event) => event._id === id)?.title) || "House";
   const componentName = (id: string) =>
-    components?.find((component) => component._id === id)?.name ?? "Component";
+    components?.find((component) => component._id === id)?.name ?? "Recipe";
 
   const items: BoardItem[] = [
     ...(tasks ?? [])

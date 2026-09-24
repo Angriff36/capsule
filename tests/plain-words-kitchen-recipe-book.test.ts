@@ -338,4 +338,33 @@ describe("plain words on the kitchen recipe book", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover kitchen prep and kitchen-display Component labels as Recipe", () => {
+    const prepPanel = readFileSync(
+      "src/features/kitchen/DishPrepTasksPanel.tsx",
+      "utf8",
+    );
+    const kitchenDisplay = readFileSync(
+      "src/features/production/KitchenDisplayPage.tsx",
+      "utf8",
+    );
+    const batchAllocations = readFileSync(
+      "src/features/production/BatchAllocationsPanel.tsx",
+      "utf8",
+    );
+
+    expect(prepPanel).not.toContain("Component: {component.name}");
+    expect(prepPanel).not.toContain("Component linked");
+    expect(kitchenDisplay).not.toContain('?? "Component"');
+    expect(batchAllocations).not.toContain('?? "Component"');
+
+    expect(prepPanel).toContain("Recipe: {component.name}");
+    expect(prepPanel).toContain("Recipe linked");
+    expect(kitchenDisplay).toContain('?? "Recipe"');
+    expect(batchAllocations).toContain('?? "Recipe"');
+
+    for (const fresh of ["Recipe: Tomato sauce", "Recipe linked", "Recipe"]) {
+      expectPlain(fresh);
+    }
+  });
 });

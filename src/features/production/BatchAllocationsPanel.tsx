@@ -28,7 +28,7 @@ export function BatchAllocationsPanel() {
   const batchOf = (id: string) =>
     (batches ?? []).find((batch) => batch._id === id);
   const componentName = (id: string) =>
-    components?.find((component) => component._id === id)?.name ?? "Component";
+    components?.find((component) => component._id === id)?.name ?? "Recipe";
   const shareLabel = (row: any) =>
     row.isSurplus
       ? "Production surplus"
