@@ -10976,7 +10976,7 @@ async function __runEquipmentRecount(ctx: MutationCtx, { docId, actualQuantity, 
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((actualQuantity >= 0))) throw new Error("Recount quantity cannot be negative");
+    if (!((actualQuantity >= 0))) throw new Error("This equipment's counted amount can't be negative. Use zero or more.");
     const previousQuantity = doc.quantity;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);

@@ -149,7 +149,7 @@ entity Equipment mixin TenantScoped, SoftDeletable {
   command recount(actualQuantity: int) {
     guard self.registeredAt != null
     guard self.deletedAt == null
-    constraint recountEquipmentNonnegative: actualQuantity >= 0 "Recount quantity cannot be negative"
+    constraint recountEquipmentNonnegative: actualQuantity >= 0 "This equipment's counted amount can't be negative. Use zero or more."
     compute previousQuantity = self.quantity
     mutate quantity = actualQuantity
     emit EquipmentRecounted {
