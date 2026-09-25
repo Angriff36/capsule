@@ -133,7 +133,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   command receiveStock(quantity: decimal(12, 4), optional unitCost: money(12, 2)) {
     guard self.stockedAt != null
     guard self.deletedAt == null
-    constraint receiveQuantityPositive: quantity > 0 "Received quantity must be positive"
+    constraint receiveQuantityPositive: quantity > 0 "This item's received amount has to be more than zero. Enter how much arrived."
     constraint receiveCostNonnegative: unitCost == null or unitCost >= 0 "Unit cost cannot be negative"
     compute previousQuantity = self.quantityOnHand
     compute nextQuantity = self.quantityOnHand + quantity

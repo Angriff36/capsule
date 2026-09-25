@@ -25445,7 +25445,7 @@ async function __runInventoryItemReceiveStock(ctx: MutationCtx, { docId, quantit
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((quantity > 0))) throw new Error("Received quantity must be positive");
+    if (!((quantity > 0))) throw new Error("This item's received amount has to be more than zero. Enter how much arrived.");
     if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("Unit cost cannot be negative");
     const previousQuantity = doc.quantityOnHand;
     const nextQuantity = (doc.quantityOnHand + quantity);
