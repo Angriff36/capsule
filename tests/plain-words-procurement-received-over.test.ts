@@ -11,26 +11,32 @@ function expectPlain(text: string) {
   expect(text).not.toContain("bun run");
 }
 
-describe("plain words on leftover procurement demand-link revise-positive copy", () => {
-  it("keeps the revise-amount-must-be-more-than-zero refusal free of jargon", () => {
+describe("plain words on leftover order-line received-over copy", () => {
+  it("keeps the received-more-than-ordered refusal free of jargon", () => {
     const manifest = readFileSync("src/procurement/order.manifest", "utf8");
     // Strip // comments the same way the culinary leftover tests do.
     const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
     const NEW =
-      "This order-to-need link's amount has to be more than zero. Enter how much this line covers.";
-    // The old jargon refusal is gone.
-    expect(visible).not.toContain("Demand link contribution must be positive");
-    // The refusal now speaks in plain catering words.
+      "This order line can't receive more than was ordered. Enter a smaller amount.";
+    // The old jargon refusal is gone from the authored file.
+    expect(visible).not.toContain(
+      "Received quantity cannot exceed ordered quantity",
+    );
+    // The refusal now speaks in plain catering words (entity + command share it).
     expect(visible).toContain(NEW);
     expectPlain(NEW);
-    // The generated copies carry the plain wording, not the old one.
-    const mutations = readFileSync("convex/mutations.ts", "utf8");
-    expect(mutations).not.toContain(
-      "Demand link contribution must be positive",
-    );
-    expect(mutations).toContain(NEW);
+    // The generated summary carries the plain wording, not the old one.
     const summary = readFileSync("manifest-context-summary.json", "utf8");
     expect(summary).toContain(NEW);
+    expect(summary).not.toContain(
+      "Received quantity cannot exceed ordered quantity",
+    );
+    // The command-level half of this refusal lands in generated mutations.
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    expect(mutations).toContain(NEW);
+    expect(mutations).not.toContain(
+      "Received quantity cannot exceed ordered quantity",
+    );
     // Already-landed copy on this same file stays.
     expect(visible).toContain(
       "This order-to-need link's amount can't be negative. Use zero or more.",
@@ -48,10 +54,16 @@ describe("plain words on leftover procurement demand-link revise-positive copy",
       "This order-to-need link is for a different need. Pick the need already on this link.",
     );
     expect(visible).toContain(
-      "This order-to-need link needs a reason before you retire it. Write why you're taking it off.",
+      "This weekly order line's amount can't be negative. Use zero or more.",
     );
     expect(visible).toContain(
-      "Procurement and managers may see order demand links",
+      "This order line's ordered amount can't be negative. Use zero or more.",
+    );
+    expect(visible).toContain(
+      "This order line's received amount can't be negative. Use zero or more.",
+    );
+    expect(visible).toContain(
+      "This order line's cost per unit can't be negative. Use zero or more.",
     );
     // Later leftovers on this same file are pinned, not rewritten.
     expect(visible).toContain("Ordered quantity must be positive");

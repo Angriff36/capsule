@@ -3,9 +3,11 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { applyAggregateCompositeIndexes } from "./apply-aggregate-composite-indexes.ts";
 import { applyOrgCapabilityCheckRole } from "./apply-org-capability-check-role.ts";
 import { applyEventServiceStyleReferenceGuard } from "./apply-event-service-style-reference-guard.ts";
 import { ManifestLineEndingNormalizer } from "./normalizeManifestLineEndings.ts";
+import { syncBuilderBaselines } from "./sync-builder-baselines.ts";
 
 const CAPSULE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -37,14 +39,23 @@ export function regenerate(passthrough: string[] = []): number {
   const status = runBuilder(["generate", "convex", "--apply", ...passthrough]);
   if (status !== 0) return status;
   // Builder emits checkRole(user.role). Re-apply org capability enforcement
-  // and the service-style reference guard, refreshing ownership digests.
+  // and the service-style reference guard, and point aggregate sums at their
+  // composite indexes, refreshing ownership digests.
   const touched = [
     ...applyOrgCapabilityCheckRole(CAPSULE_ROOT),
     ...applyEventServiceStyleReferenceGuard(CAPSULE_ROOT),
+    ...applyAggregateCompositeIndexes(CAPSULE_ROOT),
   ];
   if (touched.length > 0) {
     console.log(
       `manifest-regen: applied generated runtime patches (${touched.join(", ")})`,
+    );
+  }
+  // The patches moved ledger digests after Builder's own baseline prune.
+  const synced = syncBuilderBaselines(CAPSULE_ROOT);
+  if (synced.written + synced.removed > 0) {
+    console.log(
+      `manifest-regen: baseline store synced (${String(synced.written)} written, ${String(synced.removed)} removed)`,
     );
   }
   return 0;

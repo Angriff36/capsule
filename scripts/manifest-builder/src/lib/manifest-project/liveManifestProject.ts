@@ -9,6 +9,7 @@ import {
   applyProjectGeneration,
   planProjectGeneration,
   type GeneratedFileMap,
+  type ProjectGenerationApplyResult,
   type ProjectGenerationPlan,
 } from "../projectGeneration";
 import { ManifestBuildConfigLoader } from "./manifestBuildConfig";
@@ -126,8 +127,10 @@ export class LiveManifestProject {
     };
   }
 
-  async apply(result: LiveManifestProjectPlanResult): Promise<void> {
-    await applyProjectGeneration(result.plan);
+  async apply(
+    result: LiveManifestProjectPlanResult,
+  ): Promise<ProjectGenerationApplyResult> {
+    return applyProjectGeneration(result.plan);
   }
 
   private async loadEditableTree(

@@ -18,6 +18,7 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { regenerate } from "./manifest-regen.ts";
+import { baselineDrift } from "./sync-builder-baselines.ts";
 
 const CAPSULE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const status = regenerate();
@@ -28,6 +29,16 @@ if (status !== 0) {
   process.exit(status);
 }
 
+// The baseline store must hold exactly the blobs the ledger names; leftovers
+// piled up to ~970 files twice (Sep 11, Sep 24 2026).
+const drift = baselineDrift(CAPSULE_ROOT);
+if (drift.unreferenced.length > 0 || drift.missing.length > 0) {
+  console.error(
+    `manifest-regen-check: .builder/baselines differs from the ledger (${String(drift.unreferenced.length)} unreferenced, ${String(drift.missing.length)} missing).`,
+  );
+  process.exit(1);
+}
+
 // Scope the drift check to Builder-owned paths only (issue #375 follow-up):
 // a bare `git status --porcelain` also reports any unrelated uncommitted
 // work in the tree, which would falsely block a push that touches nothing
@@ -36,7 +47,13 @@ const ownershipPath = ".builder/ownership.json";
 const ownership = JSON.parse(
   readFileSync(resolve(CAPSULE_ROOT, ownershipPath), "utf-8"),
 ) as { files?: Record<string, unknown> };
-const ownedPaths = [ownershipPath, ...Object.keys(ownership.files ?? {})];
+// .builder/baselines is listed so new or pruned blobs are committed with the
+// ledger instead of accumulating as untracked files.
+const ownedPaths = [
+  ownershipPath,
+  ".builder/baselines",
+  ...Object.keys(ownership.files ?? {}),
+];
 
 const dirty = execFileSync(
   "git",

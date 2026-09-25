@@ -22,11 +22,25 @@ const policy = new SupplyLifecyclePolicy();
 
 const percent = (value: number) => `${Math.round(value * 100)}%`;
 
+/** An ordered need whose event amount changed after the order went out. */
+const orderedChangeNote = (need: PurchaseNeed): string | null => {
+  if (need.status !== "ordered" && need.status !== "fulfilled") return null;
+  if (need.orderedQuantity == null) return null;
+  const ordered = Number(need.orderedQuantity);
+  const required = Number(need.requiredQuantity);
+  if (Math.abs(required - ordered) < 0.0001) return null;
+  const was = `Ordered ${formatQty(ordered)} ${need.unit}; the event now needs ${formatQty(required)} ${need.unit}.`;
+  return required > ordered
+    ? `${was} The extra ${formatQty(required - ordered)} ${need.unit} goes on this week's order.`
+    : `${was} Ask the vendor if you can cut ${formatQty(ordered - required)} ${need.unit}.`;
+};
+
 type PurchaseNeed = {
   _id: string;
   ingredientId: string;
   eventId: string;
   requiredQuantity: number | string;
+  orderedQuantity?: number | string | null;
   unit: string;
   status: string;
   ingredientDemandId: string;
@@ -155,6 +169,9 @@ export function PurchasingQueueSplit({
                           {eventName(need.eventId)} · {need.requiredQuantity}{" "}
                           {need.unit}
                         </span>
+                        {orderedChangeNote(need) ? (
+                          <small>{orderedChangeNote(need)}</small>
+                        ) : null}
                         <small className="purchase-stock-context">
                           {stock === undefined ? (
                             "Loading stock..."

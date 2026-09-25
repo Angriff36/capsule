@@ -2,7 +2,7 @@
 # The ONE production deployment command (owner rule, 2026-09-20). Run it on the
 # WORK PC, on the branch to release:
 #
-#   bash scripts/deploy-production.sh [--reviewer <model>]
+#   bash scripts/deploy-production.sh [--reviewer <model> | --no-review]
 #
 # It is ONLY the orchestrator. The authoritative pieces stay where they are:
 #   scripts/release.sh          merge, gate, the one main push, archive
@@ -34,6 +34,7 @@ ORIGIN_MATCH="Angriff36/capsule"
 VERCEL_WAIT_SECONDS=900
 
 reviewer=""
+no_review=0
 fail() {
   echo ""
   echo "RESULT: FAIL - $1"
@@ -42,6 +43,8 @@ fail() {
 while [ $# -gt 0 ]; do
   case "$1" in
     --reviewer) reviewer="${2:-}"; [ -n "$reviewer" ] || fail "--reviewer needs a model name"; shift 2 ;;
+    # Ryan, 2026-09-24: "dont need to do another code review for such a small change".
+    --no-review) no_review=1; shift ;;
     --ssh-host) PROD_SSH="${2:-}"; shift 2 ;;
     *) fail "unknown argument $1" ;;
   esac
@@ -104,8 +107,13 @@ if [ "$branch" = "main" ]; then
     *) fail "you are on main. Check out the branch to release" ;;
   esac
 else
-  [ -n "$reviewer" ] || run_review
-  bash scripts/release.sh --reviewer "$reviewer" || fail "scripts/release.sh failed (above). Nothing after it ran"
+  if [ "$no_review" = 1 ] && [ -z "$reviewer" ]; then
+    release_args=(--no-review)
+  else
+    [ -n "$reviewer" ] || run_review
+    release_args=(--reviewer "$reviewer")
+  fi
+  bash scripts/release.sh "${release_args[@]}" || fail "scripts/release.sh failed (above). Nothing after it ran"
   git fetch origin --quiet || fail "git fetch failed after the release"
 fi
 sha="$(git rev-parse origin/main)"
