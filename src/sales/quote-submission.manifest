@@ -80,9 +80,9 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
   constraint consentRequired: self.consentGrantedAt != null "Data processing consent is required"
 
   // Policies - public access for quote submission
-  default policy quoteSubmissionRead read: true "Anyone may read quote submission status by ID"
+  default policy quoteSubmissionRead read: true "Anyone may check a quote request"
   default policy quoteSubmissionWrite write: roleAllows(user.role, "salesAccess") "Only sales staff may update quote submissions"
-  default policy quoteSubmissionExecute execute: true "Anyone may execute quote submission commands (public form)"
+  default policy quoteSubmissionExecute execute: true "Anyone may send a quote request"
 
   command create(
     dedupKey: string,

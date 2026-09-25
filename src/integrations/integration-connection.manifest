@@ -81,9 +81,9 @@ entity IntegrationConnection mixin TenantScoped, SoftDeletable {
 
   // Read at the manager tier so an operator can see integration health; write
   // and execute at admin because connecting a payment account binds real money.
-  default policy integrationConnectionRead read: roleAllows(user.role, "manageAccess") "Managers may read integration connections"
-  default policy integrationConnectionWrite write: roleAllows(user.role, "adminAccess") "Admins may write integration connections through commands"
-  default policy integrationConnectionExecute execute: roleAllows(user.role, "adminAccess") "Admins may execute integration connection commands"
+  default policy integrationConnectionRead read: roleAllows(user.role, "manageAccess") "Managers may see outside-service connections"
+  default policy integrationConnectionWrite write: roleAllows(user.role, "adminAccess") "Admins may update integration connections"
+  default policy integrationConnectionExecute execute: roleAllows(user.role, "adminAccess") "Admins may change integration connections"
 
   // Begin an onboarding/authorization attempt. Creates the row.
   // Named `authorize`, not `connect` — `connect` is a Manifest reserved word.

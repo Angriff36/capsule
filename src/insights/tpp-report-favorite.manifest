@@ -17,7 +17,7 @@ entity TppReportFavorite mixin TenantScoped {
   property indexed personId: uuid?
   property indexed reportId: string?
 
-  default policy tppReportFavoriteRead read: self.personId == null or self.personId == user.personId "Staff may read their own report favorites"
+  default policy tppReportFavoriteRead read: self.personId == null or self.personId == user.personId "Staff may see their own report favorites"
   default policy tppReportFavoriteWrite write: roleAllows(user.role, "reportFavoriteSeamOnly") "Report favorites are managed only through the app"
   default policy tppReportFavoriteExecute execute: roleAllows(user.role, "reportFavoriteSeamOnly") "Report favorites are managed only through the app"
 

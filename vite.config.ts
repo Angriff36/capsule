@@ -253,6 +253,9 @@ export default defineConfig(({ mode }) => ({
   },
   test: {
     environment: "node",
+    // Runtime proofs nominally take 3-5s; on this shared multi-session box
+    // they blow past vitest's 5s default and the gate flakes (#398).
+    testTimeout: 30_000,
     // Each worker loads the generated Convex runtime. Oversubscribing large
     // machines adds contention and makes otherwise fast proofs time out.
     maxWorkers: Math.min(8, availableParallelism()),

@@ -36,7 +36,7 @@ export function ComponentRecipeStatusPanel({
         </p>
       ) : report === null ? (
         <p className="py-4 text-base text-ink-2">
-          Recipe status is unavailable for this record.
+          Recipe status isn't available for this item.
         </p>
       ) : (
         <>

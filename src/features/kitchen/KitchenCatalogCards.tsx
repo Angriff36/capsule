@@ -340,7 +340,7 @@ export function KitchenCatalogCards({
             </div>
           </div>
           <footer className="culinary-ledger-footer">
-            <span>{rows.length.toLocaleString()} matching records</span>
+            <span>{rows.length.toLocaleString()} matching items</span>
             <span>Select a row to preview</span>
           </footer>
         </div>
@@ -348,7 +348,7 @@ export function KitchenCatalogCards({
 
       <RecordPreviewSheet
         open={selected != null}
-        title={selected?.name ?? "Record"}
+        title={selected?.name ?? "Item"}
         description={
           selected ? ledgerDescription(section, selected) : undefined
         }
@@ -360,7 +360,7 @@ export function KitchenCatalogCards({
               {recordLink(
                 section,
                 selected._id,
-                "Open full record",
+                "Open full card",
                 "btn btn-primary",
               )}
               <KitchenCatalogLifecycleButtons
@@ -408,7 +408,7 @@ function CatalogPreview({
       </div>
 
       <section className="culinary-preview-section">
-        <h3>Record details</h3>
+        <h3>Item details</h3>
         <dl>
           {facts.map((fact) => (
             <div key={fact.label}>

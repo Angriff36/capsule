@@ -84,8 +84,8 @@ entity ImportDataset mixin TenantScoped, SoftDeletable {
   constraint importOrderPositive: self.importOrder > 0 "Import order must be positive"
 
   // Policies
-  default policy importDatasetRead read: roleAllows(user.role, "importAccess") "Staff may read import datasets"
-  default policy importDatasetWrite write: roleAllows(user.role, "importAccess") "Staff may write import datasets"
+  default policy importDatasetRead read: roleAllows(user.role, "importAccess") "Staff may see import lists"
+  default policy importDatasetWrite write: roleAllows(user.role, "importAccess") "Staff may update import lists"
 
   // register - Create a new dataset definition
   command register(

@@ -51,9 +51,9 @@ entity Message mixin TenantScoped, SoftDeletable {
 
   constraint messageBodyPresent: length(trim(self.bodyText)) > 0 "Message text is required"
 
-  default policy messageRead read: roleAllows(user.role, "staffAccess") "Staff may read messages"
-  default policy messageWrite write: roleAllows(user.role, "staffAccess") "Staff may write messages through commands"
-  default policy messageExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute message commands"
+  default policy messageRead read: roleAllows(user.role, "staffAccess") "Staff may see messages"
+  default policy messageWrite write: roleAllows(user.role, "staffAccess") "Staff may update messages"
+  default policy messageExecute execute: roleAllows(user.role, "staffAccess") "Staff may change messages"
 
   // Post one message into a thread (inbound or outbound). threadId is a supplied
   // target validated by the belongsTo relation; the author identity is stamped

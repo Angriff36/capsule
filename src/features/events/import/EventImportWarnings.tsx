@@ -39,8 +39,8 @@ export function EventImportWarnings({ warnings, decisions }: Props) {
         </ul>
       ) : null}
       <p className="text-xs text-ink-3">
-        Report disagreements and off-headcount servings are raised as review
-        flags on the event so they are settled there, not lost here.
+        Where the reports disagree, or servings do not match the head count,
+        Capsule flags it on the event so you can settle it there.
       </p>
     </section>
   );

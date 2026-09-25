@@ -128,7 +128,7 @@ export function ImportRunsListPage() {
     const reason = await prompt.askReason({
       title: "Mark Import Failed",
       description:
-        "Record why this run failed so the next attempt knows what went wrong.",
+        "Write why this import failed so the next attempt knows what went wrong.",
       label: "Failure details",
       placeholder: "What went wrong…",
       confirmLabel: "Mark failed",
@@ -172,7 +172,7 @@ export function ImportRunsListPage() {
       <header className="supply-masthead">
         <div>
           <p className="eyebrow">Import</p>
-          <h1 className="display-title mt-2">Import Runs</h1>
+          <h1 className="display-title mt-2">Imports</h1>
           <p className="mt-3 max-w-160 text-ink-2">
             Bring data over from your old systems (TPP, CSV files, connected
             apps). Follow each import's progress, review what came in, and save
@@ -185,7 +185,7 @@ export function ImportRunsListPage() {
             onClick={() => setShowForm(!showForm)}
             className="btn btn-primary"
           >
-            {showForm ? "Cancel" : "New import run"}
+            {showForm ? "Cancel" : "New import"}
           </button>
         </div>
       </header>
@@ -199,7 +199,7 @@ export function ImportRunsListPage() {
         <div className="card mt-4">
           <div className="border-b border-line px-3">
             <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
-              Start New Import Run
+              Start new import
             </h2>
           </div>
           <form onSubmit={handleStartImport} className="p-4">
@@ -374,7 +374,7 @@ export function ImportRunsListPage() {
           </div>
           <div className="ml-auto">
             <p className="text-xs text-ink-2">
-              {filteredRuns.length} import run(s)
+              {filteredRuns.length} import(s)
             </p>
           </div>
         </div>
@@ -387,7 +387,7 @@ export function ImportRunsListPage() {
                 <th className="text-left py-3 px-4 font-medium">Source</th>
                 <th className="text-left py-3 px-4 font-medium">Dataset</th>
                 <th className="text-left py-3 px-4 font-medium">Status</th>
-                <th className="text-left py-3 px-4 font-medium">Records</th>
+                <th className="text-left py-3 px-4 font-medium">Items</th>
                 <th className="text-left py-3 px-4 font-medium">Started</th>
                 <th className="text-left py-3 px-4 font-medium">Completed</th>
                 <th className="text-left py-3 px-4 font-medium">Actions</th>
@@ -403,9 +403,9 @@ export function ImportRunsListPage() {
               ) : filteredRuns.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="text-center py-8 text-ink-2">
-                    No import runs found.{" "}
+                    No imports found.{" "}
                     {!sourceSystemFilter && !datasetTypeFilter && !statusFilter
-                      ? "Create a new import run to get started."
+                      ? "Start a new import."
                       : "Adjust filters to see more results."}
                   </td>
                 </tr>
@@ -495,7 +495,7 @@ export function ImportRunsListPage() {
       <div className="card mt-4">
         <div className="border-b border-line px-3">
           <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
-            Import Run Workflow
+            How an import works
           </h2>
         </div>
         <div className="p-4">
@@ -537,12 +537,11 @@ export function ImportRunsListPage() {
           <h3 className="font-medium text-xs mb-2 mt-4">Actions</h3>
           <ul className="text-xs text-ink-2 space-y-1">
             <li>
-              • <strong>View</strong>: See detailed import run information and
-              stage transitions
+              • <strong>View</strong>: See the import details
             </li>
             <li>
               • <strong>Fail</strong>: Manually mark an import as failed (for
-              stuck runs)
+              stuck imports)
             </li>
             <li>
               • <strong>Revert</strong>: Roll back a completed import (removes

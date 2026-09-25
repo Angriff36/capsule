@@ -1,4 +1,15 @@
+import { CommercialMoney } from "../../lib/commercialMoney";
+
 export type RevenueEstimate = { amount: number; basis: string };
+
+export function allocateRevenueShare(input: {
+  method: "percent" | "fixed";
+  revenue: number;
+  percent: number;
+  fixed: number;
+}): number {
+  return new CommercialMoney().allocate(input);
+}
 
 export function eventRevenueEstimate(event: {
   quotedPrice?: number | null;

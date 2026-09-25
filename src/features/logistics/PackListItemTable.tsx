@@ -10,9 +10,11 @@ interface PackListItemRow {
   _id: string;
   description: string;
   note?: string | null;
+  sentInstead?: string | null;
   dishId?: string | null;
   requiredQuantity: number;
   packedQuantity: number;
+  packedByPersonId?: string | null;
   unit: string;
   status: unknown;
   version: number;
@@ -26,6 +28,7 @@ interface PackListItemTableProps {
   canEditLines: boolean;
   busy: string | null;
   dishName: (dishId?: string | null) => string | null;
+  packedByName: (personId?: string | null) => string | null;
   itemActions: (status: string) => LogisticsAction[];
   onAdd: () => void;
   onInvokeItem: (item: PackListItemRow, key: string) => void;
@@ -45,6 +48,7 @@ export function PackListItemTable({
   canEditLines,
   busy,
   dishName,
+  packedByName,
   itemActions,
   onAdd,
   onInvokeItem,
@@ -135,6 +139,11 @@ export function PackListItemTable({
                 {item.note ? (
                   <small className="block">Note: {item.note}</small>
                 ) : null}
+                {item.sentInstead ? (
+                  <small className="block">
+                    Sent instead: {item.sentInstead}
+                  </small>
+                ) : null}
                 {failedItem?.id === item._id ? (
                   <small className="block text-danger" role="alert">
                     {failedItem.message}
@@ -146,6 +155,11 @@ export function PackListItemTable({
               </td>
               <td>
                 {item.packedQuantity} {item.unit}
+                {packedByName(item.packedByPersonId) ? (
+                  <small className="block">
+                    {packedByName(item.packedByPersonId)}
+                  </small>
+                ) : null}
               </td>
               <td>
                 <StatusChip status={String(item.status)} />
@@ -175,6 +189,15 @@ export function PackListItemTable({
                   ))}
                   {canEditLines ? (
                     <>
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        disabled={busy != null}
+                        onClick={() => onInvokeItem(item, "sentInstead")}
+                      >
+                        {item.sentInstead
+                          ? "Edit sent instead"
+                          : "Sent instead"}
+                      </button>
                       <button
                         className="btn btn-ghost btn-sm"
                         disabled={busy != null}

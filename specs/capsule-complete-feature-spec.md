@@ -16,7 +16,7 @@ Verdicts below reflect what exists in `src/**` today, checked section-by-section
 | 3.2 | Service Style entity | ✅ | `operations/service-style.manifest` (register/revise/retire/activate) + `/admin/catalogs` admin UI + idempotent seed; retired rows hidden on create, resolved on detail. Import mapping/reconciliation queue not built. |
 | 3.3 | Sales Lock + pipeline | 🟡 | `sales_lock` stage + `Event.lockForSales` command live. `quote` stage unreachable; Confirmed conflated with Executing. |
 | 3.4 | Equipment PackList ≠ PrepList | ✅ | Distinct `PackList`/`PackListItem` (`logistics/pack-list.manifest`), separate from food PrepList. Not yet linked to Equipment catalog. |
-| 4.1 | Event creation fields | 🟡 | Date/guests/venue + occasion, service-style, salesperson, referral selectors live (e871648). Missing: duplicate/archive/reopen paths. |
+| 4.1 | Event creation fields | 🟡 | Date/guests/venue + occasion, service-style, salesperson, referral selectors live (e871648). Archive/reactivate and duplicate exist (2026-09-22; AC-239). Salesperson/referral persistence proven (2026-09-22; AC-234). Remaining: owner Confirmed/final mapping. |
 | 4.2 | Online menu pricing | 🟡 | Price in model (`MenuDish.sellingPrice`) but client portal omits it (`clientPortal.ts:131-138`). |
 | 4.3 | Self-service quote builder | 🟡 | Public quote form + dedup + one-action conversion to client/lead/event/linked draft proposal live (proven by `tests/proofs/quote-to-booked-event.runtime.test.ts`). Menu selections/enhancements captured as text, not structured; estimate labelling and attribution not built. |
 | 4.4 | Social DM inquiry capture | ❌ | `Lead.source` free-text only; no webhook/ingestion. |

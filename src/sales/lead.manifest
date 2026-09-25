@@ -44,9 +44,9 @@ entity Lead mixin TenantScoped, SoftDeletable {
   constraint leadEstimatedValueNonnegative: self.estimatedValue >= 0 "Lead estimated value cannot be negative"
   constraint leadProbabilityRange: self.probability >= 0 and self.probability <= 100 "Lead probability must be between 0 and 100"
 
-  default policy leadRead read: roleAllows(user.role, "salesAccess") "Sales staff may read leads"
-  default policy leadWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update leads through commands"
-  default policy leadExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute lead commands"
+  default policy leadRead read: roleAllows(user.role, "salesAccess") "Sales staff may see leads"
+  default policy leadWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update leads"
+  default policy leadExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may change leads"
 
   command capture(
     leadType: ClientType,

@@ -65,7 +65,7 @@ export function CulinaryRecordPicker({
           {exact.editionNumber != null
             ? ` (edition ${exact.editionNumber})`
             : ""}
-          . Select it, create a new edition, or create a distinct record only if
+          . Select it, create a new edition, or create a separate item only if
           you intend a different item.
         </p>
       ) : null}

@@ -179,6 +179,10 @@ fi
 # 3. The documented deploy.
 bun install --frozen-lockfile || fail "bun install failed"
 npx convex deploy -y || fail "convex deploy failed"
+# The Convex CLI rewrites its own generated files on every deploy. They are
+# tracked, so the next release would refuse this "dirty" checkout: put the
+# committed versions back so the box is clean for the next run.
+git checkout -- convex/_generated/ 2>/dev/null || true
 
 # 4. Runtime verification, on the backend that was just deployed. "success"
 #    means the function ran; "Server Error" means the backend does not have it.

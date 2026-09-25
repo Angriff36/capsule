@@ -11,6 +11,7 @@ import {
   internalQuery,
   mutation,
   query,
+  type QueryCtx,
 } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
 
@@ -40,6 +41,275 @@ type CutoverStatus =
   | "go"
   | "no_go"
   | "rolled_back";
+
+/**
+ * Tenant-scoped provider readiness for the cutover gate (spec §6.6, issue
+ * #386). Derived ONLY from the evidence of the calling tenant: canonical
+ * `integrationConnections` rows (a tenant-scoped table) and the
+ * manifestEvents connect/disconnect/reconcile rows whose entityId is this
+ * tenant (the Calendar and QBO connection ledger). Latest event wins: a
+ * historic connect never overrules a later disconnect or revocation, and
+ * sync evidence belongs to the CURRENT engagement only — a reconcile
+ * qualifies only when it happened at or after the latest connect and
+ * carries that connection's id whenever both payloads identify one, so the
+ * clean sync of a previous engagement never rides a reconnect. A provider
+ * the tenant never engaged is unneeded and cannot block cutover.
+ */
+interface ProviderReadiness {
+  passed: boolean;
+  message: string;
+  blockers: string[];
+  warnings: string[];
+}
+
+const PROVIDER_LABELS: Record<string, string> = {
+  stripe: "Stripe",
+  quickbooks: "QuickBooks",
+  google_calendar: "Calendar",
+  email: "Email",
+  sms: "SMS",
+  nowsta: "Nowsta",
+  instagram: "Instagram",
+  facebook: "Facebook",
+  tiktok: "TikTok",
+};
+
+/** Providers whose connection state lives in the manifestEvents ledger. */
+const LEDGER_PROVIDERS: Array<{
+  provider: string;
+  entity: string;
+  connectedType: string;
+  disconnectedType: string;
+  reconciledType: string;
+}> = [
+  {
+    provider: "google_calendar",
+    entity: "GoogleCalendarConnection",
+    connectedType: "GoogleCalendarConnected",
+    disconnectedType: "GoogleCalendarDisconnected",
+    reconciledType: "GoogleCalendarReconciled",
+  },
+  {
+    provider: "quickbooks",
+    entity: "QuickBooksConnection",
+    connectedType: "QuickBooksConnected",
+    disconnectedType: "QuickBooksDisconnected",
+    reconciledType: "QuickBooksReconciled",
+  },
+];
+
+function payloadRecord(payload: unknown): Record<string, unknown> | null {
+  return payload != null &&
+    typeof payload === "object" &&
+    !Array.isArray(payload)
+    ? (payload as Record<string, unknown>)
+    : null;
+}
+
+function payloadNumber(
+  payload: Record<string, unknown>,
+  key: string,
+): number | null {
+  const value = payload[key];
+  return typeof value === "number" ? value : null;
+}
+
+function payloadText(
+  payload: Record<string, unknown>,
+  key: string,
+): string | null {
+  const value = payload[key];
+  return typeof value === "string" && value.length > 0 ? value : null;
+}
+
+async function evaluateProviderReadiness(
+  db: QueryCtx["db"],
+  tenantId: string,
+): Promise<ProviderReadiness> {
+  const blockers: string[] = [];
+  const warnings: string[] = [];
+  const lines: string[] = [];
+
+  // Canonical connections of this tenant only; freshest row per provider.
+  const canonicalRows = await db
+    .query("integrationConnections")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .collect();
+  const canonicalByProvider = new Map<string, Doc<"integrationConnections">>();
+  for (const row of canonicalRows) {
+    if (row.deletedAt != null) continue;
+    const current = canonicalByProvider.get(row.provider);
+    const rowTime = row.updatedAt ?? row._creationTime;
+    const currentTime = current
+      ? (current.updatedAt ?? current._creationTime)
+      : -1;
+    if (!current || rowTime > currentTime) {
+      canonicalByProvider.set(row.provider, row);
+    }
+  }
+
+  // The ledger rows of this tenant only: entityId is the tenant id for
+  // connection lifecycle and reconcile events, so rows of any other tenant
+  // can never appear here.
+  const ledgerRows = await db
+    .query("manifestEvents")
+    .withIndex("by_entityId", (q) => q.eq("entityId", tenantId))
+    .collect();
+
+  const ledgerByProvider = new Map<
+    string,
+    {
+      engaged: boolean;
+      connected: boolean;
+      lastReconcile: {
+        at: number;
+        failed: number | null;
+        error: string | null;
+      } | null;
+    }
+  >();
+  for (const spec of LEDGER_PROVIDERS) {
+    const rows = ledgerRows.filter((row) => row.entity === spec.entity);
+
+    // Latest lifecycle event decides engagement: a historic connect never
+    // overrules a later disconnect or revocation.
+    const lifecycle = rows
+      .filter(
+        (row) =>
+          row.type === spec.connectedType || row.type === spec.disconnectedType,
+      )
+      .sort((left, right) => right.createdAt - left.createdAt)[0];
+    const connect = lifecycle?.type === spec.connectedType ? lifecycle : null;
+    const connectConnectionId = connect
+      ? payloadText(payloadRecord(connect.payload) ?? {}, "connectionId")
+      : null;
+
+    // Sync evidence belongs to the current engagement only: a reconcile
+    // qualifies when it happened at or after the latest connect AND carries
+    // that connection's id whenever both payloads identify one. The clean
+    // sync of a previous engagement therefore never qualifies a reconnect.
+    const reconcile = connect
+      ? rows
+          .filter(
+            (row) =>
+              row.type === spec.reconciledType &&
+              row.createdAt >= connect.createdAt,
+          )
+          .sort((left, right) => right.createdAt - left.createdAt)
+          .find((row) => {
+            const reconcileConnectionId = payloadText(
+              payloadRecord(row.payload) ?? {},
+              "connectionId",
+            );
+            return (
+              connectConnectionId == null ||
+              reconcileConnectionId == null ||
+              reconcileConnectionId === connectConnectionId
+            );
+          })
+      : undefined;
+
+    const reconcilePayload = reconcile
+      ? payloadRecord(reconcile.payload)
+      : null;
+    ledgerByProvider.set(spec.provider, {
+      engaged: lifecycle != null,
+      connected: connect != null,
+      lastReconcile: reconcile
+        ? {
+            at: reconcile.createdAt,
+            failed: reconcilePayload
+              ? payloadNumber(reconcilePayload, "failed")
+              : null,
+            error: reconcilePayload
+              ? payloadText(reconcilePayload, "error")
+              : null,
+          }
+        : null,
+    });
+  }
+
+  const providers = new Set<string>([
+    ...canonicalByProvider.keys(),
+    ...ledgerByProvider.keys(),
+  ]);
+  for (const provider of providers) {
+    const label = PROVIDER_LABELS[provider] ?? provider;
+    const canonical = canonicalByProvider.get(provider);
+    const ledger = ledgerByProvider.get(provider) ?? null;
+    if (canonical == null && ledger?.engaged !== true) continue;
+
+    const connected =
+      canonical != null
+        ? canonical.status === "connected"
+        : (ledger?.connected ?? false);
+
+    if (!connected) {
+      const state = canonical ? canonical.status : "disconnected";
+      blockers.push(
+        `${label} is ${state} but this workspace has used it. Connect it again or take it off before you switch.`,
+      );
+      lines.push(`${label}: ${state}`);
+      continue;
+    }
+
+    // Connected: the current engagement must hold healthy sync evidence —
+    // connecting alone never substitutes for a successful sync on THIS
+    // connection.
+    if (ledger != null) {
+      if (ledger.lastReconcile == null) {
+        blockers.push(
+          `${label} is connected but no sync has completed since it was connected. Sync it before you switch.`,
+        );
+        lines.push(`${label}: connected, nothing synced yet`);
+        continue;
+      }
+      const failed = ledger.lastReconcile.failed ?? 0;
+      if (failed > 0 || ledger.lastReconcile.error != null) {
+        blockers.push(
+          failed > 0
+            ? `${label} is connected but its latest sync failed (${failed} item(s)). Sync clean before you switch.`
+            : `${label} is connected but its latest sync reported an error: ${ledger.lastReconcile.error}.`,
+        );
+        lines.push(`${label}: sync failed`);
+        continue;
+      }
+    }
+    if (
+      canonical != null &&
+      canonical.lastErrorAt != null &&
+      (canonical.lastSuccessfulSyncAt == null ||
+        canonical.lastErrorAt > canonical.lastSuccessfulSyncAt)
+    ) {
+      blockers.push(
+        `${label} is connected but its latest sync failed: ${canonical.lastErrorMessage ?? "unknown error"}.`,
+      );
+      lines.push(`${label}: sync failed`);
+      continue;
+    }
+    if (
+      provider === "stripe" &&
+      canonical != null &&
+      !(canonical.chargesEnabled && canonical.payoutsEnabled)
+    ) {
+      blockers.push(
+        `${label} is connected but cannot accept charges and payouts yet. Finish Stripe setup before you switch.`,
+      );
+      lines.push(`${label}: not payout-ready`);
+      continue;
+    }
+    lines.push(`${label}: connected`);
+  }
+
+  const message =
+    blockers.length > 0
+      ? `Outside services need attention: ${blockers.join(" ")}`
+      : lines.length > 0
+        ? `Outside services: ${lines.join("; ")}`
+        : "No outside services in use (OK to switch)";
+
+  return { passed: blockers.length === 0, message, blockers, warnings };
+}
 
 /**
  * ========================================================================
@@ -138,11 +408,14 @@ export const validateCutoverReadiness = query({
     const checks: CutoverValidationResult["checks"] = {
       finalDeltaImport: { passed: false, message: "Checking..." },
       zeroCriticalMappings: { passed: false, message: "Checking..." },
-      businessValidation: { passed: false, message: "Pending manual sign-off" },
+      businessValidation: {
+        passed: false,
+        message: "Waiting for a manager to sign off",
+      },
       providerReadiness: { passed: false, message: "Checking integrations..." },
       rollbackPlan: {
         passed: false,
-        message: "No rollback plan documented",
+        message: "No switch-back plan written yet",
         hasPlan: false,
       },
     };
@@ -160,17 +433,17 @@ export const validateCutoverReadiness = query({
     if (!latestImport) {
       checks.finalDeltaImport = {
         passed: false,
-        message: "No import runs found",
-        details: "At least one successful import run is required",
+        message: "No imports found",
+        details: "At least one finished import is required",
       };
-      blockers.push("No import runs have been executed");
+      blockers.push("No imports have been finished");
     } else if (latestImport.status !== "completed") {
       checks.finalDeltaImport = {
         passed: false,
         message: `Latest import is ${latestImport.status}`,
         details: `Import ID: ${latestImport._id}`,
       };
-      blockers.push(`Latest import run has status: ${latestImport.status}`);
+      blockers.push(`Latest import has status: ${latestImport.status}`);
     } else {
       // Check if it's recent (last 7 days) for "final delta"
       const daysSinceImport = latestImport.completionTime
@@ -181,9 +454,9 @@ export const validateCutoverReadiness = query({
         checks.finalDeltaImport = {
           passed: false,
           message: "Latest import is stale",
-          details: `${Math.floor(daysSinceImport)} days old. Run a final delta import.`,
+          details: `${Math.floor(daysSinceImport)} days old. Do one last import.`,
         };
-        blockers.push("Latest import run is more than 7 days old");
+        blockers.push("Latest import is more than 7 days old");
       } else {
         checks.finalDeltaImport = {
           passed: true,
@@ -210,18 +483,16 @@ export const validateCutoverReadiness = query({
       passed: criticalUnresolved.length === 0,
       message:
         criticalUnresolved.length === 0
-          ? "All critical mappings verified"
-          : `${criticalUnresolved.length} unresolved TPP mappings`,
+          ? "Every leftover TPP item is matched up"
+          : `${criticalUnresolved.length} leftover TPP items still need matching`,
       count: criticalUnresolved.length,
     };
 
     if (criticalUnresolved.length > 0) {
       blockers.push(
-        `${criticalUnresolved.length} critical TPP record mappings are unverified`,
+        `${criticalUnresolved.length} leftover TPP items still need matching`,
       );
-      warnings.push(
-        "Use the Reconcile Records page to verify or resolve unverified mappings",
-      );
+      warnings.push("Use the match-up page to finish leftover TPP items");
     }
 
     // Check 3: Business validation (manual sign-off)
@@ -236,37 +507,31 @@ export const validateCutoverReadiness = query({
     checks.businessValidation = {
       passed: hasBusinessApproval,
       message: hasBusinessApproval
-        ? "Business sign-off confirmed"
-        : "Requires manual sign-off",
+        ? "A manager has signed off"
+        : "A manager still needs to sign off",
     };
 
     if (!hasBusinessApproval) {
-      blockers.push("Business validation requires explicit approval");
+      blockers.push("A manager still needs to sign off on this switch");
     }
 
     // Check 4: Provider readiness (TENANT-ISOLATED)
-    // Check if integrations are connected via manifestEvents ledger
-    // Note: manifestEvents doesn't have tenantId, so we scan all events
-    // In production, you'd filter by tenant-scoped integration connections
-    const integrationEvents = await ctx.db.query("manifestEvents").collect();
-
-    const calendarConnected = integrationEvents.some(
-      (e) => e.type === "GoogleCalendarConnected",
-    );
-    const qboConnected = integrationEvents.some(
-      (e) => e.type === "QuickBooksConnected",
-    );
-
-    if (!calendarConnected && !qboConnected) {
-      checks.providerReadiness = {
-        passed: true,
-        message: "No integrations configured (OK for cutover)",
-      };
-    } else {
-      checks.providerReadiness = {
-        passed: true,
-        message: `Integrations: ${calendarConnected ? "Calendar " : ""}${qboConnected ? "+ QBO " : ""}`,
-      };
+    // Derived from the canonical connections and sync evidence of THIS
+    // tenant only (issue #386): connect events of another tenant cannot
+    // pass or fail this tenant, an engaged provider that is disconnected,
+    // revoked, erroring, or failing to sync stays unresolved, sync evidence
+    // must belong to the current connection, and providers this workspace
+    // never engaged do not block cutover.
+    const providers = await evaluateProviderReadiness(ctx.db, tenantId);
+    checks.providerReadiness = {
+      passed: providers.passed,
+      message: providers.message,
+    };
+    for (const providerBlocker of providers.blockers) {
+      blockers.push(providerBlocker);
+    }
+    for (const providerWarning of providers.warnings) {
+      warnings.push(providerWarning);
     }
 
     // Check 5: Rollback plan
@@ -278,13 +543,13 @@ export const validateCutoverReadiness = query({
     checks.rollbackPlan = {
       passed: hasRollbackPlan,
       message: hasRollbackPlan
-        ? "Rollback plan documented"
-        : "Rollback plan not documented",
+        ? "Switch-back plan is written"
+        : "No switch-back plan written yet",
       hasPlan: hasRollbackPlan,
     };
 
     if (!hasRollbackPlan) {
-      blockers.push("Rollback plan must be documented before cutover");
+      blockers.push("Write the switch-back plan before you switch");
     }
 
     const canProceed = blockers.length === 0 && criticalUnresolved.length === 0;
@@ -391,16 +656,14 @@ export const recordCutoverApprovals = mutation({
 
     // Restrict to admin/owner only
     if (auth.role !== "admin" && auth.role !== "owner") {
-      throw new ConvexError(
-        "Only organization administrators can record cutover approvals.",
-      );
+      throw new ConvexError("Only admins can save the switch sign-off.");
     }
 
     const docId = await findOrCreateCutoverDecision(ctx, tenantId);
 
     // Inline the logic from CutoverDecision_recordApprovals
     const doc = await ctx.db.get(docId);
-    if (!doc) throw new ConvexError("CutoverDecision not found");
+    if (!doc) throw new ConvexError("Switch decision isn't on file");
     const updates = {
       businessApproved: args.businessApproved,
       rollbackPlan: args.rollbackPlan,
@@ -411,7 +674,7 @@ export const recordCutoverApprovals = mutation({
 
     return {
       success: true,
-      message: "Cutover approvals recorded",
+      message: "Switch sign-off saved",
     };
   },
 });
@@ -431,9 +694,7 @@ export const executeCutoverDecision = mutation({
 
     // Restrict to admin/owner only
     if (auth.role !== "admin" && auth.role !== "owner") {
-      throw new ConvexError(
-        "Only organization administrators can execute cutover.",
-      );
+      throw new ConvexError("Only admins can approve or stop this switch.");
     }
 
     const cutoverDecision = args.decision as "go" | "no_go";
@@ -453,7 +714,7 @@ export const executeCutoverDecision = mutation({
       // Validate business approval
       if (!currentDecision?.businessApproved) {
         throw new ConvexError(
-          "Cannot proceed: Business validation requires explicit approval. Use recordCutoverApprovals first.",
+          "Can't switch yet: someone still needs to sign off.",
         );
       }
 
@@ -463,7 +724,7 @@ export const executeCutoverDecision = mutation({
         currentDecision.rollbackPlan.length === 0
       ) {
         throw new ConvexError(
-          "Cannot proceed: Rollback plan must be documented. Use recordCutoverApprovals first.",
+          "Can't switch yet: write the switch-back plan first.",
         );
       }
 
@@ -482,7 +743,7 @@ export const executeCutoverDecision = mutation({
 
       if (criticalUnresolved.length > 0) {
         throw new ConvexError(
-          `Cannot proceed: ${criticalUnresolved.length} critical TPP mappings are unverified. Resolve all critical mappings before cutover.`,
+          `Can't switch yet: ${criticalUnresolved.length} leftover TPP items still need matching.`,
         );
       }
 
@@ -495,7 +756,7 @@ export const executeCutoverDecision = mutation({
 
       if (!latestImport || latestImport.status !== "completed") {
         throw new ConvexError(
-          "Cannot proceed: Latest import run is not completed. Run a successful final delta import first.",
+          "Can't switch yet: finish one last import first.",
         );
       }
 
@@ -505,7 +766,18 @@ export const executeCutoverDecision = mutation({
 
       if (daysSinceImport > 7) {
         throw new ConvexError(
-          `Cannot proceed: Latest import run is stale (${Math.floor(daysSinceImport)} days old). Run a final delta import first.`,
+          `Can't switch yet: the latest import is ${Math.floor(daysSinceImport)} days old. Do one last import first.`,
+        );
+      }
+
+      // Provider readiness uses the same tenant-scoped evidence as the
+      // readiness check (issue #386): a GO decision cannot land while an
+      // engaged provider is disconnected, revoked, or failing, and a
+      // connection without a successful sync of its own does not count.
+      const providers = await evaluateProviderReadiness(ctx.db, tenantId);
+      if (!providers.passed) {
+        throw new ConvexError(
+          `Can't switch yet: ${providers.blockers.join(" ")} Fix the connections, or choose Don't switch yet.`,
         );
       }
     }
@@ -513,7 +785,7 @@ export const executeCutoverDecision = mutation({
     // Inline the logic from CutoverDecision_execute
     const executeDecision = args.decision as "go" | "no_go";
     const executeDoc = await ctx.db.get(docId);
-    if (!executeDoc) throw new ConvexError("CutoverDecision not found");
+    if (!executeDoc) throw new ConvexError("Switch decision isn't on file");
 
     const executeUpdates = {
       status: executeDecision,
@@ -526,7 +798,7 @@ export const executeCutoverDecision = mutation({
     return {
       success: true,
       status: executeDecision,
-      message: `Cutover decision recorded: ${executeDecision.toUpperCase()}`,
+      message: `Switch decision saved: ${executeDecision.toUpperCase()}`,
     };
   },
 });
@@ -544,9 +816,7 @@ export const setTppReadOnly = mutation({
 
     // Restrict to admin/owner only
     if (auth.role !== "admin" && auth.role !== "owner") {
-      throw new ConvexError(
-        "Only organization administrators can set TPP read-only.",
-      );
+      throw new ConvexError("Only admins can set TPP to read-only.");
     }
 
     // Find existing cutover decision
@@ -557,13 +827,13 @@ export const setTppReadOnly = mutation({
 
     if (!decision) {
       throw new ConvexError(
-        "Cutover decision not found. Initialize cutover first.",
+        "No switch decision is on file yet. Start the switch checks first.",
       );
     }
 
     if (decision.status !== "go") {
       throw new ConvexError(
-        "TPP cannot be set to read-only until cutover is approved (GO decision).",
+        "TPP can be set to read-only only after the switch is approved.",
       );
     }
 
@@ -575,7 +845,7 @@ export const setTppReadOnly = mutation({
 
     return {
       success: true,
-      message: "TPP system marked as read-only. Scheduled imports disabled.",
+      message: "TPP is now read-only. Scheduled imports are off.",
     };
   },
 });
@@ -593,9 +863,7 @@ export const rollbackCutover = mutation({
 
     // Restrict to admin/owner only
     if (auth.role !== "admin" && auth.role !== "owner") {
-      throw new ConvexError(
-        "Only organization administrators can rollback cutover.",
-      );
+      throw new ConvexError("Only admins can undo the switch.");
     }
 
     // Find existing cutover decision
@@ -605,11 +873,11 @@ export const rollbackCutover = mutation({
       .first();
 
     if (!decision) {
-      throw new ConvexError("Cutover decision not found. Cannot rollback.");
+      throw new ConvexError("No switch decision is on file. Nothing to undo.");
     }
 
     if (decision.status !== "go") {
-      throw new ConvexError("Cannot rollback: cutover was not approved (GO).");
+      throw new ConvexError("Can't undo: the switch was not approved.");
     }
 
     // Inline the logic from CutoverDecision_rollback
@@ -623,7 +891,7 @@ export const rollbackCutover = mutation({
 
     return {
       success: true,
-      message: "Cutover rolled back. TPP re-enabled for writes.",
+      message: "Switch undone. TPP writes are back on.",
     };
   },
 });

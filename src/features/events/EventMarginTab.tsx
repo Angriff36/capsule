@@ -13,6 +13,7 @@ import {
   useListIngredient,
   useListIngredientDemand,
   useListIngredientPriceObservation,
+  useListItemUnitMapping,
   useListInvoice,
   useListPayrollInput,
   useListVendorOrder,
@@ -20,6 +21,7 @@ import {
   useListVendorOrderLineDemand,
 } from "../../lib/manifest-convex-react";
 import { buildEventMenuCost } from "./eventMenuCost";
+import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import { TableSkeleton } from "../../ui/primitives";
 import {
   EventMarginCostBreakdown,
@@ -45,6 +47,7 @@ export function EventMarginTab({ eventId }: Props) {
   const componentIngredients = useListComponentIngredient();
   const ingredients = useListIngredient();
   const priceObservations = useListIngredientPriceObservation();
+  const itemUnitMappings = useListItemUnitMapping();
   const invoices = useListInvoice();
   const demands = useListIngredientDemand();
   const orders = useListVendorOrder();
@@ -120,6 +123,7 @@ export function EventMarginTab({ eventId }: Props) {
           deletedAt: row.deletedAt,
         })),
         priceObservations: priceObservations ?? [],
+        unitMappings: RecordedUnitMappings.fromRows(itemUnitMappings),
       }),
     [
       componentIngredients,
@@ -130,6 +134,7 @@ export function EventMarginTab({ eventId }: Props) {
       eventDishes,
       eventId,
       ingredients,
+      itemUnitMappings,
       priceObservations,
     ],
   );

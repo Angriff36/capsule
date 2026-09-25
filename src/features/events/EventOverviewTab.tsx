@@ -12,6 +12,7 @@ import type {
   EventLifecycleAction,
   EventLifecycleActionKey,
 } from "./EventLifecyclePolicy";
+import { EventReadinessCard } from "./EventReadinessCard";
 import { EventOverviewRail } from "./EventOverviewRail";
 import { EventPipelineStageCard } from "./EventPipelineStageCard";
 import { EventSetupProgress } from "./EventSetupProgress";
@@ -31,13 +32,17 @@ type OverviewEvent = {
   hasMenuDishes?: boolean;
   hasStaffAssigned?: boolean;
   eventType: string;
+  clientName?: string | null;
   venueId?: Id<"venues"> | null;
   venueName?: string | null;
   venueAddress?: string | null;
   occasionId?: Id<"occasions"> | null;
+  occasionName?: string | null;
   serviceStyleId?: Id<"serviceStyles"> | null;
+  serviceStyleName?: string | null;
   referralSourceId?: Id<"referralSources"> | null;
   assignedToId?: Id<"people"> | null;
+  ownerName?: string | null;
   recurrenceFrequency?: string | null;
   recurrenceNextStartsAt?: number | null;
   recurrenceGeneratedCount?: number | null;
@@ -112,6 +117,8 @@ export function EventOverviewTab({
           <EventDetailsCard
             clientId={clientId}
             clients={clients}
+            clientName={event.clientName}
+            clientsLoading={clients === undefined}
             eventType={event.eventType}
             startsAt={startsAt}
             endsAt={endsAt}
@@ -122,7 +129,9 @@ export function EventOverviewTab({
             venuesLoading={reviseProps.venuesLoading}
             venueAddress={event.venueAddress}
             occasionId={event.occasionId}
+            occasionName={event.occasionName}
             serviceStyleId={event.serviceStyleId}
+            serviceStyleName={event.serviceStyleName}
             referralSourceId={event.referralSourceId}
             primaryContactName={primaryContactName}
             primaryContactEmail={reviseProps.primaryContactEmail}
@@ -143,10 +152,13 @@ export function EventOverviewTab({
         </div>
 
         <div className="event-overview-rail">
+          <EventReadinessCard eventId={eventId} />
           <EventSetupProgress eventId={eventId} event={event} />
           <EventOverviewRail
             assignedToId={event.assignedToId}
+            ownerName={event.ownerName}
             people={people}
+            peopleLoading={people === undefined}
             dishCount={dishCount}
             staffCount={staffCount}
             timelineCount={timelineCount}

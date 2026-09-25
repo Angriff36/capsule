@@ -19,11 +19,13 @@ import {
   useListEventGuest,
   useListIngredient,
   useListIngredientPriceObservation,
+  useListItemUnitMapping,
   useListInventoryItem,
   useListInventoryReservation,
 } from "../../lib/manifest-convex-react";
 import { formatMoneyExact } from "../../lib/format";
 import { useHeldQueryRows } from "../../lib/heldQueryRows";
+import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import type { Id } from "../../lib/api";
 import {
   CateringPackagePicker,
@@ -57,6 +59,7 @@ import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventMenuLineNote } from "./EventMenuLineNote";
 import { EventMenuLineOverrides } from "./EventMenuLineOverrides";
 import { orderEventMenuLines, planEventMenuLineSwap } from "./eventMenuOrder";
+import { eventDishLabel } from "./eventDishLabel";
 import {
   EventMenuDietaryConflictsCard,
   type DietaryConflictInputs,
@@ -117,6 +120,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const components = useListComponent();
   const componentIngredients = useListComponentIngredient();
   const ingredients = useListIngredient();
+  const itemUnitMappings = useListItemUnitMapping();
   const priceObservations = useListIngredientPriceObservation();
   const containers = useListDishContainer();
   const inventoryItems = useListInventoryItem();
@@ -262,6 +266,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           deletedAt: row.deletedAt,
         })),
         priceObservations: priceObservations ?? [],
+        unitMappings: RecordedUnitMappings.fromRows(itemUnitMappings),
       }),
     [
       componentIngredients,
@@ -270,6 +275,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
       dishIngredients,
       eventId,
       expectedHeadcount,
+      itemUnitMappings,
       ingredients,
       priceObservations,
       selections,
@@ -284,9 +290,13 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           return {
             eventDishId: row._id,
             dishId: row.dishId,
-            name:
-              dishes?.find((dish) => dish._id === row.dishId)?.name ??
-              "Unknown dish",
+            name: eventDishLabel({
+              dishId: row.dishId,
+              dishName: row.dishName,
+              liveName:
+                dishes?.find((dish) => dish._id === row.dishId)?.name ?? "",
+              dishesLoading: dishes === undefined,
+            }),
             servings: Number(row.quantityServings),
             unitSellPrice: fields.unitSellPrice,
             specialInstructions: row.specialInstructions,
@@ -323,9 +333,14 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
         return [
           {
             lineId: selection._id,
-            dishName:
-              dishes?.find((dish) => dish._id === selection.dishId)?.name ??
-              "Unknown dish",
+            dishName: eventDishLabel({
+              dishId: selection.dishId,
+              dishName: selection.dishName,
+              liveName:
+                dishes?.find((dish) => dish._id === selection.dishId)?.name ??
+                "",
+              dishesLoading: dishes === undefined,
+            }),
             note,
           },
         ];
@@ -460,8 +475,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
       return expectedHeadcount;
     const values = await prompt.askFields({
       title,
-      description:
-        "The event guest count is not recorded. Enter the servings to add.",
+      description: "This event has no guest count. Enter the servings to add.",
       fields: [
         {
           name: "servings",
@@ -527,9 +541,13 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     void (async () => {
       const selection = selections.find((item) => item._id === lineId);
       if (!selection) return;
-      const dishName =
-        dishes?.find((dish) => dish._id === selection.dishId)?.name ??
-        "Unknown dish";
+      const dishName = eventDishLabel({
+        dishId: selection.dishId,
+        dishName: selection.dishName,
+        liveName:
+          dishes?.find((dish) => dish._id === selection.dishId)?.name ?? "",
+        dishesLoading: dishes === undefined,
+      });
       const current = parseEventMenuLineFields(selection.specialInstructions);
       const startingNote =
         suggestedNote && !current.notes.includes(suggestedNote)
@@ -754,6 +772,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                 eventId,
                 dishId,
                 quantityServings: servings,
+                dishName: dishes?.find((d) => d._id === dishId)?.name,
                 headcountOverride: 0,
               });
               await refreshStock();
@@ -842,6 +861,14 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                   const dish = dishes?.find(
                     (row) => row._id === selection.dishId,
                   );
+                  // Printed name: the line's add-time snapshot first, live
+                  // catalog name only for legacy lines with no snapshot.
+                  const dishTitle = eventDishLabel({
+                    dishId: selection.dishId,
+                    dishName: selection.dishName,
+                    liveName: dish?.name ?? "",
+                    dishesLoading: dishes === undefined,
+                  });
                   const dishCost = eventMenuCostForDish(
                     costRollup,
                     selection._id,
@@ -904,7 +931,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                   );
                   const recipeOpen = openRecipeId === selection._id;
                   const headcountHint = eventMenuHeadcountHint({
-                    dishName: dish?.name ?? "Unknown dish",
+                    dishName: dishTitle,
                     quantityServings: Number(selection.quantityServings),
                     expectedHeadcount,
                     headcountOverride: (
@@ -992,14 +1019,17 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                           />
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                              <span className="text-base font-semibold text-ink">
-                                {dish?.name ?? "Unknown dish"}
+                              <span
+                                className="text-base font-semibold text-ink"
+                                data-testid="event-menu-dish-name"
+                              >
+                                {dishTitle}
                               </span>
                               {dish ? (
                                 <Link
                                   to={dishPath(dish._id)}
                                   className="text-xs text-ink-3 underline decoration-dotted hover:text-ink"
-                                  title="Opens the shared catalog record. Edits there change this dish on every event — use the kitchen note below for event-only instructions."
+                                  title="Opens the shared dish. Edits there change this dish on every event — use the kitchen note below for this event only."
                                   data-testid="event-menu-catalog-link"
                                 >
                                   Catalog dish ↗
@@ -1034,7 +1064,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                               eventId={eventId}
                               eventDishId={selection._id}
                               dishId={selection.dishId}
-                              dishName={dish?.name ?? "Unknown dish"}
+                              dishName={dishTitle}
                               busy={busy != null}
                               prompt={prompt}
                               onFailure={(error) =>

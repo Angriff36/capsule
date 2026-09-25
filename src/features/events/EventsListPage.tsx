@@ -11,6 +11,7 @@ import {
   TableSkeleton,
 } from "../../ui/primitives";
 import { SavedViewsBar } from "../views/SavedViewsBar";
+import { EventArchiveVisibility } from "./eventArchiveVisibility";
 import { clientDisplayName } from "./clientName";
 import { eventImportPath } from "./eventRoutes";
 import { EVENT_STAGES, type EventStage, STAGE_LABEL } from "./eventStatus";
@@ -79,11 +80,13 @@ export function EventsListPage() {
   const [search, setSearch] = useState("");
   const [dir, setDir] = useState<"asc" | "desc">("asc");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  // Archived events stay out of the ledger until the operator asks for them.
+  const [showArchived, setShowArchived] = useState(false);
   const now = Date.now();
 
   const live = useMemo(
-    () => (events ?? []).filter((e) => e.deletedAt == null),
-    [events],
+    () => EventArchiveVisibility.visibleRows(events, { showArchived }),
+    [events, showArchived],
   );
 
   const counts = useMemo(() => {
@@ -279,6 +282,14 @@ export function EventsListPage() {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            className="btn btn-ghost"
+            data-testid="events-show-archived"
+            onClick={() => setShowArchived((value) => !value)}
+          >
+            {showArchived ? "Hide archived" : "Show archived"}
+          </button>
           <Link to="/events/new" className="btn btn-primary">
             <PlusIcon /> New event
           </Link>

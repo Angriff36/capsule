@@ -98,7 +98,7 @@ export function ClientDetailPage() {
     return (
       <ErrorState
         title="Client not found"
-        detail="This client is missing or belongs to another tenant."
+        detail="This client is missing or belongs to another workspace."
       />
     );
   }

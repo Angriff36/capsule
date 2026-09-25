@@ -509,7 +509,9 @@ export function TrainingPage() {
               <p className="eyebrow">Completion ledger</p>
               <h2>Passed assessments</h2>
             </div>
-            <span>{formatCountNoun(activeCompletions.length, "record")}</span>
+            <span>
+              {formatCountNoun(activeCompletions.length, "completion")}
+            </span>
           </div>
           {loading ? (
             <TableSkeleton rows={4} />

@@ -20,10 +20,10 @@ export function EventTimelineRunSheetHeader({
   onPickTemplate,
 }: Props) {
   return (
-    <section className="card p-5" aria-label="Run sheet">
+    <section className="card p-5" aria-label="Day-of timeline">
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <div className="min-w-0">
-          <h3 className="text-lg font-semibold text-ink">Event run sheet</h3>
+          <h3 className="text-lg font-semibold text-ink">Event timeline</h3>
           <p className="mt-1 text-sm text-ink-3">
             {windowStart == null
               ? "No blocks scheduled yet"

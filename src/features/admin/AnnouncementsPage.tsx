@@ -1,5 +1,9 @@
 import { useQuery } from "convex/react";
 import { useMemo, useState, type FormEvent } from "react";
+import {
+  announcementStaffActions,
+  staffActionNeedsConfirm,
+} from "../../agent/CapsuleStaffActionOffer";
 import { api } from "../../lib/api";
 import {
   useAnnouncementRemove,
@@ -15,17 +19,28 @@ import {
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
+import { useActionPrompt } from "../../ui/action-prompt";
 
-const CATEGORY_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
-  { value: "policyUpdate", label: "New policy" },
-  { value: "safety", label: "Safety reminder" },
-  { value: "training", label: "Upcoming training" },
-  { value: "general", label: "General notice" },
-];
+/** Clearer words than the generated enum name, keyed by the generated value. */
+const FRIENDLY_CATEGORY: Record<string, string> = {
+  policyUpdate: "New policy",
+  safety: "Safety reminder",
+  training: "Upcoming training",
+  general: "General notice",
+};
 
-const CATEGORY_LABEL: Record<string, string> = Object.fromEntries(
-  CATEGORY_OPTIONS.map((o) => [o.value, o.label]),
-);
+function categoryChoices(post: {
+  fields: ReadonlyArray<{
+    name: string;
+    choices?: ReadonlyArray<{ value: string; label: string }>;
+  }>;
+}) {
+  const field = post.fields.find((item) => item.name === "category");
+  return (field?.choices ?? []).map((choice) => ({
+    value: choice.value,
+    label: FRIENDLY_CATEGORY[choice.value] ?? choice.label,
+  }));
+}
 
 // Manifest `post`/`remove` commands gate on the manageAccess capability, which
 // manager + every *_manager role + admin/owner/system inherit. The UI gate
@@ -53,6 +68,11 @@ export function AnnouncementsPage() {
   const [removingId, setRemovingId] = useState<string | null>(null);
   const { error, setError } = useActionFailure();
   const { notice, setNotice } = useActionNotice();
+  const offers = useMemo(() => announcementStaffActions(), []);
+  const post = offers.forPerson("Announcement.post");
+  const removeOffer = offers.forPerson("Announcement.remove");
+  const categories = post ? categoryChoices(post) : [];
+  const { prompt, host: confirmHost } = useActionPrompt(removingId != null);
 
   const canManage = canManageAnnouncements(authStatus?.role);
 
@@ -77,7 +97,20 @@ export function AnnouncementsPage() {
     const body = String(data.get("body") ?? "").trim();
     const category = String(data.get("category") ?? "general");
     const expiresRaw = String(data.get("expiresAt") ?? "");
-    if (!title || !body || !expiresRaw) {
+    const titleRequired = post?.fields.some(
+      (field) => field.name === "title" && field.required,
+    );
+    const bodyRequired = post?.fields.some(
+      (field) => field.name === "body" && field.required,
+    );
+    const expiresRequired = post?.fields.some(
+      (field) => field.name === "expiresAt" && field.required,
+    );
+    if (
+      (titleRequired && !title) ||
+      (bodyRequired && !body) ||
+      (expiresRequired && !expiresRaw)
+    ) {
       setError("Title, message, and expiry date are required.");
       return;
     }
@@ -104,11 +137,20 @@ export function AnnouncementsPage() {
   };
 
   const remove = (id: string, version: number) => {
-    if (!canManage || removingId != null) return;
-    setRemovingId(id);
-    setError(null);
-    setNotice(null);
+    if (!canManage || removingId != null || !removeOffer) return;
     void (async () => {
+      if (staffActionNeedsConfirm(removeOffer)) {
+        const confirmed = await prompt.askConfirm({
+          title: removeOffer.label,
+          description: "This announcement comes off the board for everyone.",
+          confirmLabel: removeOffer.label,
+          tone: "danger",
+        });
+        if (!confirmed) return;
+      }
+      setRemovingId(id);
+      setError(null);
+      setNotice(null);
       try {
         await removeAnnouncement({ docId: id as never, version });
         setNotice(
@@ -149,8 +191,9 @@ export function AnnouncementsPage() {
           {notice}
         </p>
       ) : null}
+      {confirmHost}
 
-      {canManage ? (
+      {canManage && post ? (
         <Section title="Post an announcement">
           <form
             className="supply-form grid gap-4 border-0 p-4 sm:grid-cols-2"
@@ -162,7 +205,9 @@ export function AnnouncementsPage() {
                 name="title"
                 className="input"
                 placeholder="New allergy-awareness procedure"
-                required
+                required={post.fields.some(
+                  (field) => field.name === "title" && field.required,
+                )}
                 disabled={busy}
                 maxLength={120}
               />
@@ -174,7 +219,9 @@ export function AnnouncementsPage() {
                 className="input"
                 rows={3}
                 placeholder="Everyone must review the updated cross-contact protocol before Friday's service."
-                required
+                required={post.fields.some(
+                  (field) => field.name === "body" && field.required,
+                )}
                 disabled={busy}
                 maxLength={1000}
               />
@@ -186,8 +233,11 @@ export function AnnouncementsPage() {
                 className="input"
                 defaultValue="general"
                 disabled={busy}
+                required={post.fields.some(
+                  (field) => field.name === "category" && field.required,
+                )}
               >
-                {CATEGORY_OPTIONS.map((option) => (
+                {categories.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
@@ -199,13 +249,15 @@ export function AnnouncementsPage() {
               <BoundedDateInput
                 name="expiresAt"
                 className="input"
-                required
+                required={post.fields.some(
+                  (field) => field.name === "expiresAt" && field.required,
+                )}
                 disabled={busy}
               />
             </label>
             <div className="supply-row-actions sm:col-span-2">
               <button className="btn btn-primary" type="submit" disabled={busy}>
-                {busy ? "Posting…" : "Post announcement"}
+                {busy ? "Posting…" : post.label}
               </button>
             </div>
           </form>
@@ -237,7 +289,7 @@ export function AnnouncementsPage() {
                         {row.title}
                       </span>
                       <span className="chip border-line-2 bg-inset text-ink-2">
-                        {CATEGORY_LABEL[String(row.category)] ??
+                        {FRIENDLY_CATEGORY[String(row.category)] ??
                           String(row.category)}
                       </span>
                       {removed ? (
@@ -261,7 +313,7 @@ export function AnnouncementsPage() {
                       Expires {dateFormat.format(row.expiresAt as number)}
                     </p>
                   </div>
-                  {canManage && !removed ? (
+                  {canManage && removeOffer && !removed ? (
                     <button
                       type="button"
                       className="btn btn-ghost btn-sm"
@@ -270,7 +322,9 @@ export function AnnouncementsPage() {
                       }
                       disabled={removingId != null}
                     >
-                      {removingId === String(row._id) ? "Removing…" : "Remove"}
+                      {removingId === String(row._id)
+                        ? "Removing…"
+                        : removeOffer.label}
                     </button>
                   ) : null}
                 </li>

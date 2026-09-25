@@ -52,18 +52,18 @@ entity Component mixin TenantScoped, SoftDeletable {
   // #132 divisor fix (#134). servesPerYield stays for nutrition only.
   computed liveCostPerGuest: money(12, 2) = self.yieldQuantity > 0 ? sum(filter(self.ingredientLines, (line) => line.deletedAt == null and line.addedAt != null), (line) => line.unit == line.ingredient.unit ? line.quantity * (line.wasteFactor != null ? line.wasteFactor : 1) * line.ingredient.costPerUnit : 0) / self.yieldQuantity : 0
 
-  constraint componentIdentityComplete: self.draftedAt == null or length(trim(self.name)) > 0 "Drafted components require a name"
-  constraint componentYieldPositive: self.yieldQuantity > 0 "Component yield quantity must be positive"
+  constraint componentIdentityComplete: self.draftedAt == null or length(trim(self.name)) > 0 "Drafted recipes require a name"
+  constraint componentYieldPositive: self.yieldQuantity > 0 "Recipe yield quantity must be positive"
   constraint componentServesPerYieldPositive: self.servesPerYield > 0 "Serves per yield must be a positive integer"
-  constraint componentBatchPositive: self.batchMultiplier > 0 "Component batch multiplier must be positive"
+  constraint componentBatchPositive: self.batchMultiplier > 0 "Recipe batch multiplier must be positive"
 
   transition status from "draft" to ["published", "retired"]
   transition status from "published" to ["draft", "retired"]
   transition status from "retired" to []
 
-  default policy componentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read components"
-  default policy componentWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write components through commands"
-  default policy componentExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute component commands"
+  default policy componentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see recipes"
+  default policy componentWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update recipes"
+  default policy componentExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change recipes"
 
   command draft(
     name: string,
@@ -80,10 +80,10 @@ entity Component mixin TenantScoped, SoftDeletable {
   ) {
     guard self.draftedAt == null
     guard self.deletedAt == null
-    constraint draftComponentName: length(trim(name)) > 0 "Component name is required"
-    constraint draftYieldPositive: yieldQuantity > 0 "Component yield quantity must be positive"
+    constraint draftComponentName: length(trim(name)) > 0 "Recipe name is required"
+    constraint draftYieldPositive: yieldQuantity > 0 "Recipe yield quantity must be positive"
     constraint draftServesPerYieldPositive: servesPerYield == null or servesPerYield > 0 "Serves per yield must be a positive integer"
-    constraint draftBatchPositive: batchMultiplier == null or batchMultiplier > 0 "Component batch multiplier must be positive"
+    constraint draftBatchPositive: batchMultiplier == null or batchMultiplier > 0 "Recipe batch multiplier must be positive"
     mutate name = name
     mutate yieldQuantity = yieldQuantity
     mutate yieldUnit = yieldUnit
@@ -122,10 +122,10 @@ entity Component mixin TenantScoped, SoftDeletable {
   ) {
     guard self.status == "draft"
     guard self.deletedAt == null
-    constraint reviseComponentName: length(trim(name)) > 0 "Component name is required"
-    constraint reviseYieldPositive: yieldQuantity > 0 "Component yield quantity must be positive"
+    constraint reviseComponentName: length(trim(name)) > 0 "Recipe name is required"
+    constraint reviseYieldPositive: yieldQuantity > 0 "Recipe yield quantity must be positive"
     constraint reviseServesPerYieldPositive: servesPerYield == null or servesPerYield > 0 "Serves per yield must be a positive integer"
-    constraint reviseBatchPositive: batchMultiplier > 0 "Component batch multiplier must be positive"
+    constraint reviseBatchPositive: batchMultiplier > 0 "Recipe batch multiplier must be positive"
     mutate name = name
     mutate yieldQuantity = yieldQuantity
     mutate yieldUnit = yieldUnit
@@ -266,12 +266,12 @@ entity ComponentIngredient mixin TenantScoped, SoftDeletable {
   computed unitsMatchIngredientPrice: boolean = self.unit == self.ingredient.unit
   computed liveIngredientCost: money(12, 2) = self.unit == self.ingredient.unit ? self.quantity * (self.wasteFactor != null ? self.wasteFactor : 1) * self.ingredient.costPerUnit : 0
 
-  constraint lineQuantityPositive: self.addedAt == null or self.quantity > 0 "Component ingredient quantity must be positive"
+  constraint lineQuantityPositive: self.addedAt == null or self.quantity > 0 "Recipe ingredient quantity must be positive"
   constraint lineWasteFactorPositive: self.addedAt == null or self.wasteFactor == null or self.wasteFactor > 0 "Waste factor must be greater than 0"
 
-  default policy componentIngredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read component ingredient lines"
-  default policy componentIngredientWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write component ingredient lines through commands"
-  default policy componentIngredientExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute component ingredient line commands"
+  default policy componentIngredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see recipe ingredient lines"
+  default policy componentIngredientWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update recipe ingredient lines"
+  default policy componentIngredientExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change recipe ingredient lines"
 
   command add(
     componentId: uuid,
@@ -284,7 +284,7 @@ entity ComponentIngredient mixin TenantScoped, SoftDeletable {
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
-    constraint addLineQuantity: quantity > 0 "Component ingredient quantity must be positive"
+    constraint addLineQuantity: quantity > 0 "Recipe ingredient quantity must be positive"
     constraint addLineWasteFactor: wasteFactor == null or wasteFactor > 0 "Waste factor must be greater than 0"
     mutate componentId = componentId
     mutate ingredientId = ingredientId
@@ -322,7 +322,7 @@ entity ComponentIngredient mixin TenantScoped, SoftDeletable {
   command adjustQuantity(quantity: decimal(10, 4), unit: UnitOfMeasure) {
     guard self.addedAt != null
     guard self.deletedAt == null
-    constraint adjustLineQuantity: quantity > 0 "Component ingredient quantity must be positive"
+    constraint adjustLineQuantity: quantity > 0 "Recipe ingredient quantity must be positive"
     compute previousQuantity = self.quantity
     compute previousUnit = self.unit
     mutate quantity = quantity
@@ -372,11 +372,11 @@ entity ComponentStep mixin TenantScoped, SoftDeletable {
 
   belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
 
-  constraint stepInstructionComplete: self.addedAt == null or length(trim(self.instruction)) > 0 "Component steps require an instruction"
+  constraint stepInstructionComplete: self.addedAt == null or length(trim(self.instruction)) > 0 "Recipe steps require an instruction"
 
-  default policy componentStepRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read component steps"
-  default policy componentStepWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write component steps through commands"
-  default policy componentStepExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute component step commands"
+  default policy componentStepRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see recipe steps"
+  default policy componentStepWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update recipe steps"
+  default policy componentStepExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change recipe steps"
 
   command add(
     componentId: uuid,
@@ -386,8 +386,8 @@ entity ComponentStep mixin TenantScoped, SoftDeletable {
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
-    constraint addStepInstruction: length(trim(instruction)) > 0 "Component step instruction is required"
-    constraint addStepDuration: durationMinutes == null or durationMinutes >= 0 "Component step duration cannot be negative"
+    constraint addStepInstruction: length(trim(instruction)) > 0 "Recipe step instruction is required"
+    constraint addStepDuration: durationMinutes == null or durationMinutes >= 0 "Recipe step duration cannot be negative"
     mutate componentId = componentId
     mutate instruction = instruction
     mutate sortOrder = sortOrder != null ? sortOrder : 0
@@ -409,8 +409,8 @@ entity ComponentStep mixin TenantScoped, SoftDeletable {
   ) {
     guard self.addedAt != null
     guard self.deletedAt == null
-    constraint reviseStepInstruction: length(trim(instruction)) > 0 "Component step instruction is required"
-    constraint reviseStepDuration: durationMinutes == null or durationMinutes >= 0 "Component step duration cannot be negative"
+    constraint reviseStepInstruction: length(trim(instruction)) > 0 "Recipe step instruction is required"
+    constraint reviseStepDuration: durationMinutes == null or durationMinutes >= 0 "Recipe step duration cannot be negative"
     mutate instruction = instruction
     mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
     mutate durationMinutes = durationMinutes
@@ -461,9 +461,9 @@ entity ComponentSnapshot mixin TenantScoped, SoftDeletable {
 
   belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
 
-  default policy componentSnapshotRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read component version history"
-  default policy componentSnapshotWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write component snapshots through commands"
-  default policy componentSnapshotExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute component snapshot commands"
+  default policy componentSnapshotRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see recipe versions"
+  default policy componentSnapshotWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update recipe versions"
+  default policy componentSnapshotExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change recipe versions"
 
   command capture(
     componentId: uuid,
@@ -649,9 +649,9 @@ entity ComponentComponent mixin TenantScoped, SoftDeletable {
   constraint nestedLineNotSelf: self.addedAt == null or self.componentId != self.childComponentId "A recipe cannot contain itself"
   constraint nestedLineQuantityPositive: self.addedAt == null or self.quantity > 0 "Nested recipe quantity must be positive"
 
-  default policy componentComponentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read nested recipe lines"
-  default policy componentComponentWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write nested recipe lines through commands"
-  default policy componentComponentExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute nested recipe line commands"
+  default policy componentComponentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see nested recipe lines"
+  default policy componentComponentWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update nested recipe lines"
+  default policy componentComponentExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change nested recipe lines"
 
   command add(
     componentId: uuid,
@@ -740,12 +740,12 @@ entity ComponentPortionSpec mixin TenantScoped, SoftDeletable {
 
   belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
 
-  constraint portionSpecNamed: self.definedAt == null or length(trim(self.name)) > 0 "Portion spec name is required"
+  constraint portionSpecNamed: self.definedAt == null or length(trim(self.name)) > 0 "Portion size name is required"
   constraint portionSpecPiecePositive: self.definedAt == null or self.pieceQuantity > 0 "Piece quantity must be positive"
 
-  default policy componentPortionSpecRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read portion specs"
-  default policy componentPortionSpecWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write portion specs through commands"
-  default policy componentPortionSpecExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute portion spec commands"
+  default policy componentPortionSpecRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see portion sizes"
+  default policy componentPortionSpecWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update portion sizes"
+  default policy componentPortionSpecExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change portion sizes"
 
   command define(
     componentId: uuid,
@@ -757,7 +757,7 @@ entity ComponentPortionSpec mixin TenantScoped, SoftDeletable {
   ) {
     guard self.definedAt == null
     guard self.deletedAt == null
-    constraint defineSpecName: length(trim(name)) > 0 "Portion spec name is required"
+    constraint defineSpecName: length(trim(name)) > 0 "Portion size name is required"
     constraint defineSpecPiece: pieceQuantity > 0 "Piece quantity must be positive"
     constraint defineSpecPieces: piecesPerBatch == null or piecesPerBatch > 0 "Pieces per batch must be positive"
     mutate componentId = componentId
@@ -784,7 +784,7 @@ entity ComponentPortionSpec mixin TenantScoped, SoftDeletable {
   ) {
     guard self.definedAt != null
     guard self.deletedAt == null
-    constraint reviseSpecName: length(trim(name)) > 0 "Portion spec name is required"
+    constraint reviseSpecName: length(trim(name)) > 0 "Portion size name is required"
     constraint reviseSpecPiece: pieceQuantity > 0 "Piece quantity must be positive"
     mutate name = name
     mutate pieceQuantity = pieceQuantity

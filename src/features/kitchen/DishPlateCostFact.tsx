@@ -7,8 +7,10 @@ import {
   useListDishIngredient,
   useListIngredient,
   useListIngredientPriceObservation,
+  useListItemUnitMapping,
 } from "../../lib/manifest-convex-react";
 import { buildEventMenuCost } from "../events/eventMenuCost";
+import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 
 /** Cost of one serving of a dish from its priced ingredient lines. */
 export type DishPlateCost = {
@@ -30,6 +32,7 @@ export function useDishPlateCost(dishId: string): DishPlateCost | undefined {
   const componentIngredients = useListComponentIngredient();
   const ingredients = useListIngredient();
   const priceObservations = useListIngredientPriceObservation();
+  const itemUnitMappings = useListItemUnitMapping();
   return useMemo(() => {
     if (
       !dishIngredients ||
@@ -37,7 +40,8 @@ export function useDishPlateCost(dishId: string): DishPlateCost | undefined {
       !components ||
       !componentIngredients ||
       !ingredients ||
-      !priceObservations
+      !priceObservations ||
+      !itemUnitMappings
     ) {
       return undefined;
     }
@@ -95,6 +99,7 @@ export function useDishPlateCost(dishId: string): DishPlateCost | undefined {
         deletedAt: row.deletedAt,
       })),
       priceObservations,
+      unitMappings: RecordedUnitMappings.fromRows(itemUnitMappings),
     });
     const line = rollup.dishes[0];
     if (!line) return undefined;
@@ -111,6 +116,7 @@ export function useDishPlateCost(dishId: string): DishPlateCost | undefined {
     dishId,
     dishIngredients,
     ingredients,
+    itemUnitMappings,
     priceObservations,
   ]);
 }

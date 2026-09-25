@@ -229,4 +229,11 @@
     overflow: visible;
     padding: 0;
   }
+  /* One sheet per paper (issue #374 item 3): the rail's report prints only
+     when the rail started the print — EventReportView tags <html> with
+     .home-report-printing — so a page's own print never drags the rail's
+     sheet onto its paper. */
+  html:not(.home-report-printing) .home-report-rail {
+    display: none;
+  }
 }

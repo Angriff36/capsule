@@ -155,6 +155,30 @@ describe("runtime proof: quote submission → conversion (AC-008)", () => {
     expect((proposals[0] as { _id?: string })._id).toBe(converted.proposalId);
     // AC-008: the converted proposal is linked to the event it created.
     expect((proposals[0] as { eventId?: string }).eventId).toBe(eventId);
+
+    // AC-235: conversion links records, not loose text — the event, lead and
+    // proposal all point at the converted client, and the lead points at a
+    // primary contact created for that client.
+    expect((events[0] as { clientId?: string }).clientId).toBe(
+      converted.clientId,
+    );
+    expect((leads[0] as { clientId?: string }).clientId).toBe(
+      converted.clientId,
+    );
+    expect(
+      (leads[0] as { clientContactId?: string }).clientContactId,
+    ).toBeTruthy();
+    expect((proposals[0] as { clientId?: string }).clientId).toBe(
+      converted.clientId,
+    );
+
+    const clientContacts = await liveRows(owner, "clientContacts");
+    expect(clientContacts).toHaveLength(1);
+    const contact = clientContacts[0] as { _id?: string; clientId?: string };
+    expect(contact._id).toBe(
+      (leads[0] as { clientContactId?: string }).clientContactId,
+    );
+    expect(contact.clientId).toBe(converted.clientId);
   });
 });
 

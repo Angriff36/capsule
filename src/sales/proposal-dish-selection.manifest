@@ -32,9 +32,9 @@ entity ProposalDishSelection mixin TenantScoped, SoftDeletable {
 
   constraint proposalDishSelectionServingsPositive: self.selectedAt == null or self.quantityServings > 0 "Selection servings must be positive"
 
-  default policy proposalDishSelectionRead read: roleAllows(user.role, "salesAccess") "Sales staff may read proposal dish selections"
-  default policy proposalDishSelectionWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write proposal dish selections through commands"
-  default policy proposalDishSelectionExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute proposal dish selection commands"
+  default policy proposalDishSelectionRead read: roleAllows(user.role, "salesAccess") "Sales staff may see proposal dish selections"
+  default policy proposalDishSelectionWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update proposal dish selections"
+  default policy proposalDishSelectionExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may change proposal dish selections"
 
   // Pick a dish off a published menu while the proposal is still in review.
   command select(

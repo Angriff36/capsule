@@ -58,9 +58,9 @@ entity Candidate mixin TenantScoped, SoftDeletable {
 
   constraint candidateComplete: self.appliedAt == null or length(trim(self.fullName)) > 0 "An applied candidate requires a name"
 
-  default policy candidateRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may read candidates"
-  default policy candidateWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may write candidates through commands"
-  default policy candidateExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may execute candidate commands"
+  default policy candidateRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may see candidates"
+  default policy candidateWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may update candidates"
+  default policy candidateExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may change candidates"
 
   // Create verb → Candidate_createViaApply. Source fields are all optional so a
   // manually-entered candidate (no KM provenance) and an ingested one share the
@@ -194,9 +194,9 @@ entity Interview mixin TenantScoped, SoftDeletable {
   // A conducted interview must have been booked first (direct fields only).
   constraint interviewComplete: self.conductedAt == null or self.bookedAt != null "A conducted interview must have been booked"
 
-  default policy interviewRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may read interviews"
-  default policy interviewWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may write interviews through commands"
-  default policy interviewExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may execute interview commands"
+  default policy interviewRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may see interviews"
+  default policy interviewWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may update interviews"
+  default policy interviewExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may change interviews"
 
   // Create verb → Interview_createViaSchedule. Mirrors OneOnOneAction.capture:
   // candidateId seeds the belongsTo so `self.candidate` resolves at creation,

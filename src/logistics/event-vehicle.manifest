@@ -47,9 +47,9 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
 
   // The crew needs to know which truck they are on; the people who run events
   // and logistics set it from the tracker.
-  default policy eventVehicleAssignmentRead read: roleAllows(user.role, "staffAccess") "Staff may read event vehicle assignments"
-  default policy eventVehicleAssignmentWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event, sales and logistics staff and managers may write event vehicle assignments through commands"
-  default policy eventVehicleAssignmentExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event, sales and logistics staff and managers may execute event vehicle assignment commands"
+  default policy eventVehicleAssignmentRead read: roleAllows(user.role, "staffAccess") "Staff may see event vehicle assignments"
+  default policy eventVehicleAssignmentWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event, sales and logistics staff and managers may update event vehicle assignments"
+  default policy eventVehicleAssignmentExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event, sales and logistics staff and managers may change event vehicle assignments"
 
   command assign(
     eventId: uuid,

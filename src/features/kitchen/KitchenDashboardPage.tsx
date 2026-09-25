@@ -27,6 +27,7 @@ import { reportActionOk } from "../../ui/action-result";
 import { ActionMenu, TableSkeleton } from "../../ui/primitives";
 import { BulkRunFailure, runBulkItems } from "../../ui/bulk-select";
 import { displayEventMenuNotes } from "../events/eventMenuLineFields";
+import { ProductionLifecyclePolicy } from "../production/ProductionLifecyclePolicy";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { KitchenBookNav } from "./KitchenBookNav";
 import { KitchenCommandDeckFilters } from "./command-deck/KitchenCommandDeckFilters";
@@ -40,6 +41,9 @@ import type {
 
 /** One prep task with the service it belongs to. */
 type LedgerRow = { task: PrepTaskLike; event: EventLike };
+
+/** Same generated prep lifecycle the Prep Board uses for Claim, Start, and Complete. */
+const prepLifecycle = new ProductionLifecyclePolicy();
 
 /** prepTasks.unit is a closed enum in convex/schema.ts; offer exactly it. */
 const PREP_UNITS = [
@@ -449,13 +453,11 @@ export function KitchenDashboardPage() {
    *  backend reject a later one left the earlier ones committed, so a failed
    *  bulk action was half applied. */
   const bulkTargets = (label: string) =>
-    pickedRows.filter((r) => {
-      const status = String(r.task.status);
-      if (label === "claim") return status === "pending";
-      if (label === "start") return status === "claimed";
-      if (label === "complete") return status === "in_progress";
-      return false;
-    });
+    pickedRows.filter((row) =>
+      prepLifecycle
+        .prepActions(String(row.task.status))
+        .some((action) => action.key === label),
+    );
 
   const onPickedBulk = (
     label: string,
@@ -1073,7 +1075,7 @@ export function KitchenDashboardPage() {
           <p className="mt-3 text-base text-danger">
             {String(
               (row.task as { blockReason?: string | null }).blockReason ??
-                "Blocked — reason not recorded.",
+                "Blocked — no reason on file.",
             )}
           </p>
         ) : null}
@@ -1145,7 +1147,7 @@ export function KitchenDashboardPage() {
           </select>
           <ActionMenu>
             <Link to="/kitchen/yield">Yield variance</Link>
-            <Link to="/kitchen">Components</Link>
+            <Link to="/kitchen">Recipes</Link>
             <Link to="/kitchen/ingredients">Ingredients</Link>
             <Link to="/kitchen/dishes">Dishes</Link>
             <Link to="/kitchen/menus">Menus</Link>

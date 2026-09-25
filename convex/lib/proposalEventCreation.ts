@@ -31,6 +31,7 @@ import { api } from "../_generated/api";
 import type { Doc } from "../_generated/dataModel";
 import { v } from "convex/values";
 import { getAuthContext } from "./authContext";
+import { proposalBookingVenue } from "./proposalBookingVenue";
 
 // The linked event's id type, derived from the proposal document type rather
 // than named directly, so the event-manifest integration guard can prove this
@@ -126,10 +127,38 @@ export const createEventFromAcceptedProposal = mutation({
       throw new Error("The event's client must match the proposal's client.");
     }
 
+    // Venue identity (AC-410): the proposal stores a venue NAME only. When
+    // the caller omitted venueId, resolve that name against this tenant's
+    // saved venues — a unique live match is attached, an ambiguous one throws
+    // (never a silent first match), zero matches books with the caller's
+    // text. A caller-picked id is kept and re-checked against live tenant
+    // venues. Read-only here: the governed command below re-enforces
+    // everything on the event row itself.
+    const venueRows = await ctx.db
+      .query("venues")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", proposal.tenantId))
+      .collect();
+    const decision = proposalBookingVenue.decide({
+      tenantId: proposal.tenantId,
+      proposalVenueName: proposal.venueName ?? args.event.venueName,
+      requestedVenueId: args.event.venueId,
+      venues: venueRows,
+    });
+    const eventArgs = { ...args.event };
+    if (decision.kind !== "none") {
+      eventArgs.venueId = decision.venue._id;
+      if (!eventArgs.venueName?.trim()) {
+        eventArgs.venueName = decision.venue.name;
+      }
+      if (eventArgs.venueCapacity === undefined) {
+        eventArgs.venueCapacity = decision.venue.capacity;
+      }
+    }
+
     // 1. Create the event through the generated governed command.
     const created: { docId: LinkedEventId } = await ctx.runMutation(
       api.mutations.Event_createViaPlanEngagement,
-      args.event,
+      eventArgs,
     );
 
     // 2. Staged link + menu cascade through the domain commands. If staging,

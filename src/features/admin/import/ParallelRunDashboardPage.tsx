@@ -36,6 +36,29 @@ const DATASET_TYPE_LABELS: Record<string, string> = {
   pack_list: "Pack Lists",
 };
 
+// Item type labels
+const RECORD_TYPE_LABELS: Record<string, string> = {
+  event_record: "Event",
+  contact: "Contact",
+  lead: "Lead",
+  menu: "Menu",
+  venue: "Venue",
+  payment: "Payment",
+  invoice: "Invoice",
+  contract: "Contract",
+  proposal: "Proposal",
+  client: "Client",
+  vendor: "Vendor",
+  person: "Person",
+  task: "Task",
+  batch: "Batch",
+  order: "Order",
+  delivery: "Delivery",
+  stock: "Stock",
+  location: "Location",
+  pack_list: "Pack List",
+};
+
 // This dashboard compares the events dataset — events are the spine every
 // other imported record hangs off, so they are the §6.5 parallel-run gate.
 const COMPARISON_DATASET = "events";
@@ -462,7 +485,7 @@ export function ParallelRunDashboardPage() {
     <div className="operations-stage supply-stage">
       <header className="supply-masthead">
         <div>
-          <h1 className="display-title">Parallel Run Dashboard</h1>
+          <h1 className="display-title">Compare with TPP</h1>
           <p className="mt-3 max-w-160 text-ink-2">
             A daily side-by-side of TPP and Capsule events over the last 30
             days, so you can confirm everything came over correctly before
@@ -513,7 +536,7 @@ export function ParallelRunDashboardPage() {
             </div>
             <div className="bg-white p-4 rounded-sm shadow">
               <h3 className="text-xs font-medium text-ink-3">
-                Unresolved Mappings
+                Not matched yet
               </h3>
               <p
                 className={`text-xl font-bold ${
@@ -534,7 +557,7 @@ export function ParallelRunDashboardPage() {
           <section className="working-ledger mt-6">
             <div className="ledger-heading">
               <div>
-                <h2>Record Counts Comparison</h2>
+                <h2>How the counts compare</h2>
               </div>
               <span>{formatCountNoun(comparisonMetrics.length, "metric")}</span>
             </div>
@@ -618,8 +641,8 @@ export function ParallelRunDashboardPage() {
                 </p>
               </div>
               <span>
-                {menuCatalogComparison.runCount} menu import{" "}
-                {menuCatalogComparison.runCount === 1 ? "run" : "runs"}
+                {menuCatalogComparison.runCount} menu import
+                {menuCatalogComparison.runCount === 1 ? "" : "s"}
               </span>
             </div>
             {menuCatalogComparison.tppTotal === 0 &&
@@ -961,14 +984,12 @@ export function ParallelRunDashboardPage() {
           <section className="working-ledger mt-6">
             <div className="ledger-heading">
               <div>
-                <h2>Records still to match</h2>
+                <h2>Still to match</h2>
                 <p className="text-xs text-ink-2">
-                  Imported records that still need to be checked or matched up.
+                  Imported items that still need to be checked or matched up.
                 </p>
               </div>
-              <span>
-                {formatCountNoun(unresolvedMappings.length, "record")}
-              </span>
+              <span>{formatCountNoun(unresolvedMappings.length, "item")}</span>
             </div>
             <div className="supply-table-wrap">
               <table className="supply-table">
@@ -977,7 +998,7 @@ export function ParallelRunDashboardPage() {
                     <th>Old system</th>
                     <th>Type</th>
                     <th>Reference in the old system</th>
-                    <th>Capsule record</th>
+                    <th>In Capsule</th>
                     <th>Status</th>
                     <th>Actions</th>
                   </tr>
@@ -986,7 +1007,7 @@ export function ParallelRunDashboardPage() {
                   {unresolvedMappings.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="text-center text-ok">
-                        ✓ All mappings verified
+                        ✓ Everything is matched
                       </td>
                     </tr>
                   ) : (
@@ -996,7 +1017,11 @@ export function ParallelRunDashboardPage() {
                           {SOURCE_SYSTEM_LABELS[link.sourceSystem] ??
                             link.sourceSystem}
                         </td>
-                        <td>{link.recordType}</td>
+                        <td>
+                          {RECORD_TYPE_LABELS[link.recordType] ||
+                            RECORD_TYPE_LABELS[link.capsuleEntity] ||
+                            link.recordType}
+                        </td>
                         <td
                           className="font-mono text-xs text-ink-3"
                           title={link.externalId}
@@ -1004,7 +1029,7 @@ export function ParallelRunDashboardPage() {
                           {link.externalId.slice(0, 16)}…
                         </td>
                         <td title={link.capsuleId || undefined}>
-                          {link.capsuleId ? "Linked" : "Unmapped"}
+                          {link.capsuleId ? "Linked" : "Not matched"}
                         </td>
                         <td>
                           <StatusChip status={String(link.conflictStatus)} />
@@ -1034,7 +1059,7 @@ export function ParallelRunDashboardPage() {
             </div>
             {unresolvedMappings.length > 50 && (
               <p className="mt-3 text-xs text-center text-ink-3">
-                Showing 50 of {unresolvedMappings.length} unresolved mappings
+                Showing 50 of {unresolvedMappings.length} leftover items
               </p>
             )}
           </section>
@@ -1043,12 +1068,14 @@ export function ParallelRunDashboardPage() {
           <section className="working-ledger mt-6">
             <div className="ledger-heading">
               <div>
-                <h2>Recent Import Runs</h2>
+                <h2>Recent imports</h2>
                 <p className="text-xs text-ink-2">
                   The imports these comparisons are based on.
                 </p>
               </div>
-              <span>{formatCountNoun(completedImportRuns.length, "run")}</span>
+              <span>
+                {formatCountNoun(completedImportRuns.length, "import")}
+              </span>
             </div>
             <div className="supply-table-wrap">
               <table className="supply-table">
@@ -1058,7 +1085,7 @@ export function ParallelRunDashboardPage() {
                     <th>Dataset</th>
                     <th>Status</th>
                     <th>Date</th>
-                    <th>Records</th>
+                    <th>Items</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -1117,9 +1144,7 @@ export function ParallelRunDashboardPage() {
 
           {/* Help Text */}
           <section className="mt-6 p-4 bg-info-soft border border-info/40 rounded-sm">
-            <h3 className="font-semibold text-info">
-              Understanding the Dashboard
-            </h3>
+            <h3 className="font-semibold text-info">What these numbers mean</h3>
             <ul className="mt-2 space-y-1 text-xs text-info">
               <li>
                 • <strong>Match status</strong>: Capsule and TPP counts are
@@ -1134,7 +1159,7 @@ export function ParallelRunDashboardPage() {
                 (&gt;5-10%) - investigation required
               </li>
               <li>
-                • <strong>Records still to match</strong>: Imported records to
+                • <strong>Still to match</strong>: Imported items to
                 double-check before the final switch
               </li>
               <li>
@@ -1142,8 +1167,8 @@ export function ParallelRunDashboardPage() {
                 24 hours for review
               </li>
               <li>
-                • <strong>Drill-down</strong>: Click "View" links to inspect
-                individual records
+                • <strong>Look closer</strong>: Click View to open individual
+                items
               </li>
             </ul>
           </section>

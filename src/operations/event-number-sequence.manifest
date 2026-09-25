@@ -16,9 +16,9 @@ entity EventNumberSequence mixin TenantScoped {
 
   property required lastNumber: int
 
-  default policy eventNumberSequenceRead read: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Event number sequences are private implementation records"
-  default policy eventNumberSequenceWrite write: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Event number sequences are managed only by the numbering seam"
-  default policy eventNumberSequenceExecute execute: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Event number sequences expose no generated commands"
+  default policy eventNumberSequenceRead read: roleAllows(user.role, "eventNumberSequenceSeamOnly") "These counters stay behind the scenes"
+  default policy eventNumberSequenceWrite write: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Only Capsule can update event number counters"
+  default policy eventNumberSequenceExecute execute: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Event number counters stay behind the scenes"
 
   store EventNumberSequence in durable
 }
@@ -36,9 +36,9 @@ entity EventNumberAssignment mixin TenantScoped {
   property indexed required eventNumber: string
 
   // The whole crew reads event numbers; only the numbering seam writes them.
-  default policy eventNumberAssignmentRead read: roleAllows(user.role, "staffAccess") "Staff may read event numbers"
-  default policy eventNumberAssignmentWrite write: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Event numbers are given only by the numbering seam"
-  default policy eventNumberAssignmentExecute execute: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Event number assignments expose no generated commands"
+  default policy eventNumberAssignmentRead read: roleAllows(user.role, "staffAccess") "Staff may see event numbers"
+  default policy eventNumberAssignmentWrite write: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Only Capsule can assign event numbers"
+  default policy eventNumberAssignmentExecute execute: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Assigned event numbers stay behind the scenes"
 
   store EventNumberAssignment in durable
 }

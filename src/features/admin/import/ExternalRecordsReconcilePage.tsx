@@ -142,11 +142,11 @@ export function ExternalRecordsReconcilePage() {
           verified: true,
         });
       }
-      setNotice(`Verified ${selectedIds.size} record(s) successfully.`);
+      setNotice(`Checked ${selectedIds.size} item(s).`);
       setSelectedIds(new Set());
     } catch (cause: unknown) {
       setError(
-        cause instanceof Error ? cause.message : "Failed to verify records.",
+        cause instanceof Error ? cause.message : "Couldn't check those items.",
       );
     } finally {
       setBusy(false);
@@ -166,14 +166,14 @@ export function ExternalRecordsReconcilePage() {
           docId: id,
           conflictStatus: "resolved",
           resolvedByUserId: operatorId,
-          resolutionNote: "Skipped during reconciliation",
+          resolutionNote: "Skipped while matching leftover items",
         });
       }
-      setNotice(`Skipped ${selectedIds.size} record(s).`);
+      setNotice(`Skipped ${selectedIds.size} item(s).`);
       setSelectedIds(new Set());
     } catch (cause: unknown) {
       setError(
-        cause instanceof Error ? cause.message : "Failed to skip records.",
+        cause instanceof Error ? cause.message : "Couldn't skip those items.",
       );
     } finally {
       setBusy(false);
@@ -196,7 +196,8 @@ export function ExternalRecordsReconcilePage() {
         docId: linkId,
         conflictStatus: "resolved",
         resolvedByUserId: operatorId,
-        resolutionNote: "Matched to Capsule payment during reconciliation",
+        resolutionNote:
+          "Matched to a Capsule payment while matching leftover items",
       });
       setNotice("Payment linked and resolved.");
       setMatchingId(null);
@@ -215,9 +216,9 @@ export function ExternalRecordsReconcilePage() {
       <header className="supply-masthead">
         <div>
           <p className="eyebrow">Import · Matching</p>
-          <h1 className="display-title mt-2">Imported records to match up</h1>
+          <h1 className="display-title mt-2">Match leftover items</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Check what came over from your old system and confirm each record
+            Check what came over from your old system and confirm each item
             matches the right thing in Capsule. Anything still waiting shows
             here.
           </p>
@@ -282,7 +283,7 @@ export function ExternalRecordsReconcilePage() {
         {selectedIds.size > 0 ? (
           <div className="flex items-center gap-3 p-4 bg-inset border-b border-line">
             <span className="text-xs font-medium">
-              {selectedIds.size} record(s) selected
+              {selectedIds.size} item(s) selected
             </span>
             <button
               type="button"
@@ -334,9 +335,7 @@ export function ExternalRecordsReconcilePage() {
                 <th className="text-left py-3 px-4 font-medium">
                   In Capsule as
                 </th>
-                <th className="text-left py-3 px-4 font-medium">
-                  Capsule record
-                </th>
+                <th className="text-left py-3 px-4 font-medium">In Capsule</th>
                 <th className="text-left py-3 px-4 font-medium">Status</th>
                 <th className="text-left py-3 px-4 font-medium">Created</th>
                 <th className="text-left py-3 px-4 font-medium">Actions</th>
@@ -497,19 +496,19 @@ export function ExternalRecordsReconcilePage() {
               existing Capsule payment, then mark it resolved.
             </li>
             <li>
-              • <strong>Verify</strong>: Confirm a match is correct; the record
-              is marked done and leaves this list.
+              • <strong>Verify</strong>: Confirm a match is correct; the item is
+              marked done and leaves this list.
             </li>
             <li>
               • <strong>Skip</strong>: Mark as resolved with a note. Use this
-              for records that shouldn&apos;t be linked or need manual review
+              for items that shouldn&apos;t be linked or need manual review
               later.
             </li>
           </ul>
           <h3 className="font-medium text-xs mb-2 mt-4">Status Guide</h3>
           <ul className="text-xs text-ink-2 space-y-1">
             <li>
-              • Records marked <strong>Conflict</strong> need to be sorted out
+              • Items marked <strong>Conflict</strong> need to be sorted out
               before they leave this list.
             </li>
             <li>
@@ -517,7 +516,7 @@ export function ExternalRecordsReconcilePage() {
               QuickBooks, etc.).
             </li>
             <li>
-              • Select multiple records to perform bulk Verify / Skip actions.
+              • Select multiple items to perform bulk Verify / Skip actions.
             </li>
           </ul>
         </div>

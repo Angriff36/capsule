@@ -4,8 +4,20 @@ import type { MutationCtx } from "../_generated/server";
 import { reconcileEventPrepWork } from "./prepWorkReconciliation";
 import { reconcileDishPrep, standDownEventPrep } from "./prepRecipeEvents";
 import { releaseEventInventoryHolds } from "./inventoryEvents";
-import { standDownEventLogisticsAndBilling } from "./eventCancellation";
+import { eventCancellationReconciliation } from "./cancellationReconciliation";
 import { reconcileEventTiming } from "./eventTimingOperations";
+import { eventStaffingReconciliation } from "./staffingReconciliation";
+import { eventHeadcountReconciliation } from "./headcountReconciliation";
+import { eventPackReconciliation } from "./packReconciliation";
+import { eventDemandReconciliation } from "./demandReconciliation";
+import { eventPrepReconciliation } from "./prepReconciliation";
+import { eventHeadcountStaffingReconciliation } from "./headcountStaffingReconciliation";
+import { eventProposalReconciliation } from "./proposalReconciliation";
+import { eventPacketReconciliation } from "./packetReconciliation";
+import { eventRecipeReconciliation } from "./recipeReconciliation";
+import { eventVenueReconciliation } from "./venueReconciliation";
+import { eventStyleReconciliation } from "./styleReconciliation";
+import { eventRentalReconciliation } from "./rentalReconciliation";
 import {
   reconcileEventStaffing, reflectManualEventShiftTiming, validateAutomaticEventShift,
   validateEventStaffingReferences, validateEventStaffingTiming,
@@ -19,9 +31,9 @@ import {
   adoptLegacyDraftQuantity,
   reconcileCancelledPurchaseDrafts,
   retireUnusedAutomaticDraft,
-  standDownEventPurchasing,
 } from "./purchasingEvents";
 import { moveEventPurchasingWeek } from "./purchasingReschedule";
+import { lineOverridePurchasingFollowThrough } from "./lineOverridePurchasing";
 import { ensureUniqueInvoiceNumber } from "./invoiceNumbering";
 import { ensureEventNumber } from "./eventNumbering";
 import { recordAcceptedProposalRevision } from "./proposalAcceptanceRevision";
@@ -90,8 +102,152 @@ export async function handleManifestEvent(
   }
   if (event.entity === "Event" &&
     ["EventTimingConfigured", "EventScheduleChanged"].includes(event.type)) {
-    await reconcileEventTiming(ctx, event.entityId as Id<"events">);
-    await reconcileEventStaffing(ctx, event.entityId as Id<"events">);
+    await reconcileEventTiming(ctx, event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type });
+    await eventStaffingReconciliation.run(ctx, event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type });
+    // Rental holds move only on a reschedule: a timing reconfiguration keeps
+    // the same event window, so there is no hold still sitting on an old one.
+    if (event.type === "EventScheduleChanged")
+      await eventRentalReconciliation.run(ctx, event.entityId as Id<"events">,
+        { triggerEventId: String(event.eventId), triggerType: event.type });
+    return;
+  }
+  if (event.entity === "Event" && event.type === "EventHeadcountChanged") {
+    // Menu + pack + demand sides: the EventDish.syncHeadcount,
+    // PackListItem.syncContainerServings, and EventIngredientContribution
+    // demand-sync fan-outs already ran; these record the §8.2 receipts (once
+    // per input shape, one per domain).
+    await eventHeadcountReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        previousHeadcount: Number(event.payload.previousHeadcount),
+        newHeadcount: Number(event.payload.newHeadcount),
+      },
+    );
+    await eventPackReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        previousHeadcount: Number(event.payload.previousHeadcount),
+        newHeadcount: Number(event.payload.newHeadcount),
+      },
+    );
+    await eventDemandReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        previousHeadcount: Number(event.payload.previousHeadcount),
+        newHeadcount: Number(event.payload.newHeadcount),
+      },
+    );
+    await eventPrepReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        previousHeadcount: Number(event.payload.previousHeadcount),
+        newHeadcount: Number(event.payload.newHeadcount),
+      },
+    );
+    // Staffing does not scale with guest count: live staff needs keep their
+    // role, status, and window — this records the §8.2 staffing receipt only.
+    await eventHeadcountStaffingReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        previousHeadcount: Number(event.payload.previousHeadcount),
+        newHeadcount: Number(event.payload.newHeadcount),
+      },
+    );
+    // A headcount change never rewrites an accepted proposal — it records a
+    // `proposal/change requirement` and keeps the signed document as history.
+    await eventProposalReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        previousHeadcount: Number(event.payload.previousHeadcount),
+        newHeadcount: Number(event.payload.newHeadcount),
+      },
+    );
+    // A headcount change never mutates an issued packet revision — it
+    // records packet staleness and keeps the print as history (§14.1).
+    await eventPacketReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        previousHeadcount: Number(event.payload.previousHeadcount),
+        newHeadcount: Number(event.payload.newHeadcount),
+      },
+    );
+    return;
+  }
+  if (event.entity === "ComponentIngredient" && event.type === "ComponentIngredientQuantityAdjusted") {
+    // Recipe line edit: declared fan-outs already re-recorded contributions
+    // and synced demand. This records one §8.2 recipe receipt per live Event.
+    await eventRecipeReconciliation.run(
+      ctx,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        componentId: event.payload.componentId as Id<"components">,
+        componentIngredientId: String(event.entityId),
+        ingredientId: String(event.payload.ingredientId),
+        quantity: Number(event.payload.quantity),
+        unit: String(event.payload.unit),
+      },
+    );
+    return;
+  }
+  if (event.entity === "Event" && event.type === "EventVenueChanged") {
+    // Venue snapshot already written by Event.changeVenue. This records
+    // one §8.2 venue receipt and flags the issued packet stale without
+    // rewriting it.
+    await eventVenueReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        venueId:
+          event.payload.venueId == null ? null : String(event.payload.venueId),
+        venueName:
+          event.payload.venueName == null
+            ? null
+            : String(event.payload.venueName),
+        venueAddress:
+          event.payload.venueAddress == null
+            ? null
+            : String(event.payload.venueAddress),
+        venueCapacity:
+          event.payload.venueCapacity == null
+            ? null
+            : Number(event.payload.venueCapacity),
+      },
+    );
+    return;
+  }
+  if (event.entity === "Event" && event.type === "EventServiceStyleChanged") {
+    // Style snapshot already written by Event.changeServiceStyle. The
+    // generated pack-kit fanOut already ran. This records one §8.2 style
+    // receipt and flags the issued packet stale without rewriting it.
+    await eventStyleReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        serviceStyleId: String(event.payload.serviceStyleId),
+        serviceStyleName:
+          event.payload.serviceStyleName == null
+            ? null
+            : String(event.payload.serviceStyleName),
+      },
+    );
     return;
   }
   if (event.entity === "Organization" && event.type === "OrganizationBrandLogoSet") {
@@ -131,8 +287,10 @@ export async function handleManifestEvent(
   }
   if (event.entity === "EventTimelineActivity" &&
     event.type === "EventTimelineCalculatedTimingRequested") {
-    await reconcileEventTiming(ctx, event.payload.eventId as Id<"events">);
-    await reconcileEventStaffing(ctx, event.payload.eventId as Id<"events">);
+    await reconcileEventTiming(ctx, event.payload.eventId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type });
+    await eventStaffingReconciliation.run(ctx, event.payload.eventId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type });
     return;
   }
   if ((event.entity === "EventAssignment" &&
@@ -193,22 +351,28 @@ export async function handleManifestEvent(
     return;
   }
   if (event.entity === "Event" && event.type === "EventCancelled") {
-    await reconcileEventStaffing(ctx, event.entityId as Id<"events">);
-    await releaseEventInventoryHolds(ctx, event.entityId as Id<"events">);
-    await standDownEventLogisticsAndBilling(
+    await eventCancellationReconciliation.run(
       ctx,
       event.entityId as Id<"events">,
-    );
-    await standDownEventPurchasing(ctx, event.entityId as Id<"events">);
-    await standDownEventPrep(
-      ctx,
-      { eventId: event.entityId as Id<"events"> },
+      { triggerEventId: String(event.eventId), triggerType: event.type },
       String(event.payload.reason),
     );
     return;
   }
   if (event.entity === "Event" && event.type === "EventCompleted") {
     await releaseEventInventoryHolds(ctx, event.entityId as Id<"events">);
+    return;
+  }
+  if (
+    event.entity === "EventDishLineOverride" &&
+    (event.type === "EventDishLineOverrideApplied" ||
+      event.type === "EventDishLineOverrideRevoked")
+  ) {
+    await lineOverridePurchasingFollowThrough.apply(
+      ctx,
+      event.payload.eventId,
+      event.entityId,
+    );
     return;
   }
   if (

@@ -160,8 +160,8 @@ export function ItemUnitMappingsPanel({
         <div className="document-empty">
           <p>No unit conversion on file.</p>
           <span>
-            Record one when a pack, a cup or a portion of this ingredient means
-            a fixed amount.
+            Add one when a pack, a cup or a portion of this ingredient means a
+            fixed amount.
           </span>
         </div>
       ) : (
@@ -181,7 +181,7 @@ export function ItemUnitMappingsPanel({
                   row.source || null,
                 ]
                   .filter(Boolean)
-                  .join(" · ") || "No source recorded"}
+                  .join(" · ") || "No source on file"}
               </span>
               <div className="culinary-line-actions">
                 <button
@@ -277,7 +277,7 @@ export function ItemUnitMappingsPanel({
         </label>
         <p className="text-sm text-ink-2 sm:col-span-2">{helper}</p>
         <button className="btn btn-primary self-end" disabled={busy != null}>
-          {busy === "add" ? "Saving…" : "Record conversion"}
+          {busy === "add" ? "Saving…" : "Save conversion"}
         </button>
       </form>
     </section>

@@ -594,8 +594,8 @@ export function ClientPortalUnavailable() {
         <p className="client-portal-eyebrow">Client event view</p>
         <h1>This link isn’t available.</h1>
         <p>
-          It may be incomplete or no longer match an event. Ask your catering
-          contact for the current client link.
+          It may have expired or been turned off. Ask your catering contact for
+          the current client link.
         </p>
       </div>
     </main>

@@ -364,7 +364,7 @@ export class ComponentImportRepository {
 
   async load(importId: string): Promise<ComponentImportReviewState> {
     const row = await this.ports.getImport(importId);
-    if (!row) throw new Error("Component import not found");
+    if (!row) throw new Error("Recipe import not found");
     const lines = await this.ports.listLinesByImportId(importId);
     const state = mapStoredReview(row, lines);
     this.baseline = state;

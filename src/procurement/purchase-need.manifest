@@ -56,9 +56,9 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
 
   // manageAccess: Event.approve (event_manager) foreach-creates PurchaseNeed;
   // inventoryAccess: purchasing staff. Do not invent a specialty "approve-only" cap.
-  default policy purchaseNeedRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may read purchase needs"
-  default policy purchaseNeedWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may write purchase needs through commands"
-  default policy purchaseNeedExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may execute purchase need commands"
+  default policy purchaseNeedRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may see purchase needs"
+  default policy purchaseNeedWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may update purchase needs"
+  default policy purchaseNeedExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may change purchase needs"
 
   // Reserved runtime create name — required for the reaction-wired create path
   // (semantics.md § Manual parent id on create; PROMPT trap 3 correction).
@@ -72,14 +72,15 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     optional purchasingWeekStart: datetime,
     optional preferredVendorId: uuid
   ) {
-    guard self.openedAt == null
+    // Idempotent create: EventApproved may re-run; unique demand key still binds.
+    guard self.openedAt == null or (self.eventId == eventId and self.ingredientDemandId == ingredientDemandId)
     guard self.deletedAt == null
     constraint createNeedQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
     // Full event requirement — weekly line applies on-hand once across consolidated needs.
-    mutate requiredQuantity = requiredQuantity
-    mutate purchasingWeekStart = purchasingWeekStart
-    mutate preferredVendorId = preferredVendorId
-    mutate openedAt = now()
+    mutate requiredQuantity = self.openedAt != null ? self.requiredQuantity : requiredQuantity
+    mutate purchasingWeekStart = self.openedAt != null ? self.purchasingWeekStart : purchasingWeekStart
+    mutate preferredVendorId = self.openedAt != null ? self.preferredVendorId : preferredVendorId
+    mutate openedAt = self.openedAt != null ? self.openedAt : now()
     emit PurchaseNeedOpened {
       purchaseNeedId: self.id
       tenantId: self.tenantId

@@ -1,3 +1,5 @@
+import { CommercialMoney } from "../../lib/commercialMoney";
+
 export type CommissionMetrics = {
   totalCommission: number;
   salespeople: Array<{ name: string; commission: number }>;
@@ -44,16 +46,18 @@ export function calculateCommissionMetrics(input: {
         : "Unknown salesperson",
       commission: 0,
     };
-    current.commission += Number(attribution.allocatedAmount) || 0;
+    current.commission = new CommercialMoney().sum([
+      current.commission,
+      Number(attribution.allocatedAmount) || 0,
+    ]);
     byPerson.set(groupId, current);
   }
   const salespeople = Array.from(byPerson.values()).sort(
     (a, b) => b.commission - a.commission,
   );
   return {
-    totalCommission: salespeople.reduce(
-      (sum, person) => sum + person.commission,
-      0,
+    totalCommission: new CommercialMoney().sum(
+      salespeople.map((person) => person.commission),
     ),
     salespeople,
   };

@@ -70,9 +70,9 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
 
   constraint lineComplete: self.addedAt == null or (length(trim(self.description)) > 0 and self.unitPrice >= 0 and self.quantity >= 0 and self.amount >= 0) "Priced lines require a description and non-negative money and quantity"
 
-  default policy proposalLineItemRead read: roleAllows(user.role, "salesAccess") "Sales staff may read proposal line items"
-  default policy proposalLineItemWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write proposal line items through commands"
-  default policy proposalLineItemExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute proposal line item commands"
+  default policy proposalLineItemRead read: roleAllows(user.role, "salesAccess") "Sales staff may see proposal line items"
+  default policy proposalLineItemWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update proposal line items"
+  default policy proposalLineItemExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may change proposal line items"
 
   // Add a priced line. `amount` is supplied by the caller (computed by the
   // central calc in src/lib/pricing.ts); the entity stores it verbatim. Only

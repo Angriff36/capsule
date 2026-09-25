@@ -51,8 +51,8 @@ describe("breadcrumbsForPath", () => {
     ]);
     expect(labels("/kitchen/components/abc")).toEqual([
       "Kitchen",
-      "Recipes & components",
-      "Component",
+      "Recipes",
+      "Recipe",
     ]);
     expect(labels("/events/new")).toEqual(["Events", "New event"]);
   });

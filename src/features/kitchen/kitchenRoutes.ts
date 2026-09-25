@@ -2,7 +2,7 @@ export type KitchenSection = "components" | "ingredients" | "dishes" | "menus";
 
 /** "dishes".slice(0, -1) is "dishe" — spell the singulars out instead. */
 export const KITCHEN_SECTION_SINGULAR: Record<KitchenSection, string> = {
-  components: "component",
+  components: "recipe",
   ingredients: "ingredient",
   dishes: "dish",
   menus: "menu",
@@ -13,11 +13,11 @@ export const KITCHEN_SECTIONS: readonly {
   label: string;
   path: string;
 }[] = [
-  { key: "components", label: "Components", path: "/kitchen/components" },
+  { key: "components", label: "Recipes", path: "/kitchen/components" },
   { key: "ingredients", label: "Ingredients", path: "/kitchen/ingredients" },
   { key: "dishes", label: "Dishes", path: "/kitchen/dishes" },
   { key: "menus", label: "Menus", path: "/kitchen/menus" },
-  { key: "prep", label: "Command deck", path: "/kitchen/prep" },
+  { key: "prep", label: "Prep board", path: "/kitchen/prep" },
   { key: "unresolved", label: "Unresolved", path: "/kitchen/unresolved" },
   { key: "stations", label: "Stations", path: "/kitchen/stations" },
   { key: "cleanup", label: "Cleanup", path: "/kitchen/cleanup" },

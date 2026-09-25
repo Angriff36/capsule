@@ -36,9 +36,9 @@ entity TrainingModule mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
 
-  default policy trainingModuleRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read training modules"
-  default policy trainingModuleWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write training modules through commands"
-  default policy trainingModuleExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute training module commands"
+  default policy trainingModuleRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may see training modules"
+  default policy trainingModuleWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may update training modules"
+  default policy trainingModuleExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may change training modules"
 
   command define(
     name: string,
@@ -114,9 +114,9 @@ entity TrainingCompletion mixin TenantScoped, SoftDeletable {
   constraint trainingCompletionScore: self.assessmentScore >= 0 and self.assessmentScore <= 100 "Assessment score must be between 0 and 100"
   constraint trainingCompletionComplete: self.recordedAt == null or self.completedAt != null "Recorded training completions require a completion date"
 
-  default policy trainingCompletionRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read training completions"
-  default policy trainingCompletionWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write training completions through commands"
-  default policy trainingCompletionExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute training completion commands"
+  default policy trainingCompletionRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may see training completions"
+  default policy trainingCompletionWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may update training completions"
+  default policy trainingCompletionExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may change training completions"
 
   command record(
     personId: uuid,
@@ -173,9 +173,9 @@ entity ShiftType mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
 
-  default policy shiftTypeRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read shift types"
-  default policy shiftTypeWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write shift types through commands"
-  default policy shiftTypeExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute shift type commands"
+  default policy shiftTypeRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may see shift types"
+  default policy shiftTypeWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may update shift types"
+  default policy shiftTypeExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may change shift types"
 
   command define(
     name: string,

@@ -44,6 +44,7 @@ import { KitchenCatalogCreateForm } from "./KitchenCatalogCreateForm";
 import { KitchenCatalogDisplayCache } from "./KitchenCatalogDisplayCache";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
+  KITCHEN_SECTIONS,
   KITCHEN_SECTION_SINGULAR,
   COMPONENT_IMPORT_PATH,
   dishPath,
@@ -182,7 +183,7 @@ function KitchenCatalogPageContent({
       });
     }
     return [
-      { value: "all", label: "All records", count: visibleRows.length },
+      { value: "all", label: "All items", count: visibleRows.length },
       ...Array.from(counts, ([value, entry]) => ({
         value,
         label: entry.label,
@@ -471,7 +472,10 @@ function KitchenCatalogPageContent({
     });
   };
 
-  const title = section[0].toUpperCase() + section.slice(1);
+  const sectionLabel =
+    KITCHEN_SECTIONS.find((entry) => entry.key === section)?.label ?? section;
+  const title = sectionLabel;
+  const subtitle = `Browse and open ${sectionLabel.toLowerCase()} — then open the one that needs work.`;
   const lifecycleCommands = {
     purgeIngredient,
     reinstateIngredient,
@@ -490,15 +494,12 @@ function KitchenCatalogPageContent({
           <h1 className="text-xl font-semibold tracking-tight text-ink">
             {title}
           </h1>
-          <p className="mt-0.5 text-sm text-ink-2">
-            Browse and open {section} — then drill into the record that needs
-            work.
-          </p>
+          <p className="mt-0.5 text-sm text-ink-2">{subtitle}</p>
         </div>
         <div className="component-book-masthead-actions">
           {section === "components" ? (
             <Link to={COMPONENT_IMPORT_PATH} className="btn btn-ghost">
-              Import component
+              Import recipe
             </Link>
           ) : null}
           <button
@@ -531,9 +532,9 @@ function KitchenCatalogPageContent({
       <section className="component-catalog">
         <div className="component-index-heading">
           <h2 className="text-lg font-semibold text-ink">
-            All {section}
+            All {sectionLabel.toLowerCase()}
             <span className="ml-2 text-sm font-medium text-ink-2">
-              {formatCountNoun(displayRows.length, "record")}
+              {formatCountNoun(displayRows.length, "item")}
             </span>
           </h2>
         </div>
@@ -543,8 +544,8 @@ function KitchenCatalogPageContent({
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder={`Search ${section} by name or category…`}
-              aria-label={`Search ${section}`}
+              placeholder={`Search ${sectionLabel.toLowerCase()} by name or category…`}
+              aria-label={`Search ${sectionLabel.toLowerCase()}`}
             />
           </label>
           <label className="culinary-toolbar-field culinary-category-select">
@@ -596,7 +597,7 @@ function KitchenCatalogPageContent({
         ) : displayRows.length === 0 ? (
           search ? (
             <div className="component-filter-empty">
-              <p>No records match this search.</p>
+              <p>Nothing matches this search.</p>
             </div>
           ) : (
             <div className="component-empty-state">
@@ -605,7 +606,7 @@ function KitchenCatalogPageContent({
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-ink">
-                  No {section} yet
+                  No {sectionLabel.toLowerCase()} yet
                 </h3>
                 <p className="mt-2 max-w-110 text-ink-2">
                   Add the first {KITCHEN_SECTION_SINGULAR[section]} with the

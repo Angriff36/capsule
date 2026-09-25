@@ -4,6 +4,7 @@ import { formatStatusLabel } from "../../lib/statusLabels";
 import { CheckCircleIcon, ClockIcon, UsersIcon } from "../../ui/icons";
 import { HardHatIcon, RepeatIcon } from "./eventDetailIcons";
 import { EventOverviewCard } from "./EventOverviewCard";
+import { eventOwnerLabel } from "./eventOwnerLabel";
 
 type OwnerPerson = {
   _id: string;
@@ -14,7 +15,9 @@ type OwnerPerson = {
 
 export type EventOverviewRailProps = {
   readonly assignedToId?: string | null;
+  readonly ownerName?: string | null;
   readonly people: readonly OwnerPerson[] | undefined;
+  readonly peopleLoading: boolean;
   readonly dishCount: number;
   readonly staffCount: number;
   readonly timelineCount: number;
@@ -67,20 +70,27 @@ export function EventOverviewRail(props: EventOverviewRailProps) {
   return (
     <>
       <EventOverviewCard title="Assigned owner" testId="event-assigned-owner">
-        {owner ? (
-          <div>
-            <p className="text-base font-semibold text-ink">
-              {owner.givenName} {owner.familyName}
-            </p>
+        <div>
+          {/* The booked owner snapshot (eventOwnerLabel) — a later catalog
+              rename must not rewrite the printed name. Role stays a live
+              catalog fact, so it only prints when the person row exists. */}
+          <p
+            className="text-base font-semibold text-ink"
+            data-testid="event-assigned-owner-name"
+          >
+            {eventOwnerLabel({
+              assignedToId: props.assignedToId,
+              ownerName: props.ownerName,
+              liveName: owner ? `${owner.givenName} ${owner.familyName}` : "—",
+              peopleLoading: props.peopleLoading,
+            })}
+          </p>
+          {owner ? (
             <p className="text-sm text-ink-2">
               {formatStatusLabel(owner.role)}
             </p>
-          </div>
-        ) : (
-          <p className="text-base text-ink-2">
-            No owner assigned to this event.
-          </p>
-        )}
+          ) : null}
+        </div>
       </EventOverviewCard>
 
       <EventOverviewCard title="Quick stats" testId="event-quick-stats">
@@ -148,7 +158,7 @@ export function EventOverviewRail(props: EventOverviewRailProps) {
       >
         <p className="text-base leading-relaxed text-ink-2">
           {props.operationalRequirements?.trim() ||
-            "No operational requirements recorded."}
+            "No operational requirements on file."}
         </p>
         <a
           href={props.editHref}

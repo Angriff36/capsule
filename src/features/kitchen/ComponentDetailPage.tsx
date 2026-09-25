@@ -11,6 +11,7 @@ import {
   useListDishComponent,
   useListIngredient,
   useListIngredientPriceObservation,
+  useListItemUnitMapping,
   useListPerson,
   useListComponentIngredient,
   useListComponentSnapshot,
@@ -46,6 +47,7 @@ import {
   resolveIngredientPrice,
 } from "./IngredientPriceHistory";
 import { calculateComponentCost } from "./ComponentCostCalculator";
+import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import { ComponentCostPanel } from "./ComponentCostPanel";
 import {
   calculateComponentNutrition,
@@ -90,9 +92,10 @@ export function ComponentDetailPage() {
     useGetEvent,
     prepTask?.componentId === id ? prepTask?.eventId : undefined,
   );
-  useTrackRecent("Component", component?.name);
+  useTrackRecent("Recipe", component?.name);
   const ingredients = useListIngredient();
   const priceObservations = useListIngredientPriceObservation();
+  const itemUnitMappings = useListItemUnitMapping();
   const lines = useListComponentIngredient();
   const dishes = useListDish();
   const dishComponents = useListDishComponent();
@@ -150,7 +153,7 @@ export function ComponentDetailPage() {
   const { prompt, host } = useActionPrompt();
   const draftForm = useFormDraft(`component-revise:${id ?? "none"}`);
 
-  if (!id) return <ErrorState title="Component not found" />;
+  if (!id) return <ErrorState title="Recipe not found" />;
   if (component === undefined)
     return (
       <div className="culinary-document space-y-4">
@@ -162,8 +165,8 @@ export function ComponentDetailPage() {
   if (component === null || component.deletedAt != null)
     return (
       <ErrorState
-        title="Component not found"
-        detail="This component is unavailable or no longer exists."
+        title="Recipe not found"
+        detail="This recipe is unavailable or no longer exists."
       />
     );
 
@@ -281,6 +284,7 @@ export function ComponentDetailPage() {
       }),
     batchMultiplier: Number(component.batchMultiplier),
     yieldQuantity: Number(component.yieldQuantity),
+    mappings: RecordedUnitMappings.fromRows(itemUnitMappings),
   });
   const servesPerYield = Number(
     (component as { servesPerYield?: number }).servesPerYield ?? 1,
@@ -371,7 +375,7 @@ export function ComponentDetailPage() {
   return (
     <article className="culinary-document culinary-document-compact culinary-studio">
       <Link to="/kitchen/components" className="culinary-studio-back">
-        ← Component index
+        ← Recipes
       </Link>
       <KitchenBookNav />
       {host}
@@ -389,7 +393,7 @@ export function ComponentDetailPage() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="eyebrow">
-              Component · Edition {component.versionNumber} ·{" "}
+              Recipe · Edition {component.versionNumber} ·{" "}
               {formatStatusLabel(String(component.status))}
             </p>
             <h1 className="culinary-title-compact">{component.name}</h1>
@@ -632,7 +636,7 @@ export function ComponentDetailPage() {
                               title: "Remove ingredient line",
                               description: `Remove ${ingredientName(
                                 line.ingredientId,
-                              )} from this component.`,
+                              )} from this recipe.`,
                               label: "Removal reason",
                               confirmLabel: "Remove line",
                               tone: "danger",
@@ -661,7 +665,7 @@ export function ComponentDetailPage() {
             <div className="document-empty">
               <p>No ingredient lines yet.</p>
               <span>
-                You can still publish this component — ingredient lines are
+                You can still publish this recipe — ingredient lines are
                 optional.
               </span>
             </div>
@@ -806,9 +810,9 @@ export function ComponentDetailPage() {
           </ul>
         ) : (
           <div className="document-empty">
-            <p>No plated dish uses this component.</p>
+            <p>No plated dish uses this recipe.</p>
             <span>
-              Create one from the Dishes index when the component is ready for
+              Create one from the Dishes index when the recipe is ready for
               service.
             </span>
           </div>
@@ -834,7 +838,7 @@ function ComponentEditForm({
       <div className="culinary-create-heading">
         <div>
           <p className="eyebrow">Draft editor</p>
-          <h2 className="font-display text-xl">Revise component</h2>
+          <h2 className="font-display text-xl">Revise recipe</h2>
         </div>
         <button className="btn btn-primary" disabled={busy}>
           {busy ? "Saving…" : "Save draft"}

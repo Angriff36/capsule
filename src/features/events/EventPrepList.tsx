@@ -56,7 +56,7 @@ export function EventPrepList({
       await resolveChoice({ docId: task._id, choice, version: task.version });
     } catch (cause) {
       setChoiceError(
-        cause instanceof Error ? cause.message : "Could not record the choice.",
+        cause instanceof Error ? cause.message : "Could not save the choice.",
       );
     } finally {
       setChoiceBusy(null);
@@ -129,7 +129,7 @@ export function EventPrepList({
             </header>
             {group.tasks.length === 0 ? (
               <p className="py-4 text-base text-ink-2">
-                No prep steps recorded for this dish.
+                No prep steps on file for this dish.
               </p>
             ) : (
               <ol className="divide-y divide-line">

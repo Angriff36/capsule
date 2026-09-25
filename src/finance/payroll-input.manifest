@@ -51,9 +51,9 @@ entity PayrollInput mixin TenantScoped, SoftDeletable {
   transition status from "finalized" to ["voided"]
   transition status from "voided" to []
 
-  default policy payrollInputRead read: roleAllows(user.role, "financeManageAccess") "Finance managers may read payroll inputs"
-  default policy payrollInputWrite write: roleAllows(user.role, "financeManageAccess") "Finance managers may write payroll inputs through commands"
-  default policy payrollInputExecute execute: roleAllows(user.role, "financeManageAccess") "Finance managers may execute payroll input commands"
+  default policy payrollInputRead read: roleAllows(user.role, "financeManageAccess") "Finance managers may see payroll inputs"
+  default policy payrollInputWrite write: roleAllows(user.role, "financeManageAccess") "Finance managers may update payroll inputs"
+  default policy payrollInputExecute execute: roleAllows(user.role, "financeManageAccess") "Finance managers may change payroll inputs"
 
   command prepare(
     personId: uuid,
@@ -73,9 +73,9 @@ entity PayrollInput mixin TenantScoped, SoftDeletable {
     guard self.preparedAt == null
     guard self.deletedAt == null
     guard self.person != null
-    constraint preparePersonMatch: personId == self.personId "Prepare personId must match the seeded person reference"
-    constraint prepareEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Prepare eventId must match the seeded event reference when both are set"
-    constraint prepareShiftMatch: shiftId == null or self.shiftId == null or shiftId == self.shiftId "Prepare shiftId must match the seeded shift reference when both are set"
+    constraint preparePersonMatch: personId == self.personId "This payroll input is for a different person. Pick the person already on this payroll input."
+    constraint prepareEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "This payroll input is for a different event. Pick the event already on this payroll input."
+    constraint prepareShiftMatch: shiftId == null or self.shiftId == null or shiftId == self.shiftId "This payroll input is for a different shift. Pick the shift already on this payroll input."
     constraint preparePeriodOrder: periodEnd >= periodStart "Payroll period end must be at or after period start"
     constraint prepareMinutesNonnegative: regularMinutes >= 0 and overtimeMinutes >= 0 and totalMinutes >= 0 "Payroll minutes cannot be negative"
     constraint prepareTotalMinutes: totalMinutes == regularMinutes + overtimeMinutes "Total minutes must equal regular plus overtime"

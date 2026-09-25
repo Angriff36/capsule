@@ -4,6 +4,7 @@ import { PageGuide } from "../guide/PageGuide";
 import { WifiOffIcon } from "../../ui/icons";
 import { AnnouncementBanner } from "../../features/announcements/AnnouncementBanner";
 import { AssistantPanel } from "../../features/assistant/AssistantPanel";
+import { WorkingEventErrorBoundary } from "../../features/events/WorkingEventErrorBoundary";
 import { WorkingEventReports } from "../../features/home/WorkingEventReports";
 import { ActionResultHost } from "../../ui/action-result";
 import { CommandPalette } from "./CommandPalette";
@@ -107,7 +108,9 @@ export function AppShell() {
         open={assistantOpen}
         onClose={() => setAssistantOpen(false)}
       />
-      <WorkingEventReports />
+      <WorkingEventErrorBoundary label="report rail">
+        <WorkingEventReports />
+      </WorkingEventErrorBoundary>
     </div>
   );
 }

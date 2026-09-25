@@ -115,11 +115,11 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
   transition status from "banned" to ["preferred", "approved", "restricted"]
 
   // Read: facility staff can read relationships
-  default policy venueVendorRelationshipRead read: roleAllows(user.role, "facilityAccess") "Facility staff may read venue vendor relationships"
+  default policy venueVendorRelationshipRead read: roleAllows(user.role, "facilityAccess") "Facility staff may see venue vendor relationships"
   // Write: facility managers can establish/revise relationships
-  default policy venueVendorRelationshipWrite write: roleAllows(user.role, "facilityManageAccess") "Facility managers may write venue vendor relationships"
+  default policy venueVendorRelationshipWrite write: roleAllows(user.role, "facilityManageAccess") "Facility managers may update venue vendor relationships"
   // Execute: facility managers can change status
-  default policy venueVendorRelationshipExecute execute: roleAllows(user.role, "facilityManageAccess") "Facility managers may execute relationship commands"
+  default policy venueVendorRelationshipExecute execute: roleAllows(user.role, "facilityManageAccess") "Facility managers may change venue vendor relationships"
 
   command establish(
     venueId: string,

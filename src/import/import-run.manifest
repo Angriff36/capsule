@@ -97,9 +97,9 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   transition status from "failed" to []
   transition status from "reverted" to []
 
-  default policy importRunRead read: roleAllows(user.role, "importAccess") "Staff may read import runs"
-  default policy importRunWrite write: roleAllows(user.role, "importAccess") "Staff may write import runs through commands"
-  default policy importRunExecute execute: roleAllows(user.role, "importAccess") "Staff may execute import run commands"
+  default policy importRunRead read: roleAllows(user.role, "importAccess") "Staff may see imports"
+  default policy importRunWrite write: roleAllows(user.role, "importAccess") "Staff may update imports"
+  default policy importRunExecute execute: roleAllows(user.role, "importAccess") "Staff may change imports"
 
   command start(
     sourceSystem: ImportSourceSystem,

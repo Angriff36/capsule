@@ -62,9 +62,9 @@ entity Shift mixin TenantScoped, SoftDeletable {
   transition status from "cancelled" to []
   transition status from "no_show" to []
 
-  default policy shiftRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and ((user.personId != null and self.personId == user.personId) or self.eventId != null)) "Workforce staff may read shifts; crew may read their own shifts and the shared event schedule"
-  default policy shiftWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and ((user.personId != null and self.personId == user.personId) or self.eventId != null)) "Crew may use commands to update their own shifts and the shared event schedule"
-  default policy shiftExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and ((user.personId != null and self.personId == user.personId) or self.eventId != null)) "Crew may use commands to update their own shifts and the shared event schedule"
+  default policy shiftRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and ((user.personId != null and self.personId == user.personId) or self.eventId != null)) "Workforce staff may see shifts; crew may see their own shifts and the shared event schedule"
+  default policy shiftWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and ((user.personId != null and self.personId == user.personId) or self.eventId != null)) "Crew may update their own shifts and the shared event schedule"
+  default policy shiftExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and ((user.personId != null and self.personId == user.personId) or self.eventId != null)) "Crew may change their own shifts and the shared event schedule"
 
   command schedule(
     personId: uuid,
@@ -83,8 +83,8 @@ entity Shift mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.person != null and self.person.deletedAt == null and self.person.status == "active" "Select an active staff member in this workspace"
     guard roleAllows(user.role, "workforceManageAccess") or (eventStaffingSourceIds != null and length(eventStaffingSourceIds) > 0 and self.eventId != null and roleAllows(user.role, "workforceSelfAccess") and (roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess")))
-    constraint schedulePersonMatch: personId == self.personId "Schedule personId must match the seeded person reference"
-    constraint scheduleEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Schedule eventId must match the seeded event reference when provided"
+    constraint schedulePersonMatch: personId == self.personId "This shift is for a different person. Pick the person already on this shift."
+    constraint scheduleEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "This shift is for a different event. Pick the event already on this shift."
     constraint scheduleEventPresent: (eventId == null and self.eventId == null) or (self.event != null and self.event.deletedAt == null) "Select an event in this workspace"
     constraint scheduleDates: endsAt > startsAt "Shift end must be after its start"
     constraint scheduleShiftTypeActive: shiftTypeId == null or (self.shiftType != null and self.shiftType.deletedAt == null and self.shiftType.status == "active") "Selected shift type must be active"
@@ -381,9 +381,9 @@ entity WeeklyScheduleNotice mixin TenantScoped, SoftDeletable {
   constraint weeklyScheduleHasShifts: self.publishedAt == null or self.shiftCount > 0 "Published schedules require at least one shift"
   constraint weeklyScheduleHasSummary: self.publishedAt == null or length(trim(self.shiftSummary)) > 0 "Published schedules require a staff summary"
 
-  default policy weeklyScheduleNoticeRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may read schedule notices"
-  default policy weeklyScheduleNoticeWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may write schedule notices through commands"
-  default policy weeklyScheduleNoticeExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may execute schedule notice commands"
+  default policy weeklyScheduleNoticeRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may see schedule notices"
+  default policy weeklyScheduleNoticeWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may update schedule notices"
+  default policy weeklyScheduleNoticeExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may change schedule notices"
 
   command publishSchedule(
     personId: uuid,
@@ -397,7 +397,7 @@ entity WeeklyScheduleNotice mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.person != null
     guard roleAllows(user.role, "workforceManageAccess")
-    constraint publishSchedulePersonMatch: personId == self.personId "Schedule recipient must match the seeded person reference"
+    constraint publishSchedulePersonMatch: personId == self.personId "This schedule notice is for a different person. Pick the person already on this schedule notice."
     constraint publishScheduleWindow: weekEndsAt > weekStartsAt "Work week end must be after its start"
     constraint publishScheduleShiftCount: shiftCount > 0 "Publish requires at least one scheduled shift"
     constraint publishScheduleSummary: length(trim(shiftSummary)) > 0 "Publish requires a shift summary"

@@ -267,7 +267,7 @@ export function KitchenCatalogCleanupPage() {
             Imported TPP menu rows sorted into what they really are. The TPP
             import map and the rules decided most; Jev suggested the rest.
             Approve a group, then apply. A row that stops being a dish is
-            retired, never deleted, and its link names the new record.
+            retired, never deleted, and its link names the new item.
           </p>
         </div>
       </header>
@@ -287,8 +287,8 @@ export function KitchenCatalogCleanupPage() {
       ) : total === 0 ? (
         <div className="document-empty mt-4">
           <p>
-            No suggestions recorded yet. Run the planner script
-            (scripts/catalog-reclassification-plan.ts) against this backend.
+            No suggestions on file yet. Ask someone who can plan catalog cleanup
+            to generate them for this kitchen.
           </p>
         </div>
       ) : (

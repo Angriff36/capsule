@@ -570,6 +570,45 @@ export const processQuoteSubmission = action({
       }
     }
 
+    // Contact — find an existing live contact for the client (a retry reuses
+    // it, so the same client never gets a second contact), else create the
+    // primary contact from the submission's name/email/phone.
+    let clientContactId: Id<"clientContacts"> | null = null;
+    if (clientId) {
+      try {
+        const existingContacts = await ctx.runQuery(
+          api.queries.listClientContact,
+        );
+        const existingContact = existingContacts.find(
+          (c) => c.clientId === clientId,
+        );
+        if (existingContact) {
+          clientContactId = existingContact._id;
+        } else {
+          const trimmedName = clientName.trim() || "Quote Lead";
+          const [givenName, ...familyParts] = trimmedName.split(/\s+/);
+          const created = await ctx.runMutation(
+            api.mutations.ClientContact_createViaAdd,
+            {
+              clientId,
+              givenName,
+              ...(familyParts.length > 0
+                ? { familyName: familyParts.join(" ") }
+                : {}),
+              email: email || undefined,
+              phone,
+              isPrimary: true,
+            },
+          );
+          clientContactId = created.docId;
+        }
+      } catch (error) {
+        errors.push(
+          `contact: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+
     // Retry must resume the conversion substeps too: a lead may have been
     // captured before the prior attempt failed to link/confirm its client.
     if (leadId && clientId) {
@@ -582,6 +621,7 @@ export const processQuoteSubmission = action({
           await ctx.runMutation(api.mutations.Lead_stageConversion, {
             docId: leadId,
             clientId,
+            ...(clientContactId ? { clientContactId } : {}),
           });
           await ctx.runMutation(api.mutations.Lead_confirmConversion, {
             docId: leadId,

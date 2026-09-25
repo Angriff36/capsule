@@ -82,9 +82,9 @@ entity Payment mixin TenantScoped, SoftDeletable {
   transition status from "failed" to []
   transition status from "refunded" to []
 
-  default policy paymentRead read: roleAllows(user.role, "financeAccess") "Finance staff may read payments"
-  default policy paymentWrite write: roleAllows(user.role, "financeAccess") "Finance staff may write payments through commands"
-  default policy paymentExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute payment commands"
+  default policy paymentRead read: roleAllows(user.role, "financeAccess") "Finance staff may see payments"
+  default policy paymentWrite write: roleAllows(user.role, "financeAccess") "Finance staff may update payments"
+  default policy paymentExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may change payments"
 
   command record(
     invoiceId: uuid,

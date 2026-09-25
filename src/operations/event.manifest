@@ -127,12 +127,12 @@ entity Client mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["archived"]
   transition status from "archived" to ["active"]
 
-  default policy clientRead read: roleAllows(user.role, "salesAccess") or roleAllows(user.role, "financeAccess") "Sales and finance may read client accounts for CRM and billing"
+  default policy clientRead read: roleAllows(user.role, "salesAccess") or roleAllows(user.role, "financeAccess") "Sales and finance may see client accounts for CRM and billing"
   // Write policies gate command mutation (semantics.md § policy enforcement:
   // "enforced only at command execution"; no separate store-level write gate).
   // Staff tier here; manager-only commands carry explicit roleAllows guards.
-  default policy clientWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write client accounts through commands"
-  default policy clientExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute client commands"
+  default policy clientWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update client accounts"
+  default policy clientExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may change client accounts"
 
   command register(
     clientType: ClientType,
@@ -384,9 +384,9 @@ entity Venue mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["inactive"]
   transition status from "inactive" to ["active"]
 
-  default policy venueRead read: roleAllows(user.role, "eventAccess") "Event staff may read venues"
-  default policy venueWrite write: roleAllows(user.role, "eventAccess") "Event staff may write venues through commands"
-  default policy venueExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute venue commands"
+  default policy venueRead read: roleAllows(user.role, "eventAccess") "Event staff may see venues"
+  default policy venueWrite write: roleAllows(user.role, "eventAccess") "Event staff may update venues"
+  default policy venueExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change venues"
 
   command register(
     name: string,
@@ -588,13 +588,26 @@ entity Event mixin TenantScoped, SoftDeletable {
   versionProperty version: number
 
   property clientId: uuid?
+  // Snapshot the booked client printed name so a later catalog edit cannot
+  // rewrite the Event (backend §4.1, AC-398 slice).
+  property clientName: string?
   property clientMergeAuthorizationId: uuid?
   property mergeTargetClientId: uuid?
   property serviceStyleId: uuid?
+  // Snapshot the booked service-style label so a later catalog rename does
+  // not retroactively change the Event (backend §4.1, AC-398 slice).
+  property serviceStyleName: string?
   property occasionId: uuid?
+  // Snapshot the booked occasion label so a later catalog rename does
+  // not retroactively change the Event (backend §4.1, AC-398 slice).
+  property occasionName: string?
   property referralSourceId: uuid?
   property venueId: uuid?
   property assignedToId: uuid?
+  // Printed owner/salesperson name at plan / assign time. A later catalog
+  // Person.correctIdentity rename must not rewrite this Event. assignedToId
+  // stays the live Person link.
+  property ownerName: string?
   property required searchable title: string = ""
   // The 4-digit number the shop calls the event by: on the Event Tracker, the
   // binder spine and the chat channel. The numbering seam
@@ -649,6 +662,10 @@ entity Event mixin TenantScoped, SoftDeletable {
   property salesLockedAt: datetime?
   property finalizedAt: datetime?
   property cancellationReason: string?
+  // Archive is a visibility flag (AC-239): hide the Event from the active list
+  // without moving its stage or cancelling work. Not a new EventStage.
+  property archivedAt: datetime?
+  property archiveReason: string?
   property recurrenceFrequency: EventRecurrenceFrequency?
   property recurrenceEndCondition: EventRecurrenceEndCondition?
   property recurrenceEndsAt: datetime?
@@ -738,6 +755,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   hasMany layoutSections: EventLayoutSection
 
   computed isTerminal: boolean = self.stage == "cancelled" or self.stage == "closed_out"
+  computed isArchived: boolean = self.archivedAt != null
   computed timingCanRecalculate: boolean = self.deletedAt == null and self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled"
   // Same authority as the staffing commands, evaluated for the current reader.
   computed staffingCanManage: boolean = roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
@@ -758,7 +776,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   // Binder color code (training part 4): red = cooked on site (full service),
   // green = limited service, blue = drop-off clipboard.
   computed binderColor: string? = self.serviceStyle != null and self.serviceStyle.name == "Full Service" ? "red" : (self.serviceStyle != null and self.serviceStyle.name == "Limited Service" ? "green" : (self.serviceStyle != null and self.serviceStyle.name == "Drop Off" ? "blue" : null))
-  computed isEditable: boolean = self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+  computed isEditable: boolean = self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
   // Setup readiness for approval / automation (UI EventSetupProgress). Distinct
   // from isReadyForExecution (in-flight prep/pack/delivery). Uses raw child
   // fields via count_of — not child computeds (parent rollup limitation).
@@ -801,11 +819,11 @@ entity Event mixin TenantScoped, SoftDeletable {
   transition stage from "cancelled" to []
   transition stage from "closed_out" to []
 
-  default policy eventRead read: roleAllows(user.role, "staffAccess") "Staff may read shared event plans and operational context"
+  default policy eventRead read: roleAllows(user.role, "staffAccess") "Staff may see shared event plans and operational context"
   // Write policies gate command mutation (see Client note); staff tier here,
   // manager-only commands (approve/cancel/changePricing/...) carry guards.
-  default policy eventWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may write events through commands"
-  default policy eventExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may execute event commands"
+  default policy eventWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may update events"
+  default policy eventExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may change events"
 
   command planEngagement(
     clientId: uuid,
@@ -817,8 +835,11 @@ entity Event mixin TenantScoped, SoftDeletable {
     primaryContactName: string,
     budgetAmount: money(12, 2),
     quotedPrice: money(12, 2),
+    optional clientName: string,
     optional serviceStyleId: uuid,
+    optional serviceStyleName: string,
     optional occasionId: uuid,
+    optional occasionName: string,
     optional venueId: uuid,
     optional venueName: string,
     optional venueAddress: string,
@@ -829,6 +850,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional serviceRequirements: string,
     optional operationalRequirements: string,
     optional assignedToId: uuid,
+    optional ownerName: string,
     optional referralSourceId: uuid
   ) {
     guard self.stage == "planning"
@@ -842,13 +864,16 @@ entity Event mixin TenantScoped, SoftDeletable {
     constraint planContact: length(trim(primaryContactName)) > 0 "Primary contact name is required"
     constraint planPricing: budgetAmount >= 0 and quotedPrice >= 0 "Event pricing cannot be negative"
     mutate clientId = clientId
+    mutate clientName = clientName
     mutate title = title
     mutate eventType = eventType
     mutate startsAt = startsAt
     mutate endsAt = endsAt
     mutate purchasingWeekStart = startsAt - ((startsAt - 374400000) % 604800000)
     mutate serviceStyleId = serviceStyleId
+    mutate serviceStyleName = serviceStyleName
     mutate occasionId = occasionId
+    mutate occasionName = occasionName
     mutate venueId = venueId
     mutate venueName = venueName
     mutate venueAddress = venueAddress
@@ -863,6 +888,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate budgetAmount = budgetAmount
     mutate quotedPrice = quotedPrice
     mutate assignedToId = assignedToId
+    mutate ownerName = ownerName
     mutate referralSourceId = referralSourceId
     mutate stage = "planning"
     mutate plannedAt = now()
@@ -1013,7 +1039,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   }
 
   command reschedule(startsAt: datetime, endsAt: datetime) {
-    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
     constraint scheduleDates: endsAt > startsAt "Event end must be after its start"
     compute shiftedServiceStartsAt = self.serviceStartsAt != null and self.startsAt != null ? self.serviceStartsAt + (startsAt - self.startsAt) : self.serviceStartsAt
@@ -1029,9 +1055,9 @@ entity Event mixin TenantScoped, SoftDeletable {
       startsAt: startsAt
       endsAt: endsAt
     }
-    // Purchasing follows the event to its new week (#328). Declared consumers
-    // refresh the recipe/demand week copies; the transactional handler moves
-    // open purchase needs between weekly drafts (submitted orders stay put).
+    // Purchasing follows the event to its new week (#328). The handler moves
+    // live ingredient demand and open purchase needs. Fulfilled demand and
+    // submitted orders stay on the week they were already bought for.
     emit EventPurchasingWeekChanged {
       eventId: self.id
       tenantId: self.tenantId
@@ -1045,7 +1071,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   // propagation a reschedule does. Safe to run again; a no-op week change
   // still refreshes copies and moves nothing.
   command normalizePurchasingWeek() {
-    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "executing"
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock" or self.stage == "executing"
     guard self.deletedAt == null
     guard self.startsAt != null
     compute previousPurchasingWeekStart = self.purchasingWeekStart
@@ -1071,7 +1097,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may plan the event timeline"
-    constraint activeEventTiming: self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled" "Finished or cancelled events keep their recorded timing; correct individual blocks if needed"
+    constraint activeEventTiming: self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled" "Finished or cancelled events keep their saved timing; correct individual blocks if needed"
     constraint timingSetupNonnegative: setupMinutes == null or setupMinutes >= 0 "Setup minutes cannot be negative"
     constraint timingLoadNonnegative: loadMinutes == null or loadMinutes >= 0 "Load minutes cannot be negative"
     constraint timingOutboundNonnegative: outboundTravelMinutes == null or outboundTravelMinutes >= 0 "Travel minutes cannot be negative"
@@ -1151,7 +1177,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional venueAddress: string,
     optional venueCapacity: number
   ) {
-    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
     constraint changeVenueCapacity: venueCapacity == null or venueCapacity >= 0 "Venue capacity cannot be negative"
     mutate venueId = venueId
@@ -1169,7 +1195,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   }
 
   command changeHeadcount(newHeadcount: number) {
-    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "executing"
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock" or self.stage == "executing"
     guard self.deletedAt == null
     constraint headcountRange: newHeadcount >= 1 and newHeadcount <= 100000 "Headcount must be between 1 and 100000"
     compute previousHeadcount = self.expectedHeadcount
@@ -1184,15 +1210,17 @@ entity Event mixin TenantScoped, SoftDeletable {
 
   // Service corrections stay available during live operations; packet review
   // must use this command so the native reference and event audit agree.
-  command changeServiceStyle(serviceStyleId: uuid) {
+  command changeServiceStyle(serviceStyleId: uuid, optional serviceStyleName: string) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
     constraint serviceStyleReferenceInput: length(trim(serviceStyleId)) > 0 "Events must reference a service style"
     mutate serviceStyleId = serviceStyleId
+    mutate serviceStyleName = serviceStyleName != null ? serviceStyleName : self.serviceStyleName
     emit EventServiceStyleChanged {
       eventId: self.id
       tenantId: self.tenantId
       serviceStyleId: serviceStyleId
+      serviceStyleName: serviceStyleName
     }
   }
 
@@ -1201,7 +1229,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional primaryContactEmail: string,
     optional primaryContactPhone: string
   ) {
-    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
     constraint contactName: length(trim(primaryContactName)) > 0 "Primary contact name is required"
     mutate primaryContactName = primaryContactName
@@ -1251,7 +1279,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional serviceRequirements: string,
     optional operationalRequirements: string
   ) {
-    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
     mutate accessibilityNeeds = accessibilityNeeds != null ? accessibilityNeeds : []
     mutate serviceRequirements = serviceRequirements
@@ -1409,10 +1437,33 @@ entity Event mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command assignOwner(optional assignedToId: uuid) {
-    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+  // AC-228: completion freezes Event.changePricing. An authorized
+  // correction with a reason still updates the commercial seed and
+  // writes one EventCommercialCorrected ledger row. Allowed at
+  // completed and closed_out only — sales_lock change-orders are
+  // PL-COMMERCIAL-CHANGE, not this command.
+  command correctCommercial(reason: string, budgetAmount: money(12, 2), quotedPrice: money(12, 2)) {
+    guard self.stage == "completed" or self.stage == "closed_out"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "salesManageAccess")
+    constraint correctionReasonPresent: length(trim(reason)) > 0 "Correction reason is required"
+    constraint correctionPricingNonnegative: budgetAmount >= 0 and quotedPrice >= 0 "Event pricing cannot be negative"
+    mutate budgetAmount = budgetAmount
+    mutate quotedPrice = quotedPrice
+    emit EventCommercialCorrected {
+      eventId: self.id
+      tenantId: self.tenantId
+      reason: reason
+      budgetAmount: budgetAmount
+      quotedPrice: quotedPrice
+    }
+  }
+
+  command assignOwner(optional assignedToId: uuid, optional ownerName: string) {
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
     mutate assignedToId = assignedToId
+    mutate ownerName = assignedToId == null ? null : (ownerName != null ? ownerName : self.ownerName)
     emit EventOwnerAssigned {
       eventId: self.id
       tenantId: self.tenantId
@@ -1434,7 +1485,9 @@ entity Event mixin TenantScoped, SoftDeletable {
   }
 
   command returnToPlanning(reason: string) {
-    guard self.stage == "pending_approval" or self.stage == "approved"
+    // Transition table + EventReturnToPlanningLifecycle: quote→planning and
+    // pending_approval→planning. approved cannot regress (only sales_lock or cancelled).
+    guard self.stage == "quote" or self.stage == "pending_approval"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
     constraint returnReason: length(trim(reason)) > 0 "Return reason is required"
@@ -1520,6 +1573,35 @@ entity Event mixin TenantScoped, SoftDeletable {
       expectedHeadcount: self.expectedHeadcount
       quotedPrice: self.quotedPrice
       budgetAmount: self.budgetAmount
+    }
+  }
+
+  // Archive hides the Event from the active list (AC-239). It is a visibility
+  // flag, not a stage move: any live stage can be archived, and stage, money,
+  // and headcount stay exactly as they are.
+  command archive(reason: string) {
+    guard self.deletedAt == null
+    guard self.archivedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    constraint archiveReasonPresent: length(trim(reason)) > 0 "Archive reason is required"
+    mutate archivedAt = now()
+    mutate archiveReason = reason
+    emit EventArchived {
+      eventId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command reactivate() {
+    guard self.deletedAt == null
+    guard self.archivedAt != null
+    guard roleAllows(user.role, "eventManageAccess")
+    mutate archivedAt = null
+    mutate archiveReason = null
+    emit EventReactivated {
+      eventId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -1615,9 +1697,9 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
   transition rsvpStatus from "confirmed" to ["confirmed", "declined"]
   transition rsvpStatus from "declined" to []
 
-  default policy eventGuestRead read: roleAllows(user.role, "eventAccess") "Event staff may read guest attendance"
-  default policy eventGuestWrite write: roleAllows(user.role, "eventAccess") "Event staff may write guest attendance through commands"
-  default policy eventGuestExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute guest attendance commands"
+  default policy eventGuestRead read: roleAllows(user.role, "eventAccess") "Event staff may see guest attendance"
+  default policy eventGuestWrite write: roleAllows(user.role, "eventAccess") "Event staff may update the guest list"
+  default policy eventGuestExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change the guest list"
 
   command invite(
     eventId: uuid,
@@ -1766,9 +1848,9 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   constraint timelineActivityWindowOrdered: self.startsAt == null or self.endsAt == null or self.endsAt >= self.startsAt "Timeline activity end must not precede its start"
   constraint timelineActivitySortNonnegative: self.sortOrder >= 0 "Timeline activity sort order cannot be negative"
 
-  default policy eventTimelineActivityRead read: roleAllows(user.role, "staffAccess") "Staff may read the shared event timeline"
-  default policy eventTimelineActivityWrite write: roleAllows(user.role, "staffAccess") "Staff may record timeline work through commands"
-  default policy eventTimelineActivityExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute timeline work commands"
+  default policy eventTimelineActivityRead read: roleAllows(user.role, "staffAccess") "Staff may see the shared event timeline"
+  default policy eventTimelineActivityWrite write: roleAllows(user.role, "staffAccess") "Staff may add timeline work"
+  default policy eventTimelineActivityExecute execute: roleAllows(user.role, "staffAccess") "Staff may change timeline work"
 
   command schedule(
     eventId: uuid,
@@ -1876,7 +1958,7 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.scheduledAt != null
     guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may plan the event timeline"
-    constraint activeTimingParent: self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" "Calculated timing requires an active event; historical blocks keep their recorded times"
+    constraint activeTimingParent: self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" "Calculated timing requires an active event; historical blocks keep their saved times"
     constraint sameTimingMilestone: self.timingMilestone == null or self.timingMilestone == milestone "This block already represents another timing milestone"
     constraint plannedTimingWindow: startsAt == null or endsAt == null or endsAt >= startsAt "Activity end must not precede its start"
     compute keepTiming = self.completedAt != null or self.timingPerformedAt != null or self.timingManuallyAdjustedAt != null or (self.timingMilestone == null and (self.startsAt != null or self.endsAt != null))
@@ -1895,9 +1977,9 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.timingMilestone != null
     guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may plan the event timeline"
-    constraint activeCalculatedTimingParent: self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" "Calculated timing requires an active event; historical blocks keep their recorded times"
+    constraint activeCalculatedTimingParent: self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" "Calculated timing requires an active event; historical blocks keep their saved times"
     // An explicit return to the plan may change manual times, not work history.
-    constraint preservePerformedTiming: self.completedAt == null and self.timingPerformedAt == null "Performed work keeps its recorded time"
+    constraint preservePerformedTiming: self.completedAt == null and self.timingPerformedAt == null "Performed work keeps its saved time"
     mutate timingManuallyAdjustedAt = null
     emit EventTimelineCalculatedTimingRequested {
       activityId: self.id
@@ -1953,9 +2035,9 @@ entity EventTimelineComment mixin TenantScoped, SoftDeletable {
 
   constraint timelineCommentBody: self.postedAt == null or length(trim(self.body)) > 0 "Timeline comment text is required"
 
-  default policy eventTimelineCommentRead read: roleAllows(user.role, "eventAccess") "Event staff may read timeline comments"
-  default policy eventTimelineCommentWrite write: roleAllows(user.role, "eventAccess") "Event staff may write timeline comments through commands"
-  default policy eventTimelineCommentExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute timeline comment commands"
+  default policy eventTimelineCommentRead read: roleAllows(user.role, "eventAccess") "Event staff may see timeline comments"
+  default policy eventTimelineCommentWrite write: roleAllows(user.role, "eventAccess") "Event staff may add timeline comments"
+  default policy eventTimelineCommentExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change timeline comments"
 
   command post(
     eventId: uuid,
@@ -2019,9 +2101,9 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
   constraint layoutSectionTypeComplete: self.addedAt == null or length(trim(self.type)) > 0 "Layout section type is required once added"
   constraint layoutSectionSortNonnegative: self.sortOrder >= 0 "Layout section sort order cannot be negative"
 
-  default policy eventLayoutSectionRead read: roleAllows(user.role, "eventAccess") "Event staff may read event layout sections"
-  default policy eventLayoutSectionWrite write: roleAllows(user.role, "eventAccess") "Event staff may write event layout sections through commands"
-  default policy eventLayoutSectionExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute event layout section commands"
+  default policy eventLayoutSectionRead read: roleAllows(user.role, "eventAccess") "Event staff may see event layout sections"
+  default policy eventLayoutSectionWrite write: roleAllows(user.role, "eventAccess") "Event staff may update the floor plan"
+  default policy eventLayoutSectionExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change the floor plan"
 
   command add(
     eventId: uuid,
@@ -2234,6 +2316,7 @@ event EventServiceStyleChanged: "event.service_style_changed" {
   eventId: string
   tenantId: string
   serviceStyleId: string
+  serviceStyleName: string?
 }
 
 event EventHeadcountChanged: "event.headcount_changed" {
@@ -2259,6 +2342,14 @@ event EventRequirementsChanged: "event.requirements_changed" {
 event EventPricingChanged: "event.pricing_changed" {
   eventId: string
   tenantId: string
+  budgetAmount: money(12, 2)
+  quotedPrice: money(12, 2)
+}
+
+event EventCommercialCorrected: "event.commercial_corrected" {
+  eventId: string
+  tenantId: string
+  reason: string
   budgetAmount: money(12, 2)
   quotedPrice: money(12, 2)
 }
@@ -2308,6 +2399,17 @@ event EventCancelled: "event.cancelled" {
   tenantId: string
   clientId: string
   reason: string
+}
+
+event EventArchived: "event.archived" {
+  eventId: string
+  tenantId: string
+  reason: string
+}
+
+event EventReactivated: "event.reactivated" {
+  eventId: string
+  tenantId: string
 }
 
 event EventClosedOut: "event.closed_out" {

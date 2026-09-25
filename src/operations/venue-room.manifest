@@ -30,9 +30,9 @@ entity VenueRoom mixin TenantScoped, SoftDeletable {
   constraint venueRoomName: self.addedAt == null or length(trim(self.name)) > 0 "Room name is required"
   constraint venueRoomCapacity: self.capacity >= 0 "Room capacity cannot be negative"
 
-  default policy venueRoomRead read: roleAllows(user.role, "eventAccess") "Event staff may read venue rooms"
-  default policy venueRoomWrite write: roleAllows(user.role, "eventAccess") "Event staff may write venue rooms through commands"
-  default policy venueRoomExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute venue room commands"
+  default policy venueRoomRead read: roleAllows(user.role, "eventAccess") "Event staff may see venue rooms"
+  default policy venueRoomWrite write: roleAllows(user.role, "eventAccess") "Event staff may update venue rooms"
+  default policy venueRoomExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change venue rooms"
 
   command add(
     venueId: uuid,

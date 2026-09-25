@@ -48,7 +48,7 @@ function stateTransitionFailure(detail: string): CommandFailure | null {
       : `It's already ${humanizeState(from)} and can't change from here.`;
   return {
     category: "guard_blocked",
-    title: "Not ready for this step yet",
+    title: "Not ready for this yet",
     detail: `This can't move to "${humanizeState(to)}" while it's "${humanizeState(
       from,
     )}". ${nextSteps}`,
@@ -103,7 +103,7 @@ function creationSubject(operation: string | undefined): string {
   const entity = operation?.match(/^([A-Za-z0-9]+)_createVia/)?.[1];
   return entity
     ? entity.replace(/([a-z0-9])([A-Z])/g, "$1 $2").toLowerCase()
-    : "record";
+    : "item";
 }
 
 function isZodError(
@@ -138,7 +138,7 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
     const classified = classifyCommandFailure(bulk.cause);
     return {
       ...classified,
-      detail: `${classified.detail} (${bulk.completed} completed, ${bulk.failed} failed, ${bulk.remaining} remaining.)`,
+      detail: `${classified.detail} (${bulk.completed} saved, ${bulk.failed} didn't go through, ${bulk.remaining} still waiting.)`,
     };
   }
   const normalized = normalizeCommandError(error);
@@ -154,9 +154,9 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
   if (/ConcurrencyConflict|VERSION_MISMATCH/i.test(detail)) {
     return {
       category: "conflict",
-      title: "This record changed elsewhere",
+      title: "Someone else changed this",
       detail:
-        "Someone else updated this record while you were working. Refresh to load the latest, then try again — your entered details are still valid.",
+        "Someone else saved a change while you were working. Refresh to see the latest, then try again — what you typed is still here.",
       action: REFRESH_ACTION,
     };
   }
@@ -165,7 +165,7 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
   if (/\bnot found\b/i.test(detail)) {
     return {
       category: "conflict",
-      title: "This record isn't available",
+      title: "This isn't available anymore",
       detail:
         "It may have been removed, or it isn't part of your workspace. Refresh to see the current list.",
       action: REFRESH_ACTION,
@@ -188,13 +188,18 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
       category: "unexpected",
       title: "Secure field storage failed",
       detail: requestId
-        ? `Contact/address encryption could not run (Request ID: ${requestId}). Refresh once. If it persists, the workspace encryption key drifted — do not rewrite CONVEX_FIELD_ENCRYPTION_KEY without migrating data.`
-        : "Contact/address encryption could not run. Refresh once. If it persists, the workspace encryption key may have drifted.",
+        ? `Contact and address details could not be read (ask the office with this code: ${requestId}). Refresh once. If it happens again, ask the office to check Capsule's secure storage.`
+        : "Contact and address details could not be read. Refresh once. If it happens again, ask the office to check Capsule's secure storage.",
       action: REFRESH_ACTION,
     };
   }
   if (/staff may|permission|not allowed|policy/i.test(detail)) {
-    return { category: "denied", title: "Action denied", detail };
+    return {
+      category: "denied",
+      title: "You can't do this",
+      detail:
+        "Your account does not have access. Ask someone who can, or switch to an account that can.",
+    };
   }
   if (/Guard \d+ failed/i.test(detail) && /_createVia/.test(operation ?? "")) {
     const subject = creationSubject(operation);

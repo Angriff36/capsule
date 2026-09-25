@@ -47,9 +47,9 @@ entity RoleScorecard mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["archived"]
   transition status from "archived" to ["active"]
 
-  default policy roleScorecardRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may read role scorecards"
-  default policy roleScorecardWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may write role scorecards through commands"
-  default policy roleScorecardExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may execute role scorecard commands"
+  default policy roleScorecardRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may see role scorecards"
+  default policy roleScorecardWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may update role scorecards"
+  default policy roleScorecardExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may change role scorecards"
 
   command define(
     role: CapsuleRole,

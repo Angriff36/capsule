@@ -114,11 +114,11 @@ export const PAGE_GUIDES: PageGuide[] = [
   },
   {
     prefix: "/kitchen/components",
-    title: "Recipes & components",
+    title: "Recipes",
     purpose:
       "Your recipe book — the sauces, sides, and building blocks that dishes are made from.",
     steps: [
-      "Create a component with its ingredients and yield.",
+      "Create a recipe with its ingredients and yield.",
       "Publish it so dishes and prep lists can use it.",
     ],
   },
@@ -165,10 +165,10 @@ export const PAGE_GUIDES: PageGuide[] = [
     prefix: "/kitchen/yield",
     title: "Yield variance",
     purpose:
-      "Planned vs. actual yield for completed production batches, grouped by component.",
+      "Planned vs. actual yield for completed production batches, grouped by recipe.",
     steps: [
       "Pick a 30, 90, or 365 day window.",
-      "Look for components that consistently under- or over-yield and fix the recipe or the prep.",
+      "Look for recipes that consistently under- or over-yield and fix the recipe or the prep.",
     ],
   },
   {

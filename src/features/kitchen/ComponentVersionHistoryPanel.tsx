@@ -81,7 +81,7 @@ export function ComponentVersionHistoryPanel({
 
       {history.length === 0 ? (
         <div className="document-empty">
-          <p>No prior versions recorded yet.</p>
+          <p>No earlier versions on file yet.</p>
           <span>
             Each edit to this component captures a snapshot with author and
             time.

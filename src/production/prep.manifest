@@ -39,9 +39,9 @@ entity QualityCheck mixin TenantScoped, SoftDeletable {
   transition status from "passed" to ["pending"]
   transition status from "failed" to ["pending"]
 
-  default policy qualityCheckRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read quality checks"
-  default policy qualityCheckWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write quality checks through commands"
-  default policy qualityCheckExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute quality check commands"
+  default policy qualityCheckRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see quality checks"
+  default policy qualityCheckWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update quality checks"
+  default policy qualityCheckExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change quality checks"
 
   command open(
     optional prepTaskId: uuid,

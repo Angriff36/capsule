@@ -153,7 +153,7 @@ export function LiveEventProfitabilityWidget({
                 <strong data-testid="live-profit-cost">
                   {formatMoney(result.totalCommittedCost)}
                 </strong>
-                <small>priced records to date</small>
+                <small>priced so far</small>
               </div>
             </div>
           </div>
@@ -195,7 +195,7 @@ export function LiveEventProfitabilityWidget({
                 </strong>
                 <small>
                   {(clockedLabor?.recordCount ?? 0) > 0
-                    ? `${hours.format(result.laborHours)} clocked hours · ${result.payrollInputCount} time record${result.payrollInputCount === 1 ? "" : "s"}`
+                    ? `${hours.format(result.laborHours)} clocked hours · ${result.payrollInputCount} time card${result.payrollInputCount === 1 ? "" : "s"}`
                     : (clockedLabor?.scheduledShiftCount ?? 0) > 0
                       ? `${hours.format(result.laborHours)} scheduled hours · ${result.payrollInputCount} shift${result.payrollInputCount === 1 ? "" : "s"} (forecast)`
                       : `${hours.format(result.laborHours)} reviewed hours · ${result.payrollInputCount} payroll input${result.payrollInputCount === 1 ? "" : "s"}`}

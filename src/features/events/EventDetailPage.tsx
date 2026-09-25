@@ -14,6 +14,7 @@ import { useRouteRecord } from "../../lib/routeRecord";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   useEventApprove,
+  useEventArchive,
   useEventBeginExecution,
   useEventCancel,
   useEventChangeHeadcount,
@@ -53,6 +54,7 @@ import {
   UsersIcon,
 } from "../../ui/icons";
 import { MapPinIcon, TagIcon } from "./eventDetailIcons";
+import { eventCommercialQuotedPrice } from "./eventCommercialSeed";
 import { eventVenueLabel } from "./eventVenueLabel";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
@@ -73,6 +75,8 @@ import { downloadBeoPdf } from "./beoPdf";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { clientDisplayName } from "./clientName";
 import { EventClientTab } from "./EventClientTab";
+import { EventArchiveMenuItems } from "./EventArchiveMenuItems";
+import { EventDuplicateMenuItem } from "./EventDuplicateMenuItem";
 import { EventDetailTabs } from "./EventDetailTabs";
 import { EventEquipmentPanel } from "./EventEquipmentPanel";
 import { EventGuestPanel } from "./EventGuestPanel";
@@ -194,6 +198,7 @@ function EventDetailContent({
   const complete = useEventComplete();
   const closeOut = useEventCloseOut();
   const cancel = useEventCancel();
+  const archive = useEventArchive();
   const returnToPlanning = useEventReturnToPlanning();
   const changeHeadcount = useEventChangeHeadcount();
   const changePricing = useEventChangePricing();
@@ -203,7 +208,7 @@ function EventDetailContent({
   const reschedule = useEventReschedule();
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   const [reasonFor, setReasonFor] = useState<
-    "cancel" | "returnToPlanning" | null
+    "cancel" | "returnToPlanning" | "archive" | null
   >(null);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
@@ -438,6 +443,17 @@ function EventDetailContent({
           {action.label}
         </button>
       ))}
+      <EventDuplicateMenuItem event={event} busy={busy} run={run} />
+      <EventArchiveMenuItems
+        event={event}
+        busy={busy}
+        version={version}
+        run={run}
+        onArchive={() => {
+          setReasonFor("archive");
+          setReason("");
+        }}
+      />
     </ActionMenu>,
   ];
 
@@ -489,7 +505,10 @@ function EventDetailContent({
           <p className="mt-3 border-t border-line pt-3 text-sm text-ink-2">
             <span className="font-semibold text-ink">Budget / quoted</span>{" "}
             {formatMoney(event.budgetAmount, currencyCode)} /{" "}
-            {formatMoney(event.quotedPrice, currencyCode)}
+            {formatMoney(
+              eventCommercialQuotedPrice({ quotedPrice: event.quotedPrice }),
+              currencyCode,
+            )}
           </p>
           <div className="mobile-actions mt-4 flex flex-wrap items-center justify-end gap-2">
             {headerActions}
@@ -543,9 +562,9 @@ function EventDetailContent({
                 </span>
                 <span className="inline-flex min-w-0 items-center gap-1.5">
                   <MapPinIcon width={14} height={14} />
-                  {venue ? (
+                  {event.venueId ? (
                     <Link to="/facilities" className="hover:underline">
-                      {venue.name}
+                      {venueLabel}
                     </Link>
                   ) : (
                     venueLabel
@@ -593,6 +612,16 @@ function EventDetailContent({
               void run(() =>
                 cancel({ docId: event._id, reason: reason.trim(), version }),
               );
+            else if (reasonFor === "archive")
+              void run(
+                () =>
+                  archive({
+                    docId: event._id,
+                    reason: reason.trim(),
+                    version,
+                  }),
+                "Event archived",
+              );
             else
               void run(() =>
                 returnToPlanning({
@@ -606,7 +635,9 @@ function EventDetailContent({
           <label className="field-label min-w-0 flex-1 basis-48">
             {reasonFor === "cancel"
               ? "Reason for cancelling"
-              : "Reason for returning to planning"}
+              : reasonFor === "archive"
+                ? "Reason for archiving"
+                : "Reason for returning to planning"}
             <input
               autoFocus
               value={reason}
@@ -619,7 +650,9 @@ function EventDetailContent({
             type="submit"
             disabled={busy || !reason.trim()}
             className={
-              reasonFor === "cancel" ? "btn btn-danger" : "btn btn-primary"
+              reasonFor === "cancel" || reasonFor === "archive"
+                ? "btn btn-danger"
+                : "btn btn-primary"
             }
           >
             Confirm
@@ -751,7 +784,7 @@ function EventDetailContent({
           <section className="space-y-4" data-testid="event-guests-tab">
             <EventTabIntro
               title="Guests"
-              description="Invite guests, track RSVPs and table assignments, and record dietary needs that feed the allergen briefing."
+              description="Invite guests, track RSVPs and table assignments, and note dietary needs so they show up on the allergen briefing."
             />
             <EventGuestPanel
               eventId={event._id}

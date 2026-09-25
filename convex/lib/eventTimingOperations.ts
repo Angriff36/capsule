@@ -2,6 +2,8 @@ import { api } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 import { eventTimingWindows, matchesTimingMilestone } from "../../src/lib/eventTimingMilestones";
+import { eventReconciliationReceipt } from "./reconciliationReceipt";
+import type { ReconciliationReceiptOutput, TimingWindow } from "./reconciliationReceipt";
 
 type TimingEvent = Doc<"events"> & {
   timingCanRecalculate: boolean;
@@ -50,13 +52,55 @@ export async function readEventTimingPlan(ctx: QueryCtx, eventId: Id<"events">):
   return { event, milestones, nextSortOrder };
 }
 
+/** Which ledger command triggered this reconcile — recorded on the receipt. */
+export type TimingReconcileTrigger = {
+  triggerEventId: string;
+  triggerType: string;
+};
+
 /** Runs in the originating Event command's transaction, including reschedules. */
-export async function reconcileEventTiming(ctx: MutationCtx, eventId: Id<"events">) {
+export async function reconcileEventTiming(
+  ctx: MutationCtx,
+  eventId: Id<"events">,
+  trigger?: TimingReconcileTrigger,
+) {
   const { event, milestones, nextSortOrder } = await readEventTimingPlan(ctx, eventId);
   if (event.timingConfiguredAt == null) return;
+  // Same rule as EventTimelineActivity.planTiming: a cancelled parent keeps
+  // its historical times; calculated timing must not re-plan them (AC-424).
+  if (event.stage === "cancelled") {
+    throw new Error(
+      "Calculated timing requires an active event; historical blocks keep their recorded times",
+    );
+  }
+  const windows: TimingWindow[] = milestones.map((milestone) => ({
+    key: milestone.key, startsAt: milestone.startsAt, endsAt: milestone.endsAt,
+  }));
+  const checkpoint = eventReconciliationReceipt.windowsCheckpoint(windows);
+  const operationKey = eventReconciliationReceipt.operationKey(
+    String(eventId), "timing", checkpoint,
+  );
+  // §8.2 replay no-op: this exact input shape already reconciled; a second
+  // run must write neither timeline rows nor another receipt.
+  const prior = await eventReconciliationReceipt.readPrior(ctx, event.tenantId, operationKey);
+  if (prior) return;
   let nextOrder = nextSortOrder;
+  let createdCount = 0;
+  let updatedCount = 0;
+  let preservedCount = 0;
+  const unresolved: ReconciliationReceiptOutput["unresolved"] = [];
   for (const milestone of milestones) {
-    if (milestone.removed || milestone.matches.length > 1) continue;
+    if (milestone.removed) {
+      unresolved.push({ code: "TIMING_REMOVED", recordIds: [] });
+      continue;
+    }
+    if (milestone.matches.length > 1) {
+      unresolved.push({
+        code: "TIMING_AMBIGUOUS",
+        recordIds: milestone.matches.map((match) => match._id),
+      });
+      continue;
+    }
     let row = milestone.row;
     if (!row) {
       // Start untimed so the planning command can distinguish a fresh generated
@@ -68,14 +112,34 @@ export async function reconcileEventTiming(ctx: MutationCtx, eventId: Id<"events
           idempotencyKey: `event-timing:${eventId}:${milestone.key}` },
       );
       row = await ctx.db.get(created.docId);
+      createdCount++;
     }
     if (!row) throw new Error("Timeline block was not created");
     if (row.timingMilestone === milestone.key &&
       (milestone.performed || milestone.manual ||
-        ((row.startsAt ?? null) === milestone.startsAt && (row.endsAt ?? null) === milestone.endsAt))) continue;
+        ((row.startsAt ?? null) === milestone.startsAt && (row.endsAt ?? null) === milestone.endsAt))) {
+      preservedCount++;
+      continue;
+    }
     await ctx.runMutation(api.mutations.EventTimelineActivity_planTiming, {
       docId: row._id, version: row.version, milestone: milestone.key,
       startsAt: milestone.startsAt ?? undefined, endsAt: milestone.endsAt ?? undefined,
     });
+    updatedCount++;
   }
+  await eventReconciliationReceipt.persist(ctx, event.tenantId, operationKey, {
+    eventId: String(eventId),
+    tenantId: event.tenantId,
+    triggerEventId: trigger?.triggerEventId ?? String(eventId),
+    triggerType: trigger?.triggerType ?? "reconcileEventTiming",
+    inputVersions: { checkpoint, windows },
+    affectedDomains: ["timing"],
+    createdCount,
+    updatedCount,
+    retiredCount: 0,
+    preservedCount,
+    exceptionCount: 0,
+    unresolved,
+    checkpoint: { state: "complete", key: operationKey },
+  });
 }

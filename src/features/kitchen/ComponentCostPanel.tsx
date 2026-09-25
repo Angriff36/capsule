@@ -7,7 +7,7 @@ import { formatMoneyExact } from "../../lib/format";
 
 function issueText(line: ComponentCostLineResult) {
   if (line.status === "missing_ingredient") {
-    return "An ingredient on this component is no longer available.";
+    return "An ingredient on this recipe is no longer available.";
   }
   if (line.status === "missing_price") {
     return `${line.ingredientName} needs a current cost per ${line.pricingUnit}.`;
@@ -46,7 +46,7 @@ export function ComponentCostPanel({
       <div className="component-cost-intro">
         <p className="eyebrow">Live food cost</p>
         <div className="component-cost-title-row">
-          <h2 id="component-cost-heading">Component cost</h2>
+          <h2 id="component-cost-heading">Recipe cost</h2>
           <span className="component-cost-live">
             <i aria-hidden="true" /> Current pricing
           </span>

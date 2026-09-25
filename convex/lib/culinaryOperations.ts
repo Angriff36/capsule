@@ -255,7 +255,7 @@ async function authorize(ctx: MutationCtx) {
 async function ownedImport(ctx: MutationCtx, id: Id<"componentImports">, tenantId: string) {
   const row = await ctx.db.get(id);
   if (!row || row.deletedAt != null || row.tenantId !== tenantId) {
-    throw new Error("Component import not found");
+    throw new Error("Recipe import not found");
   }
   return row;
 }

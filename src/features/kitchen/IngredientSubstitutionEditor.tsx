@@ -79,9 +79,9 @@ export function IngredientSubstitutionEditor({
       <div className="culinary-section-heading">
         <div>
           <p className="eyebrow">Shortage playbook</p>
-          <h2 id="ingredient-substitutes-heading">Mapped substitutes</h2>
+          <h2 id="ingredient-substitutes-heading">Saved substitutes</h2>
         </div>
-        <span>{selectedIds.length} mapped</span>
+        <span>{selectedIds.length} on file</span>
       </div>
       <p className="max-w-160 text-base text-ink-2">
         When this ingredient cannot cover component demand, the event menu ranks
@@ -91,7 +91,7 @@ export function IngredientSubstitutionEditor({
       {selectedIds.length ? (
         <ul
           className="mt-4 space-y-2"
-          aria-label="Mapped ingredient substitutes"
+          aria-label="Saved ingredient substitutes"
         >
           {selectedIds.map((candidateId) => {
             const candidate = ingredientById.get(candidateId);
@@ -148,8 +148,8 @@ export function IngredientSubstitutionEditor({
         </ul>
       ) : (
         <div className="document-empty mt-4">
-          <p>No substitutes mapped yet.</p>
-          <span>Map same-unit ingredients so shortages come with options.</span>
+          <p>No substitutes on file yet.</p>
+          <span>Add same-unit ingredients so shortages come with options.</span>
         </div>
       )}
 

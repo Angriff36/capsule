@@ -217,7 +217,7 @@ export function useEventImportRunner(input: {
       );
       if (unsupported.length > 0) {
         throw new Error(
-          `This screen cannot run ${unsupported.join(", ")} yet — enter this bundle through the agent importer.`,
+          `This screen can't do every step in this bundle yet. Enter it through the agent importer.`,
         );
       }
       const runScope =

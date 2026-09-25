@@ -88,7 +88,7 @@ export function EventGuestSidebar({
         </div>
         {headcount > 0 ? (
           <p className="mt-3 border-t border-line pt-2 text-sm text-ink-3">
-            {summary.total} of {headcount} sold covers recorded.
+            {summary.total} of {headcount} sold covers on the list.
           </p>
         ) : null}
       </div>
@@ -97,7 +97,7 @@ export function EventGuestSidebar({
         <p className="eyebrow">Dietary breakdown</p>
         <div className="mt-3 grid gap-2">
           {summary.dietary.length === 0 ? (
-            <p className="text-sm text-ink-3">Nothing recorded yet.</p>
+            <p className="text-sm text-ink-3">Nothing on the list yet.</p>
           ) : (
             summary.dietary.map((row) => (
               <Tally key={row.label} label={row.label} count={row.count} />
@@ -149,8 +149,8 @@ export function EventGuestSidebar({
         <div className="card p-4">
           <p className="eyebrow">Seating</p>
           <p className="mt-2 text-base text-ink-2">
-            {summary.unassignedTables} of {summary.total} recorded guests have
-            no table yet.
+            {summary.unassignedTables} of {summary.total} guests on the list
+            have no table yet.
           </p>
         </div>
       ) : null}

@@ -101,7 +101,7 @@ export function ContractsPage() {
       form.reset();
       setShowDraft(false);
       setNotice(
-        "Contract drafted. Deliver the document outside Capsule, then record it sent here.",
+        "Contract drafted. Deliver the document outside Capsule, then mark it sent here.",
       );
     });
   };
@@ -325,7 +325,7 @@ export function ContractsPage() {
                           disabled={busy != null}
                           onClick={() => invoke(row, action.key)}
                         >
-                          {action.key === "send" ? "Record sent" : action.label}
+                          {action.key === "send" ? "Mark sent" : action.label}
                         </button>
                       ))}
                     <Link

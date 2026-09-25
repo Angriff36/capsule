@@ -6,6 +6,7 @@ import {
   useGetPackList,
   useListDish,
   useListEvent,
+  useListPerson,
   useListPackListItem,
   useListPackListTemplate,
   usePackListCancel,
@@ -20,6 +21,8 @@ import {
   useListServiceStyleKitItem,
   usePackListItemMarkMissing,
   usePackListItemMarkPacked,
+  usePackListItemRecordPackedCount,
+  usePackListItemRecordSentInstead,
   usePackListMarkLoaded,
   usePackListMarkPacked,
   usePackListStartPacking,
@@ -70,6 +73,7 @@ export function PackListDetailPage() {
   const items = useListPackListItem();
   const events = useListEvent();
   const dishes = useListDish();
+  const people = useListPerson();
   const createItem = useCreatePackListItem();
   const applyPackTemplate = useApplyPackTemplate();
   const templates = useListPackListTemplate();
@@ -82,6 +86,8 @@ export function PackListDetailPage() {
   const serviceStyles = useListServiceStyle();
   const kitItems = useListServiceStyleKitItem();
   const markItemPacked = usePackListItemMarkPacked();
+  const recordPackedCount = usePackListItemRecordPackedCount();
+  const recordSentInstead = usePackListItemRecordSentInstead();
   const markItemMissing = usePackListItemMarkMissing();
   const startPacking = usePackListStartPacking();
   const markPacked = usePackListMarkPacked();
@@ -154,6 +160,15 @@ export function PackListDetailPage() {
       ? (dishes?.find((dish) => dish._id === dishId && dish.deletedAt == null)
           ?.name ?? null)
       : null;
+  const packedByName = (personId?: string | null) => {
+    if (!personId) return null;
+    const person = people?.find(
+      (row) => row._id === personId && row.deletedAt == null,
+    );
+    if (!person) return people ? "A teammate" : null;
+    const name = `${person.givenName} ${person.familyName}`.trim();
+    return name || "A teammate";
+  };
   const canAddItems =
     String(packList.status) === "draft" ||
     String(packList.status) === "packing";
@@ -374,11 +389,45 @@ export function PackListDetailPage() {
       _id: string;
       version: number;
       requiredQuantity: number;
+      packedQuantity: number;
       status: unknown;
       note?: string | null;
+      sentInstead?: string | null;
     },
     key: string,
   ) => {
+    if (key === "sentInstead") {
+      const values = await prompt.askFields({
+        title: "Sent instead",
+        description:
+          "If a different item went out, say what it was. The listed item stays. Leave this empty to clear it.",
+        confirmLabel: "Save",
+        fields: [
+          {
+            name: "sentInstead",
+            label: "What went out",
+            inputType: "text",
+            required: false,
+            defaultValue: item.sentInstead ?? "",
+          },
+        ],
+      });
+      if (!values) return;
+      const sentInstead = values.sentInstead?.trim() || undefined;
+      void run(`${item._id}:sentInstead`, async () => {
+        await recordSentInstead({
+          docId: item._id,
+          version: item.version,
+          sentInstead,
+        });
+        setNotice(
+          sentInstead
+            ? "Saved what went out instead."
+            : "Cleared what went out instead.",
+        );
+      });
+      return;
+    }
     if (key === "note") {
       const values = await prompt.askFields({
         title: "Packer note",
@@ -414,29 +463,42 @@ export function PackListDetailPage() {
       return;
     }
     if (key === "markPacked") {
+      const alreadyPacked = Number(item.packedQuantity ?? 0);
+      const required = Number(item.requiredQuantity);
       const values = await prompt.askFields({
-        title: "Mark item packed",
-        description: "Enter the packed quantity for this load-sheet line.",
-        confirmLabel: "Mark packed",
+        title:
+          alreadyPacked > 0 ? "Update packed quantity" : "Mark item packed",
+        description:
+          "Enter the total packed so far. A short count stays on the list until the rest is packed.",
+        confirmLabel: "Save packed quantity",
         fields: [
           {
             name: "packedQuantity",
-            label: "Packed quantity",
+            label: "Total packed so far",
             inputType: "number",
             required: true,
-            defaultValue: String(item.requiredQuantity),
+            defaultValue: String(
+              alreadyPacked > 0 ? alreadyPacked : item.requiredQuantity,
+            ),
           },
         ],
       });
       if (!values) return;
+      const packedQuantity = Number(values.packedQuantity);
       void run(`${item._id}:${key}`, async () => {
         const started = await ensurePacking();
-        await markItemPacked({
+        const save =
+          packedQuantity < required ? recordPackedCount : markItemPacked;
+        await save({
           docId: item._id,
           version: item.version,
-          packedQuantity: Number(values.packedQuantity),
+          packedQuantity,
         });
-        setNotice(`Item marked packed.${started}`);
+        setNotice(
+          packedQuantity < required
+            ? `Recorded ${packedQuantity} of ${required}. This line stays open until the rest is packed.${started}`
+            : `Item marked packed.${started}`,
+        );
       });
       return;
     }
@@ -722,6 +784,7 @@ export function PackListDetailPage() {
           canEditLines={listIsLive}
           busy={busy}
           dishName={dishName}
+          packedByName={packedByName}
           itemActions={(status) => policy.packItemActions(status)}
           failedItem={
             failureItemId && failure

@@ -109,7 +109,7 @@ Secrets stay in `.env.local` (`CONVEX_URL`, `CAPSULE_AGENT_JWT`).
 ## Agent prompt (copy-paste)
 
 Use the locked prompt in
-[AGENT_PROMPT_ENTER_COMPONENT.md](./AGENT_PROMPT_ENTER_COMPONENT.md)
+[AGENT_PROMPT_ENTER_RECIPE.md](./AGENT_PROMPT_ENTER_RECIPE.md)
 (`bun run agent:enter-component` — works without MCP).
 
 ## Proof

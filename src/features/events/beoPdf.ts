@@ -112,7 +112,7 @@ export function beoPdfFileName(event: BeoEventRecord): string {
   return `beo-${cleanLabel(event.title)}.pdf`;
 }
 
-const plain = (value: unknown, fallback = "Not recorded") => {
+const plain = (value: unknown, fallback = "Not listed") => {
   const text = String(value ?? "").trim();
   return text || fallback;
 };
@@ -350,13 +350,13 @@ export function buildBeoPdf(input: BeoPdfInput): jsPDF {
     {
       primary:
         event.expectedHeadcount == null
-          ? "Guest count not recorded"
+          ? "Guest count not listed"
           : formatCountNoun(event.expectedHeadcount, "guest"),
-      secondary: plain(event.eventType, "Event type not recorded"),
+      secondary: plain(event.eventType, "Event type not listed"),
     },
     {
       primary: `Venue: ${plain(event.venueName, "Venue not assigned")}`,
-      secondary: plain(event.venueAddress, "Address not recorded"),
+      secondary: plain(event.venueAddress, "Address not listed"),
     },
   ]);
 
@@ -368,7 +368,7 @@ export function buildBeoPdf(input: BeoPdfInput): jsPDF {
 
   const menuBlocks: BeoBlock[] =
     dishes.length === 0
-      ? [{ primary: "No menu selections recorded" }]
+      ? [{ primary: "No menu selections listed" }]
       : dishes.map(({ selection, dish }) => ({
           primary: `${plain(selection.course || dish?.course, "Dish")} - ${plain(dish?.name, "Unnamed dish")}`,
           secondary: joinDetails([
@@ -379,7 +379,7 @@ export function buildBeoPdf(input: BeoPdfInput): jsPDF {
         }));
   const timelineBlocks: BeoBlock[] =
     timeline.length === 0
-      ? [{ primary: "No timeline activities recorded" }]
+      ? [{ primary: "No timeline listed" }]
       : timeline.map((activity) => ({
           primary: `${clockRange(activity.startsAt, activity.endsAt)} - ${plain(activity.name, "Unnamed activity")}`,
           secondary: joinDetails([activity.responsibleParty, activity.notes]),
@@ -389,7 +389,7 @@ export function buildBeoPdf(input: BeoPdfInput): jsPDF {
     .filter((entry): entry is BeoRosterEntry => entry !== null);
   const staffBlocks: BeoBlock[] =
     staff.length === 0
-      ? [{ primary: "No staff coverage recorded" }]
+      ? [{ primary: "No staff coverage listed" }]
       : staff
           .sort(
             (left, right) =>
@@ -407,20 +407,20 @@ export function buildBeoPdf(input: BeoPdfInput): jsPDF {
   drawSection("Special instructions", [
     {
       primary: "Service",
-      secondary: plain(event.serviceRequirements, "No service notes recorded."),
+      secondary: plain(event.serviceRequirements, "No service notes listed."),
     },
     {
       primary: "Operations",
       secondary: plain(
         event.operationalRequirements,
-        "No operational notes recorded.",
+        "No operational notes listed.",
       ),
     },
     {
       primary: "Accessibility",
       secondary: event.accessibilityNeeds?.length
         ? event.accessibilityNeeds.join(", ")
-        : "No accessibility notes recorded.",
+        : "No accessibility notes listed.",
     },
   ]);
 
@@ -433,7 +433,7 @@ export function buildBeoPdf(input: BeoPdfInput): jsPDF {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(DETAIL_FONT_SIZE);
     doc.setTextColor(59, 62, 69);
-    doc.text("BEO | Live event record", MARGIN, FOOTER_Y);
+    doc.text("BEO | This event", MARGIN, FOOTER_Y);
     doc.text(`${page} / ${pageCount}`, RIGHT, FOOTER_Y, { align: "right" });
   }
   return doc;

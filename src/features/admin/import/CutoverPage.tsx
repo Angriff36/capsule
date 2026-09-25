@@ -1,4 +1,4 @@
-// TPP Cutover Page — Final migration validation and go/no-go gate.
+// TPP Switch Page — final checks before Capsule takes over from TPP.
 // Implements spec §6.6: final delta import, zero critical unresolved mappings,
 // business validation, provider readiness, rollback plan, TPP read-only transition.
 
@@ -61,11 +61,11 @@ export function CutoverPage() {
   const handleExecuteDecision = async (decision: "go" | "no_go") => {
     if (!localRollbackPlan.trim()) {
       const reason = await prompt.askReason({
-        title: "Rollback Plan Required",
+        title: "Switch-back plan needed",
         description:
-          "Please document the rollback plan before executing cutover decision.",
-        label: "Rollback plan",
-        placeholder: "Describe the rollback strategy...",
+          "Write the switch-back plan before you approve or stop this switch.",
+        label: "Switch-back plan",
+        placeholder: "How would you switch back...",
         confirmLabel: "Continue",
       });
       if (reason) {
@@ -89,8 +89,8 @@ export function CutoverPage() {
         decision,
         reason:
           decision === "go"
-            ? `Cutover approved - all checks passed. Rollback plan: ${rollbackPlan}`
-            : `Cutover rejected - ${rollbackPlan}`,
+            ? `Switch approved - every check passed. Switch-back plan: ${rollbackPlan}`
+            : `Switch stopped - ${rollbackPlan}`,
       });
       window.location.reload();
     } catch (err) {
@@ -104,9 +104,9 @@ export function CutoverPage() {
   // Set TPP read-only
   const handleSetTppReadOnly = async () => {
     const reason = await prompt.askReason({
-      title: "Set TPP Read-Only",
+      title: "Set TPP to read-only",
       description:
-        "This will disable scheduled TPP imports. TPP will become read-only. Provide a reason:",
+        "This turns off scheduled TPP imports. TPP becomes read-only. Say why:",
       label: "Reason",
       placeholder: "Reason for setting TPP read-only...",
       confirmLabel: "Set Read-Only",
@@ -130,12 +130,12 @@ export function CutoverPage() {
   // Rollback cutover
   const handleRollback = async () => {
     const reason = await prompt.askReason({
-      title: "Rollback Cutover",
+      title: "Undo the switch",
       description:
-        "This will rollback the cutover decision and re-enable TPP for writes. Explain why:",
-      label: "Rollback reason",
-      placeholder: "Reason for rollback...",
-      confirmLabel: "Rollback",
+        "This undoes the switch and turns TPP writes back on. Say why:",
+      label: "Undo reason",
+      placeholder: "Reason for undoing the switch...",
+      confirmLabel: "Undo it",
     });
 
     if (reason) {
@@ -193,8 +193,8 @@ export function CutoverPage() {
     return (
       <div className="operations-stage space-y-6">
         <PageHeader
-          title="TPP Migration Cutover"
-          lead="Final validation and go/no-go gate for TPP migration."
+          title="Switch from TPP"
+          lead="Last checks before Capsule takes over from TPP."
         />
         <AdminWorkspaceNav />
         <TableSkeleton rows={8} />
@@ -205,8 +205,8 @@ export function CutoverPage() {
   return (
     <div className="operations-stage space-y-6">
       <PageHeader
-        title="TPP Migration Cutover"
-        lead="Final validation and go/no-go gate for TPP migration."
+        title="Switch from TPP"
+        lead="Last checks before Capsule takes over from TPP."
         actions={
           <Link to="/admin" className="btn btn-secondary btn-sm">
             <ArrowLeftIcon width={12} height={12} className="mr-2" />
@@ -228,9 +228,9 @@ export function CutoverPage() {
         <div className="flex items-center gap-3 p-4 bg-ok-soft border border-ok/40 rounded-sm">
           <CheckCircle className="w-5 h-5 text-ok" />
           <div>
-            <p className="font-medium">Cutover Approved</p>
+            <p className="font-medium">Switch approved</p>
             <p className="text-xs text-ok">
-              TPP migration cutover was approved on{" "}
+              The switch from TPP was approved on{" "}
               {formatDate(cutoverStatus.decidedAt)}.
             </p>
           </div>
@@ -241,9 +241,9 @@ export function CutoverPage() {
         <div className="flex items-center gap-3 p-4 bg-danger-soft border border-danger/40 rounded-sm">
           <XCircle className="w-5 h-5 text-danger" />
           <div>
-            <p className="font-medium">Cutover Rejected</p>
+            <p className="font-medium">Switch stopped</p>
             <p className="text-xs text-danger">
-              TPP migration cutover was rejected on{" "}
+              The switch from TPP was stopped on{" "}
               {formatDate(cutoverStatus.decidedAt)}.
             </p>
           </div>
@@ -254,9 +254,9 @@ export function CutoverPage() {
         <div className="flex items-center gap-3 p-4 bg-warn-soft border border-warn/40 rounded-sm">
           <AlertTriangle className="w-5 h-5 text-warn" />
           <div>
-            <p className="font-medium">Cutover Rolled Back</p>
+            <p className="font-medium">Switch undone</p>
             <p className="text-xs text-warn">
-              Emergency rollback executed on{" "}
+              Emergency switch-back happened on{" "}
               {formatDate(cutoverStatus.decidedAt)}.
             </p>
           </div>
@@ -279,7 +279,7 @@ export function CutoverPage() {
 
       {/* Validation results */}
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Cutover Validation</h2>
+        <h2 className="text-xl font-semibold">Switch checklist</h2>
 
         {/* Overall status */}
         <div
@@ -296,7 +296,9 @@ export function CutoverPage() {
               <XCircle className="w-6 h-6 text-danger" />
             )}
             <h3 className="font-medium">
-              {validation.canProceed ? "Ready for Cutover" : "Cutover Blocked"}
+              {validation.canProceed
+                ? "Ready to switch"
+                : "Not ready to switch"}
             </h3>
           </div>
           {!validation.canProceed && validation.blockers.length > 0 && (
@@ -311,7 +313,7 @@ export function CutoverPage() {
         {/* Individual checks */}
         <div className="grid gap-4">
           <ValidationCard
-            title="Final Delta Import"
+            title="Last import"
             check={validation.checks.finalDeltaImport}
             details={validation.checks.finalDeltaImport.details}
             action={
@@ -333,25 +335,25 @@ export function CutoverPage() {
           />
 
           <ValidationCard
-            title="Zero Critical Mappings"
+            title="Nothing left to match"
             check={validation.checks.zeroCriticalMappings}
-            details="All TPP legacy record mappings must be verified"
+            details="Every leftover TPP item is matched up"
             action={
               (validation.checks.zeroCriticalMappings.count || 0) > 0 ? (
                 <Link
                   to="/admin/reconcile"
                   className="text-xs text-info hover:text-info"
                 >
-                  Resolve Mappings
+                  Finish matching
                 </Link>
               ) : null
             }
           />
 
           <ValidationCard
-            title="Business Validation"
+            title="Manager sign-off"
             check={validation.checks.businessValidation}
-            details="Requires manual sign-off from business stakeholders"
+            details="A manager still needs to sign off"
             action={
               <label className="flex items-center gap-2 text-xs">
                 <input
@@ -360,32 +362,32 @@ export function CutoverPage() {
                   onChange={(e) => setLocalApproval(e.target.checked)}
                   disabled={!isAdmin}
                 />
-                I approve this cutover
+                I approve this switch
               </label>
             }
           />
 
           <ValidationCard
-            title="Provider Readiness"
+            title="Outside services ready"
             check={validation.checks.providerReadiness}
-            details="QuickBooks, Calendar, SMS integrations operational"
+            details="QuickBooks, calendar, and texts are working"
           />
 
           <ValidationCard
-            title="Rollback Plan"
+            title="Switch-back plan"
             check={validation.checks.rollbackPlan}
-            details="Document rollback strategy before cutover"
+            details="Write the switch-back plan before you switch"
             action={
               <button
                 type="button"
                 onClick={() =>
                   setLocalRollbackPlan(
-                    "Rollback: Revert latest import, re-enable TPP writes",
+                    "Switch back: undo the latest import, turn TPP writes back on",
                   )
                 }
                 className="text-xs text-info hover:text-info"
               >
-                Use Template
+                Use the usual plan
               </button>
             }
           />
@@ -395,11 +397,11 @@ export function CutoverPage() {
         <div className="border rounded-sm p-4 space-y-2">
           <label className="flex items-center gap-2 font-medium">
             <FileText className="w-4 h-4" />
-            Rollback Plan
+            Switch-back plan
           </label>
           <textarea
             className="w-full border rounded-sm p-2 text-xs min-h-[100px]"
-            placeholder="Describe the rollback strategy: what to revert, how to re-enable TPP, data recovery steps..."
+            placeholder="Write how to switch back: what to undo, how to turn TPP writes back on, how to recover the lists..."
             value={localRollbackPlan}
             onChange={(e) => setLocalRollbackPlan(e.target.value)}
             disabled={!isAdmin}
@@ -411,7 +413,7 @@ export function CutoverPage() {
       <div className="border rounded-sm p-4 space-y-4">
         <h2 className="text-xl font-semibold flex items-center gap-2">
           <Settings className="w-5 h-5" />
-          Cutover Actions
+          Switch actions
         </h2>
 
         <div className="grid gap-3">
@@ -431,7 +433,7 @@ export function CutoverPage() {
                 onClick={() => handleExecuteDecision("go")}
               >
                 <CheckCircle className="w-4 h-4 mr-2" />
-                Execute GO Decision
+                Approve the switch
               </button>
 
               <button
@@ -441,7 +443,7 @@ export function CutoverPage() {
                 onClick={() => handleExecuteDecision("no_go")}
               >
                 <XCircle className="w-4 h-4 mr-2" />
-                Execute NO-GO Decision
+                Don't switch yet
               </button>
             </>
           ) : cutoverStatus.status === "go" ? (
@@ -463,24 +465,25 @@ export function CutoverPage() {
                 onClick={handleRollback}
               >
                 <AlertTriangle className="w-4 h-4 mr-2" />
-                Emergency Rollback
+                Undo the switch
               </button>
             </>
           ) : cutoverStatus.status === "no_go" ? (
             <div className="p-4 bg-inset rounded-sm text-xs text-ink-2">
-              Cutover was rejected. Address blockers and retry when ready.
+              The switch was stopped. Fix what's in the way and try again when
+              ready.
             </div>
           ) : cutoverStatus.status === "rolled_back" ? (
             <div className="p-4 bg-warn-soft rounded-sm text-xs text-warn">
-              Cutover was rolled back. Review the rollback plan and retry when
-              ready.
+              The switch was undone. Review the switch-back plan and try again
+              when ready.
             </div>
           ) : null}
         </div>
 
         {!isAdmin && (
           <p className="text-xs text-ink-3">
-            Only organization administrators can execute cutover decisions.
+            Only admins can approve or stop this switch.
           </p>
         )}
       </div>
@@ -489,8 +492,8 @@ export function CutoverPage() {
       <div className="text-xs text-ink-2 space-y-1">
         <p className="font-medium">How the final switch works:</p>
         <ol className="list-decimal list-inside space-y-1">
-          <li>Run one last import to catch anything new in TPP</li>
-          <li>Match up every remaining imported record</li>
+          <li>Do one last import to catch anything new in TPP</li>
+          <li>Match up every leftover imported item</li>
           <li>Write down the plan for switching back, just in case</li>
           <li>Get sign-off from the business</li>
           <li>Approve the switch</li>

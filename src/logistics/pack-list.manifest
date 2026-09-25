@@ -64,9 +64,9 @@ entity PackList mixin TenantScoped, SoftDeletable {
   // logisticsAccess: packing staff. Same cascade pattern as PurchaseNeed.
   // Read wide: the Event Tracker shows pack status to the whole crew. Event
   // and sales staff write because they open a pack list from the tracker row.
-  default policy packListRead read: roleAllows(user.role, "staffAccess") "Staff may read pack lists"
-  default policy packListWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may write pack lists through commands"
-  default policy packListExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may execute pack list commands"
+  default policy packListRead read: roleAllows(user.role, "staffAccess") "Staff may see pack lists"
+  default policy packListWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may update pack lists"
+  default policy packListExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may change pack lists"
 
   // Idempotent open: Event.approve reaction may re-fire; do not fail or duplicate.
   command open(
@@ -312,6 +312,9 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   // Servingware type note for the packer (Mangia Ops Final Lock Training part
   // 3, PACKLIST): "wood board", "white marble bowl". Empty = no note.
   property note: string?
+  // What actually went out when it was not the listed item. The listed
+  // description, quantity, and status stay. Empty clears it.
+  property sentInstead: string?
   // Set on a line that came from the service style kit; the idempotency key of
   // the kit cascade.
   property indexed serviceStyleKitItemId: uuid?
@@ -323,6 +326,9 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   property required status: PackListItemStatus = "pending"
   property listedAt: datetime?
   property packedAt: datetime?
+  // Last staff profile that saved a count on this line. Missing when that
+  // account is not linked to a profile. Saving a count is never blocked for that.
+  property packedByPersonId: uuid?
   property missingAt: datetime?
 
   belongsTo packList: PackList fields [tenantId, packListId] references [tenantId, id]
@@ -343,9 +349,9 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
 
   // Kitchen and logistics share physical packing; recipe corrections also
   // reconcile container requirements through these same commands.
-  default policy packListItemRead read: roleAllows(user.role, "staffAccess") "Staff may read pack list items"
-  default policy packListItemWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may write pack list items through commands"
-  default policy packListItemExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may execute pack list item commands"
+  default policy packListItemRead read: roleAllows(user.role, "staffAccess") "Staff may see pack list items"
+  default policy packListItemWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may update pack list items"
+  default policy packListItemExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may change pack list items"
 
   command addItem(
     packListId: uuid,
@@ -359,9 +365,9 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     guard self.status == "pending"
     guard self.deletedAt == null
     guard self.packList != null and self.packList.openedAt != null and (self.packList.status == "draft" or self.packList.status == "packing")
-    constraint addItemPackListMatch: packListId == self.packListId "Add item packListId must match the seeded pack list reference"
-    constraint addItemDishMatch: dishId == null or self.dishId == null or dishId == self.dishId "Add item dishId must match the seeded dish reference when provided"
-    constraint addItemBatchMatch: productionBatchId == null or self.productionBatchId == null or productionBatchId == self.productionBatchId "Add item productionBatchId must match the seeded batch reference when provided"
+    constraint addItemPackListMatch: packListId == self.packListId "This pack item is for a different pack list. Pick the pack list already on this pack item."
+    constraint addItemDishMatch: dishId == null or self.dishId == null or dishId == self.dishId "This pack item is for a different dish. Pick the dish already on this pack item."
+    constraint addItemBatchMatch: productionBatchId == null or self.productionBatchId == null or productionBatchId == self.productionBatchId "This pack item is for a different batch. Pick the batch already on this pack item."
     constraint addItemDescriptionPresent: length(trim(description)) > 0 "Pack item description is required"
     constraint addItemQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
     mutate packListId = packListId
@@ -470,8 +476,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   }
 
   command syncContainerServings(quantityServings: number) {
-    // Catalog edits update active planning, never the recorded completed event.
-    compute eligible = self.deletedAt == null and self.followsDishServings == true and self.dishContainer != null and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled" and self.packList.event != null and self.packList.event.deletedAt == null and self.packList.event.stage != "completed" and self.packList.event.stage != "closed_out" and self.packList.event.stage != "cancelled"
+    // Active planning only: list not terminal, line still follows, EventDish still live. Event.changeHeadcount already refuses completed/closed_out/cancelled — do not use self.packList.event (generator never loads that hop).
+    compute eligible = self.deletedAt == null and self.followsDishServings == true and self.dishContainer != null and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled" and self.eventDish != null and self.eventDish.deletedAt == null and self.eventDish.removedAt == null
     compute planned = quantityServings > 0 and self.dishContainer != null and self.dishContainer.deletedAt == null and self.dishContainer.status == "active" ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
     mutate requiredQuantity = eligible ? planned : self.requiredQuantity
     mutate containerServings = eligible ? quantityServings : self.containerServings
@@ -480,6 +486,32 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
       packListId: self.packListId
       tenantId: self.tenantId
       additionalRequired: eligible and self.requiredQuantity > self.packedQuantity
+    }
+  }
+
+  // A short count stays listed. Mark packed is only the full amount, so the
+  // pack screen can keep offering that button from the proven listed → packed step.
+  command recordPackedCount(packedQuantity: decimal(12, 4)) {
+    guard self.status == "listed"
+    guard self.listedAt != null
+    guard self.deletedAt == null
+    guard self.packList != null and (self.packList.status == "packing" or self.packList.status == "packed" or self.packList.status == "loaded" or self.packList.status == "dispatched")
+    constraint recordPackedCountPositive: packedQuantity > 0 "Packed quantity must be positive"
+    constraint recordPackedCountShort: packedQuantity < self.requiredQuantity "This is the full amount. Mark the line packed."
+    compute previousPacked = self.packedQuantity
+    mutate packedQuantity = packedQuantity
+    mutate packedByPersonId = user.personId != null ? user.personId : self.packedByPersonId
+    emit PackListItemCountRecorded {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      eventId: self.packList.eventId
+      description: self.description
+      previousPackedQuantity: previousPacked
+      packedQuantity: packedQuantity
+      requiredQuantity: self.requiredQuantity
+      unit: self.unit
+      status: self.status
     }
   }
 
@@ -492,11 +524,13 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     guard self.packList != null and (self.packList.status == "packing" or self.packList.status == "packed" or self.packList.status == "loaded" or self.packList.status == "dispatched")
     constraint markPackedQuantityPositive: packedQuantity > 0 "Packed quantity must be positive"
     constraint markPackedNotOver: packedQuantity <= self.requiredQuantity "Packed quantity cannot exceed required quantity"
+    constraint markPackedComplete: packedQuantity == self.requiredQuantity "Save a short count on this line until you have the full amount"
     compute previousStatus = self.status
     compute previousPacked = self.packedQuantity
     mutate packedQuantity = packedQuantity
     mutate status = "packed"
     mutate packedAt = now()
+    mutate packedByPersonId = user.personId != null ? user.personId : self.packedByPersonId
     emit PackListItemPacked {
       packListItemId: self.id
       tenantId: self.tenantId
@@ -613,6 +647,18 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Record a stand-in without rewriting the listed item. A blank entry clears it.
+  command recordSentInstead(optional sentInstead: string) {
+    guard self.deletedAt == null
+    mutate sentInstead = sentInstead != null and length(trim(sentInstead)) > 0 ? trim(sentInstead) : null
+    emit PackListItemSentInsteadRecorded {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      sentInstead: sentInstead != null and length(trim(sentInstead)) > 0 ? trim(sentInstead) : null
+    }
+  }
+
   store PackListItem in durable
 }
 
@@ -690,6 +736,19 @@ event PackListItemAdded: "pack_list_item.added" {
   status: PackListItemStatus
 }
 
+event PackListItemCountRecorded: "pack_list_item.count_recorded" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  eventId: string
+  description: string
+  previousPackedQuantity: decimal(12, 4)
+  packedQuantity: decimal(12, 4)
+  requiredQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  status: PackListItemStatus
+}
+
 event PackListItemPacked: "pack_list_item.packed" {
   packListItemId: string
   tenantId: string
@@ -756,6 +815,13 @@ event PackListItemAnnotated: "pack_list_item.annotated" {
   packListItemId: string
   tenantId: string
   packListId: string
+}
+
+event PackListItemSentInsteadRecorded: "pack_list_item.sent_instead_recorded" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  sentInstead: string?
 }
 
 event PackListItemQuantityAdjusted: "pack_list_item.quantity_adjusted" {

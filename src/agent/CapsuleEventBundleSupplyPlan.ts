@@ -65,7 +65,7 @@ export function planSupplySteps(input: SupplyPlanInput): SupplyPlanResult {
   const directory = context.directory;
   if (!directory) {
     warnings.push(
-      `${lines.length} purchasing line(s) were read but not entered: the run had no tenant directory to match vendors and ingredients against.`,
+      `${lines.length} purchasing line(s) were read but not entered: Capsule could not look up your vendors and ingredients to match them.`,
     );
     return { steps, warnings, seedIds, counts };
   }
@@ -110,7 +110,7 @@ export function planSupplySteps(input: SupplyPlanInput): SupplyPlanResult {
   }
   if (unmappedUnits.size > 0) {
     warnings.push(
-      `Ingredients with unmapped purchasing units were not created: ${[...unmappedUnits].join(", ")}.`,
+      `These ingredients were not added because their purchase units were not understood: ${[...unmappedUnits].join(", ")}.`,
     );
   }
 
@@ -143,7 +143,7 @@ export function planSupplySteps(input: SupplyPlanInput): SupplyPlanResult {
     );
     if (!measure) {
       warnings.push(
-        `Purchasing item "${line.inventoryItem}" was not ordered: quantity or unit could not be mapped.`,
+        `Purchasing item "${line.inventoryItem}" was not ordered: its amount was not understood.`,
       );
       continue;
     }

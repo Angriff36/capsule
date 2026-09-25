@@ -95,7 +95,6 @@ export function EventImportPreviewPanel({ bundle, plan, recognized }: Props) {
           className="flex flex-wrap gap-2 text-sm"
           data-testid="event-import-summary"
         >
-          <li className="chip">{plan.steps.length} steps</li>
           <li className="chip">{bundle.menu.length} menu lines</li>
           <li className="chip">{summary.dishes} new catalog dishes</li>
           <li className="chip">{summary.timelineActivities} timeline blocks</li>

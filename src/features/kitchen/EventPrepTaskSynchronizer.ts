@@ -160,7 +160,7 @@ export class EventPrepTaskSynchronizer {
               );
               if (balance.kind === "unresolved") {
                 throw new Error(
-                  `Cannot reconcile remaining work for ${template.name}: recorded work has incompatible units or invalid quantities.`,
+                  `Can't update leftover prep for ${template.name}: the amounts already done use different units or aren't valid numbers.`,
                 );
               }
               existing = balance.targetTaskId

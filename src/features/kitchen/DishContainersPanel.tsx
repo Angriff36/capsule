@@ -150,7 +150,7 @@ export function DishContainersPanel({ dishId }: Props) {
       ) : rows.length === 0 ? (
         <div className="recipe-empty">
           <p>
-            No serving containers recorded. Add one to include it on event pack
+            No serving containers on file. Add one to include it on event pack
             lists.
           </p>
         </div>

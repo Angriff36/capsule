@@ -119,13 +119,13 @@ export function DishComponentPortionSpecPanel({ dishId }: Props) {
         quantityBasis: values.quantityBasis,
       });
       setNotice(
-        `Portion spec saved for ${row.componentName ?? "the subrecipe"}.`,
+        `Portion size saved for ${row.componentName ?? "the subrecipe"}.`,
       );
     } catch (cause) {
       setError(
         cause instanceof Error
           ? cause.message
-          : "Could not save the portion spec.",
+          : "Could not save the portion size.",
       );
     } finally {
       setBusy(null);
@@ -135,7 +135,7 @@ export function DishComponentPortionSpecPanel({ dishId }: Props) {
   return (
     <section className="culinary-section">
       <div className="culinary-section-heading">
-        <h2>Portion specs</h2>
+        <h2>Portion sizes</h2>
         <span>How many pieces of each subrecipe one portion uses</span>
       </div>
 
@@ -219,24 +219,24 @@ function PortionSpecRow({
           to={componentPath(row.componentId)}
           className="text-lg font-medium text-accent underline-offset-2 hover:underline"
         >
-          {row.componentName ?? "Component unavailable"}
+          {row.componentName ?? "Recipe unavailable"}
         </Link>
         {row.specs.length === 0 ? (
           <span className="text-sm text-ink-3">
-            No portion specs on this subrecipe — define one on its page first.
+            No portion sizes on this subrecipe — add one on its page first.
           </span>
         ) : null}
       </div>
       <form className="mt-2 grid gap-2 sm:grid-cols-4" onSubmit={submit}>
         <label className="field-label sm:col-span-2">
-          <span>Portion spec</span>
+          <span>Portion size</span>
           <select
             className="input"
             value={portionSpecId}
             disabled={busy || row.specs.length === 0}
             onChange={(event) => setPortionSpecId(event.target.value)}
           >
-            <option value="">Plain yield (no spec)</option>
+            <option value="">Plain yield (no size)</option>
             {row.specs.map((spec) => (
               <option key={spec._id} value={spec._id}>
                 {spec.name} ({spec.pieceQuantity} {spec.pieceUnit})
@@ -273,7 +273,7 @@ function PortionSpecRow({
         </label>
         <div className="sm:col-span-4">
           <button type="submit" className="btn btn-primary" disabled={!canSave}>
-            {working ? "Saving…" : "Save portion spec"}
+            {working ? "Saving…" : "Save portion size"}
           </button>
         </div>
       </form>

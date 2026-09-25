@@ -76,9 +76,9 @@ entity Attachment mixin TenantScoped, SoftDeletable {
   // never return a persisted chat file: `uploadedById == null` is the
   // create-time draft escape alone (the read policy runs before mutates), and
   // a copied sign-in id is never an authorization.
-  default policy attachmentRead read: roleAllows(user.role, "staffAccess") and (self.parentType != "staffMessage" or self.uploadedById == null) "Staff may read attachments; chat files are read through their message"
-  default policy attachmentWrite write: roleAllows(user.role, "staffAccess") "Staff may write attachments through commands"
-  default policy attachmentExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute attachment commands"
+  default policy attachmentRead read: roleAllows(user.role, "staffAccess") and (self.parentType != "staffMessage" or self.uploadedById == null) "Staff may see attached files; chat files show up with their message"
+  default policy attachmentWrite write: roleAllows(user.role, "staffAccess") "Staff may update attachments"
+  default policy attachmentExecute execute: roleAllows(user.role, "staffAccess") "Staff may change attachments"
 
   command attach(
     parentType: AttachmentParentType,
@@ -98,7 +98,7 @@ entity Attachment mixin TenantScoped, SoftDeletable {
     // transaction as their message, after the blob and the parent message are
     // verified; the public command never creates one.
     constraint attachNotChat: parentType != "staffMessage" "Chat files are attached through their message"
-    constraint attachParent: length(trim(parentId)) > 0 "Parent record is required"
+    constraint attachParent: length(trim(parentId)) > 0 "This file needs something to attach to"
     constraint attachFileName: length(trim(fileName)) > 0 "File name is required"
     constraint attachStorage: length(trim(storageId)) > 0 "Stored file reference is required"
     constraint attachSize: fileSize >= 0 "File size cannot be negative"

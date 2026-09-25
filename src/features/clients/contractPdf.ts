@@ -176,7 +176,7 @@ export function buildContractPdf(input: ContractPdfInput): jsPDF {
       client.countryCode,
     ]
       .filter(Boolean)
-      .join(" · ") || "Not recorded",
+      .join(" · ") || "Not on file",
   );
   detailRow("Provider", branding.displayName);
   y += 22;
@@ -189,7 +189,7 @@ export function buildContractPdf(input: ContractPdfInput): jsPDF {
     [
       "Guests",
       event.expectedHeadcount == null
-        ? "Not recorded"
+        ? "Not on file"
         : `${event.expectedHeadcount} expected`,
     ],
     [
@@ -240,11 +240,7 @@ export function buildContractPdf(input: ContractPdfInput): jsPDF {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(102, 108, 105);
-  doc.text(
-    `Client signature recorded ${dateText(contract.signedAt)}`,
-    MARGIN,
-    y + 31,
-  );
+  doc.text(`Client signed ${dateText(contract.signedAt)}`, MARGIN, y + 31);
   doc.text("Catering provider", RIGHT - 220, y + 31);
 
   doc.setDrawColor(220, 221, 218);

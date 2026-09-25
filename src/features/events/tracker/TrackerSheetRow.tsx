@@ -23,7 +23,7 @@ export interface TrackerRowPermissions {
 
 export interface TrackerRowActions {
   onEventNumber: (next: string) => void;
-  onServiceStyle: (serviceStyleId: string) => void;
+  onServiceStyle: (serviceStyleId: string, serviceStyleName?: string) => void;
   onBinderBuilt: (built: boolean) => void;
   onOpenPackList: () => void;
   onAddRig: (first: { vehicleId?: string; trailerId?: string }) => void;
@@ -114,7 +114,10 @@ export function TrackerSheetRow({
             onChange={(domEvent) => {
               const next = domEvent.currentTarget.value;
               if (next && next !== row.serviceStyleId)
-                actions.onServiceStyle(next);
+                actions.onServiceStyle(
+                  next,
+                  styleOptions.find((style) => style.id === next)?.label,
+                );
             }}
           >
             <option value="" disabled>

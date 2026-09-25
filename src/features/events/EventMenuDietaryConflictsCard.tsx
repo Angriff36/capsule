@@ -205,10 +205,10 @@ export function EventMenuDietaryConflictsCard({
         </ul>
       )}
       <p className="mt-3 text-xs text-ink-3">
-        Matches words in the catalog record, so a dish that is already made
-        without the item can still appear here — that is what the note is for.
-        Missing ingredients on a dish are not checked; fill in the recipe in
-        Kitchen → Dishes to make this stricter.
+        Matches words on the shared dish, so a dish that is already made without
+        the item can still appear here — that is what the note is for. Missing
+        ingredients on a dish are not checked; fill in the recipe in Kitchen →
+        Dishes to make this stricter.
       </p>
     </section>
   );
@@ -253,7 +253,7 @@ function ConflictRow({
           rel="noopener"
           className="text-xs text-brand underline"
         >
-          Catalog record ↗
+          Open dish ↗
         </Link>
       </div>
     </li>

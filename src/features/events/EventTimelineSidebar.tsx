@@ -48,9 +48,9 @@ export function EventTimelineSidebar({
 }: Props) {
   return (
     <aside className="w-full shrink-0 space-y-5 xl:w-[17rem]">
-      <section className="card p-4" aria-label="Run sheet window">
+      <section className="card p-4" aria-label="Timeline window">
         <h3 className="mb-3 text-base font-semibold text-ink">
-          Run sheet window
+          Timeline window
         </h3>
         <dl className="flex flex-col gap-2">
           <div>
@@ -141,11 +141,11 @@ export function EventTimelineSidebar({
         </section>
       ) : null}
 
-      <section className="card p-4" aria-label="Questions on this run sheet">
+      <section className="card p-4" aria-label="Questions on this timeline">
         <h3 className="mb-3 text-base font-semibold text-ink">Questions</h3>
         <p className="text-2xl font-semibold text-brand">{questionCount}</p>
         <p className="mt-1 text-xs text-ink-3">
-          Posted on the blocks of this run sheet.
+          Posted on the timeline blocks.
         </p>
       </section>
     </aside>

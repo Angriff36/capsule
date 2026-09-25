@@ -123,7 +123,7 @@ export function IngredientDetailsEditor({
     >
       <div className="culinary-section-heading">
         <div>
-          <p className="eyebrow">Catalog record</p>
+          <p className="eyebrow">This ingredient</p>
           <h2 id="ingredient-details-heading">Details</h2>
         </div>
         {!canEdit && <span>Reinstate to edit</span>}

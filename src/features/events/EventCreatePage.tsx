@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { Doc } from "../../lib/api";
-import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
+import { formatCountNoun } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
   useCreateClient,
@@ -19,7 +19,6 @@ import {
   useListServiceStyle,
   useListVenue,
 } from "../../lib/manifest-convex-react";
-import { formatMoneyExact } from "../../lib/format";
 import { ArrowLeftIcon, ChevronRightIcon } from "../../ui/icons";
 import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { FieldError, useFieldValidation } from "../../ui/formValidation";
@@ -27,11 +26,13 @@ import { PageHeader, Section, Skeleton } from "../../ui/primitives";
 import { useCreateEventFromProposal } from "../clients/useCreateEventFromProposal";
 import { CLIENTS_ROUTES } from "../clients/clientsRoutes";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
+import { ProposalEventCarryoverPreview } from "./ProposalEventCarryoverPreview";
 import { cleanCommandArgs } from "./CleanCommandArgs";
 import { clientDisplayName } from "./clientName";
 import { eventCreateDisabledReason } from "./eventCreateGuards";
 import { useEnsureBuiltInServiceStyle } from "../../lib/eventCreateCatalogClient";
 import { EventCreateServiceStyleField } from "./EventCreateServiceStyleField";
+import { SERVICE_STYLE_CATALOG } from "./serviceStyleCatalog";
 import { EventCreateServiceStyleResolver } from "./EventCreateServiceStyleResolver";
 import { eventPlanEngagementFormMapper } from "./EventPlanEngagementFormMapper";
 import { FailureBanner } from "./FailureBanner";
@@ -260,6 +261,12 @@ export function EventCreatePage() {
     const match = proposalEventPrefill.matchVenue(proposal, activeVenues);
     if (match) setVenueId((current) => current || match._id);
   }, [proposal, venues]);
+  // Issue #393: a proposal venue NAME can match several saved venues — the
+  // form must say so instead of implying the proposal named exactly one.
+  const proposalVenueMatches =
+    proposal != null && proposalLinkable && proposal.venueName
+      ? proposalEventPrefill.venueMatches(proposal, activeVenues)
+      : [];
 
   const run = async (
     kind: "client" | "venue" | "event",
@@ -440,18 +447,60 @@ export function EventCreatePage() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const venue = activeVenues.find((item) => item._id === venueId);
-    const buildArgs = async () =>
-      eventPlanEngagementFormMapper.toCommandArgs({
+    // The selected style row (or built-in catalog name) goes onto the event as
+    // the serviceStyleName snapshot, so a later catalog rename cannot rewrite
+    // the booked style (same as venueName).
+    const resolveServiceStyle = async () => {
+      const id = await new EventCreateServiceStyleResolver(
+        ensureBuiltInServiceStyle,
+      ).resolve(serviceStyleId, serviceStyles);
+      const name =
+        (serviceStyles ?? []).find((style) => style._id === id)?.name ??
+        SERVICE_STYLE_CATALOG.find((row) => row.code === serviceStyleId.trim())
+          ?.name;
+      return { id, name: name?.trim() || undefined };
+    };
+    const buildArgs = async () => {
+      const serviceStyle = await resolveServiceStyle();
+      // The selected occasion row goes onto the event as the occasionName
+      // snapshot, so a later catalog rename cannot rewrite the booked occasion
+      // (same as serviceStyleName).
+      const occasion = activeOccasions.find((row) => row._id === occasionId);
+      // The selected client row goes onto the event as the clientName
+      // snapshot, so a later catalog edit cannot rewrite the booked client.
+      const selectedClient = activeClients.find((row) => row._id === clientId);
+      // The selected salesperson row goes onto the event as the ownerName
+      // snapshot, so a later catalog rename cannot rewrite the booked owner
+      // (same as occasionName).
+      const selectedSalesperson = salespeople.find(
+        (person) => person._id === salespersonId,
+      );
+      return eventPlanEngagementFormMapper.toCommandArgs({
         clientId,
+        client: selectedClient
+          ? { name: clientDisplayName(selectedClient._id, [selectedClient]) }
+          : undefined,
         venueId,
         venue,
         title: String(data.get("title") ?? ""),
         eventTypeRaw: String(data.get("eventType") ?? ""),
         occasionId,
-        serviceStyleId: await new EventCreateServiceStyleResolver(
-          ensureBuiltInServiceStyle,
-        ).resolve(serviceStyleId, serviceStyles),
+        occasion: occasion ? { name: occasion.name } : undefined,
+        serviceStyleId: serviceStyle.id,
+        serviceStyle: serviceStyle.name
+          ? { name: serviceStyle.name }
+          : undefined,
         salespersonId,
+        salesperson: selectedSalesperson
+          ? {
+              name: [
+                selectedSalesperson.givenName,
+                selectedSalesperson.familyName,
+              ]
+                .filter(Boolean)
+                .join(" "),
+            }
+          : undefined,
         referralSourceId,
         startsAtRaw: String(data.get("startsAt") ?? ""),
         endsAtRaw: String(data.get("endsAt") ?? ""),
@@ -467,6 +516,7 @@ export function EventCreatePage() {
           data.get("operationalRequirements") ?? "",
         ),
       });
+    };
     // A proposalId in the route NEVER falls through to generic unlinked
     // creation (issue #392): the canonical seam books an accepted, unlinked
     // proposal and returns the existing event when another booking won the
@@ -858,92 +908,54 @@ export function EventCreatePage() {
                 </div>
               ) : (
                 <div className="space-y-1.5 p-3 text-sm text-ink-2">
-                  <p className="font-medium text-ink">{proposal.title}</p>
-                  <p>
-                    {proposal.eventType ? `${proposal.eventType} · ` : ""}
-                    {Number(proposal.guestCount ?? 0)} guests ·{" "}
-                    {formatMoneyExact(Number(proposal.total ?? 0))}
-                  </p>
-                  <p>
-                    {proposal.eventDate != null
-                      ? `Starts: ${formatDate(proposal.eventDate)} · ${formatTime(proposal.eventDate)}`
-                      : "No start date on the proposal — set the start time on the event."}
-                  </p>
-                  <p>
-                    {proposal.eventEndDate != null
-                      ? `Ends: ${formatDate(proposal.eventEndDate)} · ${formatTime(proposal.eventEndDate)}`
-                      : "No end time on the proposal — set the end time on the event."}
-                  </p>
-                  {proposalEnhancementCount > 0 ? (
-                    <p>
-                      Enhancements: {proposalEnhancementCount} on the proposal —
-                      they will show on the event.
-                    </p>
-                  ) : null}
-                  {proposal.venueName ? (
-                    <p>
-                      Venue: {proposal.venueName}
-                      {proposal.venueAddress
-                        ? ` — ${proposal.venueAddress}`
-                        : ""}
-                    </p>
-                  ) : null}
-                  {proposalLinkable ? (
-                    <p className="pt-1 text-xs leading-relaxed text-ink-3">
-                      {proposalMenuCount > 0
-                        ? `Creating this event links it to the proposal and copies its ${proposalMenuCount} menu selection${proposalMenuCount === 1 ? "" : "s"} onto the event.`
-                        : "Creating this event links it to the proposal. It has no menu selections to copy."}
-                    </p>
-                  ) : proposal.eventId ? (
-                    <>
-                      <p
-                        role="status"
-                        className="pt-1 text-xs leading-relaxed text-ink-3"
+                  <ProposalEventCarryoverPreview
+                    preview={proposalEventPrefill.carryoverPreview({
+                      proposal,
+                      menuCount: proposalMenuCount,
+                      enhancementCount: proposalEnhancementCount,
+                    })}
+                  />
+                  {!proposalLinkable && proposal.eventId != null ? (
+                    <div className="pt-1">
+                      <Link
+                        to={eventDetailPath(String(proposal.eventId))}
+                        className="btn btn-primary min-h-[40px]"
                       >
-                        Already booked — this proposal is linked to an event.
-                      </p>
-                      <div className="pt-1">
-                        <Link
-                          to={eventDetailPath(String(proposal.eventId))}
-                          className="btn btn-primary min-h-[40px]"
-                        >
-                          Open event
-                        </Link>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <p
-                        role="status"
-                        className="pt-1 text-xs leading-relaxed text-ink-3"
+                        Open event
+                      </Link>
+                    </div>
+                  ) : !proposalLinkable ? (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      <Link
+                        to={CLIENTS_ROUTES.proposal(proposal._id)}
+                        className="btn btn-secondary btn-sm"
                       >
-                        This proposal is {String(proposal.status)} — only an
-                        accepted proposal can be booked into an event.
-                      </p>
-                      <div className="flex flex-wrap gap-2 pt-1">
-                        <Link
-                          to={CLIENTS_ROUTES.proposal(proposal._id)}
-                          className="btn btn-secondary btn-sm"
-                        >
-                          Open proposal
-                        </Link>
-                        <Link
-                          to={eventCreatePath()}
-                          className="btn btn-ghost btn-sm"
-                        >
-                          Start a standalone event
-                        </Link>
-                      </div>
-                    </>
-                  )}
+                        Open proposal
+                      </Link>
+                      <Link
+                        to={eventCreatePath()}
+                        className="btn btn-ghost btn-sm"
+                      >
+                        Start a standalone event
+                      </Link>
+                    </div>
+                  ) : null}
                   {proposalLinkable &&
                   proposal.venueName &&
                   venues !== undefined &&
                   !venueId ? (
-                    <p className="text-xs leading-relaxed text-ink-3">
-                      No saved venue matched “{proposal.venueName}” — pick or
-                      create it in the Venue panel.
-                    </p>
+                    proposalVenueMatches.length > 1 ? (
+                      <p className="text-xs leading-relaxed text-ink-3">
+                        {proposalVenueMatches.length} saved venues match “
+                        {proposal.venueName}” — pick the right one in the Venue
+                        panel.
+                      </p>
+                    ) : (
+                      <p className="text-xs leading-relaxed text-ink-3">
+                        No saved venue matched “{proposal.venueName}” — pick or
+                        create it in the Venue panel.
+                      </p>
+                    )
                   ) : null}
                 </div>
               )}
@@ -1075,7 +1087,7 @@ export function EventCreatePage() {
                   {selectedVenue &&
                   Number(selectedVenue.capacity ?? 0) === 0 ? (
                     <p className="text-xs leading-relaxed text-ink-3">
-                      This venue has no capacity recorded — set it in Facilities
+                      This venue has no capacity on file — set it in Facilities
                       → Venues if it matters for this booking.
                     </p>
                   ) : null}
@@ -1130,8 +1142,8 @@ export function EventCreatePage() {
             </>
           ) : null}
           <p className="text-xs leading-relaxed text-ink-3">
-            Creation is policy-checked by the generated Client, Venue, and Event
-            commands. Any denial or guard failure appears above.
+            If something can't be created, the reason appears above. Fix it and
+            try again.
           </p>
         </aside>
       </div>

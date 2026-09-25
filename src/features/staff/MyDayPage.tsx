@@ -639,7 +639,7 @@ export function MyDayPage() {
                       <StatusChip status={String(lastRecord.status)} />
                     </>
                   ) : (
-                    <p>No completed time records yet.</p>
+                    <p>No completed time entries yet.</p>
                   )}
                 </div>
               </Section>

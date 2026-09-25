@@ -151,7 +151,7 @@ export function MobileNotesCard({ event }: { readonly event: Doc<"events"> }) {
       seeAllTo={`${eventDetailPath(event._id, "overview")}&full=1`}
     >
       {notes.length === 0 && eventComments.length === 0 ? (
-        <MobileEmpty>No notes recorded for this event.</MobileEmpty>
+        <MobileEmpty>No notes on this event.</MobileEmpty>
       ) : null}
       {notes.map(([label, value]) => (
         <div key={label} className="pt-2">

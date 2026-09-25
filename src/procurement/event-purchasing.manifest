@@ -23,9 +23,9 @@ entity WeeklyPurchasingConfig mixin TenantScoped, SoftDeletable {
 
   belongsTo defaultVendor: Vendor fields [tenantId, defaultVendorId] references [tenantId, id]
 
-  default policy weeklyPurchasingConfigRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may read weekly purchasing config"
-  default policy weeklyPurchasingConfigWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may write weekly purchasing config"
-  default policy weeklyPurchasingConfigExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute weekly purchasing config"
+  default policy weeklyPurchasingConfigRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may see weekly purchasing config"
+  default policy weeklyPurchasingConfigWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may update weekly purchasing config"
+  default policy weeklyPurchasingConfigExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may change weekly purchasing config"
 
   command configure(defaultVendorId: uuid) {
     // Reconfigure is allowed so the default vendor stays correctable.
@@ -205,9 +205,9 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
 
-  default policy eventIngredientContributionRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory and managers may read event ingredient contributions"
-  default policy eventIngredientContributionWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory and managers may write event ingredient contributions"
-  default policy eventIngredientContributionExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory and managers may execute event ingredient contributions"
+  default policy eventIngredientContributionRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory and managers may see event ingredient contributions"
+  default policy eventIngredientContributionWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory and managers may update event ingredient contributions"
+  default policy eventIngredientContributionExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory and managers may change event ingredient contributions"
 
   command record(
     eventId: uuid,

@@ -47,9 +47,9 @@ entity OneOnOne mixin TenantScoped, SoftDeletable {
   // uuids; the UI offers two separate people pickers.
   constraint meetingComplete: self.heldAt == null or self.meetingDate != null "A held one-on-one requires a meeting date"
 
-  default policy oneOnOneRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may read one-on-ones"
-  default policy oneOnOneWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may write one-on-ones through commands"
-  default policy oneOnOneExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may execute one-on-one commands"
+  default policy oneOnOneRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may see one-on-ones"
+  default policy oneOnOneWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may update one-on-ones"
+  default policy oneOnOneExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may change one-on-ones"
 
   command hold(
     leadPersonId: uuid,
@@ -105,9 +105,9 @@ entity OneOnOneAction mixin TenantScoped, SoftDeletable {
 
   transition status from "open" to ["closed"]
 
-  default policy oneOnOneActionRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may read one-on-one actions"
-  default policy oneOnOneActionWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may write one-on-one actions through commands"
-  default policy oneOnOneActionExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may execute one-on-one action commands"
+  default policy oneOnOneActionRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may see one-on-one actions"
+  default policy oneOnOneActionWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may update one-on-one actions"
+  default policy oneOnOneActionExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may change one-on-one actions"
 
   // Capture a follow-up against an already-held meeting. Mirrors
   // ProposalLineItem.addLine: oneOnOneId seeds the belongsTo so `self.oneOnOne`

@@ -46,9 +46,9 @@ entity ServiceStyle mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["inactive"]
   transition status from "inactive" to ["active"]
 
-  default policy serviceStyleRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may read service styles"
-  default policy serviceStyleWrite write: roleAllows(user.role, "eventManageAccess") "Event managers may write service styles through commands"
-  default policy serviceStyleExecute execute: roleAllows(user.role, "eventManageAccess") "Event managers may execute service style commands"
+  default policy serviceStyleRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may see service styles"
+  default policy serviceStyleWrite write: roleAllows(user.role, "eventManageAccess") "Event managers may update service styles"
+  default policy serviceStyleExecute execute: roleAllows(user.role, "eventManageAccess") "Event managers may change service styles"
 
   command register(
     name: string,

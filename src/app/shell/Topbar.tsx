@@ -1,6 +1,7 @@
 import { UserButton, useUser } from "@clerk/react";
 import { useQuery } from "convex/react";
 import { Link, useLocation } from "react-router-dom";
+import { WorkingEventErrorBoundary } from "../../features/events/WorkingEventErrorBoundary";
 import { NotificationTray } from "../../features/notifications/NotificationTray";
 import { api } from "../../lib/api";
 import { WORKSPACE_NAME } from "../../lib/workspace";
@@ -100,7 +101,9 @@ export function Topbar({
         ))}
       </nav>
 
-      <WorkingEventChip />
+      <WorkingEventErrorBoundary label="top-bar chip">
+        <WorkingEventChip />
+      </WorkingEventErrorBoundary>
 
       <div className="ml-auto flex items-center gap-2">
         <button

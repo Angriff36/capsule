@@ -44,7 +44,7 @@ export function DishComponentsPanel({ dishId }: Props) {
     const data = new FormData(form);
     const componentId = String(data.get("componentId") ?? "");
     if (!componentId) {
-      setError("Pick a component to attach.");
+      setError("Pick a subrecipe to add.");
       return;
     }
     const component = components?.find((entry) => entry._id === componentId);
@@ -67,13 +67,11 @@ export function DishComponentsPanel({ dishId }: Props) {
       });
       form.reset();
       setNotice(
-        "Component attached. Its ingredients now drive demand, purchasing, and food cost for every event using this dish.",
+        "Subrecipe added. Its ingredients now drive demand, purchasing, and food cost for every event using this dish.",
       );
     } catch (cause) {
       setError(
-        cause instanceof Error
-          ? cause.message
-          : "Could not attach the component.",
+        cause instanceof Error ? cause.message : "Could not add the subrecipe.",
       );
     } finally {
       setBusy(null);
@@ -88,9 +86,9 @@ export function DishComponentsPanel({ dishId }: Props) {
     // Detaching drops the component's ingredients out of demand, purchasing
     // and food cost for every event using this dish — confirm before firing.
     const ok = await prompt.askConfirm({
-      title: "Detach component",
+      title: "Remove subrecipe",
       description: `Remove "${componentName}" from this dish? Its ingredients stop driving demand, purchasing, and food cost for events using this dish.`,
-      confirmLabel: "Detach",
+      confirmLabel: "Remove",
       tone: "danger",
     });
     if (!ok) return;
@@ -103,12 +101,12 @@ export function DishComponentsPanel({ dishId }: Props) {
         version,
         reason: "Removed from dish",
       });
-      setNotice("Component detached.");
+      setNotice("Subrecipe removed.");
     } catch (cause) {
       setError(
         cause instanceof Error
           ? cause.message
-          : "Could not detach the component.",
+          : "Could not remove the subrecipe.",
       );
     } finally {
       setBusy(null);
@@ -161,7 +159,7 @@ export function DishComponentsPanel({ dishId }: Props) {
                     </Link>
                   ) : (
                     <p className="text-lg font-medium text-ink">
-                      Component unavailable
+                      Recipe unavailable
                     </p>
                   )}
                   <p className="text-sm text-ink-3">
@@ -181,11 +179,11 @@ export function DishComponentsPanel({ dishId }: Props) {
                     void onDetach(
                       row._id,
                       row.version,
-                      component?.name ?? "this component",
+                      component?.name ?? "this subrecipe",
                     )
                   }
                 >
-                  {busy === row._id ? "Working…" : "Detach"}
+                  {busy === row._id ? "Working…" : "Remove"}
                 </button>
               </li>
             );
@@ -197,9 +195,9 @@ export function DishComponentsPanel({ dishId }: Props) {
         <summary>Add subrecipe</summary>
         <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={onAttach}>
           <label className="block text-sm sm:col-span-2">
-            <span className="meta-term">Component</span>
+            <span className="meta-term">Subrecipe</span>
             <select name="componentId" className="input mt-1" defaultValue="">
-              <option value="">Select a component…</option>
+              <option value="">Select a subrecipe…</option>
               {available.map((component) => (
                 <option key={component._id} value={component._id}>
                   {component.name}
@@ -209,7 +207,7 @@ export function DishComponentsPanel({ dishId }: Props) {
           </label>
           <label className="block text-sm">
             <span className="meta-term">
-              Yield (0 = the component&apos;s own)
+              Yield (0 = the subrecipe&apos;s own)
             </span>
             <input
               name="yieldQuantity"
@@ -245,7 +243,7 @@ export function DishComponentsPanel({ dishId }: Props) {
               className="btn btn-primary"
               disabled={busy != null || available.length === 0}
             >
-              {busy === "attach" ? "Attaching…" : "Attach component"}
+              {busy === "attach" ? "Adding…" : "Add subrecipe"}
             </button>
           </div>
         </form>

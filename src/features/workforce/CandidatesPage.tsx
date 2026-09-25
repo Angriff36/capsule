@@ -473,7 +473,7 @@ export function CandidatesPage() {
               <p className="eyebrow">Candidate pipeline</p>
               <h2>All candidates</h2>
             </div>
-            <span>{formatCountNoun(liveCandidates.length, "record")}</span>
+            <span>{formatCountNoun(liveCandidates.length, "candidate")}</span>
           </div>
           {liveCandidates.map((candidate) => {
             const candidateInterviews = liveInterviews.filter(

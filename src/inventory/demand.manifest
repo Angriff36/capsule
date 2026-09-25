@@ -81,13 +81,14 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
   transition status from "fulfilled" to []
   transition status from "superseded" to []
 
-  default policy ingredientDemandRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may read ingredient demand"
-  default policy ingredientDemandWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may write ingredient demand through commands"
-  default policy ingredientDemandExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may execute ingredient demand commands"
+  default policy ingredientDemandRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may see ingredient demand"
+  default policy ingredientDemandWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may update ingredient demand"
+  default policy ingredientDemandExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may change ingredient demand"
 
   // Manifest-owned BOM reconcile (match else create from contributions).
+  // System-callable only: staff are not offered this action.
   // Initialization-capable: mutates required eventId/ingredientId/quantity/unit.
-  command syncFromContributions(
+  private command syncFromContributions(
     eventId: uuid,
     ingredientId: uuid,
     requiredQuantity: decimal(12, 4),
@@ -249,6 +250,16 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
   }
 
+  // Reschedule moves live demand onto the event's week. Fulfilled and
+  // superseded rows stay on the week they were already bought for.
+  private command alignPurchasingWeek() {
+    guard self.deletedAt == null
+    guard self.status == "pending" or self.status == "calculated" or self.status == "confirmed"
+    guard self.event != null
+    guard self.event.purchasingWeekStart != null
+    mutate purchasingWeekStart = self.event.purchasingWeekStart
+  }
+
   command recalculate(newQuantity: decimal(12, 4), reason: string) {
     guard self.status == "calculated" or self.status == "confirmed"
     guard self.calculatedAt != null
@@ -349,9 +360,9 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
   transition status from "recorded" to ["voided"]
   transition status from "voided" to []
 
-  default policy wasteRecordRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read waste records"
-  default policy wasteRecordWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write waste records through commands"
-  default policy wasteRecordExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute waste record commands"
+  default policy wasteRecordRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may see waste entries"
+  default policy wasteRecordWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may update waste entries"
+  default policy wasteRecordExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may change waste entries"
 
   command record(
     ingredientId: uuid,

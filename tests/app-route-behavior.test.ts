@@ -32,12 +32,12 @@ it.each([
   ["/inventory/demand", "What each event needs"],
   ["/inventory/stock", "What the house holds"],
   ["/inventory/purchasing", "Weekly purchasing drafts"],
-  ["/kitchen/components", "Components"],
+  ["/kitchen/components", "Recipes"],
   ["/kitchen/ingredients", "Ingredients"],
   ["/kitchen/dishes", "Dishes"],
   ["/kitchen/menus", "Menus"],
   ["/admin/catalogs", "Catalogs"],
-  ["/kitchen/components/import", "Component import"],
+  ["/kitchen/components/import", "Import recipe"],
 ])(
   "opens %s through the real authentication gate and shell",
   async (path, heading) => {

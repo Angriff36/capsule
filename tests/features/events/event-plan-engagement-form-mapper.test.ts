@@ -48,4 +48,68 @@ describe("EventPlanEngagementFormMapper", () => {
       ),
     ).toThrow("Event type is required.");
   });
+
+  it("stamps the trimmed service style name next to the style id", () => {
+    const args = new EventPlanEngagementFormMapper().toCommandArgs(
+      validInput({
+        serviceStyleId: "style-id",
+        serviceStyle: { name: "  Full Service  " },
+      }),
+    );
+
+    expect(args).toMatchObject({
+      serviceStyleId: "style-id",
+      serviceStyleName: "Full Service",
+    });
+  });
+
+  it("stamps the trimmed occasion name next to the occasion id", () => {
+    const args = new EventPlanEngagementFormMapper().toCommandArgs(
+      validInput({
+        occasionId: "occ-id",
+        occasion: { name: "  Wedding  " },
+      }),
+    );
+
+    expect(args).toMatchObject({
+      occasionId: "occ-id",
+      occasionName: "Wedding",
+    });
+  });
+
+  it("stamps the trimmed client name next to the client id", () => {
+    const args = new EventPlanEngagementFormMapper().toCommandArgs(
+      validInput({
+        clientId: "client-id",
+        client: { name: "  Acme Catering  " },
+      }),
+    );
+
+    expect(args).toMatchObject({
+      clientId: "client-id",
+      clientName: "Acme Catering",
+    });
+  });
+
+  it("stamps the trimmed owner name next to the salesperson id", () => {
+    const args = new EventPlanEngagementFormMapper().toCommandArgs(
+      validInput({
+        salespersonId: "person-id",
+        salesperson: { name: "  Pat Owner  " },
+      }),
+    );
+
+    expect(args).toMatchObject({
+      assignedToId: "person-id",
+      ownerName: "Pat Owner",
+    });
+  });
+
+  it("stamps the referral source id", () => {
+    const args = new EventPlanEngagementFormMapper().toCommandArgs(
+      validInput({ referralSourceId: "  ref-id  " }),
+    );
+
+    expect(args).toMatchObject({ referralSourceId: "ref-id" });
+  });
 });

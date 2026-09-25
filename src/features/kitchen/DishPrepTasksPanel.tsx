@@ -293,10 +293,10 @@ export function DishPrepTasksPanel({ dishId }: Props) {
                       to={componentPath(component._id)}
                       className="text-base text-accent underline-offset-2 hover:underline"
                     >
-                      Component: {component.name}
+                      Recipe: {component.name}
                     </Link>
                   ) : task.componentId ? (
-                    <span className="text-sm text-ink-3">Component linked</span>
+                    <span className="text-sm text-ink-3">Recipe linked</span>
                   ) : null}
                   <details className="recipe-row-editor">
                     <summary aria-label={`Manage ${task.name}`}>Manage</summary>

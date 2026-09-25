@@ -34,7 +34,7 @@ describe("culinary recovery presentation", () => {
       navigateToId: null,
       recoveredId: "old-component",
       notice:
-        "Recovered a previously saved component import with 1 ingredient line. The current review is still here; open the saved component or choose Save component again to import this review.",
+        "Recovered a previously saved recipe import with 1 ingredient line. The current review is still here; open the saved recipe or choose Save and edit recipe again to import this review.",
     });
   });
 

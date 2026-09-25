@@ -325,7 +325,7 @@ export function EventTimelinePanel({ eventId }: Props) {
       <div className="card">
         <EmptyState
           title="No timeline activities"
-          hint="Pick a template or add an activity to build the day-of run sheet."
+          hint="Pick a template or add an activity to build the day-of timeline."
         />
       </div>
     );

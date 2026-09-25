@@ -180,7 +180,7 @@ export function DishDetailsEditor({
     <section className="culinary-section" aria-labelledby="dish-edit-heading">
       <div className="culinary-section-heading">
         <div>
-          <p className="eyebrow">Catalog record</p>
+          <p className="eyebrow">This dish</p>
           <h2 id="dish-edit-heading">Edit dish</h2>
         </div>
         {isActive ? null : <span>Reinstate to edit</span>}

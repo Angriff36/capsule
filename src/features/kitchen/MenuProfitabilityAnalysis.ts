@@ -7,6 +7,8 @@ import {
   calculateComponentCost,
   type ComponentCostIngredientInput,
 } from "./ComponentCostCalculator";
+import { EventMenuLinePricer } from "../events/eventMenuLinePricer";
+import type { RecordedUnitMapping } from "../../lib/quantityMoney";
 import type { UnitOfMeasure } from "./import/UnitOfMeasureMapper";
 
 export const DEFAULT_GROSS_MARGIN_TARGET = 70;
@@ -106,43 +108,8 @@ export interface BuildMenuProfitabilityInput {
   componentIngredients: ComponentIngredientProfitabilityInput[];
   ingredients: IngredientProfitabilityInput[];
   priceObservations: IngredientPriceObservationInput[];
+  unitMappings?: readonly RecordedUnitMapping[];
   grossMarginTarget?: number;
-}
-
-type DirectDishIngredientCostStatus =
-  "priced" | "missing_ingredient" | "missing_price" | "incompatible_unit";
-
-function priceDirectDishIngredientLine(
-  line: DishIngredientProfitabilityInput,
-  ingredientsById: Map<string, ComponentCostIngredientInput>,
-): { extendedCost: number; status: DirectDishIngredientCostStatus } {
-  const ingredient = ingredientsById.get(line.ingredientId);
-  if (!ingredient) {
-    return { extendedCost: 0, status: "missing_ingredient" };
-  }
-
-  const costPerUnit = Number(ingredient.costPerUnit);
-  if (!Number.isFinite(costPerUnit) || costPerUnit <= 0) {
-    return { extendedCost: 0, status: "missing_price" };
-  }
-
-  if (line.unit !== ingredient.unit) {
-    return { extendedCost: 0, status: "incompatible_unit" };
-  }
-
-  const quantity = Number(line.quantity);
-  const wasteFactor = line.wasteFactor != null ? Number(line.wasteFactor) : 1;
-  if (!Number.isFinite(quantity) || quantity <= 0) {
-    return { extendedCost: 0, status: "missing_price" };
-  }
-  if (!Number.isFinite(wasteFactor) || wasteFactor <= 0) {
-    return { extendedCost: 0, status: "missing_price" };
-  }
-
-  return {
-    extendedCost: quantity * wasteFactor * costPerUnit,
-    status: "priced",
-  };
 }
 
 function isActive(value: Deletable): boolean {
@@ -178,8 +145,10 @@ export function buildMenuProfitability({
   componentIngredients,
   ingredients,
   priceObservations,
+  unitMappings,
   grossMarginTarget,
 }: BuildMenuProfitabilityInput): MenuProfitabilityAnalysis {
+  const linePricer = new EventMenuLinePricer(unitMappings);
   const target = clampTarget(grossMarginTarget);
   const dishesById = new Map(
     dishes.filter(isActive).map((dish) => [dish.id, dish]),
@@ -255,6 +224,7 @@ export function buildMenuProfitability({
           unit: componentLine.unit,
         })),
         ingredients: costingIngredients,
+        mappings: unitMappings,
         batchMultiplier: batchMultiplier ?? 0,
         yieldQuantity: yieldQuantity ?? 0,
       });
@@ -277,7 +247,10 @@ export function buildMenuProfitability({
     }
 
     for (const directLine of directLines) {
-      const priced = priceDirectDishIngredientLine(directLine, ingredientsById);
+      const ingredient = ingredientsById.get(directLine.ingredientId);
+      const priced = ingredient
+        ? linePricer.price(directLine, ingredient)
+        : { extendedCost: 0, status: "missing_ingredient" as const };
       if (priced.status === "priced") {
         pricedLineCount += 1;
         componentCost += priced.extendedCost;

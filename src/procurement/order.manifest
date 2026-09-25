@@ -85,14 +85,14 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   transition status from "submitted" to ["confirmed", "cancelled"]
   transition status from "confirmed" to ["partially_received", "received", "cancelled"]
   transition status from "partially_received" to ["received", "cancelled"]
-  transition status from "received" to []
+  transition status from "received" to ["partially_received"]
   transition status from "cancelled" to []
 
   // manageAccess: Event.approve reaction chain ensures the weekly DRAFT.
   // procurementAccess: day-to-day purchasing. Submit stays a buyer action.
-  default policy vendorOrderRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may read vendor orders"
-  default policy vendorOrderWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may write vendor orders through commands"
-  default policy vendorOrderExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute vendor order commands"
+  default policy vendorOrderRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may see vendor orders"
+  default policy vendorOrderWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may update vendor orders"
+  default policy vendorOrderExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may change vendor orders"
 
   command open(
     vendorId: uuid,
@@ -406,6 +406,17 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // A count correction on a finished order puts it back in receiving when the
+  // line is short again, so the buyer can record the rest. Already-open orders
+  // stay as they are.
+  command noteReceiptCorrection(lineStillShort: boolean) {
+    guard self.deletedAt == null
+    guard self.status == "confirmed" or self.status == "partially_received" or self.status == "received"
+    compute reopen = lineStillShort and self.status == "received"
+    mutate status = reopen ? "partially_received" : self.status
+    mutate receivedAt = reopen ? null : self.receivedAt
+  }
+
   store VendorOrder in durable
 }
 
@@ -428,6 +439,9 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   property quantityIsManual: boolean?
   property quantityReviewReason: string?
   property required receivedQuantity: decimal(12, 4) = 0
+  // Each buyer correction gets its own number so a later correction of the
+  // same two counts still moves stock. A retry of one save keeps this number.
+  property receiptCorrectionCount: int?
   // Outstanding supply already committed outside the editable weekly draft.
   property supplyWeekStart: datetime?
   property pendingSupplyQuantity: decimal(12, 4)?
@@ -461,7 +475,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   computed isFullyReceived: boolean = self.orderedQuantity > 0 and self.receivedQuantity >= self.orderedQuantity
   computed hasReceivingDiscrepancy: boolean = self.discrepancyQuantity != null and self.discrepancyQuantity > 0
 
-  constraint lineOrderedPositive: self.addedAt == null or self.orderedQuantity >= 0 "Ordered quantity cannot be negative"
+  constraint lineOrderedPositive: self.addedAt == null or self.orderedQuantity >= 0 "This order line's ordered amount can't be negative. Use zero or more."
   constraint lineReceivedNonnegative: self.receivedQuantity >= 0 "Received quantity cannot be negative"
   constraint lineReceivedNotOver: self.receivedQuantity <= self.orderedQuantity "Received quantity cannot exceed ordered quantity"
   constraint lineCostNonnegative: self.unitCost >= 0 "Unit cost cannot be negative"
@@ -469,12 +483,12 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   transition status from "pending" to ["added", "cancelled"]
   transition status from "added" to ["receiving", "complete", "cancelled"]
   transition status from "receiving" to ["complete", "cancelled"]
-  transition status from "complete" to []
+  transition status from "complete" to ["receiving"]
   transition status from "cancelled" to []
 
-  default policy vendorOrderLineRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may read vendor order lines"
-  default policy vendorOrderLineWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may write vendor order lines through commands"
-  default policy vendorOrderLineExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute vendor order line commands"
+  default policy vendorOrderLineRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may see vendor order lines"
+  default policy vendorOrderLineWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may update vendor order lines"
+  default policy vendorOrderLineExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may change vendor order lines"
 
   command addLine(
     vendorOrderId: uuid,
@@ -545,7 +559,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.vendorOrder != null and self.vendorOrder.status == "draft"
     guard self.ingredient != null and self.ingredient.status == "active"
-    constraint ensureContributionPositive: contributionQuantity >= 0 "Contribution quantity cannot be negative"
+    constraint ensureContributionPositive: contributionQuantity >= 0 "This weekly order line's amount can't be negative. Use zero or more."
     // stockClaimed sums every open automatic line's stockAppliedQuantity for
     // this ingredient/unit, including this line's own earlier claim, which is
     // returned before the week's share of stock is worked out (#327).
@@ -710,6 +724,51 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The original delivery lot stays as first recorded. This writes the corrected
+  // received total and a reasoned difference; stock moves by that difference once.
+  command correctReceipt(
+    correctedQuantity: decimal(12, 4),
+    reason: string,
+    supplierLotNumber: string
+  ) {
+    guard self.addedAt != null
+    guard self.status == "receiving" or self.status == "complete"
+    guard self.deletedAt == null
+    guard self.receivedQuantity > 0
+    guard self.locationId != null
+    guard self.vendorOrder != null and (self.vendorOrder.status == "confirmed" or self.vendorOrder.status == "partially_received" or self.vendorOrder.status == "received")
+    constraint correctCountNonnegative: correctedQuantity >= 0 "The corrected count can't be negative. Use zero or more."
+    constraint correctCountWithinOrder: correctedQuantity <= self.orderedQuantity "The corrected count can't be higher than what was ordered."
+    constraint correctCountChanged: correctedQuantity != self.receivedQuantity "Enter a count that's different from the current received count."
+    constraint correctReasonRequired: length(trim(reason)) > 0 "Say why this count changed."
+    constraint correctLotRequired: length(trim(supplierLotNumber)) > 0 "Supplier lot number is required so this delivery can be traced."
+    compute priorReceived = self.receivedQuantity
+    compute nextStatus = correctedQuantity == self.orderedQuantity ? "complete" : "receiving"
+    compute correctionSequence = (self.receiptCorrectionCount != null ? self.receiptCorrectionCount : 0) + 1
+    mutate receivedQuantity = correctedQuantity
+    mutate receiptCorrectionCount = correctionSequence
+    mutate pendingSupplyQuantity = self.pendingSupplyQuantity != null ? max(0, self.orderedQuantity - correctedQuantity) : self.pendingSupplyQuantity
+    mutate status = nextStatus
+    mutate completedAt = correctedQuantity == self.orderedQuantity ? (self.completedAt != null ? self.completedAt : now()) : null
+    emit VendorOrderLineReceiptCorrected {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+      vendorOrderId: self.vendorOrderId
+      vendorId: self.vendorOrder.vendorId
+      ingredientId: self.ingredientId
+      locationId: self.locationId
+      supplierLotNumber: supplierLotNumber
+      priorReceivedQuantity: priorReceived
+      correctedReceivedQuantity: correctedQuantity
+      delta: correctedQuantity - priorReceived
+      orderedQuantity: self.orderedQuantity
+      lineStillShort: correctedQuantity < self.orderedQuantity
+      unit: self.unit
+      reason: reason
+      correctionSequence: correctionSequence
+    }
+  }
+
   command cancelLine(reason: string) {
     guard self.addedAt != null
     guard self.status == "added" or self.status == "receiving"
@@ -787,12 +846,12 @@ entity InventoryLot mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
 
-  constraint inventoryLotComplete: self.receivedAt == null or (length(trim(self.supplierLotNumber)) > 0 and self.receiptQuantity > 0 and self.cumulativeReceivedQuantity > 0) "Recorded inventory lots require a supplier lot number and positive receipt quantities"
+  constraint inventoryLotComplete: self.receivedAt == null or (length(trim(self.supplierLotNumber)) > 0 and self.receiptQuantity > 0 and self.cumulativeReceivedQuantity > 0) "Receipt lots require a supplier lot number and positive receipt quantities"
   constraint inventoryLotCostNonnegative: self.unitCost >= 0 "Inventory lot unit cost cannot be negative"
 
-  default policy inventoryLotRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Inventory, procurement, and managers may read receipt lots"
-  default policy inventoryLotWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may record receipt lots"
-  default policy inventoryLotExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute receipt lot commands"
+  default policy inventoryLotRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Inventory, procurement, and managers may see receipt lots"
+  default policy inventoryLotWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may update receipt lots"
+  default policy inventoryLotExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may change receipt lots"
 
   command record(
     supplierLotNumber: string,
@@ -839,6 +898,85 @@ entity InventoryLot mixin TenantScoped, SoftDeletable {
   }
 
   store InventoryLot in durable
+}
+
+// One reasoned difference against a delivery. The original lot is never rewritten.
+// Each correction number moves stock once. Replaying that same number does not.
+entity ReceiptCorrection mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, vendorOrderLineId, correctionSequence]
+  timestamps
+  versionProperty version: number
+
+  property indexed required vendorOrderLineId: uuid
+  property required vendorOrderId: uuid
+  property required vendorId: uuid
+  property indexed required ingredientId: uuid
+  property indexed required locationId: uuid
+  property indexed required supplierLotNumber: string = ""
+  property required priorReceivedQuantity: decimal(12, 4) = 0
+  property required correctedReceivedQuantity: decimal(12, 4) = 0
+  property required delta: decimal(12, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property required reason: string = ""
+  property required correctionSequence: int = 0
+  property recordedAt: datetime?
+
+  belongsTo vendorOrderLine: VendorOrderLine fields [tenantId, vendorOrderLineId] references [tenantId, id]
+  belongsTo vendorOrder: VendorOrder fields [tenantId, vendorOrderId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+  belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
+
+  constraint receiptCorrectionReason: self.recordedAt == null or length(trim(self.reason)) > 0 "Say why this count changed."
+  constraint receiptCorrectionLot: self.recordedAt == null or length(trim(self.supplierLotNumber)) > 0 "Supplier lot number is required so this delivery can be traced."
+
+  default policy receiptCorrectionRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Inventory, procurement, and managers may see receipt corrections"
+  default policy receiptCorrectionWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may update receipt corrections"
+  default policy receiptCorrectionExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may change receipt corrections"
+
+  command record(
+    vendorOrderLineId: uuid,
+    vendorOrderId: uuid,
+    vendorId: uuid,
+    ingredientId: uuid,
+    locationId: uuid,
+    supplierLotNumber: string,
+    priorReceivedQuantity: decimal(12, 4),
+    correctedReceivedQuantity: decimal(12, 4),
+    delta: decimal(12, 4),
+    unit: UnitOfMeasure,
+    reason: string,
+    correctionSequence: int
+  ) {
+    guard self.recordedAt == null or (self.vendorOrderLineId == vendorOrderLineId and self.vendorOrderId == vendorOrderId and self.vendorId == vendorId and self.ingredientId == ingredientId and self.locationId == locationId and self.supplierLotNumber == supplierLotNumber and self.priorReceivedQuantity == priorReceivedQuantity and self.correctedReceivedQuantity == correctedReceivedQuantity and self.delta == delta and self.unit == unit and self.reason == reason and self.correctionSequence == correctionSequence)
+    guard self.deletedAt == null
+    constraint recordCorrectionReason: length(trim(reason)) > 0 "Say why this count changed."
+    constraint recordCorrectionLot: length(trim(supplierLotNumber)) > 0 "Supplier lot number is required so this delivery can be traced."
+    compute stockDelta = self.recordedAt == null ? delta : 0
+    mutate vendorOrderLineId = vendorOrderLineId
+    mutate vendorOrderId = vendorOrderId
+    mutate vendorId = vendorId
+    mutate ingredientId = ingredientId
+    mutate locationId = locationId
+    mutate supplierLotNumber = supplierLotNumber
+    mutate priorReceivedQuantity = priorReceivedQuantity
+    mutate correctedReceivedQuantity = correctedReceivedQuantity
+    mutate delta = delta
+    mutate unit = unit
+    mutate reason = reason
+    mutate correctionSequence = correctionSequence
+    mutate recordedAt = self.recordedAt == null ? now() : self.recordedAt
+    emit ReceiptCorrectionStock {
+      tenantId: self.tenantId
+      ingredientId: ingredientId
+      locationId: locationId
+      delta: stockDelta
+      unit: unit
+      reason: reason
+    }
+  }
+
+  store ReceiptCorrection in durable
 }
 
 event InventoryLotStockRecorded: "inventory_lot.stock_recorded" {
@@ -888,9 +1026,9 @@ entity IngredientPriceObservation mixin TenantScoped, SoftDeletable {
   constraint observationCumulativePositive: self.observedAt == null or self.cumulativeReceivedQuantity > 0 "Price observation cumulative quantity must be positive"
   constraint observationPriceNonnegative: self.unitPrice >= 0 "Price observation unit price cannot be negative"
 
-  default policy ingredientPriceObservationRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Kitchen, procurement, and managers may read confirmed ingredient prices"
-  default policy ingredientPriceObservationWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may record confirmed ingredient prices"
-  default policy ingredientPriceObservationExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute confirmed ingredient price commands"
+  default policy ingredientPriceObservationRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Kitchen, procurement, and managers may see confirmed ingredient prices"
+  default policy ingredientPriceObservationWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may update confirmed ingredient prices"
+  default policy ingredientPriceObservationExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may change confirmed ingredient prices"
 
   command record(
     ingredientId: uuid,
@@ -943,11 +1081,11 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
   belongsTo ingredientDemand: IngredientDemand fields [tenantId, ingredientDemandId] references [tenantId, id]
   belongsTo vendorOrder: VendorOrder fields [tenantId, vendorOrderId] references [tenantId, id]
 
-  constraint demandLinkQuantityPositive: self.linkedAt == null or self.contributionQuantity >= 0 "Demand link contribution cannot be negative"
+  constraint demandLinkQuantityPositive: self.linkedAt == null or self.contributionQuantity >= 0 "This order-to-need link's amount can't be negative. Use zero or more."
 
-  default policy vendorOrderLineDemandRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may read order demand links"
-  default policy vendorOrderLineDemandWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may write order demand links through commands"
-  default policy vendorOrderLineDemandExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute order demand link commands"
+  default policy vendorOrderLineDemandRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may see order demand links"
+  default policy vendorOrderLineDemandWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may update order demand links"
+  default policy vendorOrderLineDemandExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may change order demand links"
 
   command link(
     vendorOrderLineId: uuid,
@@ -962,11 +1100,11 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
     guard self.ingredientDemand != null
     // First link or idempotent revise of the same demand→line contribution.
     guard self.linkedAt == null or (self.vendorOrderLineId == vendorOrderLineId and self.ingredientDemandId == ingredientDemandId)
-    constraint linkLineMatch: self.linkedAt == null or vendorOrderLineId == self.vendorOrderLineId "Demand link vendorOrderLineId must match the seeded line reference"
-    constraint linkDemandMatch: self.linkedAt == null or ingredientDemandId == self.ingredientDemandId "Demand link ingredientDemandId must match the seeded demand reference"
-    constraint linkOrderMatch: self.linkedAt == null or vendorOrderId == self.vendorOrderId "Demand link vendorOrderId must match the seeded order reference"
-    constraint linkOrderOwnsLine: vendorOrderId == self.vendorOrderLine.vendorOrderId "Demand link vendorOrderId must own the vendor order line"
-    constraint linkQuantityPositive: contributionQuantity >= 0 "Demand link contribution cannot be negative"
+    constraint linkLineMatch: self.linkedAt == null or vendorOrderLineId == self.vendorOrderLineId "This order-to-need link is for a different order line. Pick the order line already on this link."
+    constraint linkDemandMatch: self.linkedAt == null or ingredientDemandId == self.ingredientDemandId "This order-to-need link is for a different need. Pick the need already on this link."
+    constraint linkOrderMatch: self.linkedAt == null or vendorOrderId == self.vendorOrderId "This order-to-need link is for a different order. Pick the order already on this link."
+    constraint linkOrderOwnsLine: vendorOrderId == self.vendorOrderLine.vendorOrderId "This order-to-need link's line isn't on this order. Pick a line from the order already on this link."
+    constraint linkQuantityPositive: contributionQuantity >= 0 "This order-to-need link's amount can't be negative. Use zero or more."
     mutate vendorOrderLineId = vendorOrderLineId
     mutate ingredientDemandId = ingredientDemandId
     mutate vendorOrderId = vendorOrderId
@@ -987,7 +1125,7 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
     guard self.linkedAt != null
     guard self.deletedAt == null
     guard self.vendorOrder != null and self.vendorOrder.status == "draft"
-    constraint reviseQuantityPositive: contributionQuantity > 0 "Demand link contribution must be positive"
+    constraint reviseQuantityPositive: contributionQuantity > 0 "This order-to-need link's amount has to be more than zero. Enter how much this line covers."
     mutate contributionQuantity = contributionQuantity
     emit VendorOrderLineDemandRevised {
       vendorOrderLineDemandId: self.id
@@ -1003,7 +1141,7 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
     guard self.linkedAt != null
     guard self.deletedAt == null
     guard self.vendorOrder != null and self.vendorOrder.status == "draft"
-    constraint retireReasonPresent: length(trim(reason)) > 0 "Demand link retirement reason is required"
+    constraint retireReasonPresent: length(trim(reason)) > 0 "This order-to-need link needs a reason before you retire it. Write why you're taking it off."
     mutate removedAt = now()
     mutate deletedAt = now()
     emit VendorOrderLineDemandRetired {
@@ -1194,6 +1332,24 @@ event VendorOrderLineReceived: "vendor_order_line.received" {
   discrepancyQuantity: decimal(12, 4)?
 }
 
+event VendorOrderLineReceiptCorrected: "vendor_order_line.receipt_corrected" {
+  vendorOrderLineId: string
+  tenantId: string
+  vendorOrderId: string
+  vendorId: string
+  ingredientId: string
+  locationId: string
+  supplierLotNumber: string
+  priorReceivedQuantity: decimal(12, 4)
+  correctedReceivedQuantity: decimal(12, 4)
+  delta: decimal(12, 4)
+  orderedQuantity: decimal(12, 4)
+  lineStillShort: boolean
+  unit: UnitOfMeasure
+  reason: string
+  correctionSequence: int
+}
+
 event VendorOrderLineQuantityRevised: "vendor_order_line.quantity_revised" {
   vendorOrderLineId: string
   tenantId: string
@@ -1312,4 +1468,47 @@ on VendorOrderLineReceived run InventoryLot.record
     cumulativeReceivedQuantity: payload.receivedQuantity
     unit: payload.unit
     unitCost: payload.unitCost
+  }
+
+on VendorOrderLineReceiptCorrected run ReceiptCorrection.record
+  match vendorOrderLineId = payload.vendorOrderLineId, correctionSequence = payload.correctionSequence
+  else create
+  params {
+    vendorOrderLineId: payload.vendorOrderLineId
+    vendorOrderId: payload.vendorOrderId
+    vendorId: payload.vendorId
+    ingredientId: payload.ingredientId
+    locationId: payload.locationId
+    supplierLotNumber: payload.supplierLotNumber
+    priorReceivedQuantity: payload.priorReceivedQuantity
+    correctedReceivedQuantity: payload.correctedReceivedQuantity
+    delta: payload.delta
+    unit: payload.unit
+    reason: payload.reason
+    correctionSequence: payload.correctionSequence
+  }
+
+on VendorOrderLineReceiptCorrected run VendorOrder.noteReceiptCorrection
+  resolve payload.vendorOrderId
+  params {
+    lineStillShort: payload.lineStillShort
+  }
+
+event ReceiptCorrectionStock: "receipt_correction.stock" {
+  tenantId: string
+  ingredientId: string
+  locationId: string
+  delta: number
+  unit: string
+  reason: string
+}
+
+on ReceiptCorrectionStock run InventoryItem.applyReceiptCorrection
+  match ingredientId = payload.ingredientId, locationId = payload.locationId
+  params {
+    ingredientId: payload.ingredientId
+    locationId: payload.locationId
+    delta: payload.delta
+    unit: payload.unit
+    reason: payload.reason
   }

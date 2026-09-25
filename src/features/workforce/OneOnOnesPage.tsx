@@ -401,7 +401,7 @@ export function OneOnOnesPage() {
               <p className="eyebrow">One-on-one ledger</p>
               <h2>Held meetings</h2>
             </div>
-            <span>{formatCountNoun(heldMeetings.length, "record")}</span>
+            <span>{formatCountNoun(heldMeetings.length, "meeting")}</span>
           </div>
           {heldMeetings.map((meeting) => {
             const meetingActions = liveActions.filter(

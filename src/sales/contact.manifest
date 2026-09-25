@@ -41,9 +41,9 @@ entity ClientContact mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["removed"]
   transition status from "removed" to []
 
-  default policy clientContactRead read: roleAllows(user.role, "salesAccess") "Sales staff may read client contacts"
-  default policy clientContactWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write client contacts through commands"
-  default policy clientContactExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute client contact commands"
+  default policy clientContactRead read: roleAllows(user.role, "salesAccess") "Sales staff may see client contacts"
+  default policy clientContactWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update client contacts"
+  default policy clientContactExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may change client contacts"
 
   command add(
     clientId: uuid,

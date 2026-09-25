@@ -64,7 +64,7 @@ export function useTrackerRowActions() {
           }),
         "Event number saved",
       ),
-    onServiceStyle: (serviceStyleId) =>
+    onServiceStyle: (serviceStyleId, serviceStyleName) =>
       void run(
         row,
         () =>
@@ -72,6 +72,7 @@ export function useTrackerRowActions() {
             docId: row.id,
             version: row.version,
             serviceStyleId,
+            serviceStyleName,
           }),
         "Service style saved. Its kit is on the pack list.",
       ),

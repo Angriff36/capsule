@@ -116,15 +116,15 @@ export function QuickFileImport() {
           </p>
           {totalPending > 0 || totalErrors > 0 ? (
             <p className="mt-1 text-xs text-ink-3">
-              Records that need review are in the{" "}
+              Items that need review are in the{" "}
               <Link to="/admin/reconcile" className="text-brand">
-                reconcile queue
+                leftover match list
               </Link>
               .
             </p>
           ) : null}
           <p className="mt-1 text-xs text-ink-3">
-            {results.length} import run{results.length === 1 ? "" : "s"}:{" "}
+            {results.length} import{results.length === 1 ? "" : "s"}:{" "}
             {results.map((r, i) => (
               <span key={r.importRunId}>
                 {i > 0 ? ", " : ""}

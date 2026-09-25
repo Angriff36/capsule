@@ -45,7 +45,7 @@ export function TimelineBlockPicker({
         tabIndex={-1}
         className="text-xl font-semibold"
       >
-        Choose run-of-show blocks
+        Choose timeline blocks
       </h2>
       <p className="mt-2 text-base text-ink-2">
         Add the work this event needs. Times stay blank until planned; crew can
@@ -123,7 +123,7 @@ export function TimelineBlockPicker({
                       <span className="min-w-0">
                         <span className="block text-base font-medium">
                           {template.label}
-                          {added ? " · Already on this run" : ""}
+                          {added ? " · Already on this timeline" : ""}
                         </span>
                         <span className="block text-sm text-ink-2">
                           {template.defaultTeam} · {template.notes}

@@ -63,7 +63,11 @@ export const EVENT_TAB_GROUPS: readonly {
     label: "Day-of",
     tabs: ["timeline", "staffing", "equipment", "layouts"],
   },
-  { key: "records", label: "Records", tabs: ["photos", "incidents"] },
+  {
+    key: "records",
+    label: "Photos & incidents",
+    tabs: ["photos", "incidents"],
+  },
   { key: "money", label: "Money", tabs: ["margin"] },
 ] as const;
 

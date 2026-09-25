@@ -73,9 +73,9 @@ entity Incident mixin TenantScoped, SoftDeletable {
   transition status from "resolved" to []
   transition status from "dismissed" to []
 
-  default policy incidentRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may read incidents"
-  default policy incidentWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may write incidents through commands"
-  default policy incidentExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may execute incident commands"
+  default policy incidentRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may see incidents"
+  default policy incidentWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may update incidents"
+  default policy incidentExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may change incidents"
 
   command report(
     eventId: uuid,
@@ -223,9 +223,9 @@ entity CorrectiveAction mixin TenantScoped, SoftDeletable {
   transition status from "open" to ["closed"]
   transition status from "closed" to []
 
-  default policy correctiveActionRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may read corrective actions"
-  default policy correctiveActionWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may write corrective actions through commands"
-  default policy correctiveActionExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may execute corrective action commands"
+  default policy correctiveActionRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may see corrective actions"
+  default policy correctiveActionWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may update corrective actions"
+  default policy correctiveActionExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may change corrective actions"
 
   command open(incidentId: uuid, eventId: uuid, description: string) {
     guard self.openedAt == null

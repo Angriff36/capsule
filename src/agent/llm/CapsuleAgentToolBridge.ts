@@ -26,7 +26,10 @@ export class CapsuleAgentToolBridge {
     options: CapsuleAgentToolBridgeOptions = {},
   ) {
     const strategy = options.toolNameStrategy ?? "snake";
-    const nameMapper = new CapsuleAgentToolNameMapper(catalog.list(), strategy);
+    const nameMapper = new CapsuleAgentToolNameMapper(
+      catalog.offeredToPeople(),
+      strategy,
+    );
     this.definitionFactory = new CapsuleAgentToolDefinitionFactory(
       catalog,
       nameMapper,

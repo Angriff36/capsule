@@ -43,9 +43,9 @@ entity VenueNote mixin TenantScoped, SoftDeletable {
 
   constraint venueNoteContent: self.postedAt == null or length(trim(self.content)) > 0 "Note content is required"
 
-  default policy venueNoteRead read: roleAllows(user.role, "eventAccess") and (self.visibility != "management_only" or roleAllows(user.role, "manageAccess")) "Event staff may read venue notes; management-only notes require managers"
-  default policy venueNoteWrite write: roleAllows(user.role, "eventAccess") "Event staff may write venue notes through commands"
-  default policy venueNoteExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute venue note commands"
+  default policy venueNoteRead read: roleAllows(user.role, "eventAccess") and (self.visibility != "management_only" or roleAllows(user.role, "manageAccess")) "Event staff may see venue notes; management-only notes require managers"
+  default policy venueNoteWrite write: roleAllows(user.role, "eventAccess") "Event staff may update venue notes"
+  default policy venueNoteExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change venue notes"
 
   command post(
     venueId: uuid,

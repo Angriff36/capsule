@@ -19,9 +19,9 @@ entity TaxRate mixin TenantScoped, SoftDeletable {
 
   constraint taxRateComplete: self.configuredAt == null or (length(trim(self.name)) > 0 and self.percentage > 0 and self.percentage <= 100 and (self.appliesToFood or self.appliesToService or self.appliesToRental)) "Tax rates require a name, a percentage from 0 to 100, and at least one applicability"
 
-  default policy taxRateRead read: roleAllows(user.role, "financeAccess") "Finance staff may read tax rates"
+  default policy taxRateRead read: roleAllows(user.role, "financeAccess") "Finance staff may see tax rates"
   default policy taxRateWrite write: roleAllows(user.role, "financeAccess") "Finance staff may maintain tax rates"
-  default policy taxRateExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute tax-rate commands"
+  default policy taxRateExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may change tax rates"
 
   command define(
     name: string,

@@ -56,13 +56,13 @@ export function GuestListCoverageNotice({
       <div>
         <p className="font-semibold text-warn">
           {severity === "empty"
-            ? `No guests recorded — this event expects ${expectedHeadcount}.`
-            : `Only ${guestCount} of ${expectedHeadcount} expected guests are recorded.`}
+            ? `No guests on the list — this event expects ${expectedHeadcount}.`
+            : `Only ${guestCount} of ${expectedHeadcount} expected guests are on the list.`}
         </p>
         <p className="mt-0.5 text-sm text-ink-2">
-          The allergen briefing only covers guests on this list. Until the list
-          is filled in, an empty briefing means &ldquo;not recorded yet&rdquo; —
-          not &ldquo;no allergies or dietary needs&rdquo;.
+          {
+            "The allergen briefing only covers guests on this list. Until the list is filled in, an empty briefing means “not on the list yet” — not “no allergies or dietary needs”."
+          }
         </p>
       </div>
     </div>

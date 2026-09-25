@@ -91,7 +91,7 @@ export const CHAT_LINK_KIND_LABELS: Record<ChatLinkKind, string> = {
   dish: "Dish",
   menu: "Menu",
   client: "Client",
-  component: "Component",
+  component: "Recipe",
   ingredient: "Ingredient",
   person: "Teammate",
 };

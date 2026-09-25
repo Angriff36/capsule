@@ -51,8 +51,14 @@ import { FailureBanner } from "./FailureBanner";
 const LANE_DAYS = 14;
 // Mirrors the Event command guards in src/operations/event.manifest so a card
 // never offers an edit the command would refuse: reschedule / changeVenue /
-// assignOwner stop at approved; changeHeadcount also runs while executing.
-const RESCHEDULE_STAGES = new Set(["planning", "pending_approval", "approved"]);
+// changePrimaryContact / changeRequirements run through sales_lock;
+// changeHeadcount also runs while executing.
+const RESCHEDULE_STAGES = new Set([
+  "planning",
+  "pending_approval",
+  "approved",
+  "sales_lock",
+]);
 const HEADCOUNT_STAGES = new Set([...RESCHEDULE_STAGES, "executing"]);
 const DEFAULT_START_OFFSET = 10 * 60 * 60 * 1000;
 const DEFAULT_DURATION = 4 * 60 * 60 * 1000;
@@ -469,6 +475,18 @@ export function EventTrackerPage() {
 
   const commitOwner = (event: CalendarEventFacts, personId: string) => {
     if ((event.ownerId ?? "") === personId) return;
+    // Stamp the chosen person's printed name as the ownerName snapshot (same
+    // as the create form); clearing the owner omits it so the command clears
+    // the snapshot with the link.
+    const person =
+      roster.find((row) => row._id === personId) ??
+      (people ?? []).find((row) => row._id === personId);
+    const ownerName = personId
+      ? [person?.givenName ?? "", person?.familyName ?? ""]
+          .filter(Boolean)
+          .join(" ")
+          .trim() || undefined
+      : undefined;
     void run(
       event,
       () =>
@@ -476,6 +494,7 @@ export function EventTrackerPage() {
           docId: event.id,
           version: event.version,
           assignedToId: personId || undefined,
+          ownerName,
         }),
       "Owner saved",
     );

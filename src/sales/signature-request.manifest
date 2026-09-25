@@ -85,9 +85,9 @@ entity SignatureRequest mixin TenantScoped, SoftDeletable {
   transition status from "expired" to []
   transition status from "revoked" to []
 
-  default policy signatureRequestRead read: roleAllows(user.role, "salesAccess") "Sales staff may read signature requests"
-  default policy signatureRequestWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write signature requests through commands"
-  default policy signatureRequestExecute execute: roleAllows(user.role, "salesAccess") or roleAllows(user.role, "clientAccess") "Sales staff and clients may execute signature request commands"
+  default policy signatureRequestRead read: roleAllows(user.role, "salesAccess") "Sales staff may see signature requests"
+  default policy signatureRequestWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update signature requests"
+  default policy signatureRequestExecute execute: roleAllows(user.role, "salesAccess") or roleAllows(user.role, "clientAccess") "Sales staff and clients may change signature requests"
 
   command requestSignature(
     proposalRevisionId: uuid,

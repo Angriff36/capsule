@@ -71,9 +71,9 @@ entity Dish mixin TenantScoped, SoftDeletable {
   // salesAccess: sales browses the published catalog for proposal menu
   // selection (sales/proposal-dish-selection.manifest).
   // Event managers compose package recipes as well as their event menu lines.
-  default policy dishRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, sales and managers may read dishes"
-  default policy dishWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may write dishes through commands"
-  default policy dishExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may execute dish commands"
+  default policy dishRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, sales and managers may see dishes"
+  default policy dishWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may update dishes"
+  default policy dishExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may change dishes"
 
   command introduce(
     name: string,
@@ -352,9 +352,9 @@ entity DishIngredient mixin TenantScoped, SoftDeletable {
   constraint dishLineQuantityPositive: self.addedAt == null or self.quantity > 0 "Dish ingredient quantity must be positive"
   constraint dishLineWasteFactorPositive: self.addedAt == null or self.wasteFactor == null or self.wasteFactor > 0 "Waste factor must be greater than 0"
 
-  default policy dishIngredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read dish ingredient lines"
-  default policy dishIngredientWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write dish ingredient lines through commands"
-  default policy dishIngredientExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute dish ingredient line commands"
+  default policy dishIngredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see dish ingredient lines"
+  default policy dishIngredientWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update dish ingredient lines"
+  default policy dishIngredientExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change dish ingredient lines"
 
   command add(
     dishId: uuid,
@@ -450,9 +450,9 @@ entity DishComponent mixin TenantScoped, SoftDeletable {
   belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
   belongsTo portionSpec: ComponentPortionSpec fields [tenantId, portionSpecId] references [tenantId, id]
 
-  default policy dishComponentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read dish component composition"
-  default policy dishComponentWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write dish component composition through commands"
-  default policy dishComponentExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute dish component composition commands"
+  default policy dishComponentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see dish recipes"
+  default policy dishComponentWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update dish recipes"
+  default policy dishComponentExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change dish recipes"
 
   command attach(
     dishId: uuid,
@@ -465,9 +465,9 @@ entity DishComponent mixin TenantScoped, SoftDeletable {
     guard self.attachedAt == null
     guard self.deletedAt == null
     guard self.dish != null and self.dish.status == "active"
-    constraint attachDishMatch: dishId == self.dishId "Attach dishId must match the seeded dish reference"
-    constraint attachYieldPositive: yieldQuantity > 0 "Attached component yield must be positive"
-    constraint attachBatchPositive: batchMultiplier == null or batchMultiplier > 0 "Attached component batch multiplier must be positive"
+    constraint attachDishMatch: dishId == self.dishId "This subrecipe is for a different dish. Pick the dish already on this subrecipe."
+    constraint attachYieldPositive: yieldQuantity > 0 "This subrecipe's yield must be more than zero."
+    constraint attachBatchPositive: batchMultiplier == null or batchMultiplier > 0 "When you enter a batch size on this subrecipe, it must be more than zero."
     mutate dishId = dishId
     mutate componentId = componentId
     mutate yieldQuantity = yieldQuantity
@@ -600,16 +600,16 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   hasMany materials: DishTaskMaterial
 
-  constraint dishTaskNameComplete: self.status == "retired" or length(trim(self.name)) > 0 "Dish task name is required"
-  constraint dishTaskQuantityPositive: self.defaultQuantity == null or self.defaultQuantity > 0 "Dish task quantity must be positive"
-  constraint dishTaskSortNonnegative: self.sortOrder >= 0 "Dish task sort order cannot be negative"
+  constraint dishTaskNameComplete: self.status == "retired" or length(trim(self.name)) > 0 "This dish task has no name. Type a name for it."
+  constraint dishTaskQuantityPositive: self.defaultQuantity == null or self.defaultQuantity > 0 "When you enter a quantity on this dish task, it must be more than zero."
+  constraint dishTaskSortNonnegative: self.sortOrder >= 0 "This dish task's place in the list can't be negative. Use zero or more."
 
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
 
-  default policy dishTaskRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may read dish task templates"
-  default policy dishTaskWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may write dish task templates through commands"
-  default policy dishTaskExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may execute dish task template commands"
+  default policy dishTaskRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may see dish task templates"
+  default policy dishTaskWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may update dish task templates"
+  default policy dishTaskExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may change dish task templates"
 
   command add(
     dishId: uuid,
@@ -629,10 +629,10 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard self.dish != null and self.dish.status == "active"
-    constraint addDishMatch: dishId == self.dishId "Dish task dishId must match the seeded Dish reference"
-    constraint addNamePresent: length(trim(name)) > 0 "Dish task name is required"
-    constraint addQuantityPositive: defaultQuantity == null or defaultQuantity > 0 "Dish task quantity must be positive"
-    constraint addSortNonnegative: sortOrder == null or sortOrder >= 0 "Dish task sort order cannot be negative"
+    constraint addDishMatch: dishId == self.dishId "This dish task is for a different dish. Pick the dish already on this dish task."
+    constraint addNamePresent: length(trim(name)) > 0 "This dish task has no name. Type a name for it."
+    constraint addQuantityPositive: defaultQuantity == null or defaultQuantity > 0 "When you enter a quantity on this dish task, it must be more than zero."
+    constraint addSortNonnegative: sortOrder == null or sortOrder >= 0 "This dish task's place in the list can't be negative. Use zero or more."
     mutate dishId = dishId
     mutate activeDishId = dishId
     mutate name = name
@@ -680,9 +680,9 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard self.dish != null and self.dish.status == "active"
-    constraint reviseNamePresent: length(trim(name)) > 0 "Dish task name is required"
-    constraint reviseQuantityPositive: defaultQuantity == null or defaultQuantity > 0 "Dish task quantity must be positive"
-    constraint reviseSortNonnegative: sortOrder == null or sortOrder >= 0 "Dish task sort order cannot be negative"
+    constraint reviseNamePresent: length(trim(name)) > 0 "This dish task has no name. Type a name for it."
+    constraint reviseQuantityPositive: defaultQuantity == null or defaultQuantity > 0 "When you enter a quantity on this dish task, it must be more than zero."
+    constraint reviseSortNonnegative: sortOrder == null or sortOrder >= 0 "This dish task's place in the list can't be negative. Use zero or more."
     mutate name = name
     mutate category = category != null ? category : self.category
     mutate taskType = taskType != null ? taskType : self.taskType
@@ -718,8 +718,8 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   ) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint specifyLeadTimeNonnegative: (leadTimeMinDays == null or leadTimeMinDays >= 0) and (leadTimeMaxDays == null or leadTimeMaxDays >= 0) "Lead time cannot be negative"
-    constraint specifySequenceNotSelf: sequenceAfterDishTaskId == null or sequenceAfterDishTaskId != self.id "A step cannot follow itself"
+    constraint specifyLeadTimeNonnegative: (leadTimeMinDays == null or leadTimeMinDays >= 0) and (leadTimeMaxDays == null or leadTimeMaxDays >= 0) "This dish task's lead time can't be negative. Use zero or more days."
+    constraint specifySequenceNotSelf: sequenceAfterDishTaskId == null or sequenceAfterDishTaskId != self.id "This dish task can't follow itself. Pick a different dish task to come after, or leave that blank."
     mutate stage = stage != null ? stage : self.stage
     mutate resolution = resolution != null ? resolution : self.resolution
     mutate choiceOptions = choiceOptions != null ? choiceOptions : self.choiceOptions
@@ -739,7 +739,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   command retire(reason: string) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint retireReasonPresent: length(trim(reason)) > 0 "Dish task retirement reason is required"
+    constraint retireReasonPresent: length(trim(reason)) > 0 "This dish task needs a reason before you retire it. Write why you're taking it off."
     mutate retiredAt = now()
     mutate retirementReason = reason
     mutate status = "retired"
@@ -937,9 +937,9 @@ entity DishTaskMaterial mixin TenantScoped, SoftDeletable {
 
   constraint materialHasTarget: self.linkedAt == null or self.dishIngredientId != null or self.dishComponentId != null or self.dishContainerId != null "A task material must point at a requirement"
 
-  default policy dishTaskMaterialRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may read task materials"
-  default policy dishTaskMaterialWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may write task materials through commands"
-  default policy dishTaskMaterialExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may execute task material commands"
+  default policy dishTaskMaterialRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may see task materials"
+  default policy dishTaskMaterialWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may update task materials"
+  default policy dishTaskMaterialExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may change task materials"
 
   command link(
     dishTaskId: uuid,

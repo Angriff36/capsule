@@ -38,14 +38,11 @@ export class EventTabErrorBoundary extends Component<Props, State> {
           <p className="text-lg font-semibold text-ink">
             {this.props.tabLabel} could not load
           </p>
-          <p className="mt-1 text-base text-ink-2">{message}</p>
-          {needsConvexSync ? (
-            <p className="mt-2 text-sm text-ink-3">
-              This screen is newer than the server behind it. Run{" "}
-              <code className="font-mono">bun run dev:convex</code> locally (or
-              deploy the latest version), then reload this page.
-            </p>
-          ) : null}
+          <p className="mt-1 text-base text-ink-2">
+            {needsConvexSync
+              ? "This tab is newer than the live app behind it. Reload the page. If it still fails, ask the office to update Capsule."
+              : "Something on this tab failed. Try again. If it keeps failing, reload the page."}
+          </p>
           <button
             type="button"
             className="btn btn-ghost mt-3"

@@ -1,4 +1,5 @@
 import { formatCount, formatMoney, formatPercent } from "../../lib/format";
+import { InvoiceMoneyLedger } from "../../lib/invoiceMoneyLedger";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import type { ReportSubjectArea } from "./ReportCreateForm";
 import type {
@@ -426,18 +427,10 @@ function buildFinanceReport(
   const dateOf = (row: SourceRow) =>
     firstDate(row, "issuedAt", "dueDate", "createdAt", "_creationTime");
   const rows = filterRows(sourceRows, dateWindow, dateOf);
-  const invoiced = rows.reduce(
-    (total, row) => total + recognizedInvoiceTotal(row),
-    0,
-  );
-  const collected = rows.reduce(
-    (total, row) => total + collectedInvoiceTotal(row),
-    0,
-  );
-  const outstanding = rows.reduce(
-    (total, row) => total + collectibleInvoiceDue(row),
-    0,
-  );
+  const ledger = new InvoiceMoneyLedger();
+  const invoiced = ledger.sum(rows.map(recognizedInvoiceTotal));
+  const collected = ledger.sum(rows.map(collectedInvoiceTotal));
+  const outstanding = ledger.sum(rows.map(collectibleInvoiceDue));
   const overdue = rows.filter(isOverdue).length;
   return model({
     subject: "finance",

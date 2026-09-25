@@ -324,7 +324,7 @@ export function RoleScorecardsPage() {
               <p className="eyebrow">Scorecard ledger</p>
               <h2>Defined scorecards</h2>
             </div>
-            <span>{formatCountNoun(rows.length, "record")}</span>
+            <span>{formatCountNoun(rows.length, "scorecard")}</span>
           </div>
           {rows.length === 0 ? (
             <div className="document-empty">

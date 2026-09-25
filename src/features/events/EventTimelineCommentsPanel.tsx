@@ -75,7 +75,7 @@ export function EventTimelineCommentsPanel({ eventId }: Props) {
     <EventTabPanel
       eyebrow="Planning notes"
       title="Planning notes"
-      description="Day-level notes that stay with the plan. Live crew conversation happens in Team Chat; questions about a run-sheet block live on the Timeline tab."
+      description="Day-level notes that stay with the plan. Live crew conversation happens in Team Chat; questions about a timeline block live on the Timeline tab."
       testId="event-overview-comments"
       actions={
         <Link

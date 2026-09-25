@@ -139,6 +139,52 @@ describe("event menu cost rollup", () => {
     expect(rollup.mismatches[0]?.message).toMatch(/not converted/i);
   });
 
+  it("recorded pack mapping prices an otherwise incompatible recipe unit", () => {
+    const rollup = buildEventMenuCost({
+      eventId: "event-mapping",
+      expectedHeadcount: 98,
+      eventDishes: [
+        {
+          id: "event-dish-pollo",
+          eventId: "event-mapping",
+          dishId: "dish-pollo",
+          quantityServings: 98,
+        },
+      ],
+      dishIngredients: [
+        {
+          id: "line-tomato",
+          dishId: "dish-pollo",
+          ingredientId: "ing-tomato",
+          quantity: 1,
+          unit: "each",
+          addedAt: 1,
+        },
+      ],
+      ingredients: [
+        {
+          id: "ing-tomato",
+          name: "Heirloom Tomato",
+          unit: "kilogram",
+          costPerUnit: TEST_CATALOG_UNIT_COST,
+        },
+      ],
+      unitMappings: [
+        {
+          ingredientId: "ing-tomato",
+          kind: "pack",
+          unit: "each",
+          equalsQuantity: 1,
+          equalsUnit: "kilogram",
+        },
+      ],
+    });
+
+    expect(rollup.foodCost).toBeCloseTo(98 * TEST_CATALOG_UNIT_COST);
+    expect(rollup.mismatches).toEqual([]);
+    expect(rollup.pricedLineCount).toBe(1);
+  });
+
   it("converts compatible mass units instead of requiring an exact label match", () => {
     const rollup = buildEventMenuCost({
       eventId: "event-1",

@@ -22,16 +22,16 @@ function statusLabel(status: MenuProfitabilityStatus): string {
 
 function guidance(row: MenuProfitabilityRow): string {
   if (row.status === "low_margin") {
-    return "Reprice this dish or review its component ingredients.";
+    return "Reprice this dish or review its recipe ingredients.";
   }
   if (row.status === "missing_price" && !row.costComplete) {
-    return "Set a selling price and complete its component costing.";
+    return "Set a selling price and complete its recipe costing.";
   }
   if (row.status === "missing_price") {
     return "Set a selling price to unlock its margin rank.";
   }
   if (row.status === "incomplete_cost") {
-    return "Complete component pricing before trusting this margin.";
+    return "Complete recipe pricing before trusting this margin.";
   }
   return "Healthy against the current food-cost target.";
 }
@@ -87,7 +87,7 @@ export function MenuProfitabilityPanel({
           <p className="menu-profitability__eyebrow">Menu economics</p>
           <h2 id="menu-profitability-heading">Margin board</h2>
           <p>
-            Live component cost against each dish's menu price, ranked by gross
+            Live recipe cost against each dish's menu price, ranked by gross
             margin.
           </p>
         </div>
@@ -140,7 +140,7 @@ export function MenuProfitabilityPanel({
             <div>
               <dt>Not ranked</dt>
               <dd>{analysis.unrankedDishCount}</dd>
-              <small>missing price or component cost</small>
+              <small>missing price or recipe cost</small>
             </div>
           </dl>
 
@@ -148,7 +148,7 @@ export function MenuProfitabilityPanel({
             <span>Rank</span>
             <span>Dish</span>
             <span>Sell</span>
-            <span>Component cost</span>
+            <span>Recipe cost</span>
             <span>Gross margin</span>
           </div>
 
@@ -169,7 +169,7 @@ export function MenuProfitabilityPanel({
                     <Link to={dishPath(row.dishId)}>{row.dishName}</Link>
                     <span>
                       {row.course || "Unassigned course"} · {row.componentCount}{" "}
-                      {row.componentCount === 1 ? "component" : "components"}
+                      {row.componentCount === 1 ? "recipe" : "recipes"}
                     </span>
                   </div>
                   <div className="menu-profitability__metric is-cost">
@@ -181,7 +181,7 @@ export function MenuProfitabilityPanel({
                     </strong>
                   </div>
                   <div className="menu-profitability__metric">
-                    <span>Component cost</span>
+                    <span>Recipe cost</span>
                     <strong>
                       {row.costComplete
                         ? formatMoneyExact(row.componentCost)
@@ -207,7 +207,7 @@ export function MenuProfitabilityPanel({
                   <div className="menu-profitability__guidance">
                     <p>{guidance(row)}</p>
                     <div>
-                      <Link to={dishPath(row.dishId)}>Review components</Link>
+                      <Link to={dishPath(row.dishId)}>Review recipes</Link>
                       <button
                         type="button"
                         onClick={() => beginReprice(row)}

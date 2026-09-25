@@ -1,6 +1,5 @@
 import {
   calculateComponentCost,
-  convertComponentQuantity,
   type ComponentCostIngredientInput,
 } from "../kitchen/ComponentCostCalculator";
 import {
@@ -9,6 +8,9 @@ import {
   type IngredientPriceObservationInput,
 } from "../kitchen/IngredientPriceHistory";
 import type { UnitOfMeasure } from "../kitchen/import/UnitOfMeasureMapper";
+import { CommercialMoney } from "../../lib/commercialMoney";
+import type { RecordedUnitMapping } from "../../lib/quantityMoney";
+import { EventMenuLinePricer } from "./eventMenuLinePricer";
 
 type SoftDelete = { deletedAt?: unknown };
 
@@ -146,6 +148,8 @@ export type BuildEventMenuCostInput = {
   componentIngredients?: readonly EventMenuCostComponentIngredient[];
   ingredients: readonly EventMenuCostIngredient[];
   priceObservations?: readonly IngredientPriceObservationInput[];
+  /** Recorded pack / density mappings, scoped per ingredient. */
+  unitMappings?: readonly RecordedUnitMapping[];
 };
 
 function isActive(row: SoftDelete) {
@@ -166,35 +170,6 @@ function servingsFor(
 
 function asUnit(value: string): UnitOfMeasure {
   return value as UnitOfMeasure;
-}
-
-function priceDirectLine(
-  line: EventMenuCostDishIngredient,
-  ingredient: ComponentCostIngredientInput,
-): {
-  extendedCost: number;
-  status: "priced" | "missing_price" | "incompatible_unit";
-} {
-  const costPerUnit = Number(ingredient.costPerUnit);
-  if (!Number.isFinite(costPerUnit) || costPerUnit <= 0) {
-    return { extendedCost: 0, status: "missing_price" };
-  }
-  const quantity = Number(line.quantity);
-  const wasteFactor = line.wasteFactor != null ? Number(line.wasteFactor) : 1;
-  if (!Number.isFinite(quantity) || quantity <= 0) {
-    return { extendedCost: 0, status: "missing_price" };
-  }
-  const converted = convertComponentQuantity(
-    quantity,
-    asUnit(String(line.unit)),
-    asUnit(ingredient.unit),
-  );
-  if (converted == null) {
-    return { extendedCost: 0, status: "incompatible_unit" };
-  }
-  const waste =
-    Number.isFinite(wasteFactor) && wasteFactor > 0 ? wasteFactor : 1;
-  return { extendedCost: converted * waste * costPerUnit, status: "priced" };
 }
 
 function mismatchMessage(
@@ -232,6 +207,7 @@ export function buildEventMenuCost(
   const ingredientsById = new Map(
     costingIngredients.map((ingredient) => [ingredient.id, ingredient]),
   );
+  const linePricer = new EventMenuLinePricer(input.unitMappings);
   const linesByDish = new Map<string, EventMenuCostDishIngredient[]>();
   for (const line of input.dishIngredients.filter(isActive)) {
     if (line.addedAt == null) continue;
@@ -275,7 +251,7 @@ export function buildEventMenuCost(
           incompleteLineCount += 1;
           continue;
         }
-        const priced = priceDirectLine(line, ingredient);
+        const priced = linePricer.price(line, ingredient);
         if (priced.status === "priced") {
           pricedLineCount += 1;
           perServing += priced.extendedCost;
@@ -312,6 +288,7 @@ export function buildEventMenuCost(
             unit: asUnit(String(line.unit)),
           })),
           ingredients: costingIngredients,
+          mappings: input.unitMappings,
           batchMultiplier:
             Number.isFinite(batchMultiplier) && batchMultiplier > 0
               ? batchMultiplier
@@ -356,7 +333,9 @@ export function buildEventMenuCost(
       };
     });
 
-  const foodCost = dishes.reduce((sum, dish) => sum + dish.foodCost, 0);
+  const foodCost = new CommercialMoney().sum(
+    dishes.map((dish) => dish.foodCost),
+  );
   const servings = eventMenuHeaderServings(
     input.expectedHeadcount,
     dishes.map((dish) => dish.servings),

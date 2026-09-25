@@ -131,7 +131,7 @@ it("shows each disposition count and warns about unaccounted workbooks without c
     ["Normalized", 11],
     ["Linked reference", 12],
     ["Duplicate view", 13],
-    ["Needs mapping", 14],
+    ["Needs a match", 14],
     ["Unsupported", 15],
     ["Invalid", 16],
   ]) {

@@ -9,10 +9,10 @@ const sections = [
   { label: "API keys", path: "/admin/api-keys" },
   { label: "Data exports", path: "/admin/data-export" },
   { label: "Integrations", path: "/admin/integrations" },
-  { label: "Import runs", path: "/admin/imports" },
-  { label: "Parallel run", path: "/admin/parallel-run" },
-  { label: "Reconcile records", path: "/admin/reconcile" },
-  { label: "Cutover", path: "/admin/cutover" },
+  { label: "Imports", path: "/admin/imports" },
+  { label: "Compare with TPP", path: "/admin/parallel-run" },
+  { label: "Match leftover items", path: "/admin/reconcile" },
+  { label: "Switch from TPP", path: "/admin/cutover" },
 ] as const;
 
 export function AdminWorkspaceNav() {

@@ -25,7 +25,7 @@ export class CapsuleMcpToolRegistrar {
       "List Capsule governed kitchen/ops commands. Each entry has uiImplemented; gaps mean backend-only (no Capsule screen yet).",
       {},
       async () => {
-        const commands = this.catalog.list();
+        const commands = this.catalog.offeredToPeople();
         const uiGaps = this.catalog.uiGaps();
         return this.text.format(
           {

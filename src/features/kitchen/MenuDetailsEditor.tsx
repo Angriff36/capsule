@@ -106,7 +106,7 @@ export function MenuDetailsEditor({
     <section className="culinary-section" aria-labelledby="menu-edit-heading">
       <div className="culinary-section-heading">
         <div>
-          <p className="eyebrow">Menu record</p>
+          <p className="eyebrow">This menu</p>
           <h2 id="menu-edit-heading">Edit menu</h2>
         </div>
         {canEditDetails ? null : <span>Details edit in draft only</span>}

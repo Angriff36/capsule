@@ -1,3 +1,5 @@
+import { CommercialMoney } from "../../lib/commercialMoney";
+
 export type FoodCostGranularity = "week" | "month" | "quarter";
 
 type DateValue = Date | number | string | null | undefined;
@@ -77,7 +79,7 @@ function amount(value: number | null | undefined): number {
 }
 
 function ratio(foodCost: number, revenue: number): number | null {
-  return revenue <= 0 ? null : (foodCost / revenue) * 100;
+  return new CommercialMoney().foodCostPercent(foodCost, revenue);
 }
 
 /**
@@ -213,8 +215,8 @@ export function buildFoodCostReport({
       (candidate) => date >= candidate.start && date < candidate.end,
     );
     if (period) {
-      period.revenue += revenue;
-      period.foodCost += foodCost;
+      period.revenue = new CommercialMoney().sum([period.revenue, revenue]);
+      period.foodCost = new CommercialMoney().sum([period.foodCost, foodCost]);
       period.eventCount += 1;
     }
   }
@@ -227,10 +229,11 @@ export function buildFoodCostReport({
   }
 
   eventRows.sort((a, b) => b.date.getTime() - a.date.getTime());
-  const totalRevenue = eventRows.reduce((sum, event) => sum + event.revenue, 0);
-  const totalFoodCost = eventRows.reduce(
-    (sum, event) => sum + event.foodCost,
-    0,
+  const totalRevenue = new CommercialMoney().sum(
+    eventRows.map((event) => event.revenue),
+  );
+  const totalFoodCost = new CommercialMoney().sum(
+    eventRows.map((event) => event.foodCost),
   );
   const totalPercentage = ratio(totalFoodCost, totalRevenue);
   const totalVariance =

@@ -159,8 +159,8 @@ export function PayrollPrepareForm({
           {clocked ? (
             <span className="text-xs text-ink-3">
               {clocked.recordCount === 0
-                ? "No closed time records in this period — enter minutes manually."
-                : `${clocked.recordCount} closed time record${clocked.recordCount === 1 ? "" : "s"} · ${(clockedTotal / 60).toFixed(1)} h clocked total`}
+                ? "No closed time entries in this period — enter minutes manually."
+                : `${clocked.recordCount} closed time ${clocked.recordCount === 1 ? "entry" : "entries"} · ${(clockedTotal / 60).toFixed(1)} h clocked total`}
             </span>
           ) : (
             <span className="text-xs text-ink-3">

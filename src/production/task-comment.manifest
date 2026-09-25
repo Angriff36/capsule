@@ -43,9 +43,9 @@ entity PrepTaskComment mixin TenantScoped, SoftDeletable {
   constraint prepTaskCommentBodyPresent: length(trim(self.body)) > 0 "Comment text is required"
   constraint prepTaskCommentOwnerImmutable: self.postedAt == null or self.taskOwnerAssignedToId == null or self.authorPersonId != self.taskOwnerAssignedToId or self.taskOwnerAuthSubjectId == null or self.taskOwnerAuthSubjectId != self.authorAuthSubjectId "Task owners cannot post comments that notify themselves"
 
-  default policy prepTaskCommentRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and event managers may read prep task comments"
-  default policy prepTaskCommentWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and event managers may post prep task comments through commands"
-  default policy prepTaskCommentExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and event managers may execute prep task comment commands"
+  default policy prepTaskCommentRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and event managers may see prep task comments"
+  default policy prepTaskCommentWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and event managers may update prep task comments"
+  default policy prepTaskCommentExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and event managers may change prep task comments"
 
   command post(
     prepTaskId: uuid,

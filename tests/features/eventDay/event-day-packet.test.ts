@@ -47,37 +47,45 @@ function completeInput(): EventDayInputs {
     },
   } as unknown as EventDayInputs;
 }
-describe("Event Day packet readiness", () => {
-  it("does not show ready for an otherwise complete event with packet issues", () => {
+describe("Event Day and the workbook checklist", () => {
+  it("shows ready from real records even while workbook checks are unanswered", () => {
     const input: any = completeInput();
     input.packetReadiness.ready = false;
-    input.packetReadiness.requiredOpenIssueCount = 2;
+    input.packetReadiness.finalSignoffsComplete = false;
+    input.packetReadiness.requiredOpenIssueCount = 46;
     input.packetReadiness.sections[4] = {
       section: "vehicles",
       status: "blocked",
       openIssueCount: 2,
-      urgentAction: "Confirm vehicle assignment with the manager.",
+      openIssues: [
+        { label: "Verify vehicle assignment", owner: "Ops", count: 2 },
+      ],
+      urgentAction: "Operations review or required verification is pending",
     };
     const summary = deriveEventDay(input);
-    expect(summary.ringLabel).not.toBe("Show ready");
-    expect(summary.readinessPct).toBeLessThan(100);
+    expect(summary.ringLabel).toBe("Show ready");
+    expect(summary.readinessPct).toBe(100);
+    expect(summary.blockers).toEqual([]);
     expect(summary.sections).toHaveLength(9);
+    // The unanswered checks still ride along for the manager's jump link.
     expect(summary.sections.find((s) => s.key === "vehicles")).toMatchObject({
-      status: "blocked",
+      status: "dormant",
+      caption: "No deliveries",
       openIssueCount: 2,
-      urgentAction: "Confirm vehicle assignment with the manager.",
+      urgentAction: null,
     });
+    expect(
+      summary.sections.find((s) => s.key === "vehicles")?.openIssues,
+    ).toHaveLength(1);
   });
-  it("keeps final signoffs and unavailable packet state from showing ready", () => {
+  it("works the same with no workbook at all", () => {
     const input: any = completeInput();
-    input.packetReadiness.finalSignoffsComplete = false;
-    input.packetReadiness.ready = false;
-    expect(deriveEventDay(input).ringLabel).not.toBe("Show ready");
     delete input.packetReadiness;
-    expect(deriveEventDay(input).ringLabel).not.toBe("Show ready");
+    const summary = deriveEventDay(input);
+    expect(summary.ringLabel).toBe("Show ready");
+    expect(summary.sections.every((s) => s.openIssueCount === 0)).toBe(true);
   });
-  it("shows ready only when native completeness and packet readiness both agree", () => {
-    expect(deriveEventDay(completeInput()).ringLabel).toBe("Show ready");
+  it("still needs review when a real record is open", () => {
     const input = completeInput();
     input.staffNeeds = [
       {

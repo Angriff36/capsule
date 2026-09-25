@@ -1,4 +1,5 @@
 import { formatDate, formatMoney } from "../../lib/format";
+import { InvoiceMoneyLedger } from "../../lib/invoiceMoneyLedger";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   catalogUnitForStockLine,
@@ -249,17 +250,14 @@ export class DashboardWidgetPolicy {
         invoice.status === "overdue" ||
         (invoice.dueDate != null && invoice.dueDate < now),
     );
-    const agingBuckets = [0, 0, 0, 0];
-    for (const invoice of openInvoices) {
-      if (invoice.dueDate == null || invoice.dueDate >= now) {
-        agingBuckets[0] += number(invoice.amountDue);
-        continue;
-      }
-      const age = Math.floor((now - invoice.dueDate) / DAY_MS);
-      if (age <= 30) agingBuckets[1] += number(invoice.amountDue);
-      else if (age <= 60) agingBuckets[2] += number(invoice.amountDue);
-      else agingBuckets[3] += number(invoice.amountDue);
-    }
+    const ledger = new InvoiceMoneyLedger();
+    const aging = ledger.ageOpenBalances(
+      openInvoices.map((invoice) => ({
+        amountDue: number(invoice.amountDue),
+        dueDate: invoice.dueDate ?? null,
+      })),
+      now,
+    );
 
     const lowStock = inventory
       .filter((item) =>
@@ -332,12 +330,14 @@ export class DashboardWidgetPolicy {
       .sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, 5);
 
-    const receivables30 = openInvoices
-      .filter(
-        (invoice) =>
-          invoice.dueDate == null || invoice.dueDate <= now + 30 * DAY_MS,
-      )
-      .reduce((sum, invoice) => sum + number(invoice.amountDue), 0);
+    const receivables30 = ledger.sum(
+      openInvoices
+        .filter(
+          (invoice) =>
+            invoice.dueDate == null || invoice.dueDate <= now + 30 * DAY_MS,
+        )
+        .map((invoice) => number(invoice.amountDue)),
+    );
     const committedOrders = vendorOrders
       .filter((order) => COMMITTED_ORDER_STATUSES.has(String(order.status)))
       .reduce(
@@ -365,17 +365,16 @@ export class DashboardWidgetPolicy {
       invoice_aging: {
         ...get("invoice_aging"),
         metric: formatMoney(
-          overdueInvoices.reduce(
-            (sum, invoice) => sum + number(invoice.amountDue),
-            0,
+          ledger.sum(
+            overdueInvoices.map((invoice) => number(invoice.amountDue)),
           ),
         ),
         metricLabel: `${overdueInvoices.length} overdue ${overdueInvoices.length === 1 ? "invoice" : "invoices"}`,
         rows: [
-          { label: "Current", value: formatMoney(agingBuckets[0]) },
-          { label: "1–30 days", value: formatMoney(agingBuckets[1]) },
-          { label: "31–60 days", value: formatMoney(agingBuckets[2]) },
-          { label: "61+ days", value: formatMoney(agingBuckets[3]) },
+          { label: "Current", value: formatMoney(aging.current) },
+          { label: "1–30 days", value: formatMoney(aging.days1to30) },
+          { label: "31–60 days", value: formatMoney(aging.days31to60) },
+          { label: "61+ days", value: formatMoney(aging.days61plus) },
         ],
       },
       low_stock_alerts: {
@@ -435,9 +434,7 @@ export class DashboardWidgetPolicy {
           },
           {
             label: "Overdue receivables",
-            value: formatMoney(
-              agingBuckets[1] + agingBuckets[2] + agingBuckets[3],
-            ),
+            value: formatMoney(aging.overdue),
           },
         ],
       },

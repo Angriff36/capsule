@@ -65,9 +65,9 @@ entity Equipment mixin TenantScoped, SoftDeletable {
   transition status from "retired" to ["active"]
 
   // Logistics staff read/execute too: pack-out and event checkout consume this catalog.
-  default policy equipmentRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may read equipment"
-  default policy equipmentWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may write equipment through commands"
-  default policy equipmentExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may execute equipment commands"
+  default policy equipmentRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may see equipment"
+  default policy equipmentWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may update equipment"
+  default policy equipmentExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may change equipment"
 
   command register(
     name: string,
@@ -263,14 +263,15 @@ entity EquipmentReservation mixin TenantScoped, SoftDeletable {
   belongsTo equipment: Equipment fields [tenantId, equipmentId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
-  constraint equipmentReservationComplete: self.reservedAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.quantity > 0) "Equipment reservations require a valid date range and positive quantity"
+  constraint equipmentReservationComplete: self.reservedAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.quantity > 0) "Equipment handoffs require a valid date range and positive quantity"
 
   transition status from "reserved" to ["checked_out", "cancelled"]
   transition status from "checked_out" to ["returned"]
 
-  default policy equipmentReservationRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may read equipment reservations"
-  default policy equipmentReservationWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may update equipment handoffs"
-  default policy equipmentReservationExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may execute equipment handoff commands"
+  // Event managers need execute so EventCancelled can stand down reserved rows.
+  default policy equipmentReservationRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventManageAccess") "Inventory or logistics staff may see equipment handoffs, or event managers stand down a cancelled event"
+  default policy equipmentReservationWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventManageAccess") "Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event"
+  default policy equipmentReservationExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventManageAccess") "Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event"
 
   command checkOut(condition: EquipmentCondition, optional note: string) {
     guard self.status == "reserved"
@@ -382,9 +383,9 @@ entity EquipmentMaintenanceTask mixin TenantScoped, SoftDeletable {
 
   constraint maintenanceTaskComplete: self.scheduledAt == null or (length(trim(self.taskName)) > 0 and self.intervalDays > 0 and self.nextDueAt != null) "Scheduled maintenance requires a task, recurrence interval, and due date"
 
-  default policy maintenanceTaskRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may read equipment maintenance"
+  default policy maintenanceTaskRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may see equipment maintenance"
   default policy maintenanceTaskWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may update equipment maintenance"
-  default policy maintenanceTaskExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may execute equipment maintenance commands"
+  default policy maintenanceTaskExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may change equipment maintenance"
 
   command schedule(
     equipmentId: uuid,
@@ -471,9 +472,9 @@ entity EquipmentServiceEntry mixin TenantScoped, SoftDeletable {
 
   constraint equipmentServiceComplete: self.loggedAt == null or (length(trim(self.technician)) > 0 and self.cost >= 0 and self.completedAt != null and self.nextDueAt != null) "Completed service requires a technician, nonnegative cost, completion time, and next due date"
 
-  default policy equipmentServiceRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may read equipment service history"
-  default policy equipmentServiceWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may record equipment service"
-  default policy equipmentServiceExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may execute equipment service commands"
+  default policy equipmentServiceRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may see equipment service history"
+  default policy equipmentServiceWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may add equipment service"
+  default policy equipmentServiceExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may change equipment service"
 
   command record(
     maintenanceTaskId: uuid,

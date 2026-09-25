@@ -173,7 +173,7 @@ export function MobileStaffCard({
       seeAllTo={eventDetailPath(eventId, "staffing")}
     >
       {rows.length === 0 ? (
-        <MobileEmpty>No staff coverage recorded.</MobileEmpty>
+        <MobileEmpty>No staff coverage on file.</MobileEmpty>
       ) : (
         shown.map((row) => {
           const windows = (

@@ -58,8 +58,8 @@ export function ProposalAcceptancePage({
               Proposal Accepted
             </h1>
             <p className="text-ink-2">
-              Thank you! Your acceptance has been recorded. We'll be in touch
-              shortly to confirm the next steps.
+              Thank you! Your acceptance is saved. We'll be in touch shortly to
+              confirm the next steps.
             </p>
           </div>
         </div>
@@ -210,7 +210,7 @@ export function ProposalAcceptancePage({
             {error ? (
               <div className="mb-6">
                 <ErrorState
-                  title="Unable to record acceptance"
+                  title="Couldn't save your acceptance"
                   detail={publicErrorMessage(
                     error,
                     "Please contact us if this problem persists",
@@ -235,7 +235,7 @@ export function ProposalAcceptancePage({
                 disabled={busy}
                 className="btn btn-primary flex-1 justify-center"
               >
-                {busy ? "Recording…" : "Accept Proposal"}
+                {busy ? "Saving…" : "Accept Proposal"}
               </button>
               <a href="mailto:" className="btn btn-ghost flex-1 justify-center">
                 Contact Us
@@ -245,7 +245,7 @@ export function ProposalAcceptancePage({
             {/* Footer Info */}
             <div className="mt-8 pt-6 border-t border-line text-center">
               <p className="text-2xs text-ink-3">
-                This acceptance is being recorded for {pending.recipientName} (
+                This acceptance is for {pending.recipientName} (
                 {pending.recipientEmail})
               </p>
               <p className="text-2xs text-ink-3 mt-1">

@@ -47,9 +47,9 @@ entity CreditMemo mixin TenantScoped, SoftDeletable {
   transition status from "available" to ["applied"]
   transition status from "applied" to []
 
-  default policy creditMemoRead read: roleAllows(user.role, "financeAccess") "Finance staff may read credit memos"
-  default policy creditMemoWrite write: roleAllows(user.role, "financeAccess") "Finance staff may write credit memos through commands"
-  default policy creditMemoExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute credit memo commands"
+  default policy creditMemoRead read: roleAllows(user.role, "financeAccess") "Finance staff may see credit memos"
+  default policy creditMemoWrite write: roleAllows(user.role, "financeAccess") "Finance staff may update credit memos"
+  default policy creditMemoExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may change credit memos"
 
   command issue(
     sourceInvoiceId: uuid,

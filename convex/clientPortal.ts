@@ -2,10 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { api } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import { action, query } from "./_generated/server";
-import {
-  createClientPortalToken,
-  verifyClientPortalToken,
-} from "./lib/clientPortalToken";
+import { resolveClientPortalAccess } from "./lib/clientPortalLinks";
 
 const CLIENT_VISIBLE_INVOICE_STATUSES = new Set([
   "sent",
@@ -16,8 +13,9 @@ const CLIENT_VISIBLE_INVOICE_STATUSES = new Set([
 ]);
 
 /**
- * Creates a bearer link only after the generated Event query authorizes the
- * current operator through Manifest's eventRead capability policy.
+ * Copies a client link for an event the operator can already open.
+ * The saved link id is the public address. Copying again turns the
+ * previous link off. The link stops working after 90 days.
  */
 export const createShareToken = action({
   args: { eventId: v.id("events") },
@@ -31,9 +29,29 @@ export const createShareToken = action({
         "Event unavailable. Check your workspace access and try again.",
       );
     }
-    return createClientPortalToken({
-      eventId: String(event._id),
-      tenantId: event.tenantId,
+    const linkId = await ctx.runMutation(
+      api.lib.clientPortalLinks.issueClientPortalLink,
+      { eventId },
+    );
+    return String(linkId);
+  },
+});
+
+/** Turns off every open client link for an event the operator can open. */
+export const turnOffShare = action({
+  args: { eventId: v.id("events") },
+  handler: async (ctx, { eventId }): Promise<void> => {
+    const event: Doc<"events"> | null = await ctx.runQuery(
+      api.queries.getEvent,
+      { id: eventId },
+    );
+    if (!event) {
+      throw new ConvexError(
+        "Event unavailable. Check your workspace access and try again.",
+      );
+    }
+    await ctx.runMutation(api.lib.clientPortalLinks.turnOffClientPortalLinks, {
+      eventId,
     });
   },
 });
@@ -42,7 +60,7 @@ export const createShareToken = action({
 export const getEvent = query({
   args: { token: v.string() },
   handler: async (ctx, { token }) => {
-    const access = await verifyClientPortalToken(token);
+    const access = await resolveClientPortalAccess(ctx, token);
     if (!access) return null;
 
     const eventId = ctx.db.normalizeId("events", access.eventId);
@@ -159,7 +177,6 @@ export const getEvent = query({
       postalCode: clientRecord?.postalCode ?? null,
       countryCode: clientRecord?.countryCode ?? null,
       email: clientRecord?.email ?? null,
-      taxId: clientRecord?.taxId ?? null,
       paymentTermsDays: clientRecord?.paymentTermsDays ?? 30,
       taxExempt: clientRecord?.taxExempt ?? false,
     };
@@ -320,7 +337,7 @@ export const getEvent = query({
               role: assignment.role,
               startsAt: assignment.startsAt ?? null,
               endsAt: assignment.endsAt ?? null,
-              notes: assignment.notes ?? null,
+              // Crew notes stay on the staff schedule. They are not for the client.
               status: assignment.status,
             },
             person:

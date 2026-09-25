@@ -5,7 +5,7 @@
 // verifier, backend scope), `ssh` and `codex` are stubs that log their command
 // line. Nothing here contacts Vercel, the production box, or a reviewer.
 import { describe, expect, it } from "vitest";
-import { spawnSync } from "node:child_process";
+import { YieldingCommand } from "./yielding-command";
 import {
   chmodSync,
   copyFileSync,
@@ -56,15 +56,15 @@ printf '%b\\n' "\${STUB_REVIEW:-No blocking findings.\\nVERDICT: APPROVE}"
 `,
 };
 
-function git(cwd: string, ...args: string[]): string {
-  const result = spawnSync("git", args, { cwd, encoding: "utf8" });
+async function git(cwd: string, ...args: string[]): Promise<string> {
+  const result = await YieldingCommand.run("git", args, { cwd });
   if (result.status !== 0)
     throw new Error(`git ${args.join(" ")}: ${result.stderr}`);
   return result.stdout.trim();
 }
 
 /** A checkout on BRANCH (one commit ahead of main), pushed to a local bare origin. */
-function makeCheckout() {
+async function makeCheckout() {
   const root = mkdtempSync(join(tmpdir(), "capsule-deploy-production-"));
   const origin = join(root, "origin.git");
   const work = join(root, "work");
@@ -78,39 +78,42 @@ function makeCheckout() {
     chmodSync(join(bin, name), 0o755);
   }
 
-  git(origin, "init", "--bare", "-b", "main");
-  git(work, "init", "-b", "main");
-  git(work, "config", "user.email", "test@example.invalid");
-  git(work, "config", "user.name", "Deploy Production Test");
-  git(work, "config", "core.autocrlf", "false");
-  git(work, "config", "core.hooksPath", join(root, "no-hooks"));
+  await git(origin, "init", "--bare", "-b", "main");
+  await git(work, "init", "-b", "main");
+  await git(work, "config", "user.email", "test@example.invalid");
+  await git(work, "config", "user.name", "Deploy Production Test");
+  await git(work, "config", "core.autocrlf", "false");
+  await git(work, "config", "core.hooksPath", join(root, "no-hooks"));
   writeFileSync(join(work, ".gitignore"), ".artifacts/\n");
   for (const name of ["release.sh", "deploy-production.sh"])
     copyFileSync(join(SCRIPTS, name), join(work, "scripts", name));
-  git(work, "add", "-A");
-  git(work, "commit", "-m", "base");
-  git(work, "remote", "add", "origin", origin.replace(/\\/g, "/"));
-  git(work, "push", "-q", "origin", "main");
-  git(work, "checkout", "-q", "-b", BRANCH);
+  await git(work, "add", "-A");
+  await git(work, "commit", "-m", "base");
+  await git(work, "remote", "add", "origin", origin.replace(/\\/g, "/"));
+  await git(work, "push", "-q", "origin", "main");
+  await git(work, "checkout", "-q", "-b", BRANCH);
   writeFileSync(join(work, "feature.txt"), "x\n");
-  git(work, "add", "-A");
-  git(work, "commit", "-m", "feature");
-  git(work, "push", "-q", "origin", BRANCH);
+  await git(work, "add", "-A");
+  await git(work, "commit", "-m", "feature");
+  await git(work, "push", "-q", "origin", BRANCH);
 
-  const run = (args: string[], env: Record<string, string> = {}) => {
+  const run = async (args: string[], env: Record<string, string> = {}) => {
     const launch =
       'export PATH="$(cygpath -u "$STUB_BIN" 2>/dev/null || echo "$STUB_BIN"):$PATH"; exec bash scripts/deploy-production.sh "$@"';
-    const result = spawnSync(BASH, ["-c", launch, "bash", ...args], {
-      cwd: work,
-      encoding: "utf8",
-      env: {
-        ...process.env,
-        STUB_BIN: bin,
-        STUB_LOG: log.replace(/\\/g, "/"),
-        CAPSULE_RELEASE_WAIT: "0",
-        ...env,
+    const result = await YieldingCommand.run(
+      BASH,
+      ["-c", launch, "bash", ...args],
+      {
+        cwd: work,
+        env: {
+          ...process.env,
+          STUB_BIN: bin,
+          STUB_LOG: log.replace(/\\/g, "/"),
+          CAPSULE_RELEASE_WAIT: "0",
+          ...env,
+        },
       },
-    });
+    );
     return {
       status: result.status,
       output: `${result.stdout}\n${result.stderr}`,
@@ -134,15 +137,15 @@ const BACKEND =
 describe("scripts/deploy-production.sh", () => {
   it(
     "frontend-only release: releases, verifies Vercel, never opens SSH",
-    () => {
-      const checkout = makeCheckout();
-      const result = checkout.run(["--reviewer", "test-model"]);
-      const sha = checkout.mainSha();
+    async () => {
+      const checkout = await makeCheckout();
+      const result = await checkout.run(["--reviewer", "test-model"]);
+      const sha = await checkout.mainSha();
       expect(result.lastLine).toBe(
         `RESULT: PASS - frontend deployed at ${sha}; backend unchanged`,
       );
       expect(result.status).toBe(0);
-      expect(git(checkout.work, "log", "-1", "--format=%s", sha)).toBe(
+      expect(await git(checkout.work, "log", "-1", "--format=%s", sha)).toBe(
         `[release] ${BRANCH} (reviewed by test-model)`,
       );
       expect(checkout.calls()).toEqual([
@@ -155,12 +158,12 @@ describe("scripts/deploy-production.sh", () => {
 
   it(
     "backend release: runs the canonical backend deploy on the box with the release sha and the new queries",
-    () => {
-      const checkout = makeCheckout();
-      const result = checkout.run(["--reviewer", "test-model"], {
+    async () => {
+      const checkout = await makeCheckout();
+      const result = await checkout.run(["--reviewer", "test-model"], {
         STUB_SCOPE: BACKEND,
       });
-      const sha = checkout.mainSha();
+      const sha = await checkout.mainSha();
       expect(result.lastLine).toBe(
         `RESULT: PASS - frontend and backend deployed at ${sha}`,
       );
@@ -184,9 +187,9 @@ describe("scripts/deploy-production.sh", () => {
 
   it(
     "stops at the first failure: Vercel, SSH, a missing PASS line, a failed release",
-    () => {
-      const vercel = makeCheckout();
-      const vercelRun = vercel.run(["--reviewer", "test-model"], {
+    async () => {
+      const vercel = await makeCheckout();
+      const vercelRun = await vercel.run(["--reviewer", "test-model"], {
         STUB_VERCEL_EXIT: "1",
         STUB_SCOPE: BACKEND,
       });
@@ -195,8 +198,8 @@ describe("scripts/deploy-production.sh", () => {
       expect(vercel.calls()).toHaveLength(1);
 
       for (const mode of ["fail", "silent"]) {
-        const checkout = makeCheckout();
-        const result = checkout.run(["--reviewer", "test-model"], {
+        const checkout = await makeCheckout();
+        const result = await checkout.run(["--reviewer", "test-model"], {
           STUB_SCOPE: BACKEND,
           STUB_SSH: mode,
         });
@@ -206,14 +209,14 @@ describe("scripts/deploy-production.sh", () => {
       }
 
       // release.sh refuses a dirty tree: nothing after it runs.
-      const dirty = makeCheckout();
-      const before = dirty.mainSha();
+      const dirty = await makeCheckout();
+      const before = await dirty.mainSha();
       writeFileSync(join(dirty.work, "feature.txt"), "changed\n");
-      const dirtyRun = dirty.run(["--reviewer", "test-model"]);
+      const dirtyRun = await dirty.run(["--reviewer", "test-model"]);
       expect(dirtyRun.lastLine).toContain(
         "RESULT: FAIL - scripts/release.sh failed",
       );
-      expect(dirty.mainSha()).toBe(before);
+      expect(await dirty.mainSha()).toBe(before);
       expect(dirty.calls()).toEqual([]);
     },
     TIMEOUT,
@@ -221,26 +224,26 @@ describe("scripts/deploy-production.sh", () => {
 
   it(
     "with no --reviewer it runs the review and releases only on VERDICT: APPROVE",
-    () => {
-      const rejected = makeCheckout();
-      const before = rejected.mainSha();
-      const rejectedRun = rejected.run([], {
+    async () => {
+      const rejected = await makeCheckout();
+      const before = await rejected.mainSha();
+      const rejectedRun = await rejected.run([], {
         STUB_REVIEW: "[P1] Something breaks.\\nVERDICT: REJECT",
       });
       expect(rejectedRun.lastLine).toContain("the review REJECTED");
-      expect(rejected.mainSha()).toBe(before);
+      expect(await rejected.mainSha()).toBe(before);
 
-      const silent = makeCheckout();
-      const silentBefore = silent.mainSha();
-      const silentRun = silent.run([], { STUB_REVIEW: "Looks fine." });
+      const silent = await makeCheckout();
+      const silentBefore = await silent.mainSha();
+      const silentRun = await silent.run([], { STUB_REVIEW: "Looks fine." });
       expect(silentRun.lastLine).toContain("the review gave no verdict");
-      expect(silent.mainSha()).toBe(silentBefore);
+      expect(await silent.mainSha()).toBe(silentBefore);
 
       // A branch that already landed on main (a GitHub-side merge) has no diff
       // to review: no automatic approval, the reviewer must be named.
-      const landed = makeCheckout();
-      git(landed.work, "checkout", "-q", "main");
-      git(
+      const landed = await makeCheckout();
+      await git(landed.work, "checkout", "-q", "main");
+      await git(
         landed.work,
         "merge",
         "--no-ff",
@@ -248,16 +251,16 @@ describe("scripts/deploy-production.sh", () => {
         "-m",
         "Merge pull request #1",
       );
-      git(landed.work, "push", "-q", "origin", "main");
-      git(landed.work, "checkout", "-q", BRANCH);
-      const landedBefore = landed.mainSha();
-      const landedRun = landed.run([]);
+      await git(landed.work, "push", "-q", "origin", "main");
+      await git(landed.work, "checkout", "-q", BRANCH);
+      const landedBefore = await landed.mainSha();
+      const landedRun = await landed.run([]);
       expect(landedRun.lastLine).toContain("is already on origin/main");
-      expect(landed.mainSha()).toBe(landedBefore);
+      expect(await landed.mainSha()).toBe(landedBefore);
       expect(landed.calls()).toEqual([]);
 
-      const approved = makeCheckout();
-      const approvedRun = approved.run([]);
+      const approved = await makeCheckout();
+      const approvedRun = await approved.run([]);
       expect(approvedRun.lastLine).toContain(
         "RESULT: PASS - frontend deployed",
       );
@@ -268,7 +271,13 @@ describe("scripts/deploy-production.sh", () => {
         ),
       );
       expect(
-        git(approved.work, "log", "-1", "--format=%s", approved.mainSha()),
+        await git(
+          approved.work,
+          "log",
+          "-1",
+          "--format=%s",
+          await approved.mainSha(),
+        ),
       ).toBe(`[release] ${BRANCH} (reviewed by gpt-5.6-sol)`);
     },
     TIMEOUT,
@@ -276,24 +285,24 @@ describe("scripts/deploy-production.sh", () => {
 
   it(
     "run again on main at the [release] commit: continues without a second release",
-    () => {
-      const checkout = makeCheckout();
-      const first = checkout.run(["--reviewer", "test-model"], {
+    async () => {
+      const checkout = await makeCheckout();
+      const first = await checkout.run(["--reviewer", "test-model"], {
         STUB_SCOPE: BACKEND,
         STUB_SSH: "fail",
       });
       expect(first.status).toBe(1);
-      const sha = checkout.mainSha();
-      expect(git(checkout.work, "symbolic-ref", "--short", "HEAD")).toBe(
+      const sha = await checkout.mainSha();
+      expect(await git(checkout.work, "symbolic-ref", "--short", "HEAD")).toBe(
         "main",
       );
 
-      const second = checkout.run([], { STUB_SCOPE: BACKEND });
+      const second = await checkout.run([], { STUB_SCOPE: BACKEND });
       expect(second.output).toContain("Continuing that release.");
       expect(second.lastLine).toBe(
         `RESULT: PASS - frontend and backend deployed at ${sha}`,
       );
-      expect(checkout.mainSha()).toBe(sha);
+      expect(await checkout.mainSha()).toBe(sha);
       expect(checkout.calls().some((call) => call.startsWith("codex"))).toBe(
         false,
       );

@@ -226,7 +226,7 @@ export function ComponentMethodStepsPanel({
         </ol>
       ) : !prose ? (
         <div className="document-empty">
-          <p>No method recorded.</p>
+          <p>No method on file.</p>
           <span>Add the steps a cook follows, one line at a time.</span>
         </div>
       ) : null}

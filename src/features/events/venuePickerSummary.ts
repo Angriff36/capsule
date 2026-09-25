@@ -37,7 +37,7 @@ export function venueSummary(venue: VenuePickerFacts): string {
   const pin = venueCoordinates(venue);
   const parts = [
     venueAddress(venue) ??
-      (pin ? `GPS ${formatCoordinates(pin)}` : "No address recorded"),
+      (pin ? `GPS ${formatCoordinates(pin)}` : "No address on file"),
   ];
   const capacity = Number(venue.capacity ?? 0);
   parts.push(capacity > 0 ? `capacity ${capacity}` : "capacity not set");

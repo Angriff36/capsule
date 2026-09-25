@@ -160,7 +160,7 @@ export function EventGuestPanel({
           <Tile
             label="Total invited"
             value={summary.total}
-            note={headcount > 0 ? `of ${headcount} headcount` : "recorded"}
+            note={headcount > 0 ? `of ${headcount} headcount` : "on the list"}
           />
           <Tile
             label="Confirmed"

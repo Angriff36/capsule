@@ -8,6 +8,7 @@ import {
 import { useStorageUrls } from "../../../lib/fileStorageClient";
 import { useGetEvent } from "../../../lib/manifest-convex-react";
 import { useEventImportRetry } from "../../../lib/useEventImportRetry";
+import { eventSourceEvidenceKey } from "../eventSourceEvidenceLink";
 import { eventDetailPath } from "../eventRoutes";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { FailureBanner } from "../FailureBanner";
@@ -98,6 +99,10 @@ export function EventImportDraftPanel({ eventId }: { eventId: Id<"events"> }) {
       setBusy(false);
     }
   };
+  const sourceKey = eventSourceEvidenceKey({
+    storedKey: event.importSourceKey,
+    liveFileName: draft.sources[0]?.name,
+  });
   const facts = Object.entries(draft.facts).filter(
     ([key, value]) =>
       key !== "menu" &&
@@ -119,6 +124,9 @@ export function EventImportDraftPanel({ eventId }: { eventId: Id<"events"> }) {
         Saved source details for review. These reflect the import, not later
         edits to the event or confirmation that the event is ready.
       </p>
+      {sourceKey ? (
+        <p data-testid="event-source-evidence-key">Source link: {sourceKey}</p>
+      ) : null}
       {draft.status === "matching" || draft.status === "saved" ? (
         <p role="status">
           Menu matching is pending. Imported details are retained below.
@@ -147,12 +155,12 @@ export function EventImportDraftPanel({ eventId }: { eventId: Id<"events"> }) {
         {draft.sources.length > 0 ? (
           <SourceFiles sources={draft.sources} />
         ) : (
-          <p className="text-ink-2">No source files recorded.</p>
+          <p className="text-ink-2">No source files on this import.</p>
         )}
       </div>
       {draft.missing.length > 0 ? (
         <div>
-          <h3 className="font-semibold">Not recorded in the source</h3>
+          <h3 className="font-semibold">Not on the worksheet</h3>
           <ul className="mt-1 list-disc space-y-1 pl-5 text-ink-2">
             {draft.missing.map((key, index) => (
               <li key={`${key}-${index}`}>{factLabels[key] ?? key}</li>
@@ -176,7 +184,7 @@ export function EventImportDraftPanel({ eventId }: { eventId: Id<"events"> }) {
             Unresolved menu lines ({unresolved.length})
           </h3>
           <p className="text-ink-2">
-            These source lines have not been linked to event dishes.
+            These menu lines are not yet tied to a dish on the event.
           </p>
           <ol className="divide-y divide-line">
             {unresolved.map((line, index) => (
@@ -186,12 +194,14 @@ export function EventImportDraftPanel({ eventId }: { eventId: Id<"events"> }) {
                   <div>
                     <dt className="inline font-medium">Quantity: </dt>
                     <dd className="inline">
-                      {line.quantity ?? "Not recorded"}
+                      {line.quantity ?? "Not on the worksheet"}
                     </dd>
                   </div>
                   <div>
                     <dt className="inline font-medium">Unit: </dt>
-                    <dd className="inline">{line.unit || "Not recorded"}</dd>
+                    <dd className="inline">
+                      {line.unit || "Not on the worksheet"}
+                    </dd>
                   </div>
                   {line.course ? (
                     <div>

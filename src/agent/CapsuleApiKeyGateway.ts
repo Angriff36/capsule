@@ -13,6 +13,8 @@
  */
 import { createClerkClient } from "@clerk/backend";
 import { createHash } from "node:crypto";
+import { commandApiIdempotencyGate } from "./CommandApiIdempotencyGate";
+import { ConvexSiteOrigin } from "./ConvexSiteOrigin";
 
 export interface ApiKeyGatewayDeps {
   /**
@@ -69,6 +71,33 @@ export function createApiKeyGateway(deps: ApiKeyGatewayDeps) {
       });
     }
 
+    // Retryable external commands must carry an idempotency key (header or
+    // body). Check BEFORE minting so a missing-key call never touches
+    // Clerk/Convex, then stamp the key onto the forwarded body so Convex HTTP
+    // sees `idempotencyKey` even when the caller only sent the header.
+    const body =
+      request.method === "GET" || request.method === "HEAD"
+        ? undefined
+        : await request.text();
+    let forwardBody = body;
+    if (
+      commandApiIdempotencyGate.isRetryableExternalCommand(
+        request.method,
+        url.pathname,
+      )
+    ) {
+      const key = commandApiIdempotencyGate.readKey(
+        request.headers,
+        body ?? "",
+      );
+      if (!key) {
+        return json(400, {
+          error: "Idempotency key required for retryable external commands",
+        });
+      }
+      forwardBody = commandApiIdempotencyGate.applyToBody(body ?? "", key);
+    }
+
     const cacheKey = createHash("sha256").update(secret).digest("hex");
     const cached = tokens.get(cacheKey);
     let jwt = cached && now() - cached.at < TOKEN_CACHE_MS ? cached.jwt : "";
@@ -87,15 +116,11 @@ export function createApiKeyGateway(deps: ApiKeyGatewayDeps) {
     headers.set("Authorization", `Bearer ${jwt}`);
     const contentType = request.headers.get("content-type");
     if (contentType) headers.set("Content-Type", contentType);
-    const body =
-      request.method === "GET" || request.method === "HEAD"
-        ? undefined
-        : await request.text();
     const upstream = await deps.forward(
       new Request(`${deps.convexSiteUrl}${url.pathname}${url.search}`, {
         method: request.method,
         headers,
-        body,
+        body: forwardBody,
       }),
     );
     return new Response(await upstream.text(), {
@@ -133,10 +158,7 @@ export function createClerkApiKeyGatewayDeps(
   const clerk = createClerkClient({ secretKey });
   const sessions = new Map<string, string>();
   return {
-    convexSiteUrl: convexUrl
-      .replace(".convex.cloud", ".convex.site")
-      .replace(/:3210$/, ":3211")
-      .replace(/\/$/, ""),
+    convexSiteUrl: ConvexSiteOrigin.from(convexUrl),
     verifyApiKey: (secret) => clerk.apiKeys.verify(secret),
     mintSessionToken: async (userId) => {
       let sessionId = sessions.get(userId);

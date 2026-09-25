@@ -67,12 +67,12 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
   hasMany lines: ComponentImportLine
   belongsTo resultingComponent: Component fields [tenantId, resultingComponentId] references [tenantId, id]
 
-  constraint importSourcePresent: self.uploadedAt == null or length(trim(self.rawSourceText)) > 0 "Import source content is required"
-  constraint importYieldPositive: self.parsedYieldQuantity == null or self.parsedYieldQuantity > 0 "Parsed yield quantity must be positive when present"
-  constraint importBatchPositive: self.parsedBatchMultiplier == null or self.parsedBatchMultiplier > 0 "Parsed batch multiplier must be positive when present"
-  constraint importLineCountsNonnegative: self.parsedLineCount >= 0 and self.resolvedLineCount >= 0 "Import line counts cannot be negative"
-  constraint importResolvedWithinParsed: self.resolvedLineCount <= self.parsedLineCount "Resolved line count cannot exceed parsed line count"
-  constraint importCompletionRequiresComponent: self.completedAt == null or self.resultingComponentId != null "Completed imports require a resulting component"
+  constraint importSourcePresent: self.uploadedAt == null or length(trim(self.rawSourceText)) > 0 "Paste recipe text before parsing."
+  constraint importYieldPositive: self.parsedYieldQuantity == null or self.parsedYieldQuantity > 0 "When you enter a yield, it must be more than zero."
+  constraint importBatchPositive: self.parsedBatchMultiplier == null or self.parsedBatchMultiplier > 0 "When you enter a batch size, it must be more than zero."
+  constraint importLineCountsNonnegative: self.parsedLineCount >= 0 and self.resolvedLineCount >= 0 "This recipe's line counts can't be negative. Use zero or more."
+  constraint importResolvedWithinParsed: self.resolvedLineCount <= self.parsedLineCount "You can't finish more lines than this recipe has. Check the numbers."
+  constraint importCompletionRequiresComponent: self.completedAt == null or self.resultingComponentId != null "Completed imports require a resulting recipe"
 
   transition status from "uploaded" to ["parsed", "failed", "cancelled"]
   transition status from "parsed" to ["reviewing", "failed", "cancelled"]
@@ -83,9 +83,9 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
   transition status from "failed" to ["reviewing", "cancelled"]
   transition status from "cancelled" to []
 
-  default policy componentImportRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read component imports"
-  default policy componentImportWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write component imports through commands"
-  default policy componentImportExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute component import commands"
+  default policy componentImportRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see recipe imports"
+  default policy componentImportWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update recipe imports"
+  default policy componentImportExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change recipe imports"
 
   command upload(
     sourceKind: ComponentImportSourceKind,
@@ -98,9 +98,9 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
   ) {
     guard self.uploadedAt == null
     guard self.deletedAt == null
-    constraint uploadSourcePresent: length(trim(rawSourceText)) > 0 "Import source content is required"
-    constraint uploadByteCountNonnegative: sourceByteCount >= 0 "Source byte count cannot be negative"
-    constraint uploadFingerprintPresent: length(trim(sourceFingerprint)) > 0 "Source fingerprint is required"
+    constraint uploadSourcePresent: length(trim(rawSourceText)) > 0 "Paste recipe text before parsing."
+    constraint uploadByteCountNonnegative: sourceByteCount >= 0 "This recipe's size can't be negative. Use zero or more."
+    constraint uploadFingerprintPresent: length(trim(sourceFingerprint)) > 0 "This recipe isn't identified. Paste the recipe text first."
     mutate sourceKind = sourceKind
     mutate sourceFilename = sourceFilename
     mutate csvSheetText = csvSheetText
@@ -133,10 +133,10 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     guard self.status == "uploaded"
     guard self.uploadedAt != null
     guard self.deletedAt == null
-    constraint parseNamePresent: length(trim(parsedName)) > 0 "Parsed component name is required"
-    constraint parseLineCountNonnegative: parsedLineCount >= 0 "Parsed line count cannot be negative"
-    constraint parseYieldPositive: parsedYieldQuantity == null or parsedYieldQuantity > 0 "Parsed yield quantity must be positive when present"
-    constraint parseBatchPositive: parsedBatchMultiplier == null or parsedBatchMultiplier > 0 "Parsed batch multiplier must be positive when present"
+    constraint parseNamePresent: length(trim(parsedName)) > 0 "Parsed recipe name is required"
+    constraint parseLineCountNonnegative: parsedLineCount >= 0 "This recipe can't have a negative number of lines. Use zero or more."
+    constraint parseYieldPositive: parsedYieldQuantity == null or parsedYieldQuantity > 0 "When you enter a yield, it must be more than zero."
+    constraint parseBatchPositive: parsedBatchMultiplier == null or parsedBatchMultiplier > 0 "When you enter a batch size, it must be more than zero."
     mutate parsedName = parsedName
     mutate parsedDescription = parsedDescription
     mutate parsedCategory = parsedCategory
@@ -188,9 +188,9 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     guard self.reviewStartedAt != null
     guard self.reviewRevision == expectedReviewRevision
     guard self.deletedAt == null
-    constraint reviseNamePresent: length(trim(parsedName)) > 0 "Reviewed component name is required"
-    constraint reviseYieldPositive: parsedYieldQuantity == null or parsedYieldQuantity > 0 "Reviewed yield quantity must be positive when present"
-    constraint reviseBatchPositive: parsedBatchMultiplier == null or parsedBatchMultiplier > 0 "Reviewed batch multiplier must be positive when present"
+    constraint reviseNamePresent: length(trim(parsedName)) > 0 "Reviewed recipe name is required"
+    constraint reviseYieldPositive: parsedYieldQuantity == null or parsedYieldQuantity > 0 "When you enter a yield on this review, it must be more than zero."
+    constraint reviseBatchPositive: parsedBatchMultiplier == null or parsedBatchMultiplier > 0 "When you enter a batch size on this review, it must be more than zero."
     mutate parsedName = parsedName
     mutate parsedDescription = parsedDescription
     mutate parsedCategory = parsedCategory
@@ -211,8 +211,8 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     guard self.status == "reviewing"
     guard self.reviewStartedAt != null
     guard self.deletedAt == null
-    constraint progressNonnegative: resolvedLineCount >= 0 "Resolved line count cannot be negative"
-    constraint progressWithinParsed: resolvedLineCount <= self.parsedLineCount "Resolved line count cannot exceed parsed line count"
+    constraint progressNonnegative: resolvedLineCount >= 0 "You can't have a negative number of finished lines. Use zero or more."
+    constraint progressWithinParsed: resolvedLineCount <= self.parsedLineCount "You can't finish more lines than this recipe has. Check the numbers."
     mutate resolvedLineCount = resolvedLineCount
     emit ComponentImportResolutionProgressRecorded {
       componentImportId: self.id
@@ -363,12 +363,12 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
   belongsTo import: ComponentImport fields [tenantId, importId] references [tenantId, id]
   belongsTo matchedIngredient: Ingredient fields [tenantId, matchedIngredientId] references [tenantId, id]
 
-  constraint lineMatchedIngredientAllowed: self.matchedIngredientId == null or self.matchStatus == "exact" or self.matchStatus == "confirmed_existing" or self.matchStatus == "confirmed_new" "Only exact, confirmed existing, or attached confirmed-new lines may carry a matched ingredient id"
-  constraint lineConfirmedNewWithoutMatch: self.matchStatus != "confirmed_new" or self.matchedIngredientId == null or self.resolvedAt != null "Confirmed new lines link their created ingredient only after resolution"
+  constraint lineMatchedIngredientAllowed: self.matchedIngredientId == null or self.matchStatus == "exact" or self.matchStatus == "confirmed_existing" or self.matchStatus == "confirmed_new" "This line isn't ready to keep that ingredient. Confirm the match first, or attach the ingredient you created."
+  constraint lineConfirmedNewWithoutMatch: self.matchStatus != "confirmed_new" or self.matchedIngredientId == null or self.resolvedAt != null "This new line isn't finished yet. Finish it before you attach the ingredient you created."
 
-  default policy componentImportLineRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read component import lines"
-  default policy componentImportLineWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write component import lines through commands"
-  default policy componentImportLineExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute component import line commands"
+  default policy componentImportLineRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see recipe import lines"
+  default policy componentImportLineWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update recipe import lines"
+  default policy componentImportLineExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change recipe import lines"
 
   command stage(
     importId: uuid,
@@ -382,9 +382,9 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
     guard self.resolvedAt == null
     guard self.deletedAt == null
     guard self.import != null
-    constraint stageImportMatch: importId == self.importId "Stage importId must match the seeded import reference"
-    constraint stageSourceLinePresent: length(trim(sourceLine)) > 0 "Source line is required"
-    constraint stageOrderNonnegative: sourceOrder >= 0 "Source order cannot be negative"
+    constraint stageImportMatch: importId == self.importId "This line is for a different recipe import. Pick the recipe import already on this line."
+    constraint stageSourceLinePresent: length(trim(sourceLine)) > 0 "This line has no recipe text. Paste the original line from the recipe."
+    constraint stageOrderNonnegative: sourceOrder >= 0 "This line's place in the recipe can't be negative. Use zero or more."
     mutate importId = importId
     mutate sourceOrder = sourceOrder
     mutate sourceLine = sourceLine

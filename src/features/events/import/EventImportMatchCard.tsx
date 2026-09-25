@@ -35,7 +35,11 @@ export function EventImportMatchCard({
 }: Props) {
   const dishLines = bundleDishLines(bundle);
   const withNew = (options: readonly SearchSelectOption[], label: string) => [
-    { id: NEW_RECORD, label, hint: "A new record is created on import." },
+    {
+      id: NEW_RECORD,
+      label,
+      hint: "A new one is added when you create the event.",
+    },
     ...options,
   ];
   const setDish = (key: string, id: string) => {
@@ -49,12 +53,12 @@ export function EventImportMatchCard({
   return (
     <section className="card space-y-4 p-4" data-testid="event-import-match">
       <div>
-        <p className="eyebrow">Existing records</p>
+        <p className="eyebrow">Already in Capsule</p>
         <h2 className="text-base font-semibold text-ink">
-          Reuse what is already in Capsule
+          We found these in Capsule
         </h2>
         <p className="text-sm text-ink-3">
-          Matched by name. Change any pick, or choose “create new”.
+          We matched them by name. Change any pick, or choose “create new”.
         </p>
       </div>
 

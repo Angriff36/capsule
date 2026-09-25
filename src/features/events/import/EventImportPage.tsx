@@ -132,7 +132,7 @@ export function EventImportPage() {
       </Link>
       <PageHeader
         title="Import an event from its BEO"
-        lead="Paste the banquet event order or worksheet text, check what was read, and create the event with its menu, timeline, open shifts and pack list in one step."
+        lead="Paste the banquet event order or worksheet text, check what was read, and create the event with its menu, timeline, open shifts and pack list at once."
       />
 
       {runner.failure ? (
@@ -203,11 +203,11 @@ export function EventImportPage() {
               data-testid="event-import-create"
             >
               {busy
-                ? `Creating… ${runner.progress?.completed ?? 0} of ${runner.progress?.total ?? 0}`
+                ? "Creating the event…"
                 : runner.plan
-                  ? `Create event (${runner.plan.steps.length} steps)`
+                  ? "Create event"
                   : bundle && !directory
-                    ? "Checking existing records…"
+                    ? "Checking clients, venues, and dishes already in Capsule…"
                     : "Create event"}
             </button>
             {runner.progress ? (
@@ -216,7 +216,7 @@ export function EventImportPage() {
               </span>
             ) : runner.failure ? (
               <span className="text-sm text-ink-3">
-                Steps that finished are kept. Fix the cause and click Create
+                What already saved stays. Fix the problem and click Create event
                 again — it continues where it stopped.
               </span>
             ) : null}

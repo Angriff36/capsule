@@ -37,7 +37,7 @@ export function planStaffSteps(input: {
   const people = context.directory?.people;
   if (people === undefined && !context.unmatchedStaffAsOpenShifts) {
     warnings.push(
-      `${bundle.staff.length} staff assignment(s) were read but not entered: the run had no people directory to match names against.`,
+      `${bundle.staff.length} staff assignment(s) were read but not entered: Capsule could not look up your staff to match the names.`,
     );
     return { steps, warnings, count, openShifts };
   }

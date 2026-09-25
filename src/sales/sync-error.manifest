@@ -53,9 +53,9 @@ entity SyncError mixin TenantScoped, SoftDeletable {
   // docId) and there is no way to insert a SyncError row.
   property recordedAt: datetime?
 
-  default policy syncErrorRead read: roleAllows(user.role, "staffAccess") "Staff may read sync errors"
-  default policy syncErrorWrite write: roleAllows(user.role, "staffAccess") "Staff may write sync errors through commands"
-  default policy syncErrorExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute sync error commands"
+  default policy syncErrorRead read: roleAllows(user.role, "staffAccess") "Staff may see sync errors"
+  default policy syncErrorWrite write: roleAllows(user.role, "staffAccess") "Staff may update connection problems"
+  default policy syncErrorExecute execute: roleAllows(user.role, "staffAccess") "Staff may change connection problems"
 
   // Record a sync/parse failure. The actor identity is stamped from trusted
   // auth context. status starts pending; a retry that succeeds or a dismiss

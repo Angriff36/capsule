@@ -38,15 +38,15 @@ entity EventAllergenCheck mixin TenantScoped, SoftDeletable {
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
   belongsTo checkedBy: Person fields [tenantId, checkedById] references [tenantId, id]
 
-  constraint allergenCheckImmutable: self.checkedAt == null or self.status == "recorded" "Recorded allergen checks are immutable"
-  constraint allergenCheckFlagConsistency: self.checkedAt == null or (self.result == "pass" and length(self.flaggedAllergens) == 0) or (self.result == "flagged" and length(self.flaggedAllergens) > 0) "Pass requires no flagged allergens; flagged requires at least one"
+  constraint allergenCheckImmutable: self.checkedAt == null or self.status == "recorded" "This allergen check is already saved. You can't change it. Start a new check if something changed."
+  constraint allergenCheckFlagConsistency: self.checkedAt == null or (self.result == "pass" and length(self.flaggedAllergens) == 0) or (self.result == "flagged" and length(self.flaggedAllergens) > 0) "This allergen check can't pass with allergens listed. If you flagged it, name at least one allergen."
 
   transition status from "pending" to ["recorded"]
   transition status from "recorded" to []
 
-  default policy allergenCheckRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may read event allergen checks"
-  default policy allergenCheckWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may write event allergen checks through commands"
-  default policy allergenCheckExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may execute event allergen check commands"
+  default policy allergenCheckRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may see event allergen checks"
+  default policy allergenCheckWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may update event allergen checks"
+  default policy allergenCheckExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may change event allergen checks"
 
   command record(
     eventId: uuid,
@@ -61,10 +61,10 @@ entity EventAllergenCheck mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.event != null
     guard user.id != null
-    constraint recordEventMatch: eventId == self.eventId "Record eventId must match the seeded event reference"
-    constraint recordEventDishMatch: eventDishId == null or self.eventDishId == null or eventDishId == self.eventDishId "Record eventDishId must match the seeded event dish reference when provided"
-    constraint recordDishMatch: dishId == null or self.dishId == null or dishId == self.dishId "Record dishId must match the seeded dish reference when provided"
-    constraint recordFlagConsistency: (result == "pass" and (flaggedAllergens == null or length(flaggedAllergens) == 0)) or (result == "flagged" and flaggedAllergens != null and length(flaggedAllergens) > 0) "Pass requires no flagged allergens; flagged requires at least one"
+    constraint recordEventMatch: eventId == self.eventId "This allergen check is for a different event. Pick the event already on this allergen check."
+    constraint recordEventDishMatch: eventDishId == null or self.eventDishId == null or eventDishId == self.eventDishId "This allergen check is for a different event dish. Pick the event dish already on this allergen check, or leave that blank."
+    constraint recordDishMatch: dishId == null or self.dishId == null or dishId == self.dishId "This allergen check is for a different dish. Pick the dish already on this allergen check, or leave that blank."
+    constraint recordFlagConsistency: (result == "pass" and (flaggedAllergens == null or length(flaggedAllergens) == 0)) or (result == "flagged" and flaggedAllergens != null and length(flaggedAllergens) > 0) "This allergen check can't pass with allergens listed. If you flagged it, name at least one allergen."
     compute nextFlags = flaggedAllergens != null ? flaggedAllergens : []
     mutate eventId = eventId
     mutate eventDishId = eventDishId != null ? eventDishId : self.eventDishId

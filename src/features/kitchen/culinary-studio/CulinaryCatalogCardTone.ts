@@ -5,7 +5,7 @@ export class CulinaryCatalogCardTone {
   static kindLabel(section: KitchenSection): string {
     switch (section) {
       case "components":
-        return "Component";
+        return "Recipe";
       case "ingredients":
         return "Ingredient";
       case "dishes":
@@ -13,7 +13,7 @@ export class CulinaryCatalogCardTone {
       case "menus":
         return "Menu";
       default:
-        return "Record";
+        return "Kitchen item";
     }
   }
 

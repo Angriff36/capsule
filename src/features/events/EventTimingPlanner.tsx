@@ -7,94 +7,18 @@ import {
   useEventTimelineActivityUseCalculatedTiming,
 } from "../../lib/manifest-convex-react";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
-import { localDateTime } from "./eventDetailFormHelpers";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
+import {
+  durationFields,
+  startDraft,
+  timeLabel,
+  type Draft,
+  type Plan,
+} from "./EventTimingPlannerDraft";
+import { localDateTime } from "./eventDetailFormHelpers";
 
-const durationFields = [
-  [
-    "setupMinutes",
-    "timingSetupMinutes",
-    "Onsite setup",
-    "Before service; full service 180 min, limited service 90 min.",
-  ],
-  [
-    "loadMinutes",
-    "timingLoadMinutes",
-    "Load at shop",
-    "Start with 60 min; allow more for larger loads or more vehicles.",
-  ],
-  [
-    "outboundTravelMinutes",
-    "timingOutboundTravelMinutes",
-    "Travel to venue",
-    "Use a checked drive time, not an estimate.",
-  ],
-  [
-    "cleanupMinutes",
-    "timingCleanupMinutes",
-    "Cleanup & reload",
-    "After event end; typically 60 min. Adjust for this event.",
-  ],
-  [
-    "returnTravelMinutes",
-    "timingReturnTravelMinutes",
-    "Travel back to shop",
-    "Check the return trip; it may differ from the outward trip.",
-  ],
-  [
-    "unloadMinutes",
-    "timingUnloadMinutes",
-    "Unload at shop",
-    "Allow time to finish unloading before staff off.",
-  ],
-] as const;
-
-type Plan = NonNullable<ReturnType<typeof useEventTimingPlan>>;
 type Milestone = Plan["milestones"][number];
-type Draft = {
-  version: number;
-  serviceStartsAt: string;
-  originalServiceAt?: number | null;
-} & Record<(typeof durationFields)[number][0], string>;
-
-function startDraft(plan: Plan): Draft {
-  const { event } = plan;
-  const sourceService = plan.milestones.find((m) => m.key === "service")?.row
-    ?.startsAt;
-  const originalServiceAt =
-    event.serviceStartsAt ??
-    (event.timingConfiguredAt == null ? sourceService : undefined);
-  const defaults: Record<string, number | null | undefined> =
-    event.timingConfiguredAt == null
-      ? {
-          setupMinutes: event.timingSuggestedSetupMinutes,
-          loadMinutes: 60,
-          cleanupMinutes: 60,
-        }
-      : {};
-  return {
-    version: event.version,
-    originalServiceAt,
-    serviceStartsAt: localDateTime(originalServiceAt),
-    ...Object.fromEntries(
-      durationFields.map(([key, field]) => [
-        key,
-        String(event[field] ?? defaults[key] ?? ""),
-      ]),
-    ),
-  } as Draft;
-}
-
-const timeLabel = (value?: number | null) =>
-  value == null
-    ? "Time not set"
-    : new Date(value).toLocaleString(undefined, {
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-      });
 
 /** Event inputs and their shared milestones, with visible preserved exceptions. */
 export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
@@ -216,8 +140,8 @@ export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
       </p>
       {!plan.event.timingCanRecalculate && (
         <p className="mt-2 text-base text-ink-2">
-          This event keeps its recorded timing. Individual timeline blocks
-          remain available for corrections.
+          This event keeps its saved timing. Individual timeline blocks remain
+          available for corrections.
         </p>
       )}
       {failure && (
@@ -227,7 +151,7 @@ export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
       )}
       {saved && (
         <p role="status" className="mt-3 text-base text-success">
-          Timing saved to the shared run.
+          Timing saved on this event.
         </p>
       )}
       {draft && (
@@ -322,7 +246,7 @@ export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
                     </p>
                     <p className="text-base">
                       {milestone.removed
-                        ? "Removed from the run"
+                        ? "Removed from this event"
                         : `${milestone.matches.length > 1 ? "Calculated: " : ""}${timeLabel(row ? row.startsAt : milestone.startsAt)}`}
                       {!milestone.removed &&
                         (row ? row.endsAt : milestone.endsAt) != null &&

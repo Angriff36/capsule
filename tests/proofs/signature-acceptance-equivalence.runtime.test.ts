@@ -921,7 +921,7 @@ describe("disabled sales capability (tenant kill-switch)", () => {
       proof.anonymous.mutation(api.signatureAcceptance.completeSignature, {
         token: requestId,
       }),
-    ).rejects.toThrow("Sales staff may read proposals");
+    ).rejects.toThrow("Sales staff may see proposals");
 
     // Full rollback: the request stays requested, the proposal stays viewed,
     // no completion/acceptance reached the ledger, no menu copy landed.

@@ -29,9 +29,9 @@ entity ProposalEnhancement mixin TenantScoped, SoftDeletable {
 
   constraint enhancementComplete: self.addedAt == null or (length(trim(self.name)) > 0 and self.price >= 0) "Enhancements require a name and a non-negative price"
 
-  default policy proposalEnhancementRead read: roleAllows(user.role, "salesAccess") "Sales staff may read proposal enhancements"
-  default policy proposalEnhancementWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write proposal enhancements through commands"
-  default policy proposalEnhancementExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute proposal enhancement commands"
+  default policy proposalEnhancementRead read: roleAllows(user.role, "salesAccess") "Sales staff may see proposal enhancements"
+  default policy proposalEnhancementWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update proposal enhancements"
+  default policy proposalEnhancementExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may change proposal enhancements"
 
   // Offer an enhancement. Like line items, only editable while the proposal
   // is still a draft — a sent proposal's revision snapshot is immutable.

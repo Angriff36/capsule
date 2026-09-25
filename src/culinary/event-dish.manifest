@@ -17,6 +17,9 @@ entity EventDish mixin TenantScoped, SoftDeletable {
 
   property required eventId: uuid
   property required dishId: uuid
+  // Printed name at add / confirm time. A later catalog Dish rename
+  // must not rewrite this Event line. dishId stays the live catalog link.
+  property dishName: string?
   // Catalog edits follow active event work, never completed history.
   property indexed recipeSyncDishId: uuid?
   // One serving quantity for prep, purchasing, containers and food cost.
@@ -66,17 +69,18 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   // reconciliation run under the initiating operator's auth. The shared
   // policy admits those paths; composition commands retain explicit manager
   // checks, and proposal confirmation retains its manager/sales check.
-  default policy eventDishRead read: roleAllows(user.role, "staffAccess") "Employed staff may read event dishes"
+  default policy eventDishRead read: roleAllows(user.role, "staffAccess") "Employed staff may see event dishes"
   // Kitchen catalog edits may request packing refresh; composition commands
   // retain their own manager/sales authority checks below.
-  default policy eventDishWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "kitchenAccess") "Managers, sales and kitchen staff may write event dishes through commands"
-  default policy eventDishExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "kitchenAccess") "Managers, sales and kitchen staff may execute event dish commands"
+  default policy eventDishWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "kitchenAccess") "Managers, sales and kitchen staff may update event dishes"
+  default policy eventDishExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "kitchenAccess") "Managers, sales and kitchen staff may change event dishes"
 
   // Add this dish to the event (create).
   command addToEvent(
     eventId: uuid,
     dishId: uuid,
     quantityServings: number,
+    optional dishName: string,
     optional headcountOverride: int,
     optional course: string,
     optional serviceStyle: string,
@@ -89,8 +93,9 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     // To put the same Dish back after remove: allocate a NEW EventDish and call addToEvent.
     guard self.addedAt == null
     guard self.deletedAt == null
-    // Live event only — includes executing (86/swap mid-service). Not cancelled/done.
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    // Live event only — includes executing (86/swap mid-service) and sales_lock
+    // (live ops, not a menu freeze). Not cancelled/done.
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
     // Seed check: createVia pre-writes eventId on the row; the arg must match
     // that seed. Fails only on buggy/mismatched API calls — not a business "can't move dishes" rule.
     constraint addToEventEventMatch: eventId == self.eventId "addToEvent eventId must match the seeded event reference"
@@ -98,6 +103,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     constraint addToEventHeadcountOverrideNonnegative: headcountOverride == null or headcountOverride >= 0 "Headcount override cannot be negative"
     mutate eventId = eventId
     mutate dishId = dishId
+    mutate dishName = dishName
     mutate recipeSyncDishId = dishId
     mutate quantityServings = quantityServings
     mutate followsEventHeadcount = quantityServings == self.event.expectedHeadcount and (headcountOverride == null or headcountOverride == 0)
@@ -131,7 +137,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     // Live event + post-event correction. Zero = 86 without deleting the line.
     // Refunds are Invoice/Payment — not this field. Cancelled stays locked.
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing" or self.event.stage == "completed" or self.event.stage == "closed_out")
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing" or self.event.stage == "completed" or self.event.stage == "closed_out")
     constraint adjustServingsNonnegative: quantityServings >= 0 "Event dish servings cannot be negative"
     compute previousQuantityServings = self.quantityServings
     mutate quantityServings = quantityServings
@@ -153,7 +159,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "manageAccess")
     guard self.addedAt != null
     guard self.deletedAt == null
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
     compute follows = self.followsEventHeadcount != null ? self.followsEventHeadcount : (self.quantityServings == previousHeadcount and (self.headcountOverride == null or self.headcountOverride == 0))
     compute previousQuantityServings = self.quantityServings
     mutate followsEventHeadcount = follows
@@ -174,7 +180,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "manageAccess")
     guard self.addedAt != null
     guard self.deletedAt == null
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing" or self.event.stage == "completed" or self.event.stage == "closed_out")
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing" or self.event.stage == "completed" or self.event.stage == "closed_out")
     constraint setHeadcountOverrideNonnegative: headcountOverride >= 0 "Headcount override cannot be negative"
     compute previousQuantityServings = self.quantityServings
     mutate headcountOverride = headcountOverride
@@ -202,7 +208,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "manageAccess")
     guard self.addedAt != null
     guard self.deletedAt == null
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
     mutate course = course
     mutate serviceStyle = serviceStyle
     emit EventDishCourseChanged {
@@ -232,8 +238,8 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "manageAccess")
     guard self.addedAt != null
     guard self.deletedAt == null
-    // Notes are allowed through executing — kitchen/service still needs them.
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    // Notes are allowed through executing and sales_lock — kitchen/service still needs them.
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
     mutate specialInstructions = specialInstructions
     emit EventDishInstructionsUpdated {
       eventDishId: self.id
@@ -252,6 +258,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     eventId: uuid,
     dishId: uuid,
     quantityServings: number,
+    optional dishName: string,
     optional course: string,
     optional serviceStyle: string,
     optional specialInstructions: string
@@ -260,12 +267,13 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     // catalog refreshes through the shared entity policy.
     guard roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess")
     guard self.deletedAt == null
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
     constraint confirmFromProposalEventMatch: eventId == self.eventId "confirmFromProposal eventId must match the seeded event reference"
     constraint confirmFromProposalServingsNonnegative: quantityServings >= 0 "Event dish servings cannot be negative"
     compute wasExistingLine = self.addedAt != null
     mutate eventId = eventId
     mutate dishId = dishId
+    mutate dishName = dishName != null ? dishName : self.dishName
     mutate recipeSyncDishId = dishId
     mutate quantityServings = self.addedAt != null ? self.quantityServings : quantityServings
     mutate followsEventHeadcount = wasExistingLine ? self.followsEventHeadcount : quantityServings == self.event.expectedHeadcount
@@ -324,8 +332,9 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "manageAccess")
     guard self.addedAt != null
     guard self.deletedAt == null
-    // Includes executing — ran out / pull from service. Not after the event is done/cancelled.
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    // Includes executing (ran out / pull from service) and sales_lock (live ops, not a menu freeze).
+    // Not after the event is done/cancelled.
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
     constraint removeEventDishReason: length(trim(reason)) > 0 "Removal reason is required"
     compute previousQuantityServings = self.quantityServings
     mutate deletedAt = now()
@@ -474,9 +483,9 @@ entity EventDishLineOverride mixin TenantScoped, SoftDeletable {
   constraint overrideReasonPresent: self.appliedAt == null or length(trim(self.reason)) > 0 "Override reason is required"
   constraint overridePortionsNonnegative: self.portionsAffected >= 0 "Portions affected cannot be negative"
 
-  default policy eventDishLineOverrideRead read: roleAllows(user.role, "staffAccess") "Employed staff may read event dish overrides"
-  default policy eventDishLineOverrideWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "kitchenAccess") "Managers and kitchen staff may write event dish overrides through commands"
-  default policy eventDishLineOverrideExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "kitchenAccess") "Managers and kitchen staff may execute event dish override commands"
+  default policy eventDishLineOverrideRead read: roleAllows(user.role, "staffAccess") "Employed staff may see event dish overrides"
+  default policy eventDishLineOverrideWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "kitchenAccess") "Managers and kitchen staff may update event dish overrides"
+  default policy eventDishLineOverrideExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "kitchenAccess") "Managers and kitchen staff may change event dish overrides"
 
   command apply(
     eventDishId: uuid,
