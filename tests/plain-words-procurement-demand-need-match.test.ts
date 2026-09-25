@@ -58,8 +58,6 @@ describe("plain words on leftover procurement demand-link need-match copy", () =
     expect(visible).toContain(
       "This order-to-need link's amount has to be more than zero. Enter how much this line covers.",
     );
-    expect(visible).toContain(
-      "Received quantity cannot exceed ordered quantity",
-    );
+    expect(visible).toContain("Unit cost cannot be negative");
   });
 });

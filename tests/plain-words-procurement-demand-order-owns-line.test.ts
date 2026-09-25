@@ -57,8 +57,6 @@ describe("plain words on leftover procurement demand-link order-owns-line copy",
       "This order-to-need link's amount has to be more than zero. Enter how much this line covers.",
     );
     // Later leftovers on this same file are pinned, not rewritten.
-    expect(visible).toContain(
-      "Received quantity cannot exceed ordered quantity",
-    );
+    expect(visible).toContain("Unit cost cannot be negative");
   });
 });

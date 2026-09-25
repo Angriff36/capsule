@@ -53616,7 +53616,7 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
     if (!(((__rel_vendorOrder != null) && ((__rel_vendorOrder.status === "confirmed") || (__rel_vendorOrder.status === "partially_received"))))) throw new Error("Guard 3 failed");
     if (!(((doc.locationId == null) || (locationId === doc.locationId)))) throw new Error("Receipt locationId must match the seeded location when one was pre-set");
     if (!((quantity > 0))) throw new Error("Received quantity must be positive");
-    if (!(((doc.receivedQuantity + quantity) <= doc.orderedQuantity))) throw new Error("Received quantity cannot exceed ordered quantity");
+    if (!(((doc.receivedQuantity + quantity) <= doc.orderedQuantity))) throw new Error("This order line can't receive more than was ordered. Enter a smaller amount.");
     if (!((unitPrice >= 0))) throw new Error("Receipt unit price cannot be negative");
     if (!((((supplierLotNumber).trim()).length > 0))) throw new Error("Supplier lot number is required for traceability");
     if (!(((discrepancyQuantity == null) || (discrepancyQuantity >= 0)))) throw new Error("Discrepancy quantity cannot be negative");

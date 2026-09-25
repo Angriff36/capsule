@@ -477,7 +477,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
 
   constraint lineOrderedPositive: self.addedAt == null or self.orderedQuantity >= 0 "This order line's ordered amount can't be negative. Use zero or more."
   constraint lineReceivedNonnegative: self.receivedQuantity >= 0 "This order line's received amount can't be negative. Use zero or more."
-  constraint lineReceivedNotOver: self.receivedQuantity <= self.orderedQuantity "Received quantity cannot exceed ordered quantity"
+  constraint lineReceivedNotOver: self.receivedQuantity <= self.orderedQuantity "This order line can't receive more than was ordered. Enter a smaller amount."
   constraint lineCostNonnegative: self.unitCost >= 0 "Unit cost cannot be negative"
 
   transition status from "pending" to ["added", "cancelled"]
@@ -687,7 +687,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     guard self.vendorOrder != null and (self.vendorOrder.status == "confirmed" or self.vendorOrder.status == "partially_received")
     constraint receiptLocationMatch: self.locationId == null or locationId == self.locationId "Receipt locationId must match the seeded location when one was pre-set"
     constraint receiptQuantityPositive: quantity > 0 "Received quantity must be positive"
-    constraint receiptNotOver: self.receivedQuantity + quantity <= self.orderedQuantity "Received quantity cannot exceed ordered quantity"
+    constraint receiptNotOver: self.receivedQuantity + quantity <= self.orderedQuantity "This order line can't receive more than was ordered. Enter a smaller amount."
     constraint receiptPriceNonnegative: unitPrice >= 0 "Receipt unit price cannot be negative"
     constraint receiptSupplierLotRequired: length(trim(supplierLotNumber)) > 0 "Supplier lot number is required for traceability"
     constraint receiptDiscrepancyNonnegative: discrepancyQuantity == null or discrepancyQuantity >= 0 "Discrepancy quantity cannot be negative"

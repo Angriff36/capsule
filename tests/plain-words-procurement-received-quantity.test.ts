@@ -54,8 +54,6 @@ describe("plain words on leftover order-line received quantity copy", () => {
       "This order line's ordered amount can't be negative. Use zero or more.",
     );
     // Later leftovers on this same file are pinned, not rewritten.
-    expect(visible).toContain(
-      "Received quantity cannot exceed ordered quantity",
-    );
+    expect(visible).toContain("Unit cost cannot be negative");
   });
 });
