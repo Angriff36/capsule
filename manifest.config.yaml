@@ -77,3 +77,11 @@ projections:
         Invoice:
           - fields: [tenantId, invoiceNumber]
             name: by_tenantId_and_invoiceNumber
+        # Ingredient totals per event: every contribution reaction sums one
+        # ingredient's rows in one event. Reading the whole event 13 times per
+        # contribution passed Convex's 16 MB read limit on a 15-dish BEO
+        # import (2026-09-24). scripts/apply-aggregate-composite-indexes.ts
+        # points those generated sums at this index.
+        EventIngredientContribution:
+          - fields: [eventId, ingredientId]
+            name: by_eventId_and_ingredientId

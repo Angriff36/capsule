@@ -1122,7 +1122,8 @@ export default defineSchema({
     .index("by_sourceKey", ["sourceKey"])
     .index("by_eventId", ["eventId"])
     .index("by_eventDishId", ["eventDishId"])
-    .index("by_ingredientId", ["ingredientId"]),
+    .index("by_ingredientId", ["ingredientId"])
+    .index("by_eventId_and_ingredientId", ["eventId", "ingredientId"]),
   eventLayoutSections: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
