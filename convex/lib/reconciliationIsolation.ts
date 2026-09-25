@@ -12,6 +12,9 @@ import { eventReconciliationReceipt } from "./reconciliationReceipt";
 export type IsolationDomain = {
   name: string;
   run: () => Promise<void>;
+  /** A throw aborts the whole command instead of being recorded: this
+   * domain's work must never be left half-done under a committed parent. */
+  mustSucceed?: boolean;
 };
 
 type IsolationTrigger = {
@@ -49,6 +52,7 @@ export class EventReconciliationIsolation {
       try {
         await domain.run();
       } catch (error) {
+        if (domain.mustSucceed) throw error;
         const code = error instanceof Error ? error.message : String(error);
         const entry = { code, recordIds: [args.eventId] };
         unresolved.push(entry);

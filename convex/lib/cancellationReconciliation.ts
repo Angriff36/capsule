@@ -150,7 +150,13 @@ export class EventCancellationReconciliation {
       trigger,
       domains: [
         { name: "timing", run: () => reconcileEventTiming(ctx, eventId, trigger) },
-        { name: "purchasing", run: () => standDownEventPurchasing(ctx, eventId) },
+        // A purchasing failure must fail the cancel: a cancelled event with
+        // live purchase needs would keep the buyer shopping for it.
+        {
+          name: "purchasing",
+          run: () => standDownEventPurchasing(ctx, eventId),
+          mustSucceed: true,
+        },
       ],
     });
     await standDownEventPrep(ctx, { eventId }, reason);
