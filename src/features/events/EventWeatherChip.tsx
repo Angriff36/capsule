@@ -99,7 +99,7 @@ export function EventWeatherChip({
 }
 
 /** The forecast row matching the event's local date, or null when absent. */
-function dayInWindow(
+export function dayInWindow(
   days: WeatherDay[] | null | undefined,
   startsAt: number | null | undefined,
 ): WeatherDay | null {

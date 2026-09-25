@@ -45,15 +45,7 @@ import {
   useEventStaffNeedRows,
 } from "../../lib/eventScopedQueries";
 import { useTrackRecent } from "../../lib/recents";
-import {
-  ArrowLeftIcon,
-  BuildingIcon,
-  CalendarIcon,
-  ClockIcon,
-  DownloadIcon,
-  UsersIcon,
-} from "../../ui/icons";
-import { MapPinIcon, TagIcon } from "./eventDetailIcons";
+import { ArrowLeftIcon, DownloadIcon } from "../../ui/icons";
 import { eventCommercialQuotedPrice } from "./eventCommercialSeed";
 import { eventVenueLabel } from "./eventVenueLabel";
 import { QueryLoadState } from "../../ui/QueryLoadState";
@@ -78,6 +70,7 @@ import { EventClientTab } from "./EventClientTab";
 import { EventArchiveMenuItems } from "./EventArchiveMenuItems";
 import { EventDuplicateMenuItem } from "./EventDuplicateMenuItem";
 import { EventDetailTabs } from "./EventDetailTabs";
+import { EventDashboard } from "./dashboard/EventDashboard";
 import { EventEquipmentPanel } from "./EventEquipmentPanel";
 import { EventGuestPanel } from "./EventGuestPanel";
 import { EventIncidentPanel } from "./EventIncidentPanel";
@@ -457,144 +450,50 @@ function EventDetailContent({
     </ActionMenu>,
   ];
 
-  return (
-    <div className="space-y-5">
-      {mobile ? (
-        <section
-          className="card px-4 py-4"
-          data-testid="event-context-header-mobile"
-        >
-          <div className="flex items-start gap-2">
-            <Link
-              to="/events"
-              aria-label="All events"
-              className="-ml-1 grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-2 hover:bg-inset"
-            >
-              <ArrowLeftIcon width={18} height={18} />
-            </Link>
-            <div className="min-w-0 flex-1">
-              <h1 className="text-xl leading-tight font-bold text-ink">
-                {event.title}
-              </h1>
-              <div className="mt-1.5 flex flex-wrap items-center gap-2 text-sm text-ink-2">
-                <StatusChip status={String(event.stage)} />
-                <span>{formatStatusLabel(event.eventType)}</span>
-                {event.startsAt != null ? (
-                  <span>· {relativeDays(event.startsAt)}</span>
-                ) : null}
-              </div>
-            </div>
-          </div>
-          <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3">
-            <HeroFact label="Date">
-              {formatDate(event.startsAt)}
-              <span className="block text-sm font-medium text-ink-2">
-                {event.startsAt != null
-                  ? `${formatTime(event.startsAt)} – ${formatTime(event.endsAt)}`
-                  : "—"}
-              </span>
-            </HeroFact>
-            <HeroFact label="Headcount">
-              {formatCount(event.expectedHeadcount)} guests
-            </HeroFact>
-            <HeroFact label="Venue">{venueLabel}</HeroFact>
-            <HeroFact label="Client">
-              {clientDisplayName(event.clientId, clients)}
-            </HeroFact>
-          </dl>
-          <p className="mt-3 border-t border-line pt-3 text-sm text-ink-2">
-            <span className="font-semibold text-ink">Budget / quoted</span>{" "}
-            {formatMoney(event.budgetAmount, currencyCode)} /{" "}
-            {formatMoney(
-              eventCommercialQuotedPrice({ quotedPrice: event.quotedPrice }),
-              currencyCode,
-            )}
-          </p>
-          <div className="mobile-actions mt-4 flex flex-wrap items-center justify-end gap-2">
-            {headerActions}
-          </div>
-        </section>
-      ) : (
-        <section className="card px-6 py-5" data-testid="event-context-header">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="min-w-0">
-              <Link
-                to="/events"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-2 hover:text-ink"
-              >
-                <ArrowLeftIcon width={13} height={13} /> All events
-              </Link>
-              <div className="mt-1.5 flex flex-wrap items-center gap-3">
-                <h1 className="text-3xl font-bold tracking-tight text-ink">
-                  {event.title}
-                </h1>
-                <StatusChip status={String(event.stage)} />
-              </div>
-              <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-base text-ink-2">
-                <span className="inline-flex min-w-0 items-center gap-1.5">
-                  <BuildingIcon width={14} height={14} />
-                  {(() => {
-                    const client = clients?.find(
-                      (c) => c._id === event.clientId,
-                    );
-                    const name = clientDisplayName(event.clientId, clients);
-                    if (!client) return name;
-                    return (
-                      <HoverPreview
-                        card={<ClientPreviewCard client={client} />}
-                      >
-                        <Link
-                          to={`/clients/${client._id}`}
-                          className="hover:underline"
-                        >
-                          {name}
-                        </Link>
-                      </HoverPreview>
-                    );
-                  })()}
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <CalendarIcon width={14} height={14} />
-                  {formatDate(event.startsAt)}
-                  {event.startsAt != null
-                    ? ` · ${formatTime(event.startsAt)} – ${formatTime(event.endsAt)}`
-                    : ""}
-                </span>
-                <span className="inline-flex min-w-0 items-center gap-1.5">
-                  <MapPinIcon width={14} height={14} />
-                  {event.venueId ? (
-                    <Link to="/facilities" className="hover:underline">
-                      {venueLabel}
-                    </Link>
-                  ) : (
-                    venueLabel
-                  )}
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <UsersIcon width={14} height={14} />
-                  {formatCount(event.expectedHeadcount)} guests
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <TagIcon width={14} height={14} />
-                  {formatStatusLabel(event.eventType)}
-                </span>
-              </div>
-            </div>
-            <div className="flex flex-col items-end gap-2">
-              {typeof event.updatedAt === "number" ? (
-                <span className="inline-flex items-center gap-1.5 text-sm text-ink-3">
-                  <ClockIcon width={13} height={13} />
-                  Last updated {relativeDays(event.updatedAt)}
-                </span>
-              ) : null}
-              <div className="flex flex-wrap items-center justify-end gap-2">
-                {headerActions}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
+  const overviewProps = {
+    eventId: event._id,
+    event: event,
+    version: version,
+    busy: busy,
+    canRevise: canRevise,
+    canChangeHeadcount: canChangeHeadcount,
+    reviseBlockedReason: reviseBlockedReason,
+    headcountBlockedReason: headcountBlockedReason,
+    venuesLoading: venues === undefined,
+    activeVenues: activeVenues,
+    venue: venue,
+    clients: clients,
+    clientId: event.clientId,
+    startsAt: event.startsAt,
+    endsAt: event.endsAt,
+    expectedHeadcount: event.expectedHeadcount,
+    venueId: event.venueId,
+    budgetAmount: event.budgetAmount,
+    quotedPrice: event.quotedPrice,
+    primaryContactName: event.primaryContactName,
+    primaryContactEmail: event.primaryContactEmail,
+    primaryContactPhone: event.primaryContactPhone,
+    accessibilityNeeds: event.accessibilityNeeds,
+    serviceRequirements: event.serviceRequirements,
+    operationalRequirements: event.operationalRequirements,
+    stage: String(event.stage),
+    currencyCode: currencyCode,
+    lifecycleActions: lifecycle,
+    onAction: runAction,
+    people: people,
+    dishCount: dishCount,
+    staffCount: staffCount,
+    timelineCount: timelineCount,
+    run: run,
+    onReschedule: reschedule,
+    onChangeHeadcount: changeHeadcount,
+    onChangeVenue: changeVenue,
+    onChangePricing: changePricing,
+    onChangePrimaryContact: changePrimaryContact,
+    onChangeRequirements: changeRequirements,
+  };
+  const notices = (
+    <>
       {savedToast}
       {pdfNotice ? (
         <p className="banner banner-ok" role="status">
@@ -671,72 +570,10 @@ function EventDetailContent({
       {event.stage === "planning" && event.plannedAt == null ? (
         <CompleteDraftPlanningPanel event={event} clients={clients} />
       ) : null}
-
-      <EventDetailTabs active={activeTab} onChange={setTab} compact={mobile} />
-
-      {mobileOverview ? (
-        <EventTabErrorBoundary tabLabel="Overview" key="mobile-overview">
-          <MobileEventOverview
-            event={event}
-            venue={venue}
-            clients={clients}
-            dishes={dishes}
-            eventDishes={eventDishes}
-            activities={timelineActivities}
-            staffingRoster={staffingRoster}
-            people={people}
-          />
-        </EventTabErrorBoundary>
-      ) : null}
-      {activeTab === "overview" && !mobileOverview ? (
-        <EventTabErrorBoundary tabLabel="Overview" key="overview">
-          <EventOverviewTab
-            eventId={event._id}
-            event={event}
-            version={version}
-            busy={busy}
-            canRevise={canRevise}
-            canChangeHeadcount={canChangeHeadcount}
-            reviseBlockedReason={reviseBlockedReason}
-            headcountBlockedReason={headcountBlockedReason}
-            venuesLoading={venues === undefined}
-            activeVenues={activeVenues}
-            venue={venue}
-            clients={clients}
-            clientId={event.clientId}
-            startsAt={event.startsAt}
-            endsAt={event.endsAt}
-            expectedHeadcount={event.expectedHeadcount}
-            venueId={event.venueId}
-            budgetAmount={event.budgetAmount}
-            quotedPrice={event.quotedPrice}
-            primaryContactName={event.primaryContactName}
-            primaryContactEmail={event.primaryContactEmail}
-            primaryContactPhone={event.primaryContactPhone}
-            accessibilityNeeds={event.accessibilityNeeds}
-            serviceRequirements={event.serviceRequirements}
-            operationalRequirements={event.operationalRequirements}
-            stage={String(event.stage)}
-            currencyCode={currencyCode}
-            lifecycleActions={lifecycle}
-            onAction={runAction}
-            people={people}
-            dishCount={dishCount}
-            staffCount={staffCount}
-            timelineCount={timelineCount}
-            run={run}
-            onReschedule={reschedule}
-            onChangeHeadcount={changeHeadcount}
-            onChangeVenue={changeVenue}
-            onChangePricing={changePricing}
-            onChangePrimaryContact={changePrimaryContact}
-            onChangeRequirements={changeRequirements}
-          />
-          <div className="mt-5">
-            <EventSourceProvenancePanel capsuleId={event._id} />
-          </div>
-        </EventTabErrorBoundary>
-      ) : null}
+    </>
+  );
+  const otherTabs = (
+    <>
       {activeTab === "chat" ? (
         <EventTabErrorBoundary tabLabel="Team Chat" key="chat">
           <EventChatTab eventId={event._id} eventTitle={String(event.title)} />
@@ -873,6 +710,128 @@ function EventDetailContent({
           <EventMarginTab eventId={event._id} />
         </EventTabErrorBoundary>
       ) : null}
+    </>
+  );
+
+  if (!mobile) {
+    return (
+      <EventDashboard
+        title={String(event.title)}
+        updatedAt={typeof event.updatedAt === "number" ? event.updatedAt : null}
+        client={(() => {
+          const client = clients?.find((c) => c._id === event.clientId);
+          const name = clientDisplayName(event.clientId, clients);
+          if (!client) return name;
+          return (
+            <HoverPreview card={<ClientPreviewCard client={client} />}>
+              <Link to={`/clients/${client._id}`} className="hover:underline">
+                {name}
+              </Link>
+            </HoverPreview>
+          );
+        })()}
+        venue={
+          event.venueId ? (
+            <Link to="/facilities">{venueLabel}</Link>
+          ) : (
+            venueLabel
+          )
+        }
+        actions={headerActions}
+        activeTab={activeTab}
+        onTab={setTab}
+        overview={overviewProps}
+        notices={notices}
+      >
+        {otherTabs}
+      </EventDashboard>
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      <section
+        className="card px-4 py-4"
+        data-testid="event-context-header-mobile"
+      >
+        <div className="flex items-start gap-2">
+          <Link
+            to="/events"
+            aria-label="All events"
+            className="-ml-1 grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-2 hover:bg-inset"
+          >
+            <ArrowLeftIcon width={18} height={18} />
+          </Link>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl leading-tight font-bold text-ink">
+              {event.title}
+            </h1>
+            <div className="mt-1.5 flex flex-wrap items-center gap-2 text-sm text-ink-2">
+              <StatusChip status={String(event.stage)} />
+              <span>{formatStatusLabel(event.eventType)}</span>
+              {event.startsAt != null ? (
+                <span>· {relativeDays(event.startsAt)}</span>
+              ) : null}
+            </div>
+          </div>
+        </div>
+        <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3">
+          <HeroFact label="Date">
+            {formatDate(event.startsAt)}
+            <span className="block text-sm font-medium text-ink-2">
+              {event.startsAt != null
+                ? `${formatTime(event.startsAt)} – ${formatTime(event.endsAt)}`
+                : "—"}
+            </span>
+          </HeroFact>
+          <HeroFact label="Headcount">
+            {formatCount(event.expectedHeadcount)} guests
+          </HeroFact>
+          <HeroFact label="Venue">{venueLabel}</HeroFact>
+          <HeroFact label="Client">
+            {clientDisplayName(event.clientId, clients)}
+          </HeroFact>
+        </dl>
+        <p className="mt-3 border-t border-line pt-3 text-sm text-ink-2">
+          <span className="font-semibold text-ink">Budget / quoted</span>{" "}
+          {formatMoney(event.budgetAmount, currencyCode)} /{" "}
+          {formatMoney(
+            eventCommercialQuotedPrice({ quotedPrice: event.quotedPrice }),
+            currencyCode,
+          )}
+        </p>
+        <div className="mobile-actions mt-4 flex flex-wrap items-center justify-end gap-2">
+          {headerActions}
+        </div>
+      </section>
+
+      {notices}
+
+      <EventDetailTabs active={activeTab} onChange={setTab} compact={mobile} />
+
+      {mobileOverview ? (
+        <EventTabErrorBoundary tabLabel="Overview" key="mobile-overview">
+          <MobileEventOverview
+            event={event}
+            venue={venue}
+            clients={clients}
+            dishes={dishes}
+            eventDishes={eventDishes}
+            activities={timelineActivities}
+            staffingRoster={staffingRoster}
+            people={people}
+          />
+        </EventTabErrorBoundary>
+      ) : null}
+      {activeTab === "overview" && !mobileOverview ? (
+        <EventTabErrorBoundary tabLabel="Overview" key="overview">
+          <EventOverviewTab {...overviewProps} />
+          <div className="mt-5">
+            <EventSourceProvenancePanel capsuleId={event._id} />
+          </div>
+        </EventTabErrorBoundary>
+      ) : null}
+      {otherTabs}
     </div>
   );
 }

@@ -283,6 +283,26 @@ stack clock, shifts, calendar, prep, and secondary workflows. Preserve keyboard
 focus, named calendar controls, a skip link, 40–44px mobile targets, and offline
 feedback. All other routes retain their existing presentation contract.
 
+## Event page dashboard (owner requested 2026-09-24)
+
+Ryan supplied `capsule-event-dashboard.html` (2026-09-18) as the event page
+design and rejected a build that did not match it: "that looks nothing like
+this file". On desktop, `/events/:id` follows that file: a centered hero
+(stage, countdown and updated pills, a large Instrument Serif title with the
+second word in the accent, a facts row, the allergy pill from the service
+notes), a nine-step pipeline card, a pill group switcher (Overview, Plan,
+Food, People, Site, Money) with section pills under it, and an overview of a
+four-count strip, tiles, and a planning-notes bar. Each tile opens a modal
+sheet that holds the app's existing cards and edit forms. Non-overview
+sections render inside the same paper frame.
+
+The route uses the file's own tokens (cream `#F4EEE2` ground, `#C24E28`
+accent, Instrument Serif / Schibsted Grotesk / DM Mono, 22px radii), scoped to
+`.evd` in `src/features/events/dashboard/EventDashboard.css`, with the file's
+dark palette under `.dark`. This is a scoped exception; phones keep the
+existing mobile event views. Do not add it to
+`design-contract-exceptions.json`.
+
 ## Overview
 
 CapsuleX is the operating system for organizations that plan, produce, staff, deliver, and execute catered events. It should feel like a beautifully maintained service book rather than a generic administration dashboard. The application sits inside a pale botanical frame. Its working surfaces are warm white, its primary ink is a deep culinary green, and its hierarchy comes from editorial serif type, fine rules, measured negative space, and dense operational lists.

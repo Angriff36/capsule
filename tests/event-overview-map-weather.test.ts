@@ -2,7 +2,7 @@
 import { createElement } from "react";
 import { Route, Routes } from "react-router-dom";
 import { expect, it, vi } from "vitest";
-import { backend, container, mount } from "./support/mounted-app";
+import { backend, click, container, mount } from "./support/mounted-app";
 import { EventDetailPage } from "../src/features/events/EventDetailPage";
 import type { Id } from "../src/lib/api";
 
@@ -64,6 +64,12 @@ it("shows the venue map and event-day weather chip for a coordinates-only venue"
   );
   try {
     await mount(page(), `/events/${eventId}`);
+    // The desktop overview keeps the map in the Event details sheet.
+    await click(
+      container.querySelector<HTMLElement>(
+        '[data-testid="event-dash-tile-details"]',
+      )!,
+    );
   } finally {
     vi.unstubAllGlobals();
   }

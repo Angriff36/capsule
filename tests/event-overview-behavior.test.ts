@@ -2,12 +2,22 @@
 import { createElement } from "react";
 import { Route, Routes } from "react-router-dom";
 import { expect, it } from "vitest";
-import { backend, container, mount } from "./support/mounted-app";
+import { backend, click, container, mount } from "./support/mounted-app";
 import { EventDetailPage } from "../src/features/events/EventDetailPage";
 import { EventBattleBoardLayoutsPanel } from "../src/features/events/EventBattleBoardLayoutsPanel";
 import type { Id } from "../src/lib/api";
 
 const eventId = "nn7ez3fz56ya246m6p17az2ad58crnwg" as Id<"events">;
+/** The desktop overview keeps each card in a tile's sheet; open it first. */
+async function openTile(id: string, cardTestId: string) {
+  if (container.querySelector(`[data-testid="${cardTestId}"]`)) return;
+  await click(
+    container.querySelector<HTMLElement>(
+      `[data-testid="event-dash-tile-${id}"]`,
+    )!,
+  );
+}
+
 const page = () =>
   createElement(
     Routes,
@@ -102,6 +112,7 @@ it("prints the booked venue snapshot in the header, not a later catalog rename",
   ]);
   await mount(page(), `/events/${eventId}`);
   expect(container.textContent).toContain("Garden Hall");
+  await openTile("details", "event-details-card");
   expect(container.textContent).toContain("100 Oak St");
   // Scoped to the header venue chip: the edit-basics form's venue picker
   // legitimately lists live catalog names, so the whole page still contains
@@ -135,6 +146,7 @@ it("prints the booked service style snapshot in the details card, not a later ca
   // Scoped to the details card: the edit-basics form's style picker
   // legitimately lists live catalog names, so the whole page still contains
   // the renamed string.
+  await openTile("details", "event-details-card");
   const card = container.querySelector('[data-testid="event-details-card"]')!;
   expect(card.textContent).toContain("Full Service");
   expect(card.textContent).not.toContain("Full Service RENAMED");
@@ -165,6 +177,7 @@ it("prints the booked occasion snapshot in the details card, not a later catalog
   // Scoped to the details card: the edit-basics form's occasion picker
   // legitimately lists live catalog names, so the whole page still contains
   // the renamed string.
+  await openTile("details", "event-details-card");
   const card = container.querySelector('[data-testid="event-details-card"]')!;
   expect(card.textContent).toContain("Wedding");
   expect(card.textContent).not.toContain("Wedding RENAMED");
@@ -196,6 +209,7 @@ it("prints the booked client snapshot in the details card, not a later catalog r
   // Scoped to the details card: the edit-basics form's client picker
   // legitimately lists live catalog names, so the whole page still contains
   // the renamed string.
+  await openTile("details", "event-details-card");
   const card = container.querySelector('[data-testid="event-details-card"]')!;
   expect(card.textContent).toContain("Acme Catering");
   expect(card.textContent).not.toContain("Acme RENAMED");
@@ -223,6 +237,7 @@ it("prints the booked owner snapshot in the assigned-owner card, not a later cat
     },
   ]);
   await mount(page(), `/events/${eventId}`);
+  await openTile("team", "event-assigned-owner");
   const name = container.querySelector(
     '[data-testid="event-assigned-owner-name"]',
   );
@@ -287,6 +302,7 @@ it("prints the booked commercial seed on the budget card, not a later proposal t
     enhancements: [],
   });
   await mount(page(), `/events/${eventId}`);
+  await openTile("money", "event-budget-card");
   const card = container.querySelector('[data-testid="event-budget-card"]')!;
   // formatMoney prints whole-dollar USD without cents.
   expect(card.textContent).toContain("$2,000");
@@ -334,10 +350,12 @@ it("prints the live nine-domain readiness summary, not a frozen Event readiness 
     ],
   });
   await mount(page(), `/events/${eventId}`);
+  await openTile("ready", "event-readiness-summary");
   expect(backend.reads).toHaveBeenCalledWith(
     "eventReadiness:getEventReadiness",
     { eventId },
   );
+  await openTile("ready", "event-readiness-summary");
   const card = container.querySelector(
     '[data-testid="event-readiness-summary"]',
   )!;
@@ -388,6 +406,7 @@ it("prints the live nine-domain readiness summary, not a frozen Event readiness 
     ],
   });
   await mount(page());
+  await openTile("ready", "event-readiness-summary");
   const live = container.querySelector(
     '[data-testid="event-readiness-summary"]',
   )!;
