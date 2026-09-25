@@ -25246,7 +25246,7 @@ async function __runInventoryItemOpen(ctx: MutationCtx, { docId, ingredientId, l
     if (!(((quantityOnHand == null) || (quantityOnHand >= 0)))) throw new Error("Quantity on hand cannot be negative");
     if (!(((parLevel == null) || (parLevel >= 0)))) throw new Error("Par level cannot be negative");
     if (!(((reorderThreshold == null) || (reorderThreshold >= 0)))) throw new Error("Reorder threshold cannot be negative");
-    if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("Unit cost cannot be negative");
+    if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("This item's cost per unit can't be negative. Use zero or more.");
     const previousQuantity = doc.quantityOnHand;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -25340,7 +25340,7 @@ export const InventoryItem_createViaOpen = mutation({
     if (!(((quantityOnHand == null) || (quantityOnHand >= 0)))) throw new Error("Quantity on hand cannot be negative");
     if (!(((parLevel == null) || (parLevel >= 0)))) throw new Error("Par level cannot be negative");
     if (!(((reorderThreshold == null) || (reorderThreshold >= 0)))) throw new Error("Reorder threshold cannot be negative");
-    if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("Unit cost cannot be negative");
+    if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("This item's cost per unit can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -25446,7 +25446,7 @@ async function __runInventoryItemReceiveStock(ctx: MutationCtx, { docId, quantit
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((quantity > 0))) throw new Error("This item's received amount has to be more than zero. Enter how much arrived.");
-    if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("Unit cost cannot be negative");
+    if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("This item's cost per unit can't be negative. Use zero or more.");
     const previousQuantity = doc.quantityOnHand;
     const nextQuantity = (doc.quantityOnHand + quantity);
     if (version !== undefined && (doc as any).version !== version) {
@@ -25757,7 +25757,7 @@ async function __runInventoryItemUpdateLevels(ctx: MutationCtx, { docId, parLeve
     if (!(checkRole(user, "inventoryManageAccess"))) throw new Error("Guard 2 failed");
     if (!((parLevel >= 0))) throw new Error("Par level cannot be negative");
     if (!((reorderThreshold >= 0))) throw new Error("Reorder threshold cannot be negative");
-    if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("Unit cost cannot be negative");
+    if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("This item's cost per unit can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }

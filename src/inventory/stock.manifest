@@ -48,7 +48,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   constraint stockNonnegative: self.stockedAt == null or self.quantityOnHand >= 0 "Quantity on hand cannot be negative"
   constraint stockParNonnegative: self.parLevel >= 0 "Par level cannot be negative"
   constraint stockReorderNonnegative: self.reorderThreshold >= 0 "Reorder threshold cannot be negative"
-  constraint stockCostNonnegative: self.unitCost >= 0 "Unit cost cannot be negative"
+  constraint stockCostNonnegative: self.unitCost >= 0 "This item's cost per unit can't be negative. Use zero or more."
 
   default policy inventoryItemRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may see stock items"
   default policy inventoryItemWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may update stock items"
@@ -75,7 +75,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     constraint openStockQuantityNonnegative: quantityOnHand == null or quantityOnHand >= 0 "Quantity on hand cannot be negative"
     constraint openStockParNonnegative: parLevel == null or parLevel >= 0 "Par level cannot be negative"
     constraint openStockReorderNonnegative: reorderThreshold == null or reorderThreshold >= 0 "Reorder threshold cannot be negative"
-    constraint openStockCostNonnegative: unitCost == null or unitCost >= 0 "Unit cost cannot be negative"
+    constraint openStockCostNonnegative: unitCost == null or unitCost >= 0 "This item's cost per unit can't be negative. Use zero or more."
     compute previousQuantity = self.quantityOnHand
     mutate ingredientId = ingredientId
     mutate locationId = locationId
@@ -135,7 +135,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     guard self.stockedAt != null
     guard self.deletedAt == null
     constraint receiveQuantityPositive: quantity > 0 "This item's received amount has to be more than zero. Enter how much arrived."
-    constraint receiveCostNonnegative: unitCost == null or unitCost >= 0 "Unit cost cannot be negative"
+    constraint receiveCostNonnegative: unitCost == null or unitCost >= 0 "This item's cost per unit can't be negative. Use zero or more."
     compute previousQuantity = self.quantityOnHand
     compute nextQuantity = self.quantityOnHand + quantity
     mutate quantityOnHand = nextQuantity
@@ -279,7 +279,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "inventoryManageAccess")
     constraint levelsParNonnegative: parLevel >= 0 "Par level cannot be negative"
     constraint levelsReorderNonnegative: reorderThreshold >= 0 "Reorder threshold cannot be negative"
-    constraint levelsCostNonnegative: unitCost == null or unitCost >= 0 "Unit cost cannot be negative"
+    constraint levelsCostNonnegative: unitCost == null or unitCost >= 0 "This item's cost per unit can't be negative. Use zero or more."
     mutate parLevel = parLevel
     mutate reorderThreshold = reorderThreshold
     mutate unitCost = unitCost != null ? unitCost : self.unitCost
