@@ -53608,7 +53608,7 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
     if (!(((doc.locationId == null) || (locationId === doc.locationId)))) throw new Error("Receipt locationId must match the seeded location when one was pre-set");
     if (!((quantity > 0))) throw new Error("This order line's received amount has to be more than zero. Enter how much arrived.");
     if (!(((doc.receivedQuantity + quantity) <= doc.orderedQuantity))) throw new Error("This order line can't receive more than was ordered. Enter a smaller amount.");
-    if (!((unitPrice >= 0))) throw new Error("Receipt unit price cannot be negative");
+    if (!((unitPrice >= 0))) throw new Error("This order line's price per unit can't be negative. Use zero or more.");
     if (!((((supplierLotNumber).trim()).length > 0))) throw new Error("Supplier lot number is required for traceability");
     if (!(((discrepancyQuantity == null) || (discrepancyQuantity >= 0)))) throw new Error("Discrepancy quantity cannot be negative");
     const previousReceived = doc.receivedQuantity;

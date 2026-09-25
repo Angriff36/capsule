@@ -61,6 +61,6 @@ describe("plain words on leftover order-line unit-cost copy", () => {
       "This order line's received amount has to be more than zero. Enter how much arrived.",
     );
     // Later leftovers on this same file are pinned, not rewritten.
-    expect(visible).toContain("Receipt unit price cannot be negative");
+    expect(visible).toContain("Ordered quantity must be positive");
   });
 });

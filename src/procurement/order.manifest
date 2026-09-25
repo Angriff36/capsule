@@ -688,7 +688,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     constraint receiptLocationMatch: self.locationId == null or locationId == self.locationId "Receipt locationId must match the seeded location when one was pre-set"
     constraint receiptQuantityPositive: quantity > 0 "This order line's received amount has to be more than zero. Enter how much arrived."
     constraint receiptNotOver: self.receivedQuantity + quantity <= self.orderedQuantity "This order line can't receive more than was ordered. Enter a smaller amount."
-    constraint receiptPriceNonnegative: unitPrice >= 0 "Receipt unit price cannot be negative"
+    constraint receiptPriceNonnegative: unitPrice >= 0 "This order line's price per unit can't be negative. Use zero or more."
     constraint receiptSupplierLotRequired: length(trim(supplierLotNumber)) > 0 "Supplier lot number is required for traceability"
     constraint receiptDiscrepancyNonnegative: discrepancyQuantity == null or discrepancyQuantity >= 0 "Discrepancy quantity cannot be negative"
     compute previousReceived = self.receivedQuantity

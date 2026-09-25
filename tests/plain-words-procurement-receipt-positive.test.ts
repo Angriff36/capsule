@@ -42,7 +42,10 @@ describe("plain words on leftover order-line received-amount-positive copy", () 
     expect(visible).toContain(
       "This order line can't receive more than was ordered. Enter a smaller amount.",
     );
+    expect(visible).toContain(
+      "This order line's price per unit can't be negative. Use zero or more.",
+    );
     // Later leftovers on this same file are pinned, not rewritten.
-    expect(visible).toContain("Receipt unit price cannot be negative");
+    expect(visible).toContain("Ordered quantity must be positive");
   });
 });
