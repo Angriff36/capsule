@@ -16,7 +16,8 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
 
   // Deduplication key - normalized email + event date + tenantId hash
   // Ensures submit-once behavior even if user submits multiple times
-  property dedupKey: string
+  // Set once by create; the dedup contract depends on it never moving.
+  property readonly dedupKey: string
 
   // Submission metadata
   property status: QuoteSubmissionStatus = "pending"

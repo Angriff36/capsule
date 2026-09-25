@@ -15494,6 +15494,7 @@ async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dish
       addedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
+    if (!__creation && JSON.stringify((updates as any)["eventId"] ?? null) !== JSON.stringify(doc["eventId"] ?? null)) throw new Error("E_READONLY: Property 'eventId' is readonly and cannot be modified after creation");
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const __rel_event__post = await __resolveRelation(ctx, "events", [__auth.tenantId, __after.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
@@ -15943,6 +15944,7 @@ async function __runEventDishConfirmFromProposal(ctx: MutationCtx, { docId, even
       addedAt: ((doc.addedAt != null) ? doc.addedAt : Date.now()),
       version: ((doc as any).version ?? 0) + 1
     };
+    if (!__creation && JSON.stringify((updates as any)["eventId"] ?? null) !== JSON.stringify(doc["eventId"] ?? null)) throw new Error("E_READONLY: Property 'eventId' is readonly and cannot be modified after creation");
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const __rel_event__post = await __resolveRelation(ctx, "events", [__auth.tenantId, __after.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
@@ -39348,6 +39350,7 @@ async function __runProposalLineItemAddLine(ctx: MutationCtx, { docId, proposalI
       addedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
+    if (!__creation && JSON.stringify((updates as any)["proposalId"] ?? null) !== JSON.stringify(doc["proposalId"] ?? null)) throw new Error("E_READONLY: Property 'proposalId' is readonly and cannot be modified after creation");
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, lineItemId: docId, tenantId: __after.tenantId, proposalId: proposalId, description: description, pricingBasis: pricingBasis, unitPrice: unitPrice, amount: amount, _subject: { entity: "ProposalLineItem", command: "addLine", id: docId } };
