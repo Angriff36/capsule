@@ -40,7 +40,8 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   computed isBelowPar: boolean = self.parLevel > 0 and self.quantityOnHand < self.parLevel
   computed isBelowReorder: boolean = self.reorderThreshold > 0 and self.quantityOnHand < self.reorderThreshold
   computed inventoryValue: money(12, 2) = self.quantityOnHand * self.unitCost
-  // Free stock for display; over-reservation hard gate stays orchestrator (Convex sum multi-hop).
+  // Free stock. InventoryReservation.reserve refuses holds beyond it unless
+  // the company turned stock-level checks off (InventorySettings).
   computed totalReserved: decimal(12, 4) = sum(self.reservations, (r) => r.status == "active" ? r.quantity : 0)
   computed availableQuantity: decimal(12, 4) = self.quantityOnHand - self.totalReserved
 
@@ -334,6 +335,38 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   store InventoryItem in durable
 }
 
+// One per company. Ryan (2026-09-24): a company can turn the free-stock check
+// on reservations off and back on at any time; no data is lost. No row means
+// the check is on.
+entity InventorySettings mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId]
+  timestamps
+  versionProperty version: number
+
+  property required stockLevelsTracked: boolean = true
+  property registeredAt: datetime?
+
+  default policy inventorySettingsRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Inventory staff or event managers may see stock settings"
+  default policy inventorySettingsWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff or managers may update stock settings"
+  default policy inventorySettingsExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff or managers may change stock settings"
+
+  command register(stockLevelsTracked: boolean) {
+    guard self.deletedAt == null
+    guard self.registeredAt == null
+    mutate stockLevelsTracked = stockLevelsTracked
+    mutate registeredAt = now()
+  }
+
+  command setStockTracking(stockLevelsTracked: boolean) {
+    guard self.deletedAt == null
+    guard self.registeredAt != null
+    mutate stockLevelsTracked = stockLevelsTracked
+  }
+
+  store InventorySettings in durable
+}
+
 // Quantity of an InventoryItem held for an Event. Capsule-pro only stored
 // aggregate quantityReserved; this entity records each event's hold, release
 // and consumption separately so closing an event preserves stock history.
@@ -357,6 +390,7 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
   belongsTo inventoryLot: InventoryLot fields [tenantId, inventoryLotId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+  belongsTo inventorySettings: InventorySettings fields [tenantId] references [tenantId]
 
   constraint reservationQuantityPositive: self.reservedAt == null or self.quantity > 0 "Reservation quantity must be positive"
 
@@ -393,6 +427,9 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
     // different ingredient or storage location. Legacy stock may omit a lot.
     constraint reserveLotMatch: inventoryLotId == null or (self.inventoryLot != null and self.inventoryLot.deletedAt == null and self.inventoryLot.ingredientId == ingredientId and self.inventoryLot.locationId == self.inventoryItem.locationId) "Selected lot must match the reserved ingredient and stock location"
     constraint reserveQuantityPositive: quantity > 0 "Reservation quantity must be positive"
+    // Free stock = on hand minus active holds. Skipped when the company turned
+    // stock-level checks off (Ryan, 2026-09-24).
+    constraint reserveFitsFreeStock: self.inventoryItem == null or (self.inventorySettings != null and self.inventorySettings.deletedAt == null and self.inventorySettings.stockLevelsTracked == false) or quantity <= self.inventoryItem.quantityOnHand - sum(self.inventoryItem.reservations, (r) => r.status == "active" ? r.quantity : 0) "Not enough free stock: other events already hold some of it. Lower the amount, or turn off stock-level checks on the stock book."
     mutate inventoryItemId = inventoryItemId
     mutate inventoryLotId = inventoryLotId
     mutate eventId = eventId

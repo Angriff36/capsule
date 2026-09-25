@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   useCreateInventoryItem,
   useCreateInventoryReservation,
+  useCreateInventorySettings,
   useCreateStockTransfer,
   useCreateStorageLocation,
   useInventoryItemReceiveStock,
@@ -11,12 +12,14 @@ import {
   useInventoryItemUpdateLevels,
   useInventoryReservationConsume,
   useInventoryReservationRelease,
+  useInventorySettingsSetStockTracking,
   useListEvent,
   useListIngredient,
   useListIngredientDemand,
   useListInventoryItem,
   useListInventoryLot,
   useListInventoryReservation,
+  useListInventorySettings,
   useListStockTransfer,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
@@ -94,6 +97,7 @@ export function StockBookPage() {
   const ingredients = useListIngredient();
   const demands = useListIngredientDemand();
   const events = useListEvent();
+  const inventorySettings = useListInventorySettings();
   const createLocation = useCreateStorageLocation();
   const createItem = useCreateInventoryItem();
   const createReservation = useCreateInventoryReservation();
@@ -105,6 +109,8 @@ export function StockBookPage() {
   const updateLevels = useInventoryItemUpdateLevels();
   const consumeReservation = useInventoryReservationConsume();
   const releaseReservation = useInventoryReservationRelease();
+  const createInventorySettings = useCreateInventorySettings();
+  const setStockTracking = useInventorySettingsSetStockTracking();
   const [form, setForm] = useState<
     "location" | "stock" | "reserve" | "transfer" | null
   >(null);
@@ -176,6 +182,26 @@ export function StockBookPage() {
         a.quantityOnHand / Math.max(1, a.reorderThreshold) -
         b.quantityOnHand / Math.max(1, b.reorderThreshold),
     );
+
+  // No settings row means the free-stock check on reservations is on.
+  const stockSettings = (inventorySettings ?? []).find(
+    (row) => row.deletedAt == null,
+  );
+  const stockLevelsTracked = stockSettings?.stockLevelsTracked !== false;
+  const toggleStockTracking = () =>
+    void run("stock-tracking", async () => {
+      if (stockSettings) {
+        await setStockTracking({
+          docId: stockSettings._id,
+          version: stockSettings.version,
+          stockLevelsTracked: !stockLevelsTracked,
+        });
+      } else {
+        await createInventorySettings({
+          stockLevelsTracked: !stockLevelsTracked,
+        });
+      }
+    });
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -482,6 +508,18 @@ export function StockBookPage() {
             </p>
           </div>
           <div className="supply-masthead-actions">
+            <button
+              className="btn btn-ghost"
+              disabled={busy != null || inventorySettings === undefined}
+              onClick={toggleStockTracking}
+              title={
+                stockLevelsTracked
+                  ? "Reservations must fit the free stock. Turn off if you do not keep stock counts up to date."
+                  : "Reservations are not checked against stock. Turn on after a fresh count."
+              }
+            >
+              {stockLevelsTracked ? "Stock checks: on" : "Stock checks: off"}
+            </button>
             <button
               className="btn btn-ghost"
               onClick={() => setForm("location")}
