@@ -101,6 +101,7 @@ import type * as lib_invoiceNumberSequence from "../lib/invoiceNumberSequence.js
 import type * as lib_invoiceNumbering from "../lib/invoiceNumbering.js";
 import type * as lib_invoiceReminderPdf from "../lib/invoiceReminderPdf.js";
 import type * as lib_kitchenAccessGate from "../lib/kitchenAccessGate.js";
+import type * as lib_lineOverridePurchasing from "../lib/lineOverridePurchasing.js";
 import type * as lib_lookupCostBarcodeDiscovery from "../lib/lookupCostBarcodeDiscovery.js";
 import type * as lib_lookupCostFromOpenPrices from "../lib/lookupCostFromOpenPrices.js";
 import type * as lib_lookupCostTenantFallback from "../lib/lookupCostTenantFallback.js";
@@ -141,6 +142,7 @@ import type * as lib_shiftSchedulingEvents from "../lib/shiftSchedulingEvents.js
 import type * as lib_staffSignInMailer from "../lib/staffSignInMailer.js";
 import type * as lib_staffSignInPassword from "../lib/staffSignInPassword.js";
 import type * as lib_staffingReconciliation from "../lib/staffingReconciliation.js";
+import type * as lib_standInPurchaseNeed from "../lib/standInPurchaseNeed.js";
 import type * as lib_styleReconciliation from "../lib/styleReconciliation.js";
 import type * as lib_teamChatRead from "../lib/teamChatRead.js";
 import type * as lib_teamChatScan from "../lib/teamChatScan.js";
@@ -291,6 +293,7 @@ declare const fullApi: ApiFromModules<{
   "lib/invoiceNumbering": typeof lib_invoiceNumbering;
   "lib/invoiceReminderPdf": typeof lib_invoiceReminderPdf;
   "lib/kitchenAccessGate": typeof lib_kitchenAccessGate;
+  "lib/lineOverridePurchasing": typeof lib_lineOverridePurchasing;
   "lib/lookupCostBarcodeDiscovery": typeof lib_lookupCostBarcodeDiscovery;
   "lib/lookupCostFromOpenPrices": typeof lib_lookupCostFromOpenPrices;
   "lib/lookupCostTenantFallback": typeof lib_lookupCostTenantFallback;
@@ -331,6 +334,7 @@ declare const fullApi: ApiFromModules<{
   "lib/staffSignInMailer": typeof lib_staffSignInMailer;
   "lib/staffSignInPassword": typeof lib_staffSignInPassword;
   "lib/staffingReconciliation": typeof lib_staffingReconciliation;
+  "lib/standInPurchaseNeed": typeof lib_standInPurchaseNeed;
   "lib/styleReconciliation": typeof lib_styleReconciliation;
   "lib/teamChatRead": typeof lib_teamChatRead;
   "lib/teamChatScan": typeof lib_teamChatScan;
