@@ -23,9 +23,7 @@ describe("plain words on leftover weekly-line contribution copy", () => {
     // The refusal now speaks in plain catering words.
     expect(visible).toContain(NEW);
     expectPlain(NEW);
-    // The generated copies carry the plain wording. The old sentence still
-    // exists in them from event-purchasing.manifest, so only the new one is
-    // asserted present.
+    // The generated copies carry the plain wording.
     const mutations = readFileSync("convex/mutations.ts", "utf8");
     expect(mutations).toContain(NEW);
     const summary = readFileSync("manifest-context-summary.json", "utf8");

@@ -235,7 +235,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     optional productionBatchAllocationId: uuid
   ) {
     guard self.deletedAt == null
-    constraint recordQuantityPositive: quantity >= 0 "Contribution quantity cannot be negative"
+    constraint recordQuantityPositive: quantity >= 0 "This event's ingredient amount can't be negative. Use zero or more."
     constraint recordServingsNonnegative: servings >= 0 "Contribution servings cannot be negative"
     // A legacy reaction (no sourceKey) that matches a batch-owned share must
     // leave it untouched: the batch owns that quantity, not the serving count.
@@ -293,7 +293,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   command revise(quantity: decimal(12, 4), servings: decimal(12, 4)) {
     guard self.recordedAt != null
     guard self.deletedAt == null
-    constraint reviseQuantityPositive: quantity >= 0 "Contribution quantity cannot be negative"
+    constraint reviseQuantityPositive: quantity >= 0 "This event's ingredient amount can't be negative. Use zero or more."
     // Batch-owned shares are sized by their allocation, not by servings; a
     // headcount change never rewrites them (replan the batch instead).
     compute batchOwned = self.ownership == "batch_allocation" or self.ownership == "batch_surplus"
