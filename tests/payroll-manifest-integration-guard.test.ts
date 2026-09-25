@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
-  inspectPayrollManifestIntegration,
-  inspectPayrollSource,
-} from "../scripts/check-payroll-manifest-integration";
+  inspectManifestIntegration,
+  inspectManifestSource,
+} from "../scripts/check-manifest-integration";
+
+const inspectPayrollManifestIntegration = () =>
+  inspectManifestIntegration("payroll");
+const inspectPayrollSource = (file: string, source: string) =>
+  inspectManifestSource("payroll", file, source);
 
 describe("Payroll Manifest integration guard", () => {
   it("keeps PayrollLifecyclePolicy on approved generated surfaces", () => {

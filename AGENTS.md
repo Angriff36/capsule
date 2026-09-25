@@ -69,7 +69,7 @@ bun run test
 bun run test:coverage    # vitest + coverage ratchet
 bun run build
 bun run baseline:decay   # monthly hygiene checks
-bun run check            # toolchain + ownership + proof:emit + check:proof + manifest-registry + manifest-breaking (vs last [release], acks in scripts/manifest-breaking-acks.json) + nine per-domain manifest gates + design-vocab + typecheck + format:check + secrets + test:coverage + build + baseline:decay
+bun run check            # toolchain + ownership + proof:emit + check:proof + manifest-registry + manifest-breaking (vs last [release], acks in scripts/manifest-breaking-acks.json) + manifest-integration (all domain guards, generated/proof/guard.*.json) + design-vocab + typecheck + format:check + secrets + test:coverage + build + baseline:decay
 bun run codegen          # convex codegen
 bun run manifest:regen      # only regen entry — Builder apply when conflict-free
 bun run seed             # requires Convex URL

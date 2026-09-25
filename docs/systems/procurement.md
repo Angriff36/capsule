@@ -52,7 +52,7 @@ The UI preserves IngredientDemand and Event provenance and shows recorded lots u
 
 These behaviors describe the current source branch. Isolated generated-runtime qualification covers shared draft cancellation, buyer quantity preservation, return to automatic calculation, receipt history, and repeated reconciliation. Weekly date normalization, cross-week stock allocation, rescheduling propagation, live-data repair, and authenticated production proof remain open; see [the source-backed workflow record](../../codex-plans/source-backed-operations/progress.md).
 
-Proof: `tests/supply-slice-contract.test.ts`, `tests/supply-lifecycle-policy.test.ts`, `tests/supply-manifest-integration-guard.test.ts`, and `bun run check:supply-manifest`.
+Proof: `tests/supply-slice-contract.test.ts`, `tests/supply-lifecycle-policy.test.ts`, `tests/supply-manifest-integration-guard.test.ts`, and ~~`bun run check:supply-manifest`~~ `bun run check:manifest-integration` (2026-09-25).
 
 ## References
 

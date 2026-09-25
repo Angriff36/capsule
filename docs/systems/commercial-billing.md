@@ -99,7 +99,7 @@ Sales roles own client registration and CRM documents; finance roles own billing
 
 - Runtime: `tests/proofs/invoice-payment-lifecycle.runtime.test.ts`, `tests/proofs/payment-method-lifecycle.runtime.test.ts`
 - Routes/lifecycle: `tests/finance-routes.test.ts`, `tests/clients-routes.test.ts`
-- Integration guard: `tests/commercial-manifest-integration-guard.test.ts` (`bun run check:commercial-manifest`)
+- Integration guard: `tests/commercial-manifest-integration-guard.test.ts` (~~`bun run check:commercial-manifest`~~ `bun run check:manifest-integration` (2026-09-25))
 - Opaque FK Zod regression: Invoice/Payment schemas accept Convex document ids (`z.string().min(1)`)
 
 ## References

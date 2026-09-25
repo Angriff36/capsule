@@ -213,7 +213,7 @@ for (const [p,{sha256:expected}] of Object.entries(o.files)) {
 - Event creation uses generated `createVia*` / `useCreate*` hooks directly (no authored `eventPlanning` allocation seam). Keep policy, validation, lifecycle, encryption, tenant enforcement, events, and reactions in the generated command surface.
 - Consume lifecycle availability from `src/generated/manifest-wiring-bindings.ts`; do not recreate transition tables in authored feature code.
 - Generated runtime behavior still needs focused reaction tests. Structural generation and typed wiring do not prove downstream reactions execute correctly.
-- `bun run check:event-manifest` enforces this authored Event boundary and is part of `bun run check`.
+- ~~`bun run check:event-manifest`~~ `bun run check:manifest-integration` (2026-09-25) enforces this authored Event boundary and is part of `bun run check`.
 
 ## Authored Culinary integration
 
@@ -221,7 +221,7 @@ for (const [p,{sha256:expected}] of Object.entries(o.files)) {
 - Culinary creation needs no authored allocation seam. Generated `createVia*` mutations construct one final document atomically (draft → checks → mutate → single persist); nothing is written on failure.
 - Keep validation, tenant enforcement, lifecycle, events, and reactions in generated runtime behavior. Consume lifecycle availability from `src/generated/manifest-wiring-bindings.ts`; do not recreate transition tables in authored Kitchen code.
 - Generated runtime behavior still requires focused reaction tests. Typed wiring and generated creation cleanup do not prove downstream demand or production reactions execute correctly.
-- `bun run check:culinary-manifest` enforces this authored Culinary boundary and is part of `bun run check`.
+- ~~`bun run check:culinary-manifest`~~ `bun run check:manifest-integration` (2026-09-25) enforces this authored Culinary boundary and is part of `bun run check`.
 
 ## Authored Inventory and Procurement integration
 
@@ -229,14 +229,14 @@ for (const [p,{sha256:expected}] of Object.entries(o.files)) {
 - Inventory and Procurement need no authored allocation seam. Do not write their documents in `convex/lib/**` or reproduce demand, reservation, need, order, vendor, or receipt lifecycles locally.
 - Consume proven lifecycle availability from `src/generated/manifest-wiring-bindings.ts`. `VendorOrderLine.recordReceipt` has generated capability and input metadata but no static lifecycle array because its next state is quantity-dependent; let the generated command decide legality.
 - Generated runtime behavior still requires focused reaction tests. The authored UI explicitly does not claim demand-to-purchase, add-line-to-ordered, cancellation, or receipt-to-stock automation while the projection evidence remains open.
-- `bun run check:supply-manifest` enforces this authored boundary and is part of `bun run check`.
+- ~~`bun run check:supply-manifest`~~ `bun run check:manifest-integration` (2026-09-25) enforces this authored boundary and is part of `bun run check`.
 
 ## Authored Production and Quality integration
 
 - Use generated hooks from `src/lib/manifest-convex-react.ts`, including governed `useCreatePrepTask` and `useCreateQualityCheck` (open).
 - Production and Quality need no authored allocation seam. Consume lifecycle availability from `src/generated/manifest-wiring-bindings.ts`.
 - Runtime proof for failed quality blocking: `tests/proofs/quality-check-fail-block.runtime.test.ts`.
-- `bun run check:production-manifest` enforces this authored boundary and is part of `bun run check`.
+- ~~`bun run check:production-manifest`~~ `bun run check:manifest-integration` (2026-09-25) enforces this authored boundary and is part of `bun run check`.
 
 ## Hard rule
 

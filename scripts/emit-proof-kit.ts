@@ -40,6 +40,22 @@ const CULINARY_ENTITIES = [
   "Dish",
   "Menu",
 ] as const;
+// Integration-guard scopes for Culinary and Event (tables the authored
+// guards protect; not part of the capability catalog).
+const CULINARY_GUARD_ENTITIES = [
+  ...CULINARY_ENTITIES,
+  "ComponentImport",
+  "ComponentImportLine",
+  "EventDish",
+] as const;
+const EVENT_GUARD_ENTITIES = [
+  "Client",
+  "Venue",
+  "Event",
+  "EventGuest",
+] as const;
+const EVENT_STAGES =
+  "planning|pending_approval|approved|executing|completed|cancelled|closed_out|pending|confirmed|declined";
 const CATALOG_ENTITIES = [
   ...SUPPLY_ENTITIES,
   ...PRODUCTION_ENTITIES,
@@ -535,6 +551,90 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
     ],
   });
   write("guard.payroll.json", payrollGuard);
+
+  const culinaryGuard = emitIntegrationGuardConfig(
+    emitCapabilityCatalog(ir, {
+      entityFilter: CULINARY_GUARD_ENTITIES,
+      versions,
+      runtimeProofIds: new Set(),
+      structuralProofIds: new Set(),
+    }),
+    {
+      featureRoots: ["src/features/kitchen"],
+      convexLibRoot: "convex/lib",
+      versions,
+      lifecycleLiteralPattern: `\\b(?:from|to)\\s*:\\s*["'](?:draft|published|retired|active|discontinued|archived)["']`,
+      lifecyclePolicies: [
+        {
+          pathSuffix: "/CulinaryLifecyclePolicy.ts",
+          bindingsImport: '../../generated/manifest-wiring-bindings"',
+          requiredSymbols: [
+            "ComponentPublishVersionLifecycle",
+            "MenuMarkPublishedLifecycle",
+          ],
+        },
+      ],
+    },
+  );
+  write("guard.culinary.json", culinaryGuard);
+
+  const eventGuard = emitIntegrationGuardConfig(
+    emitCapabilityCatalog(ir, {
+      entityFilter: EVENT_GUARD_ENTITIES,
+      versions,
+      runtimeProofIds: new Set(),
+      structuralProofIds: new Set(),
+    }),
+    {
+      featureRoots: ["src/features/events"],
+      convexLibRoot: "convex/lib",
+      versions,
+      // Transition objects ({ from, to }) and transition maps (stage: [..]).
+      lifecycleLiteralPattern: `\\b(?:from|to)\\s*:\\s*["'](?:${EVENT_STAGES})["']|["']?(?:${EVENT_STAGES})["']?\\s*:\\s*\\[\\s*["'](?:${EVENT_STAGES})["']`,
+      lifecyclePolicies: [
+        {
+          pathSuffix: "/EventLifecyclePolicy.ts",
+          bindingsImport: '../../generated/manifest-wiring-bindings"',
+          requiredSymbols: [
+            "EventSubmitForApprovalLifecycle",
+            "EventApproveLifecycle",
+          ],
+        },
+        {
+          pathSuffix: "/EventGuestPolicy.ts",
+          bindingsImport: '../../generated/manifest-wiring-bindings"',
+          requiredSymbols: [
+            "EventGuestRsvpConfirmLifecycle",
+            "EventGuestRsvpDeclineLifecycle",
+          ],
+        },
+      ],
+      allowances: [
+        {
+          pathSuffix: "/EventGuestPanel.tsx",
+          imports: ["convex/react"],
+          hooks: ["useQuery"],
+          reason:
+            "EventGuestPanel alone reads the generated EventGuest relationship query",
+        },
+      ],
+      // Only writes whose target is an Event-domain document id count; other
+      // tables' patches in files that merely mention events do not.
+      writeTargets: {
+        typedIdTables: ["events"],
+        idNames: ["eventId", "eventGuestId", "guestId", "venueId", "clientId"],
+        memberRoots: ["event", "eventGuest", "guest", "venue", "client"],
+      },
+      exceptions: [
+        {
+          pathIncludes: "convex/lib/culinaryPlanning.ts",
+          rule: "generated-writes-only",
+          reason: "Culinary planning seam (carried over from the Event guard)",
+        },
+      ],
+    },
+  );
+  write("guard.event.json", eventGuard);
   write("capability-catalog.md", formatCapabilityCatalogMarkdown(catalog));
 
   console.log(`Emitted proof-kit artifacts to ${outDir}`);
