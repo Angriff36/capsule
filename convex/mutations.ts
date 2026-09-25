@@ -53932,7 +53932,7 @@ async function __runVendorOrderLineDemandLink(ctx: MutationCtx, { docId, vendorO
     if (!(((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")))) throw new Error("Guard 2 failed");
     if (!((__rel_ingredientDemand != null))) throw new Error("Guard 3 failed");
     if (!(((doc.linkedAt == null) || ((doc.vendorOrderLineId === vendorOrderLineId) && (doc.ingredientDemandId === ingredientDemandId))))) throw new Error("Guard 4 failed");
-    if (!(((doc.linkedAt == null) || (vendorOrderLineId === doc.vendorOrderLineId)))) throw new Error("Demand link vendorOrderLineId must match the seeded line reference");
+    if (!(((doc.linkedAt == null) || (vendorOrderLineId === doc.vendorOrderLineId)))) throw new Error("This order-to-need link is for a different order line. Pick the order line already on this link.");
     if (!(((doc.linkedAt == null) || (ingredientDemandId === doc.ingredientDemandId)))) throw new Error("Demand link ingredientDemandId must match the seeded demand reference");
     if (!(((doc.linkedAt == null) || (vendorOrderId === doc.vendorOrderId)))) throw new Error("Demand link vendorOrderId must match the seeded order reference");
     if (!((vendorOrderId === __rel_vendorOrderLine.vendorOrderId))) throw new Error("Demand link vendorOrderId must own the vendor order line");
@@ -54020,7 +54020,7 @@ export const VendorOrderLineDemand_createViaLink = mutation({
     if (!(((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")))) throw new Error("Guard 2 failed");
     if (!((__rel_ingredientDemand != null))) throw new Error("Guard 3 failed");
     if (!(((__draft.linkedAt == null) || ((__draft.vendorOrderLineId === vendorOrderLineId) && (__draft.ingredientDemandId === ingredientDemandId))))) throw new Error("Guard 4 failed");
-    if (!(((__draft.linkedAt == null) || (vendorOrderLineId === __draft.vendorOrderLineId)))) throw new Error("Demand link vendorOrderLineId must match the seeded line reference");
+    if (!(((__draft.linkedAt == null) || (vendorOrderLineId === __draft.vendorOrderLineId)))) throw new Error("This order-to-need link is for a different order line. Pick the order line already on this link.");
     if (!(((__draft.linkedAt == null) || (ingredientDemandId === __draft.ingredientDemandId)))) throw new Error("Demand link ingredientDemandId must match the seeded demand reference");
     if (!(((__draft.linkedAt == null) || (vendorOrderId === __draft.vendorOrderId)))) throw new Error("Demand link vendorOrderId must match the seeded order reference");
     if (!((vendorOrderId === __rel_vendorOrderLine.vendorOrderId))) throw new Error("Demand link vendorOrderId must own the vendor order line");
