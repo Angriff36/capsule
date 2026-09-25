@@ -59,7 +59,7 @@ entity Equipment mixin TenantScoped, SoftDeletable {
   computed totalValue: money(12, 2) = self.quantity * self.purchaseValue
 
   constraint equipmentQuantityNonnegative: self.quantity >= 0 "This equipment's amount on hand can't be negative. Use zero or more."
-  constraint equipmentValueNonnegative: self.purchaseValue >= 0 "Purchase value cannot be negative"
+  constraint equipmentValueNonnegative: self.purchaseValue >= 0 "This equipment's purchase value can't be negative. Use zero or more."
 
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
@@ -84,7 +84,7 @@ entity Equipment mixin TenantScoped, SoftDeletable {
     constraint registerEquipmentAssetTag: length(trim(assetTag)) > 0 "Asset tag is required"
     constraint registerEquipmentCategory: length(trim(category)) > 0 "Category is required"
     constraint registerEquipmentQuantity: quantity == null or quantity > 0 "Quantity must be positive"
-    constraint registerEquipmentValue: purchaseValue == null or purchaseValue >= 0 "Purchase value cannot be negative"
+    constraint registerEquipmentValue: purchaseValue == null or purchaseValue >= 0 "This equipment's purchase value can't be negative. Use zero or more."
     mutate name = name
     mutate assetTag = assetTag
     mutate category = category
@@ -116,7 +116,7 @@ entity Equipment mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint reviseEquipmentName: length(trim(name)) > 0 "Equipment name is required"
     constraint reviseEquipmentCategory: length(trim(category)) > 0 "Category is required"
-    constraint reviseEquipmentValue: purchaseValue == null or purchaseValue >= 0 "Purchase value cannot be negative"
+    constraint reviseEquipmentValue: purchaseValue == null or purchaseValue >= 0 "This equipment's purchase value can't be negative. Use zero or more."
     mutate name = name
     mutate category = category
     mutate ownership = ownership != null ? ownership : self.ownership

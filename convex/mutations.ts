@@ -11029,7 +11029,7 @@ async function __runEquipmentRegister(ctx: MutationCtx, { docId, name, assetTag,
     if (!((((assetTag).trim()).length > 0))) throw new Error("Asset tag is required");
     if (!((((category).trim()).length > 0))) throw new Error("Category is required");
     if (!(((quantity == null) || (quantity > 0)))) throw new Error("Quantity must be positive");
-    if (!(((purchaseValue == null) || (purchaseValue >= 0)))) throw new Error("Purchase value cannot be negative");
+    if (!(((purchaseValue == null) || (purchaseValue >= 0)))) throw new Error("This equipment's purchase value can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -11120,7 +11120,7 @@ export const Equipment_createViaRegister = mutation({
     if (!((((assetTag).trim()).length > 0))) throw new Error("Asset tag is required");
     if (!((((category).trim()).length > 0))) throw new Error("Category is required");
     if (!(((quantity == null) || (quantity > 0)))) throw new Error("Quantity must be positive");
-    if (!(((purchaseValue == null) || (purchaseValue >= 0)))) throw new Error("Purchase value cannot be negative");
+    if (!(((purchaseValue == null) || (purchaseValue >= 0)))) throw new Error("This equipment's purchase value can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -11224,7 +11224,7 @@ async function __runEquipmentReviseDetails(ctx: MutationCtx, { docId, name, cate
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Equipment name is required");
     if (!((((category).trim()).length > 0))) throw new Error("Category is required");
-    if (!(((purchaseValue == null) || (purchaseValue >= 0)))) throw new Error("Purchase value cannot be negative");
+    if (!(((purchaseValue == null) || (purchaseValue >= 0)))) throw new Error("This equipment's purchase value can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }

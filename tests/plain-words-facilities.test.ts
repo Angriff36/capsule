@@ -85,5 +85,11 @@ describe("plain words on leftover facilities equipment manifests", () => {
     expect(visible).toContain(
       "This equipment's amount on hand can't be negative. Use zero or more.",
     );
+
+    // negative purchase value now reads in plain words
+    expect(visible).not.toContain("Purchase value cannot be negative");
+    expect(visible).toContain(
+      "This equipment's purchase value can't be negative. Use zero or more.",
+    );
   });
 });
