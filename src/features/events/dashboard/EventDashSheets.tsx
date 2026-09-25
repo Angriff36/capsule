@@ -18,6 +18,7 @@ import { EventPacketPanel } from "../packet/EventPacketPanel";
 import { EventReviewFlagsSection } from "../review-flags/EventReviewFlagsSection";
 import { allergyLine } from "./eventDashFacts";
 import { EventDashSheetHead } from "./EventDashSheet";
+import "../EventOverview.css";
 import type { DashSheetId, EventDashOverviewProps } from "./eventDashTypes";
 
 export const SHEET_LABEL: Record<DashSheetId, string> = {
