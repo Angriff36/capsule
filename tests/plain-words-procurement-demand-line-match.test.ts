@@ -45,7 +45,7 @@ describe("plain words on leftover procurement demand-link line-match copy", () =
     );
     // Later leftovers on this same file are pinned, not rewritten.
     expect(visible).toContain(
-      "Demand link ingredientDemandId must match the seeded demand reference",
+      "This order-to-need link is for a different need. Pick the need already on this link.",
     );
     expect(visible).toContain(
       "Demand link vendorOrderId must match the seeded order reference",
