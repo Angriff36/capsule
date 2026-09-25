@@ -18,7 +18,8 @@ import { EventPipelineStageCard } from "./EventPipelineStageCard";
 import { EventSetupProgress } from "./EventSetupProgress";
 import { EventStageActionsCard } from "./EventStageActionsCard";
 import { EventTimelineCommentsPanel } from "./EventTimelineCommentsPanel";
-import { EventWeatherPanel } from "./EventWeatherPanel";
+import { EventMapPanel } from "./EventMapPanel";
+import { EventWeatherChip } from "./EventWeatherChip";
 import { EventReviewFlagsSection } from "./review-flags/EventReviewFlagsSection";
 import { EventPacketPanel } from "./packet/EventPacketPanel";
 import { EventImportDraftPanel } from "./import/EventImportDraftPanel";
@@ -43,10 +44,6 @@ type OverviewEvent = {
   referralSourceId?: Id<"referralSources"> | null;
   assignedToId?: Id<"people"> | null;
   ownerName?: string | null;
-  recurrenceFrequency?: string | null;
-  recurrenceNextStartsAt?: number | null;
-  recurrenceGeneratedCount?: number | null;
-  recurrenceActive?: boolean | null;
 };
 
 type OwnerPerson = {
@@ -72,10 +69,13 @@ type Props = EventDetailRevisePanelsProps & {
 };
 
 /**
- * Overview layout: pipeline, stage moves, standing facts, money, and weather
- * down the main column; readiness, ownership, counts, recurrence, and standing
- * instructions in the rail. Edit forms sit below the read surface, anchored at
- * `#event-setup-basics` so every "Edit" link on the page lands on them.
+ * Overview layout, in priority order: where the event sits (pipeline, stage
+ * moves, review flags), what it is (details), where it is (venue map with the
+ * event-day weather chip riding in the header), the money surface, then the
+ * workflow packet. Readiness, ownership, and counts hold the rail — they fold
+ * under the main column below 1280px and on phones. Edit forms sit below the
+ * read surface, anchored at `#event-setup-basics`, so every "Edit" link on
+ * the page lands on them.
  */
 export function EventOverviewTab({
   event,
@@ -112,8 +112,6 @@ export function EventOverviewTab({
             onAction={onAction}
           />
           <EventReviewFlagsSection eventId={eventId} />
-          <EventImportDraftPanel eventId={eventId} />
-          <EventPacketPanel eventId={eventId} />
           <EventDetailsCard
             clientId={clientId}
             clients={clients}
@@ -138,8 +136,9 @@ export function EventOverviewTab({
             accessibilityNeeds={reviseProps.accessibilityNeeds}
             editHref={editHref}
           />
-          <EventProposalSourceCard eventId={eventId} />
-          <EventProposalEnhancementsCard eventId={eventId} />
+          <EventMapPanel venue={venue} startsAt={startsAt}>
+            <EventWeatherChip venue={venue} startsAt={startsAt} />
+          </EventMapPanel>
           <EventBudgetCard
             budgetAmount={budgetAmount}
             quotedPrice={quotedPrice}
@@ -148,7 +147,10 @@ export function EventOverviewTab({
             locked={!reviseProps.canRevise}
           />
           <EventInvoiceCard eventId={eventId} currencyCode={currencyCode} />
-          <EventWeatherPanel venue={venue} />
+          <EventImportDraftPanel eventId={eventId} />
+          <EventPacketPanel eventId={eventId} />
+          <EventProposalSourceCard eventId={eventId} />
+          <EventProposalEnhancementsCard eventId={eventId} />
         </div>
 
         <div className="event-overview-rail">
@@ -162,15 +164,10 @@ export function EventOverviewTab({
             dishCount={dishCount}
             staffCount={staffCount}
             timelineCount={timelineCount}
-            recurrenceFrequency={event.recurrenceFrequency}
-            recurrenceNextStartsAt={event.recurrenceNextStartsAt}
-            recurrenceGeneratedCount={event.recurrenceGeneratedCount}
-            recurrenceActive={event.recurrenceActive}
             operationalRequirements={reviseProps.operationalRequirements}
             menuHref={eventDetailPath(eventId, "menu")}
             staffingHref={eventDetailPath(eventId, "staffing")}
             timelineHref={eventDetailPath(eventId, "timeline")}
-            recurringHref={eventDetailPath(eventId, "recurring")}
             editHref={editHref}
           />
         </div>
