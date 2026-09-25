@@ -55,7 +55,7 @@ describe("plain words on leftover quality allergen-check flag-consistency copy",
     );
     const orderVisible = orderManifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
     expect(orderVisible).toContain(
-      "Demand link contribution cannot be negative",
+      "This order-to-need link's amount can't be negative. Use zero or more.",
     );
   });
 });

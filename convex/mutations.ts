@@ -53936,7 +53936,7 @@ async function __runVendorOrderLineDemandLink(ctx: MutationCtx, { docId, vendorO
     if (!(((doc.linkedAt == null) || (ingredientDemandId === doc.ingredientDemandId)))) throw new Error("Demand link ingredientDemandId must match the seeded demand reference");
     if (!(((doc.linkedAt == null) || (vendorOrderId === doc.vendorOrderId)))) throw new Error("Demand link vendorOrderId must match the seeded order reference");
     if (!((vendorOrderId === __rel_vendorOrderLine.vendorOrderId))) throw new Error("Demand link vendorOrderId must own the vendor order line");
-    if (!((contributionQuantity >= 0))) throw new Error("Demand link contribution cannot be negative");
+    if (!((contributionQuantity >= 0))) throw new Error("This order-to-need link's amount can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -54024,7 +54024,7 @@ export const VendorOrderLineDemand_createViaLink = mutation({
     if (!(((__draft.linkedAt == null) || (ingredientDemandId === __draft.ingredientDemandId)))) throw new Error("Demand link ingredientDemandId must match the seeded demand reference");
     if (!(((__draft.linkedAt == null) || (vendorOrderId === __draft.vendorOrderId)))) throw new Error("Demand link vendorOrderId must match the seeded order reference");
     if (!((vendorOrderId === __rel_vendorOrderLine.vendorOrderId))) throw new Error("Demand link vendorOrderId must own the vendor order line");
-    if (!((contributionQuantity >= 0))) throw new Error("Demand link contribution cannot be negative");
+    if (!((contributionQuantity >= 0))) throw new Error("This order-to-need link's amount can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
