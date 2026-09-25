@@ -52,7 +52,9 @@ describe("plain words on leftover stock transfer saved-amount copy", () => {
       "This transfer is sending to a different stock item. Pick the stock item already on this transfer.",
     );
     expect(visible).toContain(
-      "Cannot transfer more than the source has on hand",
+      "This transfer can't move more than the send-from stock has on hand. Enter a smaller amount.",
     );
+    // Later leftovers on this same file are pinned, not rewritten.
+    expect(visible).toContain("Source and destination stock lines must differ");
   });
 });
