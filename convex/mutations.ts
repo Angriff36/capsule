@@ -53421,7 +53421,7 @@ async function __runVendorOrderLineEnsureWeeklyLine(ctx: MutationCtx, { docId, v
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")))) throw new Error("Guard 1 failed");
     if (!(((__rel_ingredient != null) && (__rel_ingredient.status === "active")))) throw new Error("Guard 2 failed");
-    if (!((contributionQuantity >= 0))) throw new Error("Contribution quantity cannot be negative");
+    if (!((contributionQuantity >= 0))) throw new Error("This weekly order line's amount can't be negative. Use zero or more.");
     const ownClaim = ((doc.stockAppliedQuantity != null) ? doc.stockAppliedQuantity : 0);
     const claimedElsewhere = Math.max(0, (((stockClaimed != null) ? stockClaimed : 0) - ownClaim));
     const availableStock = Math.max(0, (onHand - claimedElsewhere));

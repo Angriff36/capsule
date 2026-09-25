@@ -559,7 +559,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.vendorOrder != null and self.vendorOrder.status == "draft"
     guard self.ingredient != null and self.ingredient.status == "active"
-    constraint ensureContributionPositive: contributionQuantity >= 0 "Contribution quantity cannot be negative"
+    constraint ensureContributionPositive: contributionQuantity >= 0 "This weekly order line's amount can't be negative. Use zero or more."
     // stockClaimed sums every open automatic line's stockAppliedQuantity for
     // this ingredient/unit, including this line's own earlier claim, which is
     // returned before the week's share of stock is worked out (#327).
