@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # The ONE release of a branch (owner rule, 2026-08-25).
 #
-#   bash scripts/release.sh --reviewer <model>
+#   bash scripts/release.sh --reviewer <model> | --no-review
 #
 # 1. Merges the current branch into main (--no-ff), runs `bun run check` on
 #    the merge result, and only then pushes main once. That push is the only
@@ -11,19 +11,25 @@
 #    so it is moved to the release commit and never archived.
 #
 # --reviewer names the independent cross-model reviewer that APPROVED the
-# diff (AGENTS.md merge gate). The merge commit records it. The merge
+# diff (AGENTS.md merge gate). The merge commit records it. --no-review
+# releases a change the merge gate does not send to review (Ryan, 2026-09-24:
+# "dont need to do another code review for such a small change"). The merge
 # subject starts with "[release]" — vercel.json builds main ONLY for such
 # commits, so a merge made on GitHub (PR button, auto-merge) never deploys.
 set -euo pipefail
 
 reviewer=""
+no_review=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --reviewer) reviewer="${2:-}"; shift 2 ;;
+    --no-review) no_review=1; shift ;;
     *) echo "release: unknown argument $1"; exit 1 ;;
   esac
 done
-[ -n "$reviewer" ] || { echo "release: --reviewer <model> is required (independent review approval)."; exit 1; }
+[ -n "$reviewer" ] || [ "$no_review" = 1 ] || { echo "release: pass --reviewer <model> (the approving reviewer) or --no-review."; exit 1; }
+rerun_args="--no-review"
+[ -z "$reviewer" ] || rerun_args="--reviewer $reviewer"
 
 branch="$(git symbolic-ref --short -q HEAD || true)"
 [ -n "$branch" ] || { echo "release: detached HEAD. Check out the branch to release."; exit 1; }
@@ -76,7 +82,7 @@ archive_branch() {
   elif ! git push --atomic --force-with-lease="refs/heads/$branch:$branch_sha" origin "$branch_sha:refs/heads/archive/$branch" ":refs/heads/$branch"; then
     git checkout -q "$branch"
     echo "release: main is released, but archiving $branch on origin failed (new commits on it, or a network error). You are back on $branch."
-    echo "  Run this again: bash scripts/release.sh --reviewer $reviewer"
+    echo "  Run this again: bash scripts/release.sh $rerun_args"
     echo "  It resumes the archive without a second release. If $branch gained commits during the gate, it"
     echo "  keeps them: archive only the released sha and keep working on the branch:"
     echo "    git push origin $branch_sha:refs/heads/archive/$branch && git pull --ff-only origin $branch"
@@ -139,7 +145,11 @@ mkdir -p .artifacts && : > .artifacts/release-empty.env
 bun --env-file=.artifacts/release-empty.env scripts/check-deployment-config.ts --environment production --no-env-files
 
 git checkout -q main
-subject="[release] $branch (reviewed by $reviewer)"
+if [ -n "$reviewer" ]; then
+  subject="[release] $branch (reviewed by $reviewer)"
+else
+  subject="[release] $branch (no review needed)"
+fi
 if git merge-base --is-ancestor "$branch" main; then
   # Already on main (e.g. a GitHub-side merge that never deployed). A real
   # [release] commit is still required: Vercel builds main only for one.
@@ -190,7 +200,7 @@ if ! CAPSULE_RELEASE=1 git push origin main; then
     echo "  Local main holds the unpushed release commit $(git rev-parse main). When origin is back:"
     echo "  git ls-remote origin refs/heads/main"
     echo "  If it prints that sha, the release LANDED. Finish the archive (no second release):"
-    echo "    git checkout $branch && bash scripts/release.sh --reviewer $reviewer"
+    echo "    git checkout $branch && bash scripts/release.sh $rerun_args"
     echo "  If it prints a different sha, the release did NOT land. Reset and release again:"
     echo "    git checkout $branch && git branch -f main origin/main"
     exit 1
