@@ -475,7 +475,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   computed isFullyReceived: boolean = self.orderedQuantity > 0 and self.receivedQuantity >= self.orderedQuantity
   computed hasReceivingDiscrepancy: boolean = self.discrepancyQuantity != null and self.discrepancyQuantity > 0
 
-  constraint lineOrderedPositive: self.addedAt == null or self.orderedQuantity >= 0 "Ordered quantity cannot be negative"
+  constraint lineOrderedPositive: self.addedAt == null or self.orderedQuantity >= 0 "This order line's ordered amount can't be negative. Use zero or more."
   constraint lineReceivedNonnegative: self.receivedQuantity >= 0 "Received quantity cannot be negative"
   constraint lineReceivedNotOver: self.receivedQuantity <= self.orderedQuantity "Received quantity cannot exceed ordered quantity"
   constraint lineCostNonnegative: self.unitCost >= 0 "Unit cost cannot be negative"
