@@ -26257,6 +26257,15 @@ export const InventoryReservation_createViaReserve = mutation({
     const __rel_inventoryLot = await __resolveRelation(ctx, "inventoryLots", [__auth.tenantId, __draft.inventoryLotId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_inventorySettings = await __resolveRelation(ctx, "inventorySettings", [__auth.tenantId], ["tenantId"], "tenantId", __auth.tenantId);
+    const __aggRoot: Record<string, any> = {};
+    (__aggRoot as any).event = __rel_event;
+    (__aggRoot as any).inventoryItem = __rel_inventoryItem;
+    if ((__aggRoot as any).inventoryItem) {
+      (__aggRoot as any).inventoryItem.reservations = await ctx.db.query("inventoryReservations").withIndex("by_inventoryItemId", (q: any) => q.eq("inventoryItemId", (__aggRoot as any).inventoryItem._id)).collect();
+      (__aggRoot as any).inventoryItem.reservations = (__aggRoot as any).inventoryItem.reservations.filter((row: any) => row.tenantId === __auth.tenantId);
+    }
+    (__aggRoot as any).inventoryLot = __rel_inventoryLot;
+    (__aggRoot as any).inventorySettings = __rel_inventorySettings;
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may see inventory reservations");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may update inventory reservations");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may change inventory reservations");
