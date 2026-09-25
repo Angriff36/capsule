@@ -1,4 +1,8 @@
-@import "tailwindcss";
+/* Scan app code only. Scanning the repo root picked up loop notes and
+   .manifest edits (IMPLEMENTATION_PLAN.md, STATE.md, ...) and full-reloaded
+   the dev page every few minutes (2026-09-24). */
+@import "tailwindcss" source("..");
+@source not "../**/*.manifest";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
