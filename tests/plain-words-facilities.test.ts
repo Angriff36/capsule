@@ -80,7 +80,10 @@ describe("plain words on leftover facilities equipment manifests", () => {
       "Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event",
     );
 
-    // later leftover, unchanged
-    expect(visible).toContain("Equipment quantity cannot be negative");
+    // negative amount on hand now reads in plain words
+    expect(visible).not.toContain("Equipment quantity cannot be negative");
+    expect(visible).toContain(
+      "This equipment's amount on hand can't be negative. Use zero or more.",
+    );
   });
 });

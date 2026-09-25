@@ -58,7 +58,7 @@ entity Equipment mixin TenantScoped, SoftDeletable {
   computed isActive: boolean = self.status == "active"
   computed totalValue: money(12, 2) = self.quantity * self.purchaseValue
 
-  constraint equipmentQuantityNonnegative: self.quantity >= 0 "Equipment quantity cannot be negative"
+  constraint equipmentQuantityNonnegative: self.quantity >= 0 "This equipment's amount on hand can't be negative. Use zero or more."
   constraint equipmentValueNonnegative: self.purchaseValue >= 0 "Purchase value cannot be negative"
 
   transition status from "active" to ["retired"]
