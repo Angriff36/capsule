@@ -58,7 +58,7 @@ entity StockTransfer mixin TenantScoped, SoftDeletable {
     constraint transferDestinationLocationMatch: destinationLocationId == self.destinationItem.locationId "Transfer destinationLocationId must match the destination stock location"
     constraint transferDistinctLocations: sourceLocationId != destinationLocationId "Source and destination locations must differ"
     constraint transferSameUnit: self.sourceItem.unit == self.destinationItem.unit "Source and destination stock lines must use the same unit"
-    constraint transferRecordQuantityPositive: quantity > 0 "Transfer quantity must be positive"
+    constraint transferRecordQuantityPositive: quantity > 0 "This transfer's amount has to be more than zero. Enter how much to move."
     constraint transferSourceAvailable: self.sourceItem.quantityOnHand >= quantity "Cannot transfer more than the source has on hand"
     mutate sourceInventoryItemId = sourceInventoryItemId
     mutate destinationInventoryItemId = destinationInventoryItemId

@@ -47824,7 +47824,7 @@ async function __runStockTransferRecord(ctx: MutationCtx, { docId, sourceInvento
     if (!((destinationLocationId === __rel_destinationItem.locationId))) throw new Error("Transfer destinationLocationId must match the destination stock location");
     if (!((sourceLocationId !== destinationLocationId))) throw new Error("Source and destination locations must differ");
     if (!((__rel_sourceItem.unit === __rel_destinationItem.unit))) throw new Error("Source and destination stock lines must use the same unit");
-    if (!((quantity > 0))) throw new Error("Transfer quantity must be positive");
+    if (!((quantity > 0))) throw new Error("This transfer's amount has to be more than zero. Enter how much to move.");
     if (!((__rel_sourceItem.quantityOnHand >= quantity))) throw new Error("Cannot transfer more than the source has on hand");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -47933,7 +47933,7 @@ export const StockTransfer_createViaRecord = mutation({
     if (!((destinationLocationId === __rel_destinationItem.locationId))) throw new Error("Transfer destinationLocationId must match the destination stock location");
     if (!((sourceLocationId !== destinationLocationId))) throw new Error("Source and destination locations must differ");
     if (!((__rel_sourceItem.unit === __rel_destinationItem.unit))) throw new Error("Source and destination stock lines must use the same unit");
-    if (!((quantity > 0))) throw new Error("Transfer quantity must be positive");
+    if (!((quantity > 0))) throw new Error("This transfer's amount has to be more than zero. Enter how much to move.");
     if (!((__rel_sourceItem.quantityOnHand >= quantity))) throw new Error("Cannot transfer more than the source has on hand");
     const doc: Record<string, any> = {
       ...__draft,

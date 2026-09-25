@@ -1,0 +1,54 @@
+import { readFileSync } from "node:fs";
+import { describe, expect, it } from "vitest";
+
+// Words the owner banned from user-visible copy (2026-09-23).
+const FORBIDDEN =
+  /\b(idempotency|tenant|seam|projection|canonical|hydrate|mapped|reaction|guard|policy|constraint|manifest|convex|builder|directory|record)\b/i;
+
+function expectPlain(text: string) {
+  expect(text).not.toMatch(FORBIDDEN);
+  expect(text).not.toContain("CONVEX_FIELD_ENCRYPTION_KEY");
+  expect(text).not.toContain("bun run");
+}
+
+describe("plain words on leftover stock transfer record move-amount copy", () => {
+  it("keeps the save-move refusal free of jargon", () => {
+    const manifest = readFileSync("src/inventory/transfer.manifest", "utf8");
+    // Strip // comments the same way the culinary leftover tests do.
+    const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+    const NEW =
+      "This transfer's amount has to be more than zero. Enter how much to move.";
+    // The old jargon refusal is gone from the authored transfer file as a
+    // quoted message. (The substring still lives inside the later leftover
+    // "Transfer quantity must be positive once recorded", so pin that form.)
+    expect(visible).not.toContain('"Transfer quantity must be positive"');
+    // The refusal now speaks in plain catering words.
+    expect(visible).toContain(NEW);
+    expectPlain(NEW);
+    // The generated summary carries the plain wording.
+    const summary = readFileSync("manifest-context-summary.json", "utf8");
+    expect(summary).toContain(NEW);
+    // This leftover is command-level: regen copies the command message into
+    // generated mutations on stock transfer record and createViaRecord.
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    expect(mutations).toContain(NEW);
+    expect(mutations).not.toContain("Transfer quantity must be positive");
+    // Already-landed copy on this same file stays.
+    expect(visible).toContain("Inventory staff may see stock transfers");
+    expect(visible).toContain("Inventory staff may update stock transfers");
+    expect(visible).toContain("Inventory staff may change stock transfers");
+    // Later leftovers on this same file are pinned, not rewritten.
+    expect(visible).toContain(
+      "Transfer quantity must be positive once recorded",
+    );
+    expect(visible).toContain(
+      "Record sourceInventoryItemId must match the seeded source stock reference",
+    );
+    expect(visible).toContain(
+      "Record destinationInventoryItemId must match the seeded destination stock reference",
+    );
+    expect(visible).toContain(
+      "Cannot transfer more than the source has on hand",
+    );
+  });
+});
