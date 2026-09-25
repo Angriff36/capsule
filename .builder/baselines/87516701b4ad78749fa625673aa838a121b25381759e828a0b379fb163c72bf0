@@ -9220,7 +9220,7 @@ async function __runDishComponentAttach(ctx: MutationCtx, { docId, dishId, compo
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventDishComponentSeeds", __elseDoc as any);
-        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "attach", emitIndex: 0 });
@@ -9330,7 +9330,7 @@ export const DishComponent_createViaAttach = mutation({
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventDishComponentSeeds", __elseDoc as any);
-        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "attach", emitIndex: 0 });
@@ -9917,7 +9917,7 @@ async function __runDishIngredientAdd(ctx: MutationCtx, { docId, dishId, ingredi
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "add", emitIndex: 0 });
@@ -10028,7 +10028,7 @@ export const DishIngredient_createViaAdd = mutation({
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "add", emitIndex: 0 });
@@ -10090,7 +10090,7 @@ async function __runDishIngredientAdjustQuantity(ctx: MutationCtx, { docId, quan
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "adjustQuantity", emitIndex: 0 });
@@ -11906,7 +11906,7 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("invoices", __elseDoc as any);
-      await __runInvoiceIssue(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runInvoiceIssue(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     const __match2_raw = await ctx.db.query("packLists").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     const __match2_rows = __match2_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).activeEventId === payload.eventId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
@@ -11927,7 +11927,7 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("packLists", __elseDoc as any);
-      await __runPackListOpen(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runPackListOpen(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     const fanRows3 = (await ctx.db.query("eventDishComponentSeeds").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows3) {
@@ -11952,7 +11952,7 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("productionBatches", __elseDoc as any);
-        await __runProductionBatchPlan(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runProductionBatchPlan(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     const fanRows4 = (await ctx.db.query("ingredientDemands").withIndex("by_purchaseEligibleEventId", (q) => q.eq("purchaseEligibleEventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -12812,7 +12812,7 @@ async function __runEventCloseOut(ctx: MutationCtx, { docId, version }: any, __c
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("eventCloseouts", __elseDoc as any);
-      await __runEventCloseoutCapture(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runEventCloseoutCapture(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "closeOut", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -15493,7 +15493,7 @@ async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dish
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventDishComponentSeeds", __elseDoc as any);
-        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     const fanRows2 = (await ctx.db.query("dishIngredients").withIndex("by_dishId", (q) => q.eq("dishId", payload.dishId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -15519,7 +15519,7 @@ async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dish
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     const fanRows3 = (await ctx.db.query("packLists").filter((q) => q.eq(q.field("activeEventId"), payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -15554,7 +15554,7 @@ async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dish
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("prepTasks", __elseDoc as any);
-        await __runPrepTaskOpen(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runPrepTaskOpen(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "addToEvent", emitIndex: 0 });
@@ -15681,7 +15681,7 @@ export const EventDish_createViaAddToEvent = mutation({
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventDishComponentSeeds", __elseDoc as any);
-        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     const fanRows2 = (await ctx.db.query("dishIngredients").withIndex("by_dishId", (q) => q.eq("dishId", payload.dishId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -15707,7 +15707,7 @@ export const EventDish_createViaAddToEvent = mutation({
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     const fanRows3 = (await ctx.db.query("packLists").filter((q) => q.eq(q.field("activeEventId"), payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -15742,7 +15742,7 @@ export const EventDish_createViaAddToEvent = mutation({
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("prepTasks", __elseDoc as any);
-        await __runPrepTaskOpen(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runPrepTaskOpen(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "addToEvent", emitIndex: 0 });
@@ -15937,7 +15937,7 @@ async function __runEventDishConfirmFromProposal(ctx: MutationCtx, { docId, even
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventDishComponentSeeds", __elseDoc as any);
-        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     const fanRows1 = (await ctx.db.query("dishIngredients").withIndex("by_dishId", (q) => q.eq("dishId", payload.seedDishId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -15963,7 +15963,7 @@ async function __runEventDishConfirmFromProposal(ctx: MutationCtx, { docId, even
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "confirmFromProposal", emitIndex: 0 });
@@ -16255,7 +16255,7 @@ async function __runEventDishRequestContainerPack(ctx: MutationCtx, { docId, pac
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("packListItems", __elseDoc as any);
-        await __runPackListItemEnsureContainer(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runPackListItemEnsureContainer(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "requestContainerPack", emitIndex: 0 });
@@ -16513,7 +16513,7 @@ async function __runEventDishComponentSeedRefresh(ctx: MutationCtx, { docId, ver
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "refresh", emitIndex: 0 });
@@ -16664,7 +16664,7 @@ async function __runEventDishComponentSeedSeed(ctx: MutationCtx, { docId, eventI
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "seed", emitIndex: 0 });
@@ -16775,7 +16775,7 @@ export const EventDishComponentSeed_createViaSeed = mutation({
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "seed", emitIndex: 0 });
@@ -17471,43 +17471,43 @@ async function __runEventIngredientContributionRecord(ctx: MutationCtx, { docId,
     // Reactions
     const __agg0_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
-    const __agg0_rowsf = __agg0_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg0_rowsf = __agg0_rows.filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg0 = __agg0_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg1_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg1_rowsf = __agg1_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "gram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg1_rowsf = __agg1_rows.filter((d) => (d as any).unit === "gram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg1 = __agg1_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg2_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg2_rowsf = __agg2_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "kilogram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg2_rowsf = __agg2_rows.filter((d) => (d as any).unit === "kilogram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg2 = __agg2_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg3_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg3_rowsf = __agg3_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "ounce").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg3_rowsf = __agg3_rows.filter((d) => (d as any).unit === "ounce").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg3 = __agg3_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg4_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg4_rowsf = __agg4_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "pound").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg4_rowsf = __agg4_rows.filter((d) => (d as any).unit === "pound").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg4 = __agg4_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg5_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg5_rowsf = __agg5_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "milliliter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg5_rowsf = __agg5_rows.filter((d) => (d as any).unit === "milliliter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg5 = __agg5_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg6_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg6_rowsf = __agg6_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "liter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg6_rowsf = __agg6_rows.filter((d) => (d as any).unit === "liter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg6 = __agg6_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg7_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg7_rowsf = __agg7_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "teaspoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg7_rowsf = __agg7_rows.filter((d) => (d as any).unit === "teaspoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg7 = __agg7_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg8_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg8_rowsf = __agg8_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "tablespoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg8_rowsf = __agg8_rows.filter((d) => (d as any).unit === "tablespoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg8 = __agg8_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg9_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg9_rowsf = __agg9_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "cup").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg9_rowsf = __agg9_rows.filter((d) => (d as any).unit === "cup").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg9 = __agg9_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg10_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg10_rowsf = __agg10_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "pint").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg10_rowsf = __agg10_rows.filter((d) => (d as any).unit === "pint").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg10 = __agg10_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg11_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg11_rowsf = __agg11_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "quart").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg11_rowsf = __agg11_rows.filter((d) => (d as any).unit === "quart").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg11 = __agg11_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg12_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg12_rowsf = __agg12_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "gallon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg12_rowsf = __agg12_rows.filter((d) => (d as any).unit === "gallon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg12 = __agg12_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __match0_raw = await ctx.db.query("ingredientDemands").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     const __match0_rows = __match0_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).ingredientId === payload.ingredientId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
@@ -17529,7 +17529,7 @@ async function __runEventIngredientContributionRecord(ctx: MutationCtx, { docId,
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
-      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -17679,43 +17679,43 @@ export const EventIngredientContribution_createViaRecord = mutation({
     // Reactions
     const __agg0_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
-    const __agg0_rowsf = __agg0_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg0_rowsf = __agg0_rows.filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg0 = __agg0_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg1_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg1_rowsf = __agg1_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "gram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg1_rowsf = __agg1_rows.filter((d) => (d as any).unit === "gram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg1 = __agg1_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg2_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg2_rowsf = __agg2_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "kilogram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg2_rowsf = __agg2_rows.filter((d) => (d as any).unit === "kilogram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg2 = __agg2_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg3_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg3_rowsf = __agg3_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "ounce").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg3_rowsf = __agg3_rows.filter((d) => (d as any).unit === "ounce").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg3 = __agg3_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg4_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg4_rowsf = __agg4_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "pound").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg4_rowsf = __agg4_rows.filter((d) => (d as any).unit === "pound").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg4 = __agg4_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg5_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg5_rowsf = __agg5_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "milliliter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg5_rowsf = __agg5_rows.filter((d) => (d as any).unit === "milliliter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg5 = __agg5_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg6_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg6_rowsf = __agg6_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "liter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg6_rowsf = __agg6_rows.filter((d) => (d as any).unit === "liter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg6 = __agg6_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg7_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg7_rowsf = __agg7_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "teaspoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg7_rowsf = __agg7_rows.filter((d) => (d as any).unit === "teaspoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg7 = __agg7_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg8_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg8_rowsf = __agg8_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "tablespoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg8_rowsf = __agg8_rows.filter((d) => (d as any).unit === "tablespoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg8 = __agg8_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg9_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg9_rowsf = __agg9_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "cup").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg9_rowsf = __agg9_rows.filter((d) => (d as any).unit === "cup").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg9 = __agg9_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg10_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg10_rowsf = __agg10_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "pint").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg10_rowsf = __agg10_rows.filter((d) => (d as any).unit === "pint").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg10 = __agg10_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg11_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg11_rowsf = __agg11_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "quart").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg11_rowsf = __agg11_rows.filter((d) => (d as any).unit === "quart").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg11 = __agg11_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg12_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg12_rowsf = __agg12_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "gallon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg12_rowsf = __agg12_rows.filter((d) => (d as any).unit === "gallon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg12 = __agg12_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __match0_raw = await ctx.db.query("ingredientDemands").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     const __match0_rows = __match0_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).ingredientId === payload.ingredientId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
@@ -17737,7 +17737,7 @@ export const EventIngredientContribution_createViaRecord = mutation({
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
-      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
@@ -17819,43 +17819,43 @@ async function __runEventIngredientContributionRetire(ctx: MutationCtx, { docId,
     // Reactions
     const __agg0_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
-    const __agg0_rowsf = __agg0_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg0_rowsf = __agg0_rows.filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg0 = __agg0_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg1_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg1_rowsf = __agg1_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "gram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg1_rowsf = __agg1_rows.filter((d) => (d as any).unit === "gram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg1 = __agg1_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg2_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg2_rowsf = __agg2_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "kilogram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg2_rowsf = __agg2_rows.filter((d) => (d as any).unit === "kilogram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg2 = __agg2_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg3_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg3_rowsf = __agg3_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "ounce").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg3_rowsf = __agg3_rows.filter((d) => (d as any).unit === "ounce").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg3 = __agg3_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg4_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg4_rowsf = __agg4_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "pound").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg4_rowsf = __agg4_rows.filter((d) => (d as any).unit === "pound").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg4 = __agg4_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg5_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg5_rowsf = __agg5_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "milliliter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg5_rowsf = __agg5_rows.filter((d) => (d as any).unit === "milliliter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg5 = __agg5_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg6_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg6_rowsf = __agg6_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "liter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg6_rowsf = __agg6_rows.filter((d) => (d as any).unit === "liter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg6 = __agg6_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg7_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg7_rowsf = __agg7_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "teaspoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg7_rowsf = __agg7_rows.filter((d) => (d as any).unit === "teaspoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg7 = __agg7_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg8_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg8_rowsf = __agg8_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "tablespoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg8_rowsf = __agg8_rows.filter((d) => (d as any).unit === "tablespoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg8 = __agg8_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg9_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg9_rowsf = __agg9_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "cup").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg9_rowsf = __agg9_rows.filter((d) => (d as any).unit === "cup").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg9 = __agg9_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg10_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg10_rowsf = __agg10_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "pint").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg10_rowsf = __agg10_rows.filter((d) => (d as any).unit === "pint").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg10 = __agg10_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg11_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg11_rowsf = __agg11_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "quart").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg11_rowsf = __agg11_rows.filter((d) => (d as any).unit === "quart").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg11 = __agg11_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg12_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg12_rowsf = __agg12_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "gallon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg12_rowsf = __agg12_rows.filter((d) => (d as any).unit === "gallon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg12 = __agg12_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __match0_raw = await ctx.db.query("ingredientDemands").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     const __match0_rows = __match0_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).ingredientId === payload.ingredientId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
@@ -17877,7 +17877,7 @@ async function __runEventIngredientContributionRetire(ctx: MutationCtx, { docId,
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
-      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "retire", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -17932,43 +17932,43 @@ async function __runEventIngredientContributionRetirePreviousUnit(ctx: MutationC
     // Reactions
     const __agg0_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
-    const __agg0_rowsf = __agg0_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg0_rowsf = __agg0_rows.filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg0 = __agg0_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg1_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg1_rowsf = __agg1_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "gram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg1_rowsf = __agg1_rows.filter((d) => (d as any).unit === "gram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg1 = __agg1_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg2_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg2_rowsf = __agg2_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "kilogram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg2_rowsf = __agg2_rows.filter((d) => (d as any).unit === "kilogram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg2 = __agg2_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg3_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg3_rowsf = __agg3_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "ounce").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg3_rowsf = __agg3_rows.filter((d) => (d as any).unit === "ounce").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg3 = __agg3_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg4_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg4_rowsf = __agg4_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "pound").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg4_rowsf = __agg4_rows.filter((d) => (d as any).unit === "pound").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg4 = __agg4_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg5_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg5_rowsf = __agg5_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "milliliter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg5_rowsf = __agg5_rows.filter((d) => (d as any).unit === "milliliter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg5 = __agg5_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg6_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg6_rowsf = __agg6_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "liter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg6_rowsf = __agg6_rows.filter((d) => (d as any).unit === "liter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg6 = __agg6_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg7_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg7_rowsf = __agg7_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "teaspoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg7_rowsf = __agg7_rows.filter((d) => (d as any).unit === "teaspoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg7 = __agg7_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg8_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg8_rowsf = __agg8_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "tablespoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg8_rowsf = __agg8_rows.filter((d) => (d as any).unit === "tablespoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg8 = __agg8_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg9_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg9_rowsf = __agg9_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "cup").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg9_rowsf = __agg9_rows.filter((d) => (d as any).unit === "cup").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg9 = __agg9_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg10_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg10_rowsf = __agg10_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "pint").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg10_rowsf = __agg10_rows.filter((d) => (d as any).unit === "pint").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg10 = __agg10_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg11_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg11_rowsf = __agg11_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "quart").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg11_rowsf = __agg11_rows.filter((d) => (d as any).unit === "quart").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg11 = __agg11_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg12_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg12_rowsf = __agg12_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "gallon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg12_rowsf = __agg12_rows.filter((d) => (d as any).unit === "gallon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg12 = __agg12_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __match0_raw = await ctx.db.query("ingredientDemands").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     const __match0_rows = __match0_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).ingredientId === payload.ingredientId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
@@ -17990,7 +17990,7 @@ async function __runEventIngredientContributionRetirePreviousUnit(ctx: MutationC
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
-      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "retirePreviousUnit", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -18048,43 +18048,43 @@ async function __runEventIngredientContributionRevise(ctx: MutationCtx, { docId,
     // Reactions
     const __agg0_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
-    const __agg0_rowsf = __agg0_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg0_rowsf = __agg0_rows.filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg0 = __agg0_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg1_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg1_rowsf = __agg1_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "gram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg1_rowsf = __agg1_rows.filter((d) => (d as any).unit === "gram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg1 = __agg1_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg2_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg2_rowsf = __agg2_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "kilogram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg2_rowsf = __agg2_rows.filter((d) => (d as any).unit === "kilogram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg2 = __agg2_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg3_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg3_rowsf = __agg3_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "ounce").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg3_rowsf = __agg3_rows.filter((d) => (d as any).unit === "ounce").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg3 = __agg3_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg4_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg4_rowsf = __agg4_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "pound").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg4_rowsf = __agg4_rows.filter((d) => (d as any).unit === "pound").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg4 = __agg4_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg5_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg5_rowsf = __agg5_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "milliliter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg5_rowsf = __agg5_rows.filter((d) => (d as any).unit === "milliliter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg5 = __agg5_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg6_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg6_rowsf = __agg6_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "liter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg6_rowsf = __agg6_rows.filter((d) => (d as any).unit === "liter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg6 = __agg6_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg7_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg7_rowsf = __agg7_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "teaspoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg7_rowsf = __agg7_rows.filter((d) => (d as any).unit === "teaspoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg7 = __agg7_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg8_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg8_rowsf = __agg8_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "tablespoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg8_rowsf = __agg8_rows.filter((d) => (d as any).unit === "tablespoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg8 = __agg8_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg9_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg9_rowsf = __agg9_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "cup").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg9_rowsf = __agg9_rows.filter((d) => (d as any).unit === "cup").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg9 = __agg9_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg10_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg10_rowsf = __agg10_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "pint").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg10_rowsf = __agg10_rows.filter((d) => (d as any).unit === "pint").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg10 = __agg10_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg11_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg11_rowsf = __agg11_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "quart").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg11_rowsf = __agg11_rows.filter((d) => (d as any).unit === "quart").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg11 = __agg11_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg12_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg12_rowsf = __agg12_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "gallon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg12_rowsf = __agg12_rows.filter((d) => (d as any).unit === "gallon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg12 = __agg12_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __match0_raw = await ctx.db.query("ingredientDemands").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     const __match0_rows = __match0_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).ingredientId === payload.ingredientId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
@@ -18106,7 +18106,7 @@ async function __runEventIngredientContributionRevise(ctx: MutationCtx, { docId,
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
-      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "revise", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -18165,43 +18165,43 @@ async function __runEventIngredientContributionSupersede(ctx: MutationCtx, { doc
     // Reactions
     const __agg0_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
-    const __agg0_rowsf = __agg0_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg0_rowsf = __agg0_rows.filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg0 = __agg0_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg1_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg1_rowsf = __agg1_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "gram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg1_rowsf = __agg1_rows.filter((d) => (d as any).unit === "gram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg1 = __agg1_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg2_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg2_rowsf = __agg2_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "kilogram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg2_rowsf = __agg2_rows.filter((d) => (d as any).unit === "kilogram").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg2 = __agg2_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg3_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg3_rowsf = __agg3_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "ounce").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg3_rowsf = __agg3_rows.filter((d) => (d as any).unit === "ounce").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg3 = __agg3_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg4_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg4_rowsf = __agg4_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "pound").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg4_rowsf = __agg4_rows.filter((d) => (d as any).unit === "pound").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg4 = __agg4_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg5_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg5_rowsf = __agg5_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "milliliter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg5_rowsf = __agg5_rows.filter((d) => (d as any).unit === "milliliter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg5 = __agg5_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg6_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg6_rowsf = __agg6_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "liter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg6_rowsf = __agg6_rows.filter((d) => (d as any).unit === "liter").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg6 = __agg6_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg7_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg7_rowsf = __agg7_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "teaspoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg7_rowsf = __agg7_rows.filter((d) => (d as any).unit === "teaspoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg7 = __agg7_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg8_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg8_rowsf = __agg8_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "tablespoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg8_rowsf = __agg8_rows.filter((d) => (d as any).unit === "tablespoon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg8 = __agg8_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg9_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg9_rowsf = __agg9_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "cup").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg9_rowsf = __agg9_rows.filter((d) => (d as any).unit === "cup").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg9 = __agg9_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg10_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg10_rowsf = __agg10_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "pint").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg10_rowsf = __agg10_rows.filter((d) => (d as any).unit === "pint").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg10 = __agg10_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg11_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg11_rowsf = __agg11_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "quart").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg11_rowsf = __agg11_rows.filter((d) => (d as any).unit === "quart").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg11 = __agg11_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg12_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId_and_ingredientId", (q) => q.eq("eventId", payload.eventId).eq("ingredientId", payload.ingredientId)).collect();
-    const __agg12_rowsf = __agg12_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).unit === "gallon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg12_rowsf = __agg12_rows.filter((d) => (d as any).unit === "gallon").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg12 = __agg12_rowsf.reduce((acc, d) => { const n = Number((d as any).quantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __match0_raw = await ctx.db.query("ingredientDemands").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     const __match0_rows = __match0_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).ingredientId === payload.ingredientId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
@@ -18223,7 +18223,7 @@ async function __runEventIngredientContributionSupersede(ctx: MutationCtx, { doc
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
-      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "supersede", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -25861,7 +25861,7 @@ async function __runInventoryLotRecord(ctx: MutationCtx, { docId, supplierLotNum
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("inventoryItems", __elseDoc as any);
-      await __runInventoryItemReceiveDelivery(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runInventoryItemReceiveDelivery(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -25993,7 +25993,7 @@ export const InventoryLot_createViaRecord = mutation({
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("inventoryItems", __elseDoc as any);
-      await __runInventoryItemReceiveDelivery(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runInventoryItemReceiveDelivery(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
@@ -30673,7 +30673,7 @@ async function __runPackListApplyServiceStyleKit(ctx: MutationCtx, { docId, serv
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("packListItems", __elseDoc as any);
-        await __runPackListItemEnsureKitItem(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runPackListItemEnsureKitItem(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "applyServiceStyleKit", emitIndex: 0 });
@@ -30955,7 +30955,7 @@ async function __runPackListMarkPacked(ctx: MutationCtx, { docId, version }: any
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("deliveries", __elseDoc as any);
-      await __runDeliverySchedule(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runDeliverySchedule(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "markPacked", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -31047,7 +31047,7 @@ async function __runPackListOpen(ctx: MutationCtx, { docId, eventId, name, purpo
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("packListItems", __elseDoc as any);
-        await __runPackListItemEnsureKitItem(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runPackListItemEnsureKitItem(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     const fanRows1 = (await ctx.db.query("eventDishes").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -31164,7 +31164,7 @@ export const PackList_createViaOpen = mutation({
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("packListItems", __elseDoc as any);
-        await __runPackListItemEnsureKitItem(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runPackListItemEnsureKitItem(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     const fanRows1 = (await ctx.db.query("eventDishes").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -31285,7 +31285,7 @@ async function __runPackListRequestDishContainers(ctx: MutationCtx, { docId, eve
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("packListItems", __elseDoc as any);
-        await __runPackListItemEnsureContainer(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runPackListItemEnsureContainer(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "requestDishContainers", emitIndex: 0 });
@@ -37980,7 +37980,7 @@ async function __runProposalAccept(ctx: MutationCtx, { docId, eventId, acceptedR
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventDishes", __elseDoc as any);
-        await __runEventDishConfirmFromProposal(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventDishConfirmFromProposal(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "accept", emitIndex: 0 });
@@ -38429,7 +38429,7 @@ async function __runProposalLinkEvent(ctx: MutationCtx, { docId, version }: any,
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventDishes", __elseDoc as any);
-        await __runEventDishConfirmFromProposal(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventDishConfirmFromProposal(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "linkEvent", emitIndex: 0 });
@@ -52398,7 +52398,7 @@ async function __runVendorOrderEnsureWeeklyDraft(ctx: MutationCtx, { docId, vend
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("vendorOrderLines", __elseDoc as any);
-      await __runVendorOrderLineEnsureWeeklyLine(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runVendorOrderLineEnsureWeeklyLine(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "ensureWeeklyDraft", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -53508,7 +53508,7 @@ async function __runVendorOrderLineCorrectReceipt(ctx: MutationCtx, { docId, cor
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("receiptCorrections", __elseDoc as any);
-      await __runReceiptCorrectionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runReceiptCorrectionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     const reactionTarget1 = payload.vendorOrderId;
     if (reactionTarget1) await __runVendorOrderNoteReceiptCorrection(ctx, { docId: reactionTarget1, lineStillShort: payload.lineStillShort } as any);
@@ -53626,7 +53626,7 @@ async function __runVendorOrderLineEnsureWeeklyLine(ctx: MutationCtx, { docId, v
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("vendorOrderLineDemands", __elseDoc as any);
-      await __runVendorOrderLineDemandLink(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runVendorOrderLineDemandLink(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "ensureWeeklyLine", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -53810,7 +53810,7 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientPriceObservations", __elseDoc as any);
-      await __runIngredientPriceObservationRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runIngredientPriceObservationRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     const __match1_raw = await ctx.db.query("inventoryLots").withIndex("by_vendorOrderLineId", (q) => q.eq("vendorOrderLineId", payload.vendorOrderLineId)).collect();
     const __match1_rows = __match1_raw.filter((d) => (d as any).vendorOrderLineId === payload.vendorOrderLineId && (d as any).cumulativeReceivedQuantity === payload.receivedQuantity && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
@@ -53834,7 +53834,7 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("inventoryLots", __elseDoc as any);
-      await __runInventoryLotRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runInventoryLotRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "recordReceipt", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -56563,7 +56563,7 @@ async function __runWeeklyPurchasingConfigRouteNeed(ctx: MutationCtx, { docId, p
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("vendorOrders", __elseDoc as any);
-      await __runVendorOrderEnsureWeeklyDraft(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runVendorOrderEnsureWeeklyDraft(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "routeNeed", emitIndex: 0 });
     return { ...doc, ...updates };
