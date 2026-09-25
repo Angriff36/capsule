@@ -25651,7 +25651,7 @@ async function __runInventoryItemTransferIn(ctx: MutationCtx, { docId, quantity,
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((quantity > 0))) throw new Error("Transfer quantity must be positive");
+    if (!((quantity > 0))) throw new Error("This item's transfer amount has to be more than zero. Enter how much to move.");
     const previousQuantity = doc.quantityOnHand;
     const nextQuantity = (doc.quantityOnHand + quantity);
     if (version !== undefined && (doc as any).version !== version) {
@@ -25702,7 +25702,7 @@ async function __runInventoryItemTransferOut(ctx: MutationCtx, { docId, quantity
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((quantity > 0))) throw new Error("Transfer quantity must be positive");
+    if (!((quantity > 0))) throw new Error("This item's transfer amount has to be more than zero. Enter how much to move.");
     if (!((doc.quantityOnHand >= quantity))) throw new Error("Cannot transfer more than quantity on hand");
     const previousQuantity = doc.quantityOnHand;
     const nextQuantity = (doc.quantityOnHand - quantity);

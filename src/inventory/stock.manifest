@@ -229,7 +229,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   command transferOut(quantity: decimal(12, 4), destinationLocationId: uuid) {
     guard self.stockedAt != null
     guard self.deletedAt == null
-    constraint transferOutPositive: quantity > 0 "Transfer quantity must be positive"
+    constraint transferOutPositive: quantity > 0 "This item's transfer amount has to be more than zero. Enter how much to move."
     constraint transferOutAvailable: self.quantityOnHand >= quantity "Cannot transfer more than quantity on hand"
     compute previousQuantity = self.quantityOnHand
     compute nextQuantity = self.quantityOnHand - quantity
@@ -251,7 +251,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   command transferIn(quantity: decimal(12, 4), sourceLocationId: uuid) {
     guard self.stockedAt != null
     guard self.deletedAt == null
-    constraint transferInPositive: quantity > 0 "Transfer quantity must be positive"
+    constraint transferInPositive: quantity > 0 "This item's transfer amount has to be more than zero. Enter how much to move."
     compute previousQuantity = self.quantityOnHand
     compute nextQuantity = self.quantityOnHand + quantity
     mutate quantityOnHand = nextQuantity

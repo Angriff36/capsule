@@ -11,29 +11,29 @@ function expectPlain(text: string) {
   expect(text).not.toContain("bun run");
 }
 
-describe("plain words on leftover stock on-hand copy", () => {
-  it("keeps the negative-on-hand refusal free of jargon", () => {
+describe("plain words on leftover stock transfer-amount-positive copy", () => {
+  it("keeps the zero-transfer refusal free of jargon", () => {
     const manifest = readFileSync("src/inventory/stock.manifest", "utf8");
     // Strip // comments the same way the culinary leftover tests do.
     const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
     const NEW =
-      "This item's on-hand amount can't be negative. Use zero or more.";
-    // The old jargon refusal is gone from the authored file.
-    expect(visible).not.toContain("Quantity on hand cannot be negative");
-    // The refusal now speaks in plain catering words (entity + commands share it).
+      "This item's transfer amount has to be more than zero. Enter how much to move.";
+    // The old jargon refusal is gone from the authored stock-item file.
+    expect(visible).not.toContain("Transfer quantity must be positive");
+    // The refusal now speaks in plain catering words.
     expect(visible).toContain(NEW);
     expectPlain(NEW);
     // The generated summary carries the plain wording.
     const summary = readFileSync("manifest-context-summary.json", "utf8");
     expect(summary).toContain(NEW);
-    // This leftover is mixed: the entity-level refusal plus command-level
-    // copies on open, adjustQuantity, and applyReceiptCorrection land in
-    // generated mutations on InventoryItem.
+    // This leftover is command-level: regen copies the command messages into
+    // generated mutations on stock transfer out and transfer in.
     const mutations = readFileSync("convex/mutations.ts", "utf8");
     expect(mutations).toContain(NEW);
-    // After this slice the old refusal is gone everywhere generated.
-    expect(mutations).not.toContain("Quantity on hand cannot be negative");
     // Already-landed copy on this same file stays.
+    expect(visible).toContain(
+      "This item's on-hand amount can't be negative. Use zero or more.",
+    );
     expect(visible).toContain(
       "This item's cost per unit can't be negative. Use zero or more.",
     );
@@ -52,5 +52,6 @@ describe("plain words on leftover stock on-hand copy", () => {
     expect(visible).toContain("Par level cannot be negative");
     expect(visible).toContain("Reorder threshold cannot be negative");
     expect(visible).toContain("Recount quantity cannot be negative");
+    expect(visible).toContain("Cannot transfer more than quantity on hand");
   });
 });

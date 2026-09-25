@@ -44,7 +44,6 @@ describe("plain words on leftover stock receive-amount-positive copy", () => {
     expect(visible).toContain(
       "This item's cost per unit can't be negative. Use zero or more.",
     );
-    expect(visible).toContain("Transfer quantity must be positive");
     expect(visible).toContain("Adjustment reason is required");
   });
 });

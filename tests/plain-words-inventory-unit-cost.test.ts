@@ -43,7 +43,6 @@ describe("plain words on leftover stock unit-cost copy", () => {
     );
     expect(visible).toContain("Say why this count changed.");
     // Later leftovers on this same file are pinned, not rewritten.
-    expect(visible).toContain("Transfer quantity must be positive");
     expect(visible).toContain("Adjustment reason is required");
   });
 });
