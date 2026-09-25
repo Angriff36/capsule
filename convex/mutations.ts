@@ -39873,7 +39873,7 @@ async function __runPurchaseNeedAssignToDraft(ctx: MutationCtx, { docId, vendorO
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may see purchase needs");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update purchase needs");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change purchase needs");
-    if (!((doc.status === "open"))) throw new Error("Guard 0 failed");
+    if (!((doc.status !== "cancelled"))) throw new Error("Guard 0 failed");
     if (!((doc.openedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((((doc.vendorOrderId == null) || ((__rel_vendorOrder != null) && (__rel_vendorOrder.status !== "draft"))) || ((doc.vendorOrderId === vendorOrderId) && (doc.vendorOrderLineId === vendorOrderLineId))))) throw new Error("Guard 3 failed");
@@ -39882,14 +39882,14 @@ async function __runPurchaseNeedAssignToDraft(ctx: MutationCtx, { docId, vendorO
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
-      vendorOrderId: vendorOrderId,
-      vendorOrderLineId: vendorOrderLineId,
+      vendorOrderId: ((doc.status === "open") ? vendorOrderId : doc.vendorOrderId),
+      vendorOrderLineId: ((doc.status === "open") ? vendorOrderLineId : doc.vendorOrderLineId),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, purchaseNeedId: docId, tenantId: __after.tenantId, eventId: __after.eventId, ingredientDemandId: __after.ingredientDemandId, ingredientId: __after.ingredientId, vendorOrderId: vendorOrderId, vendorOrderLineId: vendorOrderLineId, status: "open", _subject: { entity: "PurchaseNeed", command: "assignToDraft", id: docId } };
-    const __manifestEvent0 = { type: "PurchaseNeedDraftAssigned", entity: "PurchaseNeed", entityId: docId, payload: { purchaseNeedId: docId, tenantId: __after.tenantId, eventId: __after.eventId, ingredientDemandId: __after.ingredientDemandId, ingredientId: __after.ingredientId, vendorOrderId: vendorOrderId, vendorOrderLineId: vendorOrderLineId, status: "open" }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, purchaseNeedId: docId, tenantId: __after.tenantId, eventId: __after.eventId, ingredientDemandId: __after.ingredientDemandId, ingredientId: __after.ingredientId, vendorOrderId: vendorOrderId, vendorOrderLineId: vendorOrderLineId, status: __after.status, _subject: { entity: "PurchaseNeed", command: "assignToDraft", id: docId } };
+    const __manifestEvent0 = { type: "PurchaseNeedDraftAssigned", entity: "PurchaseNeed", entityId: docId, payload: { purchaseNeedId: docId, tenantId: __after.tenantId, eventId: __after.eventId, ingredientDemandId: __after.ingredientDemandId, ingredientId: __after.ingredientId, vendorOrderId: vendorOrderId, vendorOrderLineId: vendorOrderLineId, status: __after.status }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "assignToDraft", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -39990,6 +39990,7 @@ async function __runPurchaseNeedCreate(ctx: MutationCtx, args: any) {
       ingredientDemandId: args.ingredientDemandId,
       ingredientId: args.ingredientId,
       unit: args.unit ?? "each",
+      orderedQuantity: args.orderedQuantity,
       vendorOrderId: args.vendorOrderId,
       vendorOrderLineId: args.vendorOrderLineId,
       status: args.status ?? "open",
@@ -40034,6 +40035,7 @@ export const PurchaseNeed_create = mutation({
     ingredientDemandId: v.id("ingredientDemands"),
     ingredientId: v.id("ingredients"),
     unit: v.optional(v.union(v.literal("each"), v.literal("gram"), v.literal("kilogram"), v.literal("ounce"), v.literal("pound"), v.literal("milliliter"), v.literal("liter"), v.literal("teaspoon"), v.literal("tablespoon"), v.literal("cup"), v.literal("pint"), v.literal("quart"), v.literal("gallon"), v.literal("portion"), v.literal("serving"), v.literal("batch"), v.literal("melon"), v.literal("bottle"), v.literal("fluid_ounce"), v.literal("piece"), v.literal("slice"), v.literal("pizza"), v.literal("package"), v.literal("case"), v.literal("can"), v.literal("tub"))),
+    orderedQuantity: v.optional(v.union(v.number(), v.null())),
     vendorOrderId: v.optional(v.union(v.id("vendorOrders"), v.null())),
     vendorOrderLineId: v.optional(v.union(v.id("vendorOrderLines"), v.null())),
     status: v.optional(v.union(v.literal("open"), v.literal("ordered"), v.literal("fulfilled"), v.literal("cancelled"))),
@@ -40096,6 +40098,7 @@ async function __runPurchaseNeedMarkDraftOrdered(ctx: MutationCtx, { docId, vers
     const updates = {
       status: "ordered",
       orderedAt: Date.now(),
+      orderedQuantity: doc.requiredQuantity,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -40220,6 +40223,7 @@ async function __runPurchaseNeedMarkOrdered(ctx: MutationCtx, { docId, vendorOrd
       vendorOrderLineId: vendorOrderLineId,
       status: "ordered",
       orderedAt: Date.now(),
+      orderedQuantity: doc.requiredQuantity,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -40383,31 +40387,18 @@ async function __runPurchaseNeedReviseRequired(ctx: MutationCtx, { docId, requir
     const targetVolume = ((doc.unit === "milliliter") ? 1 : ((doc.unit === "liter") ? 1000 : ((doc.unit === "teaspoon") ? 4.92892159375 : ((doc.unit === "tablespoon") ? 14.78676478125 : ((doc.unit === "cup") ? 236.5882365 : ((doc.unit === "pint") ? 473.176473 : ((doc.unit === "quart") ? 946.352946 : ((doc.unit === "gallon") ? 3785.411784 : 0))))))));
     const compatibleUnit = (((incomingUnit === doc.unit) || ((sourceMass > 0) && (targetMass > 0))) || ((sourceVolume > 0) && (targetVolume > 0)));
     const unitRatio = ((incomingUnit === doc.unit) ? 1 : (((sourceMass > 0) && (targetMass > 0)) ? (sourceMass / targetMass) : (((sourceVolume > 0) && (targetVolume > 0)) ? (sourceVolume / targetVolume) : 1)));
-    {
-      const __cur = doc.status;
-      if (__cur !== undefined) {
-        const __from = String(__cur);
-        const __to = "open";
-        const __allowed: Record<string, string[]> = { "open": ["ordered", "cancelled"], "ordered": ["open", "fulfilled", "cancelled"], "fulfilled": ["open"], "cancelled": [] };
-        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
-          const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
-          throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
-        }
-      }
-    }
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
       requiredQuantity: (requiredQuantity * unitRatio),
       unit: (compatibleUnit ? doc.unit : incomingUnit),
-      status: "open",
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, purchaseNeedId: docId, tenantId: __after.tenantId, eventId: __after.eventId, ingredientDemandId: __after.ingredientDemandId, ingredientId: __after.ingredientId, preferredVendorId: __after.preferredVendorId, requiredQuantity: __after.requiredQuantity, unit: __after.unit, purchasingWeekStart: __after.purchasingWeekStart, status: "open", _subject: { entity: "PurchaseNeed", command: "reviseRequired", id: docId } };
-    const __manifestEvent0 = { type: "PurchaseNeedOpened", entity: "PurchaseNeed", entityId: docId, payload: { purchaseNeedId: docId, tenantId: __after.tenantId, eventId: __after.eventId, ingredientDemandId: __after.ingredientDemandId, ingredientId: __after.ingredientId, preferredVendorId: __after.preferredVendorId, requiredQuantity: __after.requiredQuantity, unit: __after.unit, purchasingWeekStart: __after.purchasingWeekStart, status: "open" }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, purchaseNeedId: docId, tenantId: __after.tenantId, eventId: __after.eventId, ingredientDemandId: __after.ingredientDemandId, ingredientId: __after.ingredientId, preferredVendorId: __after.preferredVendorId, requiredQuantity: __after.requiredQuantity, unit: __after.unit, purchasingWeekStart: __after.purchasingWeekStart, status: __after.status, _subject: { entity: "PurchaseNeed", command: "reviseRequired", id: docId } };
+    const __manifestEvent0 = { type: "PurchaseNeedOpened", entity: "PurchaseNeed", entityId: docId, payload: { purchaseNeedId: docId, tenantId: __after.tenantId, eventId: __after.eventId, ingredientDemandId: __after.ingredientDemandId, ingredientId: __after.ingredientId, preferredVendorId: __after.preferredVendorId, requiredQuantity: __after.requiredQuantity, unit: __after.unit, purchasingWeekStart: __after.purchasingWeekStart, status: __after.status }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     // Reactions
     const reactionTarget0 = payload.ingredientDemandId;

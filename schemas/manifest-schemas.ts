@@ -2768,6 +2768,7 @@ export const PurchaseNeedSchema = z.object({
   preferredVendorId: z.string().uuid().nullable().optional(),
   requiredQuantity: z.number().default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
+  orderedQuantity: z.number().nullable().optional(),
   purchasingWeekStart: z.coerce.date().nullable().optional(),
   vendorOrderId: z.string().uuid().nullable().optional(),
   vendorOrderLineId: z.string().uuid().nullable().optional(),
