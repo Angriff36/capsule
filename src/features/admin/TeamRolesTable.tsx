@@ -205,7 +205,7 @@ function PersonRoleCell({
   );
 }
 
-function PersonPayRateCell({
+export function PersonPayRateCell({
   person,
   rate,
   canEdit,
