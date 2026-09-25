@@ -49,10 +49,11 @@ describe("plain words on leftover procurement demand-link order-match copy", () 
     expect(visible).toContain(
       "Procurement and managers may see order demand links",
     );
-    // Later leftovers on this same file are pinned, not rewritten.
+    // The order-owns-the-line refusal is already landed in plain words.
     expect(visible).toContain(
-      "Demand link vendorOrderId must own the vendor order line",
+      "This order-to-need link's line isn't on this order. Pick a line from the order already on this link.",
     );
+    // Later leftovers on this same file are pinned, not rewritten.
     expect(visible).toContain("Demand link contribution must be positive");
     expect(visible).toContain("Contribution quantity cannot be negative");
   });

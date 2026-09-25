@@ -51,7 +51,7 @@ describe("plain words on leftover procurement demand-link line-match copy", () =
       "This order-to-need link is for a different order. Pick the order already on this link.",
     );
     expect(visible).toContain(
-      "Demand link vendorOrderId must own the vendor order line",
+      "This order-to-need link's line isn't on this order. Pick a line from the order already on this link.",
     );
     expect(visible).toContain("Demand link contribution must be positive");
   });
