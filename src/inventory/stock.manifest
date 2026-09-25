@@ -211,7 +211,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   command recount(actualQuantity: decimal(12, 4)) {
     guard self.stockedAt != null
     guard self.deletedAt == null
-    constraint recountNonnegative: actualQuantity >= 0 "Recount quantity cannot be negative"
+    constraint recountNonnegative: actualQuantity >= 0 "This item's counted amount can't be negative. Use zero or more."
     compute previousQuantity = self.quantityOnHand
     mutate quantityOnHand = actualQuantity
     emit InventoryRecounted {

@@ -55,6 +55,8 @@ describe("plain words on leftover stock on-hand copy", () => {
     expect(visible).toContain(
       "This item's reorder threshold can't be negative. Use zero or more.",
     );
-    expect(visible).toContain("Recount quantity cannot be negative");
+    expect(visible).toContain(
+      "This item's counted amount can't be negative. Use zero or more.",
+    );
   });
 });

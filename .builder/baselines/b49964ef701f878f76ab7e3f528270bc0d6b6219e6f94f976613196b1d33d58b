@@ -25498,7 +25498,7 @@ async function __runInventoryItemRecount(ctx: MutationCtx, { docId, actualQuanti
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((actualQuantity >= 0))) throw new Error("Recount quantity cannot be negative");
+    if (!((actualQuantity >= 0))) throw new Error("This item's counted amount can't be negative. Use zero or more.");
     const previousQuantity = doc.quantityOnHand;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
