@@ -42,7 +42,7 @@ describe("plain words on leftover stock transfer record move-amount copy", () =>
       "This saved transfer's amount has to be more than zero. Enter how much was moved.",
     );
     expect(visible).toContain(
-      "Record sourceInventoryItemId must match the seeded source stock reference",
+      "This transfer is taking from a different stock item. Pick the stock item already on this transfer.",
     );
     expect(visible).toContain(
       "Record destinationInventoryItemId must match the seeded destination stock reference",
