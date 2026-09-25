@@ -257,7 +257,7 @@ entity StockCountLine mixin TenantScoped, SoftDeletable {
     guard self.session != null and self.session.status == "in_progress"
     guard self.inventoryItem != null and self.inventoryItem.deletedAt == null
     guard self.countedQuantity != self.inventoryItem.quantityOnHand
-    constraint stockCountVarianceReasonRequired: length(trim(reason)) > 0 "Adjustment reason is required"
+    constraint stockCountVarianceReasonRequired: length(trim(reason)) > 0 "Say why this count doesn't match what's on hand."
     compute ledgerQuantity = self.inventoryItem.quantityOnHand
     compute adjustmentQuantity = self.countedQuantity - ledgerQuantity
     mutate ledgerQuantityAtReconcile = ledgerQuantity

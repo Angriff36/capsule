@@ -25122,7 +25122,7 @@ async function __runInventoryItemAdjustQuantity(ctx: MutationCtx, { docId, delta
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Adjustment reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're changing this item's amount.");
     if (!(((doc.quantityOnHand + delta) >= 0))) throw new Error("This item's on-hand amount can't be negative. Use zero or more.");
     const previousQuantity = doc.quantityOnHand;
     const nextQuantity = (doc.quantityOnHand + delta);
@@ -47428,7 +47428,7 @@ async function __runStockCountLineReconcileVariance(ctx: MutationCtx, { docId, r
     if (!(((__rel_session != null) && (__rel_session.status === "in_progress")))) throw new Error("Guard 2 failed");
     if (!(((__rel_inventoryItem != null) && (__rel_inventoryItem.deletedAt == null)))) throw new Error("Guard 3 failed");
     if (!((doc.countedQuantity !== __rel_inventoryItem.quantityOnHand))) throw new Error("Guard 4 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Adjustment reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why this count doesn't match what's on hand.");
     const ledgerQuantity = __rel_inventoryItem.quantityOnHand;
     const adjustmentQuantity = (doc.countedQuantity - ledgerQuantity);
     {

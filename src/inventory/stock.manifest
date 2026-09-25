@@ -157,7 +157,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   command adjustQuantity(delta: decimal(12, 4), reason: string) {
     guard self.stockedAt != null
     guard self.deletedAt == null
-    constraint adjustReasonRequired: length(trim(reason)) > 0 "Adjustment reason is required"
+    constraint adjustReasonRequired: length(trim(reason)) > 0 "Say why you're changing this item's amount."
     constraint adjustResultNonnegative: self.quantityOnHand + delta >= 0 "This item's on-hand amount can't be negative. Use zero or more."
     compute previousQuantity = self.quantityOnHand
     compute nextQuantity = self.quantityOnHand + delta
