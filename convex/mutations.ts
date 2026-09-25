@@ -54114,7 +54114,7 @@ async function __runVendorOrderLineDemandRevise(ctx: MutationCtx, { docId, contr
     if (!((doc.linkedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")))) throw new Error("Guard 2 failed");
-    if (!((contributionQuantity > 0))) throw new Error("Demand link contribution must be positive");
+    if (!((contributionQuantity > 0))) throw new Error("This order-to-need link's amount has to be more than zero. Enter how much this line covers.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }

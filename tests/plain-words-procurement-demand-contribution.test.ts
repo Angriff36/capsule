@@ -53,6 +53,8 @@ describe("plain words on leftover procurement demand-link contribution copy", ()
     expect(visible).toContain(
       "This order-to-need link's line isn't on this order. Pick a line from the order already on this link.",
     );
-    expect(visible).toContain("Demand link contribution must be positive");
+    expect(visible).toContain(
+      "This order-to-need link's amount has to be more than zero. Enter how much this line covers.",
+    );
   });
 });

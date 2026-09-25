@@ -52,8 +52,11 @@ describe("plain words on leftover procurement demand-link order-owns-line copy",
     expect(visible).toContain(
       "Procurement and managers may see order demand links",
     );
+    // The revise-positive refusal is already landed in plain words.
+    expect(visible).toContain(
+      "This order-to-need link's amount has to be more than zero. Enter how much this line covers.",
+    );
     // Later leftovers on this same file are pinned, not rewritten.
-    expect(visible).toContain("Demand link contribution must be positive");
     expect(visible).toContain("Contribution quantity cannot be negative");
   });
 });

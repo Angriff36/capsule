@@ -1125,7 +1125,7 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
     guard self.linkedAt != null
     guard self.deletedAt == null
     guard self.vendorOrder != null and self.vendorOrder.status == "draft"
-    constraint reviseQuantityPositive: contributionQuantity > 0 "Demand link contribution must be positive"
+    constraint reviseQuantityPositive: contributionQuantity > 0 "This order-to-need link's amount has to be more than zero. Enter how much this line covers."
     mutate contributionQuantity = contributionQuantity
     emit VendorOrderLineDemandRevised {
       vendorOrderLineDemandId: self.id
