@@ -344,6 +344,8 @@ import {
   InventoryReservationConsumeParamsSchema,
   InventoryReservationReleaseParamsSchema,
   InventoryReservationReserveParamsSchema,
+  InventorySettingsRegisterParamsSchema,
+  InventorySettingsSetStockTrackingParamsSchema,
   InvoiceApplyCreditParamsSchema,
   InvoiceApplyPaymentParamsSchema,
   InvoiceAssignNumberParamsSchema,
@@ -5549,6 +5551,47 @@ export function useCreateInventoryReservation() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = InventoryReservationReserveParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for InventorySettings. */
+export function useListInventorySettings() {
+  return useQuery(api.queries.listInventorySettings);
+}
+
+/** Reactive get-by-id for InventorySettings. Pass "skip" to suspend. */
+export function useGetInventorySettings(id: string | "skip") {
+  return useQuery(api.queries.getInventorySettings, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for InventorySettings.register. */
+export function useInventorySettingsRegister() {
+  const mutate = useMutation(api.mutations.InventorySettings_register);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InventorySettingsRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for InventorySettings.setStockTracking. */
+export function useInventorySettingsSetStockTracking() {
+  const mutate = useMutation(api.mutations.InventorySettings_setStockTracking);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InventorySettingsSetStockTrackingParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for InventorySettings.register. */
+export function useCreateInventorySettings() {
+  const mutate = useMutation(api.mutations.InventorySettings_createViaRegister);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = InventorySettingsRegisterParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -11324,4 +11367,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1204 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1209 as const;

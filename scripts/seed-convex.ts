@@ -357,6 +357,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.InventoryReservation_createViaReserve, { "inventoryItemId": "inventoryItemId-inventory-reservation-1", "inventoryLotId": "inventoryLotId-inventory-reservation-1", "eventId": "eventId-inventory-reservation-1", "ingredientId": "ingredientId-inventory-reservation-1", "quantity": 1 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.InventoryReservation_createViaReserve, { "inventoryItemId": "inventoryItemId-inventory-reservation-2", "inventoryLotId": "inventoryLotId-inventory-reservation-2", "eventId": "eventId-inventory-reservation-2", "ingredientId": "ingredientId-inventory-reservation-2", "quantity": 2 } as any);
+  // InventorySettings → api.mutations.InventorySettings_createViaRegister
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.InventorySettings_createViaRegister, { "stockLevelsTracked": false } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.InventorySettings_createViaRegister, { "stockLevelsTracked": false } as any);
   // Invoice has multiple initialization commands (issue, markDepositPaid, sendBalanceReminder); using the selected initialization command: issue.
   // Invoice → api.mutations.Invoice_createViaIssue
   rowsAttempted += 1;
@@ -1183,6 +1188,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "InventoryReservation",
       "createMutation": "InventoryReservation_createViaReserve",
+      "rowCount": 2
+    },
+    {
+      "entity": "InventorySettings",
+      "createMutation": "InventorySettings_createViaRegister",
       "rowCount": 2
     },
     {

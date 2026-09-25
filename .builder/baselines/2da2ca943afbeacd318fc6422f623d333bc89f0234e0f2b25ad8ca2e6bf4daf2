@@ -1875,6 +1875,19 @@ export const InventoryReservationSchema = z.object({
 
 export type InventoryReservation = z.infer<typeof InventoryReservationSchema>;
 
+// Entity: InventorySettings
+export const InventorySettingsSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  stockLevelsTracked: z.boolean().default(true),
+  registeredAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type InventorySettings = z.infer<typeof InventorySettingsSchema>;
+
 // Entity: Invoice
 export const InvoiceSchema = z.object({
   id: z.string().uuid(),
@@ -7057,6 +7070,20 @@ export const InventoryReservationReserveParamsSchema = z.object({
 });
 
 export type InventoryReservationReserveParams = z.infer<typeof InventoryReservationReserveParamsSchema>;
+
+// Command: register on InventorySettings
+export const InventorySettingsRegisterParamsSchema = z.object({
+  stockLevelsTracked: z.boolean(),
+});
+
+export type InventorySettingsRegisterParams = z.infer<typeof InventorySettingsRegisterParamsSchema>;
+
+// Command: setStockTracking on InventorySettings
+export const InventorySettingsSetStockTrackingParamsSchema = z.object({
+  stockLevelsTracked: z.boolean(),
+});
+
+export type InventorySettingsSetStockTrackingParams = z.infer<typeof InventorySettingsSetStockTrackingParamsSchema>;
 
 // Command: applyCredit on Invoice
 export const InvoiceApplyCreditParamsSchema = z.object({
