@@ -51,8 +51,11 @@ describe("plain words on leftover stock transfer source-available copy", () => {
     expect(visible).toContain("Inventory staff may see stock transfers");
     expect(visible).toContain("Inventory staff may update stock transfers");
     expect(visible).toContain("Inventory staff may change stock transfers");
+    // Already-landed copy on this same file stays.
+    expect(visible).toContain(
+      "This transfer can't send to the same stock item it takes from. Pick a different send-to item.",
+    );
     // Later leftovers on this same file are pinned, not rewritten.
-    expect(visible).toContain("Source and destination stock lines must differ");
     expect(visible).toContain(
       "Transfer ingredientId must match the source stock ingredient",
     );
