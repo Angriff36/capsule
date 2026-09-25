@@ -25,6 +25,15 @@ export const CAPSULE_UNITS = [
   "batch",
   "melon",
   "bottle",
+  // Revision-2 culinary model units (TPP catalog and printed sheets).
+  "fluid_ounce",
+  "piece",
+  "slice",
+  "pizza",
+  "package",
+  "case",
+  "can",
+  "tub",
 ] as const;
 
 export type CapsuleUnit = (typeof CAPSULE_UNITS)[number];
@@ -48,6 +57,12 @@ const ALIASES: Record<string, CapsuleUnit> = {
   tsp: "teaspoon",
   teaspoons: "teaspoon",
   tbsp: "tablespoon",
+  tbs: "tablespoon",
+  tbl: "tablespoon",
+  tbls: "tablespoon",
+  tblsp: "tablespoon",
+  // TPP prep sheets print this misspelling ("1.2 tbslp").
+  tbslp: "tablespoon",
   tablespoons: "tablespoon",
   cups: "cup",
   pints: "pint",
@@ -60,11 +75,23 @@ const ALIASES: Record<string, CapsuleUnit> = {
   batches: "batch",
   melons: "melon",
   bottles: "bottle",
+  pieces: "piece",
+  pc: "piece",
+  pcs: "piece",
+  slices: "slice",
+  pizzas: "pizza",
+  packages: "package",
+  pkg: "package",
+  bag: "package",
+  bags: "package",
+  cases: "case",
+  cans: "can",
+  tubs: "tub",
 };
 
 /**
  * Read a TPP unit word. Returns undefined when the unit has no Capsule
- * equivalent, for example the purchasing unit "Case". For measured amounts,
+ * equivalent, for example the purchasing unit "Pallet". For measured amounts,
  * use toCapsuleMeasure so quantity changes with the unit (fluid ounces to cups).
  */
 export function toCapsuleUnit(

@@ -94,7 +94,7 @@ function normalizeCommandError(error: unknown): NormalizedCommandError {
     .replace(/^Server Error\s*/i, "")
     .replace(/^Uncaught (?:DOMException|OperationError|Error):\s*/i, "")
     .replace(/^Error:\s*/i, "")
-    .replace(/\s+Called by client\s*$/i, "")
+    .replace(/\s*Called by client\s*$/i, "")
     .trim();
   return { detail, operation, requestId };
 }
