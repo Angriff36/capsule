@@ -92,6 +92,12 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
 
+  // Seeds follow menu, recipe, headcount and schedule changes made by any
+  // staff role (reactions run as the acting user), so the gate is staff, not
+  // a specialty cap: it keeps identities outside the role hierarchy out of
+  // these commands without blocking live ops (manifest scan finding).
+  default policy eventDishComponentSeedExecute execute: roleAllows(user.role, "staffAccess") "Staff actions keep dish recipe seeds in step"
+
   command seed(
     eventId: uuid,
     eventDishId: uuid,
