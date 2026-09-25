@@ -230,7 +230,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     guard self.stockedAt != null
     guard self.deletedAt == null
     constraint transferOutPositive: quantity > 0 "This item's transfer amount has to be more than zero. Enter how much to move."
-    constraint transferOutAvailable: self.quantityOnHand >= quantity "Cannot transfer more than quantity on hand"
+    constraint transferOutAvailable: self.quantityOnHand >= quantity "This item can't send more than it has on hand. Enter a smaller amount."
     compute previousQuantity = self.quantityOnHand
     compute nextQuantity = self.quantityOnHand - quantity
     mutate quantityOnHand = nextQuantity

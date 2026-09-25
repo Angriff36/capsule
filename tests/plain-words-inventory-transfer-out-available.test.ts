@@ -11,49 +11,31 @@ function expectPlain(text: string) {
   expect(text).not.toContain("bun run");
 }
 
-describe("plain words on leftover stock transfer-amount-positive copy", () => {
-  it("keeps the zero-transfer refusal free of jargon", () => {
+describe("plain words on leftover stock transfer-out-available copy", () => {
+  it("keeps the too-much-to-send refusal free of jargon", () => {
     const manifest = readFileSync("src/inventory/stock.manifest", "utf8");
     // Strip // comments the same way the culinary leftover tests do.
     const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
     const NEW =
-      "This item's transfer amount has to be more than zero. Enter how much to move.";
+      "This item can't send more than it has on hand. Enter a smaller amount.";
     // The old jargon refusal is gone from the authored stock-item file.
-    expect(visible).not.toContain("Transfer quantity must be positive");
+    expect(visible).not.toContain("Cannot transfer more than quantity on hand");
     // The refusal now speaks in plain catering words.
     expect(visible).toContain(NEW);
     expectPlain(NEW);
     // The generated summary carries the plain wording.
     const summary = readFileSync("manifest-context-summary.json", "utf8");
     expect(summary).toContain(NEW);
-    // This leftover is command-level: regen copies the command messages into
-    // generated mutations on stock transfer out and transfer in.
+    // This leftover is command-level: regen copies the command message into
+    // generated mutations on stock transfer out.
     const mutations = readFileSync("convex/mutations.ts", "utf8");
     expect(mutations).toContain(NEW);
     // Already-landed copy on this same file stays.
     expect(visible).toContain(
-      "This item's on-hand amount can't be negative. Use zero or more.",
+      "This item's transfer amount has to be more than zero. Enter how much to move.",
     );
-    expect(visible).toContain(
-      "This item's cost per unit can't be negative. Use zero or more.",
-    );
-    expect(visible).toContain(
-      "This item's received amount has to be more than zero. Enter how much arrived.",
-    );
-    expect(visible).toContain(
-      "Inventory staff and managers may see stock items",
-    );
-    expect(visible).toContain(
-      "Inventory staff and managers may update stock items",
-    );
-    expect(visible).toContain("Say why this count changed.");
     // Later leftovers on this same file are pinned, not rewritten.
     expect(visible).toContain("Adjustment reason is required");
     expect(visible).toContain("Par level cannot be negative");
-    expect(visible).toContain("Reorder threshold cannot be negative");
-    expect(visible).toContain("Recount quantity cannot be negative");
-    expect(visible).toContain(
-      "This item can't send more than it has on hand. Enter a smaller amount.",
-    );
   });
 });

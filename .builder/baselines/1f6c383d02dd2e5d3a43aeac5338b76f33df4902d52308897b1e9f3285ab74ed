@@ -25703,7 +25703,7 @@ async function __runInventoryItemTransferOut(ctx: MutationCtx, { docId, quantity
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((quantity > 0))) throw new Error("This item's transfer amount has to be more than zero. Enter how much to move.");
-    if (!((doc.quantityOnHand >= quantity))) throw new Error("Cannot transfer more than quantity on hand");
+    if (!((doc.quantityOnHand >= quantity))) throw new Error("This item can't send more than it has on hand. Enter a smaller amount.");
     const previousQuantity = doc.quantityOnHand;
     const nextQuantity = (doc.quantityOnHand - quantity);
     if (version !== undefined && (doc as any).version !== version) {
