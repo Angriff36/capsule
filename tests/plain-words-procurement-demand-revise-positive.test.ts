@@ -54,6 +54,6 @@ describe("plain words on leftover procurement demand-link revise-positive copy",
       "Procurement and managers may see order demand links",
     );
     // Later leftovers on this same file are pinned, not rewritten.
-    expect(visible).toContain("Received quantity must be positive");
+    expect(visible).toContain("Receipt unit price cannot be negative");
   });
 });

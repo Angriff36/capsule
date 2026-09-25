@@ -47,6 +47,6 @@ describe("plain words on leftover weekly-line contribution copy", () => {
       "This order-to-need link is for a different need. Pick the need already on this link.",
     );
     // Later leftovers on this same file are pinned, not rewritten.
-    expect(visible).toContain("Received quantity must be positive");
+    expect(visible).toContain("Receipt unit price cannot be negative");
   });
 });
