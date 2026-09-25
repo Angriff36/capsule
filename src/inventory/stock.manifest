@@ -47,7 +47,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
 
   constraint stockNonnegative: self.stockedAt == null or self.quantityOnHand >= 0 "This item's on-hand amount can't be negative. Use zero or more."
   constraint stockParNonnegative: self.parLevel >= 0 "This item's par level can't be negative. Use zero or more."
-  constraint stockReorderNonnegative: self.reorderThreshold >= 0 "Reorder threshold cannot be negative"
+  constraint stockReorderNonnegative: self.reorderThreshold >= 0 "This item's reorder threshold can't be negative. Use zero or more."
   constraint stockCostNonnegative: self.unitCost >= 0 "This item's cost per unit can't be negative. Use zero or more."
 
   default policy inventoryItemRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may see stock items"
@@ -74,7 +74,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     constraint openStockUnitMatchesCatalog: self.ingredient != null and unit == self.ingredient.unit "Stock line unit must match the ingredient's catalog unit — units do not convert"
     constraint openStockQuantityNonnegative: quantityOnHand == null or quantityOnHand >= 0 "This item's on-hand amount can't be negative. Use zero or more."
     constraint openStockParNonnegative: parLevel == null or parLevel >= 0 "This item's par level can't be negative. Use zero or more."
-    constraint openStockReorderNonnegative: reorderThreshold == null or reorderThreshold >= 0 "Reorder threshold cannot be negative"
+    constraint openStockReorderNonnegative: reorderThreshold == null or reorderThreshold >= 0 "This item's reorder threshold can't be negative. Use zero or more."
     constraint openStockCostNonnegative: unitCost == null or unitCost >= 0 "This item's cost per unit can't be negative. Use zero or more."
     compute previousQuantity = self.quantityOnHand
     mutate ingredientId = ingredientId
@@ -278,7 +278,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard roleAllows(user.role, "inventoryManageAccess")
     constraint levelsParNonnegative: parLevel >= 0 "This item's par level can't be negative. Use zero or more."
-    constraint levelsReorderNonnegative: reorderThreshold >= 0 "Reorder threshold cannot be negative"
+    constraint levelsReorderNonnegative: reorderThreshold >= 0 "This item's reorder threshold can't be negative. Use zero or more."
     constraint levelsCostNonnegative: unitCost == null or unitCost >= 0 "This item's cost per unit can't be negative. Use zero or more."
     mutate parLevel = parLevel
     mutate reorderThreshold = reorderThreshold

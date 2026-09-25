@@ -25245,7 +25245,7 @@ async function __runInventoryItemOpen(ctx: MutationCtx, { docId, ingredientId, l
     if (!(((__rel_ingredient != null) && (unit === __rel_ingredient.unit)))) throw new Error("Stock line unit must match the ingredient's catalog unit — units do not convert");
     if (!(((quantityOnHand == null) || (quantityOnHand >= 0)))) throw new Error("This item's on-hand amount can't be negative. Use zero or more.");
     if (!(((parLevel == null) || (parLevel >= 0)))) throw new Error("This item's par level can't be negative. Use zero or more.");
-    if (!(((reorderThreshold == null) || (reorderThreshold >= 0)))) throw new Error("Reorder threshold cannot be negative");
+    if (!(((reorderThreshold == null) || (reorderThreshold >= 0)))) throw new Error("This item's reorder threshold can't be negative. Use zero or more.");
     if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("This item's cost per unit can't be negative. Use zero or more.");
     const previousQuantity = doc.quantityOnHand;
     if (version !== undefined && (doc as any).version !== version) {
@@ -25339,7 +25339,7 @@ export const InventoryItem_createViaOpen = mutation({
     if (!(((__rel_ingredient != null) && (unit === __rel_ingredient.unit)))) throw new Error("Stock line unit must match the ingredient's catalog unit — units do not convert");
     if (!(((quantityOnHand == null) || (quantityOnHand >= 0)))) throw new Error("This item's on-hand amount can't be negative. Use zero or more.");
     if (!(((parLevel == null) || (parLevel >= 0)))) throw new Error("This item's par level can't be negative. Use zero or more.");
-    if (!(((reorderThreshold == null) || (reorderThreshold >= 0)))) throw new Error("Reorder threshold cannot be negative");
+    if (!(((reorderThreshold == null) || (reorderThreshold >= 0)))) throw new Error("This item's reorder threshold can't be negative. Use zero or more.");
     if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("This item's cost per unit can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
@@ -25756,7 +25756,7 @@ async function __runInventoryItemUpdateLevels(ctx: MutationCtx, { docId, parLeve
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "inventoryManageAccess"))) throw new Error("Guard 2 failed");
     if (!((parLevel >= 0))) throw new Error("This item's par level can't be negative. Use zero or more.");
-    if (!((reorderThreshold >= 0))) throw new Error("Reorder threshold cannot be negative");
+    if (!((reorderThreshold >= 0))) throw new Error("This item's reorder threshold can't be negative. Use zero or more.");
     if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("This item's cost per unit can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
