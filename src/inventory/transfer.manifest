@@ -29,7 +29,7 @@ entity StockTransfer mixin TenantScoped, SoftDeletable {
   belongsTo sourceLocation: StorageLocation fields [tenantId, sourceLocationId] references [tenantId, id]
   belongsTo destinationLocation: StorageLocation fields [tenantId, destinationLocationId] references [tenantId, id]
 
-  constraint transferQuantityPositive: self.transferredAt == null or self.quantity > 0 "Transfer quantity must be positive once recorded"
+  constraint transferQuantityPositive: self.transferredAt == null or self.quantity > 0 "This saved transfer's amount has to be more than zero. Enter how much was moved."
 
   default policy stockTransferRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may see stock transfers"
   default policy stockTransferWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may update stock transfers"
