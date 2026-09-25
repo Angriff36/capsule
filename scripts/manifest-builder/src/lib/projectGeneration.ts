@@ -45,6 +45,7 @@ export type {
 export type {
   ApplyOwnershipManifestHooks,
   ApplyOwnershipManifestPlan,
+  ProjectGenerationApplyResult,
   InstallProjectDependenciesOptions,
 } from "./projectGenerationApply";
 export {

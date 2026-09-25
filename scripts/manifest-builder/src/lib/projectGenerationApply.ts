@@ -12,7 +12,11 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
-import { baselineBlobPath } from "./projectGenerationBaselineStore";
+import { ProjectGenerationBaselinePruner } from "./projectGenerationBaselinePrune";
+import {
+  ProjectGenerationBaselineStore,
+  baselineBlobPath,
+} from "./projectGenerationBaselineStore";
 import type {
   OwnershipManifest,
   ProjectGenerationPlan,
@@ -171,9 +175,14 @@ async function commitStagedWrites(options: {
   }
 }
 
+export interface ProjectGenerationApplyResult {
+  /** `.builder/baselines` digests removed because the next ledger no longer references them. */
+  prunedBaselineDigests: string[];
+}
+
 export async function applyProjectGeneration(
   plan: ProjectGenerationPlan,
-): Promise<void> {
+): Promise<ProjectGenerationApplyResult> {
   if (plan.conflicts.length > 0) {
     const detail = plan.conflicts
       .map((entry) =>
@@ -191,6 +200,12 @@ export async function applyProjectGeneration(
       content,
     ]),
   );
+  // Baseline GC rides the same backup/rollback transaction as the generated
+  // writes: a failed apply restores pruned blobs along with everything else.
+  const pruner = new ProjectGenerationBaselinePruner(
+    new ProjectGenerationBaselineStore(plan.targetDir),
+  );
+  const prune = await pruner.prunePaths(plan);
   await commitStagedWrites({
     targetDir: plan.targetDir,
     targetExisted: plan.targetExisted,
@@ -199,8 +214,9 @@ export async function applyProjectGeneration(
       ...baselineWrites,
       [OWNERSHIP_MANIFEST_PATH]: formatOwnershipManifest(plan.nextOwnership),
     },
-    deletions: plan.deletions,
+    deletions: [...plan.deletions, ...prune.paths],
   });
+  return { prunedBaselineDigests: prune.digests };
 }
 
 /**

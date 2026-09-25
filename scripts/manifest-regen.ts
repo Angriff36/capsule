@@ -7,6 +7,7 @@ import { applyAggregateCompositeIndexes } from "./apply-aggregate-composite-inde
 import { applyOrgCapabilityCheckRole } from "./apply-org-capability-check-role.ts";
 import { applyEventServiceStyleReferenceGuard } from "./apply-event-service-style-reference-guard.ts";
 import { ManifestLineEndingNormalizer } from "./normalizeManifestLineEndings.ts";
+import { syncBuilderBaselines } from "./sync-builder-baselines.ts";
 
 const CAPSULE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -48,6 +49,13 @@ export function regenerate(passthrough: string[] = []): number {
   if (touched.length > 0) {
     console.log(
       `manifest-regen: applied generated runtime patches (${touched.join(", ")})`,
+    );
+  }
+  // The patches moved ledger digests after Builder's own baseline prune.
+  const synced = syncBuilderBaselines(CAPSULE_ROOT);
+  if (synced.written + synced.removed > 0) {
+    console.log(
+      `manifest-regen: baseline store synced (${String(synced.written)} written, ${String(synced.removed)} removed)`,
     );
   }
   return 0;
