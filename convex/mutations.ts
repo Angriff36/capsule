@@ -53014,7 +53014,7 @@ async function __runVendorOrderLineAddLine(ctx: MutationCtx, { docId, vendorOrde
     if (!((((ingredientDemandId == null) || (doc.ingredientDemandId == null)) || (ingredientDemandId === doc.ingredientDemandId)))) throw new Error("Add line ingredientDemandId must match the seeded demand reference when provided");
     if (!((((locationId == null) || (doc.locationId == null)) || (locationId === doc.locationId)))) throw new Error("Add line locationId must match the seeded location reference when provided");
     if (!((orderedQuantity > 0))) throw new Error("Ordered quantity must be positive");
-    if (!((unitCost >= 0))) throw new Error("Unit cost cannot be negative");
+    if (!((unitCost >= 0))) throw new Error("This order line's cost per unit can't be negative. Use zero or more.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -53137,7 +53137,7 @@ export const VendorOrderLine_createViaAddLine = mutation({
     if (!((((ingredientDemandId == null) || (__draft.ingredientDemandId == null)) || (ingredientDemandId === __draft.ingredientDemandId)))) throw new Error("Add line ingredientDemandId must match the seeded demand reference when provided");
     if (!((((locationId == null) || (__draft.locationId == null)) || (locationId === __draft.locationId)))) throw new Error("Add line locationId must match the seeded location reference when provided");
     if (!((orderedQuantity > 0))) throw new Error("Ordered quantity must be positive");
-    if (!((unitCost >= 0))) throw new Error("Unit cost cannot be negative");
+    if (!((unitCost >= 0))) throw new Error("This order line's cost per unit can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -53853,7 +53853,7 @@ async function __runVendorOrderLineReviseQuantity(ctx: MutationCtx, { docId, ord
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")))) throw new Error("Guard 2 failed");
     if (!((orderedQuantity > 0))) throw new Error("Ordered quantity must be positive");
-    if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("Unit cost cannot be negative");
+    if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("This order line's cost per unit can't be negative. Use zero or more.");
     const nextUnitCost = ((unitCost != null) ? unitCost : doc.unitCost);
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
