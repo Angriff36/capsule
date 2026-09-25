@@ -1,0 +1,140 @@
+{
+  "_note": "Known completeness errors, each owned by an issue. Remove an entry when its finding is fixed (the gate fails on stale entries). Added 2026-09-25.",
+  "tracked": [
+    {
+      "code": "DOMAIN_ORPHAN_CREATE",
+      "key": "EventNumberAssignment",
+      "issue": "https://github.com/Angriff36/Manifest/issues/90"
+    },
+    {
+      "code": "DOMAIN_ORPHAN_CREATE",
+      "key": "TppReportFavorite",
+      "issue": "https://github.com/Angriff36/Manifest/issues/90"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "DishTask.stationId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "EventDishComponentSeed.componentId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "EventDishComponentSeed.dishId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "EventDishLineOverride.componentId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "EventDishLineOverride.ingredientId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "EventIngredientContribution.componentId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "EventIngredientContribution.dishId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "EventIngredientContribution.productionBatchAllocationId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "EventIngredientContribution.productionBatchId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "EventNumberAssignment.eventId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "EventTemplate.menuId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "ItemUnitMapping.componentId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "PackListItem.serviceStyleKitItemId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "PackListTemplate.occasionId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "PackListTemplate.serviceStyleId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "PrepTask.stationId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "PrepTaskMaterial.dishComponentId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "PrepTaskMaterial.dishIngredientId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "PrepTaskMaterial.eventIngredientContributionId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "PrepTaskMaterial.productionBatchAllocationId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "ProposalLineItem.menuDishId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "ReceiptCorrection.vendorId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "SignatureRequest.proposalId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "TppReportFavorite.personId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "VendorContractPriceTier.contractId",
+      "issue": "https://github.com/Angriff36/Manifest/issues/90"
+    }
+  ]
+}
