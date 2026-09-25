@@ -49,7 +49,9 @@ describe("plain words on leftover stock on-hand copy", () => {
     expect(visible).toContain("Say why this count changed.");
     // Later leftovers on this same file are pinned, not rewritten.
     expect(visible).toContain("Say why you're changing this item's amount.");
-    expect(visible).toContain("Par level cannot be negative");
+    expect(visible).toContain(
+      "This item's par level can't be negative. Use zero or more.",
+    );
     expect(visible).toContain("Reorder threshold cannot be negative");
     expect(visible).toContain("Recount quantity cannot be negative");
   });
