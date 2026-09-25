@@ -204,6 +204,7 @@ describe("plain words on event screens", () => {
       "src/features/events/EventMenuTab.tsx",
       "src/features/events/EventMenuDietaryConflictsCard.tsx",
       "src/features/events/EventOverviewRail.tsx",
+      "src/features/events/dashboard/eventDashFacts.ts",
       "src/features/events/EventStaffingTab.tsx",
       "src/features/events/EventGuestSidebar.tsx",
       "src/features/events/eventGuestSummary.ts",

@@ -16,7 +16,7 @@ import { eventDetailPath } from "../eventRoutes";
 import { STAGE_LABEL, type EventStage } from "../eventStatus";
 import { EventPacketPanel } from "../packet/EventPacketPanel";
 import { EventReviewFlagsSection } from "../review-flags/EventReviewFlagsSection";
-import { allergyLine } from "./eventDashFacts";
+import { allergyLine, noteSections } from "./eventDashFacts";
 import { EventDashSheetHead } from "./EventDashSheet";
 import "../EventOverview.css";
 import type { DashSheetId, EventDashOverviewProps } from "./eventDashTypes";
@@ -163,7 +163,10 @@ export function EventDashSheetBody({
         </>
       );
     case "service": {
-      const allergy = allergyLine(reviseProps.serviceRequirements);
+      const allergy = allergyLine(
+        reviseProps.serviceRequirements,
+        reviseProps.operationalRequirements,
+      );
       return (
         <>
           <EventDashSheetHead
@@ -224,11 +227,17 @@ export function EventDashSheetBody({
             lede="Travel, pack list, site setup, and strike."
           />
           <div className="evd-sheet-body">
-            <div className="evd-note">
-              <span className="evd-label">Operations</span>
-              {reviseProps.operationalRequirements?.trim() ||
-                "No operational requirements on file."}
-            </div>
+            {noteSections(reviseProps.operationalRequirements).map(
+              (section, index) => (
+                <div
+                  key={`${section.label}:${index}`}
+                  className={`evd-note${/allerg/i.test(section.text) ? " crit" : ""}`}
+                >
+                  <span className="evd-label">{section.label}</span>
+                  {section.text}
+                </div>
+              ),
+            )}
             {editButton}
           </div>
         </>
@@ -266,11 +275,9 @@ export function EventDashSheetBody({
               dishCount={dishCount}
               staffCount={staffCount}
               timelineCount={timelineCount}
-              operationalRequirements={reviseProps.operationalRequirements}
               menuHref={eventDetailPath(eventId, "menu")}
               staffingHref={eventDetailPath(eventId, "staffing")}
               timelineHref={eventDetailPath(eventId, "timeline")}
-              editHref={editHref}
             />
             <div className="evd-center">
               <Link

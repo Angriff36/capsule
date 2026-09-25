@@ -26,7 +26,9 @@
   --evd-mono: var(--font-mono);
   position: relative;
   isolation: isolate;
-  padding: 0 24px 48px;
+  padding: 0 24px 40px;
+  border-radius: var(--radius-sheet);
+  background: var(--evd-bg);
   color: var(--evd-ink);
   font: 400 15px/1.55 var(--evd-sans);
 }
@@ -34,7 +36,15 @@
   max-width: 1120px;
   margin: 0 auto;
 }
-.evd button {
+/* Reset only the dashboard's own controls; the tabs keep the app buttons. */
+:where(
+  .evd-tile,
+  .evd-seg button,
+  .evd-sub button,
+  .evd-allergy,
+  .evd-sheet-x,
+  .evd-btn
+) {
   font: inherit;
   color: inherit;
   cursor: pointer;
@@ -47,8 +57,8 @@
   border-radius: 6px;
 }
 .evd-label {
-  font: 500 11px/1 var(--evd-mono);
-  letter-spacing: 0.14em;
+  font: 600 12px/1.2 var(--evd-sans);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--evd-muted);
 }
@@ -84,8 +94,8 @@
   padding: 6px 12px;
   border-radius: 99px;
   border: 1px solid var(--evd-line);
-  font: 500 11px/1 var(--evd-mono);
-  letter-spacing: 0.1em;
+  font: 600 12px/1 var(--evd-sans);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--evd-muted);
   background: var(--evd-paper);
@@ -123,7 +133,7 @@
   justify-content: center;
   flex-wrap: wrap;
   gap: 6px 0;
-  margin-top: 26px;
+  margin-top: 22px;
   font-size: 14px;
 }
 .evd-meta > span {
@@ -325,7 +335,7 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  margin: 44px 0 28px;
+  margin: 32px 0 20px;
   scroll-margin-top: 16px;
 }
 .evd-seg {
@@ -355,10 +365,12 @@
   background: var(--evd-ink);
   color: var(--evd-bg);
 }
+.evd-sub:empty {
+  display: none;
+}
 .evd-sub {
   display: flex;
   gap: 4px;
-  min-height: 32px;
   flex-wrap: wrap;
   justify-content: center;
 }
@@ -449,6 +461,10 @@
   letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
+.evd-big.small {
+  font-size: 26px;
+  line-height: 1.15;
+}
 .evd-big.q {
   color: var(--evd-muted);
   opacity: 0.7;
@@ -508,11 +524,6 @@
 
 /* tab panels reuse the app's own screens inside the paper frame */
 .evd-panel {
-  padding: 28px;
-  border: 1px solid var(--evd-line);
-  border-radius: var(--evd-radius);
-  background: var(--evd-paper);
-  box-shadow: var(--evd-shadow);
   animation: evd-rise 0.5s both cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -628,8 +639,7 @@
   margin-bottom: 9px;
 }
 /* the app's cards, flattened onto the sheet and panel paper */
-.evd-sheet .card,
-.evd-panel .card {
+.evd-sheet .card {
   background: transparent;
   border-color: var(--evd-line);
   box-shadow: none;
@@ -669,6 +679,15 @@
   }
 }
 @media (max-width: 620px) {
+  /* Six groups do not fit one phone row: wrap instead of hiding "People". */
+  .evd-seg {
+    flex-wrap: wrap;
+    justify-content: center;
+    border-radius: var(--radius-sheet);
+  }
+  .evd .evd-seg button {
+    padding: 7px 14px;
+  }
   .evd {
     padding: 0 16px 40px;
   }
@@ -688,8 +707,7 @@
   .evd-stat:nth-child(n + 3) {
     border-top: 1px solid var(--evd-line);
   }
-  .evd-sheet,
-  .evd-panel {
+  .evd-sheet {
     padding: 28px 18px;
   }
   .evd-meta > span {

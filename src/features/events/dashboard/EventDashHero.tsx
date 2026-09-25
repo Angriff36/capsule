@@ -21,6 +21,7 @@ type Props = {
   readonly expectedHeadcount?: number | null;
   readonly eventType: string;
   readonly serviceRequirements?: string | null;
+  readonly operationalRequirements?: string | null;
   readonly onOpenService: () => void;
   readonly onOpenEdit: () => void;
   /** Export BEO, the More menu, and any header action. */
@@ -31,7 +32,10 @@ type Props = {
 export function EventDashHero(props: Props) {
   const { lead, accent } = splitTitle(props.title);
   const countdown = countdownLabel(props.startsAt);
-  const allergy = allergyLine(props.serviceRequirements);
+  const allergy = allergyLine(
+    props.serviceRequirements,
+    props.operationalRequirements,
+  );
   const when =
     props.startsAt != null
       ? `${formatDate(props.startsAt)} · ${formatTime(props.startsAt)} – ${formatTime(props.endsAt)}`
@@ -75,9 +79,6 @@ export function EventDashHero(props: Props) {
           </>
         ) : null}
       </h1>
-      <p className="evd-lede">
-        This booking — menu, staff, timeline, and money in one place.
-      </p>
       <div className="evd-meta">
         <span>{props.client}</span>
         <span>{when}</span>
@@ -85,8 +86,8 @@ export function EventDashHero(props: Props) {
         <span>{formatCount(props.expectedHeadcount)} guests</span>
         <span>{formatStatusLabel(props.eventType)}</span>
       </div>
-      <div className="evd-hero-row">
-        {allergy ? (
+      {allergy ? (
+        <div className="evd-hero-row">
           <button
             type="button"
             className="evd-allergy"
@@ -110,16 +111,18 @@ export function EventDashHero(props: Props) {
               <b>Allergy</b> · {allergy}
             </span>
           </button>
-        ) : null}
+        </div>
+      ) : null}
+      <div className="evd-actions">
         <button
           type="button"
-          className="evd-edit-link"
+          className="btn btn-ghost"
           onClick={props.onOpenEdit}
         >
-          Edit
+          Edit event
         </button>
+        {props.actions}
       </div>
-      <div className="evd-actions">{props.actions}</div>
     </section>
   );
 }

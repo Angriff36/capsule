@@ -9,6 +9,7 @@ import { formatCount, formatMoney, formatTime } from "../../../lib/format";
 import {
   useListEventTimelineComment,
   useListInvoice,
+  useListServiceStyle,
 } from "../../../lib/manifest-convex-react";
 import { formatStatusLabel } from "../../../lib/statusLabels";
 import { EventProposalEnhancementsCard } from "../../clients/EventProposalEnhancementsCard";
@@ -124,6 +125,12 @@ export function EventDashOverview({
   const comments = useListEventTimelineComment();
   const canManagePacket = useEventPacketAccess(eventId);
   const forecast = useEventDayForecast(props.venue, props.startsAt);
+  const serviceStyles = useListServiceStyle();
+  // The event stores the style id; the booked name is filled only on some rows.
+  const serviceStyle =
+    event.serviceStyleName ||
+    serviceStyles?.find((row) => row._id === event.serviceStyleId)?.name ||
+    null;
 
   const setup = [
     ["Client assigned", event.hasAssignedClient],
@@ -161,7 +168,10 @@ export function EventDashOverview({
       })
     : null;
 
-  const allergy = allergyLine(props.serviceRequirements);
+  const allergy = allergyLine(
+    props.serviceRequirements,
+    props.operationalRequirements,
+  );
   const serviceLine = firstLine(props.serviceRequirements);
   const opsLine = firstLine(props.operationalRequirements);
   const travel = event.timingOutboundTravelMinutes;
@@ -274,8 +284,10 @@ export function EventDashOverview({
           onOpen={onOpen}
           tone={allergy ? "alert" : undefined}
           big={
-            <div className={`evd-big${allergy || serviceLine ? "" : " q"}`}>
-              {allergy ? "Allergy" : serviceLine ? "Notes" : "—"}
+            <div
+              className={`evd-big small${allergy || serviceStyle ? "" : " q"}`}
+            >
+              {allergy ? "Allergy" : (serviceStyle ?? "No style set")}
             </div>
           }
           hint={firstLine(allergy, 80) ?? serviceLine ?? "No service notes yet"}
@@ -289,8 +301,10 @@ export function EventDashOverview({
           index={next()}
           onOpen={onOpen}
           big={
-            <div className={`evd-big${travel ? "" : opsLine ? "" : " q"}`}>
-              {travel ? durationLabel(travel) : opsLine ? "Notes" : "—"}
+            <div
+              className={`evd-big small${travel || event.venueName ? "" : " q"}`}
+            >
+              {travel ? durationLabel(travel) : event.venueName || "No venue"}
             </div>
           }
           hint={

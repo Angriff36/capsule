@@ -71,6 +71,7 @@ export function EventDashboard(props: Props) {
           expectedHeadcount={overview.expectedHeadcount}
           eventType={overview.event.eventType}
           serviceRequirements={overview.serviceRequirements}
+          operationalRequirements={overview.operationalRequirements}
           onOpenService={() => setSheet("service")}
           onOpenEdit={() => setSheet("edit")}
           actions={props.actions}
@@ -84,10 +85,12 @@ export function EventDashboard(props: Props) {
         <EventDashNav active={props.activeTab} onChange={onTab} />
         {props.activeTab === "overview" ? (
           <EventDashOverview props={overview} onOpen={setSheet} />
-        ) : (
-          <div className="evd-panel">{props.children}</div>
-        )}
+        ) : null}
       </div>
+      {/* Tabs use the full width; they bring their own cards. */}
+      {props.activeTab !== "overview" ? (
+        <div className="evd-panel">{props.children}</div>
+      ) : null}
       <EventDashSheet
         open={sheet !== null}
         label={sheet ? SHEET_LABEL[sheet] : "Event sheet"}

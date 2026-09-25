@@ -21,11 +21,9 @@ export type EventOverviewRailProps = {
   readonly dishCount: number;
   readonly staffCount: number;
   readonly timelineCount: number;
-  readonly operationalRequirements?: string | null;
   readonly menuHref: string;
   readonly staffingHref: string;
   readonly timelineHref: string;
-  readonly editHref: string;
 };
 
 function StatRow({
@@ -52,7 +50,7 @@ function StatRow({
   );
 }
 
-/** Ownership, counts, and standing instructions for this event. */
+/** Ownership and counts for this event. */
 export function EventOverviewRail(props: EventOverviewRailProps) {
   const owner = props.assignedToId
     ? props.people?.find((person) => person._id === props.assignedToId)
@@ -105,22 +103,6 @@ export function EventOverviewRail(props: EventOverviewRailProps) {
             to={props.timelineHref}
           />
         </ul>
-      </EventOverviewCard>
-
-      <EventOverviewCard
-        title="Operational requirements"
-        testId="event-operational-requirements"
-      >
-        <p className="text-base leading-relaxed text-ink-2">
-          {props.operationalRequirements?.trim() ||
-            "No operational requirements on file."}
-        </p>
-        <a
-          href={props.editHref}
-          className="mt-2 inline-block text-base font-medium text-link"
-        >
-          Edit requirements
-        </a>
       </EventOverviewCard>
     </>
   );
