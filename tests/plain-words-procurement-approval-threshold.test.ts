@@ -11,8 +11,8 @@ function expectPlain(text: string) {
   expect(text).not.toContain("bun run");
 }
 
-describe("plain words on leftover event ingredient contribution copy", () => {
-  it("keeps the event ingredient negative-amount refusal free of jargon", () => {
+describe("plain words on leftover weekly purchasing approval copy", () => {
+  it("keeps the negative order-approval amount refusal free of jargon", () => {
     const manifest = readFileSync(
       "src/procurement/event-purchasing.manifest",
       "utf8",
@@ -20,22 +20,17 @@ describe("plain words on leftover event ingredient contribution copy", () => {
     // Strip // comments the same way the culinary leftover tests do.
     const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
     const NEW =
-      "This event's ingredient amount can't be negative. Use zero or more.";
-    // The old jargon refusal is gone from the authored file (record + revise).
-    expect(visible).not.toContain("Contribution quantity cannot be negative");
+      "The order amount that needs a manager's OK can't be negative. Use zero or more, or leave it blank.";
+    // The old jargon refusal is gone from the authored file.
+    expect(visible).not.toContain("Approval threshold cannot be negative");
     // The refusal now speaks in plain catering words.
     expect(visible).toContain(NEW);
     expectPlain(NEW);
-    // Regen carries the plain wording into the generated copies; both
-    // procurement files are now clean, so the old sentence is gone there too.
+    // Regen carries the plain wording into the generated copies.
     const mutations = readFileSync("convex/mutations.ts", "utf8");
     expect(mutations).toContain(NEW);
-    expect(mutations).not.toContain("Contribution quantity cannot be negative");
+    expect(mutations).not.toContain("Approval threshold cannot be negative");
     const summary = readFileSync("manifest-context-summary.json", "utf8");
     expect(summary).toContain(NEW);
-    // Already-landed copy on this same file stays.
-    expect(visible).toContain(
-      "Inventory and managers may update event ingredient contributions",
-    );
   });
 });

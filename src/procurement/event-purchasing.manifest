@@ -40,7 +40,7 @@ entity WeeklyPurchasingConfig mixin TenantScoped, SoftDeletable {
   command setOrderApprovalThreshold(optional amount: money(12, 2)) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "manageAccess")
-    constraint approvalThresholdNonnegative: amount == null or amount >= 0 "Approval threshold cannot be negative"
+    constraint approvalThresholdNonnegative: amount == null or amount >= 0 "The order amount that needs a manager's OK can't be negative. Use zero or more, or leave it blank."
     mutate orderApprovalThresholdAmount = amount
   }
 

@@ -56607,7 +56607,7 @@ async function __runWeeklyPurchasingConfigSetOrderApprovalThreshold(ctx: Mutatio
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change weekly purchasing config");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 1 failed");
-    if (!(((amount == null) || (amount >= 0)))) throw new Error("Approval threshold cannot be negative");
+    if (!(((amount == null) || (amount >= 0)))) throw new Error("The order amount that needs a manager's OK can't be negative. Use zero or more, or leave it blank.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }

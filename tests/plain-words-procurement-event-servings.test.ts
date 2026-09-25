@@ -32,7 +32,5 @@ describe("plain words on leftover event ingredient servings copy", () => {
     expect(mutations).not.toContain("Contribution servings cannot be negative");
     const summary = readFileSync("manifest-context-summary.json", "utf8");
     expect(summary).toContain(NEW);
-    // Later leftovers on this same file are pinned, not rewritten.
-    expect(visible).toContain("Approval threshold cannot be negative");
   });
 });
