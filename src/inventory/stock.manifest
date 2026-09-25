@@ -40,14 +40,15 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   computed isBelowPar: boolean = self.parLevel > 0 and self.quantityOnHand < self.parLevel
   computed isBelowReorder: boolean = self.reorderThreshold > 0 and self.quantityOnHand < self.reorderThreshold
   computed inventoryValue: money(12, 2) = self.quantityOnHand * self.unitCost
-  // Free stock for display; over-reservation hard gate stays orchestrator (Convex sum multi-hop).
+  // Free stock. InventoryReservation.reserve refuses holds beyond it unless
+  // the company turned stock-level checks off (InventorySettings).
   computed totalReserved: decimal(12, 4) = sum(self.reservations, (r) => r.status == "active" ? r.quantity : 0)
   computed availableQuantity: decimal(12, 4) = self.quantityOnHand - self.totalReserved
 
-  constraint stockNonnegative: self.stockedAt == null or self.quantityOnHand >= 0 "Quantity on hand cannot be negative"
+  constraint stockNonnegative: self.stockedAt == null or self.quantityOnHand >= 0 "This item's on-hand amount can't be negative. Use zero or more."
   constraint stockParNonnegative: self.parLevel >= 0 "Par level cannot be negative"
   constraint stockReorderNonnegative: self.reorderThreshold >= 0 "Reorder threshold cannot be negative"
-  constraint stockCostNonnegative: self.unitCost >= 0 "Unit cost cannot be negative"
+  constraint stockCostNonnegative: self.unitCost >= 0 "This item's cost per unit can't be negative. Use zero or more."
 
   default policy inventoryItemRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may see stock items"
   default policy inventoryItemWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may update stock items"
@@ -71,10 +72,10 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     // opened in a different unit silently breaks on-hand vs demand math,
     // low-stock alerts, and suggested purchase quantities (issue #150).
     constraint openStockUnitMatchesCatalog: self.ingredient != null and unit == self.ingredient.unit "Stock line unit must match the ingredient's catalog unit — units do not convert"
-    constraint openStockQuantityNonnegative: quantityOnHand == null or quantityOnHand >= 0 "Quantity on hand cannot be negative"
+    constraint openStockQuantityNonnegative: quantityOnHand == null or quantityOnHand >= 0 "This item's on-hand amount can't be negative. Use zero or more."
     constraint openStockParNonnegative: parLevel == null or parLevel >= 0 "Par level cannot be negative"
     constraint openStockReorderNonnegative: reorderThreshold == null or reorderThreshold >= 0 "Reorder threshold cannot be negative"
-    constraint openStockCostNonnegative: unitCost == null or unitCost >= 0 "Unit cost cannot be negative"
+    constraint openStockCostNonnegative: unitCost == null or unitCost >= 0 "This item's cost per unit can't be negative. Use zero or more."
     compute previousQuantity = self.quantityOnHand
     mutate ingredientId = ingredientId
     mutate locationId = locationId
@@ -133,8 +134,8 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   command receiveStock(quantity: decimal(12, 4), optional unitCost: money(12, 2)) {
     guard self.stockedAt != null
     guard self.deletedAt == null
-    constraint receiveQuantityPositive: quantity > 0 "Received quantity must be positive"
-    constraint receiveCostNonnegative: unitCost == null or unitCost >= 0 "Unit cost cannot be negative"
+    constraint receiveQuantityPositive: quantity > 0 "This item's received amount has to be more than zero. Enter how much arrived."
+    constraint receiveCostNonnegative: unitCost == null or unitCost >= 0 "This item's cost per unit can't be negative. Use zero or more."
     compute previousQuantity = self.quantityOnHand
     compute nextQuantity = self.quantityOnHand + quantity
     mutate quantityOnHand = nextQuantity
@@ -157,7 +158,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     guard self.stockedAt != null
     guard self.deletedAt == null
     constraint adjustReasonRequired: length(trim(reason)) > 0 "Adjustment reason is required"
-    constraint adjustResultNonnegative: self.quantityOnHand + delta >= 0 "Quantity on hand cannot be negative"
+    constraint adjustResultNonnegative: self.quantityOnHand + delta >= 0 "This item's on-hand amount can't be negative. Use zero or more."
     compute previousQuantity = self.quantityOnHand
     compute nextQuantity = self.quantityOnHand + delta
     mutate quantityOnHand = nextQuantity
@@ -190,7 +191,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     constraint correctionUnitCompatible: unit == self.unit or ((unit == "gram" or unit == "kilogram" or unit == "ounce" or unit == "pound") and (self.unit == "gram" or self.unit == "kilogram" or self.unit == "ounce" or self.unit == "pound")) or ((unit == "milliliter" or unit == "liter" or unit == "teaspoon" or unit == "tablespoon" or unit == "cup" or unit == "pint" or unit == "quart" or unit == "gallon") and (self.unit == "milliliter" or self.unit == "liter" or self.unit == "teaspoon" or self.unit == "tablespoon" or self.unit == "cup" or self.unit == "pint" or self.unit == "quart" or self.unit == "gallon")) "Receipt unit needs a measured conversion to the stock unit"
     compute unitRatio = unit == stockUnit ? 1 : (targetMass > 0 ? sourceMass / targetMass : sourceVolume / targetVolume)
     compute converted = delta * unitRatio
-    constraint correctionResultNonnegative: self.quantityOnHand + (delta * (unit == self.unit ? 1 : ((self.unit == "gram" or self.unit == "kilogram" or self.unit == "ounce" or self.unit == "pound") ? ((unit == "gram" ? 1 : unit == "kilogram" ? 1000 : unit == "ounce" ? 28.349523125 : unit == "pound" ? 453.59237 : 0) / (self.unit == "gram" ? 1 : self.unit == "kilogram" ? 1000 : self.unit == "ounce" ? 28.349523125 : self.unit == "pound" ? 453.59237 : 0)) : ((unit == "milliliter" ? 1 : unit == "liter" ? 1000 : unit == "teaspoon" ? 4.92892159375 : unit == "tablespoon" ? 14.78676478125 : unit == "cup" ? 236.5882365 : unit == "pint" ? 473.176473 : unit == "quart" ? 946.352946 : unit == "gallon" ? 3785.411784 : 0) / (self.unit == "milliliter" ? 1 : self.unit == "liter" ? 1000 : self.unit == "teaspoon" ? 4.92892159375 : self.unit == "tablespoon" ? 14.78676478125 : self.unit == "cup" ? 236.5882365 : self.unit == "pint" ? 473.176473 : self.unit == "quart" ? 946.352946 : self.unit == "gallon" ? 3785.411784 : 0))))) >= 0 "Quantity on hand cannot be negative"
+    constraint correctionResultNonnegative: self.quantityOnHand + (delta * (unit == self.unit ? 1 : ((self.unit == "gram" or self.unit == "kilogram" or self.unit == "ounce" or self.unit == "pound") ? ((unit == "gram" ? 1 : unit == "kilogram" ? 1000 : unit == "ounce" ? 28.349523125 : unit == "pound" ? 453.59237 : 0) / (self.unit == "gram" ? 1 : self.unit == "kilogram" ? 1000 : self.unit == "ounce" ? 28.349523125 : self.unit == "pound" ? 453.59237 : 0)) : ((unit == "milliliter" ? 1 : unit == "liter" ? 1000 : unit == "teaspoon" ? 4.92892159375 : unit == "tablespoon" ? 14.78676478125 : unit == "cup" ? 236.5882365 : unit == "pint" ? 473.176473 : unit == "quart" ? 946.352946 : unit == "gallon" ? 3785.411784 : 0) / (self.unit == "milliliter" ? 1 : self.unit == "liter" ? 1000 : self.unit == "teaspoon" ? 4.92892159375 : self.unit == "tablespoon" ? 14.78676478125 : self.unit == "cup" ? 236.5882365 : self.unit == "pint" ? 473.176473 : self.unit == "quart" ? 946.352946 : self.unit == "gallon" ? 3785.411784 : 0))))) >= 0 "This item's on-hand amount can't be negative. Use zero or more."
     compute previousQuantity = self.quantityOnHand
     mutate quantityOnHand = self.quantityOnHand + converted
     emit InventoryQuantityAdjusted {
@@ -228,7 +229,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   command transferOut(quantity: decimal(12, 4), destinationLocationId: uuid) {
     guard self.stockedAt != null
     guard self.deletedAt == null
-    constraint transferOutPositive: quantity > 0 "Transfer quantity must be positive"
+    constraint transferOutPositive: quantity > 0 "This item's transfer amount has to be more than zero. Enter how much to move."
     constraint transferOutAvailable: self.quantityOnHand >= quantity "Cannot transfer more than quantity on hand"
     compute previousQuantity = self.quantityOnHand
     compute nextQuantity = self.quantityOnHand - quantity
@@ -250,7 +251,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   command transferIn(quantity: decimal(12, 4), sourceLocationId: uuid) {
     guard self.stockedAt != null
     guard self.deletedAt == null
-    constraint transferInPositive: quantity > 0 "Transfer quantity must be positive"
+    constraint transferInPositive: quantity > 0 "This item's transfer amount has to be more than zero. Enter how much to move."
     compute previousQuantity = self.quantityOnHand
     compute nextQuantity = self.quantityOnHand + quantity
     mutate quantityOnHand = nextQuantity
@@ -278,7 +279,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "inventoryManageAccess")
     constraint levelsParNonnegative: parLevel >= 0 "Par level cannot be negative"
     constraint levelsReorderNonnegative: reorderThreshold >= 0 "Reorder threshold cannot be negative"
-    constraint levelsCostNonnegative: unitCost == null or unitCost >= 0 "Unit cost cannot be negative"
+    constraint levelsCostNonnegative: unitCost == null or unitCost >= 0 "This item's cost per unit can't be negative. Use zero or more."
     mutate parLevel = parLevel
     mutate reorderThreshold = reorderThreshold
     mutate unitCost = unitCost != null ? unitCost : self.unitCost
@@ -334,6 +335,38 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   store InventoryItem in durable
 }
 
+// One per company. Ryan (2026-09-24): a company can turn the free-stock check
+// on reservations off and back on at any time; no data is lost. No row means
+// the check is on.
+entity InventorySettings mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId]
+  timestamps
+  versionProperty version: number
+
+  property required stockLevelsTracked: boolean = true
+  property registeredAt: datetime?
+
+  default policy inventorySettingsRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Inventory staff or event managers may see stock settings"
+  default policy inventorySettingsWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff or managers may update stock settings"
+  default policy inventorySettingsExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff or managers may change stock settings"
+
+  command register(stockLevelsTracked: boolean) {
+    guard self.deletedAt == null
+    guard self.registeredAt == null
+    mutate stockLevelsTracked = stockLevelsTracked
+    mutate registeredAt = now()
+  }
+
+  command setStockTracking(stockLevelsTracked: boolean) {
+    guard self.deletedAt == null
+    guard self.registeredAt != null
+    mutate stockLevelsTracked = stockLevelsTracked
+  }
+
+  store InventorySettings in durable
+}
+
 // Quantity of an InventoryItem held for an Event. Capsule-pro only stored
 // aggregate quantityReserved; this entity records each event's hold, release
 // and consumption separately so closing an event preserves stock history.
@@ -357,6 +390,7 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
   belongsTo inventoryLot: InventoryLot fields [tenantId, inventoryLotId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+  belongsTo inventorySettings: InventorySettings fields [tenantId] references [tenantId]
 
   constraint reservationQuantityPositive: self.reservedAt == null or self.quantity > 0 "Reservation quantity must be positive"
 
@@ -393,6 +427,9 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
     // different ingredient or storage location. Legacy stock may omit a lot.
     constraint reserveLotMatch: inventoryLotId == null or (self.inventoryLot != null and self.inventoryLot.deletedAt == null and self.inventoryLot.ingredientId == ingredientId and self.inventoryLot.locationId == self.inventoryItem.locationId) "Selected lot must match the reserved ingredient and stock location"
     constraint reserveQuantityPositive: quantity > 0 "Reservation quantity must be positive"
+    // Free stock = on hand minus active holds. Skipped when the company turned
+    // stock-level checks off (Ryan, 2026-09-24).
+    constraint reserveFitsFreeStock: self.inventoryItem == null or (self.inventorySettings != null and self.inventorySettings.deletedAt == null and self.inventorySettings.stockLevelsTracked == false) or quantity <= self.inventoryItem.quantityOnHand - sum(self.inventoryItem.reservations, (r) => r.status == "active" ? r.quantity : 0) "Not enough free stock: other events already hold some of it. Lower the amount, or turn off stock-level checks on the stock book."
     mutate inventoryItemId = inventoryItemId
     mutate inventoryLotId = inventoryLotId
     mutate eventId = eventId

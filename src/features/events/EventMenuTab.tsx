@@ -106,8 +106,10 @@ type Props = {
 };
 
 /** One ledger row: identity, the four editable fields, cost, actions. */
+// The action column has a fixed width so its buttons wrap; an `auto` column
+// took its one-line width first and left the dish name about 30px.
 const MENU_ROW_COLUMNS =
-  "xl:grid-cols-[minmax(0,1fr)_8rem_5.5rem_7rem_4.5rem_7.5rem_auto]";
+  "xl:grid-cols-[minmax(12rem,1fr)_7rem_4.5rem_6rem_4rem_6.5rem_11rem]";
 
 export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const event = useGetEvent(eventId);
@@ -1185,7 +1187,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                           ) : null}
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-2 xl:pt-4">
+                        <div className="flex flex-wrap items-center gap-2 xl:justify-end xl:pt-4 [&_.btn]:whitespace-nowrap">
                           <button
                             type="button"
                             className="btn btn-ghost btn-sm"

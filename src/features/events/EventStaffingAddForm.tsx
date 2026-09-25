@@ -137,7 +137,7 @@ export function EventStaffingAddForm({
       </label>
       <button
         type="submit"
-        className="btn btn-primary self-end"
+        className="btn btn-primary self-end whitespace-nowrap"
         disabled={busy}
         data-testid="event-staffing-add"
       >

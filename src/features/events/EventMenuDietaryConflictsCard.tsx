@@ -237,10 +237,10 @@ function ConflictRow({
           Catalog {conflict.evidence} · {describeOrigin(conflict.origin)}
         </p>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
-          className="btn btn-secondary btn-sm"
+          className="btn btn-secondary btn-sm whitespace-nowrap"
           disabled={busy}
           onClick={() => onNoteLine(conflict.lineId, suggested)}
           data-testid="dietary-conflict-note"

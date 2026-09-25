@@ -29,7 +29,7 @@ entity StockTransfer mixin TenantScoped, SoftDeletable {
   belongsTo sourceLocation: StorageLocation fields [tenantId, sourceLocationId] references [tenantId, id]
   belongsTo destinationLocation: StorageLocation fields [tenantId, destinationLocationId] references [tenantId, id]
 
-  constraint transferQuantityPositive: self.transferredAt == null or self.quantity > 0 "Transfer quantity must be positive once recorded"
+  constraint transferQuantityPositive: self.transferredAt == null or self.quantity > 0 "This saved transfer's amount has to be more than zero. Enter how much was moved."
 
   default policy stockTransferRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may see stock transfers"
   default policy stockTransferWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may update stock transfers"
@@ -49,17 +49,17 @@ entity StockTransfer mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.sourceItem != null and self.sourceItem.stockedAt != null and self.sourceItem.deletedAt == null
     guard self.destinationItem != null and self.destinationItem.stockedAt != null and self.destinationItem.deletedAt == null
-    constraint transferSourceMatch: sourceInventoryItemId == self.sourceInventoryItemId "Record sourceInventoryItemId must match the seeded source stock reference"
-    constraint transferDestinationMatch: destinationInventoryItemId == self.destinationInventoryItemId "Record destinationInventoryItemId must match the seeded destination stock reference"
-    constraint transferDistinctLines: sourceInventoryItemId != destinationInventoryItemId "Source and destination stock lines must differ"
+    constraint transferSourceMatch: sourceInventoryItemId == self.sourceInventoryItemId "This transfer is taking from a different stock item. Pick the stock item already on this transfer."
+    constraint transferDestinationMatch: destinationInventoryItemId == self.destinationInventoryItemId "This transfer is sending to a different stock item. Pick the stock item already on this transfer."
+    constraint transferDistinctLines: sourceInventoryItemId != destinationInventoryItemId "This transfer can't send to the same stock item it takes from. Pick a different send-to item."
     constraint transferIngredientMatch: ingredientId == self.sourceItem.ingredientId "Transfer ingredientId must match the source stock ingredient"
     constraint transferSameIngredient: self.sourceItem.ingredientId == self.destinationItem.ingredientId "Source and destination must hold the same ingredient"
     constraint transferSourceLocationMatch: sourceLocationId == self.sourceItem.locationId "Transfer sourceLocationId must match the source stock location"
     constraint transferDestinationLocationMatch: destinationLocationId == self.destinationItem.locationId "Transfer destinationLocationId must match the destination stock location"
     constraint transferDistinctLocations: sourceLocationId != destinationLocationId "Source and destination locations must differ"
     constraint transferSameUnit: self.sourceItem.unit == self.destinationItem.unit "Source and destination stock lines must use the same unit"
-    constraint transferRecordQuantityPositive: quantity > 0 "Transfer quantity must be positive"
-    constraint transferSourceAvailable: self.sourceItem.quantityOnHand >= quantity "Cannot transfer more than the source has on hand"
+    constraint transferRecordQuantityPositive: quantity > 0 "This transfer's amount has to be more than zero. Enter how much to move."
+    constraint transferSourceAvailable: self.sourceItem.quantityOnHand >= quantity "This transfer can't move more than the send-from stock has on hand. Enter a smaller amount."
     mutate sourceInventoryItemId = sourceInventoryItemId
     mutate destinationInventoryItemId = destinationInventoryItemId
     mutate ingredientId = ingredientId

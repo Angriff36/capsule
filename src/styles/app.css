@@ -1,4 +1,8 @@
-@import "tailwindcss";
+/* Scan app code only. Scanning the repo root picked up loop notes and
+   .manifest edits (IMPLEMENTATION_PLAN.md, STATE.md, ...) and full-reloaded
+   the dev page every few minutes (2026-09-24). */
+@import "tailwindcss" source("..");
+@source not "../**/*.manifest";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -1614,78 +1618,6 @@
   font-weight: 600;
 }
 
-/* Event detail navigation — five workflow groups on top (Plan, Food, Day-of,
-   Records, Money); the active group's sections sit on a second, quieter row.
-   Both rows scroll sideways on phones so every section stays reachable. */
-.event-detail-tabs {
-  display: grid;
-  gap: 8px;
-}
-.event-tab-groups {
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  padding: 2px;
-  scrollbar-width: thin;
-}
-.event-tab-groups button {
-  display: inline-flex;
-  height: 38px;
-  cursor: pointer;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid var(--color-line);
-  border-radius: 999px;
-  background: var(--color-panel);
-  padding: 0 16px;
-  color: var(--color-ink-2);
-  font-size: 14px;
-  font-weight: 600;
-  white-space: nowrap;
-  transition: 120ms ease;
-}
-.event-tab-groups button:hover {
-  border-color: var(--color-line-2);
-  color: var(--color-ink);
-}
-.event-tab-groups button[aria-current="page"] {
-  border-color: var(--color-brand);
-  background: var(--color-brand);
-  color: white;
-}
-.dark .event-tab-groups button[aria-current="page"] {
-  color: var(--color-canvas);
-}
-.event-tab-sections {
-  display: flex;
-  gap: 4px;
-  overflow-x: auto;
-  border-bottom: 1px solid var(--color-line);
-  padding: 0 2px;
-  scrollbar-width: thin;
-}
-.event-tab-sections button {
-  display: inline-flex;
-  height: 36px;
-  cursor: pointer;
-  align-items: center;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  padding: 0 10px;
-  color: var(--color-ink-2);
-  font-size: 14px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-.event-tab-sections button:hover {
-  color: var(--color-ink);
-}
-.event-tab-sections button[aria-current="page"] {
-  border-bottom-color: var(--color-brand);
-  color: var(--color-brand);
-  font-weight: 600;
-}
-
 /* Overflow action menu: a <details> that drops a list of secondary and
    destructive actions under a "More" button. Destructive items sit last,
    separated by a rule. */
@@ -1756,100 +1688,6 @@
     right: 0;
     left: auto;
   }
-  .mobile-actions .btn-primary {
-    flex: 1 1 auto;
-    justify-content: center;
-  }
-  .mobile-actions .action-menu > summary {
-    flex: none;
-  }
-}
-
-@media (max-width: 519px) {
-  .mobile-actions {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .mobile-actions > .action-menu > summary {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* Phone section picker: one button naming the current section; the menu
-   lists every destination grouped by workflow. No sideways scrolling. */
-.event-section-picker {
-  position: relative;
-}
-.event-section-picker-button {
-  display: flex;
-  width: 100%;
-  min-height: 52px;
-  cursor: pointer;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-md);
-  background: var(--color-panel);
-  padding: 8px 14px;
-  text-align: left;
-  box-shadow:
-    0 1px 2px rgb(30 40 36 / 0.05),
-    0 2px 8px -2px rgb(30 40 36 / 0.08);
-}
-.event-section-picker-button[aria-expanded="true"] {
-  border-color: var(--color-brand);
-}
-.event-section-picker-menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  left: 0;
-  z-index: 30;
-  display: grid;
-  max-height: 70vh;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px 12px;
-  overflow-y: auto;
-  border: 1px solid var(--color-line-2);
-  border-radius: var(--radius-md);
-  background: var(--color-panel);
-  padding: 10px;
-  box-shadow: 0 16px 40px -12px rgb(30 40 36 / 0.35);
-}
-.event-section-picker-group {
-  display: grid;
-  gap: 2px;
-  align-content: start;
-}
-.event-section-picker-group > p {
-  padding: 6px 8px 2px;
-  color: var(--color-ink-2);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.event-section-picker-group > button {
-  display: flex;
-  min-height: 40px;
-  cursor: pointer;
-  align-items: center;
-  border-radius: var(--radius-sm);
-  padding: 0 8px;
-  color: var(--color-ink);
-  font-size: 14px;
-  font-weight: 500;
-  text-align: left;
-}
-.event-section-picker-group > button:hover {
-  background: var(--color-inset);
-}
-.event-section-picker-group > button[aria-checked="true"] {
-  background: var(--color-brand-soft);
-  color: var(--color-brand);
-  font-weight: 600;
 }
 
 .supply-degraded {
@@ -4791,73 +4629,6 @@
   }
 }
 
-/* Phone shell (below 768px): sticky event header and the event-overview
-   section cards. */
-.mobile-event-header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  margin: 0 calc(-1 * var(--mobile-sheet-pad-x, 1.25rem));
-  padding: 0.5rem var(--mobile-sheet-pad-x, 1.25rem);
-  border-bottom: 1px solid var(--color-line);
-  background: color-mix(in srgb, var(--color-panel) 94%, transparent);
-  backdrop-filter: blur(8px);
-}
-.mobile-section-card {
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-md);
-  background: var(--color-panel);
-  box-shadow:
-    0 1px 2px rgb(30 40 36 / 0.05),
-    0 2px 8px -2px rgb(30 40 36 / 0.08);
-}
-.mobile-section-card > header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.6rem 0.85rem 0.4rem;
-}
-.mobile-section-card > header h2 {
-  font-size: var(--text-lg);
-  font-weight: 600;
-  color: var(--color-ink);
-}
-.mobile-section-card > div {
-  padding: 0 0.85rem 0.85rem;
-}
-.mobile-row {
-  display: flex;
-  min-height: 44px;
-  align-items: center;
-  gap: 0.6rem;
-  border-top: 1px solid var(--color-line);
-  padding: 0.4rem 0;
-  font-size: var(--text-lg);
-  color: var(--color-ink);
-}
-.mobile-row > * {
-  min-width: 0;
-}
-.mobile-row .mobile-row-main {
-  flex: 1 1 auto;
-}
-.mobile-row .mobile-row-sub {
-  display: block;
-  font-size: var(--text-sm);
-  color: var(--color-ink-3);
-}
-.mobile-check {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-  accent-color: var(--color-brand);
-}
-@media (max-width: 767px) {
-  .event-detail-tabs button {
-    min-height: 44px;
-  }
-}
 @media (max-width: 767px) {
   /* `.app-shell-sidebar` is declared inside @layer utilities after Tailwind's
      own utilities, so `max-md:hidden` on the <aside> loses. Hide it here. */
@@ -4869,16 +4640,6 @@
   /* Phone acceptance floor: primary content and form controls read at 16px
      (also stops iOS zooming into focused inputs); captions and chips keep
      their token sizes. Notched phones in standalone mode get the top inset. */
-  .mobile-row,
-  .mobile-event-header h1,
-  .mobile-section-card > header h2,
-  .mobile-section-card dd,
-  .mobile-section-card > header a,
-  .mobile-section-card p.text-base,
-  .mobile-section-card span.text-base,
-  .mobile-section-card button.btn {
-    font-size: 16px;
-  }
   .input,
   .field-input,
   select,
@@ -4891,15 +4652,5 @@
     height: auto;
     min-height: 4rem;
     padding-top: env(safe-area-inset-top);
-  }
-}
-
-@media (max-width: 767px) {
-  /* Event actions drawer on phones: every control is a 44px target. */
-  .mobile-actions .btn,
-  .mobile-actions button,
-  .mobile-actions a {
-    min-height: 44px;
-    height: auto;
   }
 }

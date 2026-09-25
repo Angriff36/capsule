@@ -108,7 +108,7 @@ export function EventClientTab({
             >
               {initials(name)}
             </span>
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 basis-48">
               <h2 className="font-display text-2xl text-ink">{name}</h2>
               <p className="mt-0.5 text-base text-ink-2">
                 {client?.clientType === "company"

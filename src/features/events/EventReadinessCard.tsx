@@ -59,14 +59,26 @@ function DomainRow({
           {row.issues.length > 0 ? row.issues.length : "Clear"}
         </span>
       </div>
-      {row.issues.map((issue) => (
-        <p
-          key={`${issue.code}:${issue.affectedIds.join(",")}`}
-          className="text-sm text-ink-2"
-        >
-          {eventReadinessIssueLine(issue)}
+      {/* One line per distinct issue: 65 open prep tasks read as one row. */}
+      {groupIssueLines(row.issues).map(({ line, count }) => (
+        <p key={line} className="text-sm text-ink-2">
+          {line}
+          {count > 1 ? (
+            <span className="ml-1 font-semibold text-ink">× {count}</span>
+          ) : null}
         </p>
       ))}
     </li>
   );
+}
+
+function groupIssueLines(
+  issues: ReturnType<typeof eventReadinessRows>[number]["issues"],
+): { line: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const issue of issues) {
+    const line = eventReadinessIssueLine(issue);
+    counts.set(line, (counts.get(line) ?? 0) + 1);
+  }
+  return [...counts].map(([line, count]) => ({ line, count }));
 }
