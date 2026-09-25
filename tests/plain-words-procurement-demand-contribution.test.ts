@@ -48,7 +48,7 @@ describe("plain words on leftover procurement demand-link contribution copy", ()
       "This order-to-need link is for a different need. Pick the need already on this link.",
     );
     expect(visible).toContain(
-      "Demand link vendorOrderId must match the seeded order reference",
+      "This order-to-need link is for a different order. Pick the order already on this link.",
     );
     expect(visible).toContain(
       "Demand link vendorOrderId must own the vendor order line",

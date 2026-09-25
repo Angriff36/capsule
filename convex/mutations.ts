@@ -53934,7 +53934,7 @@ async function __runVendorOrderLineDemandLink(ctx: MutationCtx, { docId, vendorO
     if (!(((doc.linkedAt == null) || ((doc.vendorOrderLineId === vendorOrderLineId) && (doc.ingredientDemandId === ingredientDemandId))))) throw new Error("Guard 4 failed");
     if (!(((doc.linkedAt == null) || (vendorOrderLineId === doc.vendorOrderLineId)))) throw new Error("This order-to-need link is for a different order line. Pick the order line already on this link.");
     if (!(((doc.linkedAt == null) || (ingredientDemandId === doc.ingredientDemandId)))) throw new Error("This order-to-need link is for a different need. Pick the need already on this link.");
-    if (!(((doc.linkedAt == null) || (vendorOrderId === doc.vendorOrderId)))) throw new Error("Demand link vendorOrderId must match the seeded order reference");
+    if (!(((doc.linkedAt == null) || (vendorOrderId === doc.vendorOrderId)))) throw new Error("This order-to-need link is for a different order. Pick the order already on this link.");
     if (!((vendorOrderId === __rel_vendorOrderLine.vendorOrderId))) throw new Error("Demand link vendorOrderId must own the vendor order line");
     if (!((contributionQuantity >= 0))) throw new Error("This order-to-need link's amount can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
@@ -54022,7 +54022,7 @@ export const VendorOrderLineDemand_createViaLink = mutation({
     if (!(((__draft.linkedAt == null) || ((__draft.vendorOrderLineId === vendorOrderLineId) && (__draft.ingredientDemandId === ingredientDemandId))))) throw new Error("Guard 4 failed");
     if (!(((__draft.linkedAt == null) || (vendorOrderLineId === __draft.vendorOrderLineId)))) throw new Error("This order-to-need link is for a different order line. Pick the order line already on this link.");
     if (!(((__draft.linkedAt == null) || (ingredientDemandId === __draft.ingredientDemandId)))) throw new Error("This order-to-need link is for a different need. Pick the need already on this link.");
-    if (!(((__draft.linkedAt == null) || (vendorOrderId === __draft.vendorOrderId)))) throw new Error("Demand link vendorOrderId must match the seeded order reference");
+    if (!(((__draft.linkedAt == null) || (vendorOrderId === __draft.vendorOrderId)))) throw new Error("This order-to-need link is for a different order. Pick the order already on this link.");
     if (!((vendorOrderId === __rel_vendorOrderLine.vendorOrderId))) throw new Error("Demand link vendorOrderId must own the vendor order line");
     if (!((contributionQuantity >= 0))) throw new Error("This order-to-need link's amount can't be negative. Use zero or more.");
     const doc: Record<string, any> = {

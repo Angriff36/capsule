@@ -11,16 +11,16 @@ function expectPlain(text: string) {
   expect(text).not.toContain("bun run");
 }
 
-describe("plain words on leftover procurement demand-link need-match copy", () => {
-  it("keeps the different-need refusal free of jargon", () => {
+describe("plain words on leftover procurement demand-link order-match copy", () => {
+  it("keeps the different-order refusal free of jargon", () => {
     const manifest = readFileSync("src/procurement/order.manifest", "utf8");
     // Strip // comments the same way the culinary leftover tests do.
     const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
     const NEW =
-      "This order-to-need link is for a different need. Pick the need already on this link.";
+      "This order-to-need link is for a different order. Pick the order already on this link.";
     // The old jargon refusal is gone.
     expect(visible).not.toContain(
-      "Demand link ingredientDemandId must match the seeded demand reference",
+      "Demand link vendorOrderId must match the seeded order reference",
     );
     // The refusal now speaks in plain catering words.
     expect(visible).toContain(NEW);
@@ -28,7 +28,7 @@ describe("plain words on leftover procurement demand-link need-match copy", () =
     // The generated copies carry the plain wording, not the old one.
     const mutations = readFileSync("convex/mutations.ts", "utf8");
     expect(mutations).not.toContain(
-      "Demand link ingredientDemandId must match the seeded demand reference",
+      "Demand link vendorOrderId must match the seeded order reference",
     );
     expect(mutations).toContain(NEW);
     const summary = readFileSync("manifest-context-summary.json", "utf8");
@@ -38,6 +38,9 @@ describe("plain words on leftover procurement demand-link need-match copy", () =
       "This order-to-need link is for a different order line. Pick the order line already on this link.",
     );
     expect(visible).toContain(
+      "This order-to-need link is for a different need. Pick the need already on this link.",
+    );
+    expect(visible).toContain(
       "This order-to-need link's amount can't be negative. Use zero or more.",
     );
     expect(visible).toContain(
@@ -45,10 +48,6 @@ describe("plain words on leftover procurement demand-link need-match copy", () =
     );
     expect(visible).toContain(
       "Procurement and managers may see order demand links",
-    );
-    // The different-order refusal is already landed in plain words.
-    expect(visible).toContain(
-      "This order-to-need link is for a different order. Pick the order already on this link.",
     );
     // Later leftovers on this same file are pinned, not rewritten.
     expect(visible).toContain(
