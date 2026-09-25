@@ -46,9 +46,9 @@ describe("plain words on leftover quality allergen-check event-dish copy", () =>
     expect(visible).toContain(
       "This allergen check is already saved. You can't change it. Start a new check if something changed.",
     );
-    // Later leftovers on this file are pinned: they must not change with this one.
+    // The pass/flagged refusal has landed in plain words; it must not drift.
     expect(visible).toContain(
-      "Pass requires no flagged allergens; flagged requires at least one",
+      "This allergen check can't pass with allergens listed. If you flagged it, name at least one allergen.",
     );
   });
 });
