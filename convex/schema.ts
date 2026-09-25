@@ -2527,6 +2527,7 @@ export default defineSchema({
     preferredVendorId: v.optional(v.union(v.id("vendors"), v.null())),
     requiredQuantity: v.number(),
     unit: v.union(v.literal("each"), v.literal("gram"), v.literal("kilogram"), v.literal("ounce"), v.literal("pound"), v.literal("milliliter"), v.literal("liter"), v.literal("teaspoon"), v.literal("tablespoon"), v.literal("cup"), v.literal("pint"), v.literal("quart"), v.literal("gallon"), v.literal("portion"), v.literal("serving"), v.literal("batch"), v.literal("melon"), v.literal("bottle"), v.literal("fluid_ounce"), v.literal("piece"), v.literal("slice"), v.literal("pizza"), v.literal("package"), v.literal("case"), v.literal("can"), v.literal("tub")),
+    orderedQuantity: v.optional(v.union(v.number(), v.null())),
     purchasingWeekStart: v.optional(v.union(v.number(), v.null())),
     vendorOrderId: v.optional(v.union(v.id("vendorOrders"), v.null())),
     vendorOrderLineId: v.optional(v.union(v.id("vendorOrderLines"), v.null())),
