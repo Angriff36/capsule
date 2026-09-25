@@ -16,6 +16,9 @@ projections:
       authContextImport: ./lib/authContext
       encryptionImport: ./lib/encryption
       eventHandlerImport: ./lib/operationalEvents
+      # Org capability kill-switches: generated checkRole asks this seam
+      # before the role hierarchy (roleAllows(user.role, ...) only).
+      roleGateImport: ./lib/orgCapabilityGate
       policyMode: enforce
       includeTenantFilter: true
       # Fold resolved computeds into list/get returns (documented helpers|inline).
@@ -80,8 +83,8 @@ projections:
         # Ingredient totals per event: every contribution reaction sums one
         # ingredient's rows in one event. Reading the whole event 13 times per
         # contribution passed Convex's 16 MB read limit on a 15-dish BEO
-        # import (2026-09-24). scripts/apply-aggregate-composite-indexes.ts
-        # points those generated sums at this index.
+        # import (2026-09-24). Manifest reads each sum through the declared
+        # index covering the most equality predicates, i.e. this one.
         EventIngredientContribution:
           - fields: [eventId, ingredientId]
             name: by_eventId_and_ingredientId

@@ -22,7 +22,6 @@ import {
   type ConvexApplicationPresetResult,
 } from "./convexApplicationPreset";
 import { compileProject } from "./project";
-import { applyOrgCapabilityCheckRoleToGeneratedFiles } from "./orgCapabilityCheckRoleTransform";
 import { SharedConfigPolicy } from "./sharedConfigPolicy";
 import type { IR } from "./types";
 
@@ -93,11 +92,6 @@ export class LiveManifestProject {
     }
 
     const assembledFiles = this.toGeneratedFileMap(assembly, tree);
-    // Capsule: fold org-capability checkRole into candidates before ownership
-    // planning so mutations/queries never need baselined:true for that patch.
-    applyOrgCapabilityCheckRoleToGeneratedFiles(
-      assembledFiles as Map<string, { content: string }>,
-    );
     const prepared = await this.sharedConfig.prepare({
       mode: request.mode,
       targetDir: request.targetDir,

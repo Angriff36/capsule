@@ -6,6 +6,7 @@ import { v } from "convex/values";
 import { handleManifestEvent as __handleManifestEvent } from "./lib/operationalEvents";
 import type { Doc } from "./_generated/dataModel";
 import { getAuthContext } from "./lib/authContext";
+import { roleGateDenies } from "./lib/orgCapabilityGate";
 import { encrypt, decrypt } from "./lib/encryption";
 
 async function __encryptDoc(ctx: any, entity: string, fields: readonly string[], doc: Record<string, any>): Promise<Record<string, any>> {
@@ -611,46 +612,20 @@ const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = 
   ]
 };
 
+// userOrRole: the acting user's auth object (gated by roleGateDenies) or a role name.
 function checkRole(userOrRole: unknown, action: unknown, target?: unknown): boolean {
-  let userRole: unknown;
-  let disabledCapabilities: unknown;
-  if (typeof userOrRole === "string") {
-    userRole = userOrRole;
-  } else if (userOrRole !== null && typeof userOrRole === "object") {
-    const auth = userOrRole as { role?: unknown; disabledCapabilities?: unknown };
-    userRole = auth.role;
-    disabledCapabilities = auth.disabledCapabilities;
-  } else {
-    return false;
+  let userRole: unknown = userOrRole;
+  const requestedTarget = typeof target === "string" ? target : undefined;
+  if (userOrRole !== null && typeof userOrRole === "object") {
+    userRole = (userOrRole as { role?: unknown }).role;
+    if (typeof action === "string" && roleGateDenies(userOrRole, action, requestedTarget)) return false;
   }
   if (typeof userRole !== "string" || typeof action !== "string") return false;
-  if (__orgCapabilityDeniesAction(action, disabledCapabilities)) return false;
   const perms = ROLE_PERMISSIONS[userRole];
-  const requestedTarget = typeof target === "string" ? target : undefined;
   return perms ? perms.some((permission) =>
     (permission.action === action || permission.action === "all") &&
     (permission.target === undefined || permission.target === requestedTarget)
   ) : false;
-}
-
-function __orgCapabilityDeniesAction(action: string, disabled: unknown): boolean {
-  if (!Array.isArray(disabled) || disabled.length === 0) return false;
-  const capability = __orgCapabilityForAction(action);
-  if (capability === null) return false;
-  return disabled.some((entry) => entry === capability);
-}
-
-function __orgCapabilityForAction(action: string): string | null {
-  if (action === "staffAccess" || action === "manageAccess" || action === "adminAccess") return null;
-  if (action.startsWith("kitchen")) return "kitchen";
-  if (action.startsWith("inventory")) return "inventory";
-  if (action.startsWith("procurement")) return "procurement";
-  if (action.startsWith("event")) return "events";
-  if (action.startsWith("sales")) return "sales";
-  if (action.startsWith("logistics")) return "logistics";
-  if (action.startsWith("workforce")) return "workforce";
-  if (action.startsWith("finance")) return "finance";
-  return null;
 }
 
 async function __runAnnouncementPost(ctx: MutationCtx, { docId, title, body, category, expiresAt, version }: any, __creation = false) {
@@ -12607,17 +12582,6 @@ async function __runEventChangeServiceStyle(ctx: MutationCtx, { docId, serviceSt
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const __targetServiceStyle = await ctx.db
-      .query("serviceStyles")
-      .withIndex("by_tenantId", (q: any) => q.eq("tenantId", __auth.tenantId))
-      .filter((q: any) => q.eq(q.field("_id"), serviceStyleId))
-      .first();
-    if (!__targetServiceStyle ||
-        __targetServiceStyle.tenantId !== __auth.tenantId ||
-        __targetServiceStyle.status !== "active" ||
-        __targetServiceStyle.deletedAt != null) {
-      throw new Error("Events must reference an active service style");
-    }
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
@@ -12625,6 +12589,12 @@ async function __runEventChangeServiceStyle(ctx: MutationCtx, { docId, serviceSt
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 1 failed");
     if (!((((serviceStyleId).trim()).length > 0))) throw new Error("Events must reference a service style");
+    const __chk0_id = typeof serviceStyleId === "string" ? ctx.db.normalizeId("serviceStyles", serviceStyleId) : null;
+    const __chk0_row = __chk0_id ? await ctx.db.get(__chk0_id) : null;
+    const __chk0_rows = __chk0_row ? [__chk0_row] : [];
+    const __checkTenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
+    const __chk0 = __chk0_rows.filter((d) => (d as any).status === "active").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __checkTenant).length;
+    if (!((__chk0 > 0))) throw new Error("Events must reference an active service style");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }

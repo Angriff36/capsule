@@ -1,17 +1,14 @@
 /**
  * Pre-push gate: generated Builder output must be current before code leaves
- * this machine, using the repository-local Builder. Regenerates for real,
- * including authored post-passes, and fails
+ * this machine, using the repository-local Builder. Regenerates for real
+ * and fails
  * only if that leaves tracked files changed: run `bun run manifest:regen`,
  * commit the result, push again.
  *
- * A pure dry-run of the Builder plan is not enough (issue #375): the Builder
- * IR does not know about authored post-passes like
- * applyEventServiceStyleReferenceGuard, so a dry-run always reports their
- * patched lines in convex/mutations.ts as spuriously "pending" — permanently
- * blocking every push once such a patch lands on main. Running the exact
- * same pipeline as `manifest:regen` and diffing the result against git is
- * the only way to tell real drift from that false positive.
+ * Running the exact same pipeline as `manifest:regen` and diffing the result
+ * against git also covers the baseline store sync that follows Builder
+ * (issue #375 began with authored post-passes over generated output; those
+ * were removed 2026-09-25 when Manifest 3.6.58 generated the same behavior).
  */
 import { dirname, resolve } from "node:path";
 import { execFileSync } from "node:child_process";

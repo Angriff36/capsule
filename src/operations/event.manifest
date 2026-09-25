@@ -1217,6 +1217,9 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
     constraint serviceStyleReferenceInput: length(trim(serviceStyleId)) > 0 "Events must reference a service style"
+    // The target must be one of this tenant's live, active styles (tenant and
+    // soft-delete scoping come with the read).
+    constraint serviceStyleActive: count(ServiceStyle where id == serviceStyleId, status == "active") > 0 "Events must reference an active service style"
     mutate serviceStyleId = serviceStyleId
     mutate serviceStyleName = serviceStyleName != null ? serviceStyleName : self.serviceStyleName
     emit EventServiceStyleChanged {

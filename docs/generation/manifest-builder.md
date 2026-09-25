@@ -39,7 +39,14 @@ Current preset: `convex-application` **v1.3.5** (`package.json` → `manifestPre
 - `convex/auth.config.ts`, `convex/authStatus.ts`
 - Thin adapters such as `src/lib/api.ts`
 
-Generated Convex surfaces import `getAuthContext` from `./lib/authContext`. That module is fail-closed; customize identity → Capsule role mapping there only (prefer linked `Person.role`; IdP org-role claims are bootstrap fallback — see `docs/systems/auth.md`). Org capability kill-switches load as `disabledCapabilities` on the same auth object. Builder folds the Capsule `checkRole(user, …)` / `disabledCapabilities` transform into generated `convex/mutations.ts` and `convex/queries.ts` candidates before ownership planning; `scripts/apply-org-capability-check-role.ts` remains an idempotent post-pass safety net that refreshes digests **without** `baselined: true`. Stock generated surfaces must never be baselined — only `convex/lib/authContext.ts` may.
+Generated Convex surfaces import `getAuthContext` from `./lib/authContext`. That module is fail-closed; customize identity → Capsule role mapping there only (prefer linked `Person.role`; IdP org-role claims are bootstrap fallback — see `docs/systems/auth.md`). Org capability kill-switches load as `disabledCapabilities` on the same auth object. ~~Builder folds the Capsule `checkRole(user, …)` / `disabledCapabilities` transform into generated `convex/mutations.ts` and `convex/queries.ts` candidates before ownership planning; `scripts/apply-org-capability-check-role.ts` remains an idempotent post-pass safety net that refreshes digests **without** `baselined: true`.~~ Stock generated surfaces must never be baselined — only `convex/lib/authContext.ts` may.
+
+> **Correction (2026-09-25):** Manifest 3.6.58 generates the gate itself:
+> `manifest.config.yaml` sets `roleGateImport: ./lib/orgCapabilityGate`, whose
+> `roleGateDenies(user, action)` the generated `checkRole` asks for every
+> `roleAllows(user.role, …)`. The Builder transform and every
+> `scripts/apply-*.ts` post-pass over generated output are deleted (composite
+> aggregate indexes and the Event service-style check are Manifest output too).
 
 ## Flow
 

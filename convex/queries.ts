@@ -5,6 +5,7 @@ import { query, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
 import { getAuthContext } from "./lib/authContext";
+import { roleGateDenies } from "./lib/orgCapabilityGate";
 import { decrypt } from "./lib/encryption";
 
 async function __decryptDoc(ctx: any, entity: string, fields: readonly string[], doc: any): Promise<any> {
@@ -577,46 +578,20 @@ const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = 
   ]
 };
 
+// userOrRole: the acting user's auth object (gated by roleGateDenies) or a role name.
 function checkRole(userOrRole: unknown, action: unknown, target?: unknown): boolean {
-  let userRole: unknown;
-  let disabledCapabilities: unknown;
-  if (typeof userOrRole === "string") {
-    userRole = userOrRole;
-  } else if (userOrRole !== null && typeof userOrRole === "object") {
-    const auth = userOrRole as { role?: unknown; disabledCapabilities?: unknown };
-    userRole = auth.role;
-    disabledCapabilities = auth.disabledCapabilities;
-  } else {
-    return false;
+  let userRole: unknown = userOrRole;
+  const requestedTarget = typeof target === "string" ? target : undefined;
+  if (userOrRole !== null && typeof userOrRole === "object") {
+    userRole = (userOrRole as { role?: unknown }).role;
+    if (typeof action === "string" && roleGateDenies(userOrRole, action, requestedTarget)) return false;
   }
   if (typeof userRole !== "string" || typeof action !== "string") return false;
-  if (__orgCapabilityDeniesAction(action, disabledCapabilities)) return false;
   const perms = ROLE_PERMISSIONS[userRole];
-  const requestedTarget = typeof target === "string" ? target : undefined;
   return perms ? perms.some((permission) =>
     (permission.action === action || permission.action === "all") &&
     (permission.target === undefined || permission.target === requestedTarget)
   ) : false;
-}
-
-function __orgCapabilityDeniesAction(action: string, disabled: unknown): boolean {
-  if (!Array.isArray(disabled) || disabled.length === 0) return false;
-  const capability = __orgCapabilityForAction(action);
-  if (capability === null) return false;
-  return disabled.some((entry) => entry === capability);
-}
-
-function __orgCapabilityForAction(action: string): string | null {
-  if (action === "staffAccess" || action === "manageAccess" || action === "adminAccess") return null;
-  if (action.startsWith("kitchen")) return "kitchen";
-  if (action.startsWith("inventory")) return "inventory";
-  if (action.startsWith("procurement")) return "procurement";
-  if (action.startsWith("event")) return "events";
-  if (action.startsWith("sales")) return "sales";
-  if (action.startsWith("logistics")) return "logistics";
-  if (action.startsWith("workforce")) return "workforce";
-  if (action.startsWith("finance")) return "finance";
-  return null;
 }
 
 export const listAnnouncement = query({
