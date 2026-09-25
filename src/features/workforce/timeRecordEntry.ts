@@ -140,9 +140,23 @@ export async function persistPrimaryTimeRecord(
     stampNow?: boolean;
   },
 ): Promise<{ docId: string; eventId?: string; window: TimeWindow | null }> {
+  const wantsWindow = !input.stampNow && clockOutFilled(input.clockOutAt);
+  // The server stamps an open clock-in with the current time. A start time
+  // more than half an hour in the past only sticks when the clock-out is
+  // entered too, so say that instead of quietly saving "now".
+  const typedIn = toEpoch(input.clockInAt);
+  if (
+    !input.stampNow &&
+    !wantsWindow &&
+    typedIn != null &&
+    typedIn < Date.now() - 30 * 60_000
+  ) {
+    throw new Error(
+      "This clock-in is in the past. Enter the clock-out time too, or set clock-in to now.",
+    );
+  }
   const createArgs = buildClockInCreateArgs(input);
   const created = await api.clockIn(createArgs);
-  const wantsWindow = !input.stampNow && clockOutFilled(input.clockOutAt);
   const window = wantsWindow
     ? parseTimeWindow(input.clockInAt, input.clockOutAt)
     : null;
@@ -181,15 +195,17 @@ export async function persistClockOut(
     clockOutAt?: unknown;
   },
 ): Promise<void> {
+  // Check before closing: a refused time must leave the entry open, not
+  // closed at "now" with an error on screen.
+  const desiredOut = toEpoch(input.clockOutAt);
+  if (desiredOut != null && desiredOut < input.existingClockInAt) {
+    throw new Error("Clock-out must be at or after clock-in.");
+  }
   const closed = await api.clockOut({
     docId: input.docId,
     version: input.version,
   });
-  const desiredOut = toEpoch(input.clockOutAt);
   if (desiredOut == null) return;
-  if (desiredOut < input.existingClockInAt) {
-    throw new Error("Clock-out must be at or after clock-in.");
-  }
   await api.correct({
     docId: input.docId,
     ...(closed && closed.version != null ? { version: closed.version } : {}),

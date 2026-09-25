@@ -32,6 +32,7 @@ import {
   type TimeRecordLedgerRow,
 } from "./timeRecordEntry";
 import { useWorkingEventId } from "../events/workingEvent";
+import { hoursLabel, workedShifts, workedWeeks } from "../staff/workedShifts";
 
 const policy = new WorkforceLifecyclePolicy();
 
@@ -179,7 +180,18 @@ export function TimeSheetPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
 
-  const activeRecords = (records ?? []).filter((row) => row.deletedAt == null);
+  const [personFilter, setPersonFilter] = useState("");
+  // Newest first; one person's shifts when the filter is set.
+  const activeRecords = (records ?? [])
+    .filter(
+      (row) =>
+        row.deletedAt == null &&
+        (personFilter === "" || row.personId === personFilter),
+    )
+    .sort((a, b) => (b.clockInAt ?? 0) - (a.clockInAt ?? 0));
+  const filteredWeeks = personFilter
+    ? workedWeeks(workedShifts(activeRecords))
+    : [];
   const activeWindows = (windows ?? []).filter((row) => row.deletedAt == null);
   const activePeople = (people ?? []).filter(
     (person) => person.deletedAt == null && person.status === "active",
@@ -425,7 +437,28 @@ export function TimeSheetPage() {
             <p className="eyebrow">Attendance</p>
             <h2>Time entries</h2>
           </div>
-          <span>
+          <span className="flex flex-wrap items-center gap-3">
+            <select
+              className="input"
+              aria-label="Show one person's time entries"
+              value={personFilter}
+              onChange={(event) => setPersonFilter(event.target.value)}
+              data-testid="time-entries-person-filter"
+            >
+              <option value="">Everyone</option>
+              {(people ?? [])
+                .filter((person) => person.deletedAt == null)
+                .sort((a, b) =>
+                  `${a.givenName} ${a.familyName}`.localeCompare(
+                    `${b.givenName} ${b.familyName}`,
+                  ),
+                )
+                .map((person) => (
+                  <option key={person._id} value={person._id}>
+                    {person.givenName} {person.familyName}
+                  </option>
+                ))}
+            </select>
             {formatCountNoun(
               activeRecords.length,
               "time entry",
@@ -433,6 +466,21 @@ export function TimeSheetPage() {
             )}
           </span>
         </div>
+        {personFilter && filteredWeeks.length > 0 ? (
+          <p
+            className="px-1 py-2 text-sm text-ink-2"
+            data-testid="time-entries-person-summary"
+          >
+            {personName(personFilter)}:{" "}
+            {filteredWeeks
+              .slice(0, 4)
+              .map(
+                (week) =>
+                  `week of ${formatDate(week.weekStart)} ${hoursLabel(week.hours)}`,
+              )
+              .join(" · ")}
+          </p>
+        ) : null}
         {loading ? (
           <TableSkeleton rows={5} />
         ) : activeRecords.length === 0 ? (
@@ -450,6 +498,7 @@ export function TimeSheetPage() {
                   <th>Clock in</th>
                   <th>Clock out</th>
                   <th>Break</th>
+                  <th>Hours</th>
                   <th>State</th>
                   <th aria-label="Actions" />
                 </tr>
@@ -472,6 +521,19 @@ export function TimeSheetPage() {
                         : "—"}
                     </td>
                     <TimeSheetBreakCell breakMinutes={row.breakMinutes} />
+                    <td>
+                      {row.clockInAt != null &&
+                      row.clockOutAt != null &&
+                      row.clockOutAt >= row.clockInAt
+                        ? hoursLabel(
+                            Math.max(
+                              0,
+                              (row.clockOutAt - row.clockInAt) / 3_600_000 -
+                                (row.breakMinutes ?? 0) / 60,
+                            ),
+                          )
+                        : "—"}
+                    </td>
                     <td>
                       <TimeSheetRecordState row={row} />
                     </td>
