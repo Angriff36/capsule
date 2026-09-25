@@ -47818,7 +47818,7 @@ async function __runStockTransferRecord(ctx: MutationCtx, { docId, sourceInvento
     if (!((sourceInventoryItemId === doc.sourceInventoryItemId))) throw new Error("This transfer is taking from a different stock item. Pick the stock item already on this transfer.");
     if (!((destinationInventoryItemId === doc.destinationInventoryItemId))) throw new Error("This transfer is sending to a different stock item. Pick the stock item already on this transfer.");
     if (!((sourceInventoryItemId !== destinationInventoryItemId))) throw new Error("This transfer can't send to the same stock item it takes from. Pick a different send-to item.");
-    if (!((ingredientId === __rel_sourceItem.ingredientId))) throw new Error("Transfer ingredientId must match the source stock ingredient");
+    if (!((ingredientId === __rel_sourceItem.ingredientId))) throw new Error("This transfer's ingredient doesn't match the send-from stock item. Pick the ingredient that stock item holds.");
     if (!((__rel_sourceItem.ingredientId === __rel_destinationItem.ingredientId))) throw new Error("Source and destination must hold the same ingredient");
     if (!((sourceLocationId === __rel_sourceItem.locationId))) throw new Error("Transfer sourceLocationId must match the source stock location");
     if (!((destinationLocationId === __rel_destinationItem.locationId))) throw new Error("Transfer destinationLocationId must match the destination stock location");
@@ -47927,7 +47927,7 @@ export const StockTransfer_createViaRecord = mutation({
     if (!((sourceInventoryItemId === __draft.sourceInventoryItemId))) throw new Error("This transfer is taking from a different stock item. Pick the stock item already on this transfer.");
     if (!((destinationInventoryItemId === __draft.destinationInventoryItemId))) throw new Error("This transfer is sending to a different stock item. Pick the stock item already on this transfer.");
     if (!((sourceInventoryItemId !== destinationInventoryItemId))) throw new Error("This transfer can't send to the same stock item it takes from. Pick a different send-to item.");
-    if (!((ingredientId === __rel_sourceItem.ingredientId))) throw new Error("Transfer ingredientId must match the source stock ingredient");
+    if (!((ingredientId === __rel_sourceItem.ingredientId))) throw new Error("This transfer's ingredient doesn't match the send-from stock item. Pick the ingredient that stock item holds.");
     if (!((__rel_sourceItem.ingredientId === __rel_destinationItem.ingredientId))) throw new Error("Source and destination must hold the same ingredient");
     if (!((sourceLocationId === __rel_sourceItem.locationId))) throw new Error("Transfer sourceLocationId must match the source stock location");
     if (!((destinationLocationId === __rel_destinationItem.locationId))) throw new Error("Transfer destinationLocationId must match the destination stock location");

@@ -52,7 +52,7 @@ entity StockTransfer mixin TenantScoped, SoftDeletable {
     constraint transferSourceMatch: sourceInventoryItemId == self.sourceInventoryItemId "This transfer is taking from a different stock item. Pick the stock item already on this transfer."
     constraint transferDestinationMatch: destinationInventoryItemId == self.destinationInventoryItemId "This transfer is sending to a different stock item. Pick the stock item already on this transfer."
     constraint transferDistinctLines: sourceInventoryItemId != destinationInventoryItemId "This transfer can't send to the same stock item it takes from. Pick a different send-to item."
-    constraint transferIngredientMatch: ingredientId == self.sourceItem.ingredientId "Transfer ingredientId must match the source stock ingredient"
+    constraint transferIngredientMatch: ingredientId == self.sourceItem.ingredientId "This transfer's ingredient doesn't match the send-from stock item. Pick the ingredient that stock item holds."
     constraint transferSameIngredient: self.sourceItem.ingredientId == self.destinationItem.ingredientId "Source and destination must hold the same ingredient"
     constraint transferSourceLocationMatch: sourceLocationId == self.sourceItem.locationId "Transfer sourceLocationId must match the source stock location"
     constraint transferDestinationLocationMatch: destinationLocationId == self.destinationItem.locationId "Transfer destinationLocationId must match the destination stock location"
