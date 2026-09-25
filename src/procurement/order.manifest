@@ -508,7 +508,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     constraint addLineIngredientMatch: ingredientId == self.ingredientId "Add line ingredientId must match the seeded ingredient reference"
     constraint addLineDemandMatch: ingredientDemandId == null or self.ingredientDemandId == null or ingredientDemandId == self.ingredientDemandId "Add line ingredientDemandId must match the seeded demand reference when provided"
     constraint addLineLocationMatch: locationId == null or self.locationId == null or locationId == self.locationId "Add line locationId must match the seeded location reference when provided"
-    constraint addLineQuantityPositive: orderedQuantity > 0 "Ordered quantity must be positive"
+    constraint addLineQuantityPositive: orderedQuantity > 0 "This order line's ordered amount has to be more than zero. Enter how much to order."
     constraint addLineCostNonnegative: unitCost >= 0 "This order line's cost per unit can't be negative. Use zero or more."
     mutate vendorOrderId = vendorOrderId
     mutate ingredientId = ingredientId
@@ -620,7 +620,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     guard self.status == "added"
     guard self.deletedAt == null
     guard self.vendorOrder != null and self.vendorOrder.status == "draft"
-    constraint reviseLineQuantityPositive: orderedQuantity > 0 "Ordered quantity must be positive"
+    constraint reviseLineQuantityPositive: orderedQuantity > 0 "This order line's ordered amount has to be more than zero. Enter how much to order."
     constraint reviseLineCostNonnegative: unitCost == null or unitCost >= 0 "This order line's cost per unit can't be negative. Use zero or more."
     compute nextUnitCost = unitCost != null ? unitCost : self.unitCost
     mutate quantityIsManual = orderedQuantity != self.orderedQuantity or self.quantityReviewReason != null ? true : self.quantityIsManual

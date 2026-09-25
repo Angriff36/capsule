@@ -11,47 +11,42 @@ function expectPlain(text: string) {
   expect(text).not.toContain("bun run");
 }
 
-describe("plain words on leftover order-line ordered quantity copy", () => {
-  it("keeps the order-line negative-ordered-amount refusal free of jargon", () => {
+describe("plain words on leftover order-line ordered-amount-positive copy", () => {
+  it("keeps the zero-ordered refusal free of jargon", () => {
     const manifest = readFileSync("src/procurement/order.manifest", "utf8");
     // Strip // comments the same way the culinary leftover tests do.
     const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
     const NEW =
-      "This order line's ordered amount can't be negative. Use zero or more.";
+      "This order line's ordered amount has to be more than zero. Enter how much to order.";
     // The old jargon refusal is gone from the authored file.
-    expect(visible).not.toContain("Ordered quantity cannot be negative");
-    // The refusal now speaks in plain catering words.
+    expect(visible).not.toContain("Ordered quantity must be positive");
+    // The refusal now speaks in plain catering words (entity + commands share it).
     expect(visible).toContain(NEW);
     expectPlain(NEW);
-    // The generated summary carries the plain wording, not the old one. This
-    // leftover is entity-level, so mutations.ts is not expected to carry the
-    // new sentence — but it must not carry the old one.
+    // The generated summary carries the plain wording.
     const summary = readFileSync("manifest-context-summary.json", "utf8");
     expect(summary).toContain(NEW);
-    expect(summary).not.toContain("Ordered quantity cannot be negative");
+    // The command-level half of this refusal lands in generated mutations.
     const mutations = readFileSync("convex/mutations.ts", "utf8");
-    expect(mutations).not.toContain("Ordered quantity cannot be negative");
+    expect(mutations).toContain(NEW);
     // Already-landed copy on this same file stays.
     expect(visible).toContain(
-      "This order-to-need link's amount can't be negative. Use zero or more.",
+      "This order line's received amount has to be more than zero. Enter how much arrived.",
     );
     expect(visible).toContain(
-      "This order-to-need link's line isn't on this order. Pick a line from the order already on this link.",
+      "This order line's cost per unit can't be negative. Use zero or more.",
     );
     expect(visible).toContain(
-      "This order-to-need link is for a different order. Pick the order already on this link.",
+      "This order line's ordered amount can't be negative. Use zero or more.",
     );
     expect(visible).toContain(
-      "This order-to-need link is for a different order line. Pick the order line already on this link.",
+      "This order line's received amount can't be negative. Use zero or more.",
     );
     expect(visible).toContain(
-      "This order-to-need link is for a different need. Pick the need already on this link.",
+      "This order line can't receive more than was ordered. Enter a smaller amount.",
     );
     expect(visible).toContain(
-      "This weekly order line's amount can't be negative. Use zero or more.",
-    );
-    expect(visible).toContain(
-      "This order line's ordered amount has to be more than zero. Enter how much to order.",
+      "This order line's price per unit can't be negative. Use zero or more.",
     );
     // Later leftovers on this same file are pinned, not rewritten.
     expect(visible).toContain("Discrepancy quantity cannot be negative");

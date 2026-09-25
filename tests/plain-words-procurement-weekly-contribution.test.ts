@@ -46,7 +46,10 @@ describe("plain words on leftover weekly-line contribution copy", () => {
     expect(visible).toContain(
       "This order-to-need link is for a different need. Pick the need already on this link.",
     );
+    expect(visible).toContain(
+      "This order line's ordered amount has to be more than zero. Enter how much to order.",
+    );
     // Later leftovers on this same file are pinned, not rewritten.
-    expect(visible).toContain("Ordered quantity must be positive");
+    expect(visible).toContain("Discrepancy quantity cannot be negative");
   });
 });

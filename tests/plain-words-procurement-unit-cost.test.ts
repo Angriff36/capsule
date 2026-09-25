@@ -60,7 +60,10 @@ describe("plain words on leftover order-line unit-cost copy", () => {
     expect(visible).toContain(
       "This order line's received amount has to be more than zero. Enter how much arrived.",
     );
+    expect(visible).toContain(
+      "This order line's ordered amount has to be more than zero. Enter how much to order.",
+    );
     // Later leftovers on this same file are pinned, not rewritten.
-    expect(visible).toContain("Ordered quantity must be positive");
+    expect(visible).toContain("Discrepancy quantity cannot be negative");
   });
 });
