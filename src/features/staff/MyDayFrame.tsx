@@ -49,6 +49,7 @@ export function MyDayFrame({
     { id: "my-day-dashboard", label: "Dashboard", icon: HomeIcon },
     { id: "my-day-schedule", label: "My schedule", icon: CalendarIcon },
     { id: "my-day-timesheets", label: "Time clock", icon: ClockIcon },
+    { id: "my-day-past-shifts", label: "Past shifts", icon: ClockIcon },
     { id: "my-day-prep", label: "Prep lists", icon: FlameIcon },
     { id: "my-day-availability", label: "Availability", icon: UsersIcon },
   ];

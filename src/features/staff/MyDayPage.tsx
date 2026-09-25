@@ -58,6 +58,7 @@ import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 import { MyDayCalendar, MyDaySection as Section } from "./MyDayDashboard";
 import { MyDayPrepList } from "./MyDayPrepList";
+import { MyPastShiftsCard } from "./MyPastShiftsCard";
 import { buildStaffUtilizationReport } from "../workforce/staffUtilization";
 
 const dayLabel = (ms?: number | null) =>
@@ -756,6 +757,7 @@ export function MyDayPage() {
           </div>
           <div className="my-day-secondary-grid">
             <div className="my-day-section-stack">
+              <MyPastShiftsCard records={myRecords} eventTitle={eventTitle} />
               <div data-testid="staff-schedule-notices">
                 <Section
                   title="Published schedule"
