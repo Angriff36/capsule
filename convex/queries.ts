@@ -32,6 +32,69 @@ function __allowsRead(policy: string, entity: string, check: () => unknown): boo
   }
 }
 
+function __applyMaskStrategy(strategy: { type: string; params?: number[] }, value: unknown): unknown {
+  if (value == null) return value;
+  const s = String(value);
+  switch (strategy.type) {
+    case "redact":
+      return "***";
+    case "partial": {
+      const keepStart = strategy.params?.[0] ?? 0;
+      const keepEnd = strategy.params?.[1] ?? 0;
+      if (keepStart + keepEnd >= s.length) return "*".repeat(s.length);
+      const tail = keepEnd > 0 ? s.slice(-keepEnd) : "";
+      return s.slice(0, keepStart) + "*".repeat(s.length - keepStart - keepEnd) + tail;
+    }
+    case "email": {
+      const at = s.indexOf("@");
+      if (at <= 0) return "***";
+      return s[0] + "***@" + s.slice(at + 1);
+    }
+    case "phone": {
+      const digits = s.replace(/[^0-9]/g, "");
+      if (digits.length < 4) return "***";
+      return "***-***-" + digits.slice(-4);
+    }
+    case "last4": {
+      if (s.length <= 4) return "****";
+      return "****" + s.slice(-4);
+    }
+    default:
+      return "***";
+  }
+}
+
+function __maskDoc(
+  doc: any,
+  fields: ReadonlyArray<{
+    name: string;
+    strategy: { type: string; params?: number[] };
+    unmaskWhen?: (self: any, user: any, context: any) => unknown;
+  }>,
+  auth: { user?: any; context?: any } = {},
+): any {
+  if (!doc) return doc;
+  const out = { ...(doc as any) };
+  const user = auth.user;
+  const context = auth.context;
+  for (const field of fields) {
+    const value = out[field.name];
+    if (value == null) continue;
+    if (field.unmaskWhen) {
+      try {
+        if (field.unmaskWhen(out, user, context)) continue;
+      } catch (error) {
+        console.warn(
+          `[Manifest Convex] unmaskWhen evaluation error for '${field.name}' (value stays masked)`,
+          error,
+        );
+      }
+    }
+    out[field.name] = __applyMaskStrategy(field.strategy, value);
+  }
+  return out;
+}
+
 const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = {
   "admin": [
     {
@@ -3679,6 +3742,7 @@ export const listEvent = query({
   handler: async (ctx) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("eventRead", "Event", () => checkRole(user, "staffAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("events").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
@@ -3759,7 +3823,7 @@ export const listEvent = query({
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isArchived: (__row as any).isArchived, timingCanRecalculate: (__row as any).timingCanRecalculate, staffingCanManage: (__row as any).staffingCanManage, timingSuggestedSetupMinutes: (__row as any).timingSuggestedSetupMinutes, timingOnsiteAt: (__row as any).timingOnsiteAt, timingDepartShopAt: (__row as any).timingDepartShopAt, timingStaffOnAt: (__row as any).timingStaffOnAt, timingDepartVenueAt: (__row as any).timingDepartVenueAt, timingReturnShopAt: (__row as any).timingReturnShopAt, timingStaffOffAt: (__row as any).timingStaffOffAt, timingSuggestedLoadMinutes: (__row as any).timingSuggestedLoadMinutes, timingSuggestedCleanupMinutes: (__row as any).timingSuggestedCleanupMinutes, binderColor: (__row as any).binderColor, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, hasServiceStyle: (__row as any).hasServiceStyle, hasFinalLockTiming: (__row as any).hasFinalLockTiming, isFinalLockReady: (__row as any).isFinalLockReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
-    return __projectedRows;
+    return (__projectedRows).map((d) => __maskDoc(d, [{ name: "primaryContactEmail", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }, { name: "primaryContactPhone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
@@ -3768,6 +3832,7 @@ export const getEvent = query({
   handler: async (ctx, { id }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("eventRead", "Event", () => checkRole(user, "staffAccess"))) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
@@ -3848,7 +3913,9 @@ export const getEvent = query({
     (__doc as any).isReadyForExecution = ((((((__doc as any).prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && ((((__doc as any).packLists) ?? []).filter((p: Doc<"packLists">) => ((((p.status !== "dispatched") && (p.status !== "cancelled")) && (p.status !== "draft")))).length === 0)) && ((((__doc as any).deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0));
     (__doc as any).estimatedFoodCost = (((((__doc as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
     const __hydrated = { ...(__doc as any), isTerminal: (__doc as any).isTerminal, isArchived: (__doc as any).isArchived, timingCanRecalculate: (__doc as any).timingCanRecalculate, staffingCanManage: (__doc as any).staffingCanManage, timingSuggestedSetupMinutes: (__doc as any).timingSuggestedSetupMinutes, timingOnsiteAt: (__doc as any).timingOnsiteAt, timingDepartShopAt: (__doc as any).timingDepartShopAt, timingStaffOnAt: (__doc as any).timingStaffOnAt, timingDepartVenueAt: (__doc as any).timingDepartVenueAt, timingReturnShopAt: (__doc as any).timingReturnShopAt, timingStaffOffAt: (__doc as any).timingStaffOffAt, timingSuggestedLoadMinutes: (__doc as any).timingSuggestedLoadMinutes, timingSuggestedCleanupMinutes: (__doc as any).timingSuggestedCleanupMinutes, binderColor: (__doc as any).binderColor, isEditable: (__doc as any).isEditable, hasAssignedClient: (__doc as any).hasAssignedClient, hasExpectedHeadcount: (__doc as any).hasExpectedHeadcount, hasMenuDishes: (__doc as any).hasMenuDishes, hasStaffAssigned: (__doc as any).hasStaffAssigned, isSetupReady: (__doc as any).isSetupReady, hasServiceStyle: (__doc as any).hasServiceStyle, hasFinalLockTiming: (__doc as any).hasFinalLockTiming, isFinalLockReady: (__doc as any).isFinalLockReady, isReadyForExecution: (__doc as any).isReadyForExecution, estimatedFoodCost: (__doc as any).estimatedFoodCost };
-    return __hydrated;
+    const __final = __hydrated;
+    if (!__final) return __final;
+    return __maskDoc(__final, [{ name: "primaryContactEmail", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }, { name: "primaryContactPhone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined });
   },
 });
 
@@ -3857,6 +3924,7 @@ export const listEventByTenantId = query({
   handler: async (ctx, { tenantId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("eventRead", "Event", () => checkRole(user, "staffAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -3938,7 +4006,7 @@ export const listEventByTenantId = query({
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isArchived: (__row as any).isArchived, timingCanRecalculate: (__row as any).timingCanRecalculate, staffingCanManage: (__row as any).staffingCanManage, timingSuggestedSetupMinutes: (__row as any).timingSuggestedSetupMinutes, timingOnsiteAt: (__row as any).timingOnsiteAt, timingDepartShopAt: (__row as any).timingDepartShopAt, timingStaffOnAt: (__row as any).timingStaffOnAt, timingDepartVenueAt: (__row as any).timingDepartVenueAt, timingReturnShopAt: (__row as any).timingReturnShopAt, timingStaffOffAt: (__row as any).timingStaffOffAt, timingSuggestedLoadMinutes: (__row as any).timingSuggestedLoadMinutes, timingSuggestedCleanupMinutes: (__row as any).timingSuggestedCleanupMinutes, binderColor: (__row as any).binderColor, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, hasServiceStyle: (__row as any).hasServiceStyle, hasFinalLockTiming: (__row as any).hasFinalLockTiming, isFinalLockReady: (__row as any).isFinalLockReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
-    return __projectedRows;
+    return (__projectedRows).map((d) => __maskDoc(d, [{ name: "primaryContactEmail", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }, { name: "primaryContactPhone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
@@ -3947,6 +4015,7 @@ export const listEventByEventNumber = query({
   handler: async (ctx, { eventNumber }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("eventRead", "Event", () => checkRole(user, "staffAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -4029,7 +4098,7 @@ export const listEventByEventNumber = query({
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isArchived: (__row as any).isArchived, timingCanRecalculate: (__row as any).timingCanRecalculate, staffingCanManage: (__row as any).staffingCanManage, timingSuggestedSetupMinutes: (__row as any).timingSuggestedSetupMinutes, timingOnsiteAt: (__row as any).timingOnsiteAt, timingDepartShopAt: (__row as any).timingDepartShopAt, timingStaffOnAt: (__row as any).timingStaffOnAt, timingDepartVenueAt: (__row as any).timingDepartVenueAt, timingReturnShopAt: (__row as any).timingReturnShopAt, timingStaffOffAt: (__row as any).timingStaffOffAt, timingSuggestedLoadMinutes: (__row as any).timingSuggestedLoadMinutes, timingSuggestedCleanupMinutes: (__row as any).timingSuggestedCleanupMinutes, binderColor: (__row as any).binderColor, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, hasServiceStyle: (__row as any).hasServiceStyle, hasFinalLockTiming: (__row as any).hasFinalLockTiming, isFinalLockReady: (__row as any).isFinalLockReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
-    return __projectedRows;
+    return (__projectedRows).map((d) => __maskDoc(d, [{ name: "primaryContactEmail", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }, { name: "primaryContactPhone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
@@ -4038,6 +4107,7 @@ export const listEventByClientId = query({
   handler: async (ctx, { clientId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("eventRead", "Event", () => checkRole(user, "staffAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -4120,7 +4190,7 @@ export const listEventByClientId = query({
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isArchived: (__row as any).isArchived, timingCanRecalculate: (__row as any).timingCanRecalculate, staffingCanManage: (__row as any).staffingCanManage, timingSuggestedSetupMinutes: (__row as any).timingSuggestedSetupMinutes, timingOnsiteAt: (__row as any).timingOnsiteAt, timingDepartShopAt: (__row as any).timingDepartShopAt, timingStaffOnAt: (__row as any).timingStaffOnAt, timingDepartVenueAt: (__row as any).timingDepartVenueAt, timingReturnShopAt: (__row as any).timingReturnShopAt, timingStaffOffAt: (__row as any).timingStaffOffAt, timingSuggestedLoadMinutes: (__row as any).timingSuggestedLoadMinutes, timingSuggestedCleanupMinutes: (__row as any).timingSuggestedCleanupMinutes, binderColor: (__row as any).binderColor, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, hasServiceStyle: (__row as any).hasServiceStyle, hasFinalLockTiming: (__row as any).hasFinalLockTiming, isFinalLockReady: (__row as any).isFinalLockReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
-    return __projectedRows;
+    return (__projectedRows).map((d) => __maskDoc(d, [{ name: "primaryContactEmail", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }, { name: "primaryContactPhone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
@@ -4129,6 +4199,7 @@ export const listEventByClientMergeAuthorizationId = query({
   handler: async (ctx, { clientMergeAuthorizationId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("eventRead", "Event", () => checkRole(user, "staffAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -4211,7 +4282,7 @@ export const listEventByClientMergeAuthorizationId = query({
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isArchived: (__row as any).isArchived, timingCanRecalculate: (__row as any).timingCanRecalculate, staffingCanManage: (__row as any).staffingCanManage, timingSuggestedSetupMinutes: (__row as any).timingSuggestedSetupMinutes, timingOnsiteAt: (__row as any).timingOnsiteAt, timingDepartShopAt: (__row as any).timingDepartShopAt, timingStaffOnAt: (__row as any).timingStaffOnAt, timingDepartVenueAt: (__row as any).timingDepartVenueAt, timingReturnShopAt: (__row as any).timingReturnShopAt, timingStaffOffAt: (__row as any).timingStaffOffAt, timingSuggestedLoadMinutes: (__row as any).timingSuggestedLoadMinutes, timingSuggestedCleanupMinutes: (__row as any).timingSuggestedCleanupMinutes, binderColor: (__row as any).binderColor, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, hasServiceStyle: (__row as any).hasServiceStyle, hasFinalLockTiming: (__row as any).hasFinalLockTiming, isFinalLockReady: (__row as any).isFinalLockReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
-    return __projectedRows;
+    return (__projectedRows).map((d) => __maskDoc(d, [{ name: "primaryContactEmail", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }, { name: "primaryContactPhone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
@@ -4220,6 +4291,7 @@ export const listEventByMergeTargetClientId = query({
   handler: async (ctx, { mergeTargetClientId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("eventRead", "Event", () => checkRole(user, "staffAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -4302,7 +4374,7 @@ export const listEventByMergeTargetClientId = query({
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isArchived: (__row as any).isArchived, timingCanRecalculate: (__row as any).timingCanRecalculate, staffingCanManage: (__row as any).staffingCanManage, timingSuggestedSetupMinutes: (__row as any).timingSuggestedSetupMinutes, timingOnsiteAt: (__row as any).timingOnsiteAt, timingDepartShopAt: (__row as any).timingDepartShopAt, timingStaffOnAt: (__row as any).timingStaffOnAt, timingDepartVenueAt: (__row as any).timingDepartVenueAt, timingReturnShopAt: (__row as any).timingReturnShopAt, timingStaffOffAt: (__row as any).timingStaffOffAt, timingSuggestedLoadMinutes: (__row as any).timingSuggestedLoadMinutes, timingSuggestedCleanupMinutes: (__row as any).timingSuggestedCleanupMinutes, binderColor: (__row as any).binderColor, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, hasServiceStyle: (__row as any).hasServiceStyle, hasFinalLockTiming: (__row as any).hasFinalLockTiming, isFinalLockReady: (__row as any).isFinalLockReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
-    return __projectedRows;
+    return (__projectedRows).map((d) => __maskDoc(d, [{ name: "primaryContactEmail", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }, { name: "primaryContactPhone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
@@ -4311,6 +4383,7 @@ export const listEventByServiceStyleId = query({
   handler: async (ctx, { serviceStyleId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("eventRead", "Event", () => checkRole(user, "staffAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -4393,7 +4466,7 @@ export const listEventByServiceStyleId = query({
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isArchived: (__row as any).isArchived, timingCanRecalculate: (__row as any).timingCanRecalculate, staffingCanManage: (__row as any).staffingCanManage, timingSuggestedSetupMinutes: (__row as any).timingSuggestedSetupMinutes, timingOnsiteAt: (__row as any).timingOnsiteAt, timingDepartShopAt: (__row as any).timingDepartShopAt, timingStaffOnAt: (__row as any).timingStaffOnAt, timingDepartVenueAt: (__row as any).timingDepartVenueAt, timingReturnShopAt: (__row as any).timingReturnShopAt, timingStaffOffAt: (__row as any).timingStaffOffAt, timingSuggestedLoadMinutes: (__row as any).timingSuggestedLoadMinutes, timingSuggestedCleanupMinutes: (__row as any).timingSuggestedCleanupMinutes, binderColor: (__row as any).binderColor, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, hasServiceStyle: (__row as any).hasServiceStyle, hasFinalLockTiming: (__row as any).hasFinalLockTiming, isFinalLockReady: (__row as any).isFinalLockReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
-    return __projectedRows;
+    return (__projectedRows).map((d) => __maskDoc(d, [{ name: "primaryContactEmail", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }, { name: "primaryContactPhone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
@@ -4402,6 +4475,7 @@ export const listEventByOccasionId = query({
   handler: async (ctx, { occasionId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("eventRead", "Event", () => checkRole(user, "staffAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -4484,7 +4558,7 @@ export const listEventByOccasionId = query({
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isArchived: (__row as any).isArchived, timingCanRecalculate: (__row as any).timingCanRecalculate, staffingCanManage: (__row as any).staffingCanManage, timingSuggestedSetupMinutes: (__row as any).timingSuggestedSetupMinutes, timingOnsiteAt: (__row as any).timingOnsiteAt, timingDepartShopAt: (__row as any).timingDepartShopAt, timingStaffOnAt: (__row as any).timingStaffOnAt, timingDepartVenueAt: (__row as any).timingDepartVenueAt, timingReturnShopAt: (__row as any).timingReturnShopAt, timingStaffOffAt: (__row as any).timingStaffOffAt, timingSuggestedLoadMinutes: (__row as any).timingSuggestedLoadMinutes, timingSuggestedCleanupMinutes: (__row as any).timingSuggestedCleanupMinutes, binderColor: (__row as any).binderColor, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, hasServiceStyle: (__row as any).hasServiceStyle, hasFinalLockTiming: (__row as any).hasFinalLockTiming, isFinalLockReady: (__row as any).isFinalLockReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
-    return __projectedRows;
+    return (__projectedRows).map((d) => __maskDoc(d, [{ name: "primaryContactEmail", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }, { name: "primaryContactPhone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
@@ -4493,6 +4567,7 @@ export const listEventByVenueId = query({
   handler: async (ctx, { venueId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("eventRead", "Event", () => checkRole(user, "staffAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -4575,7 +4650,7 @@ export const listEventByVenueId = query({
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isArchived: (__row as any).isArchived, timingCanRecalculate: (__row as any).timingCanRecalculate, staffingCanManage: (__row as any).staffingCanManage, timingSuggestedSetupMinutes: (__row as any).timingSuggestedSetupMinutes, timingOnsiteAt: (__row as any).timingOnsiteAt, timingDepartShopAt: (__row as any).timingDepartShopAt, timingStaffOnAt: (__row as any).timingStaffOnAt, timingDepartVenueAt: (__row as any).timingDepartVenueAt, timingReturnShopAt: (__row as any).timingReturnShopAt, timingStaffOffAt: (__row as any).timingStaffOffAt, timingSuggestedLoadMinutes: (__row as any).timingSuggestedLoadMinutes, timingSuggestedCleanupMinutes: (__row as any).timingSuggestedCleanupMinutes, binderColor: (__row as any).binderColor, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, hasServiceStyle: (__row as any).hasServiceStyle, hasFinalLockTiming: (__row as any).hasFinalLockTiming, isFinalLockReady: (__row as any).isFinalLockReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
-    return __projectedRows;
+    return (__projectedRows).map((d) => __maskDoc(d, [{ name: "primaryContactEmail", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }, { name: "primaryContactPhone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
@@ -4584,6 +4659,7 @@ export const listEventByAssignedToId = query({
   handler: async (ctx, { assignedToId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("eventRead", "Event", () => checkRole(user, "staffAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -4666,7 +4742,7 @@ export const listEventByAssignedToId = query({
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isArchived: (__row as any).isArchived, timingCanRecalculate: (__row as any).timingCanRecalculate, staffingCanManage: (__row as any).staffingCanManage, timingSuggestedSetupMinutes: (__row as any).timingSuggestedSetupMinutes, timingOnsiteAt: (__row as any).timingOnsiteAt, timingDepartShopAt: (__row as any).timingDepartShopAt, timingStaffOnAt: (__row as any).timingStaffOnAt, timingDepartVenueAt: (__row as any).timingDepartVenueAt, timingReturnShopAt: (__row as any).timingReturnShopAt, timingStaffOffAt: (__row as any).timingStaffOffAt, timingSuggestedLoadMinutes: (__row as any).timingSuggestedLoadMinutes, timingSuggestedCleanupMinutes: (__row as any).timingSuggestedCleanupMinutes, binderColor: (__row as any).binderColor, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, hasServiceStyle: (__row as any).hasServiceStyle, hasFinalLockTiming: (__row as any).hasFinalLockTiming, isFinalLockReady: (__row as any).isFinalLockReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
-    return __projectedRows;
+    return (__projectedRows).map((d) => __maskDoc(d, [{ name: "primaryContactEmail", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }, { name: "primaryContactPhone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
@@ -4675,6 +4751,7 @@ export const listEventByReferralSourceId = query({
   handler: async (ctx, { referralSourceId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("eventRead", "Event", () => checkRole(user, "staffAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -4757,7 +4834,7 @@ export const listEventByReferralSourceId = query({
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isArchived: (__row as any).isArchived, timingCanRecalculate: (__row as any).timingCanRecalculate, staffingCanManage: (__row as any).staffingCanManage, timingSuggestedSetupMinutes: (__row as any).timingSuggestedSetupMinutes, timingOnsiteAt: (__row as any).timingOnsiteAt, timingDepartShopAt: (__row as any).timingDepartShopAt, timingStaffOnAt: (__row as any).timingStaffOnAt, timingDepartVenueAt: (__row as any).timingDepartVenueAt, timingReturnShopAt: (__row as any).timingReturnShopAt, timingStaffOffAt: (__row as any).timingStaffOffAt, timingSuggestedLoadMinutes: (__row as any).timingSuggestedLoadMinutes, timingSuggestedCleanupMinutes: (__row as any).timingSuggestedCleanupMinutes, binderColor: (__row as any).binderColor, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, hasServiceStyle: (__row as any).hasServiceStyle, hasFinalLockTiming: (__row as any).hasFinalLockTiming, isFinalLockReady: (__row as any).isFinalLockReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
-    return __projectedRows;
+    return (__projectedRows).map((d) => __maskDoc(d, [{ name: "primaryContactEmail", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }, { name: "primaryContactPhone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
@@ -4766,6 +4843,7 @@ export const listEventByRecurrenceTemplateEventId = query({
   handler: async (ctx, { recurrenceTemplateEventId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("eventRead", "Event", () => checkRole(user, "staffAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -4848,7 +4926,7 @@ export const listEventByRecurrenceTemplateEventId = query({
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isArchived: (__row as any).isArchived, timingCanRecalculate: (__row as any).timingCanRecalculate, staffingCanManage: (__row as any).staffingCanManage, timingSuggestedSetupMinutes: (__row as any).timingSuggestedSetupMinutes, timingOnsiteAt: (__row as any).timingOnsiteAt, timingDepartShopAt: (__row as any).timingDepartShopAt, timingStaffOnAt: (__row as any).timingStaffOnAt, timingDepartVenueAt: (__row as any).timingDepartVenueAt, timingReturnShopAt: (__row as any).timingReturnShopAt, timingStaffOffAt: (__row as any).timingStaffOffAt, timingSuggestedLoadMinutes: (__row as any).timingSuggestedLoadMinutes, timingSuggestedCleanupMinutes: (__row as any).timingSuggestedCleanupMinutes, binderColor: (__row as any).binderColor, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, hasServiceStyle: (__row as any).hasServiceStyle, hasFinalLockTiming: (__row as any).hasFinalLockTiming, isFinalLockReady: (__row as any).isFinalLockReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
-    return __projectedRows;
+    return (__projectedRows).map((d) => __maskDoc(d, [{ name: "primaryContactEmail", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }, { name: "primaryContactPhone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "eventAccess") || checkRole(user, "salesAccess"))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
@@ -9734,13 +9812,14 @@ export const listPerson = query({
   handler: async (ctx) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("personRead", "Person", () => checkRole(user, "staffAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("people").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], row)));
     return ((__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).givenName + " ") + (__row as any).familyName); (__row as any).isAssignable = (((__row as any).status === "active") && ((__row as any).deletedAt == null)); return { ...(__row as any), displayName: (__row as any).displayName, isAssignable: (__row as any).isAssignable }; })).map((d) => {
-      const o = { ...(d as any) };
+      const o = __maskDoc(d, [{ name: "email", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "workforceAccess") || ((self.authSubjectId != null) && (self.authSubjectId === user.id)))) }, { name: "phone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "workforceAccess") || ((self.authSubjectId != null) && (self.authSubjectId === user.id)))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined });
       delete (o as any).hourlyRate;
       return o;
     });
@@ -9752,6 +9831,7 @@ export const getPerson = query({
   handler: async (ctx, { id }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("personRead", "Person", () => checkRole(user, "staffAccess"))) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
@@ -9765,7 +9845,7 @@ export const getPerson = query({
     const __hydrated = { ...(__doc as any), displayName: (__doc as any).displayName, isAssignable: (__doc as any).isAssignable };
     const __final = __hydrated;
     if (!__final) return __final;
-    const __out = { ...(__final as any) };
+    const __out = __maskDoc(__final, [{ name: "email", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "workforceAccess") || ((self.authSubjectId != null) && (self.authSubjectId === user.id)))) }, { name: "phone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "workforceAccess") || ((self.authSubjectId != null) && (self.authSubjectId === user.id)))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined });
     delete (__out as any).hourlyRate;
     return __out;
   },
@@ -9776,6 +9856,7 @@ export const listPersonByTenantId = query({
   handler: async (ctx, { tenantId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("personRead", "Person", () => checkRole(user, "staffAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -9783,7 +9864,7 @@ export const listPersonByTenantId = query({
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], row)));
     return ((__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).givenName + " ") + (__row as any).familyName); (__row as any).isAssignable = (((__row as any).status === "active") && ((__row as any).deletedAt == null)); return { ...(__row as any), displayName: (__row as any).displayName, isAssignable: (__row as any).isAssignable }; })).map((d) => {
-      const o = { ...(d as any) };
+      const o = __maskDoc(d, [{ name: "email", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "workforceAccess") || ((self.authSubjectId != null) && (self.authSubjectId === user.id)))) }, { name: "phone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "workforceAccess") || ((self.authSubjectId != null) && (self.authSubjectId === user.id)))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined });
       delete (o as any).hourlyRate;
       return o;
     });
@@ -9795,6 +9876,7 @@ export const listPersonByAuthSubjectId = query({
   handler: async (ctx, { authSubjectId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("personRead", "Person", () => checkRole(user, "staffAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -9803,7 +9885,7 @@ export const listPersonByAuthSubjectId = query({
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], row)));
     return ((__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).givenName + " ") + (__row as any).familyName); (__row as any).isAssignable = (((__row as any).status === "active") && ((__row as any).deletedAt == null)); return { ...(__row as any), displayName: (__row as any).displayName, isAssignable: (__row as any).isAssignable }; })).map((d) => {
-      const o = { ...(d as any) };
+      const o = __maskDoc(d, [{ name: "email", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "workforceAccess") || ((self.authSubjectId != null) && (self.authSubjectId === user.id)))) }, { name: "phone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "workforceAccess") || ((self.authSubjectId != null) && (self.authSubjectId === user.id)))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined });
       delete (o as any).hourlyRate;
       return o;
     });
@@ -9815,6 +9897,7 @@ export const listPersonByTenantIdAndStatus = query({
   handler: async (ctx, { tenantId, status }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("personRead", "Person", () => checkRole(user, "staffAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -9822,7 +9905,7 @@ export const listPersonByTenantIdAndStatus = query({
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], row)));
     return ((__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).givenName + " ") + (__row as any).familyName); (__row as any).isAssignable = (((__row as any).status === "active") && ((__row as any).deletedAt == null)); return { ...(__row as any), displayName: (__row as any).displayName, isAssignable: (__row as any).isAssignable }; })).map((d) => {
-      const o = { ...(d as any) };
+      const o = __maskDoc(d, [{ name: "email", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "workforceAccess") || ((self.authSubjectId != null) && (self.authSubjectId === user.id)))) }, { name: "phone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => ((checkRole(user, "workforceAccess") || ((self.authSubjectId != null) && (self.authSubjectId === user.id)))) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined });
       delete (o as any).hourlyRate;
       return o;
     });
@@ -11384,18 +11467,24 @@ export const listQualityCheckByCheckedById = query({
 export const listQuoteSubmission = query({
   args: {},
   handler: async (ctx) => {
+    const __auth = (await getAuthContext(ctx)) as any;
+    const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("quoteSubmissionRead", "QuoteSubmission", () => true)) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("quoteSubmissions").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    return (__plainRows).map((d) => __maskDoc(d, [{ name: "email", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }, { name: "phone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
 export const getQuoteSubmission = query({
   args: { id: v.id("quoteSubmissions") },
   handler: async (ctx, { id }) => {
+    const __auth = (await getAuthContext(ctx)) as any;
+    const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("quoteSubmissionRead", "QuoteSubmission", () => true)) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
@@ -11404,26 +11493,34 @@ export const getQuoteSubmission = query({
     const __rawDoc = doc;
     if (!__rawDoc) return __rawDoc;
     const __doc = __rawDoc;
-    return __doc;
+    const __final = __doc;
+    if (!__final) return __final;
+    return __maskDoc(__final, [{ name: "email", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }, { name: "phone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined });
   },
 });
 
 export const listQuoteSubmissionByTenantId = query({
   args: { tenantId: v.string() },
   handler: async (ctx, { tenantId }) => {
+    const __auth = (await getAuthContext(ctx)) as any;
+    const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("quoteSubmissionRead", "QuoteSubmission", () => true)) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("quoteSubmissions").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    return (__plainRows).map((d) => __maskDoc(d, [{ name: "email", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }, { name: "phone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
 export const listQuoteSubmissionByClientId = query({
   args: { clientId: v.optional(v.union(v.id("clients"), v.null())) },
   handler: async (ctx, { clientId }) => {
+    const __auth = (await getAuthContext(ctx)) as any;
+    const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("quoteSubmissionRead", "QuoteSubmission", () => true)) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -11431,13 +11528,16 @@ export const listQuoteSubmissionByClientId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    return (__plainRows).map((d) => __maskDoc(d, [{ name: "email", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }, { name: "phone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
 export const listQuoteSubmissionByLeadId = query({
   args: { leadId: v.optional(v.union(v.id("leads"), v.null())) },
   handler: async (ctx, { leadId }) => {
+    const __auth = (await getAuthContext(ctx)) as any;
+    const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("quoteSubmissionRead", "QuoteSubmission", () => true)) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -11445,13 +11545,16 @@ export const listQuoteSubmissionByLeadId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    return (__plainRows).map((d) => __maskDoc(d, [{ name: "email", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }, { name: "phone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
 export const listQuoteSubmissionByEventId = query({
   args: { eventId: v.optional(v.union(v.id("events"), v.null())) },
   handler: async (ctx, { eventId }) => {
+    const __auth = (await getAuthContext(ctx)) as any;
+    const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("quoteSubmissionRead", "QuoteSubmission", () => true)) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -11459,13 +11562,16 @@ export const listQuoteSubmissionByEventId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    return (__plainRows).map((d) => __maskDoc(d, [{ name: "email", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }, { name: "phone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
 export const listQuoteSubmissionByProposalId = query({
   args: { proposalId: v.optional(v.union(v.id("proposals"), v.null())) },
   handler: async (ctx, { proposalId }) => {
+    const __auth = (await getAuthContext(ctx)) as any;
+    const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("quoteSubmissionRead", "QuoteSubmission", () => true)) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -11473,13 +11579,16 @@ export const listQuoteSubmissionByProposalId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    return (__plainRows).map((d) => __maskDoc(d, [{ name: "email", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }, { name: "phone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
 export const listQuoteSubmissionByServiceStyleId = query({
   args: { serviceStyleId: v.optional(v.union(v.id("serviceStyles"), v.null())) },
   handler: async (ctx, { serviceStyleId }) => {
+    const __auth = (await getAuthContext(ctx)) as any;
+    const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("quoteSubmissionRead", "QuoteSubmission", () => true)) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -11487,13 +11596,16 @@ export const listQuoteSubmissionByServiceStyleId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    return (__plainRows).map((d) => __maskDoc(d, [{ name: "email", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }, { name: "phone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 
 export const listQuoteSubmissionByOccasionId = query({
   args: { occasionId: v.optional(v.union(v.id("occasions"), v.null())) },
   handler: async (ctx, { occasionId }) => {
+    const __auth = (await getAuthContext(ctx)) as any;
+    const user = (__auth.user ?? __auth) as any;
+    const context = (__auth.context ?? __auth) as any;
     if (!__allowsRead("quoteSubmissionRead", "QuoteSubmission", () => true)) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
@@ -11501,7 +11613,7 @@ export const listQuoteSubmissionByOccasionId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    return (__plainRows).map((d) => __maskDoc(d, [{ name: "email", strategy: {"type":"email"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }, { name: "phone", strategy: {"type":"phone"}, unmaskWhen: (self: any, user: any, context: any) => (checkRole(user, "salesAccess")) }], { user: typeof user !== "undefined" ? user : undefined, context: typeof context !== "undefined" ? context : undefined }));
   },
 });
 

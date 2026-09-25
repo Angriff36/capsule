@@ -641,8 +641,11 @@ entity Event mixin TenantScoped, SoftDeletable {
   property venueCapacity: int?
   property expectedHeadcount: int?
   property encrypted primaryContactName: string?
-  property encrypted primaryContactEmail: string?
-  property encrypted primaryContactPhone: string?
+  // Client contact PII: every staff role reads events, but only event/sales
+  // staff work with the client; others see a masked value (day-of sheets
+  // read the raw number through convex/eventDayBriefing.ts).
+  property encrypted masked(email) primaryContactEmail: string? unmask when roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess")
+  property encrypted masked(phone) primaryContactPhone: string? unmask when roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess")
   property accessibilityNeeds: list<string> = []
   property serviceRequirements: string?
   property operationalRequirements: string?

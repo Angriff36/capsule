@@ -24,8 +24,9 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
 
   // Contact information (from form)
   property clientName: string
-  property email: string
-  property phone: string?
+  // The review queue is readable by any staff role; only sales works leads.
+  property masked(email) email: string unmask when roleAllows(user.role, "salesAccess")
+  property masked(phone) phone: string? unmask when roleAllows(user.role, "salesAccess")
 
   // Event details (from form)
   property eventDate: date

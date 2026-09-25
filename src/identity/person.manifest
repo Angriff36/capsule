@@ -60,8 +60,10 @@ entity Person mixin TenantScoped, SoftDeletable {
 
   property required searchable givenName: string
   property required searchable familyName: string
-  property required encrypted email: string
-  property encrypted phone: string?
+  // Coworker contact details: workforce staff manage them and everyone sees
+  // their own row (MyDay identity match); other staff see a masked value.
+  property required encrypted masked(email) email: string unmask when roleAllows(user.role, "workforceAccess") or (self.authSubjectId != null and self.authSubjectId == user.id)
+  property encrypted masked(phone) phone: string? unmask when roleAllows(user.role, "workforceAccess") or (self.authSubjectId != null and self.authSubjectId == user.id)
   // Postal address: ordinary editable contact data for the Staff Address &
   // Phone List (#272). Optional and never gating.
   property encrypted addressLine1: string?
