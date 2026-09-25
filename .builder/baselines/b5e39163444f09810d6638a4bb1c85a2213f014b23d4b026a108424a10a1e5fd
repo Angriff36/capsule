@@ -53013,7 +53013,7 @@ async function __runVendorOrderLineAddLine(ctx: MutationCtx, { docId, vendorOrde
     if (!((ingredientId === doc.ingredientId))) throw new Error("Add line ingredientId must match the seeded ingredient reference");
     if (!((((ingredientDemandId == null) || (doc.ingredientDemandId == null)) || (ingredientDemandId === doc.ingredientDemandId)))) throw new Error("Add line ingredientDemandId must match the seeded demand reference when provided");
     if (!((((locationId == null) || (doc.locationId == null)) || (locationId === doc.locationId)))) throw new Error("Add line locationId must match the seeded location reference when provided");
-    if (!((orderedQuantity > 0))) throw new Error("Ordered quantity must be positive");
+    if (!((orderedQuantity > 0))) throw new Error("This order line's ordered amount has to be more than zero. Enter how much to order.");
     if (!((unitCost >= 0))) throw new Error("This order line's cost per unit can't be negative. Use zero or more.");
     {
       const __cur = doc.status;
@@ -53136,7 +53136,7 @@ export const VendorOrderLine_createViaAddLine = mutation({
     if (!((ingredientId === __draft.ingredientId))) throw new Error("Add line ingredientId must match the seeded ingredient reference");
     if (!((((ingredientDemandId == null) || (__draft.ingredientDemandId == null)) || (ingredientDemandId === __draft.ingredientDemandId)))) throw new Error("Add line ingredientDemandId must match the seeded demand reference when provided");
     if (!((((locationId == null) || (__draft.locationId == null)) || (locationId === __draft.locationId)))) throw new Error("Add line locationId must match the seeded location reference when provided");
-    if (!((orderedQuantity > 0))) throw new Error("Ordered quantity must be positive");
+    if (!((orderedQuantity > 0))) throw new Error("This order line's ordered amount has to be more than zero. Enter how much to order.");
     if (!((unitCost >= 0))) throw new Error("This order line's cost per unit can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
@@ -53852,7 +53852,7 @@ async function __runVendorOrderLineReviseQuantity(ctx: MutationCtx, { docId, ord
     if (!((doc.status === "added"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")))) throw new Error("Guard 2 failed");
-    if (!((orderedQuantity > 0))) throw new Error("Ordered quantity must be positive");
+    if (!((orderedQuantity > 0))) throw new Error("This order line's ordered amount has to be more than zero. Enter how much to order.");
     if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("This order line's cost per unit can't be negative. Use zero or more.");
     const nextUnitCost = ((unitCost != null) ? unitCost : doc.unitCost);
     if (version !== undefined && (doc as any).version !== version) {
