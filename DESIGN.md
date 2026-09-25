@@ -296,12 +296,15 @@ four-count strip, tiles, and a planning-notes bar. Each tile opens a modal
 sheet that holds the app's existing cards and edit forms. Non-overview
 sections render inside the same paper frame.
 
-The route uses the file's own tokens (cream `#F4EEE2` ground, `#C24E28`
-accent, Instrument Serif / Schibsted Grotesk / DM Mono, 22px radii), scoped to
-`.evd` in `src/features/events/dashboard/EventDashboard.css`, with the file's
-dark palette under `.dark`. This is a scoped exception; phones keep the
-existing mobile event views. Do not add it to
-`design-contract-exceptions.json`.
+Ryan then chose Capsule's look over the file's (2026-09-24: "capsules"):
+the route keeps the file's layout but uses the front-matter palette, orange
+primary action, DM Sans display and body type, IBM Plex Mono labels, the 16px
+sheet and 12px ledger radii, and the app's dark scheme. Do not import the
+file's cream ground, rust accent, Instrument Serif, or decorative hero rings.
+Styles are scoped to `.evd` in
+`src/features/events/dashboard/EventDashboard.css`, with `--evd-*` names that
+map onto the app tokens. This is a scoped exception; phones keep the existing
+mobile event views. Do not add it to `design-contract-exceptions.json`.
 
 ## Overview
 

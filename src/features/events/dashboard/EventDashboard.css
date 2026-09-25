@@ -1,55 +1,34 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600&display=swap");
-
 /*
- * Event page dashboard — the visual language of Ryan's event-dashboard design
- * (capsule-event-dashboard.html, 2026-09-18), scoped to `.evd` so the rest of
- * the app keeps its own tokens. Cards reused inside sheets are flattened to
- * the sheet paper below.
+ * Event page dashboard — the layout of Ryan's event-dashboard design
+ * (capsule-event-dashboard.html, 2026-09-18) in Capsule's own colors, type,
+ * and radii (Ryan, 2026-09-24: "capsules"). The --evd-* names map onto the
+ * app tokens, so the app's dark scheme applies unchanged. Cards reused inside
+ * sheets are flattened to the sheet surface below.
  */
 .evd {
-  --evd-bg: #f4eee2;
-  --evd-paper: #fbf8f1;
-  --evd-raise: #ffffff;
-  --evd-ink: #17211c;
-  --evd-muted: #6a7168;
-  --evd-line: rgba(23, 33, 28, 0.12);
-  --evd-line-2: rgba(23, 33, 28, 0.22);
-  --evd-accent: #c24e28;
-  --evd-accent-soft: rgba(194, 78, 40, 0.09);
-  --evd-gold: #a07c36;
-  --evd-ok: #2e6b4e;
-  --evd-ok-soft: rgba(46, 107, 78, 0.1);
-  --evd-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.6) inset,
-    0 18px 40px -24px rgba(23, 33, 28, 0.28);
-  --evd-serif: "Instrument Serif", Georgia, serif;
-  --evd-sans: "Schibsted Grotesk", system-ui, sans-serif;
-  --evd-mono: "DM Mono", ui-monospace, monospace;
+  --evd-bg: var(--color-canvas);
+  --evd-paper: var(--color-panel);
+  --evd-raise: var(--color-panel);
+  --evd-ink: var(--color-ink);
+  --evd-muted: var(--color-ink-3);
+  --evd-line: var(--color-line);
+  --evd-line-2: var(--color-line-2);
+  --evd-accent: var(--color-accent);
+  --evd-accent-soft: var(--color-accent-soft);
+  --evd-gold: var(--color-warn);
+  --evd-ok: var(--color-ok);
+  --evd-ok-soft: var(--color-ok-soft);
+  --evd-shadow: 0 1px 2px rgba(15, 15, 17, 0.05);
+  --evd-radius: var(--radius-sheet);
+  --evd-radius-inner: var(--radius-ledger);
+  --evd-display: var(--font-display);
+  --evd-sans: var(--font-sans);
+  --evd-mono: var(--font-mono);
   position: relative;
   isolation: isolate;
-  margin: -8px -8px 0;
   padding: 0 24px 48px;
-  border-radius: 22px;
-  background: var(--evd-bg);
   color: var(--evd-ink);
   font: 400 15px/1.55 var(--evd-sans);
-}
-.dark .evd {
-  --evd-bg: #0d1411;
-  --evd-paper: #141d19;
-  --evd-raise: #1a2520;
-  --evd-ink: #eee7d8;
-  --evd-muted: #8f968b;
-  --evd-line: rgba(238, 231, 216, 0.11);
-  --evd-line-2: rgba(238, 231, 216, 0.24);
-  --evd-accent: #f07a4f;
-  --evd-accent-soft: rgba(240, 122, 79, 0.12);
-  --evd-gold: #d3b273;
-  --evd-ok: #84cda5;
-  --evd-ok-soft: rgba(132, 205, 165, 0.12);
-  --evd-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.03) inset,
-    0 24px 50px -28px rgba(0, 0, 0, 0.8);
 }
 .evd-wrap {
   max-width: 1120px;
@@ -79,29 +58,6 @@
   position: relative;
   text-align: center;
   padding: 56px 0 36px;
-}
-.evd-hero::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: -40px;
-  width: 1100px;
-  max-width: 100vw;
-  height: 560px;
-  transform: translateX(-50%);
-  z-index: -1;
-  background:
-    radial-gradient(closest-side, var(--evd-accent-soft), transparent 70%),
-    repeating-radial-gradient(
-      circle at 50% 38%,
-      transparent 0 63px,
-      var(--evd-line) 63px 64px
-    );
-  mask-image: radial-gradient(
-    ellipse 50% 58% at 50% 38%,
-    #000 20%,
-    transparent 100%
-  );
 }
 .evd-crumb {
   display: inline-flex;
@@ -148,13 +104,14 @@
   animation: evd-pulse 2.2s infinite;
 }
 .evd-title {
-  font: 400 clamp(52px, 9vw, 104px) / 0.95 var(--evd-serif);
-  letter-spacing: -0.02em;
+  font: 700 clamp(39px, 5vw, 68px) / 1.02 var(--evd-display);
+  letter-spacing: -0.025em;
   margin: 20px 0 14px;
   color: var(--evd-ink);
 }
 .evd-title em {
   color: var(--evd-accent);
+  font-style: normal;
 }
 .evd-lede {
   color: var(--evd-muted);
@@ -235,7 +192,7 @@
 .evd-pipe {
   padding: 26px 28px 20px;
   border: 1px solid var(--evd-line);
-  border-radius: 22px;
+  border-radius: var(--evd-radius);
   background: var(--evd-paper);
   box-shadow: var(--evd-shadow);
 }
@@ -349,14 +306,13 @@
   cursor: default;
 }
 .evd .evd-btn.pri {
-  background: var(--evd-ink);
-  color: var(--evd-bg);
-  border-color: var(--evd-ink);
+  background: var(--color-accent);
+  color: var(--color-on-brand);
+  border-color: var(--color-accent);
 }
 .evd .evd-btn.pri:hover {
-  background: var(--evd-accent);
-  border-color: var(--evd-accent);
-  color: #fff;
+  background: var(--color-accent-deep);
+  border-color: var(--color-accent-deep);
 }
 .evd .evd-btn.sm {
   padding: 6px 13px;
@@ -423,7 +379,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   border: 1px solid var(--evd-line);
-  border-radius: 22px;
+  border-radius: var(--evd-radius);
   background: var(--evd-paper);
   overflow: hidden;
   margin-bottom: 16px;
@@ -440,7 +396,7 @@
 }
 .evd-stat b {
   display: block;
-  font: 400 40px/1 var(--evd-serif);
+  font: 700 32px/1 var(--evd-display);
   margin-bottom: 8px;
 }
 .evd-stat b.zero {
@@ -463,7 +419,7 @@
   min-height: 208px;
   padding: 22px 22px 24px;
   border: 1px solid var(--evd-line);
-  border-radius: 22px;
+  border-radius: var(--evd-radius);
   background: var(--evd-paper);
   box-shadow: var(--evd-shadow);
   transition:
@@ -489,8 +445,8 @@
   transform: translate(2px, -2px);
 }
 .evd-big {
-  font: 400 46px/1 var(--evd-serif);
-  letter-spacing: -0.01em;
+  font: 700 36px/1.05 var(--evd-display);
+  letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
 .evd-big.q {
@@ -521,7 +477,7 @@
   inset: 0;
   display: grid;
   place-items: center;
-  font: 400 26px var(--evd-serif);
+  font: 700 22px var(--evd-display);
 }
 .evd-notes-bar {
   display: flex;
@@ -531,7 +487,7 @@
   margin-top: 16px;
   padding: 18px 24px;
   border: 1px solid var(--evd-line);
-  border-radius: 22px;
+  border-radius: var(--evd-radius);
   background: var(--evd-paper);
   flex-wrap: wrap;
 }
@@ -554,7 +510,7 @@
 .evd-panel {
   padding: 28px;
   border: 1px solid var(--evd-line);
-  border-radius: 22px;
+  border-radius: var(--evd-radius);
   background: var(--evd-paper);
   box-shadow: var(--evd-shadow);
   animation: evd-rise 0.5s both cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -585,7 +541,7 @@
   overflow: auto;
   padding: 40px 36px 36px;
   border: 1px solid var(--evd-line);
-  border-radius: 26px;
+  border-radius: var(--evd-radius);
   background: var(--evd-paper);
   overscroll-behavior: contain;
 }
@@ -612,7 +568,7 @@
   margin-bottom: 26px;
 }
 .evd-v-head h2 {
-  font: 400 38px/1.05 var(--evd-serif);
+  font: 700 30px/1.1 var(--evd-display);
   margin: 10px 0 8px;
   color: var(--evd-ink);
 }
@@ -629,7 +585,7 @@
 .evd-note {
   padding: 18px 20px;
   border: 1px solid var(--evd-line);
-  border-radius: 16px;
+  border-radius: var(--evd-radius-inner);
   font-size: 14px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -658,7 +614,7 @@
   gap: 1px;
   background: var(--evd-line);
   border: 1px solid var(--evd-line);
-  border-radius: 16px;
+  border-radius: var(--evd-radius-inner);
   overflow: hidden;
   text-align: center;
 }
@@ -668,7 +624,7 @@
 }
 .evd-figs b {
   display: block;
-  font: 400 36px/1 var(--evd-serif);
+  font: 700 30px/1 var(--evd-display);
   margin-bottom: 9px;
 }
 /* the app's cards, flattened onto the sheet and panel paper */
@@ -677,7 +633,7 @@
   background: transparent;
   border-color: var(--evd-line);
   box-shadow: none;
-  border-radius: 16px;
+  border-radius: var(--evd-radius-inner);
 }
 
 @keyframes evd-rise {
@@ -771,7 +727,7 @@
   border-color: var(--evd-ink);
 }
 .evd-actions > .btn-primary {
-  background: var(--evd-ink);
-  color: var(--evd-bg);
-  border-color: var(--evd-ink);
+  background: var(--color-accent);
+  color: var(--color-on-brand);
+  border-color: var(--color-accent);
 }
