@@ -20,6 +20,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          # check:manifest-breaking compiles the last [release] commit's sources.
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
