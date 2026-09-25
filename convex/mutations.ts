@@ -47816,7 +47816,7 @@ async function __runStockTransferRecord(ctx: MutationCtx, { docId, sourceInvento
     if (!((((__rel_sourceItem != null) && (__rel_sourceItem.stockedAt != null)) && (__rel_sourceItem.deletedAt == null)))) throw new Error("Guard 2 failed");
     if (!((((__rel_destinationItem != null) && (__rel_destinationItem.stockedAt != null)) && (__rel_destinationItem.deletedAt == null)))) throw new Error("Guard 3 failed");
     if (!((sourceInventoryItemId === doc.sourceInventoryItemId))) throw new Error("This transfer is taking from a different stock item. Pick the stock item already on this transfer.");
-    if (!((destinationInventoryItemId === doc.destinationInventoryItemId))) throw new Error("Record destinationInventoryItemId must match the seeded destination stock reference");
+    if (!((destinationInventoryItemId === doc.destinationInventoryItemId))) throw new Error("This transfer is sending to a different stock item. Pick the stock item already on this transfer.");
     if (!((sourceInventoryItemId !== destinationInventoryItemId))) throw new Error("Source and destination stock lines must differ");
     if (!((ingredientId === __rel_sourceItem.ingredientId))) throw new Error("Transfer ingredientId must match the source stock ingredient");
     if (!((__rel_sourceItem.ingredientId === __rel_destinationItem.ingredientId))) throw new Error("Source and destination must hold the same ingredient");
@@ -47925,7 +47925,7 @@ export const StockTransfer_createViaRecord = mutation({
     if (!((((__rel_sourceItem != null) && (__rel_sourceItem.stockedAt != null)) && (__rel_sourceItem.deletedAt == null)))) throw new Error("Guard 2 failed");
     if (!((((__rel_destinationItem != null) && (__rel_destinationItem.stockedAt != null)) && (__rel_destinationItem.deletedAt == null)))) throw new Error("Guard 3 failed");
     if (!((sourceInventoryItemId === __draft.sourceInventoryItemId))) throw new Error("This transfer is taking from a different stock item. Pick the stock item already on this transfer.");
-    if (!((destinationInventoryItemId === __draft.destinationInventoryItemId))) throw new Error("Record destinationInventoryItemId must match the seeded destination stock reference");
+    if (!((destinationInventoryItemId === __draft.destinationInventoryItemId))) throw new Error("This transfer is sending to a different stock item. Pick the stock item already on this transfer.");
     if (!((sourceInventoryItemId !== destinationInventoryItemId))) throw new Error("Source and destination stock lines must differ");
     if (!((ingredientId === __rel_sourceItem.ingredientId))) throw new Error("Transfer ingredientId must match the source stock ingredient");
     if (!((__rel_sourceItem.ingredientId === __rel_destinationItem.ingredientId))) throw new Error("Source and destination must hold the same ingredient");
