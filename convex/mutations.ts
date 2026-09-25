@@ -17429,7 +17429,7 @@ async function __runEventIngredientContributionRecord(ctx: MutationCtx, { docId,
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may change event ingredient contributions");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((quantity >= 0))) throw new Error("This event's ingredient amount can't be negative. Use zero or more.");
-    if (!((servings >= 0))) throw new Error("Contribution servings cannot be negative");
+    if (!((servings >= 0))) throw new Error("This event's serving count can't be negative. Use zero or more.");
     const batchKeep = ((sourceKey == null) && ((doc.ownership === "batch_allocation") || (doc.ownership === "batch_surplus")));
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -17640,7 +17640,7 @@ export const EventIngredientContribution_createViaRecord = mutation({
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may change event ingredient contributions");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((quantity >= 0))) throw new Error("This event's ingredient amount can't be negative. Use zero or more.");
-    if (!((servings >= 0))) throw new Error("Contribution servings cannot be negative");
+    if (!((servings >= 0))) throw new Error("This event's serving count can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,

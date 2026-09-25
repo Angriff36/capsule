@@ -236,7 +236,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     constraint recordQuantityPositive: quantity >= 0 "This event's ingredient amount can't be negative. Use zero or more."
-    constraint recordServingsNonnegative: servings >= 0 "Contribution servings cannot be negative"
+    constraint recordServingsNonnegative: servings >= 0 "This event's serving count can't be negative. Use zero or more."
     // A legacy reaction (no sourceKey) that matches a batch-owned share must
     // leave it untouched: the batch owns that quantity, not the serving count.
     compute batchKeep = sourceKey == null and (self.ownership == "batch_allocation" or self.ownership == "batch_surplus")
