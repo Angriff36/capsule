@@ -1,17 +1,9 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
-import {
-  formatCount,
-  formatDate,
-  formatMoney,
-  formatTime,
-  normalizeCurrencyCode,
-  relativeDays,
-} from "../../lib/format";
+import { normalizeCurrencyCode } from "../../lib/format";
 import { useHeldQueryRows } from "../../lib/heldQueryRows";
 import { useRouteRecord } from "../../lib/routeRecord";
-import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   useEventApprove,
   useEventArchive,
@@ -45,17 +37,11 @@ import {
   useEventStaffNeedRows,
 } from "../../lib/eventScopedQueries";
 import { useTrackRecent } from "../../lib/recents";
-import { ArrowLeftIcon, DownloadIcon } from "../../ui/icons";
-import { eventCommercialQuotedPrice } from "./eventCommercialSeed";
+import { DownloadIcon } from "../../ui/icons";
 import { eventVenueLabel } from "./eventVenueLabel";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
-import {
-  ActionMenu,
-  ActionMenuRule,
-  ErrorState,
-  StatusChip,
-} from "../../ui/primitives";
+import { ActionMenu, ActionMenuRule, ErrorState } from "../../ui/primitives";
 import { reportActionOk } from "../../ui/action-result";
 import { useSuccessToast } from "../../ui/useSuccessToast";
 import { useTenantBranding } from "../admin/tenantBranding";
@@ -69,7 +55,6 @@ import { clientDisplayName } from "./clientName";
 import { EventClientTab } from "./EventClientTab";
 import { EventArchiveMenuItems } from "./EventArchiveMenuItems";
 import { EventDuplicateMenuItem } from "./EventDuplicateMenuItem";
-import { EventDetailTabs } from "./EventDetailTabs";
 import { EventDashboard } from "./dashboard/EventDashboard";
 import { EventEquipmentPanel } from "./EventEquipmentPanel";
 import { EventGuestPanel } from "./EventGuestPanel";
@@ -82,7 +67,6 @@ import {
 } from "./EventLifecyclePolicy";
 import { EventMarginTab } from "./EventMarginTab";
 import { EventMenuTab } from "./EventMenuTab";
-import { EventOverviewTab } from "./EventOverviewTab";
 import { CompleteDraftPlanningPanel } from "./CompleteDraftPlanningPanel";
 import { EventPrepTab } from "./EventPrepTab";
 import { EventPhotosTab } from "./EventPhotosTab";
@@ -93,7 +77,6 @@ import { EventLayoutsTab } from "./EventLayoutsTab";
 import { EventTimelineTab } from "./EventTimelineTab";
 import { EventTimelineStaffRoster } from "./eventTimelineStaffRoster";
 import { FailureBanner } from "./FailureBanner";
-import { MobileEventOverview } from "./mobile/MobileEventOverview";
 import { RecurringEventPanel } from "./RecurringEventPanel";
 import {
   eventDetailPath,
@@ -102,19 +85,6 @@ import {
 } from "./eventRoutes";
 import { rememberLastViewedEvent } from "./lastViewedEvent";
 import type { Doc } from "../../lib/api";
-
-function HeroFact({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="min-w-0">
-      <dt className="text-xs font-semibold tracking-[0.04em] text-ink-2 uppercase">
-        {label}
-      </dt>
-      <dd className="mt-0.5 text-base font-semibold break-words text-ink">
-        {children}
-      </dd>
-    </div>
-  );
-}
 
 export function EventDetailPage() {
   const { id } = useParams();
@@ -153,10 +123,6 @@ function EventDetailContent({
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = parseEventDetailTab(searchParams.get("tab"));
   const mobile = useMobileViewport();
-  // Phones get the nine-card overview; `full=1` opens the desktop overview
-  // (edit panels, planning notes) on a phone via "Edit" / "See all".
-  const mobileOverview =
-    mobile && activeTab === "overview" && searchParams.get("full") !== "1";
   const clients = useHeldQueryRows("clients", useListClient());
   const organizations = useListOrganization();
   // Same functional-currency rule as the phone Money card and Finance.
@@ -386,7 +352,7 @@ function EventDetailContent({
       {mobile ? (
         <Link
           key="edit-details"
-          to={`${eventDetailPath(event._id, "overview")}&full=1`}
+          to={`${eventDetailPath(event._id, "overview")}#event-setup-basics`}
         >
           Edit event details
         </Link>
@@ -713,125 +679,32 @@ function EventDetailContent({
     </>
   );
 
-  if (!mobile) {
-    return (
-      <EventDashboard
-        title={String(event.title)}
-        updatedAt={typeof event.updatedAt === "number" ? event.updatedAt : null}
-        client={(() => {
-          const client = clients?.find((c) => c._id === event.clientId);
-          const name = clientDisplayName(event.clientId, clients);
-          if (!client) return name;
-          return (
-            <HoverPreview card={<ClientPreviewCard client={client} />}>
-              <Link to={`/clients/${client._id}`} className="hover:underline">
-                {name}
-              </Link>
-            </HoverPreview>
-          );
-        })()}
-        venue={
-          event.venueId ? (
-            <Link to="/facilities">{venueLabel}</Link>
-          ) : (
-            venueLabel
-          )
-        }
-        actions={headerActions}
-        activeTab={activeTab}
-        onTab={setTab}
-        overview={overviewProps}
-        notices={notices}
-      >
-        {otherTabs}
-      </EventDashboard>
-    );
-  }
-
   return (
-    <div className="space-y-5">
-      <section
-        className="card px-4 py-4"
-        data-testid="event-context-header-mobile"
-      >
-        <div className="flex items-start gap-2">
-          <Link
-            to="/events"
-            aria-label="All events"
-            className="-ml-1 grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-2 hover:bg-inset"
-          >
-            <ArrowLeftIcon width={18} height={18} />
-          </Link>
-          <div className="min-w-0 flex-1">
-            <h1 className="text-xl leading-tight font-bold text-ink">
-              {event.title}
-            </h1>
-            <div className="mt-1.5 flex flex-wrap items-center gap-2 text-sm text-ink-2">
-              <StatusChip status={String(event.stage)} />
-              <span>{formatStatusLabel(event.eventType)}</span>
-              {event.startsAt != null ? (
-                <span>· {relativeDays(event.startsAt)}</span>
-              ) : null}
-            </div>
-          </div>
-        </div>
-        <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3">
-          <HeroFact label="Date">
-            {formatDate(event.startsAt)}
-            <span className="block text-sm font-medium text-ink-2">
-              {event.startsAt != null
-                ? `${formatTime(event.startsAt)} – ${formatTime(event.endsAt)}`
-                : "—"}
-            </span>
-          </HeroFact>
-          <HeroFact label="Headcount">
-            {formatCount(event.expectedHeadcount)} guests
-          </HeroFact>
-          <HeroFact label="Venue">{venueLabel}</HeroFact>
-          <HeroFact label="Client">
-            {clientDisplayName(event.clientId, clients)}
-          </HeroFact>
-        </dl>
-        <p className="mt-3 border-t border-line pt-3 text-sm text-ink-2">
-          <span className="font-semibold text-ink">Budget / quoted</span>{" "}
-          {formatMoney(event.budgetAmount, currencyCode)} /{" "}
-          {formatMoney(
-            eventCommercialQuotedPrice({ quotedPrice: event.quotedPrice }),
-            currencyCode,
-          )}
-        </p>
-        <div className="mobile-actions mt-4 flex flex-wrap items-center justify-end gap-2">
-          {headerActions}
-        </div>
-      </section>
-
-      {notices}
-
-      <EventDetailTabs active={activeTab} onChange={setTab} compact={mobile} />
-
-      {mobileOverview ? (
-        <EventTabErrorBoundary tabLabel="Overview" key="mobile-overview">
-          <MobileEventOverview
-            event={event}
-            venue={venue}
-            clients={clients}
-            dishes={dishes}
-            eventDishes={eventDishes}
-            activities={timelineActivities}
-            staffingRoster={staffingRoster}
-            people={people}
-          />
-        </EventTabErrorBoundary>
-      ) : null}
-      {activeTab === "overview" && !mobileOverview ? (
-        <EventTabErrorBoundary tabLabel="Overview" key="overview">
-          <EventOverviewTab {...overviewProps} />
-          <div className="mt-5">
-            <EventSourceProvenancePanel capsuleId={event._id} />
-          </div>
-        </EventTabErrorBoundary>
-      ) : null}
+    <EventDashboard
+      title={String(event.title)}
+      updatedAt={typeof event.updatedAt === "number" ? event.updatedAt : null}
+      client={(() => {
+        const client = clients?.find((c) => c._id === event.clientId);
+        const name = clientDisplayName(event.clientId, clients);
+        if (!client) return name;
+        return (
+          <HoverPreview card={<ClientPreviewCard client={client} />}>
+            <Link to={`/clients/${client._id}`} className="hover:underline">
+              {name}
+            </Link>
+          </HoverPreview>
+        );
+      })()}
+      venue={
+        event.venueId ? <Link to="/facilities">{venueLabel}</Link> : venueLabel
+      }
+      actions={headerActions}
+      activeTab={activeTab}
+      onTab={setTab}
+      overview={overviewProps}
+      notices={notices}
+    >
       {otherTabs}
-    </div>
+    </EventDashboard>
   );
 }

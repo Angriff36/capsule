@@ -287,7 +287,7 @@ feedback. All other routes retain their existing presentation contract.
 
 Ryan supplied `capsule-event-dashboard.html` (2026-09-18) as the event page
 design and rejected a build that did not match it: "that looks nothing like
-this file". On desktop, `/events/:id` follows that file: a centered hero
+this file". `/events/:id` follows that file: a centered hero
 (stage, countdown and updated pills, a large Instrument Serif title with the
 second word in the accent, a facts row, the allergy pill from the service
 notes), a nine-step pipeline card, a pill group switcher (Overview, Plan,
@@ -303,8 +303,9 @@ sheet and 12px ledger radii, and the app's dark scheme. Do not import the
 file's cream ground, rust accent, Instrument Serif, or decorative hero rings.
 Styles are scoped to `.evd` in
 `src/features/events/dashboard/EventDashboard.css`, with `--evd-*` names that
-map onto the app tokens. This is a scoped exception; phones keep the existing
-mobile event views. Do not add it to `design-contract-exceptions.json`.
+map onto the app tokens. Phones use the same page (Ryan, 2026-09-24: "obviously i want mobile
+updated"): one tile per row, a 2x2 count strip, and a sideways-scrolling
+group switcher. This is a scoped exception. Do not add it to `design-contract-exceptions.json`.
 
 ## Overview
 
