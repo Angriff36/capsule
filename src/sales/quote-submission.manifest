@@ -85,24 +85,37 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
   default policy quoteSubmissionWrite write: roleAllows(user.role, "salesAccess") "Only sales staff may update quote submissions"
   default policy quoteSubmissionExecute execute: true "Anyone may send a quote request"
 
+  // Called only by the anonymous /quote ingress seam (convex/quoteBuilder.ts),
+  // which runs it as the tenant's system role after dedup. Blank form answers
+  // arrive as null, so every non-identifying field is optional and nullable.
   command create(
     dedupKey: string,
     clientName: string,
     email: string,
-    phone: string,
+    optional phone: string?,
     eventDate: date,
-    eventEndTime: date,
+    optional eventEndTime: date?,
     guestCount: number,
-    serviceStyleId: uuid,
-    occasionId: uuid,
-    serviceStyleText: string,
-    occasionText: string,
-    venueName: string,
-    venueAddress: string,
-    menuPreferences: string,
-    dietaryRestrictions: string,
-    notes: string
+    optional serviceStyleId: uuid?,
+    optional occasionId: uuid?,
+    optional serviceStyleText: string?,
+    optional occasionText: string?,
+    optional venueName: string?,
+    optional venueAddress: string?,
+    optional menuPreferences: string?,
+    optional dietaryRestrictions: string?,
+    optional notes: string?
   ) {
+    // Abuse cap for the public web form, not throttling: a caterer's real
+    // inquiry volume is a handful a day. Global scope because the caller is
+    // anonymous (no user to key on). Repeat submits of the same request are
+    // deduped before this command runs, so they never spend the budget.
+    rateLimit {
+      maxRequests: 60
+      windowMs: 60000
+      scope: global
+    }
+
     guard self.submittedAt == null "Quote submission already exists"
     guard self.deletedAt == null "Cannot create a deleted quote submission"
 

@@ -92,6 +92,42 @@ async function __setCommandIdempotency(
   });
 }
 
+async function __consumeCommandRateLimit(
+  ctx: MutationCtx,
+  scopeKey: string,
+  maxRequests: number,
+  windowMs: number,
+  burstAllowance: number,
+): Promise<void> {
+  const now = Date.now();
+  const effectiveLimit = maxRequests + burstAllowance;
+  const existing = await ctx.db
+    .query("commandRateLimitBuckets")
+    .withIndex("by_scopeKey", (q) => q.eq("scopeKey", scopeKey))
+    .first();
+  let timestamps: number[] = [];
+  let windowStart = now;
+  if (existing !== null) {
+    const windowEnd = existing.windowStart + windowMs;
+    if (now < windowEnd) {
+      const cutoff = now - windowMs;
+      timestamps = existing.timestamps.filter((ts: number) => ts > cutoff);
+      windowStart = existing.windowStart;
+    }
+  }
+  if (timestamps.length >= effectiveLimit) {
+    const oldest = timestamps[0] ?? now;
+    const retryAfterMs = Math.max(0, oldest + windowMs - now);
+    throw new Error(`Rate limit exceeded (retry after ${retryAfterMs}ms)`);
+  }
+  timestamps = [...timestamps, now];
+  if (existing !== null) {
+    await ctx.db.patch(existing._id, { timestamps, windowStart });
+  } else {
+    await ctx.db.insert("commandRateLimitBuckets", { scopeKey, timestamps, windowStart });
+  }
+}
+
 // Role hierarchy from IR (effective permissions after inheritance).
 const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = {
   "admin": [
@@ -41479,6 +41515,8 @@ async function __runQuoteSubmissionCreate(ctx: MutationCtx, args: any) {
       status: "pending",
       version: 1
     };
+    const __rlScopeKey = "QuoteSubmission_create" + ":global";
+    await __consumeCommandRateLimit(ctx, __rlScopeKey, 60, 60000, 0);
     if (!(true)) throw new Error("Anyone may check a quote request");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Only sales staff may update quote submissions");
     if (!(true)) throw new Error("Anyone may send a quote request");
@@ -41512,19 +41550,19 @@ export const QuoteSubmission_create = mutation({
     dedupKey: v.string(),
     clientName: v.string(),
     email: v.string(),
-    phone: v.string(),
+    phone: v.optional(v.union(v.string(), v.null())),
     eventDate: v.number(),
-    eventEndTime: v.number(),
+    eventEndTime: v.optional(v.union(v.number(), v.null())),
     guestCount: v.any(),
-    serviceStyleId: v.string(),
-    occasionId: v.string(),
-    serviceStyleText: v.string(),
-    occasionText: v.string(),
-    venueName: v.string(),
-    venueAddress: v.string(),
-    menuPreferences: v.string(),
-    dietaryRestrictions: v.string(),
-    notes: v.string(),
+    serviceStyleId: v.optional(v.union(v.string(), v.null())),
+    occasionId: v.optional(v.union(v.string(), v.null())),
+    serviceStyleText: v.optional(v.union(v.string(), v.null())),
+    occasionText: v.optional(v.union(v.string(), v.null())),
+    venueName: v.optional(v.union(v.string(), v.null())),
+    venueAddress: v.optional(v.union(v.string(), v.null())),
+    menuPreferences: v.optional(v.union(v.string(), v.null())),
+    dietaryRestrictions: v.optional(v.union(v.string(), v.null())),
+    notes: v.optional(v.union(v.string(), v.null())),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
