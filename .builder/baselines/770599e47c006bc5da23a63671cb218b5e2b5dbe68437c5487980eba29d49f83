@@ -25123,7 +25123,7 @@ async function __runInventoryItemAdjustQuantity(ctx: MutationCtx, { docId, delta
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Adjustment reason is required");
-    if (!(((doc.quantityOnHand + delta) >= 0))) throw new Error("Quantity on hand cannot be negative");
+    if (!(((doc.quantityOnHand + delta) >= 0))) throw new Error("This item's on-hand amount can't be negative. Use zero or more.");
     const previousQuantity = doc.quantityOnHand;
     const nextQuantity = (doc.quantityOnHand + delta);
     if (version !== undefined && (doc as any).version !== version) {
@@ -25178,7 +25178,7 @@ async function __runInventoryItemApplyReceiptCorrection(ctx: MutationCtx, { docI
     if (!((locationId === doc.locationId))) throw new Error("Receipt location must match stock");
     if (!((((reason).trim()).length > 0))) throw new Error("Say why this count changed.");
     if (!((((unit === doc.unit) || (((((unit === "gram") || (unit === "kilogram")) || (unit === "ounce")) || (unit === "pound")) && ((((doc.unit === "gram") || (doc.unit === "kilogram")) || (doc.unit === "ounce")) || (doc.unit === "pound")))) || (((((((((unit === "milliliter") || (unit === "liter")) || (unit === "teaspoon")) || (unit === "tablespoon")) || (unit === "cup")) || (unit === "pint")) || (unit === "quart")) || (unit === "gallon")) && ((((((((doc.unit === "milliliter") || (doc.unit === "liter")) || (doc.unit === "teaspoon")) || (doc.unit === "tablespoon")) || (doc.unit === "cup")) || (doc.unit === "pint")) || (doc.unit === "quart")) || (doc.unit === "gallon")))))) throw new Error("Receipt unit needs a measured conversion to the stock unit");
-    if (!(((doc.quantityOnHand + (delta * ((unit === doc.unit) ? 1 : (((((doc.unit === "gram") || (doc.unit === "kilogram")) || (doc.unit === "ounce")) || (doc.unit === "pound")) ? (((unit === "gram") ? 1 : ((unit === "kilogram") ? 1000 : ((unit === "ounce") ? 28.349523125 : ((unit === "pound") ? 453.59237 : 0)))) / ((doc.unit === "gram") ? 1 : ((doc.unit === "kilogram") ? 1000 : ((doc.unit === "ounce") ? 28.349523125 : ((doc.unit === "pound") ? 453.59237 : 0))))) : (((unit === "milliliter") ? 1 : ((unit === "liter") ? 1000 : ((unit === "teaspoon") ? 4.92892159375 : ((unit === "tablespoon") ? 14.78676478125 : ((unit === "cup") ? 236.5882365 : ((unit === "pint") ? 473.176473 : ((unit === "quart") ? 946.352946 : ((unit === "gallon") ? 3785.411784 : 0)))))))) / ((doc.unit === "milliliter") ? 1 : ((doc.unit === "liter") ? 1000 : ((doc.unit === "teaspoon") ? 4.92892159375 : ((doc.unit === "tablespoon") ? 14.78676478125 : ((doc.unit === "cup") ? 236.5882365 : ((doc.unit === "pint") ? 473.176473 : ((doc.unit === "quart") ? 946.352946 : ((doc.unit === "gallon") ? 3785.411784 : 0))))))))))))) >= 0))) throw new Error("Quantity on hand cannot be negative");
+    if (!(((doc.quantityOnHand + (delta * ((unit === doc.unit) ? 1 : (((((doc.unit === "gram") || (doc.unit === "kilogram")) || (doc.unit === "ounce")) || (doc.unit === "pound")) ? (((unit === "gram") ? 1 : ((unit === "kilogram") ? 1000 : ((unit === "ounce") ? 28.349523125 : ((unit === "pound") ? 453.59237 : 0)))) / ((doc.unit === "gram") ? 1 : ((doc.unit === "kilogram") ? 1000 : ((doc.unit === "ounce") ? 28.349523125 : ((doc.unit === "pound") ? 453.59237 : 0))))) : (((unit === "milliliter") ? 1 : ((unit === "liter") ? 1000 : ((unit === "teaspoon") ? 4.92892159375 : ((unit === "tablespoon") ? 14.78676478125 : ((unit === "cup") ? 236.5882365 : ((unit === "pint") ? 473.176473 : ((unit === "quart") ? 946.352946 : ((unit === "gallon") ? 3785.411784 : 0)))))))) / ((doc.unit === "milliliter") ? 1 : ((doc.unit === "liter") ? 1000 : ((doc.unit === "teaspoon") ? 4.92892159375 : ((doc.unit === "tablespoon") ? 14.78676478125 : ((doc.unit === "cup") ? 236.5882365 : ((doc.unit === "pint") ? 473.176473 : ((doc.unit === "quart") ? 946.352946 : ((doc.unit === "gallon") ? 3785.411784 : 0))))))))))))) >= 0))) throw new Error("This item's on-hand amount can't be negative. Use zero or more.");
     const stockUnit = doc.unit;
     const sourceMass = ((unit === "gram") ? 1 : ((unit === "kilogram") ? 1000 : ((unit === "ounce") ? 28.349523125 : ((unit === "pound") ? 453.59237 : 0))));
     const sourceVolume = ((unit === "milliliter") ? 1 : ((unit === "liter") ? 1000 : ((unit === "teaspoon") ? 4.92892159375 : ((unit === "tablespoon") ? 14.78676478125 : ((unit === "cup") ? 236.5882365 : ((unit === "pint") ? 473.176473 : ((unit === "quart") ? 946.352946 : ((unit === "gallon") ? 3785.411784 : 0))))))));
@@ -25243,7 +25243,7 @@ async function __runInventoryItemOpen(ctx: MutationCtx, { docId, ingredientId, l
     if (!((ingredientId === doc.ingredientId))) throw new Error("Open ingredientId must match the seeded ingredient reference");
     if (!((locationId === doc.locationId))) throw new Error("Open locationId must match the seeded location reference");
     if (!(((__rel_ingredient != null) && (unit === __rel_ingredient.unit)))) throw new Error("Stock line unit must match the ingredient's catalog unit — units do not convert");
-    if (!(((quantityOnHand == null) || (quantityOnHand >= 0)))) throw new Error("Quantity on hand cannot be negative");
+    if (!(((quantityOnHand == null) || (quantityOnHand >= 0)))) throw new Error("This item's on-hand amount can't be negative. Use zero or more.");
     if (!(((parLevel == null) || (parLevel >= 0)))) throw new Error("Par level cannot be negative");
     if (!(((reorderThreshold == null) || (reorderThreshold >= 0)))) throw new Error("Reorder threshold cannot be negative");
     if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("This item's cost per unit can't be negative. Use zero or more.");
@@ -25337,7 +25337,7 @@ export const InventoryItem_createViaOpen = mutation({
     if (!((ingredientId === __draft.ingredientId))) throw new Error("Open ingredientId must match the seeded ingredient reference");
     if (!((locationId === __draft.locationId))) throw new Error("Open locationId must match the seeded location reference");
     if (!(((__rel_ingredient != null) && (unit === __rel_ingredient.unit)))) throw new Error("Stock line unit must match the ingredient's catalog unit — units do not convert");
-    if (!(((quantityOnHand == null) || (quantityOnHand >= 0)))) throw new Error("Quantity on hand cannot be negative");
+    if (!(((quantityOnHand == null) || (quantityOnHand >= 0)))) throw new Error("This item's on-hand amount can't be negative. Use zero or more.");
     if (!(((parLevel == null) || (parLevel >= 0)))) throw new Error("Par level cannot be negative");
     if (!(((reorderThreshold == null) || (reorderThreshold >= 0)))) throw new Error("Reorder threshold cannot be negative");
     if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("This item's cost per unit can't be negative. Use zero or more.");
