@@ -11026,8 +11026,8 @@ async function __runEquipmentRegister(ctx: MutationCtx, { docId, name, assetTag,
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Give this equipment a name.");
-    if (!((((assetTag).trim()).length > 0))) throw new Error("Asset tag is required");
-    if (!((((category).trim()).length > 0))) throw new Error("Category is required");
+    if (!((((assetTag).trim()).length > 0))) throw new Error("Give this equipment its tag number.");
+    if (!((((category).trim()).length > 0))) throw new Error("Pick what kind of equipment this is.");
     if (!(((quantity == null) || (quantity > 0)))) throw new Error("This equipment's amount has to be more than zero. Enter how many you have.");
     if (!(((purchaseValue == null) || (purchaseValue >= 0)))) throw new Error("This equipment's purchase value can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
@@ -11117,8 +11117,8 @@ export const Equipment_createViaRegister = mutation({
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Give this equipment a name.");
-    if (!((((assetTag).trim()).length > 0))) throw new Error("Asset tag is required");
-    if (!((((category).trim()).length > 0))) throw new Error("Category is required");
+    if (!((((assetTag).trim()).length > 0))) throw new Error("Give this equipment its tag number.");
+    if (!((((category).trim()).length > 0))) throw new Error("Pick what kind of equipment this is.");
     if (!(((quantity == null) || (quantity > 0)))) throw new Error("This equipment's amount has to be more than zero. Enter how many you have.");
     if (!(((purchaseValue == null) || (purchaseValue >= 0)))) throw new Error("This equipment's purchase value can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
@@ -11223,7 +11223,7 @@ async function __runEquipmentReviseDetails(ctx: MutationCtx, { docId, name, cate
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Give this equipment a name.");
-    if (!((((category).trim()).length > 0))) throw new Error("Category is required");
+    if (!((((category).trim()).length > 0))) throw new Error("Pick what kind of equipment this is.");
     if (!(((purchaseValue == null) || (purchaseValue >= 0)))) throw new Error("This equipment's purchase value can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);

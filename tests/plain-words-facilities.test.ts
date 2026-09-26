@@ -101,5 +101,11 @@ describe("plain words on leftover facilities equipment manifests", () => {
     // blank equipment name at register/reviseDetails now reads in plain words
     expect(visible).not.toContain("Equipment name is required");
     expect(visible).toContain("Give this equipment a name.");
+
+    // blank asset tag / category at register/reviseDetails now read in plain words
+    expect(visible).not.toContain("Asset tag is required");
+    expect(visible).not.toContain("Category is required");
+    expect(visible).toContain("Give this equipment its tag number.");
+    expect(visible).toContain("Pick what kind of equipment this is.");
   });
 });
