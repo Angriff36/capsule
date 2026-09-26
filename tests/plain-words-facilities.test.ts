@@ -107,5 +107,9 @@ describe("plain words on leftover facilities equipment manifests", () => {
     expect(visible).not.toContain("Category is required");
     expect(visible).toContain("Give this equipment its tag number.");
     expect(visible).toContain("Pick what kind of equipment this is.");
+
+    // blank retire reason now reads in plain words
+    expect(visible).not.toContain("Retirement reason is required");
+    expect(visible).toContain("Say why you're retiring this equipment.");
   });
 });

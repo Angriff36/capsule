@@ -165,7 +165,7 @@ entity Equipment mixin TenantScoped, SoftDeletable {
     guard self.registeredAt != null
     guard self.deletedAt == null
     guard roleAllows(user.role, "inventoryManageAccess") or roleAllows(user.role, "logisticsManageAccess")
-    constraint retireEquipmentReason: length(trim(reason)) > 0 "Retirement reason is required"
+    constraint retireEquipmentReason: length(trim(reason)) > 0 "Say why you're retiring this equipment."
     mutate status = "retired"
     mutate retiredAt = now()
     mutate retirementReason = reason

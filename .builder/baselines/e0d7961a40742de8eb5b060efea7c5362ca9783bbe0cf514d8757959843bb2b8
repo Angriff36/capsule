@@ -11159,7 +11159,7 @@ async function __runEquipmentRetire(ctx: MutationCtx, { docId, reason, version }
     if (!((doc.registeredAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((checkRole(user, "inventoryManageAccess") || checkRole(user, "logisticsManageAccess")))) throw new Error("Guard 3 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Retirement reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're retiring this equipment.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
