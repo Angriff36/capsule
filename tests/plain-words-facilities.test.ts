@@ -91,5 +91,11 @@ describe("plain words on leftover facilities equipment manifests", () => {
     expect(visible).toContain(
       "This equipment's purchase value can't be negative. Use zero or more.",
     );
+
+    // zero or negative amount at register now reads in plain words
+    expect(visible).not.toContain("Quantity must be positive");
+    expect(visible).toContain(
+      "This equipment's amount has to be more than zero. Enter how many you have.",
+    );
   });
 });

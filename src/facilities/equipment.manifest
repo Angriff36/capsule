@@ -83,7 +83,7 @@ entity Equipment mixin TenantScoped, SoftDeletable {
     constraint registerEquipmentName: length(trim(name)) > 0 "Equipment name is required"
     constraint registerEquipmentAssetTag: length(trim(assetTag)) > 0 "Asset tag is required"
     constraint registerEquipmentCategory: length(trim(category)) > 0 "Category is required"
-    constraint registerEquipmentQuantity: quantity == null or quantity > 0 "Quantity must be positive"
+    constraint registerEquipmentQuantity: quantity == null or quantity > 0 "This equipment's amount has to be more than zero. Enter how many you have."
     constraint registerEquipmentValue: purchaseValue == null or purchaseValue >= 0 "This equipment's purchase value can't be negative. Use zero or more."
     mutate name = name
     mutate assetTag = assetTag
