@@ -205,8 +205,16 @@ export const getImportRunStatus = query({
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
 
+    // Same outcome as the ImportRun read policy (importAccess) and the
+    // generated getImportRun: no access, another workspace or a removed run
+    // all answer not found.
     const importRun = await ctx.db.get(args.importRunId);
-    if (!importRun || importRun.tenantId !== tenantId) {
+    if (
+      !canImport(auth.role) ||
+      !importRun ||
+      importRun.tenantId !== tenantId ||
+      importRun.deletedAt != null
+    ) {
       throw new ConvexError("Import run not found");
     }
 
@@ -266,13 +274,25 @@ export const listImportRuns = query({
   handler: async (ctx, args) => {
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
+    // Same outcome as the ImportRun read policy (importAccess) and the
+    // generated listImportRunByTenantId: no access reads nothing, removed
+    // runs are left out.
+    if (!canImport(auth.role)) return [];
 
     const query = ctx.db
       .query("importRuns")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId));
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .filter((q) =>
+        q.or(
+          q.eq(q.field("deletedAt"), undefined),
+          q.eq(q.field("deletedAt"), null),
+        ),
+      );
 
     const results = await (
-      args.status ? query.filter((q) => q.eq("status", args.status)) : query
+      args.status
+        ? query.filter((q) => q.eq(q.field("status"), args.status))
+        : query
     )
       .order("desc")
       .take(args.limit ?? 50);
