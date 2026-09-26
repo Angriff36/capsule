@@ -14,6 +14,7 @@ import {
   type QueryCtx,
 } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
+import { canRead } from "./search";
 
 /**
  * Cutover validation result
@@ -97,6 +98,22 @@ const LEDGER_PROVIDERS: Array<{
     reconciledType: "QuickBooksReconciled",
   },
 ];
+
+const MANAGERS_ONLY = "Only managers can see this check";
+
+/** Newest import run of the workspace that is not removed. */
+async function latestImportRun(
+  db: QueryCtx["db"],
+  tenantId: string,
+): Promise<Doc<"importRuns"> | null> {
+  for await (const run of db
+    .query("importRuns")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .order("desc")) {
+    if (run.deletedAt == null) return run;
+  }
+  return null;
+}
 
 function payloadRecord(payload: unknown): Record<string, unknown> | null {
   return payload != null &&
@@ -327,6 +344,8 @@ export const countUnresolvedLinks = query({
   handler: async (ctx, args) => {
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
+    // Same outcome as the ExternalRecordLink read policy (importAccess).
+    if (!canRead(auth, ["importAccess"])) return { count: 0, sample: [] };
 
     const links = await ctx.db
       .query("externalRecordLinks")
@@ -336,7 +355,7 @@ export const countUnresolvedLinks = query({
     // Filter for unverified critical mappings
     const unresolved = links.filter((link) => {
       if (link.verified !== false) return false;
-      if (link.deletedAt !== null) return false;
+      if (link.deletedAt != null) return false;
 
       // Filter by source system if specified
       if (args.sourceSystem && link.sourceSystem !== args.sourceSystem) {
@@ -372,12 +391,11 @@ export const getLatestImportRun = query({
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
 
-    let query = ctx.db
-      .query("importRuns")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .order("desc");
+    // Same outcome as the ImportRun read policy (importAccess): no access
+    // reads nothing, removed runs are left out.
+    if (!canRead(auth, ["importAccess"])) return null;
 
-    const latest = await query.first();
+    const latest = await latestImportRun(ctx.db, tenantId);
 
     if (!latest) {
       return null;
@@ -423,12 +441,32 @@ export const validateCutoverReadiness = query({
     const blockers: string[] = [];
     const warnings: string[] = [];
 
+    // The checks read import runs, import matches (importAccess) and
+    // outside-service connections (manageAccess); a caller who may not read
+    // them sees no details and cannot proceed.
+    const mayRead =
+      canRead(auth, ["importAccess"]) && canRead(auth, ["manageAccess"]);
+    if (!mayRead) {
+      return {
+        canProceed: false,
+        checks: {
+          finalDeltaImport: { passed: false, message: MANAGERS_ONLY },
+          zeroCriticalMappings: { passed: false, message: MANAGERS_ONLY },
+          businessValidation: { passed: false, message: MANAGERS_ONLY },
+          providerReadiness: { passed: false, message: MANAGERS_ONLY },
+          rollbackPlan: {
+            passed: false,
+            message: MANAGERS_ONLY,
+            hasPlan: false,
+          },
+        },
+        blockers: ["Only managers can see the switch checks"],
+        warnings,
+      };
+    }
+
     // Check 1: Final delta import
-    const latestImport = await ctx.db
-      .query("importRuns")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .order("desc")
-      .first();
+    const latestImport = await latestImportRun(ctx.db, tenantId);
 
     if (!latestImport) {
       checks.finalDeltaImport = {
@@ -475,7 +513,7 @@ export const validateCutoverReadiness = query({
     const criticalUnresolved = unresolvedLinks.filter(
       (link) =>
         link.verified === false &&
-        link.deletedAt === null &&
+        link.deletedAt == null &&
         link.sourceSystem === "tpp_legacy",
     );
 
@@ -737,7 +775,7 @@ export const executeCutoverDecision = mutation({
       const criticalUnresolved = unresolvedLinks.filter(
         (link) =>
           link.verified === false &&
-          link.deletedAt === null &&
+          link.deletedAt == null &&
           link.sourceSystem === "tpp_legacy",
       );
 
@@ -748,11 +786,7 @@ export const executeCutoverDecision = mutation({
       }
 
       // Verify latest import is complete and recent
-      const latestImport = await ctx.db
-        .query("importRuns")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .order("desc")
-        .first();
+      const latestImport = await latestImportRun(ctx.db, tenantId);
 
       if (!latestImport || latestImport.status !== "completed") {
         throw new ConvexError(

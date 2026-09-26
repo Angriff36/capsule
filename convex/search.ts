@@ -32,6 +32,7 @@ const ALL_READS = [
   "eventAccess",
   "eventManageAccess",
   "financeAccess",
+  "importAccess",
   "inventoryAccess",
   "kitchenAccess",
   "logisticsAccess",
@@ -53,12 +54,18 @@ const ROLE_READS: Record<string, readonly string[]> = {
   admin: ALL_READS,
   owner: ALL_READS,
   system: ALL_READS,
-  manager: ["manageAccess", "staffAccess", "workforceSelfAccess"],
+  manager: [
+    "importAccess",
+    "manageAccess",
+    "staffAccess",
+    "workforceSelfAccess",
+  ],
   staff: ["staffAccess", "workforceSelfAccess"],
   driver: ["logisticsAccess", "staffAccess", "workforceSelfAccess"],
   event_manager: [
     "eventAccess",
     "eventManageAccess",
+    "importAccess",
     "manageAccess",
     "staffAccess",
     "workforceSelfAccess",
@@ -66,6 +73,7 @@ const ROLE_READS: Record<string, readonly string[]> = {
   event_staff: ["eventAccess", "staffAccess", "workforceSelfAccess"],
   finance_manager: [
     "financeAccess",
+    "importAccess",
     "manageAccess",
     "staffAccess",
     "workforceSelfAccess",
@@ -73,6 +81,7 @@ const ROLE_READS: Record<string, readonly string[]> = {
   finance_staff: ["financeAccess", "staffAccess", "workforceSelfAccess"],
   inventory_manager: [
     "inventoryAccess",
+    "importAccess",
     "manageAccess",
     "procurementAccess",
     "staffAccess",
@@ -82,6 +91,7 @@ const ROLE_READS: Record<string, readonly string[]> = {
   kitchen_lead: ["kitchenAccess", "staffAccess", "workforceSelfAccess"],
   kitchen_manager: [
     "kitchenAccess",
+    "importAccess",
     "manageAccess",
     "staffAccess",
     "workforceSelfAccess",
@@ -89,6 +99,7 @@ const ROLE_READS: Record<string, readonly string[]> = {
   kitchen_staff: ["kitchenAccess", "staffAccess", "workforceSelfAccess"],
   logistics_manager: [
     "logisticsAccess",
+    "importAccess",
     "manageAccess",
     "staffAccess",
     "workforceSelfAccess",
@@ -101,6 +112,7 @@ const ROLE_READS: Record<string, readonly string[]> = {
     "workforceSelfAccess",
   ],
   sales_manager: [
+    "importAccess",
     "manageAccess",
     "salesAccess",
     "staffAccess",
@@ -108,6 +120,7 @@ const ROLE_READS: Record<string, readonly string[]> = {
   ],
   sales_staff: ["salesAccess", "staffAccess", "workforceSelfAccess"],
   workforce_manager: [
+    "importAccess",
     "manageAccess",
     "staffAccess",
     "workforceAccess",
