@@ -545,7 +545,7 @@ export const reconcileTenant = internalAction({
   handler: async (ctx, args): Promise<ReconciliationResult> => {
     const context: ReconciliationContext | null = await ctx.runQuery(
       internal.googleCalendar.loadReconciliationContext,
-      args,
+      { tenantId: args.tenantId, connectionId: args.connectionId },
     );
     if (!context) {
       return {
