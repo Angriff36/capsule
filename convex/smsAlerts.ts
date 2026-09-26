@@ -41,6 +41,7 @@ const SCAN_INTERVAL_MS = 5 * 60_000;
 const EVENT_LEAD_MS = 2 * 60 * 60_000; // "starts in 2 hours"
 const RECENT_TRIGGER_MS = 24 * 60 * 60_000; // ignore stale deliveries/incidents
 const MAX_SENDS_PER_SCAN = 100;
+const MAX_ATTEMPTS = 3; // same bound as the webhook outbox
 
 type AlertType = "event_soon" | "delivery_dispatched" | "allergen_incident";
 
@@ -60,7 +61,7 @@ interface ScanContext {
   enabled: boolean;
   recipients: Recipient[];
   triggers: Trigger[];
-  alreadySent: string[]; // `${triggerKey}::${personId}`
+  alreadySent: string[]; // `${triggerKey}::${personId}`, sent or out of tries
 }
 
 interface ScanResult {
@@ -378,14 +379,20 @@ export const loadScanContext = internalQuery({
       }
     }
 
-    const alreadySent = ledger
-      .filter(
-        (row) => row.entity === ALERT_ENTITY && row.type === "SmsAlertSent",
-      )
-      .map((row) => {
-        const payload = asRecord(row.payload);
-        return `${String(payload.triggerKey)}::${String(payload.personId)}`;
-      });
+    // A key is done once it was sent, or after MAX_ATTEMPTS failed tries.
+    const alreadySent: string[] = [];
+    const failures = new Map<string, number>();
+    for (const row of ledger) {
+      if (row.entity !== ALERT_ENTITY) continue;
+      const payload = asRecord(row.payload);
+      const key = `${String(payload.triggerKey)}::${String(payload.personId)}`;
+      if (row.type === "SmsAlertSent") alreadySent.push(key);
+      if (row.type === "SmsAlertFailed") {
+        const count = (failures.get(key) ?? 0) + 1;
+        failures.set(key, count);
+        if (count === MAX_ATTEMPTS) alreadySent.push(key);
+      }
+    }
 
     return { enabled: true, recipients, triggers, alreadySent };
   },
