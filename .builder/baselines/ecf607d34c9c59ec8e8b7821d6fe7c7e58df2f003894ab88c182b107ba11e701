@@ -8452,6 +8452,15 @@ export const ProposalExpireParamsSchema = z.object({});
 
 export type ProposalExpireParams = z.infer<typeof ProposalExpireParamsSchema>;
 
+// Command: followEventHeadcount on Proposal
+export const ProposalFollowEventHeadcountParamsSchema = z.object({
+  guestCount: z.number(),
+  subtotal: z.number(),
+  total: z.number(),
+});
+
+export type ProposalFollowEventHeadcountParams = z.infer<typeof ProposalFollowEventHeadcountParamsSchema>;
+
 // Command: linkEvent on Proposal
 export const ProposalLinkEventParamsSchema = z.object({});
 
