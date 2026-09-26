@@ -89,7 +89,9 @@ export function TaxRatesPage() {
     }
     if (!(percentage > 0 && percentage <= 100)) {
       setFailure(
-        new Error("Percentage must be greater than 0 and no more than 100."),
+        new Error(
+          "This percentage has to be more than 0 and no more than 100.",
+        ),
       );
       return;
     }

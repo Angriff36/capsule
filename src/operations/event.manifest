@@ -264,7 +264,7 @@ entity Client mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard roleAllows(user.role, "salesManageAccess")
-    constraint archiveReason: length(trim(reason)) > 0 "Archive reason is required"
+    constraint archiveReason: length(trim(reason)) > 0 "Say why you're archiving this client."
     mutate status = "archived"
     mutate archivedAt = now()
     emit ClientArchived {
@@ -377,7 +377,7 @@ entity Venue mixin TenantScoped, SoftDeletable {
   computed isActive: boolean = self.status == "active"
 
   constraint venueIdentityComplete: self.registeredAt == null or length(trim(self.name)) > 0 "Registered venues require a name"
-  constraint venueCapacityNonnegative: self.capacity >= 0 "Venue capacity cannot be negative"
+  constraint venueCapacityNonnegative: self.capacity >= 0 "Venue capacity can't be negative. Use zero or more."
   constraint venueLatitudeRange: self.latitude == null or (self.latitude >= -90 and self.latitude <= 90) "Latitude must be between -90 and 90"
   constraint venueLongitudeRange: self.longitude == null or (self.longitude >= -180 and self.longitude <= 180) "Longitude must be between -180 and 180"
 
@@ -422,8 +422,8 @@ entity Venue mixin TenantScoped, SoftDeletable {
     guard self.registeredAt == null
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
-    constraint registerVenueName: length(trim(name)) > 0 "Venue name is required"
-    constraint registerVenueCapacity: capacity >= 0 "Venue capacity cannot be negative"
+    constraint registerVenueName: length(trim(name)) > 0 "Give this venue a name."
+    constraint registerVenueCapacity: capacity >= 0 "Venue capacity can't be negative. Use zero or more."
     mutate name = name
     mutate venueType = venueType
     mutate capacity = capacity
@@ -496,7 +496,7 @@ entity Venue mixin TenantScoped, SoftDeletable {
   ) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint updateVenueName: length(trim(name)) > 0 "Venue name is required"
+    constraint updateVenueName: length(trim(name)) > 0 "Give this venue a name."
     mutate name = name
     mutate venueType = venueType
     mutate onPremise = onPremise
@@ -534,7 +534,7 @@ entity Venue mixin TenantScoped, SoftDeletable {
   command changeCapacity(capacity: number) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint changeVenueCapacity: capacity >= 0 "Venue capacity cannot be negative"
+    constraint changeVenueCapacity: capacity >= 0 "Venue capacity can't be negative. Use zero or more."
     compute previousCapacity = self.capacity
     mutate capacity = capacity
     emit VenueCapacityChanged {
@@ -549,7 +549,7 @@ entity Venue mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
-    constraint deactivateVenueReason: length(trim(reason)) > 0 "Venue deactivation reason is required"
+    constraint deactivateVenueReason: length(trim(reason)) > 0 "Say why you're taking this venue out of service."
     mutate status = "inactive"
     mutate deactivatedAt = now()
     mutate deactivationReason = reason
@@ -802,9 +802,9 @@ entity Event mixin TenantScoped, SoftDeletable {
 
   // plannedAt gates full engagement invariants while planEngagement mutates fields.
   constraint eventPlanComplete: self.plannedAt == null or (length(trim(self.title)) > 0 and length(trim(self.eventType)) > 0 and self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.expectedHeadcount >= 1 and self.expectedHeadcount <= 100000 and self.primaryContactName != null and length(trim(self.primaryContactName)) > 0) "Planned events require a title, type, valid date range, headcount, and primary contact"
-  constraint validEventVenueCapacity: self.venueCapacity == null or self.venueCapacity >= 0 "Venue capacity cannot be negative"
-  constraint validEventPricing: (self.budgetAmount == null or self.budgetAmount >= 0) and (self.quotedPrice == null or self.quotedPrice >= 0) "Event pricing cannot be negative"
-  constraint validRecurrenceCount: self.recurrenceGeneratedCount == null or self.recurrenceGeneratedCount >= 1 "Recurring event generated count cannot be below one"
+  constraint validEventVenueCapacity: self.venueCapacity == null or self.venueCapacity >= 0 "Venue capacity can't be negative. Use zero or more."
+  constraint validEventPricing: (self.budgetAmount == null or self.budgetAmount >= 0) and (self.quotedPrice == null or self.quotedPrice >= 0) "This event's pricing can't be negative. Use zero or more."
+  constraint validRecurrenceCount: self.recurrenceGeneratedCount == null or self.recurrenceGeneratedCount >= 1 "The recurring count can't be below one. Use one or more."
   constraint validRecurrenceSequence: self.recurrenceSequence == null or self.recurrenceSequence >= 2 "Recurring event instances must follow the source event"
 
   // Quote → Planning → Pending Approval → Approved → Sales Lock → Executing → Final → Complete → Close Out lifecycle
@@ -856,13 +856,13 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.stage == "planning"
     guard self.plannedAt == null
     guard self.deletedAt == null
-    constraint planTitle: length(trim(title)) > 0 "Event title is required"
-    constraint planType: length(trim(eventType)) > 0 "Event type is required"
+    constraint planTitle: length(trim(title)) > 0 "Give this event a title."
+    constraint planType: length(trim(eventType)) > 0 "Pick an event type."
     constraint planDates: endsAt > startsAt "Event end must be after its start"
     constraint planHeadcount: expectedHeadcount >= 1 and expectedHeadcount <= 100000 "Headcount must be between 1 and 100000"
-    constraint planVenueCapacity: venueCapacity == null or venueCapacity >= 0 "Venue capacity cannot be negative"
-    constraint planContact: length(trim(primaryContactName)) > 0 "Primary contact name is required"
-    constraint planPricing: budgetAmount >= 0 and quotedPrice >= 0 "Event pricing cannot be negative"
+    constraint planVenueCapacity: venueCapacity == null or venueCapacity >= 0 "Venue capacity can't be negative. Use zero or more."
+    constraint planContact: length(trim(primaryContactName)) > 0 "Give this event a primary contact name."
+    constraint planPricing: budgetAmount >= 0 and quotedPrice >= 0 "This event's pricing can't be negative. Use zero or more."
     mutate clientId = clientId
     mutate clientName = clientName
     mutate title = title
@@ -937,9 +937,9 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.plannedAt == null
     guard self.deletedAt == null
     guard self.draftCapturedAt == null
-    constraint draftTitle: length(trim(title)) > 0 "Draft title is required"
+    constraint draftTitle: length(trim(title)) > 0 "Give this draft a title."
     constraint draftHeadcount: expectedHeadcount == null or (expectedHeadcount >= 0 and expectedHeadcount <= 100000) "Headcount must be between 0 and 100000 when known"
-    constraint draftPricing: (budgetAmount == null or budgetAmount >= 0) and (quotedPrice == null or quotedPrice >= 0) "Event pricing cannot be negative"
+    constraint draftPricing: (budgetAmount == null or budgetAmount >= 0) and (quotedPrice == null or quotedPrice >= 0) "This event's pricing can't be negative. Use zero or more."
     mutate title = title
     mutate clientId = clientId != null ? clientId : null
     mutate eventType = eventType != null ? eventType : ""
@@ -1006,7 +1006,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.plannedAt == null
     guard self.deletedAt == null
     constraint draftHeadcount: expectedHeadcount == null or (expectedHeadcount >= 0 and expectedHeadcount <= 100000) "Headcount must be between 0 and 100000 when known"
-    constraint draftPricing: (budgetAmount == null or budgetAmount >= 0) and (quotedPrice == null or quotedPrice >= 0) "Event pricing cannot be negative"
+    constraint draftPricing: (budgetAmount == null or budgetAmount >= 0) and (quotedPrice == null or quotedPrice >= 0) "This event's pricing can't be negative. Use zero or more."
     mutate title = title != null ? title : self.title
     mutate clientId = clientId != null ? clientId : self.clientId
     mutate eventType = eventType != null ? eventType : self.eventType
@@ -1098,12 +1098,12 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may plan the event timeline"
     constraint activeEventTiming: self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled" "Finished or cancelled events keep their saved timing; correct individual blocks if needed"
-    constraint timingSetupNonnegative: setupMinutes == null or setupMinutes >= 0 "Setup minutes cannot be negative"
-    constraint timingLoadNonnegative: loadMinutes == null or loadMinutes >= 0 "Load minutes cannot be negative"
-    constraint timingOutboundNonnegative: outboundTravelMinutes == null or outboundTravelMinutes >= 0 "Travel minutes cannot be negative"
-    constraint timingCleanupNonnegative: cleanupMinutes == null or cleanupMinutes >= 0 "Cleanup minutes cannot be negative"
-    constraint timingReturnNonnegative: returnTravelMinutes == null or returnTravelMinutes >= 0 "Return travel minutes cannot be negative"
-    constraint timingUnloadNonnegative: unloadMinutes == null or unloadMinutes >= 0 "Unload minutes cannot be negative"
+    constraint timingSetupNonnegative: setupMinutes == null or setupMinutes >= 0 "Setup time can't be negative. Use zero or more."
+    constraint timingLoadNonnegative: loadMinutes == null or loadMinutes >= 0 "Load time can't be negative. Use zero or more."
+    constraint timingOutboundNonnegative: outboundTravelMinutes == null or outboundTravelMinutes >= 0 "Travel time can't be negative. Use zero or more."
+    constraint timingCleanupNonnegative: cleanupMinutes == null or cleanupMinutes >= 0 "Cleanup time can't be negative. Use zero or more."
+    constraint timingReturnNonnegative: returnTravelMinutes == null or returnTravelMinutes >= 0 "Return travel time can't be negative. Use zero or more."
+    constraint timingUnloadNonnegative: unloadMinutes == null or unloadMinutes >= 0 "Unload time can't be negative. Use zero or more."
     mutate serviceStartsAt = serviceStartsAt
     mutate timingSetupMinutes = setupMinutes
     mutate timingLoadMinutes = loadMinutes
@@ -1132,7 +1132,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.endsAt != null
     guard self.deletedAt == null
     guard self.recurrenceTemplateEventId == null
-    constraint recurrenceSeriesIdPresent: length(trim(seriesId)) > 0 "Recurring series id is required"
+    constraint recurrenceSeriesIdPresent: length(trim(seriesId)) > 0 "Give this recurring series an id."
     constraint recurrenceNextAfterSource: nextStartsAt > self.startsAt "The first recurring instance must start after the source event"
     constraint recurrenceEndShape: (endCondition == "on_date" and recurrenceEndsAt != null and recurrenceEndsAt >= nextStartsAt and occurrenceLimit == null) or (endCondition == "after_occurrences" and recurrenceEndsAt == null and occurrenceLimit != null and occurrenceLimit >= 2 and occurrenceLimit <= 1000) "Choose an end date that includes another event or a total occurrence count from 2 to 1000"
     mutate recurrenceFrequency = frequency
@@ -1179,7 +1179,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   ) {
     guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
-    constraint changeVenueCapacity: venueCapacity == null or venueCapacity >= 0 "Venue capacity cannot be negative"
+    constraint changeVenueCapacity: venueCapacity == null or venueCapacity >= 0 "Venue capacity can't be negative. Use zero or more."
     mutate venueId = venueId
     mutate venueName = venueName
     mutate venueAddress = venueAddress
@@ -1213,7 +1213,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   command changeServiceStyle(serviceStyleId: uuid, optional serviceStyleName: string) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
-    constraint serviceStyleReferenceInput: length(trim(serviceStyleId)) > 0 "Events must reference a service style"
+    constraint serviceStyleReferenceInput: length(trim(serviceStyleId)) > 0 "Pick a service style for this event."
     mutate serviceStyleId = serviceStyleId
     mutate serviceStyleName = serviceStyleName != null ? serviceStyleName : self.serviceStyleName
     emit EventServiceStyleChanged {
@@ -1231,7 +1231,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   ) {
     guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
-    constraint contactName: length(trim(primaryContactName)) > 0 "Primary contact name is required"
+    constraint contactName: length(trim(primaryContactName)) > 0 "Give this event a primary contact name."
     mutate primaryContactName = primaryContactName
     mutate primaryContactEmail = primaryContactEmail
     mutate primaryContactPhone = primaryContactPhone
@@ -1426,7 +1426,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "salesManageAccess")
-    constraint pricingNonnegative: budgetAmount >= 0 and quotedPrice >= 0 "Event pricing cannot be negative"
+    constraint pricingNonnegative: budgetAmount >= 0 and quotedPrice >= 0 "This event's pricing can't be negative. Use zero or more."
     mutate budgetAmount = budgetAmount
     mutate quotedPrice = quotedPrice
     emit EventPricingChanged {
@@ -1446,8 +1446,8 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.stage == "completed" or self.stage == "closed_out"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "salesManageAccess")
-    constraint correctionReasonPresent: length(trim(reason)) > 0 "Correction reason is required"
-    constraint correctionPricingNonnegative: budgetAmount >= 0 and quotedPrice >= 0 "Event pricing cannot be negative"
+    constraint correctionReasonPresent: length(trim(reason)) > 0 "Say why you're correcting this event."
+    constraint correctionPricingNonnegative: budgetAmount >= 0 and quotedPrice >= 0 "This event's pricing can't be negative. Use zero or more."
     mutate budgetAmount = budgetAmount
     mutate quotedPrice = quotedPrice
     emit EventCommercialCorrected {
@@ -1490,7 +1490,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.stage == "quote" or self.stage == "pending_approval"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
-    constraint returnReason: length(trim(reason)) > 0 "Return reason is required"
+    constraint returnReason: length(trim(reason)) > 0 "Say why you're sending this event back."
     mutate stage = "planning"
     mutate approvedAt = null
     emit EventReturnedToPlanning {
@@ -1548,7 +1548,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.stage == "quote" or self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock" or self.stage == "executing" or self.stage == "final"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
-    constraint cancellationReasonPresent: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancellationReasonPresent: length(trim(reason)) > 0 "Say why you're cancelling this event."
     mutate stage = "cancelled"
     mutate cancellationReason = reason
     mutate cancelledAt = now()
@@ -1583,7 +1583,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.archivedAt == null
     guard roleAllows(user.role, "eventManageAccess")
-    constraint archiveReasonPresent: length(trim(reason)) > 0 "Archive reason is required"
+    constraint archiveReasonPresent: length(trim(reason)) > 0 "Say why you're archiving this event."
     mutate archivedAt = now()
     mutate archiveReason = reason
     emit EventArchived {
@@ -1713,7 +1713,7 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
   ) {
     guard self.invitedAt == null
     guard self.deletedAt == null
-    constraint inviteGuestName: length(trim(name)) > 0 "Guest name is required"
+    constraint inviteGuestName: length(trim(name)) > 0 "Give this guest a name."
     mutate eventId = eventId
     mutate name = name
     mutate email = email
@@ -1776,7 +1776,7 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
   command assignTable(tableAssignment: string) {
     guard self.rsvpStatus != "declined"
     guard self.deletedAt == null
-    constraint tableAssignmentPresent: length(trim(tableAssignment)) > 0 "Table assignment is required"
+    constraint tableAssignmentPresent: length(trim(tableAssignment)) > 0 "Pick a table for this guest."
     mutate tableAssignment = tableAssignment
     emit EventGuestTableAssigned {
       guestId: self.id
@@ -1788,7 +1788,7 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
 
   command withdraw(reason: string) {
     guard self.deletedAt == null
-    constraint withdrawReasonPresent: length(trim(reason)) > 0 "Withdrawal reason is required"
+    constraint withdrawReasonPresent: length(trim(reason)) > 0 "Say why this guest is withdrawing."
     mutate deletedAt = now()
     emit EventGuestWithdrawn {
       guestId: self.id
@@ -1846,7 +1846,7 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
 
   constraint timelineActivityNameComplete: self.scheduledAt == null or length(trim(self.name)) > 0 "Timeline activities require a name once scheduled"
   constraint timelineActivityWindowOrdered: self.startsAt == null or self.endsAt == null or self.endsAt >= self.startsAt "Timeline activity end must not precede its start"
-  constraint timelineActivitySortNonnegative: self.sortOrder >= 0 "Timeline activity sort order cannot be negative"
+  constraint timelineActivitySortNonnegative: self.sortOrder >= 0 "Sort order can't be negative. Use zero or more."
 
   default policy eventTimelineActivityRead read: roleAllows(user.role, "staffAccess") "Staff may see the shared event timeline"
   default policy eventTimelineActivityWrite write: roleAllows(user.role, "staffAccess") "Staff may add timeline work"
@@ -1867,11 +1867,11 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   ) {
     guard self.scheduledAt == null
     guard self.deletedAt == null
-    constraint scheduleActivityName: length(trim(name)) > 0 "Activity name is required"
+    constraint scheduleActivityName: length(trim(name)) > 0 "Give this activity a name."
     // Preserve the planning access boundary while crew can mark work done.
     guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may schedule the event timeline"
     constraint scheduleActivityWindow: startsAt == null or endsAt == null or endsAt >= startsAt "Activity end must not precede its start"
-    constraint scheduleActivitySort: sortOrder == null or sortOrder >= 0 "Timeline activity sort order cannot be negative"
+    constraint scheduleActivitySort: sortOrder == null or sortOrder >= 0 "Sort order can't be negative. Use zero or more."
     mutate eventId = eventId
     mutate name = name
     mutate startsAt = startsAt
@@ -1911,7 +1911,7 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint adjustActivityName: name == null or length(trim(name)) > 0 "Activity name cannot be blanked"
     guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may adjust the event timeline"
-    constraint adjustActivitySort: sortOrder == null or sortOrder >= 0 "Timeline activity sort order cannot be negative"
+    constraint adjustActivitySort: sortOrder == null or sortOrder >= 0 "Sort order can't be negative. Use zero or more."
     compute nextStartsAt = clearStartsAt == true ? null : (startsAt != null ? startsAt : self.startsAt)
     compute nextEndsAt = clearEndsAt == true ? null : (endsAt != null ? endsAt : self.endsAt)
     compute manualTimingChanged = (clearStartsAt == true and self.startsAt != null) or (clearEndsAt == true and self.endsAt != null) or (startsAt != null and startsAt != self.startsAt) or (endsAt != null and endsAt != self.endsAt)
@@ -2033,7 +2033,7 @@ entity EventTimelineComment mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo author: Person fields [tenantId, authorPersonId] references [tenantId, id]
 
-  constraint timelineCommentBody: self.postedAt == null or length(trim(self.body)) > 0 "Timeline comment text is required"
+  constraint timelineCommentBody: self.postedAt == null or length(trim(self.body)) > 0 "Write something in this comment."
 
   default policy eventTimelineCommentRead read: roleAllows(user.role, "eventAccess") "Event staff may see timeline comments"
   default policy eventTimelineCommentWrite write: roleAllows(user.role, "eventAccess") "Event staff may add timeline comments"
@@ -2049,8 +2049,8 @@ entity EventTimelineComment mixin TenantScoped, SoftDeletable {
     guard self.postedAt == null
     guard self.deletedAt == null
     guard user.id != null
-    constraint postTimelineCommentBody: length(trim(body)) > 0 "Comment text is required"
-    constraint postTimelineCommentAuthor: length(trim(authorName)) > 0 "Author name is required"
+    constraint postTimelineCommentBody: length(trim(body)) > 0 "Write something in this comment."
+    constraint postTimelineCommentAuthor: length(trim(authorName)) > 0 "Give this comment an author name."
     mutate eventId = eventId
     mutate activityId = activityId
     mutate authorPersonId = authorPersonId
@@ -2098,8 +2098,8 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
-  constraint layoutSectionTypeComplete: self.addedAt == null or length(trim(self.type)) > 0 "Layout section type is required once added"
-  constraint layoutSectionSortNonnegative: self.sortOrder >= 0 "Layout section sort order cannot be negative"
+  constraint layoutSectionTypeComplete: self.addedAt == null or length(trim(self.type)) > 0 "Pick a layout section type."
+  constraint layoutSectionSortNonnegative: self.sortOrder >= 0 "Sort order can't be negative. Use zero or more."
 
   default policy eventLayoutSectionRead read: roleAllows(user.role, "eventAccess") "Event staff may see event layout sections"
   default policy eventLayoutSectionWrite write: roleAllows(user.role, "eventAccess") "Event staff may update the floor plan"
@@ -2113,8 +2113,8 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
-    constraint addLayoutType: length(trim(type)) > 0 "Layout section type is required"
-    constraint addLayoutSort: sortOrder == null or sortOrder >= 0 "Layout section sort order cannot be negative"
+    constraint addLayoutType: length(trim(type)) > 0 "Pick a layout section type."
+    constraint addLayoutSort: sortOrder == null or sortOrder >= 0 "Sort order can't be negative. Use zero or more."
     mutate eventId = eventId
     mutate type = type
     mutate instructions = instructions
@@ -2137,7 +2137,7 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
     guard self.addedAt != null
     guard self.deletedAt == null
     constraint updateLayoutType: type == null or length(trim(type)) > 0 "Layout section type cannot be blanked"
-    constraint updateLayoutSort: sortOrder == null or sortOrder >= 0 "Layout section sort order cannot be negative"
+    constraint updateLayoutSort: sortOrder == null or sortOrder >= 0 "Sort order can't be negative. Use zero or more."
     mutate type = type != null ? type : self.type
     mutate instructions = instructions != null ? instructions : self.instructions
     mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder

@@ -62,8 +62,8 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   computed estimatedCost: money(12, 2) = sum(filter(self.dish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => (line.yieldQuantity > 0 ? self.targetHeadcount / line.yieldQuantity : 0) * line.batchMultiplier * sum(filter(line.component.ingredientLines, (il) => il.deletedAt == null and il.addedAt != null), (il) => il.unit == il.ingredient.unit ? il.quantity * (il.wasteFactor != null ? il.wasteFactor : 1) * il.ingredient.costPerUnit : 0)) + self.targetHeadcount * sum(filter(self.dish.ingredientLines, (dl) => dl.deletedAt == null and dl.addedAt != null), (dl) => dl.unit == dl.ingredient.unit ? dl.quantity * (dl.wasteFactor != null ? dl.wasteFactor : 1) * dl.ingredient.costPerUnit : 0)
 
   // Zero servings = 86'd / not serving; remove() is the other path.
-  constraint eventDishServingsNonnegative: self.addedAt == null or self.quantityServings >= 0 "Event dish servings cannot be negative"
-  constraint eventDishHeadcountOverrideNonnegative: self.headcountOverride == null or self.headcountOverride >= 0 "Headcount override cannot be negative"
+  constraint eventDishServingsNonnegative: self.addedAt == null or self.quantityServings >= 0 "This dish's servings can't be negative. Use zero or more."
+  constraint eventDishHeadcountOverrideNonnegative: self.headcountOverride == null or self.headcountOverride >= 0 "This headcount override can't be negative. Use zero or more."
 
   // Read: any staff on this tenant. Sales confirmation and kitchen catalog
   // reconciliation run under the initiating operator's auth. The shared
@@ -98,9 +98,9 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
     // Seed check: createVia pre-writes eventId on the row; the arg must match
     // that seed. Fails only on buggy/mismatched API calls — not a business "can't move dishes" rule.
-    constraint addToEventEventMatch: eventId == self.eventId "addToEvent eventId must match the seeded event reference"
-    constraint addToEventServingsNonnegative: quantityServings >= 0 "Event dish servings cannot be negative"
-    constraint addToEventHeadcountOverrideNonnegative: headcountOverride == null or headcountOverride >= 0 "Headcount override cannot be negative"
+    constraint addToEventEventMatch: eventId == self.eventId "This event dish is for a different event. Pick the event already on this dish."
+    constraint addToEventServingsNonnegative: quantityServings >= 0 "This dish's servings can't be negative. Use zero or more."
+    constraint addToEventHeadcountOverrideNonnegative: headcountOverride == null or headcountOverride >= 0 "This headcount override can't be negative. Use zero or more."
     mutate eventId = eventId
     mutate dishId = dishId
     mutate dishName = dishName
@@ -138,7 +138,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     // Live event + post-event correction. Zero = 86 without deleting the line.
     // Refunds are Invoice/Payment — not this field. Cancelled stays locked.
     guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing" or self.event.stage == "completed" or self.event.stage == "closed_out")
-    constraint adjustServingsNonnegative: quantityServings >= 0 "Event dish servings cannot be negative"
+    constraint adjustServingsNonnegative: quantityServings >= 0 "This dish's servings can't be negative. Use zero or more."
     compute previousQuantityServings = self.quantityServings
     mutate quantityServings = quantityServings
     mutate followsEventHeadcount = false
@@ -181,7 +181,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     guard self.addedAt != null
     guard self.deletedAt == null
     guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing" or self.event.stage == "completed" or self.event.stage == "closed_out")
-    constraint setHeadcountOverrideNonnegative: headcountOverride >= 0 "Headcount override cannot be negative"
+    constraint setHeadcountOverrideNonnegative: headcountOverride >= 0 "This headcount override can't be negative. Use zero or more."
     compute previousQuantityServings = self.quantityServings
     mutate headcountOverride = headcountOverride
     mutate followsEventHeadcount = headcountOverride == 0
@@ -268,8 +268,8 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess")
     guard self.deletedAt == null
     guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
-    constraint confirmFromProposalEventMatch: eventId == self.eventId "confirmFromProposal eventId must match the seeded event reference"
-    constraint confirmFromProposalServingsNonnegative: quantityServings >= 0 "Event dish servings cannot be negative"
+    constraint confirmFromProposalEventMatch: eventId == self.eventId "This event dish is for a different event. Pick the event already on this dish."
+    constraint confirmFromProposalServingsNonnegative: quantityServings >= 0 "This dish's servings can't be negative. Use zero or more."
     compute wasExistingLine = self.addedAt != null
     mutate eventId = eventId
     mutate dishId = dishId
@@ -335,7 +335,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     // Includes executing (ran out / pull from service) and sales_lock (live ops, not a menu freeze).
     // Not after the event is done/cancelled.
     guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
-    constraint removeEventDishReason: length(trim(reason)) > 0 "Removal reason is required"
+    constraint removeEventDishReason: length(trim(reason)) > 0 "Say why you're removing this."
     compute previousQuantityServings = self.quantityServings
     mutate deletedAt = now()
     mutate removedAt = now()
@@ -480,8 +480,8 @@ entity EventDishLineOverride mixin TenantScoped, SoftDeletable {
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
-  constraint overrideReasonPresent: self.appliedAt == null or length(trim(self.reason)) > 0 "Override reason is required"
-  constraint overridePortionsNonnegative: self.portionsAffected >= 0 "Portions affected cannot be negative"
+  constraint overrideReasonPresent: self.appliedAt == null or length(trim(self.reason)) > 0 "Say why you're making this change."
+  constraint overridePortionsNonnegative: self.portionsAffected >= 0 "The number of servings affected can't be negative. Use zero or more."
 
   default policy eventDishLineOverrideRead read: roleAllows(user.role, "staffAccess") "Employed staff may see event dish overrides"
   default policy eventDishLineOverrideWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "kitchenAccess") "Managers and kitchen staff may update event dish overrides"
@@ -504,8 +504,8 @@ entity EventDishLineOverride mixin TenantScoped, SoftDeletable {
   ) {
     guard self.appliedAt == null
     guard self.deletedAt == null
-    constraint applyOverrideReason: length(trim(reason)) > 0 "Override reason is required"
-    constraint applyOverridePortions: portionsAffected >= 0 "Portions affected cannot be negative"
+    constraint applyOverrideReason: length(trim(reason)) > 0 "Say why you're making this change."
+    constraint applyOverridePortions: portionsAffected >= 0 "The number of servings affected can't be negative. Use zero or more."
     constraint applyOverrideTarget: kind == "add" or targetDishIngredientId != null or targetDishComponentId != null or targetDishContainerId != null or targetDishTaskId != null "Remove, replace and adjust need a target line"
     constraint applyOverrideSource: (kind != "add" and kind != "replace") or ingredientId != null or componentId != null "Add and replace need an ingredient or a recipe"
     // The demand engine takes the affected portions off the catalog line first.
@@ -539,7 +539,7 @@ entity EventDishLineOverride mixin TenantScoped, SoftDeletable {
   command revoke(reason: string) {
     guard self.appliedAt != null
     guard self.deletedAt == null
-    constraint revokeOverrideReason: length(trim(reason)) > 0 "Revoke reason is required"
+    constraint revokeOverrideReason: length(trim(reason)) > 0 "Say why you're undoing this change."
     mutate revokedAt = now()
     mutate deletedAt = now()
     emit EventDishLineOverrideRevoked {

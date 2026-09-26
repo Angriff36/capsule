@@ -111,7 +111,9 @@ export function AnnouncementsPage() {
       (bodyRequired && !body) ||
       (expiresRequired && !expiresRaw)
     ) {
-      setError("Title, message, and expiry date are required.");
+      setError(
+        "Give this announcement a title, a message, and an expiry date.",
+      );
       return;
     }
     const expiresAt = new Date(`${expiresRaw}T23:59:59.999`).getTime();

@@ -70,7 +70,7 @@ entity ReviewFlag mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.event != null
     guard user.id != null
-    constraint raiseEventMatch: eventId == self.eventId "Raise eventId must match the seeded event reference"
+    constraint raiseEventMatch: eventId == self.eventId "This flag is for a different event. Pick the event already on this flag."
     constraint raiseQuestionPresent: length(trim(question)) > 0 "Say what needs a decision"
     mutate eventId = eventId
     mutate targetKind = targetKind
@@ -95,7 +95,7 @@ entity ReviewFlag mixin TenantScoped, SoftDeletable {
     guard self.status == "open"
     guard self.raisedAt != null
     guard self.deletedAt == null
-    constraint resolveTextPresent: length(trim(resolution)) > 0 "Record the decision that settles the flag"
+    constraint resolveTextPresent: length(trim(resolution)) > 0 "Say what was decided to settle this flag."
     mutate resolution = resolution
     mutate settledById = user.id
     mutate status = "resolved"

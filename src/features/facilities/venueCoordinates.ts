@@ -63,13 +63,14 @@ export function coordinatesFromFields(
     return {
       ok: false,
       error:
-        "Coordinates must be decimal degrees, e.g. 47.01359 and -116.52979.",
+        "Enter each coordinate as a plain number, like 47.01359 and -116.52979.",
     };
   }
   if (!validCoordinates({ latitude, longitude })) {
     return {
       ok: false,
-      error: "Latitude must be within ±90 and longitude within ±180.",
+      error:
+        "Latitude has to be between -90 and 90, and longitude between -180 and 180.",
     };
   }
   return { ok: true, value: { latitude, longitude } };

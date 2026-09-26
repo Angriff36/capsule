@@ -33,8 +33,8 @@ entity Menu mixin TenantScoped, SoftDeletable {
   computed isPublished: boolean = self.status == "published"
   computed isEditable: boolean = self.status == "draft"
 
-  constraint menuIdentityComplete: self.draftedAt == null or length(trim(self.name)) > 0 "Drafted menus require a name"
-  constraint menuPricingNonnegative: self.basePrice >= 0 and self.pricePerPerson >= 0 "Menu pricing cannot be negative"
+  constraint menuIdentityComplete: self.draftedAt == null or length(trim(self.name)) > 0 "Give this menu a name."
+  constraint menuPricingNonnegative: self.basePrice >= 0 and self.pricePerPerson >= 0 "This menu's pricing can't be negative. Use zero or more."
   constraint menuGuestBounds: self.minGuests >= 0 and self.maxGuests >= 0 and (self.maxGuests == 0 or self.maxGuests >= self.minGuests) "Menu max guests must be zero (unlimited) or at least min guests"
 
   transition status from "draft" to ["published", "archived"]
@@ -59,8 +59,8 @@ entity Menu mixin TenantScoped, SoftDeletable {
   ) {
     guard self.draftedAt == null
     guard self.deletedAt == null
-    constraint draftMenuName: length(trim(name)) > 0 "Menu name is required"
-    constraint draftMenuPricing: (basePrice == null or basePrice >= 0) and (pricePerPerson == null or pricePerPerson >= 0) "Menu pricing cannot be negative"
+    constraint draftMenuName: length(trim(name)) > 0 "Give this menu a name."
+    constraint draftMenuPricing: (basePrice == null or basePrice >= 0) and (pricePerPerson == null or pricePerPerson >= 0) "This menu's pricing can't be negative. Use zero or more."
     constraint draftMenuGuests: (minGuests == null or minGuests >= 0) and (maxGuests == null or maxGuests >= 0) and (minGuests == null or maxGuests == null or maxGuests == 0 or maxGuests >= minGuests) "Menu max guests must be zero (unlimited) or at least min guests"
     mutate name = name
     mutate description = description
@@ -87,7 +87,7 @@ entity Menu mixin TenantScoped, SoftDeletable {
   ) {
     guard self.status == "draft"
     guard self.deletedAt == null
-    constraint reviseMenuName: length(trim(name)) > 0 "Menu name is required"
+    constraint reviseMenuName: length(trim(name)) > 0 "Give this menu a name."
     mutate name = name
     mutate description = description
     mutate category = category
@@ -108,7 +108,7 @@ entity Menu mixin TenantScoped, SoftDeletable {
     guard self.status == "draft" or self.status == "published"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenManageAccess")
-    constraint pricingMenuNonnegative: basePrice >= 0 and pricePerPerson >= 0 "Menu pricing cannot be negative"
+    constraint pricingMenuNonnegative: basePrice >= 0 and pricePerPerson >= 0 "This menu's pricing can't be negative. Use zero or more."
     constraint pricingMenuGuests: minGuests >= 0 and maxGuests >= 0 and (maxGuests == 0 or maxGuests >= minGuests) "Menu max guests must be zero (unlimited) or at least min guests"
     mutate basePrice = basePrice
     mutate pricePerPerson = pricePerPerson
@@ -142,7 +142,7 @@ entity Menu mixin TenantScoped, SoftDeletable {
     guard self.status == "published"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenManageAccess")
-    constraint unpublishMenuReason: length(trim(reason)) > 0 "Unpublish reason is required"
+    constraint unpublishMenuReason: length(trim(reason)) > 0 "Say why you're unpublishing this menu."
     mutate status = "draft"
     mutate publishedAt = null
     emit MenuUnpublished {
@@ -156,7 +156,7 @@ entity Menu mixin TenantScoped, SoftDeletable {
     guard self.status == "draft" or self.status == "published"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenManageAccess")
-    constraint archiveMenuReason: length(trim(reason)) > 0 "Archive reason is required"
+    constraint archiveMenuReason: length(trim(reason)) > 0 "Say why you're archiving this menu."
     mutate status = "archived"
     mutate archivedAt = now()
     mutate archiveReason = reason

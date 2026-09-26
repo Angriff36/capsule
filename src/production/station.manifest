@@ -23,8 +23,8 @@ entity Station mixin TenantScoped, SoftDeletable {
   property definedAt: datetime?
   property retiredAt: datetime?
 
-  constraint stationNamed: self.definedAt == null or length(trim(self.name)) > 0 "Station name is required"
-  constraint stationSortNonnegative: self.sortOrder >= 0 "Sort order cannot be negative"
+  constraint stationNamed: self.definedAt == null or length(trim(self.name)) > 0 "Give this station a name."
+  constraint stationSortNonnegative: self.sortOrder >= 0 "The sort order can't be negative. Use zero or more."
 
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
@@ -36,7 +36,7 @@ entity Station mixin TenantScoped, SoftDeletable {
   command define(name: string, optional sortOrder: int, optional aliases: list<string>) {
     guard self.definedAt == null
     guard self.deletedAt == null
-    constraint defineStationName: length(trim(name)) > 0 "Station name is required"
+    constraint defineStationName: length(trim(name)) > 0 "Give this station a name."
     mutate name = name
     mutate sortOrder = sortOrder != null ? sortOrder : 0
     mutate aliases = aliases
@@ -51,7 +51,7 @@ entity Station mixin TenantScoped, SoftDeletable {
   command rename(name: string, optional sortOrder: int, optional aliases: list<string>) {
     guard self.definedAt != null
     guard self.deletedAt == null
-    constraint renameStationName: length(trim(name)) > 0 "Station name is required"
+    constraint renameStationName: length(trim(name)) > 0 "Give this station a name."
     mutate name = name
     mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
     mutate aliases = aliases != null ? aliases : self.aliases
@@ -65,7 +65,7 @@ entity Station mixin TenantScoped, SoftDeletable {
   command retire(reason: string) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint retireStationReason: length(trim(reason)) > 0 "Reason is required"
+    constraint retireStationReason: length(trim(reason)) > 0 "Say why you're retiring this station."
     mutate status = "retired"
     mutate retiredAt = now()
   }

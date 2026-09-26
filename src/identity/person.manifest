@@ -97,7 +97,7 @@ entity Person mixin TenantScoped, SoftDeletable {
   // create/bootstrap seeds (empty defaults) and field-by-field mutates during
   // hire are not blocked mid-command (runtime validates each mutate patch).
   // Keep expression on one line — multiline parenthesized or-constraints fail parse.
-  constraint identityComplete: self.hireDate == null or (length(trim(self.givenName)) > 0 and length(trim(self.familyName)) > 0 and length(trim(self.email)) > 0) "Hired people require first name, last name, and email"
+  constraint identityComplete: self.hireDate == null or (length(trim(self.givenName)) > 0 and length(trim(self.familyName)) > 0 and length(trim(self.email)) > 0) "A hired person needs a first name, a last name, and an email."
 
   transition status from "active" to ["inactive", "terminated"]
   transition status from "inactive" to ["active", "terminated"]
@@ -118,9 +118,9 @@ entity Person mixin TenantScoped, SoftDeletable {
     optional authSubjectId: string
   ) {
     guard self.deletedAt == null
-    constraint hireGiven: length(trim(givenName)) > 0 "First name is required"
-    constraint hireFamily: length(trim(familyName)) > 0 "Last name is required"
-    constraint hireEmail: length(trim(email)) > 0 "Email is required"
+    constraint hireGiven: length(trim(givenName)) > 0 "Give this person a first name."
+    constraint hireFamily: length(trim(familyName)) > 0 "Give this person a last name."
+    constraint hireEmail: length(trim(email)) > 0 "Give this person an email."
     mutate givenName = givenName
     mutate familyName = familyName
     mutate email = email
@@ -147,8 +147,8 @@ entity Person mixin TenantScoped, SoftDeletable {
   ) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint correctGiven: length(trim(givenName)) > 0 "First name is required"
-    constraint correctFamily: length(trim(familyName)) > 0 "Last name is required"
+    constraint correctGiven: length(trim(givenName)) > 0 "Give this person a first name."
+    constraint correctFamily: length(trim(familyName)) > 0 "Give this person a last name."
     mutate givenName = givenName
     mutate familyName = familyName
     mutate phone = phone
@@ -169,7 +169,7 @@ entity Person mixin TenantScoped, SoftDeletable {
   command correctEmail(email: string) {
     guard self.deletedAt == null
     guard self.status != "terminated"
-    constraint correctEmailPresent: length(trim(email)) > 0 "Email is required"
+    constraint correctEmailPresent: length(trim(email)) > 0 "Give this person an email."
     mutate email = email
     emit PersonEmailCorrected {
       personId: self.id
@@ -205,7 +205,7 @@ entity Person mixin TenantScoped, SoftDeletable {
   // closeouts and reports.
   command setPayRate(hourlyRate: number) {
     guard self.deletedAt == null
-    constraint payRateNonNegative: hourlyRate >= 0 "Hourly rate must be zero or more"
+    constraint payRateNonNegative: hourlyRate >= 0 "This person's hourly rate can't be negative. Use zero or more."
     mutate hourlyRate = hourlyRate
     emit PersonPayRateSet {
       personId: self.id
@@ -221,7 +221,7 @@ entity Person mixin TenantScoped, SoftDeletable {
   // managers set it from the payroll preview until regen emits this command.
   command setEmployeeNumber(employeeNumber: string) {
     guard self.deletedAt == null
-    constraint employeeNumberPresent: length(trim(employeeNumber)) > 0 "Employee number is required"
+    constraint employeeNumberPresent: length(trim(employeeNumber)) > 0 "Give this person an employee number."
     mutate employeeNumber = employeeNumber
     emit PersonEmployeeNumberSet {
       personId: self.id

@@ -193,9 +193,14 @@ export function DeliveriesPage() {
       }
       void run(`${row._id}:${key}`, async () => {
         const args = { docId: row._id, version: row.version };
-        if (key === "startTransit") await startTransit(args);
-        if (key === "confirmDelivery") await confirmDelivery(args);
-        setNotice(`Delivery updated (${key}).`);
+        if (key === "startTransit") {
+          await startTransit(args);
+          setNotice("Delivery is on the way.");
+        }
+        if (key === "confirmDelivery") {
+          await confirmDelivery(args);
+          setNotice("Delivery confirmed.");
+        }
       });
     })();
   };
@@ -259,7 +264,7 @@ export function DeliveriesPage() {
           <h1 className="display-title mt-2">Delivery runs</h1>
           <p className="mt-3 max-w-160 text-ink-2">
             Schedule a delivery from a packed pack list, assign a driver, then
-            start transit and confirm delivery or record failure.
+            start transit and confirm delivery, or mark it failed.
           </p>
         </div>
         <div className="supply-row-actions">

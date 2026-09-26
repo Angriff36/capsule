@@ -80,7 +80,7 @@ export function MyDayFrame({
                     ? "—"
                     : `${weeklyHours.toLocaleString([], { maximumFractionDigits: 1 })}h`}
                 </strong>
-                <span>Recorded this week</span>
+                <span>Logged this week</span>
               </div>
               <div>
                 <strong>{shiftCount ?? "—"}</strong>

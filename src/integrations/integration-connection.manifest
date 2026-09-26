@@ -82,8 +82,8 @@ entity IntegrationConnection mixin TenantScoped, SoftDeletable {
   // Read at the manager tier so an operator can see integration health; write
   // and execute at admin because connecting a payment account binds real money.
   default policy integrationConnectionRead read: roleAllows(user.role, "manageAccess") "Managers may see outside-service connections"
-  default policy integrationConnectionWrite write: roleAllows(user.role, "adminAccess") "Admins may update integration connections"
-  default policy integrationConnectionExecute execute: roleAllows(user.role, "adminAccess") "Admins may change integration connections"
+  default policy integrationConnectionWrite write: roleAllows(user.role, "adminAccess") "Admins may update outside-service connections"
+  default policy integrationConnectionExecute execute: roleAllows(user.role, "adminAccess") "Admins may change outside-service connections"
 
   // Begin an onboarding/authorization attempt. Creates the row.
   // Named `authorize`, not `connect` — `connect` is a Manifest reserved word.
@@ -165,7 +165,7 @@ entity IntegrationConnection mixin TenantScoped, SoftDeletable {
   command recordFailure(reason: string) {
     guard self.connectedAt != null
     guard self.deletedAt == null
-    constraint integrationFailureReason: length(trim(reason)) > 0 "Failure reason is required"
+    constraint integrationFailureReason: length(trim(reason)) > 0 "Say why the connection failed."
     mutate status = "error"
     mutate lastErrorMessage = reason
     mutate lastErrorAt = now()

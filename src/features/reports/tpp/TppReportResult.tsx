@@ -14,7 +14,7 @@ export function TppReportResult({ result }: { result: Result }) {
   if (count === 0)
     return (
       <div className="document-empty tpp-result-empty">
-        <p>No matching records.</p>
+        <p>Nothing matches.</p>
         <span>Try another event, contact, or date range.</span>
       </div>
     );

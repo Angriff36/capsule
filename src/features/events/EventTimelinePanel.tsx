@@ -274,7 +274,7 @@ export function EventTimelinePanel({ eventId }: Props) {
           const activity = byId.get(slot.id);
           if (activity == null || typeof activity.version !== "number") {
             throw new Error(
-              "Timeline activity is unavailable; refresh and retry",
+              "This timeline item didn't load. Refresh the page and try again.",
             );
           }
           return {

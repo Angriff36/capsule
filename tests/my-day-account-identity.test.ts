@@ -230,7 +230,7 @@ it("attempts real linking and explains an absent match without a fake name picke
   );
   expect(node.textContent).toContain("You’re signed in");
   expect(node.textContent).toContain(
-    "Imported staff records do not grant account access",
+    "Being on the imported staff list doesn't grant account access",
   );
   expect(node.textContent).not.toContain("Pick your name");
   expect(node.querySelector('a[href="/admin"]')).not.toBeNull();

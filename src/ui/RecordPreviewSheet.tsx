@@ -27,7 +27,7 @@ export function RecordPreviewSheet({
   open,
   title,
   description,
-  label = "Record preview",
+  label = "Item preview",
   onClose,
   children,
   footer,

@@ -20,7 +20,7 @@ const CATEGORY_STYLES: Record<string, CategoryStyle> = {
     chip: "border-danger/30 bg-danger-soft text-danger",
   },
   policyUpdate: {
-    label: "Policy",
+    label: "Rule change",
     bar: "border-l-brand",
     chip: "border-brand/30 bg-brand-soft text-brand",
   },

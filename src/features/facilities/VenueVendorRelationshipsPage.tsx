@@ -199,7 +199,7 @@ export function VenueVendorRelationshipsPage() {
       const values = await prompt.askFields({
         title: `Edit ${getVendorName(row.vendorId)}`,
         description:
-          "Terms this venue holds with the vendor. A box left blank keeps its saved value; change the policy with the status control.",
+          "Terms this venue holds with the vendor. A box left blank keeps its saved value; use the status control to change it.",
         fields: [
           {
             name: "category",
@@ -357,8 +357,8 @@ export function VenueVendorRelationshipsPage() {
         title="Venue vendor relationships"
         lead={
           venue
-            ? `Vendor policies for ${venue.name}`
-            : "Venue-specific vendor policies and status"
+            ? `Which vendors ${venue.name} prefers or limits, and on what terms`
+            : "Which vendors each venue prefers or limits, and on what terms"
         }
         actions={
           <button
@@ -529,7 +529,7 @@ export function VenueVendorRelationshipsPage() {
               <input
                 type="text"
                 name="insuranceCertificate"
-                placeholder="Certificate number or reference"
+                placeholder="Certificate number or note"
                 className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               />
             </div>

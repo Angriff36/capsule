@@ -36,7 +36,7 @@ entity ClientContact mixin TenantScoped, SoftDeletable {
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
   ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
 
-  constraint contactIdentityComplete: self.addedAt == null or (self.givenName != null and length(trim(self.givenName)) > 0) "Active contacts require a given name"
+  constraint contactIdentityComplete: self.addedAt == null or (self.givenName != null and length(trim(self.givenName)) > 0) "Give this contact a given name"
 
   transition status from "active" to ["removed"]
   transition status from "removed" to []
@@ -61,8 +61,8 @@ entity ClientContact mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard self.client != null
-    constraint addClientMatch: clientId == self.clientId "Add clientId must match the seeded client reference"
-    constraint addGivenName: length(trim(givenName)) > 0 "Contact given name is required"
+    constraint addClientMatch: clientId == self.clientId "This contact is for a different client. Use the client already on this contact."
+    constraint addGivenName: length(trim(givenName)) > 0 "Give this contact a given name"
     mutate clientId = clientId
     mutate givenName = givenName
     mutate familyName = familyName
@@ -96,7 +96,7 @@ entity ClientContact mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.addedAt != null
     guard self.deletedAt == null
-    constraint updateGivenName: length(trim(givenName)) > 0 "Contact given name is required"
+    constraint updateGivenName: length(trim(givenName)) > 0 "Give this contact a given name"
     mutate givenName = givenName
     mutate familyName = familyName != null ? familyName : self.familyName
     mutate title = title != null ? title : self.title

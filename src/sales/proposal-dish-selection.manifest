@@ -30,7 +30,7 @@ entity ProposalDishSelection mixin TenantScoped, SoftDeletable {
   belongsTo menu: Menu fields [tenantId, menuId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
 
-  constraint proposalDishSelectionServingsPositive: self.selectedAt == null or self.quantityServings > 0 "Selection servings must be positive"
+  constraint proposalDishSelectionServingsPositive: self.selectedAt == null or self.quantityServings > 0 "The number of servings has to be more than zero"
 
   default policy proposalDishSelectionRead read: roleAllows(user.role, "salesAccess") "Sales staff may see proposal dish selections"
   default policy proposalDishSelectionWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update proposal dish selections"
@@ -51,8 +51,8 @@ entity ProposalDishSelection mixin TenantScoped, SoftDeletable {
     guard self.proposal != null and (self.proposal.status == "draft" or self.proposal.status == "sent" or self.proposal.status == "viewed")
     guard self.menu != null and self.menu.status == "published"
     guard self.dish != null and self.dish.status == "active"
-    constraint selectProposalMatch: proposalId == self.proposalId "Select proposalId must match the seeded proposal reference"
-    constraint selectServingsPositive: quantityServings > 0 "Selection servings must be positive"
+    constraint selectProposalMatch: proposalId == self.proposalId "This selection is for a different proposal. Use the proposal already on this selection."
+    constraint selectServingsPositive: quantityServings > 0 "The number of servings has to be more than zero"
     mutate proposalId = proposalId
     mutate menuId = menuId
     mutate dishId = dishId
@@ -75,7 +75,7 @@ entity ProposalDishSelection mixin TenantScoped, SoftDeletable {
     guard self.selectedAt != null
     guard self.deletedAt == null
     guard self.proposal != null and (self.proposal.status == "draft" or self.proposal.status == "sent" or self.proposal.status == "viewed")
-    constraint adjustSelectionServingsPositive: quantityServings > 0 "Selection servings must be positive"
+    constraint adjustSelectionServingsPositive: quantityServings > 0 "The number of servings has to be more than zero"
     compute previousQuantityServings = self.quantityServings
     mutate quantityServings = quantityServings
     emit ProposalDishSelectionServingsAdjusted {

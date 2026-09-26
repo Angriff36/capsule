@@ -24,10 +24,10 @@ export const markChannelRead = mutation({
     const auth = await chatAuth(ctx);
     if (!auth) throw new Error("Sign in to use team chat");
     const channelKey = args.channelKey.trim();
-    if (channelKey.length === 0) throw new Error("Channel is required");
+    if (channelKey.length === 0) throw new Error("Pick a chat first.");
     const now = Date.now();
     if (args.readUpTo > now) {
-      throw new Error("Read position cannot be in the future");
+      throw new Error("This chat couldn't be marked as read. Try again.");
     }
 
     // The caller's own rows for this channel, directly (composite index);

@@ -21,9 +21,9 @@ entity AssistantLlmConfig mixin TenantScoped, SoftDeletable {
   // setup and later correction are the same form — settings stay correctable.
   command configure(baseUrl: string, apiKey: string, model: string) {
     guard self.deletedAt == null
-    constraint assistantBaseUrlHttp: startsWith(baseUrl, "https://") or startsWith(baseUrl, "http://localhost") or startsWith(baseUrl, "http://127.0.0.1") "Base URL must be an HTTP(S) endpoint"
-    constraint assistantApiKeyNonEmpty: trim(apiKey) != "" "API key cannot be empty"
-    constraint assistantModelNonEmpty: trim(model) != "" "Model cannot be empty"
+    constraint assistantBaseUrlHttp: startsWith(baseUrl, "https://") or startsWith(baseUrl, "http://localhost") or startsWith(baseUrl, "http://127.0.0.1") "The web address has to start with http:// or https://."
+    constraint assistantApiKeyNonEmpty: trim(apiKey) != "" "Enter an API key."
+    constraint assistantModelNonEmpty: trim(model) != "" "Enter a model name."
     mutate baseUrl = trim(baseUrl)
     mutate apiKey = apiKey
     mutate model = trim(model)

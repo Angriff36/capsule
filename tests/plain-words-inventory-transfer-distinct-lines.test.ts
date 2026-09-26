@@ -59,7 +59,7 @@ describe("plain words on leftover stock transfer distinct-lines copy", () => {
     );
     // Later leftovers on this same file are pinned, not rewritten.
     expect(visible).toContain(
-      "Source and destination must hold the same ingredient",
+      "This transfer's source and destination have to hold the same ingredient.",
     );
   });
 });

@@ -87,7 +87,7 @@ export function parseEventMenuCreateIngredient(input: {
 }): EventMenuCreateIngredientParse {
   const name = String(input.name ?? "").trim();
   if (!name) {
-    return { ok: false, error: "Ingredient name is required." };
+    return { ok: false, error: "Give this ingredient a name." };
   }
   const unit = String(input.unit ?? "").trim() as UnitOfMeasure;
   if (!SELECTABLE_UNITS.includes(unit)) {
@@ -97,7 +97,8 @@ export function parseEventMenuCreateIngredient(input: {
   if (costPerUnit == null) {
     return {
       ok: false,
-      error: "Catalog cost must be $0 or a non-negative amount.",
+      error:
+        "This ingredient's catalog cost can't be negative. Use zero or more.",
     };
   }
   return { ok: true, value: { name, unit, costPerUnit } };

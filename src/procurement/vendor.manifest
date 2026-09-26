@@ -45,9 +45,9 @@ entity Vendor mixin TenantScoped, SoftDeletable {
   // VendorOrder belongsTo Vendor is declared in order.manifest; inverse
   // hasMany omitted so this file stays a standalone harness entry (PB010 pattern).
 
-  constraint vendorNamePresent: self.onboardedAt == null or length(trim(self.name)) > 0 "Vendor name is required once onboarded"
-  constraint vendorPaymentTerms: self.paymentTermsDays >= 0 and self.paymentTermsDays <= 365 "Payment terms must be between 0 and 365 days"
-  constraint vendorCountryCode: self.countryCode == null or length(trim(self.countryCode)) == 2 "Country code must contain two characters"
+  constraint vendorNamePresent: self.onboardedAt == null or length(trim(self.name)) > 0 "Give this vendor a name before you onboard them."
+  constraint vendorPaymentTerms: self.paymentTermsDays >= 0 and self.paymentTermsDays <= 365 "Set payment terms between 0 and 365 days."
+  constraint vendorCountryCode: self.countryCode == null or length(trim(self.countryCode)) == 2 "Country code needs to be exactly two letters."
 
   transition status from "active" to ["suspended", "terminated"]
   transition status from "suspended" to ["active", "terminated"]
@@ -71,9 +71,9 @@ entity Vendor mixin TenantScoped, SoftDeletable {
   ) {
     guard self.onboardedAt == null
     guard self.deletedAt == null
-    constraint onboardName: length(trim(name)) > 0 "Vendor name is required"
-    constraint onboardPaymentTerms: paymentTermsDays == null or (paymentTermsDays >= 0 and paymentTermsDays <= 365) "Payment terms must be between 0 and 365 days"
-    constraint onboardCountryCode: countryCode == null or length(trim(countryCode)) == 2 "Country code must contain two characters"
+    constraint onboardName: length(trim(name)) > 0 "Give this vendor a name."
+    constraint onboardPaymentTerms: paymentTermsDays == null or (paymentTermsDays >= 0 and paymentTermsDays <= 365) "Set payment terms between 0 and 365 days."
+    constraint onboardCountryCode: countryCode == null or length(trim(countryCode)) == 2 "Country code needs to be exactly two letters."
     mutate name = name
     mutate email = email
     mutate phone = phone
@@ -108,9 +108,9 @@ entity Vendor mixin TenantScoped, SoftDeletable {
     guard self.onboardedAt != null
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint updateVendorName: length(trim(name)) > 0 "Vendor name is required"
-    constraint updateVendorPaymentTerms: paymentTermsDays == null or (paymentTermsDays >= 0 and paymentTermsDays <= 365) "Payment terms must be between 0 and 365 days"
-    constraint updateVendorCountryCode: countryCode == null or length(trim(countryCode)) == 2 "Country code must contain two characters"
+    constraint updateVendorName: length(trim(name)) > 0 "Give this vendor a name."
+    constraint updateVendorPaymentTerms: paymentTermsDays == null or (paymentTermsDays >= 0 and paymentTermsDays <= 365) "Set payment terms between 0 and 365 days."
+    constraint updateVendorCountryCode: countryCode == null or length(trim(countryCode)) == 2 "Country code needs to be exactly two letters."
     mutate name = name
     mutate email = email != null ? email : self.email
     mutate phone = phone != null ? phone : self.phone
@@ -134,7 +134,7 @@ entity Vendor mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard roleAllows(user.role, "inventoryManageAccess")
-    constraint suspendVendorReason: length(trim(reason)) > 0 "Suspension reason is required"
+    constraint suspendVendorReason: length(trim(reason)) > 0 "Say why you're suspending this vendor."
     mutate status = "suspended"
     mutate suspendedAt = now()
     mutate suspensionReason = reason
@@ -166,7 +166,7 @@ entity Vendor mixin TenantScoped, SoftDeletable {
     guard self.status == "active" or self.status == "suspended"
     guard self.deletedAt == null
     guard roleAllows(user.role, "inventoryManageAccess")
-    constraint terminateVendorReason: length(trim(reason)) > 0 "Termination reason is required"
+    constraint terminateVendorReason: length(trim(reason)) > 0 "Say why you're terminating this vendor."
     mutate status = "terminated"
     mutate terminatedAt = now()
     mutate terminationReason = reason
@@ -214,8 +214,8 @@ entity VendorContact mixin TenantScoped, SoftDeletable {
     guard self.addedAt == null
     guard self.deletedAt == null
     guard self.vendor != null and self.vendor.deletedAt == null
-    constraint addContactVendorMatch: vendorId == self.vendorId "Add contact vendorId must match the seeded vendor reference"
-    constraint addContactName: length(trim(name)) > 0 "Contact name is required"
+    constraint addContactVendorMatch: vendorId == self.vendorId "This contact is for a different vendor. Pick the vendor already on this contact."
+    constraint addContactName: length(trim(name)) > 0 "Give this contact a name."
     mutate vendorId = vendorId
     mutate name = name
     mutate role = role != null ? role : "general"
@@ -241,7 +241,7 @@ entity VendorContact mixin TenantScoped, SoftDeletable {
   ) {
     guard self.addedAt != null
     guard self.deletedAt == null
-    constraint updateContactName: length(trim(name)) > 0 "Contact name is required"
+    constraint updateContactName: length(trim(name)) > 0 "Give this contact a name."
     mutate name = name
     mutate role = role != null ? role : self.role
     mutate email = email != null ? email : self.email

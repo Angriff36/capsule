@@ -443,7 +443,7 @@ export function RecordPhotoCaptureView({
       ) : photos.length === 0 ? (
         <EmptyState
           title="No photos attached yet"
-          hint="Take or choose a photo above to document this record."
+          hint="Take or choose a photo above to document this."
         />
       ) : (
         <ul className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">

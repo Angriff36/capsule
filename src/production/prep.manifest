@@ -33,7 +33,7 @@ entity QualityCheck mixin TenantScoped, SoftDeletable {
   belongsTo productionBatch: ProductionBatch fields [tenantId, productionBatchId] references [tenantId, id]
   belongsTo checkedBy: Person fields [tenantId, checkedById] references [tenantId, id]
 
-  constraint qualitySubjectRequired: self.openedAt == null or self.prepTaskId != null or self.productionBatchId != null "Quality check must reference a PrepTask or ProductionBatch"
+  constraint qualitySubjectRequired: self.openedAt == null or self.prepTaskId != null or self.productionBatchId != null "Link this quality check to a prep task or a production batch."
 
   transition status from "pending" to ["passed", "failed"]
   transition status from "passed" to ["pending"]
@@ -51,9 +51,9 @@ entity QualityCheck mixin TenantScoped, SoftDeletable {
     guard self.openedAt == null
     guard self.status == "pending"
     guard self.deletedAt == null
-    constraint openSubjectRequired: prepTaskId != null or productionBatchId != null or self.prepTaskId != null or self.productionBatchId != null "Quality check must reference a PrepTask or ProductionBatch"
-    constraint openPrepMatch: prepTaskId == null or self.prepTaskId == null or prepTaskId == self.prepTaskId "Open prepTaskId must match the seeded prep task reference when provided"
-    constraint openBatchMatch: productionBatchId == null or self.productionBatchId == null or productionBatchId == self.productionBatchId "Open productionBatchId must match the seeded batch reference when provided"
+    constraint openSubjectRequired: prepTaskId != null or productionBatchId != null or self.prepTaskId != null or self.productionBatchId != null "Link this quality check to a prep task or a production batch."
+    constraint openPrepMatch: prepTaskId == null or self.prepTaskId == null or prepTaskId == self.prepTaskId "This quality check is for a different prep task. Pick the prep task already on this check, or leave it blank."
+    constraint openBatchMatch: productionBatchId == null or self.productionBatchId == null or productionBatchId == self.productionBatchId "This quality check is for a different batch. Pick the batch already on this check, or leave it blank."
     mutate prepTaskId = prepTaskId != null ? prepTaskId : self.prepTaskId
     mutate productionBatchId = productionBatchId != null ? productionBatchId : self.productionBatchId
     mutate notes = notes != null ? notes : self.notes

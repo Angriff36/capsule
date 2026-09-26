@@ -77,7 +77,7 @@ export function ClientProfilePanel({
         String(data.get("paymentTermsDays") ?? "").trim(),
       );
       if (!Number.isFinite(paymentTermsDays)) {
-        throw new Error("Payment terms must be a number of days.");
+        throw new Error("Enter a number of days for payment terms.");
       }
       await changeBillingProfile({
         docId: client._id,

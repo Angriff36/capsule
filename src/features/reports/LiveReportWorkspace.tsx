@@ -81,8 +81,8 @@ export function LiveReportWorkspace({
           </div>
           <h2 id="live-report-title">{String(report.name || "Untitled")}</h2>
           <p>
-            This result stays connected to current Capsule records and updates
-            when its source changes.
+            This result stays connected to what's happening in Capsule now, and
+            updates when its source changes.
           </p>
         </div>
         <span className="live-report-sharing">
@@ -155,8 +155,8 @@ export function LiveReportWorkspace({
         <div className="document-empty live-report-unavailable" role="status">
           <p>Source data isn’t available for your role.</p>
           <span>
-            You can see this saved definition, but it does not grant access to
-            the underlying {formatStatusLabel(subject)} records.
+            You can see this saved report, but it does not give you access to
+            the underlying {formatStatusLabel(subject)} data.
           </span>
         </div>
       ) : model ? (
@@ -193,15 +193,15 @@ function ReportResult({
 
       {noRows ? (
         <div className="document-empty live-report-empty">
-          <p>No records fall in this date window.</p>
-          <span>The live result will update when matching records exist.</span>
+          <p>Nothing falls in this date window.</p>
+          <span>The live result will update when matching rows exist.</span>
         </div>
       ) : (
         <div className="live-report-chart" aria-label={`${reportName} chart`}>
           {chartType === "table" ? (
             <div className="live-report-table-lead">
               <span>Table view</span>
-              <strong>{formatCount(model.rows.length)} source records</strong>
+              <strong>{formatCount(model.rows.length)} source rows</strong>
             </div>
           ) : null}
           {chartType === "bar" ? (
@@ -211,7 +211,7 @@ function ReportResult({
               series={[
                 {
                   dataKey: "value",
-                  name: "Records",
+                  name: "Total",
                   color: "var(--color-brand)",
                 },
               ]}
@@ -246,7 +246,7 @@ function ReportResult({
       <div className="live-report-detail-heading">
         <div>
           <span>Evidence</span>
-          <h3>{formatCount(model.rows.length)} matching records</h3>
+          <h3>{formatCount(model.rows.length)} matching rows</h3>
         </div>
         <button
           className="btn btn-ghost btn-sm"
@@ -261,7 +261,7 @@ function ReportResult({
       <div className="report-detail-scroll">
         <table
           className="supply-table live-report-table"
-          aria-label={`${reportName} evidence records`}
+          aria-label={`${reportName} evidence rows`}
         >
           <thead>
             <tr>

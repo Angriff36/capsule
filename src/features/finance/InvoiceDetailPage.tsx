@@ -192,7 +192,7 @@ export function InvoiceDetailPage() {
     return (
       <ErrorState
         title="Invoice not found"
-        detail="This invoice is missing or belongs to another tenant."
+        detail="This invoice is missing, or it belongs to a different business."
       />
     );
   }
@@ -384,7 +384,7 @@ export function InvoiceDetailPage() {
   const balanceReminderSent = invoice.balanceReminderSentAt != null;
   const balanceDue = Number(invoice.amountDue ?? 0) > 0;
   const balanceReminderBlock = balanceReminderSent
-    ? "A balance reminder is already recorded on this invoice."
+    ? "This invoice already has a balance reminder on file."
     : balanceDue
       ? undefined
       : "Nothing remains due on this invoice.";
@@ -395,7 +395,7 @@ export function InvoiceDetailPage() {
         docId: invoice._id,
         version: invoice.version,
       });
-      setNotice("Balance reminder recorded on this invoice.");
+      setNotice("Balance reminder is on file for this invoice.");
     });
   };
 
@@ -404,7 +404,9 @@ export function InvoiceDetailPage() {
     const data = new FormData(event.currentTarget);
     const amount = Number(String(data.get("depositAmount") ?? "").trim());
     if (!Number.isFinite(amount) || amount < 0) {
-      setFailure(new Error("Deposit amount must be zero or more."));
+      setFailure(
+        new Error("This deposit's amount can't be negative. Use zero or more."),
+      );
       return;
     }
     void run("setDeposit", async () => {
@@ -480,7 +482,7 @@ export function InvoiceDetailPage() {
       }
       if (result.recorded > 0) {
         setNotice(
-          `Recorded ${result.recorded} Stripe payment${result.recorded === 1 ? "" : "s"} (${usd(result.recordedAmount)}) — invoice balance updated.`,
+          `Added ${result.recorded} Stripe payment${result.recorded === 1 ? "" : "s"} (${usd(result.recordedAmount)}) — invoice balance updated.`,
         );
         return;
       }
@@ -504,11 +506,15 @@ export function InvoiceDetailPage() {
     const targetInvoiceId = String(data.get("targetInvoiceId") ?? "").trim();
 
     if (!creditMemoNumber) {
-      setFailure(new Error("Credit memo number is required."));
+      setFailure(new Error("Give this credit memo a number."));
       return;
     }
     if (!Number.isFinite(amount) || amount <= 0) {
-      setFailure(new Error("Credit memo amount must be greater than zero."));
+      setFailure(
+        new Error(
+          "This credit memo's amount has to be more than zero. Enter how much to credit.",
+        ),
+      );
       return;
     }
     if (amount > availableToCredit) {
@@ -624,7 +630,7 @@ export function InvoiceDetailPage() {
               Download PDF
             </button>
             <Link className="btn btn-primary" to={FINANCE_ROUTES.payments}>
-              Record payment
+              Add payment
             </Link>
           </div>
         </div>
@@ -673,7 +679,7 @@ export function InvoiceDetailPage() {
         <div className="ledger-heading">
           <div>
             <p className="eyebrow">Source</p>
-            <h2>Linked records</h2>
+            <h2>Linked to</h2>
           </div>
         </div>
         <p className="text-base text-ink-2">
@@ -722,7 +728,7 @@ export function InvoiceDetailPage() {
                 {busy === action.key
                   ? "Working…"
                   : action.key === "send"
-                    ? "Record sent"
+                    ? "Mark sent"
                     : action.label}
               </button>
             ))}
@@ -803,7 +809,7 @@ export function InvoiceDetailPage() {
           {isForeignCurrency ? (
             <span className="text-xs text-ink-3">
               1 {invoiceCurrencyCode} = {exchangeRate} {functionalCurrencyCode}{" "}
-              · recorded at issue
+              · set at issue
             </span>
           ) : null}
         </div>
@@ -882,8 +888,8 @@ export function InvoiceDetailPage() {
           <span>{relatedCreditMemos.length}</span>
         </div>
         <p className="text-base text-ink-2">
-          Preserve the paid invoice while recording a pricing correction,
-          service recovery, or other post-event credit.
+          Preserve the paid invoice while making a pricing correction, service
+          recovery, or other post-event credit.
         </p>
         <dl className="supply-kv mt-3">
           <div>
@@ -1155,8 +1161,8 @@ export function InvoiceDetailPage() {
         </div>
         <p className="mt-3 max-w-160 text-base text-ink-2">
           Share a secure Stripe checkout link so the client can pay this invoice
-          online without calling in. Confirmed Stripe payments are recorded here
-          and applied to the balance.
+          online without calling in. Confirmed Stripe payments show up here and
+          apply to the balance.
         </p>
         {paymentLinkLoading ? (
           <p className="mt-3 text-base text-ink-2" role="status">
@@ -1339,14 +1345,14 @@ export function InvoiceDetailPage() {
         </div>
         {relatedPayments.length === 0 ? (
           <EmptyState
-            title="No payments recorded yet."
-            hint="Record a payment after the invoice is sent."
+            title="No payments on file yet."
+            hint="Add a payment after the invoice is sent."
             action={
               <Link
                 className="btn btn-ghost btn-sm"
                 to={FINANCE_ROUTES.payments}
               >
-                Record payment
+                Add payment
               </Link>
             }
           />

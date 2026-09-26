@@ -277,7 +277,7 @@ describe("event archive and reactivate (AC-239)", () => {
         version: 1,
         reason: "",
       }),
-    ).rejects.toThrow("Archive reason is required");
+    ).rejects.toThrow("Say why you're archiving this event.");
     expect((await liveEvent(events, secondEventId)).archivedAt).toBeNull();
     expect(
       await lifecycleRows(events, secondEventId, "EventArchived"),

@@ -33,7 +33,7 @@ it("explains a missing client, then enforces the required contact before sending
   await mount(createElement(EventCreatePage));
   const save = button("Create event");
   expect(save.disabled).toBe(true);
-  expect(container.textContent).toContain("Client is required");
+  expect(container.textContent).toContain("Pick a client for this event.");
   await chooseAccountOrVenue("clientId", "Client A");
   await chooseAccountOrVenue("venueId", "Garden");
   input("title", "Summer dinner");

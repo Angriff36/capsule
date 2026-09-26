@@ -212,7 +212,7 @@ export function IntegrationsPage() {
     try {
       await qboDisconnect({});
       setNotice(
-        "QuickBooks disconnected. Records already synced were left in place.",
+        "QuickBooks disconnected. Invoices and payments already synced were left in place.",
       );
     } catch (cause) {
       setError(

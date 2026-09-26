@@ -45,8 +45,8 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
   computed registrationCurrent: boolean = self.registrationExpiresAt != null and self.registrationExpiresAt > now()
   computed insuranceCurrent: boolean = self.insuranceExpiresAt != null and self.insuranceExpiresAt > now()
 
-  constraint vehicleCapacityPositive: self.payloadCapacityKg > 0 "Vehicle payload capacity must be positive"
-  constraint registeredVehicleComplete: self.registeredAt == null or (length(trim(self.make)) > 0 and length(trim(self.model)) > 0 and length(trim(self.registration)) > 0) "Registered vehicles require make, model, and registration"
+  constraint vehicleCapacityPositive: self.payloadCapacityKg > 0 "This vehicle's payload capacity has to be more than zero."
+  constraint registeredVehicleComplete: self.registeredAt == null or (length(trim(self.make)) > 0 and length(trim(self.model)) > 0 and length(trim(self.registration)) > 0) "Give this vehicle a make, model, and registration before you register it."
 
   // Dispatchers need to move vehicles between real-world states without an
   // approval workflow; every state may be corrected as operating facts change.
@@ -72,10 +72,10 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
   ) {
     guard self.registeredAt == null
     guard self.deletedAt == null
-    constraint registerVehicleMake: length(trim(make)) > 0 "Vehicle make is required"
-    constraint registerVehicleModel: length(trim(model)) > 0 "Vehicle model is required"
-    constraint registerVehicleRegistration: length(trim(registration)) > 0 "Vehicle registration is required"
-    constraint registerVehicleCapacity: payloadCapacityKg > 0 "Vehicle payload capacity must be positive"
+    constraint registerVehicleMake: length(trim(make)) > 0 "Give this vehicle a make."
+    constraint registerVehicleModel: length(trim(model)) > 0 "Give this vehicle a model."
+    constraint registerVehicleRegistration: length(trim(registration)) > 0 "Give this vehicle a registration."
+    constraint registerVehicleCapacity: payloadCapacityKg > 0 "This vehicle's payload capacity has to be more than zero."
     mutate make = make
     mutate model = model
     mutate registration = registration
@@ -106,10 +106,10 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
   ) {
     guard self.registeredAt != null
     guard self.deletedAt == null
-    constraint reviseVehicleMake: length(trim(make)) > 0 "Vehicle make is required"
-    constraint reviseVehicleModel: length(trim(model)) > 0 "Vehicle model is required"
-    constraint reviseVehicleRegistration: length(trim(registration)) > 0 "Vehicle registration is required"
-    constraint reviseVehicleCapacity: payloadCapacityKg > 0 "Vehicle payload capacity must be positive"
+    constraint reviseVehicleMake: length(trim(make)) > 0 "Give this vehicle a make."
+    constraint reviseVehicleModel: length(trim(model)) > 0 "Give this vehicle a model."
+    constraint reviseVehicleRegistration: length(trim(registration)) > 0 "Give this vehicle a registration."
+    constraint reviseVehicleCapacity: payloadCapacityKg > 0 "This vehicle's payload capacity has to be more than zero."
     mutate make = make
     mutate model = model
     mutate registration = registration
@@ -152,8 +152,8 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
   ) {
     guard self.registeredAt != null
     guard self.deletedAt == null
-    constraint vehicleRegistrationNumber: length(trim(registrationNumber)) > 0 "Registration number is required"
-    constraint vehicleRegistrationExpiry: registrationExpiresAt > now() "Registration expiry must be in the future"
+    constraint vehicleRegistrationNumber: length(trim(registrationNumber)) > 0 "Give this vehicle a registration number."
+    constraint vehicleRegistrationExpiry: registrationExpiresAt > now() "This vehicle's registration expiry has to be a future date."
     mutate registrationNumber = registrationNumber
     mutate registrationExpiresAt = registrationExpiresAt
     emit VehicleRegistrationUpdated {
@@ -171,9 +171,9 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
   ) {
     guard self.registeredAt != null
     guard self.deletedAt == null
-    constraint vehicleInsuranceProvider: length(trim(insuranceProvider)) > 0 "Insurance provider is required"
-    constraint vehicleInsurancePolicy: length(trim(insurancePolicyNumber)) > 0 "Insurance policy number is required"
-    constraint vehicleInsuranceExpiry: insuranceExpiresAt > now() "Insurance expiry must be in the future"
+    constraint vehicleInsuranceProvider: length(trim(insuranceProvider)) > 0 "Give this vehicle an insurance provider."
+    constraint vehicleInsurancePolicy: length(trim(insurancePolicyNumber)) > 0 "Give this vehicle an insurance policy number."
+    constraint vehicleInsuranceExpiry: insuranceExpiresAt > now() "This vehicle's insurance expiry has to be a future date."
     mutate insuranceProvider = insuranceProvider
     mutate insurancePolicyNumber = insurancePolicyNumber
     mutate insuranceExpiresAt = insuranceExpiresAt
@@ -271,7 +271,7 @@ entity Trailer mixin TenantScoped, SoftDeletable {
   computed registrationCurrent: boolean = self.registrationExpiresAt != null and self.registrationExpiresAt > now()
   computed insuranceCurrent: boolean = self.insuranceExpiresAt != null and self.insuranceExpiresAt > now()
 
-  constraint trailerCapacityPositive: self.payloadCapacityKg > 0 "Trailer payload capacity must be positive"
+  constraint trailerCapacityPositive: self.payloadCapacityKg > 0 "This trailer's payload capacity has to be more than zero."
 
   transition operationalStatus from "available" to ["in_use", "maintenance", "out_of_service", "retired"]
   transition operationalStatus from "in_use" to ["available", "maintenance", "out_of_service", "retired"]
@@ -293,10 +293,10 @@ entity Trailer mixin TenantScoped, SoftDeletable {
   ) {
     guard self.registeredAt == null
     guard self.deletedAt == null
-    constraint registerTrailerMake: length(trim(make)) > 0 "Trailer make is required"
-    constraint registerTrailerModel: length(trim(model)) > 0 "Trailer model is required"
-    constraint registerTrailerRegistration: length(trim(registration)) > 0 "Trailer registration is required"
-    constraint registerTrailerCapacity: payloadCapacityKg > 0 "Trailer payload capacity must be positive"
+    constraint registerTrailerMake: length(trim(make)) > 0 "Give this trailer a make."
+    constraint registerTrailerModel: length(trim(model)) > 0 "Give this trailer a model."
+    constraint registerTrailerRegistration: length(trim(registration)) > 0 "Give this trailer a registration."
+    constraint registerTrailerCapacity: payloadCapacityKg > 0 "This trailer's payload capacity has to be more than zero."
     mutate make = make
     mutate model = model
     mutate registration = registration
@@ -324,10 +324,10 @@ entity Trailer mixin TenantScoped, SoftDeletable {
   ) {
     guard self.registeredAt != null
     guard self.deletedAt == null
-    constraint reviseTrailerMake: length(trim(make)) > 0 "Trailer make is required"
-    constraint reviseTrailerModel: length(trim(model)) > 0 "Trailer model is required"
-    constraint reviseTrailerRegistration: length(trim(registration)) > 0 "Trailer registration is required"
-    constraint reviseTrailerCapacity: payloadCapacityKg > 0 "Trailer payload capacity must be positive"
+    constraint reviseTrailerMake: length(trim(make)) > 0 "Give this trailer a make."
+    constraint reviseTrailerModel: length(trim(model)) > 0 "Give this trailer a model."
+    constraint reviseTrailerRegistration: length(trim(registration)) > 0 "Give this trailer a registration."
+    constraint reviseTrailerCapacity: payloadCapacityKg > 0 "This trailer's payload capacity has to be more than zero."
     mutate make = make
     mutate model = model
     mutate registration = registration
@@ -368,8 +368,8 @@ entity Trailer mixin TenantScoped, SoftDeletable {
   ) {
     guard self.registeredAt != null
     guard self.deletedAt == null
-    constraint trailerRegistrationNumber: length(trim(registrationNumber)) > 0 "Registration number is required"
-    constraint trailerRegistrationExpiry: registrationExpiresAt > now() "Registration expiry must be in the future"
+    constraint trailerRegistrationNumber: length(trim(registrationNumber)) > 0 "Give this trailer a registration number."
+    constraint trailerRegistrationExpiry: registrationExpiresAt > now() "This trailer's registration expiry has to be a future date."
     mutate registrationNumber = registrationNumber
     mutate registrationExpiresAt = registrationExpiresAt
     emit TrailerRegistrationUpdated {
@@ -387,9 +387,9 @@ entity Trailer mixin TenantScoped, SoftDeletable {
   ) {
     guard self.registeredAt != null
     guard self.deletedAt == null
-    constraint trailerInsuranceProvider: length(trim(insuranceProvider)) > 0 "Insurance provider is required"
-    constraint trailerInsurancePolicy: length(trim(insurancePolicyNumber)) > 0 "Insurance policy number is required"
-    constraint trailerInsuranceExpiry: insuranceExpiresAt > now() "Insurance expiry must be in the future"
+    constraint trailerInsuranceProvider: length(trim(insuranceProvider)) > 0 "Give this trailer an insurance provider."
+    constraint trailerInsurancePolicy: length(trim(insurancePolicyNumber)) > 0 "Give this trailer an insurance policy number."
+    constraint trailerInsuranceExpiry: insuranceExpiresAt > now() "This trailer's insurance expiry has to be a future date."
     mutate insuranceProvider = insuranceProvider
     mutate insurancePolicyNumber = insurancePolicyNumber
     mutate insuranceExpiresAt = insuranceExpiresAt
@@ -472,7 +472,7 @@ entity VehicleFuelLog mixin TenantScoped, SoftDeletable {
 
   belongsTo vehicle: Vehicle fields [tenantId, vehicleId] references [tenantId, id]
 
-  constraint vehicleFuelComplete: self.loggedAt == null or (self.odometer >= 0 and self.fuelCost >= 0 and self.filledAt != null) "Fuel logs require a nonnegative odometer, nonnegative cost, and fill date"
+  constraint vehicleFuelComplete: self.loggedAt == null or (self.odometer >= 0 and self.fuelCost >= 0 and self.filledAt != null) "Give this fuel log an odometer reading, a cost, and a fill date. None can be negative."
 
   default policy vehicleFuelRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may see fuel logs"
   default policy vehicleFuelWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may add fuel logs"
@@ -488,10 +488,10 @@ entity VehicleFuelLog mixin TenantScoped, SoftDeletable {
     guard self.loggedAt == null
     guard self.deletedAt == null
     guard self.vehicle != null
-    constraint recordFuelVehicleMatch: vehicleId == self.vehicleId "Fuel log vehicle must match the selected vehicle"
-    constraint recordFuelOdometer: odometer >= 0 "Odometer reading cannot be negative"
-    constraint recordFuelCost: fuelCost >= 0 "Fuel cost cannot be negative"
-    constraint recordFuelTime: filledAt <= now() "Fuel fill time cannot be in the future"
+    constraint recordFuelVehicleMatch: vehicleId == self.vehicleId "This fuel log is for a different vehicle. Pick the vehicle already on this fuel log."
+    constraint recordFuelOdometer: odometer >= 0 "The odometer reading can't be negative. Use zero or more."
+    constraint recordFuelCost: fuelCost >= 0 "The fuel cost can't be negative. Use zero or more."
+    constraint recordFuelTime: filledAt <= now() "The fill time can't be in the future."
     mutate odometer = odometer
     mutate fuelCost = fuelCost
     mutate filledAt = filledAt
@@ -542,7 +542,7 @@ entity VehicleMaintenanceSchedule mixin TenantScoped, SoftDeletable {
 
   belongsTo vehicle: Vehicle fields [tenantId, vehicleId] references [tenantId, id]
 
-  constraint vehicleMaintenanceComplete: self.scheduledAt == null or (length(trim(self.taskName)) > 0 and ((self.intervalType == "time" and self.intervalDays > 0 and self.nextDueAt != null) or (self.intervalType == "mileage" and self.intervalMiles > 0 and self.nextDueMileage != null))) "Scheduled maintenance requires a task and a time or mileage interval with a due target"
+  constraint vehicleMaintenanceComplete: self.scheduledAt == null or (length(trim(self.taskName)) > 0 and ((self.intervalType == "time" and self.intervalDays > 0 and self.nextDueAt != null) or (self.intervalType == "mileage" and self.intervalMiles > 0 and self.nextDueMileage != null))) "Give this maintenance a task name, and a due date or due mileage."
 
   default policy vehicleMaintenanceRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may see vehicle maintenance"
   default policy vehicleMaintenanceWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may update vehicle maintenance"
@@ -561,9 +561,9 @@ entity VehicleMaintenanceSchedule mixin TenantScoped, SoftDeletable {
     guard self.scheduledAt == null
     guard self.deletedAt == null
     guard self.vehicle != null
-    constraint scheduleMaintenanceVehicleMatch: vehicleId == self.vehicleId "Maintenance vehicle must match the selected vehicle"
-    constraint scheduleMaintenanceName: length(trim(taskName)) > 0 "Maintenance task is required"
-    constraint scheduleMaintenanceTarget: (intervalType == "time" and nextDueAt != null and (intervalDays == null or intervalDays > 0)) or (intervalType == "mileage" and nextDueMileage != null and (intervalMiles == null or intervalMiles > 0)) "Time schedules need a first due date; mileage schedules need a due odometer"
+    constraint scheduleMaintenanceVehicleMatch: vehicleId == self.vehicleId "This maintenance is for a different vehicle. Pick the vehicle already on this maintenance."
+    constraint scheduleMaintenanceName: length(trim(taskName)) > 0 "Give this maintenance a task name."
+    constraint scheduleMaintenanceTarget: (intervalType == "time" and nextDueAt != null and (intervalDays == null or intervalDays > 0)) or (intervalType == "mileage" and nextDueMileage != null and (intervalMiles == null or intervalMiles > 0)) "A time-based schedule needs a first due date. A mileage-based schedule needs a due odometer reading."
     mutate taskName = taskName
     mutate intervalType = intervalType
     mutate intervalDays = intervalDays != null ? intervalDays : 90
@@ -649,7 +649,7 @@ entity VehicleServiceEntry mixin TenantScoped, SoftDeletable {
   belongsTo maintenanceSchedule: VehicleMaintenanceSchedule fields [tenantId, maintenanceScheduleId] references [tenantId, id]
   belongsTo vehicle: Vehicle fields [tenantId, vehicleId] references [tenantId, id]
 
-  constraint vehicleServiceComplete: self.loggedAt == null or (length(trim(self.vendor)) > 0 and self.cost >= 0 and self.odometer >= 0 and self.completedAt != null) "Completed service requires a vendor, nonnegative cost, odometer reading, and completion time"
+  constraint vehicleServiceComplete: self.loggedAt == null or (length(trim(self.vendor)) > 0 and self.cost >= 0 and self.odometer >= 0 and self.completedAt != null) "Give this service a vendor, a cost, an odometer reading, and when it was done. Cost can't be negative."
 
   default policy vehicleServiceRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may see vehicle service history"
   default policy vehicleServiceWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may add vehicle service"
@@ -670,12 +670,12 @@ entity VehicleServiceEntry mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.maintenanceSchedule != null
     guard self.vehicle != null
-    constraint recordServiceScheduleMatch: maintenanceScheduleId == self.maintenanceScheduleId "Service entry must match the selected maintenance schedule"
-    constraint recordServiceVehicleMatch: vehicleId == self.vehicleId and self.maintenanceSchedule.vehicleId == vehicleId "Service entry vehicle must match its maintenance schedule"
-    constraint recordServiceVendor: length(trim(vendor)) > 0 "Vendor is required"
-    constraint recordServiceCost: cost >= 0 "Service cost cannot be negative"
-    constraint recordServiceOdometer: odometer >= 0 "Odometer reading cannot be negative"
-    constraint recordServiceTime: completedAt <= now() "Service completion cannot be in the future"
+    constraint recordServiceScheduleMatch: maintenanceScheduleId == self.maintenanceScheduleId "This service is for a different maintenance schedule. Pick the schedule already on this service."
+    constraint recordServiceVehicleMatch: vehicleId == self.vehicleId and self.maintenanceSchedule.vehicleId == vehicleId "This service's vehicle doesn't match its maintenance schedule."
+    constraint recordServiceVendor: length(trim(vendor)) > 0 "Give this service a vendor."
+    constraint recordServiceCost: cost >= 0 "The service cost can't be negative. Use zero or more."
+    constraint recordServiceOdometer: odometer >= 0 "The odometer reading can't be negative. Use zero or more."
+    constraint recordServiceTime: completedAt <= now() "The completion time can't be in the future."
     mutate vendor = vendor
     mutate cost = cost
     mutate odometer = odometer

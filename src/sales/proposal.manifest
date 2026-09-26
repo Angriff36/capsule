@@ -86,7 +86,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   ref supersededBy: Proposal fields [tenantId, supersededById] references [tenantId, id]
   ref replacesProposal: Proposal fields [tenantId, replacesProposalId] references [tenantId, id]
 
-  constraint proposalDraftComplete: self.draftedAt == null or (length(trim(self.title)) > 0 and self.guestCount >= 0 and self.subtotal >= 0 and self.taxAmount >= 0 and self.discountAmount >= 0 and self.total >= 0) "Drafted proposals require a title and non-negative money and guest counts"
+  constraint proposalDraftComplete: self.draftedAt == null or (length(trim(self.title)) > 0 and self.guestCount >= 0 and self.subtotal >= 0 and self.taxAmount >= 0 and self.discountAmount >= 0 and self.total >= 0) "Give this proposal a title, and make sure the money amounts and guest count are zero or more"
   constraint proposalTotalsConsistent: self.draftedAt == null or self.total == self.subtotal + self.taxAmount - self.discountAmount "Proposal total must equal subtotal plus tax minus discount"
 
   transition status from "draft" to ["sent"]
@@ -126,10 +126,10 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     guard self.status == "draft"
     guard self.deletedAt == null
     guard self.client != null
-    constraint draftClientMatch: clientId == self.clientId "Draft clientId must match the seeded client reference"
-    constraint draftTitle: length(trim(title)) > 0 "Proposal title is required"
-    constraint draftGuestCount: guestCount == null or guestCount >= 0 "Guest count cannot be negative"
-    constraint draftMoneyNonnegative: subtotal >= 0 and taxAmount >= 0 and discountAmount >= 0 and total >= 0 "Proposal money amounts cannot be negative"
+    constraint draftClientMatch: clientId == self.clientId "This proposal is for a different client. Use the client already on this proposal."
+    constraint draftTitle: length(trim(title)) > 0 "Give this proposal a title"
+    constraint draftGuestCount: guestCount == null or guestCount >= 0 "The guest count can't be negative. Use zero or more."
+    constraint draftMoneyNonnegative: subtotal >= 0 and taxAmount >= 0 and discountAmount >= 0 and total >= 0 "This proposal's money amounts can't be negative. Use zero or more."
     constraint draftTotalMatch: total == subtotal + taxAmount - discountAmount "Proposal total must equal subtotal plus tax minus discount"
     mutate clientId = clientId
     mutate title = title
@@ -178,7 +178,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     guard self.draftedAt != null
     guard self.deletedAt == null
     guard self.client != null and self.client.status == "active"
-    constraint sendTitle: length(trim(self.title)) > 0 "Proposal title is required before send"
+    constraint sendTitle: length(trim(self.title)) > 0 "Give this proposal a title before you send it"
     mutate status = "sent"
     mutate sentAt = now()
     emit ProposalSent {

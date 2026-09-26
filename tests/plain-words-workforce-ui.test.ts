@@ -62,7 +62,7 @@ describe("plain words on workforce UI", () => {
     }
 
     // later leftovers, unchanged
-    expect(visible).toContain("<th>Recorded</th>");
+    expect(visible).toContain("<th>Clocked</th>");
     expect(visible).toContain("less recorded breaks");
   });
 

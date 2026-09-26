@@ -45,7 +45,7 @@ entity OneOnOne mixin TenantScoped, SoftDeletable {
 
   // A held meeting must record when it happened. Both participants are required
   // uuids; the UI offers two separate people pickers.
-  constraint meetingComplete: self.heldAt == null or self.meetingDate != null "A held one-on-one requires a meeting date"
+  constraint meetingComplete: self.heldAt == null or self.meetingDate != null "Pick a meeting date for this one-on-one."
 
   default policy oneOnOneRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may see one-on-ones"
   default policy oneOnOneWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may update one-on-ones"
@@ -101,7 +101,7 @@ entity OneOnOneAction mixin TenantScoped, SoftDeletable {
   belongsTo oneOnOne: OneOnOne fields [tenantId, oneOnOneId] references [tenantId, id]
   belongsTo owner: Person fields [tenantId, ownerPersonId] references [tenantId, id]
 
-  constraint actionComplete: self.capturedAt == null or length(trim(self.description)) > 0 "A captured action requires a description"
+  constraint actionComplete: self.capturedAt == null or length(trim(self.description)) > 0 "Give this action a description."
 
   transition status from "open" to ["closed"]
 
@@ -122,7 +122,7 @@ entity OneOnOneAction mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.oneOnOne != null and self.oneOnOne.heldAt != null
     guard user.id != null
-    constraint captureDescription: length(trim(description)) > 0 "Action description is required"
+    constraint captureDescription: length(trim(description)) > 0 "Give this action a description."
     mutate oneOnOneId = oneOnOneId
     mutate ownerPersonId = ownerPersonId
     mutate description = description

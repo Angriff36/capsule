@@ -48,10 +48,10 @@ entity StockCountSession mixin TenantScoped, SoftDeletable {
     guard self.startedAt == null
     guard self.status == "in_progress"
     guard self.deletedAt == null
-    constraint stockCountLabelRequired: length(trim(label)) > 0 "Count session name is required"
+    constraint stockCountLabelRequired: length(trim(label)) > 0 "Give this count session a name."
     constraint stockCountLocationsRequired: length(trim(locationIds)) > 2 "Choose at least one storage location"
-    constraint stockCountLocationNamesRequired: length(trim(locationNames)) > 0 "Count session locations are required"
-    constraint stockCountLineCountNonnegative: lineCount >= 0 "Count line total cannot be negative"
+    constraint stockCountLocationNamesRequired: length(trim(locationNames)) > 0 "Give this count session its location names."
+    constraint stockCountLineCountNonnegative: lineCount >= 0 "The line total can't be negative. Use zero or more."
     mutate label = label
     mutate locationIds = locationIds
     mutate locationNames = locationNames
@@ -143,11 +143,11 @@ entity StockCountLine mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.session != null and self.session.status == "in_progress" and self.session.deletedAt == null
     guard self.inventoryItem != null and self.inventoryItem.stockedAt != null and self.inventoryItem.deletedAt == null
-    constraint stockCountSessionMatch: stockCountSessionId == self.stockCountSessionId "Count session must match the seeded session reference"
-    constraint stockCountInventoryItemMatch: inventoryItemId == self.inventoryItemId "Stock line must match the seeded inventory reference"
-    constraint stockCountLocationMatch: locationId == self.locationId and locationId == self.inventoryItem.locationId "Count location must match the stock line location"
-    constraint stockCountIngredientMatch: ingredientId == self.ingredientId and ingredientId == self.inventoryItem.ingredientId "Count ingredient must match the stock line ingredient"
-    constraint stockCountUnitMatch: unit == self.unit and unit == self.inventoryItem.unit "Count unit must match the stock line unit"
+    constraint stockCountSessionMatch: stockCountSessionId == self.stockCountSessionId "This line is for a different count session. Pick the session already on this line."
+    constraint stockCountInventoryItemMatch: inventoryItemId == self.inventoryItemId "This line is for a different stock item. Pick the stock item already on this line."
+    constraint stockCountLocationMatch: locationId == self.locationId and locationId == self.inventoryItem.locationId "This line's location doesn't match its stock item's location."
+    constraint stockCountIngredientMatch: ingredientId == self.ingredientId and ingredientId == self.inventoryItem.ingredientId "This line's ingredient doesn't match its stock item's ingredient."
+    constraint stockCountUnitMatch: unit == self.unit and unit == self.inventoryItem.unit "This line's unit doesn't match its stock item's unit."
     mutate stockCountSessionId = stockCountSessionId
     mutate inventoryItemId = inventoryItemId
     mutate locationId = locationId
@@ -178,7 +178,7 @@ entity StockCountLine mixin TenantScoped, SoftDeletable {
     guard self.frozenAt != null
     guard self.deletedAt == null
     guard self.session != null and self.session.status == "in_progress"
-    constraint stockCountQuantityNonnegative: countedQuantity >= 0 "Counted quantity cannot be negative"
+    constraint stockCountQuantityNonnegative: countedQuantity >= 0 "The counted amount can't be negative. Use zero or more."
     compute varianceQuantity = countedQuantity - self.expectedQuantity
     mutate countedQuantity = countedQuantity
     mutate varianceQuantity = varianceQuantity
@@ -204,7 +204,7 @@ entity StockCountLine mixin TenantScoped, SoftDeletable {
     guard self.status == "counted"
     guard self.deletedAt == null
     guard self.session != null and self.session.status == "in_progress"
-    constraint stockCountRevisedQuantityNonnegative: countedQuantity >= 0 "Counted quantity cannot be negative"
+    constraint stockCountRevisedQuantityNonnegative: countedQuantity >= 0 "The counted amount can't be negative. Use zero or more."
     compute varianceQuantity = countedQuantity - self.expectedQuantity
     mutate countedQuantity = countedQuantity
     mutate varianceQuantity = varianceQuantity

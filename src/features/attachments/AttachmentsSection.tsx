@@ -127,7 +127,7 @@ export function AttachmentsSection({
       ) : attachments.length === 0 ? (
         <EmptyState
           title="No files attached yet"
-          hint="PDFs, images, and spreadsheets attached here stay with this record."
+          hint="PDFs, images, and spreadsheets attached here stay with this item."
         />
       ) : (
         <ul className="mt-3 divide-y">

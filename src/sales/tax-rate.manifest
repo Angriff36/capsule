@@ -17,7 +17,7 @@ entity TaxRate mixin TenantScoped, SoftDeletable {
 
   computed appliesToAny: boolean = self.appliesToFood or self.appliesToService or self.appliesToRental
 
-  constraint taxRateComplete: self.configuredAt == null or (length(trim(self.name)) > 0 and self.percentage > 0 and self.percentage <= 100 and (self.appliesToFood or self.appliesToService or self.appliesToRental)) "Tax rates require a name, a percentage from 0 to 100, and at least one applicability"
+  constraint taxRateComplete: self.configuredAt == null or (length(trim(self.name)) > 0 and self.percentage > 0 and self.percentage <= 100 and (self.appliesToFood or self.appliesToService or self.appliesToRental)) "Give this tax rate a name, a percentage between 0 and 100, and pick what it applies to"
 
   default policy taxRateRead read: roleAllows(user.role, "financeAccess") "Finance staff may see tax rates"
   default policy taxRateWrite write: roleAllows(user.role, "financeAccess") "Finance staff may maintain tax rates"
@@ -32,7 +32,7 @@ entity TaxRate mixin TenantScoped, SoftDeletable {
   ) {
     guard self.configuredAt == null
     guard self.deletedAt == null
-    constraint defineTaxRateName: length(trim(name)) > 0 "Tax rate name is required"
+    constraint defineTaxRateName: length(trim(name)) > 0 "Give this tax rate a name"
     constraint defineTaxRatePercentage: percentage > 0 and percentage <= 100 "Tax rate percentage must be greater than 0 and no more than 100"
     constraint defineTaxRateApplicability: appliesToFood or appliesToService or appliesToRental "Select at least one line-item category"
     mutate name = name
@@ -59,7 +59,7 @@ entity TaxRate mixin TenantScoped, SoftDeletable {
   ) {
     guard self.configuredAt != null
     guard self.deletedAt == null
-    constraint reviseTaxRateName: length(trim(name)) > 0 "Tax rate name is required"
+    constraint reviseTaxRateName: length(trim(name)) > 0 "Give this tax rate a name"
     constraint reviseTaxRatePercentage: percentage > 0 and percentage <= 100 "Tax rate percentage must be greater than 0 and no more than 100"
     constraint reviseTaxRateApplicability: appliesToFood or appliesToService or appliesToRental "Select at least one line-item category"
     mutate name = name

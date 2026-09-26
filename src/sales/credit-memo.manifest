@@ -40,7 +40,7 @@ entity CreditMemo mixin TenantScoped, SoftDeletable {
   ref targetInvoice: Invoice fields [tenantId, targetInvoiceId] references [tenantId, id]
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
 
-  constraint creditMemoIssuedComplete: self.issuedAt == null or (length(trim(self.creditMemoNumber)) > 0 and self.amount > 0 and length(trim(self.reason)) > 0) "Issued credit memos require a number, positive amount, and reason"
+  constraint creditMemoIssuedComplete: self.issuedAt == null or (length(trim(self.creditMemoNumber)) > 0 and self.amount > 0 and length(trim(self.reason)) > 0) "Give this credit memo a number, an amount above zero, and a reason before you issue it"
   constraint creditMemoRemainingValid: self.remainingAmount >= 0 and self.remainingAmount <= self.amount "Remaining credit must stay between zero and the issued amount"
 
   transition status from "draft" to ["available", "applied"]
@@ -66,14 +66,14 @@ entity CreditMemo mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.sourceInvoice != null and self.sourceInvoice.deletedAt == null
     guard self.client != null
-    constraint issueSourceMatch: sourceInvoiceId == self.sourceInvoiceId "Source invoice must match the seeded invoice reference"
-    constraint issueClientMatch: clientId == self.clientId "Client must match the seeded client reference"
+    constraint issueSourceMatch: sourceInvoiceId == self.sourceInvoiceId "This credit memo is for a different invoice. Use the invoice already on this credit memo."
+    constraint issueClientMatch: clientId == self.clientId "This credit memo is for a different client. Use the client already on this credit memo."
     constraint sourceClientMatch: self.sourceInvoice.clientId == clientId "Credit memo client must match the paid source invoice"
     constraint sourcePaid: self.sourceInvoice.status == "paid" "Credit memos may only be issued against paid invoices"
-    constraint numberPresent: length(trim(creditMemoNumber)) > 0 "Credit memo number is required"
-    constraint amountPositive: amount > 0 "Credit memo amount must be positive"
+    constraint numberPresent: length(trim(creditMemoNumber)) > 0 "Give this credit memo a number"
+    constraint amountPositive: amount > 0 "This credit memo's amount has to be more than zero. Enter how much to credit."
     constraint amountWithinPaid: amount <= self.sourceInvoice.amountPaid "Credit memo amount cannot exceed the amount paid"
-    constraint reasonPresent: length(trim(reason)) > 0 "Credit memo reason is required"
+    constraint reasonPresent: length(trim(reason)) > 0 "Give this credit memo a reason"
     constraint targetRequired: disposition != "apply_to_balance" or targetInvoiceId != null "Choose an open invoice when applying the credit now"
     constraint carryForwardTargetEmpty: disposition != "carry_forward" or targetInvoiceId == null "Carry-forward credit cannot select a target invoice"
     constraint targetExists: targetInvoiceId == null or self.targetInvoice != null "Selected target invoice was not found"

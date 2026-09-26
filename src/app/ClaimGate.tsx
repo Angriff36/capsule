@@ -59,7 +59,7 @@ export function ClaimGate({ children }: { readonly children?: ReactNode }) {
   if (status === undefined || status.accountId !== user?.id) {
     return (
       <GateShell title="Loading workspace…">
-        <p className="text-ink-2">Confirming your workspace membership.</p>
+        <p className="text-ink-2">Checking which workspace you belong to.</p>
       </GateShell>
     );
   }

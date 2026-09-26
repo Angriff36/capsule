@@ -56,10 +56,10 @@ entity DishContainer mixin TenantScoped, SoftDeletable {
 
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
 
-  constraint dishContainerName: self.addedAt == null or length(trim(self.name)) > 0 "Container name is required"
-  constraint dishContainerServings: self.servingsPerContainer >= 1 "Servings per container must be at least 1"
-  constraint dishContainerBase: self.baseQuantity >= 0 "Base quantity cannot be negative"
-  constraint dishContainerSort: self.sortOrder >= 0 "Sort order cannot be negative"
+  constraint dishContainerName: self.addedAt == null or length(trim(self.name)) > 0 "Give this container a name."
+  constraint dishContainerServings: self.servingsPerContainer >= 1 "Each container has to hold at least 1 serving."
+  constraint dishContainerBase: self.baseQuantity >= 0 "This container's extra amount can't be negative. Use zero or more."
+  constraint dishContainerSort: self.sortOrder >= 0 "This container's place in the list can't be negative. Use zero or more."
 
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
@@ -81,8 +81,8 @@ entity DishContainer mixin TenantScoped, SoftDeletable {
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
-    constraint defineContainerName: length(trim(name)) > 0 "Container name is required"
-    constraint defineContainerServings: servingsPerContainer >= 1 "Servings per container must be at least 1"
+    constraint defineContainerName: length(trim(name)) > 0 "Give this container a name."
+    constraint defineContainerServings: servingsPerContainer >= 1 "Each container has to hold at least 1 serving."
     mutate dishId = dishId
     mutate activeDishId = dishId
     mutate name = name
@@ -115,8 +115,8 @@ entity DishContainer mixin TenantScoped, SoftDeletable {
   ) {
     guard self.addedAt != null
     guard self.deletedAt == null
-    constraint reviseContainerName: length(trim(name)) > 0 "Container name is required"
-    constraint reviseContainerServings: servingsPerContainer >= 1 "Servings per container must be at least 1"
+    constraint reviseContainerName: length(trim(name)) > 0 "Give this container a name."
+    constraint reviseContainerServings: servingsPerContainer >= 1 "Each container has to hold at least 1 serving."
     mutate name = name
     mutate serviceMethod = serviceMethod
     mutate servingsPerContainer = servingsPerContainer

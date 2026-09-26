@@ -246,7 +246,7 @@ describe("runtime proof: venue note post/pin/revise/remove (AC-316)", () => {
         category: "other" as const,
         content: "",
       }),
-    ).rejects.toThrow("Note content is required");
+    ).rejects.toThrow("Write something in this note.");
     await expect(
       proof.executeCommand(staff, M.VenueNote_createViaPost, {
         venueId,
@@ -255,7 +255,7 @@ describe("runtime proof: venue note post/pin/revise/remove (AC-316)", () => {
         category: "other" as const,
         content: "   ",
       }),
-    ).rejects.toThrow("Note content is required");
+    ).rejects.toThrow("Write something in this note.");
 
     expect(
       (await staff.query(api.queries.listVenueNote, {})) as unknown[],

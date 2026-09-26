@@ -46,6 +46,6 @@ describe("plain words on leftover pack-item batch match copy", () => {
       "Kitchen, logistics, event and sales staff and managers may update pack list items",
     );
     // Later leftovers keep their current wording.
-    expect(visible).toContain("Pack item description is required");
+    expect(visible).toContain("Give this pack item a description.");
   });
 });

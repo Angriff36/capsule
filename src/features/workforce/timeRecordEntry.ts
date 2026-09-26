@@ -161,7 +161,9 @@ export async function persistPrimaryTimeRecord(
     ? parseTimeWindow(input.clockInAt, input.clockOutAt)
     : null;
   if (wantsWindow && window == null) {
-    throw new Error("Clock-out must be at or after clock-in.");
+    throw new Error(
+      "The clock-out time has to be at or after the clock-in time.",
+    );
   }
   if (window) {
     const closed = await api.clockOut({
@@ -199,7 +201,9 @@ export async function persistClockOut(
   // closed at "now" with an error on screen.
   const desiredOut = toEpoch(input.clockOutAt);
   if (desiredOut != null && desiredOut < input.existingClockInAt) {
-    throw new Error("Clock-out must be at or after clock-in.");
+    throw new Error(
+      "The clock-out time has to be at or after the clock-in time.",
+    );
   }
   const closed = await api.clockOut({
     docId: input.docId,

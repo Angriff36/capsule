@@ -66,7 +66,7 @@ describe("plain words on leftover workforce and payroll event/shift match copy",
     }
     // Later leftovers keep their current wording.
     expect(visible).toContain(
-      "Payroll period end must be at or after period start",
+      "This payroll input's period has to end on or after it starts.",
     );
     // The time-off person leftover keeps its wording, pinned from the generated file.
     expect(mutations).toContain(

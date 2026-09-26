@@ -62,11 +62,14 @@ describe("plain words on leftover facilities equipment manifests", () => {
     expect(visible).not.toContain(
       "Equipment reservations require a valid date range and positive quantity",
     );
-    expect(visible).toContain(
+    expect(visible).not.toContain(
       "Equipment handoffs require a valid date range and positive quantity",
     );
+    expect(visible).toContain(
+      "This equipment handoff needs a valid date range and a quantity more than zero.",
+    );
     expectPlain(
-      "Equipment handoffs require a valid date range and positive quantity",
+      "This equipment handoff needs a valid date range and a quantity more than zero.",
     );
 
     // already-landed write/read leftovers must stay put

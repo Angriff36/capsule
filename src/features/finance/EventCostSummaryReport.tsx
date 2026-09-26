@@ -192,8 +192,8 @@ export function EventCostSummaryReport({
               Revenue adds up this event's billed invoices — sent through paid.
               Drafts are reported separately and never counted as revenue;
               deleted, voided, and written-off invoices are left out. Costs come
-              from the closeout you recorded for the event; equipment/ vendor
-              hire and miscellaneous/waste follow the closeout categories.
+              from the closeout you did for the event; equipment/ vendor hire
+              and miscellaneous/waste follow the closeout categories.
             </span>
           </div>
           <div>

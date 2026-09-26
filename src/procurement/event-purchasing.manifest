@@ -316,7 +316,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   command retire(reason: string) {
     guard self.recordedAt != null
     guard self.deletedAt == null
-    constraint retireReason: length(trim(reason)) > 0 "Retire reason is required"
+    constraint retireReason: length(trim(reason)) > 0 "Say why you're retiring this."
     mutate deletedAt = now()
     mutate quantity = 0
     mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
@@ -338,7 +338,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   command supersede(reason: string, optional supersededBySourceKey: string) {
     guard self.recordedAt != null
     guard self.deletedAt == null
-    constraint supersedeReason: length(trim(reason)) > 0 "Supersede reason is required"
+    constraint supersedeReason: length(trim(reason)) > 0 "Say why this is being replaced."
     mutate supersededAt = now()
     mutate supersededBySourceKey = supersededBySourceKey
     mutate deletedAt = now()

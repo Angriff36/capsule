@@ -134,11 +134,22 @@ export function PackListsPage() {
       }
       void run(`${row._id}:${key}`, async () => {
         const args = { docId: row._id, version: row.version };
-        if (key === "startPacking") await startPacking(args);
-        if (key === "markPacked") await markPacked(args);
-        if (key === "markLoaded") await markLoaded(args);
-        if (key === "dispatch") await dispatch(args);
-        setNotice(`Pack list updated (${key}).`);
+        if (key === "startPacking") {
+          await startPacking(args);
+          setNotice("Packing started.");
+        }
+        if (key === "markPacked") {
+          await markPacked(args);
+          setNotice("Pack list marked packed.");
+        }
+        if (key === "markLoaded") {
+          await markLoaded(args);
+          setNotice("Pack list marked loaded.");
+        }
+        if (key === "dispatch") {
+          await dispatch(args);
+          setNotice("Pack list dispatched.");
+        }
       });
     })();
   };

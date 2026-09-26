@@ -69,7 +69,7 @@ export function TeamRolesPanel({
     const role = String(data.get("role") ?? "staff");
     const employeeNumber = String(data.get("employeeNumber") ?? "").trim();
     if (!givenName || !familyName || !email) {
-      setError("First name, last name, and email are required.");
+      setError("Give this hire a first name, last name, and email.");
       return;
     }
     if (!PersonRoleDirectory.isAssignable(role)) {

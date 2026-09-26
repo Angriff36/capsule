@@ -628,8 +628,8 @@ async function __runAnnouncementPost(ctx: MutationCtx, { docId, title, body, cat
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change announcements");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 1 failed");
-    if (!((((title).trim()).length > 0))) throw new Error("Announcement title is required");
-    if (!((((body).trim()).length > 0))) throw new Error("Announcement body is required");
+    if (!((((title).trim()).length > 0))) throw new Error("Give this announcement a title.");
+    if (!((((body).trim()).length > 0))) throw new Error("Give this announcement something to say.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -703,8 +703,8 @@ export const Announcement_createViaPost = mutation({
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change announcements");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 1 failed");
-    if (!((((title).trim()).length > 0))) throw new Error("Announcement title is required");
-    if (!((((body).trim()).length > 0))) throw new Error("Announcement body is required");
+    if (!((((title).trim()).length > 0))) throw new Error("Give this announcement a title.");
+    if (!((((body).trim()).length > 0))) throw new Error("Give this announcement something to say.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -874,9 +874,9 @@ async function __runAssistantLlmConfigConfigure(ctx: MutationCtx, { docId, baseU
     if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may update assistant configuration");
     if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may change assistant configuration");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((((baseUrl).startsWith("https://") || (baseUrl).startsWith("http://localhost")) || (baseUrl).startsWith("http://127.0.0.1")))) throw new Error("Base URL must be an HTTP(S) endpoint");
-    if (!(((apiKey).trim() !== ""))) throw new Error("API key cannot be empty");
-    if (!(((model).trim() !== ""))) throw new Error("Model cannot be empty");
+    if (!((((baseUrl).startsWith("https://") || (baseUrl).startsWith("http://localhost")) || (baseUrl).startsWith("http://127.0.0.1")))) throw new Error("The web address has to start with http:// or https://.");
+    if (!(((apiKey).trim() !== ""))) throw new Error("Enter an API key.");
+    if (!(((model).trim() !== ""))) throw new Error("Enter a model name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -942,9 +942,9 @@ export const AssistantLlmConfig_createViaConfigure = mutation({
     if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may update assistant configuration");
     if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may change assistant configuration");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((((baseUrl).startsWith("https://") || (baseUrl).startsWith("http://localhost")) || (baseUrl).startsWith("http://127.0.0.1")))) throw new Error("Base URL must be an HTTP(S) endpoint");
-    if (!(((apiKey).trim() !== ""))) throw new Error("API key cannot be empty");
-    if (!(((model).trim() !== ""))) throw new Error("Model cannot be empty");
+    if (!((((baseUrl).startsWith("https://") || (baseUrl).startsWith("http://localhost")) || (baseUrl).startsWith("http://127.0.0.1")))) throw new Error("The web address has to start with http:// or https://.");
+    if (!(((apiKey).trim() !== ""))) throw new Error("Enter an API key.");
+    if (!(((model).trim() !== ""))) throw new Error("Enter a model name.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -974,9 +974,9 @@ async function __runAttachmentAttach(ctx: MutationCtx, { docId, parentType, pare
     if (!((doc.uploadedById == null))) throw new Error("Guard 0 failed");
     if (!((parentType !== "staffMessage"))) throw new Error("Chat files are attached through their message");
     if (!((((parentId).trim()).length > 0))) throw new Error("This file needs something to attach to");
-    if (!((((fileName).trim()).length > 0))) throw new Error("File name is required");
-    if (!((((storageId).trim()).length > 0))) throw new Error("Stored file reference is required");
-    if (!((fileSize >= 0))) throw new Error("File size cannot be negative");
+    if (!((((fileName).trim()).length > 0))) throw new Error("Give this file a name.");
+    if (!((((storageId).trim()).length > 0))) throw new Error("This file hasn't finished uploading yet.");
+    if (!((fileSize >= 0))) throw new Error("This file's size can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -1064,9 +1064,9 @@ export const Attachment_createViaAttach = mutation({
     if (!((__draft.uploadedById == null))) throw new Error("Guard 0 failed");
     if (!((parentType !== "staffMessage"))) throw new Error("Chat files are attached through their message");
     if (!((((parentId).trim()).length > 0))) throw new Error("This file needs something to attach to");
-    if (!((((fileName).trim()).length > 0))) throw new Error("File name is required");
-    if (!((((storageId).trim()).length > 0))) throw new Error("Stored file reference is required");
-    if (!((fileSize >= 0))) throw new Error("File size cannot be negative");
+    if (!((((fileName).trim()).length > 0))) throw new Error("Give this file a name.");
+    if (!((((storageId).trim()).length > 0))) throw new Error("This file hasn't finished uploading yet.");
+    if (!((fileSize >= 0))) throw new Error("This file's size can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -1381,7 +1381,7 @@ async function __runCandidateAdvance(ctx: MutationCtx, { docId, toStage, version
     if (!((doc.appliedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!(((toStage !== "hired") && (toStage !== "rejected")))) throw new Error("Use Hire or Reject to reach a terminal stage");
+    if (!(((toStage !== "hired") && (toStage !== "rejected")))) throw new Error("Use Hire or Reject to move this candidate to hired or rejected.");
     if (!(((doc.stage !== "hired") || (doc.hiredPersonId == null)))) throw new Error("This hire has a team profile. Use Revoke hire so their profile is handled too");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -1432,7 +1432,7 @@ async function __runCandidateApply(ctx: MutationCtx, { docId, fullName, email, p
     if (!((doc.appliedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((fullName).trim()).length > 0))) throw new Error("Candidate name is required");
+    if (!((((fullName).trim()).length > 0))) throw new Error("Give this candidate a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -1521,7 +1521,7 @@ export const Candidate_createViaApply = mutation({
     if (!((__draft.appliedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((fullName).trim()).length > 0))) throw new Error("Candidate name is required");
+    if (!((((fullName).trim()).length > 0))) throw new Error("Give this candidate a name.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -1716,7 +1716,7 @@ async function __runClientArchive(ctx: MutationCtx, { docId, reason, version }: 
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Archive reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're archiving this client.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -2402,8 +2402,8 @@ async function __runClientCommunicationRecord(ctx: MutationCtx, { docId, clientC
     if (!(((doc.clientContactId == null) || (__rel_clientContact != null)))) throw new Error("Guard 1 failed");
     if (!(((doc.eventId == null) || (__rel_event != null)))) throw new Error("Guard 2 failed");
     if (!((((clientContactId != null) && (eventId == null)) || ((clientContactId == null) && (eventId != null))))) throw new Error("Choose one contact or event");
-    if (!((((summary).trim()).length > 0))) throw new Error("Communication summary is required");
-    if (!((((authorName).trim()).length > 0))) throw new Error("Communication author is required");
+    if (!((((summary).trim()).length > 0))) throw new Error("Give this note a summary");
+    if (!((((authorName).trim()).length > 0))) throw new Error("Say who wrote this note");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -2490,8 +2490,8 @@ export const ClientCommunication_createViaRecord = mutation({
     if (!(((__draft.clientContactId == null) || (__rel_clientContact != null)))) throw new Error("Guard 1 failed");
     if (!(((__draft.eventId == null) || (__rel_event != null)))) throw new Error("Guard 2 failed");
     if (!((((clientContactId != null) && (eventId == null)) || ((clientContactId == null) && (eventId != null))))) throw new Error("Choose one contact or event");
-    if (!((((summary).trim()).length > 0))) throw new Error("Communication summary is required");
-    if (!((((authorName).trim()).length > 0))) throw new Error("Communication author is required");
+    if (!((((summary).trim()).length > 0))) throw new Error("Give this note a summary");
+    if (!((((authorName).trim()).length > 0))) throw new Error("Say who wrote this note");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -2533,8 +2533,8 @@ async function __runClientContactAdd(ctx: MutationCtx, { docId, clientId, givenN
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_client != null))) throw new Error("Guard 3 failed");
-    if (!((clientId === doc.clientId))) throw new Error("Add clientId must match the seeded client reference");
-    if (!((((givenName).trim()).length > 0))) throw new Error("Contact given name is required");
+    if (!((clientId === doc.clientId))) throw new Error("This contact is for a different client. Use the client already on this contact.");
+    if (!((((givenName).trim()).length > 0))) throw new Error("Give this contact a given name");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -2637,8 +2637,8 @@ export const ClientContact_createViaAdd = mutation({
     if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_client != null))) throw new Error("Guard 3 failed");
-    if (!((clientId === __draft.clientId))) throw new Error("Add clientId must match the seeded client reference");
-    if (!((((givenName).trim()).length > 0))) throw new Error("Contact given name is required");
+    if (!((clientId === __draft.clientId))) throw new Error("This contact is for a different client. Use the client already on this contact.");
+    if (!((((givenName).trim()).length > 0))) throw new Error("Give this contact a given name");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -2908,7 +2908,7 @@ async function __runClientContactUpdateDetails(ctx: MutationCtx, { docId, givenN
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.addedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((givenName).trim()).length > 0))) throw new Error("Contact given name is required");
+    if (!((((givenName).trim()).length > 0))) throw new Error("Give this contact a given name");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -2982,8 +2982,8 @@ async function __runClientMergeMerge(ctx: MutationCtx, { docId, primaryClientId,
     if (!((__rel_primaryClient.deletedAt == null))) throw new Error("Guard 6 failed");
     if (!((__rel_duplicateClient.status === "active"))) throw new Error("Guard 7 failed");
     if (!((__rel_duplicateClient.deletedAt == null))) throw new Error("Guard 8 failed");
-    if (!((primaryClientId === doc.primaryClientId))) throw new Error("Primary client must match the seeded account");
-    if (!((duplicateClientId === doc.duplicateClientId))) throw new Error("Duplicate client must match the seeded account");
+    if (!((primaryClientId === doc.primaryClientId))) throw new Error("This merge is for a different primary client. Use the primary client already on this merge.");
+    if (!((duplicateClientId === doc.duplicateClientId))) throw new Error("This merge is for a different duplicate client. Use the duplicate client already on this merge.");
     if (!((primaryClientId !== duplicateClientId))) throw new Error("Choose two different clients");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -3107,8 +3107,8 @@ export const ClientMerge_createViaMerge = mutation({
     if (!((__rel_primaryClient.deletedAt == null))) throw new Error("Guard 6 failed");
     if (!((__rel_duplicateClient.status === "active"))) throw new Error("Guard 7 failed");
     if (!((__rel_duplicateClient.deletedAt == null))) throw new Error("Guard 8 failed");
-    if (!((primaryClientId === __draft.primaryClientId))) throw new Error("Primary client must match the seeded account");
-    if (!((duplicateClientId === __draft.duplicateClientId))) throw new Error("Duplicate client must match the seeded account");
+    if (!((primaryClientId === __draft.primaryClientId))) throw new Error("This merge is for a different primary client. Use the primary client already on this merge.");
+    if (!((duplicateClientId === __draft.duplicateClientId))) throw new Error("This merge is for a different duplicate client. Use the duplicate client already on this merge.");
     if (!((primaryClientId !== duplicateClientId))) throw new Error("Choose two different clients");
     const doc: Record<string, any> = {
       ...__draft,
@@ -3308,7 +3308,7 @@ async function __runClientOutreachTaskOpen(ctx: MutationCtx, { docId, clientId, 
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client follow-up reminders");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client follow-up reminders");
     if (!((doc.openedAt == null))) throw new Error("Guard 0 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Follow-up reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give this follow-up reminder a reason");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -3388,7 +3388,7 @@ export const ClientOutreachTask_createViaOpen = mutation({
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client follow-up reminders");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client follow-up reminders");
     if (!((__draft.openedAt == null))) throw new Error("Guard 0 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Follow-up reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give this follow-up reminder a reason");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -3512,10 +3512,10 @@ async function __runComponentDraft(ctx: MutationCtx, { docId, name, yieldQuantit
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.draftedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Recipe name is required");
-    if (!((yieldQuantity > 0))) throw new Error("Recipe yield quantity must be positive");
-    if (!(((servesPerYield == null) || (servesPerYield > 0)))) throw new Error("Serves per yield must be a positive integer");
-    if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("Recipe batch multiplier must be positive");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this recipe a name.");
+    if (!((yieldQuantity > 0))) throw new Error("This recipe's yield has to be more than zero. Enter how much it makes.");
+    if (!(((servesPerYield == null) || (servesPerYield > 0)))) throw new Error("How many guests this recipe serves has to be more than zero.");
+    if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("This recipe's batch size has to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -3617,10 +3617,10 @@ export const Component_createViaDraft = mutation({
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Recipe name is required");
-    if (!((yieldQuantity > 0))) throw new Error("Recipe yield quantity must be positive");
-    if (!(((servesPerYield == null) || (servesPerYield > 0)))) throw new Error("Serves per yield must be a positive integer");
-    if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("Recipe batch multiplier must be positive");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this recipe a name.");
+    if (!((yieldQuantity > 0))) throw new Error("This recipe's yield has to be more than zero. Enter how much it makes.");
+    if (!(((servesPerYield == null) || (servesPerYield > 0)))) throw new Error("How many guests this recipe serves has to be more than zero.");
+    if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("This recipe's batch size has to be more than zero.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -3909,10 +3909,10 @@ async function __runComponentReviseDraft(ctx: MutationCtx, { docId, name, yieldQ
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Recipe name is required");
-    if (!((yieldQuantity > 0))) throw new Error("Recipe yield quantity must be positive");
-    if (!(((servesPerYield == null) || (servesPerYield > 0)))) throw new Error("Serves per yield must be a positive integer");
-    if (!((batchMultiplier > 0))) throw new Error("Recipe batch multiplier must be positive");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this recipe a name.");
+    if (!((yieldQuantity > 0))) throw new Error("This recipe's yield has to be more than zero. Enter how much it makes.");
+    if (!(((servesPerYield == null) || (servesPerYield > 0)))) throw new Error("How many guests this recipe serves has to be more than zero.");
+    if (!((batchMultiplier > 0))) throw new Error("This recipe's batch size has to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -3975,7 +3975,7 @@ async function __runComponentSetServesPerYield(ctx: MutationCtx, { docId, serves
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((servesPerYield > 0))) throw new Error("Serves per yield must be a positive integer");
+    if (!((servesPerYield > 0))) throw new Error("How many guests this recipe serves has to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -4022,7 +4022,7 @@ async function __runComponentSetStorageWindow(ctx: MutationCtx, { docId, storage
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((storageWindowDays >= 0))) throw new Error("Storage window cannot be negative");
+    if (!((storageWindowDays >= 0))) throw new Error("This recipe's storage window can't be negative. Use zero or more days.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -4073,8 +4073,8 @@ async function __runComponentComponentAdd(ctx: MutationCtx, { docId, componentId
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((componentId !== childComponentId))) throw new Error("A recipe cannot contain itself");
-    if (!((quantity > 0))) throw new Error("Nested recipe quantity must be positive");
-    if (!(((wasteFactor == null) || (wasteFactor > 0)))) throw new Error("Waste factor must be greater than 0");
+    if (!((quantity > 0))) throw new Error("This sub-recipe's amount has to be more than zero.");
+    if (!(((wasteFactor == null) || (wasteFactor > 0)))) throw new Error("This waste amount has to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -4165,8 +4165,8 @@ export const ComponentComponent_createViaAdd = mutation({
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((componentId !== childComponentId))) throw new Error("A recipe cannot contain itself");
-    if (!((quantity > 0))) throw new Error("Nested recipe quantity must be positive");
-    if (!(((wasteFactor == null) || (wasteFactor > 0)))) throw new Error("Waste factor must be greater than 0");
+    if (!((quantity > 0))) throw new Error("This sub-recipe's amount has to be more than zero.");
+    if (!(((wasteFactor == null) || (wasteFactor > 0)))) throw new Error("This waste amount has to be more than zero.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -4204,7 +4204,7 @@ async function __runComponentComponentAdjustQuantity(ctx: MutationCtx, { docId, 
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change nested recipe lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((quantity > 0))) throw new Error("Nested recipe quantity must be positive");
+    if (!((quantity > 0))) throw new Error("This sub-recipe's amount has to be more than zero.");
     const previousUnit = doc.unit;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -4255,7 +4255,7 @@ async function __runComponentComponentRemove(ctx: MutationCtx, { docId, reason, 
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change nested recipe lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Removal reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're removing this.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -4487,7 +4487,7 @@ async function __runComponentImportCancel(ctx: MutationCtx, { docId, reason, ver
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe imports");
     if (!((doc.status !== "completed"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Cancellation reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're cancelling this.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -4624,7 +4624,7 @@ async function __runComponentImportMarkFailed(ctx: MutationCtx, { docId, failure
     if (!((doc.status !== "completed"))) throw new Error("Guard 0 failed");
     if (!((doc.status !== "cancelled"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((failureDetail).trim()).length > 0))) throw new Error("Failure detail is required");
+    if (!((((failureDetail).trim()).length > 0))) throw new Error("Say what went wrong.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -4738,7 +4738,7 @@ async function __runComponentImportRecordParse(ctx: MutationCtx, { docId, parsed
     if (!((doc.status === "uploaded"))) throw new Error("Guard 0 failed");
     if (!((doc.uploadedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((parsedName).trim()).length > 0))) throw new Error("Parsed recipe name is required");
+    if (!((((parsedName).trim()).length > 0))) throw new Error("Give this parsed recipe a name.");
     if (!((parsedLineCount >= 0))) throw new Error("This recipe can't have a negative number of lines. Use zero or more.");
     if (!(((parsedYieldQuantity == null) || (parsedYieldQuantity > 0)))) throw new Error("When you enter a yield, it must be more than zero.");
     if (!(((parsedBatchMultiplier == null) || (parsedBatchMultiplier > 0)))) throw new Error("When you enter a batch size, it must be more than zero.");
@@ -4934,7 +4934,7 @@ async function __runComponentImportReviseReview(ctx: MutationCtx, { docId, expec
     if (!((doc.reviewStartedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.reviewRevision === expectedReviewRevision))) throw new Error("Guard 2 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 3 failed");
-    if (!((((parsedName).trim()).length > 0))) throw new Error("Reviewed recipe name is required");
+    if (!((((parsedName).trim()).length > 0))) throw new Error("Give this reviewed recipe a name.");
     if (!(((parsedYieldQuantity == null) || (parsedYieldQuantity > 0)))) throw new Error("When you enter a yield on this review, it must be more than zero.");
     if (!(((parsedBatchMultiplier == null) || (parsedBatchMultiplier > 0)))) throw new Error("When you enter a batch size on this review, it must be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
@@ -5293,7 +5293,7 @@ async function __runComponentImportLineDiscard(ctx: MutationCtx, { docId, reason
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe import lines");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Discard reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're discarding this line.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -5727,8 +5727,8 @@ async function __runComponentIngredientAdd(ctx: MutationCtx, { docId, componentI
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe ingredient lines");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((quantity > 0))) throw new Error("Recipe ingredient quantity must be positive");
-    if (!(((wasteFactor == null) || (wasteFactor > 0)))) throw new Error("Waste factor must be greater than 0");
+    if (!((quantity > 0))) throw new Error("This recipe ingredient's amount has to be more than zero.");
+    if (!(((wasteFactor == null) || (wasteFactor > 0)))) throw new Error("This waste amount has to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -5820,8 +5820,8 @@ export const ComponentIngredient_createViaAdd = mutation({
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe ingredient lines");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((quantity > 0))) throw new Error("Recipe ingredient quantity must be positive");
-    if (!(((wasteFactor == null) || (wasteFactor > 0)))) throw new Error("Waste factor must be greater than 0");
+    if (!((quantity > 0))) throw new Error("This recipe ingredient's amount has to be more than zero.");
+    if (!(((wasteFactor == null) || (wasteFactor > 0)))) throw new Error("This waste amount has to be more than zero.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -5864,7 +5864,7 @@ async function __runComponentIngredientAdjustQuantity(ctx: MutationCtx, { docId,
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe ingredient lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((quantity > 0))) throw new Error("Recipe ingredient quantity must be positive");
+    if (!((quantity > 0))) throw new Error("This recipe ingredient's amount has to be more than zero.");
     const previousQuantity = doc.quantity;
     const previousUnit = doc.unit;
     if (version !== undefined && (doc as any).version !== version) {
@@ -5930,7 +5930,7 @@ async function __runComponentIngredientRemove(ctx: MutationCtx, { docId, reason,
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe ingredient lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Removal reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're removing this.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -5987,7 +5987,7 @@ async function __runComponentIngredientSetWasteFactor(ctx: MutationCtx, { docId,
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe ingredient lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((wasteFactor > 0))) throw new Error("Waste factor must be greater than 0");
+    if (!((wasteFactor > 0))) throw new Error("This waste amount has to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -6035,9 +6035,9 @@ async function __runComponentPortionSpecDefine(ctx: MutationCtx, { docId, compon
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change portion sizes");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Portion size name is required");
-    if (!((pieceQuantity > 0))) throw new Error("Piece quantity must be positive");
-    if (!(((piecesPerBatch == null) || (piecesPerBatch > 0)))) throw new Error("Pieces per batch must be positive");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this portion size a name.");
+    if (!((pieceQuantity > 0))) throw new Error("This portion size's piece amount has to be more than zero.");
+    if (!(((piecesPerBatch == null) || (piecesPerBatch > 0)))) throw new Error("The pieces per batch have to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -6119,9 +6119,9 @@ export const ComponentPortionSpec_createViaDefine = mutation({
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change portion sizes");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Portion size name is required");
-    if (!((pieceQuantity > 0))) throw new Error("Piece quantity must be positive");
-    if (!(((piecesPerBatch == null) || (piecesPerBatch > 0)))) throw new Error("Pieces per batch must be positive");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this portion size a name.");
+    if (!((pieceQuantity > 0))) throw new Error("This portion size's piece amount has to be more than zero.");
+    if (!(((piecesPerBatch == null) || (piecesPerBatch > 0)))) throw new Error("The pieces per batch have to be more than zero.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -6157,7 +6157,7 @@ async function __runComponentPortionSpecRetire(ctx: MutationCtx, { docId, reason
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change portion sizes");
     if (!((doc.definedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give a reason.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -6205,8 +6205,8 @@ async function __runComponentPortionSpecRevise(ctx: MutationCtx, { docId, name, 
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change portion sizes");
     if (!((doc.definedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Portion size name is required");
-    if (!((pieceQuantity > 0))) throw new Error("Piece quantity must be positive");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this portion size a name.");
+    if (!((pieceQuantity > 0))) throw new Error("This portion size's piece amount has to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -6263,7 +6263,7 @@ async function __runComponentSnapshotCapture(ctx: MutationCtx, { docId, componen
     if (!((doc.capturedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((snapshot).trim()).length > 0))) throw new Error("Snapshot payload is required");
+    if (!((((snapshot).trim()).length > 0))) throw new Error("This recipe version has nothing to save.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -6343,7 +6343,7 @@ export const ComponentSnapshot_createViaCapture = mutation({
     if (!((__draft.capturedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((snapshot).trim()).length > 0))) throw new Error("Snapshot payload is required");
+    if (!((((snapshot).trim()).length > 0))) throw new Error("This recipe version has nothing to save.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -6379,8 +6379,8 @@ async function __runComponentStepAdd(ctx: MutationCtx, { docId, componentId, ins
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe steps");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((instruction).trim()).length > 0))) throw new Error("Recipe step instruction is required");
-    if (!(((durationMinutes == null) || (durationMinutes >= 0)))) throw new Error("Recipe step duration cannot be negative");
+    if (!((((instruction).trim()).length > 0))) throw new Error("Give this recipe step an instruction.");
+    if (!(((durationMinutes == null) || (durationMinutes >= 0)))) throw new Error("This recipe step's time can't be negative. Use zero or more minutes.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -6454,8 +6454,8 @@ export const ComponentStep_createViaAdd = mutation({
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe steps");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((instruction).trim()).length > 0))) throw new Error("Recipe step instruction is required");
-    if (!(((durationMinutes == null) || (durationMinutes >= 0)))) throw new Error("Recipe step duration cannot be negative");
+    if (!((((instruction).trim()).length > 0))) throw new Error("Give this recipe step an instruction.");
+    if (!(((durationMinutes == null) || (durationMinutes >= 0)))) throw new Error("This recipe step's time can't be negative. Use zero or more minutes.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -6489,7 +6489,7 @@ async function __runComponentStepRemove(ctx: MutationCtx, { docId, reason, versi
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe steps");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Removal reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're removing this.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -6537,8 +6537,8 @@ async function __runComponentStepRevise(ctx: MutationCtx, { docId, instruction, 
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe steps");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((instruction).trim()).length > 0))) throw new Error("Recipe step instruction is required");
-    if (!(((durationMinutes == null) || (durationMinutes >= 0)))) throw new Error("Recipe step duration cannot be negative");
+    if (!((((instruction).trim()).length > 0))) throw new Error("Give this recipe step an instruction.");
+    if (!(((durationMinutes == null) || (durationMinutes >= 0)))) throw new Error("This recipe step's time can't be negative. Use zero or more minutes.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -6597,9 +6597,9 @@ async function __runContractDraft(ctx: MutationCtx, { docId, eventId, clientId, 
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!((__rel_client != null))) throw new Error("Guard 4 failed");
-    if (!((eventId === doc.eventId))) throw new Error("Draft eventId must match the seeded event reference");
-    if (!((clientId === doc.clientId))) throw new Error("Draft clientId must match the seeded client reference");
-    if (!((((title).trim()).length > 0))) throw new Error("Contract title is required");
+    if (!((eventId === doc.eventId))) throw new Error("This contract is for a different event. Use the event already on this contract.");
+    if (!((clientId === doc.clientId))) throw new Error("This contract is for a different client. Use the client already on this contract.");
+    if (!((((title).trim()).length > 0))) throw new Error("Give this contract a title");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -6691,9 +6691,9 @@ export const Contract_createViaDraft = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!((__rel_client != null))) throw new Error("Guard 4 failed");
-    if (!((eventId === __draft.eventId))) throw new Error("Draft eventId must match the seeded event reference");
-    if (!((clientId === __draft.clientId))) throw new Error("Draft clientId must match the seeded client reference");
-    if (!((((title).trim()).length > 0))) throw new Error("Contract title is required");
+    if (!((eventId === __draft.eventId))) throw new Error("This contract is for a different event. Use the event already on this contract.");
+    if (!((clientId === __draft.clientId))) throw new Error("This contract is for a different client. Use the client already on this contract.");
+    if (!((((title).trim()).length > 0))) throw new Error("Give this contract a title");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -6847,7 +6847,7 @@ async function __runContractMarkVoided(ctx: MutationCtx, { docId, reason, versio
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change contracts");
     if (!(((doc.status === "sent") || (doc.status === "viewed")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Void reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give a reason for voiding this contract");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -6969,7 +6969,7 @@ async function __runContractSend(ctx: MutationCtx, { docId, version }: any, __cr
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
     if (!((doc.draftedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((doc.title).trim()).length > 0))) throw new Error("Contract title is required before send");
+    if (!((((doc.title).trim()).length > 0))) throw new Error("Give this contract a title before you send it");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -7029,7 +7029,7 @@ async function __runContractSign(ctx: MutationCtx, { docId, signedBy, version }:
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change contracts");
     if (!((doc.status === "viewed"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((signedBy).trim()).length > 0))) throw new Error("Signer name is required");
+    if (!((((signedBy).trim()).length > 0))) throw new Error("Give the name of who signed");
     const signedAtValue = Date.now();
     {
       const __cur = doc.status;
@@ -7147,7 +7147,7 @@ async function __runCorrectiveActionClose(ctx: MutationCtx, { docId, resolutionN
     if (!((doc.openedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((resolutionNotes).trim()).length > 0))) throw new Error("Resolution notes are required");
+    if (!((((resolutionNotes).trim()).length > 0))) throw new Error("Say how this was resolved.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -7215,9 +7215,9 @@ async function __runCorrectiveActionOpen(ctx: MutationCtx, { docId, incidentId, 
     if (!((doc.status === "open"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((incidentId === doc.incidentId))) throw new Error("Open incidentId must match the seeded incident reference");
-    if (!((eventId === doc.eventId))) throw new Error("Open eventId must match the seeded event reference");
-    if (!((((description).trim()).length > 0))) throw new Error("Corrective action description is required");
+    if (!((incidentId === doc.incidentId))) throw new Error("This corrective action is for a different incident. Pick the incident already on this corrective action.");
+    if (!((eventId === doc.eventId))) throw new Error("This corrective action is for a different event. Pick the event already on this corrective action.");
+    if (!((((description).trim()).length > 0))) throw new Error("Say what needs to be done.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -7291,9 +7291,9 @@ export const CorrectiveAction_createViaOpen = mutation({
     if (!((__draft.status === "open"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((incidentId === __draft.incidentId))) throw new Error("Open incidentId must match the seeded incident reference");
-    if (!((eventId === __draft.eventId))) throw new Error("Open eventId must match the seeded event reference");
-    if (!((((description).trim()).length > 0))) throw new Error("Corrective action description is required");
+    if (!((incidentId === __draft.incidentId))) throw new Error("This corrective action is for a different incident. Pick the incident already on this corrective action.");
+    if (!((eventId === __draft.eventId))) throw new Error("This corrective action is for a different event. Pick the event already on this corrective action.");
+    if (!((((description).trim()).length > 0))) throw new Error("Say what needs to be done.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -7336,14 +7336,14 @@ async function __runCreditMemoIssue(ctx: MutationCtx, { docId, sourceInvoiceId, 
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_sourceInvoice != null) && (__rel_sourceInvoice.deletedAt == null)))) throw new Error("Guard 3 failed");
     if (!((__rel_client != null))) throw new Error("Guard 4 failed");
-    if (!((sourceInvoiceId === doc.sourceInvoiceId))) throw new Error("Source invoice must match the seeded invoice reference");
-    if (!((clientId === doc.clientId))) throw new Error("Client must match the seeded client reference");
+    if (!((sourceInvoiceId === doc.sourceInvoiceId))) throw new Error("This credit memo is for a different invoice. Use the invoice already on this credit memo.");
+    if (!((clientId === doc.clientId))) throw new Error("This credit memo is for a different client. Use the client already on this credit memo.");
     if (!((__rel_sourceInvoice.clientId === clientId))) throw new Error("Credit memo client must match the paid source invoice");
     if (!((__rel_sourceInvoice.status === "paid"))) throw new Error("Credit memos may only be issued against paid invoices");
-    if (!((((creditMemoNumber).trim()).length > 0))) throw new Error("Credit memo number is required");
-    if (!((amount > 0))) throw new Error("Credit memo amount must be positive");
+    if (!((((creditMemoNumber).trim()).length > 0))) throw new Error("Give this credit memo a number");
+    if (!((amount > 0))) throw new Error("This credit memo's amount has to be more than zero. Enter how much to credit.");
     if (!((amount <= __rel_sourceInvoice.amountPaid))) throw new Error("Credit memo amount cannot exceed the amount paid");
-    if (!((((reason).trim()).length > 0))) throw new Error("Credit memo reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give this credit memo a reason");
     if (!(((disposition !== "apply_to_balance") || (targetInvoiceId != null)))) throw new Error("Choose an open invoice when applying the credit now");
     if (!(((disposition !== "carry_forward") || (targetInvoiceId == null)))) throw new Error("Carry-forward credit cannot select a target invoice");
     if (!(((targetInvoiceId == null) || (__rel_targetInvoice != null)))) throw new Error("Selected target invoice was not found");
@@ -7472,14 +7472,14 @@ export const CreditMemo_createViaIssue = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_sourceInvoice != null) && (__rel_sourceInvoice.deletedAt == null)))) throw new Error("Guard 3 failed");
     if (!((__rel_client != null))) throw new Error("Guard 4 failed");
-    if (!((sourceInvoiceId === __draft.sourceInvoiceId))) throw new Error("Source invoice must match the seeded invoice reference");
-    if (!((clientId === __draft.clientId))) throw new Error("Client must match the seeded client reference");
+    if (!((sourceInvoiceId === __draft.sourceInvoiceId))) throw new Error("This credit memo is for a different invoice. Use the invoice already on this credit memo.");
+    if (!((clientId === __draft.clientId))) throw new Error("This credit memo is for a different client. Use the client already on this credit memo.");
     if (!((__rel_sourceInvoice.clientId === clientId))) throw new Error("Credit memo client must match the paid source invoice");
     if (!((__rel_sourceInvoice.status === "paid"))) throw new Error("Credit memos may only be issued against paid invoices");
-    if (!((((creditMemoNumber).trim()).length > 0))) throw new Error("Credit memo number is required");
-    if (!((amount > 0))) throw new Error("Credit memo amount must be positive");
+    if (!((((creditMemoNumber).trim()).length > 0))) throw new Error("Give this credit memo a number");
+    if (!((amount > 0))) throw new Error("This credit memo's amount has to be more than zero. Enter how much to credit.");
     if (!((amount <= __rel_sourceInvoice.amountPaid))) throw new Error("Credit memo amount cannot exceed the amount paid");
-    if (!((((reason).trim()).length > 0))) throw new Error("Credit memo reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give this credit memo a reason");
     if (!(((disposition !== "apply_to_balance") || (targetInvoiceId != null)))) throw new Error("Choose an open invoice when applying the credit now");
     if (!(((disposition !== "carry_forward") || (targetInvoiceId == null)))) throw new Error("Carry-forward credit cannot select a target invoice");
     if (!(((targetInvoiceId == null) || (__rel_targetInvoice != null)))) throw new Error("Selected target invoice was not found");
@@ -7651,11 +7651,11 @@ async function __runCutoverDecisionCreate(ctx: MutationCtx, args: any) {
       rollbackPlan: args.rollbackPlan,
       businessApproved: ((args.businessApproved != null) ? args.businessApproved : false)
     };
-    if (!((user.id != null))) throw new Error("Authenticated staff may see cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may update cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may change cutover decisions");
+    if (!((user.id != null))) throw new Error("Signed-in staff may see cutover decisions");
+    if (!((user.id != null))) throw new Error("Signed-in staff may update cutover decisions");
+    if (!((user.id != null))) throw new Error("Signed-in staff may change cutover decisions");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 0 failed");
-    if (!((((args.reason).trim()).length > 0))) throw new Error("Reason is required to open a cutover decision");
+    if (!((((args.reason).trim()).length > 0))) throw new Error("Say why you're opening this cutover decision.");
     const _id = await ctx.db.insert("cutoverDecisions", doc as any);
     return { _id, ...doc };
 
@@ -7688,9 +7688,9 @@ async function __runCutoverDecisionExecute(ctx: MutationCtx, { docId, decision, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("CutoverDecision not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("CutoverDecision not found");
-    if (!((user.id != null))) throw new Error("Authenticated staff may see cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may update cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may change cutover decisions");
+    if (!((user.id != null))) throw new Error("Signed-in staff may see cutover decisions");
+    if (!((user.id != null))) throw new Error("Signed-in staff may update cutover decisions");
+    if (!((user.id != null))) throw new Error("Signed-in staff may change cutover decisions");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 0 failed");
     const updates = {
       status: decision,
@@ -7728,9 +7728,9 @@ async function __runCutoverDecisionRecordApprovals(ctx: MutationCtx, { docId, bu
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("CutoverDecision not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("CutoverDecision not found");
-    if (!((user.id != null))) throw new Error("Authenticated staff may see cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may update cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may change cutover decisions");
+    if (!((user.id != null))) throw new Error("Signed-in staff may see cutover decisions");
+    if (!((user.id != null))) throw new Error("Signed-in staff may update cutover decisions");
+    if (!((user.id != null))) throw new Error("Signed-in staff may change cutover decisions");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 0 failed");
     const updates = {
       businessApproved: businessApproved,
@@ -7768,9 +7768,9 @@ async function __runCutoverDecisionRollback(ctx: MutationCtx, { docId, reason }:
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("CutoverDecision not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("CutoverDecision not found");
-    if (!((user.id != null))) throw new Error("Authenticated staff may see cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may update cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may change cutover decisions");
+    if (!((user.id != null))) throw new Error("Signed-in staff may see cutover decisions");
+    if (!((user.id != null))) throw new Error("Signed-in staff may update cutover decisions");
+    if (!((user.id != null))) throw new Error("Signed-in staff may change cutover decisions");
     if (!((doc.status === "go"))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 1 failed");
     const updates = {
@@ -7808,9 +7808,9 @@ async function __runCutoverDecisionSetTppReadOnly(ctx: MutationCtx, { docId, rea
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("CutoverDecision not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("CutoverDecision not found");
-    if (!((user.id != null))) throw new Error("Authenticated staff may see cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may update cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may change cutover decisions");
+    if (!((user.id != null))) throw new Error("Signed-in staff may see cutover decisions");
+    if (!((user.id != null))) throw new Error("Signed-in staff may update cutover decisions");
+    if (!((user.id != null))) throw new Error("Signed-in staff may change cutover decisions");
     if (!((doc.status === "go"))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 1 failed");
     const updates = {
@@ -7852,7 +7852,7 @@ async function __runDeliveryCancel(ctx: MutationCtx, { docId, reason, version }:
     if (!(((doc.status === "scheduled") || (doc.status === "in_transit")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "logisticsManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Cancellation reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're cancelling this delivery.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -7984,7 +7984,7 @@ async function __runDeliveryMarkFailed(ctx: MutationCtx, { docId, reason, versio
     if (!((doc.scheduledAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(checkRole(user, "logisticsManageAccess"))) throw new Error("Guard 3 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Failure reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why this delivery failed.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -8059,8 +8059,8 @@ async function __runDeliverySchedule(ctx: MutationCtx, { docId, packListId, even
     if (!((packListId === doc.packListId))) throw new Error("This delivery is for a different pack list. Pick the pack list already on this delivery.");
     if (!((eventId === doc.eventId))) throw new Error("This delivery is for a different event. Pick the event already on this delivery.");
     if (!((((driverId == null) || (doc.driverId == null)) || (driverId === doc.driverId)))) throw new Error("This delivery is for a different driver. Leave the driver blank or pick the one already on this delivery.");
-    if (!(((((destination).trim()).length > 0) || (((doc.destination).trim()).length > 0)))) throw new Error("Delivery destination is required");
-    if (!(((doc.scheduledAt != null) || (windowEndsAt > windowStartsAt)))) throw new Error("Delivery window end must be after its start");
+    if (!(((((destination).trim()).length > 0) || (((doc.destination).trim()).length > 0)))) throw new Error("Give this delivery a destination.");
+    if (!(((doc.scheduledAt != null) || (windowEndsAt > windowStartsAt)))) throw new Error("This delivery's window end has to be after its start. Fix the times.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -8156,8 +8156,8 @@ export const Delivery_createViaSchedule = mutation({
     if (!((packListId === __draft.packListId))) throw new Error("This delivery is for a different pack list. Pick the pack list already on this delivery.");
     if (!((eventId === __draft.eventId))) throw new Error("This delivery is for a different event. Pick the event already on this delivery.");
     if (!((((driverId == null) || (__draft.driverId == null)) || (driverId === __draft.driverId)))) throw new Error("This delivery is for a different driver. Leave the driver blank or pick the one already on this delivery.");
-    if (!(((((destination).trim()).length > 0) || (((__draft.destination).trim()).length > 0)))) throw new Error("Delivery destination is required");
-    if (!(((__draft.scheduledAt != null) || (windowEndsAt > windowStartsAt)))) throw new Error("Delivery window end must be after its start");
+    if (!(((((destination).trim()).length > 0) || (((__draft.destination).trim()).length > 0)))) throw new Error("Give this delivery a destination.");
+    if (!(((__draft.scheduledAt != null) || (windowEndsAt > windowStartsAt)))) throw new Error("This delivery's window end has to be after its start. Fix the times.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -8468,8 +8468,8 @@ async function __runDishIntroduce(ctx: MutationCtx, { docId, name, portionSize, 
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.introducedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Dish name is required");
-    if (!((portionSize > 0))) throw new Error("Dish portion size must be positive");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this dish a name.");
+    if (!((portionSize > 0))) throw new Error("This dish's portion size has to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -8565,8 +8565,8 @@ export const Dish_createViaIntroduce = mutation({
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((__draft.introducedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Dish name is required");
-    if (!((portionSize > 0))) throw new Error("Dish portion size must be positive");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this dish a name.");
+    if (!((portionSize > 0))) throw new Error("This dish's portion size has to be more than zero.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -8607,7 +8607,7 @@ async function __runDishLinkAsEdition(ctx: MutationCtx, { docId, sourceDishId, e
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.mergedIntoDishId == null))) throw new Error("Guard 2 failed");
     if (!((sourceDishId !== doc._id))) throw new Error("A dish cannot be an edition of itself");
-    if (!(((editionNumber == null) || (editionNumber > 0)))) throw new Error("Edition number must be positive");
+    if (!(((editionNumber == null) || (editionNumber > 0)))) throw new Error("This edition number has to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -8659,7 +8659,7 @@ async function __runDishMergeInto(ctx: MutationCtx, { docId, targetDishId, reaso
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.mergedIntoDishId == null))) throw new Error("Guard 2 failed");
     if (!((targetDishId !== doc._id))) throw new Error("Cannot merge a dish into itself");
-    if (!((((reason).trim()).length > 0))) throw new Error("Merge reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're merging this.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -8909,7 +8909,7 @@ async function __runDishReviseDetails(ctx: MutationCtx, { docId, name, descripti
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Dish name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this dish a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -9020,7 +9020,7 @@ async function __runDishSaveServiceInstructions(ctx: MutationCtx, { docId, instr
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((source).trim()).length > 0))) throw new Error("Service instruction source is required");
+    if (!((((source).trim()).length > 0))) throw new Error("Say where these serving instructions came from.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -9070,7 +9070,7 @@ async function __runDishSetPrimaryImage(ctx: MutationCtx, { docId, storageId, fi
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((storageId).trim()).length > 0))) throw new Error("Primary image storage id is required");
+    if (!((((storageId).trim()).length > 0))) throw new Error("Add a photo before you set it as the main picture.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -9120,7 +9120,7 @@ async function __runDishUpdatePortioning(ctx: MutationCtx, { docId, portionSize,
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((portionSize > 0))) throw new Error("Dish portion size must be positive");
+    if (!((portionSize > 0))) throw new Error("This dish's portion size has to be more than zero.");
     const previousPortionSize = doc.portionSize;
     const previousPortionUnit = doc.portionUnit;
     if (version !== undefined && (doc as any).version !== version) {
@@ -9353,7 +9353,7 @@ async function __runDishComponentDetach(ctx: MutationCtx, { docId, reason, versi
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish recipes");
     if (!((doc.attachedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Detach reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're detaching this.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -9419,7 +9419,7 @@ async function __runDishComponentSetPortionSpec(ctx: MutationCtx, { docId, porti
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish recipes");
     if (!((doc.attachedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((pieceCount > 0))) throw new Error("Pieces per portion must be positive");
+    if (!((pieceCount > 0))) throw new Error("The pieces per portion have to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -9471,8 +9471,8 @@ async function __runDishContainerDefine(ctx: MutationCtx, { docId, dishId, name,
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish containers");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Container name is required");
-    if (!((servingsPerContainer >= 1))) throw new Error("Servings per container must be at least 1");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this container a name.");
+    if (!((servingsPerContainer >= 1))) throw new Error("Each container has to hold at least 1 serving.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -9574,8 +9574,8 @@ export const DishContainer_createViaDefine = mutation({
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish containers");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Container name is required");
-    if (!((servingsPerContainer >= 1))) throw new Error("Servings per container must be at least 1");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this container a name.");
+    if (!((servingsPerContainer >= 1))) throw new Error("Each container has to hold at least 1 serving.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -9798,8 +9798,8 @@ async function __runDishContainerRevise(ctx: MutationCtx, { docId, name, service
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish containers");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Container name is required");
-    if (!((servingsPerContainer >= 1))) throw new Error("Servings per container must be at least 1");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this container a name.");
+    if (!((servingsPerContainer >= 1))) throw new Error("Each container has to hold at least 1 serving.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -9872,8 +9872,8 @@ async function __runDishIngredientAdd(ctx: MutationCtx, { docId, dishId, ingredi
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish ingredient lines");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((quantity > 0))) throw new Error("Dish ingredient quantity must be positive");
-    if (!(((wasteFactor == null) || (wasteFactor > 0)))) throw new Error("Waste factor must be greater than 0");
+    if (!((quantity > 0))) throw new Error("This dish ingredient's amount has to be more than zero.");
+    if (!(((wasteFactor == null) || (wasteFactor > 0)))) throw new Error("This waste amount has to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -9986,8 +9986,8 @@ export const DishIngredient_createViaAdd = mutation({
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish ingredient lines");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((quantity > 0))) throw new Error("Dish ingredient quantity must be positive");
-    if (!(((wasteFactor == null) || (wasteFactor > 0)))) throw new Error("Waste factor must be greater than 0");
+    if (!((quantity > 0))) throw new Error("This dish ingredient's amount has to be more than zero.");
+    if (!(((wasteFactor == null) || (wasteFactor > 0)))) throw new Error("This waste amount has to be more than zero.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -10051,7 +10051,7 @@ async function __runDishIngredientAdjustQuantity(ctx: MutationCtx, { docId, quan
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish ingredient lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((quantity > 0))) throw new Error("Dish ingredient quantity must be positive");
+    if (!((quantity > 0))) throw new Error("This dish ingredient's amount has to be more than zero.");
     const previousQuantity = doc.quantity;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -10129,7 +10129,7 @@ async function __runDishIngredientRemove(ctx: MutationCtx, { docId, reason, vers
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish ingredient lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Removal reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're removing this.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -10583,8 +10583,8 @@ async function __runDishTaskMaterialLink(ctx: MutationCtx, { docId, dishTaskId, 
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change task materials");
     if (!((doc.linkedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((dishIngredientId != null) || (dishComponentId != null)) || (dishContainerId != null)))) throw new Error("A task material must point at a requirement");
-    if (!(((workQuantity == null) || (workQuantity > 0)))) throw new Error("Work quantity must be positive");
+    if (!((((dishIngredientId != null) || (dishComponentId != null)) || (dishContainerId != null)))) throw new Error("Pick what this task uses — an ingredient, a recipe, or a container.");
+    if (!(((workQuantity == null) || (workQuantity > 0)))) throw new Error("This work amount has to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -10666,8 +10666,8 @@ export const DishTaskMaterial_createViaLink = mutation({
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change task materials");
     if (!((__draft.linkedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((dishIngredientId != null) || (dishComponentId != null)) || (dishContainerId != null)))) throw new Error("A task material must point at a requirement");
-    if (!(((workQuantity == null) || (workQuantity > 0)))) throw new Error("Work quantity must be positive");
+    if (!((((dishIngredientId != null) || (dishComponentId != null)) || (dishContainerId != null)))) throw new Error("Pick what this task uses — an ingredient, a recipe, or a container.");
+    if (!(((workQuantity == null) || (workQuantity > 0)))) throw new Error("This work amount has to be more than zero.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -10703,7 +10703,7 @@ async function __runDishTaskMaterialUnlink(ctx: MutationCtx, { docId, reason, ve
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change task materials");
     if (!((doc.linkedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give a reason.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -11332,7 +11332,7 @@ async function __runEquipmentMaintenanceTaskApplyService(ctx: MutationCtx, { doc
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment maintenance");
     if (!((doc.scheduledAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((nextDueAt > completedAt))) throw new Error("Next maintenance due date must be after the completed service");
+    if (!((nextDueAt > completedAt))) throw new Error("The next due date has to be after the date the service was completed.");
     const isLatestService = ((doc.lastServicedAt == null) || (completedAt >= doc.lastServicedAt));
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -11386,9 +11386,9 @@ async function __runEquipmentMaintenanceTaskSchedule(ctx: MutationCtx, { docId, 
     if (!((doc.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_equipment != null))) throw new Error("Guard 2 failed");
-    if (!((equipmentId === doc.equipmentId))) throw new Error("Maintenance equipment must match the selected catalog item");
-    if (!((((taskName).trim()).length > 0))) throw new Error("Maintenance task is required");
-    if (!((intervalDays > 0))) throw new Error("Recurring interval must be at least one day");
+    if (!((equipmentId === doc.equipmentId))) throw new Error("This maintenance task is for different equipment. Pick the equipment already on this task.");
+    if (!((((taskName).trim()).length > 0))) throw new Error("Say what this maintenance task is.");
+    if (!((intervalDays > 0))) throw new Error("The recurring interval has to be at least one day.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -11467,9 +11467,9 @@ export const EquipmentMaintenanceTask_createViaSchedule = mutation({
     if (!((__draft.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_equipment != null))) throw new Error("Guard 2 failed");
-    if (!((equipmentId === __draft.equipmentId))) throw new Error("Maintenance equipment must match the selected catalog item");
-    if (!((((taskName).trim()).length > 0))) throw new Error("Maintenance task is required");
-    if (!((intervalDays > 0))) throw new Error("Recurring interval must be at least one day");
+    if (!((equipmentId === __draft.equipmentId))) throw new Error("This maintenance task is for different equipment. Pick the equipment already on this task.");
+    if (!((((taskName).trim()).length > 0))) throw new Error("Say what this maintenance task is.");
+    if (!((intervalDays > 0))) throw new Error("The recurring interval has to be at least one day.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -11707,12 +11707,12 @@ async function __runEquipmentServiceEntryRecord(ctx: MutationCtx, { docId, maint
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_maintenanceTask != null))) throw new Error("Guard 2 failed");
     if (!((__rel_equipment != null))) throw new Error("Guard 3 failed");
-    if (!((maintenanceTaskId === doc.maintenanceTaskId))) throw new Error("Service entry must match the selected maintenance task");
-    if (!(((equipmentId === doc.equipmentId) && (__rel_maintenanceTask.equipmentId === equipmentId)))) throw new Error("Service entry equipment must match its maintenance task");
-    if (!((((technician).trim()).length > 0))) throw new Error("Technician is required");
-    if (!((cost >= 0))) throw new Error("Service cost cannot be negative");
-    if (!((completedAt <= Date.now()))) throw new Error("Service completion cannot be in the future");
-    if (!((nextDueAt > completedAt))) throw new Error("Next maintenance due date must be after the completed service");
+    if (!((maintenanceTaskId === doc.maintenanceTaskId))) throw new Error("This service entry is for a different maintenance task. Pick the maintenance task already on this entry.");
+    if (!(((equipmentId === doc.equipmentId) && (__rel_maintenanceTask.equipmentId === equipmentId)))) throw new Error("This service entry's equipment has to match its maintenance task's equipment.");
+    if (!((((technician).trim()).length > 0))) throw new Error("Say who did the work.");
+    if (!((cost >= 0))) throw new Error("This service's cost can't be negative. Use zero or more.");
+    if (!((completedAt <= Date.now()))) throw new Error("The completion time can't be in the future.");
+    if (!((nextDueAt > completedAt))) throw new Error("The next due date has to be after the date the service was completed.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -11803,12 +11803,12 @@ export const EquipmentServiceEntry_createViaRecord = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_maintenanceTask != null))) throw new Error("Guard 2 failed");
     if (!((__rel_equipment != null))) throw new Error("Guard 3 failed");
-    if (!((maintenanceTaskId === __draft.maintenanceTaskId))) throw new Error("Service entry must match the selected maintenance task");
-    if (!(((equipmentId === __draft.equipmentId) && (__rel_maintenanceTask.equipmentId === equipmentId)))) throw new Error("Service entry equipment must match its maintenance task");
-    if (!((((technician).trim()).length > 0))) throw new Error("Technician is required");
-    if (!((cost >= 0))) throw new Error("Service cost cannot be negative");
-    if (!((completedAt <= Date.now()))) throw new Error("Service completion cannot be in the future");
-    if (!((nextDueAt > completedAt))) throw new Error("Next maintenance due date must be after the completed service");
+    if (!((maintenanceTaskId === __draft.maintenanceTaskId))) throw new Error("This service entry is for a different maintenance task. Pick the maintenance task already on this entry.");
+    if (!(((equipmentId === __draft.equipmentId) && (__rel_maintenanceTask.equipmentId === equipmentId)))) throw new Error("This service entry's equipment has to match its maintenance task's equipment.");
+    if (!((((technician).trim()).length > 0))) throw new Error("Say who did the work.");
+    if (!((cost >= 0))) throw new Error("This service's cost can't be negative. Use zero or more.");
+    if (!((completedAt <= Date.now()))) throw new Error("The completion time can't be in the future.");
+    if (!((nextDueAt > completedAt))) throw new Error("The next due date has to be after the date the service was completed.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -11997,7 +11997,7 @@ async function __runEventArchive(ctx: MutationCtx, { docId, reason, version }: a
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.archivedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Archive reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're archiving this event.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -12165,7 +12165,7 @@ async function __runEventCancel(ctx: MutationCtx, { docId, reason, version }: an
     if (!((((((((doc.stage === "quote") || (doc.stage === "planning")) || (doc.stage === "pending_approval")) || (doc.stage === "approved")) || (doc.stage === "sales_lock")) || (doc.stage === "executing")) || (doc.stage === "final")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Cancellation reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're cancelling this event.");
     {
       const __cur = doc.stage;
       if (__cur !== undefined) {
@@ -12253,9 +12253,9 @@ async function __runEventCaptureDraft(ctx: MutationCtx, { docId, title, clientId
     if (!((doc.plannedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((doc.draftCapturedAt == null))) throw new Error("Guard 3 failed");
-    if (!((((title).trim()).length > 0))) throw new Error("Draft title is required");
+    if (!((((title).trim()).length > 0))) throw new Error("Give this draft a title.");
     if (!(((expectedHeadcount == null) || ((expectedHeadcount >= 0) && (expectedHeadcount <= 100000))))) throw new Error("Headcount must be between 0 and 100000 when known");
-    if (!((((budgetAmount == null) || (budgetAmount >= 0)) && ((quotedPrice == null) || (quotedPrice >= 0))))) throw new Error("Event pricing cannot be negative");
+    if (!((((budgetAmount == null) || (budgetAmount >= 0)) && ((quotedPrice == null) || (quotedPrice >= 0))))) throw new Error("This event's pricing can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -12415,7 +12415,7 @@ async function __runEventChangePricing(ctx: MutationCtx, { docId, budgetAmount, 
     if (!((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "eventManageAccess") || checkRole(user, "salesManageAccess")))) throw new Error("Guard 2 failed");
-    if (!(((budgetAmount >= 0) && (quotedPrice >= 0)))) throw new Error("Event pricing cannot be negative");
+    if (!(((budgetAmount >= 0) && (quotedPrice >= 0)))) throw new Error("This event's pricing can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -12468,7 +12468,7 @@ async function __runEventChangePrimaryContact(ctx: MutationCtx, { docId, primary
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!(((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")) || (doc.stage === "sales_lock")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((primaryContactName).trim()).length > 0))) throw new Error("Primary contact name is required");
+    if (!((((primaryContactName).trim()).length > 0))) throw new Error("Give this event a primary contact name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -12588,7 +12588,7 @@ async function __runEventChangeServiceStyle(ctx: MutationCtx, { docId, serviceSt
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 1 failed");
-    if (!((((serviceStyleId).trim()).length > 0))) throw new Error("Events must reference a service style");
+    if (!((((serviceStyleId).trim()).length > 0))) throw new Error("Pick a service style for this event.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -12647,7 +12647,7 @@ async function __runEventChangeVenue(ctx: MutationCtx, { docId, venueId, venueNa
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!(((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")) || (doc.stage === "sales_lock")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((venueCapacity == null) || (venueCapacity >= 0)))) throw new Error("Venue capacity cannot be negative");
+    if (!(((venueCapacity == null) || (venueCapacity >= 0)))) throw new Error("Venue capacity can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -12933,7 +12933,7 @@ async function __runEventConfigureRecurrence(ctx: MutationCtx, { docId, frequenc
     if (!((doc.endsAt != null))) throw new Error("Guard 3 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 4 failed");
     if (!((doc.recurrenceTemplateEventId == null))) throw new Error("Guard 5 failed");
-    if (!((((seriesId).trim()).length > 0))) throw new Error("Recurring series id is required");
+    if (!((((seriesId).trim()).length > 0))) throw new Error("Give this recurring series an id.");
     if (!((nextStartsAt > doc.startsAt))) throw new Error("The first recurring instance must start after the source event");
     if (!((((((endCondition === "on_date") && (recurrenceEndsAt != null)) && (recurrenceEndsAt >= nextStartsAt)) && (occurrenceLimit == null)) || (((((endCondition === "after_occurrences") && (recurrenceEndsAt == null)) && (occurrenceLimit != null)) && (occurrenceLimit >= 2)) && (occurrenceLimit <= 1000))))) throw new Error("Choose an end date that includes another event or a total occurrence count from 2 to 1000");
     if (version !== undefined && (doc as any).version !== version) {
@@ -13003,12 +13003,12 @@ async function __runEventConfigureTiming(ctx: MutationCtx, { docId, serviceStart
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Guard 1 failed");
     if (!((((doc.stage !== "completed") && (doc.stage !== "closed_out")) && (doc.stage !== "cancelled")))) throw new Error("Finished or cancelled events keep their saved timing; correct individual blocks if needed");
-    if (!(((setupMinutes == null) || (setupMinutes >= 0)))) throw new Error("Setup minutes cannot be negative");
-    if (!(((loadMinutes == null) || (loadMinutes >= 0)))) throw new Error("Load minutes cannot be negative");
-    if (!(((outboundTravelMinutes == null) || (outboundTravelMinutes >= 0)))) throw new Error("Travel minutes cannot be negative");
-    if (!(((cleanupMinutes == null) || (cleanupMinutes >= 0)))) throw new Error("Cleanup minutes cannot be negative");
-    if (!(((returnTravelMinutes == null) || (returnTravelMinutes >= 0)))) throw new Error("Return travel minutes cannot be negative");
-    if (!(((unloadMinutes == null) || (unloadMinutes >= 0)))) throw new Error("Unload minutes cannot be negative");
+    if (!(((setupMinutes == null) || (setupMinutes >= 0)))) throw new Error("Setup time can't be negative. Use zero or more.");
+    if (!(((loadMinutes == null) || (loadMinutes >= 0)))) throw new Error("Load time can't be negative. Use zero or more.");
+    if (!(((outboundTravelMinutes == null) || (outboundTravelMinutes >= 0)))) throw new Error("Travel time can't be negative. Use zero or more.");
+    if (!(((cleanupMinutes == null) || (cleanupMinutes >= 0)))) throw new Error("Cleanup time can't be negative. Use zero or more.");
+    if (!(((returnTravelMinutes == null) || (returnTravelMinutes >= 0)))) throw new Error("Return travel time can't be negative. Use zero or more.");
+    if (!(((unloadMinutes == null) || (unloadMinutes >= 0)))) throw new Error("Unload time can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -13136,8 +13136,8 @@ async function __runEventCorrectCommercial(ctx: MutationCtx, { docId, reason, bu
     if (!(((doc.stage === "completed") || (doc.stage === "closed_out")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "eventManageAccess") || checkRole(user, "salesManageAccess")))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Correction reason is required");
-    if (!(((budgetAmount >= 0) && (quotedPrice >= 0)))) throw new Error("Event pricing cannot be negative");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're correcting this event.");
+    if (!(((budgetAmount >= 0) && (quotedPrice >= 0)))) throw new Error("This event's pricing can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -13423,13 +13423,13 @@ async function __runEventPlanEngagement(ctx: MutationCtx, { docId, clientId, tit
     if (!((doc.stage === "planning"))) throw new Error("Guard 0 failed");
     if (!((doc.plannedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((title).trim()).length > 0))) throw new Error("Event title is required");
-    if (!((((eventType).trim()).length > 0))) throw new Error("Event type is required");
+    if (!((((title).trim()).length > 0))) throw new Error("Give this event a title.");
+    if (!((((eventType).trim()).length > 0))) throw new Error("Pick an event type.");
     if (!((endsAt > startsAt))) throw new Error("Event end must be after its start");
     if (!(((expectedHeadcount >= 1) && (expectedHeadcount <= 100000)))) throw new Error("Headcount must be between 1 and 100000");
-    if (!(((venueCapacity == null) || (venueCapacity >= 0)))) throw new Error("Venue capacity cannot be negative");
-    if (!((((primaryContactName).trim()).length > 0))) throw new Error("Primary contact name is required");
-    if (!(((budgetAmount >= 0) && (quotedPrice >= 0)))) throw new Error("Event pricing cannot be negative");
+    if (!(((venueCapacity == null) || (venueCapacity >= 0)))) throw new Error("Venue capacity can't be negative. Use zero or more.");
+    if (!((((primaryContactName).trim()).length > 0))) throw new Error("Give this event a primary contact name.");
+    if (!(((budgetAmount >= 0) && (quotedPrice >= 0)))) throw new Error("This event's pricing can't be negative. Use zero or more.");
     {
       const __cur = doc.stage;
       if (__cur !== undefined) {
@@ -13610,13 +13610,13 @@ export const Event_createViaPlanEngagement = mutation({
     if (!((__draft.stage === "planning"))) throw new Error("Guard 0 failed");
     if (!((__draft.plannedAt == null))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((title).trim()).length > 0))) throw new Error("Event title is required");
-    if (!((((eventType).trim()).length > 0))) throw new Error("Event type is required");
+    if (!((((title).trim()).length > 0))) throw new Error("Give this event a title.");
+    if (!((((eventType).trim()).length > 0))) throw new Error("Pick an event type.");
     if (!((endsAt > startsAt))) throw new Error("Event end must be after its start");
     if (!(((expectedHeadcount >= 1) && (expectedHeadcount <= 100000)))) throw new Error("Headcount must be between 1 and 100000");
-    if (!(((venueCapacity == null) || (venueCapacity >= 0)))) throw new Error("Venue capacity cannot be negative");
-    if (!((((primaryContactName).trim()).length > 0))) throw new Error("Primary contact name is required");
-    if (!(((budgetAmount >= 0) && (quotedPrice >= 0)))) throw new Error("Event pricing cannot be negative");
+    if (!(((venueCapacity == null) || (venueCapacity >= 0)))) throw new Error("Venue capacity can't be negative. Use zero or more.");
+    if (!((((primaryContactName).trim()).length > 0))) throw new Error("Give this event a primary contact name.");
+    if (!(((budgetAmount >= 0) && (quotedPrice >= 0)))) throw new Error("This event's pricing can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -13852,7 +13852,7 @@ async function __runEventReturnToPlanning(ctx: MutationCtx, { docId, reason, ver
     if (!(((doc.stage === "quote") || (doc.stage === "pending_approval")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Return reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're sending this event back.");
     {
       const __cur = doc.stage;
       if (__cur !== undefined) {
@@ -14215,7 +14215,7 @@ async function __runEventUpdateImportDraft(ctx: MutationCtx, { docId, title, cli
     if (!((doc.plannedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((expectedHeadcount == null) || ((expectedHeadcount >= 0) && (expectedHeadcount <= 100000))))) throw new Error("Headcount must be between 0 and 100000 when known");
-    if (!((((budgetAmount == null) || (budgetAmount >= 0)) && ((quotedPrice == null) || (quotedPrice >= 0))))) throw new Error("Event pricing cannot be negative");
+    if (!((((budgetAmount == null) || (budgetAmount >= 0)) && ((quotedPrice == null) || (quotedPrice >= 0))))) throw new Error("This event's pricing can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -14667,8 +14667,8 @@ async function __runEventAssignmentAssign(ctx: MutationCtx, { docId, eventId, pe
     if (!((checkRole(user, "workforceManageAccess") || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 5 failed");
     if (!((eventId === doc.eventId))) throw new Error("This assignment is for a different event. Pick the event already on this assignment.");
     if (!((personId === doc.personId))) throw new Error("This assignment is for a different person. Pick the person already on this assignment.");
-    if (!((((role).trim()).length > 0))) throw new Error("Assignment role is required");
-    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("Assignment shift end must be after its start");
+    if (!((((role).trim()).length > 0))) throw new Error("Give this assignment a role.");
+    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("This assignment's shift end has to be after its start.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -14761,8 +14761,8 @@ export const EventAssignment_createViaAssign = mutation({
     if (!((checkRole(user, "workforceManageAccess") || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 5 failed");
     if (!((eventId === __draft.eventId))) throw new Error("This assignment is for a different event. Pick the event already on this assignment.");
     if (!((personId === __draft.personId))) throw new Error("This assignment is for a different person. Pick the person already on this assignment.");
-    if (!((((role).trim()).length > 0))) throw new Error("Assignment role is required");
-    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("Assignment shift end must be after its start");
+    if (!((((role).trim()).length > 0))) throw new Error("Give this assignment a role.");
+    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("This assignment's shift end has to be after its start.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -15061,7 +15061,7 @@ async function __runEventAssignmentPlanTiming(ctx: MutationCtx, { docId, startsA
     if (!(((doc.status === "assigned") || (doc.status === "confirmed")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "workforceManageAccess") || ((checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess")) || (((checkRole(user, "workforceSelfAccess") && (followsEventTiming === true)) && ((doc.followsEventTiming === true) || (((doc.followsEventTiming == null) && (doc.startsAt == null)) && (doc.endsAt == null)))) && (checkRole(user, "eventAccess") || checkRole(user, "manageAccess"))))))) throw new Error("Guard 2 failed");
-    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("Shift end must be after its start");
+    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("This shift's end has to be after its start.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -15183,13 +15183,13 @@ async function __runEventCloseoutCapture(ctx: MutationCtx, { docId, eventId, act
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_event != null))) throw new Error("Guard 2 failed");
     if (!((__rel_event.stage === "closed_out"))) throw new Error("Guard 3 failed");
-    if (!((eventId === doc.eventId))) throw new Error("Capture eventId must match the seeded event reference");
-    if (!(((((((((actualRevenue >= 0) && (budgetedRevenue >= 0)) && (actualIngredientCost >= 0)) && (actualWasteCost >= 0)) && (actualLaborCost >= 0)) && (actualVendorCost >= 0)) && (budgetedCost >= 0)) && (totalActualCost >= 0)))) throw new Error("Closeout money amounts cannot be negative");
-    if (!((totalActualCost === (((actualIngredientCost + actualWasteCost) + actualLaborCost) + actualVendorCost)))) throw new Error("Total actual cost must equal ingredient plus waste plus labor plus vendor costs");
-    if (!((revenueVariance === (budgetedRevenue - actualRevenue)))) throw new Error("Revenue variance must equal budgeted revenue minus actual revenue");
-    if (!((costVariance === (budgetedCost - totalActualCost)))) throw new Error("Cost variance must equal budgeted cost minus total actual cost");
-    if (!((grossProfit === (actualRevenue - totalActualCost)))) throw new Error("Gross profit must equal actual revenue minus total actual cost");
-    if (!(((expectedHeadcount >= 0) && (actualHeadcount >= 0)))) throw new Error("Headcount values cannot be negative");
+    if (!((eventId === doc.eventId))) throw new Error("This closeout is for a different event. Pick the event already on this closeout.");
+    if (!(((((((((actualRevenue >= 0) && (budgetedRevenue >= 0)) && (actualIngredientCost >= 0)) && (actualWasteCost >= 0)) && (actualLaborCost >= 0)) && (actualVendorCost >= 0)) && (budgetedCost >= 0)) && (totalActualCost >= 0)))) throw new Error("This closeout's money amounts can't be negative. Use zero or more.");
+    if (!((totalActualCost === (((actualIngredientCost + actualWasteCost) + actualLaborCost) + actualVendorCost)))) throw new Error("This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together.");
+    if (!((revenueVariance === (budgetedRevenue - actualRevenue)))) throw new Error("This closeout's revenue variance has to equal budgeted revenue minus actual revenue.");
+    if (!((costVariance === (budgetedCost - totalActualCost)))) throw new Error("This closeout's cost variance has to equal budgeted cost minus total actual cost.");
+    if (!((grossProfit === (actualRevenue - totalActualCost)))) throw new Error("This closeout's gross profit has to equal actual revenue minus total actual cost.");
+    if (!(((expectedHeadcount >= 0) && (actualHeadcount >= 0)))) throw new Error("This closeout's headcount numbers can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -15319,13 +15319,13 @@ export const EventCloseout_createViaCapture = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_event != null))) throw new Error("Guard 2 failed");
     if (!((__rel_event.stage === "closed_out"))) throw new Error("Guard 3 failed");
-    if (!((eventId === __draft.eventId))) throw new Error("Capture eventId must match the seeded event reference");
-    if (!(((((((((actualRevenue >= 0) && (budgetedRevenue >= 0)) && (actualIngredientCost >= 0)) && (actualWasteCost >= 0)) && (actualLaborCost >= 0)) && (actualVendorCost >= 0)) && (budgetedCost >= 0)) && (totalActualCost >= 0)))) throw new Error("Closeout money amounts cannot be negative");
-    if (!((totalActualCost === (((actualIngredientCost + actualWasteCost) + actualLaborCost) + actualVendorCost)))) throw new Error("Total actual cost must equal ingredient plus waste plus labor plus vendor costs");
-    if (!((revenueVariance === (budgetedRevenue - actualRevenue)))) throw new Error("Revenue variance must equal budgeted revenue minus actual revenue");
-    if (!((costVariance === (budgetedCost - totalActualCost)))) throw new Error("Cost variance must equal budgeted cost minus total actual cost");
-    if (!((grossProfit === (actualRevenue - totalActualCost)))) throw new Error("Gross profit must equal actual revenue minus total actual cost");
-    if (!(((expectedHeadcount >= 0) && (actualHeadcount >= 0)))) throw new Error("Headcount values cannot be negative");
+    if (!((eventId === __draft.eventId))) throw new Error("This closeout is for a different event. Pick the event already on this closeout.");
+    if (!(((((((((actualRevenue >= 0) && (budgetedRevenue >= 0)) && (actualIngredientCost >= 0)) && (actualWasteCost >= 0)) && (actualLaborCost >= 0)) && (actualVendorCost >= 0)) && (budgetedCost >= 0)) && (totalActualCost >= 0)))) throw new Error("This closeout's money amounts can't be negative. Use zero or more.");
+    if (!((totalActualCost === (((actualIngredientCost + actualWasteCost) + actualLaborCost) + actualVendorCost)))) throw new Error("This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together.");
+    if (!((revenueVariance === (budgetedRevenue - actualRevenue)))) throw new Error("This closeout's revenue variance has to equal budgeted revenue minus actual revenue.");
+    if (!((costVariance === (budgetedCost - totalActualCost)))) throw new Error("This closeout's cost variance has to equal budgeted cost minus total actual cost.");
+    if (!((grossProfit === (actualRevenue - totalActualCost)))) throw new Error("This closeout's gross profit has to equal actual revenue minus total actual cost.");
+    if (!(((expectedHeadcount >= 0) && (actualHeadcount >= 0)))) throw new Error("This closeout's headcount numbers can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -15437,9 +15437,9 @@ async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dish
     if (!((doc.addedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_event != null) && (((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
-    if (!((eventId === doc.eventId))) throw new Error("addToEvent eventId must match the seeded event reference");
-    if (!((quantityServings >= 0))) throw new Error("Event dish servings cannot be negative");
-    if (!(((headcountOverride == null) || (headcountOverride >= 0)))) throw new Error("Headcount override cannot be negative");
+    if (!((eventId === doc.eventId))) throw new Error("This event dish is for a different event. Pick the event already on this dish.");
+    if (!((quantityServings >= 0))) throw new Error("This dish's servings can't be negative. Use zero or more.");
+    if (!(((headcountOverride == null) || (headcountOverride >= 0)))) throw new Error("This headcount override can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -15629,9 +15629,9 @@ export const EventDish_createViaAddToEvent = mutation({
     if (!((__draft.addedAt == null))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_event != null) && (((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
-    if (!((eventId === __draft.eventId))) throw new Error("addToEvent eventId must match the seeded event reference");
-    if (!((quantityServings >= 0))) throw new Error("Event dish servings cannot be negative");
-    if (!(((headcountOverride == null) || (headcountOverride >= 0)))) throw new Error("Headcount override cannot be negative");
+    if (!((eventId === __draft.eventId))) throw new Error("This event dish is for a different event. Pick the event already on this dish.");
+    if (!((quantityServings >= 0))) throw new Error("This dish's servings can't be negative. Use zero or more.");
+    if (!(((headcountOverride == null) || (headcountOverride >= 0)))) throw new Error("This headcount override can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -15769,7 +15769,7 @@ async function __runEventDishAdjustServings(ctx: MutationCtx, { docId, quantityS
     if (!((doc.addedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_event != null) && (((((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing")) || (__rel_event.stage === "completed")) || (__rel_event.stage === "closed_out"))))) throw new Error("Guard 3 failed");
-    if (!((quantityServings >= 0))) throw new Error("Event dish servings cannot be negative");
+    if (!((quantityServings >= 0))) throw new Error("This dish's servings can't be negative. Use zero or more.");
     const previousQuantityServings = doc.quantityServings;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -15887,8 +15887,8 @@ async function __runEventDishConfirmFromProposal(ctx: MutationCtx, { docId, even
     if (!((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_event != null) && (((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 2 failed");
-    if (!((eventId === doc.eventId))) throw new Error("confirmFromProposal eventId must match the seeded event reference");
-    if (!((quantityServings >= 0))) throw new Error("Event dish servings cannot be negative");
+    if (!((eventId === doc.eventId))) throw new Error("This event dish is for a different event. Pick the event already on this dish.");
+    if (!((quantityServings >= 0))) throw new Error("This dish's servings can't be negative. Use zero or more.");
     const wasExistingLine = (doc.addedAt != null);
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -16051,7 +16051,7 @@ async function __runEventDishRemove(ctx: MutationCtx, { docId, reason, version }
     if (!((doc.addedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_event != null) && (((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Removal reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're removing this.");
     const previousQuantityServings = doc.quantityServings;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -16297,7 +16297,7 @@ async function __runEventDishSetHeadcountOverride(ctx: MutationCtx, { docId, hea
     if (!((doc.addedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_event != null) && (((((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing")) || (__rel_event.stage === "completed")) || (__rel_event.stage === "closed_out"))))) throw new Error("Guard 3 failed");
-    if (!((headcountOverride >= 0))) throw new Error("Headcount override cannot be negative");
+    if (!((headcountOverride >= 0))) throw new Error("This headcount override can't be negative. Use zero or more.");
     const previousQuantityServings = doc.quantityServings;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -16798,8 +16798,8 @@ async function __runEventDishLineOverrideApply(ctx: MutationCtx, { docId, eventD
     if (!((checkRole(user, "manageAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Managers and kitchen staff may change event dish overrides");
     if (!((doc.appliedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Override reason is required");
-    if (!((portionsAffected >= 0))) throw new Error("Portions affected cannot be negative");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're making this change.");
+    if (!((portionsAffected >= 0))) throw new Error("The number of servings affected can't be negative. Use zero or more.");
     if (!((((((kind === "add") || (targetDishIngredientId != null)) || (targetDishComponentId != null)) || (targetDishContainerId != null)) || (targetDishTaskId != null)))) throw new Error("Remove, replace and adjust need a target line");
     if (!(((((kind !== "add") && (kind !== "replace")) || (ingredientId != null)) || (componentId != null)))) throw new Error("Add and replace need an ingredient or a recipe");
     if (!(((kind === "remove") || (((quantity != null) && (quantity > 0)) && (unit != null))))) throw new Error("Add, replace and adjust need a quantity and a unit");
@@ -16912,8 +16912,8 @@ export const EventDishLineOverride_createViaApply = mutation({
     if (!((checkRole(user, "manageAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Managers and kitchen staff may change event dish overrides");
     if (!((__draft.appliedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Override reason is required");
-    if (!((portionsAffected >= 0))) throw new Error("Portions affected cannot be negative");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're making this change.");
+    if (!((portionsAffected >= 0))) throw new Error("The number of servings affected can't be negative. Use zero or more.");
     if (!((((((kind === "add") || (targetDishIngredientId != null)) || (targetDishComponentId != null)) || (targetDishContainerId != null)) || (targetDishTaskId != null)))) throw new Error("Remove, replace and adjust need a target line");
     if (!(((((kind !== "add") && (kind !== "replace")) || (ingredientId != null)) || (componentId != null)))) throw new Error("Add and replace need an ingredient or a recipe");
     if (!(((kind === "remove") || (((quantity != null) && (quantity > 0)) && (unit != null))))) throw new Error("Add, replace and adjust need a quantity and a unit");
@@ -16959,7 +16959,7 @@ async function __runEventDishLineOverrideRevoke(ctx: MutationCtx, { docId, reaso
     if (!((checkRole(user, "manageAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Managers and kitchen staff may change event dish overrides");
     if (!((doc.appliedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Revoke reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're undoing this change.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -17009,7 +17009,7 @@ async function __runEventGuestAssignTable(ctx: MutationCtx, { docId, tableAssign
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the guest list");
     if (!((doc.rsvpStatus !== "declined"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((tableAssignment).trim()).length > 0))) throw new Error("Table assignment is required");
+    if (!((((tableAssignment).trim()).length > 0))) throw new Error("Pick a table for this guest.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -17109,7 +17109,7 @@ async function __runEventGuestInvite(ctx: MutationCtx, { docId, eventId, name, e
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the guest list");
     if (!((doc.invitedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Guest name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this guest a name.");
     {
       const __cur = doc.rsvpStatus;
       if (__cur !== undefined) {
@@ -17214,7 +17214,7 @@ export const EventGuest_createViaInvite = mutation({
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the guest list");
     if (!((__draft.invitedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Guest name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this guest a name.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -17379,7 +17379,7 @@ async function __runEventGuestWithdraw(ctx: MutationCtx, { docId, reason, versio
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update the guest list");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the guest list");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Withdrawal reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why this guest is withdrawing.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -17801,7 +17801,7 @@ async function __runEventIngredientContributionRetire(ctx: MutationCtx, { docId,
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may change event ingredient contributions");
     if (!((doc.recordedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Retire reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're retiring this.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -18145,7 +18145,7 @@ async function __runEventIngredientContributionSupersede(ctx: MutationCtx, { doc
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may change event ingredient contributions");
     if (!((doc.recordedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Supersede reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why this is being replaced.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -18261,8 +18261,8 @@ async function __runEventLayoutSectionAdd(ctx: MutationCtx, { docId, eventId, ty
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the floor plan");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((type).trim()).length > 0))) throw new Error("Layout section type is required");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Layout section sort order cannot be negative");
+    if (!((((type).trim()).length > 0))) throw new Error("Pick a layout section type.");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Sort order can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -18336,8 +18336,8 @@ export const EventLayoutSection_createViaAdd = mutation({
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the floor plan");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((type).trim()).length > 0))) throw new Error("Layout section type is required");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Layout section sort order cannot be negative");
+    if (!((((type).trim()).length > 0))) throw new Error("Pick a layout section type.");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Sort order can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -18417,7 +18417,7 @@ async function __runEventLayoutSectionUpdate(ctx: MutationCtx, { docId, type, in
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((type == null) || (((type).trim()).length > 0)))) throw new Error("Layout section type cannot be blanked");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Layout section sort order cannot be negative");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Sort order can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -18525,7 +18525,7 @@ async function __runEventStaffNeedCancel(ctx: MutationCtx, { docId, reason, vers
     if (!((((doc.status === "open") || (doc.status === "claimed")) || (doc.status === "filled")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "workforceManageAccess") || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Cancel reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're cancelling this staffing need.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -18589,7 +18589,7 @@ async function __runEventStaffNeedChangeCoverage(ctx: MutationCtx, { docId, pers
     if (!(((doc.postedAt != null) && (doc.deletedAt == null)))) throw new Error("Guard 1 failed");
     if (!((doc.coverageContinuedAt == null))) throw new Error("Guard 2 failed");
     if (!((checkRole(user, "workforceManageAccess") || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 3 failed");
-    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("Coverage end must be after its start");
+    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("This coverage's end has to be after its start.");
     const wasCancelled = (doc.status === "cancelled");
     {
       const __cur = doc.status;
@@ -18786,7 +18786,7 @@ async function __runEventStaffNeedPlanTiming(ctx: MutationCtx, { docId, startsAt
     if (!((doc.status !== "cancelled"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "workforceManageAccess") || ((checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess")) || (((checkRole(user, "workforceSelfAccess") && (followsEventTiming === true)) && ((doc.followsEventTiming === true) || (((doc.followsEventTiming == null) && (doc.startsAt == null)) && (doc.endsAt == null)))) && (checkRole(user, "eventAccess") || checkRole(user, "manageAccess"))))))) throw new Error("Guard 2 failed");
-    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("Shift end must be after its start");
+    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("This shift's end has to be after its start.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -18840,8 +18840,8 @@ async function __runEventStaffNeedPostOpen(ctx: MutationCtx, { docId, eventId, r
     if (!((doc.postedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "workforceManageAccess") || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 2 failed");
-    if (!((((role).trim()).length > 0))) throw new Error("Staff need role is required");
-    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("Staff need end must be after its start");
+    if (!((((role).trim()).length > 0))) throw new Error("Give this staffing need a role.");
+    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("This staffing need's end has to be after its start.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -18950,8 +18950,8 @@ export const EventStaffNeed_createViaPostOpen = mutation({
     if (!((__draft.postedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "workforceManageAccess") || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 2 failed");
-    if (!((((role).trim()).length > 0))) throw new Error("Staff need role is required");
-    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("Staff need end must be after its start");
+    if (!((((role).trim()).length > 0))) throw new Error("Give this staffing need a role.");
+    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("This staffing need's end has to be after its start.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -19101,7 +19101,7 @@ async function __runEventTemplateArchive(ctx: MutationCtx, { docId, reason, vers
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.definedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Archive reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're archiving this template.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -19163,8 +19163,8 @@ async function __runEventTemplateDefine(ctx: MutationCtx, { docId, name, clientT
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change event templates");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Template name is required");
-    if (!((((eventType).trim()).length > 0))) throw new Error("Event type is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this template a name.");
+    if (!((((eventType).trim()).length > 0))) throw new Error("Pick an event type.");
     if (!(((defaultHeadcount >= 1) && (defaultHeadcount <= 100000)))) throw new Error("Default headcount must be between 1 and 100000");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -19260,8 +19260,8 @@ export const EventTemplate_createViaDefine = mutation({
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change event templates");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Template name is required");
-    if (!((((eventType).trim()).length > 0))) throw new Error("Event type is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this template a name.");
+    if (!((((eventType).trim()).length > 0))) throw new Error("Pick an event type.");
     if (!(((defaultHeadcount >= 1) && (defaultHeadcount <= 100000)))) throw new Error("Default headcount must be between 1 and 100000");
     const doc: Record<string, any> = {
       ...__draft,
@@ -19362,8 +19362,8 @@ async function __runEventTemplateRevise(ctx: MutationCtx, { docId, name, clientT
     if (!((doc.definedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Template name is required");
-    if (!((((eventType).trim()).length > 0))) throw new Error("Event type is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this template a name.");
+    if (!((((eventType).trim()).length > 0))) throw new Error("Pick an event type.");
     if (!(((defaultHeadcount >= 1) && (defaultHeadcount <= 100000)))) throw new Error("Default headcount must be between 1 and 100000");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -19428,7 +19428,7 @@ async function __runEventTimelineActivityAdjust(ctx: MutationCtx, { docId, name,
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Guard 2 failed");
     if (!(((name == null) || (((name).trim()).length > 0)))) throw new Error("Activity name cannot be blanked");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Timeline activity sort order cannot be negative");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Sort order can't be negative. Use zero or more.");
     if (!((((((((startsAt == null) && (endsAt == null)) || (clearStartsAt === true)) || (clearEndsAt === true)) || ((startsAt == null) && (doc.startsAt == null))) || ((endsAt == null) && (doc.endsAt == null))) || (((endsAt != null) ? endsAt : doc.endsAt) >= ((startsAt != null) ? startsAt : doc.startsAt))))) throw new Error("Activity end must not precede its start");
     const nextStartsAt = ((clearStartsAt === true) ? null : ((startsAt != null) ? startsAt : doc.startsAt));
     const nextEndsAt = ((clearEndsAt === true) ? null : ((endsAt != null) ? endsAt : doc.endsAt));
@@ -19701,9 +19701,9 @@ async function __runEventTimelineActivitySchedule(ctx: MutationCtx, { docId, eve
     if (!((doc.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Activity name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this activity a name.");
     if (!((((startsAt == null) || (endsAt == null)) || (endsAt >= startsAt)))) throw new Error("Activity end must not precede its start");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Timeline activity sort order cannot be negative");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Sort order can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -19806,9 +19806,9 @@ export const EventTimelineActivity_createViaSchedule = mutation({
     if (!((__draft.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Activity name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this activity a name.");
     if (!((((startsAt == null) || (endsAt == null)) || (endsAt >= startsAt)))) throw new Error("Activity end must not precede its start");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Timeline activity sort order cannot be negative");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Sort order can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -19901,8 +19901,8 @@ async function __runEventTimelineCommentPost(ctx: MutationCtx, { docId, eventId,
     if (!((doc.postedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((body).trim()).length > 0))) throw new Error("Comment text is required");
-    if (!((((authorName).trim()).length > 0))) throw new Error("Author name is required");
+    if (!((((body).trim()).length > 0))) throw new Error("Write something in this comment.");
+    if (!((((authorName).trim()).length > 0))) throw new Error("Give this comment an author name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -19982,8 +19982,8 @@ export const EventTimelineComment_createViaPost = mutation({
     if (!((__draft.postedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((body).trim()).length > 0))) throw new Error("Comment text is required");
-    if (!((((authorName).trim()).length > 0))) throw new Error("Author name is required");
+    if (!((((body).trim()).length > 0))) throw new Error("Write something in this comment.");
+    if (!((((authorName).trim()).length > 0))) throw new Error("Give this comment an author name.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -20345,7 +20345,7 @@ async function __runExternalRecordLinkDecide(ctx: MutationCtx, { docId, decision
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
-    if (!((((decidedByUserId).trim()).length > 0))) throw new Error("Deciding user is required");
+    if (!((((decidedByUserId).trim()).length > 0))) throw new Error("Pick who decided this.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -20395,7 +20395,7 @@ async function __runExternalRecordLinkDiscard(ctx: MutationCtx, { docId, reason,
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Discard reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're deleting this match.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -20443,11 +20443,11 @@ async function __runExternalRecordLinkLink(ctx: MutationCtx, { docId, sourceSyst
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((sourceSystem != null))) throw new Error("Source system is required");
-    if (!((((externalId).trim()).length > 0))) throw new Error("External ID is required");
-    if (!((((capsuleId).trim()).length > 0))) throw new Error("Capsule ID is required");
-    if (!((((verified == null) || (verified === false)) || ((verifiedByUserId != null) && (((verifiedByUserId).trim()).length > 0))))) throw new Error("Verified status requires a verifying user");
-    if (!((((effectiveStartDate == null) || (effectiveEndDate == null)) || (effectiveStartDate <= effectiveEndDate)))) throw new Error("Effective start date must be before or equal to end date");
+    if (!((sourceSystem != null))) throw new Error("Pick a source system for this match.");
+    if (!((((externalId).trim()).length > 0))) throw new Error("Give this match an external ID.");
+    if (!((((capsuleId).trim()).length > 0))) throw new Error("Give this match a Capsule ID.");
+    if (!((((verified == null) || (verified === false)) || ((verifiedByUserId != null) && (((verifiedByUserId).trim()).length > 0))))) throw new Error("This match can't be marked verified without picking who verified it.");
+    if (!((((effectiveStartDate == null) || (effectiveEndDate == null)) || (effectiveStartDate <= effectiveEndDate)))) throw new Error("This match's start date has to be on or before its end date.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -20583,11 +20583,11 @@ export const ExternalRecordLink_createViaLink = mutation({
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((sourceSystem != null))) throw new Error("Source system is required");
-    if (!((((externalId).trim()).length > 0))) throw new Error("External ID is required");
-    if (!((((capsuleId).trim()).length > 0))) throw new Error("Capsule ID is required");
-    if (!((((verified == null) || (verified === false)) || ((verifiedByUserId != null) && (((verifiedByUserId).trim()).length > 0))))) throw new Error("Verified status requires a verifying user");
-    if (!((((effectiveStartDate == null) || (effectiveEndDate == null)) || (effectiveStartDate <= effectiveEndDate)))) throw new Error("Effective start date must be before or equal to end date");
+    if (!((sourceSystem != null))) throw new Error("Pick a source system for this match.");
+    if (!((((externalId).trim()).length > 0))) throw new Error("Give this match an external ID.");
+    if (!((((capsuleId).trim()).length > 0))) throw new Error("Give this match a Capsule ID.");
+    if (!((((verified == null) || (verified === false)) || ((verifiedByUserId != null) && (((verifiedByUserId).trim()).length > 0))))) throw new Error("This match can't be marked verified without picking who verified it.");
+    if (!((((effectiveStartDate == null) || (effectiveEndDate == null)) || (effectiveStartDate <= effectiveEndDate)))) throw new Error("This match's start date has to be on or before its end date.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -20733,7 +20733,7 @@ async function __runExternalRecordLinkResolveConflict(ctx: MutationCtx, { docId,
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
-    if (!((((resolvedByUserId).trim()).length > 0))) throw new Error("Resolving user is required");
+    if (!((((resolvedByUserId).trim()).length > 0))) throw new Error("Pick who resolved this.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -20836,7 +20836,7 @@ async function __runExternalRecordLinkUnlinkExternalRecord(ctx: MutationCtx, { d
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Unlink reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're taking this match off.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -20886,7 +20886,7 @@ async function __runExternalRecordLinkUpdateCapsuleId(ctx: MutationCtx, { docId,
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
-    if (!((((capsuleId).trim()).length > 0))) throw new Error("Capsule ID is required");
+    if (!((((capsuleId).trim()).length > 0))) throw new Error("Give this match a Capsule ID.");
     const previousCapsuleId = doc.capsuleId;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -20937,7 +20937,7 @@ async function __runExternalRecordLinkVerifyLink(ctx: MutationCtx, { docId, veri
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
-    if (!((((verifiedByUserId).trim()).length > 0))) throw new Error("Verifying user is required");
+    if (!((((verifiedByUserId).trim()).length > 0))) throw new Error("Pick who verified this.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -20992,9 +20992,9 @@ async function __runImportArtifactClassify(ctx: MutationCtx, { docId, dispositio
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imported files");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
-    if (!((disposition !== "pending"))) throw new Error("Disposition must be a final classification, not pending");
-    if (!(((totalRowCount == null) || (totalRowCount >= 0)))) throw new Error("Total row count must not be negative when present");
-    if (!(((rowOutcomeCounts == null) || (((rowOutcomeCounts).trim()).length > 0)))) throw new Error("Row outcome counts must be non-empty when present");
+    if (!((disposition !== "pending"))) throw new Error("Pick what this file turned out to be. It can't stay set to pending.");
+    if (!(((totalRowCount == null) || (totalRowCount >= 0)))) throw new Error("This file's total row count can't be negative. Use zero or more.");
+    if (!(((rowOutcomeCounts == null) || (((rowOutcomeCounts).trim()).length > 0)))) throw new Error("If you give row counts for this file, they can't be blank.");
     const previousDisposition = doc.disposition;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -21047,8 +21047,8 @@ async function __runImportArtifactRecordParse(ctx: MutationCtx, { docId, parseSt
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imported files");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
-    if (!((parseStatus !== "pending"))) throw new Error("Parse status must be parsed or failed, not pending");
-    if (!(((provenance == null) || (((provenance).trim()).length > 0)))) throw new Error("Provenance must be non-empty when present");
+    if (!((parseStatus !== "pending"))) throw new Error("Say if reading this file worked or failed. It can't stay pending.");
+    if (!(((provenance == null) || (((provenance).trim()).length > 0)))) throw new Error("If you give origin details for this file, they can't be blank.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -21098,13 +21098,13 @@ async function __runImportArtifactRegister(ctx: MutationCtx, { docId, importRunI
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imported files");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt == null))) throw new Error("Guard 1 failed");
-    if (!((((importRunId).trim()).length > 0))) throw new Error("Import run id is required");
-    if (!((((name).trim()).length > 0))) throw new Error("Artifact name is required");
-    if (!((byteSize >= 0))) throw new Error("Byte size must not be negative");
-    if (!((entryCount >= 0))) throw new Error("Entry count must not be negative");
-    if (!(((checksum == null) || (((checksum).trim()).length > 0)))) throw new Error("Checksum must be non-empty when present");
-    if (!(((storageId == null) || (((storageId).trim()).length > 0)))) throw new Error("Storage id must be non-empty when present");
-    if (!(((provenance == null) || (((provenance).trim()).length > 0)))) throw new Error("Provenance must be non-empty when present");
+    if (!((((importRunId).trim()).length > 0))) throw new Error("Say which import this file belongs to.");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this file a name.");
+    if (!((byteSize >= 0))) throw new Error("This file's size can't be negative. Use zero or more.");
+    if (!((entryCount >= 0))) throw new Error("This file's number of entries can't be negative. Use zero or more.");
+    if (!(((checksum == null) || (((checksum).trim()).length > 0)))) throw new Error("If you give a checksum for this file, it can't be blank.");
+    if (!(((storageId == null) || (((storageId).trim()).length > 0)))) throw new Error("If you give a storage ID for this file, it can't be blank.");
+    if (!(((provenance == null) || (((provenance).trim()).length > 0)))) throw new Error("If you give origin details for this file, they can't be blank.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -21166,7 +21166,7 @@ async function __runImportConflictRaise(ctx: MutationCtx, { docId, externalRecor
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import conflicts");
     if (!((doc.raisedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((field).trim()).length > 0))) throw new Error("Conflict field is required");
+    if (!((((field).trim()).length > 0))) throw new Error("Say which field is in conflict.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -21262,7 +21262,7 @@ export const ImportConflict_createViaRaise = mutation({
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import conflicts");
     if (!((__draft.raisedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((field).trim()).length > 0))) throw new Error("Conflict field is required");
+    if (!((((field).trim()).length > 0))) throw new Error("Say which field is in conflict.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -21300,8 +21300,8 @@ async function __runImportConflictSettle(ctx: MutationCtx, { docId, resolution, 
     if (!((doc.raisedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.status === "pending"))) throw new Error("Guard 2 failed");
-    if (!((((resolvedByUserId).trim()).length > 0))) throw new Error("Resolving user is required");
-    if (!((resolution !== "pending"))) throw new Error("Resolution must pick keep_capsule, take_source or manual");
+    if (!((((resolvedByUserId).trim()).length > 0))) throw new Error("Pick who resolved this disagreement.");
+    if (!((resolution !== "pending"))) throw new Error("Pick how you resolved this: keep the current value, use the new value, or fix it another way.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -21513,7 +21513,7 @@ async function __runImportDatasetRecordLastImport(ctx: MutationCtx, { docId, imp
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import lists");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
-    if (!((((importRunId).trim()).length > 0))) throw new Error("Import run ID is required");
+    if (!((((importRunId).trim()).length > 0))) throw new Error("Say which import this was.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -21560,8 +21560,8 @@ async function __runImportDatasetRegister(ctx: MutationCtx, { docId, datasetCate
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import lists");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt == null))) throw new Error("Guard 1 failed");
-    if (!((datasetCategory != null))) throw new Error("Dataset category is required");
-    if (!((((config).trim()).length > 0))) throw new Error("Dataset config is required");
+    if (!((datasetCategory != null))) throw new Error("Pick what kind of data this import handles.");
+    if (!((((config).trim()).length > 0))) throw new Error("This import needs its setup filled in.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -21626,7 +21626,7 @@ async function __runImportDatasetUpdateConfig(ctx: MutationCtx, { docId, config,
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import lists");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
-    if (!((((config).trim()).length > 0))) throw new Error("Dataset config is required");
+    if (!((((config).trim()).length > 0))) throw new Error("This import needs its setup filled in.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -21681,8 +21681,8 @@ async function __runImportRunApproveReview(ctx: MutationCtx, { docId, finalRecor
     if (!((doc.status === "reviewing"))) throw new Error("Guard 0 failed");
     if (!((doc.reviewStartedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((finalRecordCounts != null))) throw new Error("Final record counts are required");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("Actor id must be non-empty when present");
+    if (!((finalRecordCounts != null))) throw new Error("This import needs its final item counts.");
+    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -21747,7 +21747,7 @@ async function __runImportRunBeginReview(ctx: MutationCtx, { docId, actorId, ver
     if (!((doc.status === "validating"))) throw new Error("Guard 0 failed");
     if (!((doc.validatedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("Actor id must be non-empty when present");
+    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -21813,7 +21813,7 @@ async function __runImportRunCommit(ctx: MutationCtx, { docId, actorId, version 
     if (!(((doc.indexNameMismatch !== true) || (doc.discrepancyExplained === true)))) throw new Error("Guard 3 failed");
     if (!((((doc.unaccountedRecordCount != null) ? doc.unaccountedRecordCount : 0) === 0))) throw new Error("Guard 4 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 5 failed");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("Actor id must be non-empty when present");
+    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -21877,8 +21877,8 @@ async function __runImportRunExplainArchiveDiscrepancy(ctx: MutationCtx, { docId
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imports");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
-    if (!((((note).trim()).length > 0))) throw new Error("Discrepancy note is required");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("Actor id must be non-empty when present");
+    if (!((((note).trim()).length > 0))) throw new Error("Say why the file counts don't match.");
+    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -21930,8 +21930,8 @@ async function __runImportRunMarkFailed(ctx: MutationCtx, { docId, failureDetail
     if (!((doc.status !== "completed"))) throw new Error("Guard 0 failed");
     if (!((doc.status !== "reverted"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((failureDetails).trim()).length > 0))) throw new Error("Failure details are required");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("Actor id must be non-empty when present");
+    if (!((((failureDetails).trim()).length > 0))) throw new Error("Say what went wrong.");
+    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -21997,10 +21997,10 @@ async function __runImportRunRecordArchiveInventory(ctx: MutationCtx, { docId, a
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
     if (!(((doc.status === "started") || (doc.status === "parsing")))) throw new Error("Guard 2 failed");
-    if (!((archiveWorkbookCount >= 0))) throw new Error("Archive workbook count must not be negative");
-    if (!(((indexWorkbookCount == null) || (indexWorkbookCount >= 0)))) throw new Error("Index workbook count must not be negative");
-    if (!(((archiveStorageId == null) || (((archiveStorageId).trim()).length > 0)))) throw new Error("Archive storage id must be non-empty when present");
-    if (!(((archiveChecksum == null) || (((archiveChecksum).trim()).length > 0)))) throw new Error("Archive checksum must be non-empty when present");
+    if (!((archiveWorkbookCount >= 0))) throw new Error("This import's file count from the upload can't be negative. Use zero or more.");
+    if (!(((indexWorkbookCount == null) || (indexWorkbookCount >= 0)))) throw new Error("This import's expected file count can't be negative. Use zero or more.");
+    if (!(((archiveStorageId == null) || (((archiveStorageId).trim()).length > 0)))) throw new Error("If you give a storage ID for the upload, it can't be blank.");
+    if (!(((archiveChecksum == null) || (((archiveChecksum).trim()).length > 0)))) throw new Error("If you give a checksum for the upload, it can't be blank.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -22058,8 +22058,8 @@ async function __runImportRunRecordCommitCheckpoint(ctx: MutationCtx, { docId, c
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.status === "committing"))) throw new Error("Guard 2 failed");
-    if (!((((commitCheckpoint).trim()).length > 0))) throw new Error("Commit checkpoint is required");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("Actor id must be non-empty when present");
+    if (!((((commitCheckpoint).trim()).length > 0))) throw new Error("This import needs to say how far its committing has gotten.");
+    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -22110,9 +22110,9 @@ async function __runImportRunRecordDispositionSummary(ctx: MutationCtx, { docId,
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
     if (!((((((doc.status === "started") || (doc.status === "parsing")) || (doc.status === "validating")) || (doc.status === "reviewing")) || (doc.status === "committing")))) throw new Error("Guard 2 failed");
-    if (!((((dispositionCounts).trim()).length > 0))) throw new Error("Disposition counts are required");
-    if (!((unaccountedRecordCount >= 0))) throw new Error("Unaccounted record count must not be negative");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("Actor id must be non-empty when present");
+    if (!((((dispositionCounts).trim()).length > 0))) throw new Error("This import needs its file outcome counts.");
+    if (!((unaccountedRecordCount >= 0))) throw new Error("This import's count of files not yet accounted for can't be negative. Use zero or more.");
+    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -22164,8 +22164,8 @@ async function __runImportRunRecordParse(ctx: MutationCtx, { docId, recordCounts
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imports");
     if (!((doc.status === "started"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((recordCounts != null))) throw new Error("Record counts are required");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("Actor id must be non-empty when present");
+    if (!((recordCounts != null))) throw new Error("This import needs its item counts.");
+    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -22230,7 +22230,7 @@ async function __runImportRunRevert(ctx: MutationCtx, { docId, actorId, version 
     if (!((doc.status === "completed"))) throw new Error("Guard 0 failed");
     if (!((doc.completionTime != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("Actor id must be non-empty when present");
+    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -22293,7 +22293,7 @@ async function __runImportRunStart(ctx: MutationCtx, { docId, sourceSystem, data
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imports");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "started"))) throw new Error("Guard 1 failed");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("Actor id must be non-empty when present");
+    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -22362,7 +22362,7 @@ async function __runImportRunValidate(ctx: MutationCtx, { docId, actorId, versio
     if (!((doc.status === "parsing"))) throw new Error("Guard 0 failed");
     if (!((doc.parsedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("Actor id must be non-empty when present");
+    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -22533,7 +22533,7 @@ async function __runIncidentDismiss(ctx: MutationCtx, { docId, reason, version }
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((checkRole(user, "eventManageAccess") || checkRole(user, "kitchenManageAccess")))) throw new Error("Guard 3 failed");
     if (!((doc.correctiveActionRequired !== true))) throw new Error("Allergen incidents stay locked until the corrective action is closed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Dismissal reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're dismissing this incident.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -22598,7 +22598,7 @@ async function __runIncidentMarkResolved(ctx: MutationCtx, { docId, resolution, 
     if (!((doc.reportedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((doc.correctiveActionRequired !== true))) throw new Error("Allergen incidents stay locked until the corrective action is closed");
-    if (!((((resolution).trim()).length > 0))) throw new Error("Resolution is required");
+    if (!((((resolution).trim()).length > 0))) throw new Error("Say how this was resolved.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -22666,11 +22666,11 @@ async function __runIncidentReport(ctx: MutationCtx, { docId, eventId, severity,
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!((user.id != null))) throw new Error("Guard 4 failed");
-    if (!((eventId === doc.eventId))) throw new Error("Report eventId must match the seeded event reference");
-    if (!((((prepTaskId == null) || (doc.prepTaskId == null)) || (prepTaskId === doc.prepTaskId)))) throw new Error("Report prepTaskId must match the seeded prep task reference when provided");
-    if (!((((deliveryId == null) || (doc.deliveryId == null)) || (deliveryId === doc.deliveryId)))) throw new Error("Report deliveryId must match the seeded delivery reference when provided");
-    if (!((((shiftId == null) || (doc.shiftId == null)) || (shiftId === doc.shiftId)))) throw new Error("Report shiftId must match the seeded shift reference when provided");
-    if (!((((description).trim()).length > 0))) throw new Error("Incident description is required");
+    if (!((eventId === doc.eventId))) throw new Error("This incident is for a different event. Pick the event already on this incident.");
+    if (!((((prepTaskId == null) || (doc.prepTaskId == null)) || (prepTaskId === doc.prepTaskId)))) throw new Error("This incident is for a different prep task. Pick the prep task already on this incident, or leave that blank.");
+    if (!((((deliveryId == null) || (doc.deliveryId == null)) || (deliveryId === doc.deliveryId)))) throw new Error("This incident is for a different delivery. Pick the delivery already on this incident, or leave that blank.");
+    if (!((((shiftId == null) || (doc.shiftId == null)) || (shiftId === doc.shiftId)))) throw new Error("This incident is for a different shift. Pick the shift already on this incident, or leave that blank.");
+    if (!((((description).trim()).length > 0))) throw new Error("Say what happened.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -22763,11 +22763,11 @@ export const Incident_createViaReport = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!((user.id != null))) throw new Error("Guard 4 failed");
-    if (!((eventId === __draft.eventId))) throw new Error("Report eventId must match the seeded event reference");
-    if (!((((prepTaskId == null) || (__draft.prepTaskId == null)) || (prepTaskId === __draft.prepTaskId)))) throw new Error("Report prepTaskId must match the seeded prep task reference when provided");
-    if (!((((deliveryId == null) || (__draft.deliveryId == null)) || (deliveryId === __draft.deliveryId)))) throw new Error("Report deliveryId must match the seeded delivery reference when provided");
-    if (!((((shiftId == null) || (__draft.shiftId == null)) || (shiftId === __draft.shiftId)))) throw new Error("Report shiftId must match the seeded shift reference when provided");
-    if (!((((description).trim()).length > 0))) throw new Error("Incident description is required");
+    if (!((eventId === __draft.eventId))) throw new Error("This incident is for a different event. Pick the event already on this incident.");
+    if (!((((prepTaskId == null) || (__draft.prepTaskId == null)) || (prepTaskId === __draft.prepTaskId)))) throw new Error("This incident is for a different prep task. Pick the prep task already on this incident, or leave that blank.");
+    if (!((((deliveryId == null) || (__draft.deliveryId == null)) || (deliveryId === __draft.deliveryId)))) throw new Error("This incident is for a different delivery. Pick the delivery already on this incident, or leave that blank.");
+    if (!((((shiftId == null) || (__draft.shiftId == null)) || (shiftId === __draft.shiftId)))) throw new Error("This incident is for a different shift. Pick the shift already on this incident, or leave that blank.");
+    if (!((((description).trim()).length > 0))) throw new Error("Say what happened.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -23007,8 +23007,8 @@ async function __runIngredientIntroduce(ctx: MutationCtx, { docId, name, unit, c
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.introducedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Ingredient name is required");
-    if (!((costPerUnit >= 0))) throw new Error("Ingredient cost per unit cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this ingredient a name.");
+    if (!((costPerUnit >= 0))) throw new Error("This ingredient's cost can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -23098,8 +23098,8 @@ export const Ingredient_createViaIntroduce = mutation({
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((__draft.introducedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Ingredient name is required");
-    if (!((costPerUnit >= 0))) throw new Error("Ingredient cost per unit cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this ingredient a name.");
+    if (!((costPerUnit >= 0))) throw new Error("This ingredient's cost can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -23138,7 +23138,7 @@ async function __runIngredientLinkAsEdition(ctx: MutationCtx, { docId, sourceIng
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.mergedIntoIngredientId == null))) throw new Error("Guard 2 failed");
     if (!((sourceIngredientId !== doc._id))) throw new Error("An ingredient cannot be an edition of itself");
-    if (!(((editionNumber == null) || (editionNumber > 0)))) throw new Error("Edition number must be positive");
+    if (!(((editionNumber == null) || (editionNumber > 0)))) throw new Error("This edition number has to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -23190,7 +23190,7 @@ async function __runIngredientMergeInto(ctx: MutationCtx, { docId, targetIngredi
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.mergedIntoIngredientId == null))) throw new Error("Guard 2 failed");
     if (!((targetIngredientId !== doc._id))) throw new Error("Cannot merge an ingredient into itself");
-    if (!((((reason).trim()).length > 0))) throw new Error("Merge reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're merging this.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -23377,15 +23377,15 @@ async function __runIngredientSetNutrition(ctx: MutationCtx, { docId, caloriesPe
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((caloriesPerUnit == null) || (caloriesPerUnit >= 0)))) throw new Error("Calories cannot be negative");
-    if (!(((proteinGramsPerUnit == null) || (proteinGramsPerUnit >= 0)))) throw new Error("Protein cannot be negative");
-    if (!(((carbsGramsPerUnit == null) || (carbsGramsPerUnit >= 0)))) throw new Error("Carbohydrates cannot be negative");
-    if (!(((fatGramsPerUnit == null) || (fatGramsPerUnit >= 0)))) throw new Error("Fat cannot be negative");
-    if (!(((fiberGramsPerUnit == null) || (fiberGramsPerUnit >= 0)))) throw new Error("Fiber cannot be negative");
-    if (!(((sugarGramsPerUnit == null) || (sugarGramsPerUnit >= 0)))) throw new Error("Sugar cannot be negative");
-    if (!(((sodiumMgPerUnit == null) || (sodiumMgPerUnit >= 0)))) throw new Error("Sodium cannot be negative");
-    if (!(((calciumMgPerUnit == null) || (calciumMgPerUnit >= 0)))) throw new Error("Calcium cannot be negative");
-    if (!(((ironMgPerUnit == null) || (ironMgPerUnit >= 0)))) throw new Error("Iron cannot be negative");
+    if (!(((caloriesPerUnit == null) || (caloriesPerUnit >= 0)))) throw new Error("This ingredient's calories can't be negative. Use zero or more.");
+    if (!(((proteinGramsPerUnit == null) || (proteinGramsPerUnit >= 0)))) throw new Error("This ingredient's protein can't be negative. Use zero or more.");
+    if (!(((carbsGramsPerUnit == null) || (carbsGramsPerUnit >= 0)))) throw new Error("This ingredient's carbs can't be negative. Use zero or more.");
+    if (!(((fatGramsPerUnit == null) || (fatGramsPerUnit >= 0)))) throw new Error("This ingredient's fat can't be negative. Use zero or more.");
+    if (!(((fiberGramsPerUnit == null) || (fiberGramsPerUnit >= 0)))) throw new Error("This ingredient's fiber can't be negative. Use zero or more.");
+    if (!(((sugarGramsPerUnit == null) || (sugarGramsPerUnit >= 0)))) throw new Error("This ingredient's sugar can't be negative. Use zero or more.");
+    if (!(((sodiumMgPerUnit == null) || (sodiumMgPerUnit >= 0)))) throw new Error("This ingredient's sodium can't be negative. Use zero or more.");
+    if (!(((calciumMgPerUnit == null) || (calciumMgPerUnit >= 0)))) throw new Error("This ingredient's calcium can't be negative. Use zero or more.");
+    if (!(((ironMgPerUnit == null) || (ironMgPerUnit >= 0)))) throw new Error("This ingredient's iron can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -23535,7 +23535,7 @@ async function __runIngredientSetPrimaryImage(ctx: MutationCtx, { docId, storage
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((storageId).trim()).length > 0))) throw new Error("Primary image storage id is required");
+    if (!((((storageId).trim()).length > 0))) throw new Error("Add a photo before you set it as the main picture.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -23586,7 +23586,7 @@ async function __runIngredientUpdateCosting(ctx: MutationCtx, { docId, costPerUn
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Guard 2 failed");
-    if (!((costPerUnit >= 0))) throw new Error("Ingredient cost per unit cannot be negative");
+    if (!((costPerUnit >= 0))) throw new Error("This ingredient's cost can't be negative. Use zero or more.");
     const previousCostPerUnit = doc.costPerUnit;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -23635,7 +23635,7 @@ async function __runIngredientUpdateDetails(ctx: MutationCtx, { docId, name, uni
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Ingredient name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this ingredient a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -23739,13 +23739,13 @@ async function __runIngredientDemandCalculate(ctx: MutationCtx, { docId, eventId
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!(((__rel_ingredient != null) && (__rel_ingredient.status === "active")))) throw new Error("Guard 4 failed");
-    if (!((eventId === doc.eventId))) throw new Error("Calculate eventId must match the seeded event reference");
-    if (!((ingredientId === doc.ingredientId))) throw new Error("Calculate ingredientId must match the seeded ingredient reference");
-    if (!((requiredQuantity > 0))) throw new Error("Required quantity must be positive");
-    if (!(((servings == null) || (servings >= 0)))) throw new Error("Servings cannot be negative");
-    if (!(((sourceComponentLineQuantity == null) || (sourceComponentLineQuantity >= 0)))) throw new Error("Source component line quantity cannot be negative");
-    if (!(((sourceBatchMultiplier == null) || (sourceBatchMultiplier >= 0)))) throw new Error("Source batch multiplier cannot be negative");
-    if (!(((sourceYieldQuantity == null) || (sourceYieldQuantity > 0)))) throw new Error("Source yield quantity must be positive when provided");
+    if (!((eventId === doc.eventId))) throw new Error("This demand is for a different event. Pick the event already on this demand.");
+    if (!((ingredientId === doc.ingredientId))) throw new Error("This demand is for a different ingredient. Pick the ingredient already on this demand.");
+    if (!((requiredQuantity > 0))) throw new Error("Enter a required amount more than zero.");
+    if (!(((servings == null) || (servings >= 0)))) throw new Error("Servings can't be negative. Use zero or more.");
+    if (!(((sourceComponentLineQuantity == null) || (sourceComponentLineQuantity >= 0)))) throw new Error("The recipe line amount can't be negative. Use zero or more.");
+    if (!(((sourceBatchMultiplier == null) || (sourceBatchMultiplier >= 0)))) throw new Error("The batch multiplier can't be negative. Use zero or more.");
+    if (!(((sourceYieldQuantity == null) || (sourceYieldQuantity > 0)))) throw new Error("If you enter a yield amount, it has to be more than zero.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -23866,13 +23866,13 @@ export const IngredientDemand_createViaCalculate = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!(((__rel_ingredient != null) && (__rel_ingredient.status === "active")))) throw new Error("Guard 4 failed");
-    if (!((eventId === __draft.eventId))) throw new Error("Calculate eventId must match the seeded event reference");
-    if (!((ingredientId === __draft.ingredientId))) throw new Error("Calculate ingredientId must match the seeded ingredient reference");
-    if (!((requiredQuantity > 0))) throw new Error("Required quantity must be positive");
-    if (!(((servings == null) || (servings >= 0)))) throw new Error("Servings cannot be negative");
-    if (!(((sourceComponentLineQuantity == null) || (sourceComponentLineQuantity >= 0)))) throw new Error("Source component line quantity cannot be negative");
-    if (!(((sourceBatchMultiplier == null) || (sourceBatchMultiplier >= 0)))) throw new Error("Source batch multiplier cannot be negative");
-    if (!(((sourceYieldQuantity == null) || (sourceYieldQuantity > 0)))) throw new Error("Source yield quantity must be positive when provided");
+    if (!((eventId === __draft.eventId))) throw new Error("This demand is for a different event. Pick the event already on this demand.");
+    if (!((ingredientId === __draft.ingredientId))) throw new Error("This demand is for a different ingredient. Pick the ingredient already on this demand.");
+    if (!((requiredQuantity > 0))) throw new Error("Enter a required amount more than zero.");
+    if (!(((servings == null) || (servings >= 0)))) throw new Error("Servings can't be negative. Use zero or more.");
+    if (!(((sourceComponentLineQuantity == null) || (sourceComponentLineQuantity >= 0)))) throw new Error("The recipe line amount can't be negative. Use zero or more.");
+    if (!(((sourceBatchMultiplier == null) || (sourceBatchMultiplier >= 0)))) throw new Error("The batch multiplier can't be negative. Use zero or more.");
+    if (!(((sourceYieldQuantity == null) || (sourceYieldQuantity > 0)))) throw new Error("If you enter a yield amount, it has to be more than zero.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -24156,8 +24156,8 @@ async function __runIngredientDemandRecalculate(ctx: MutationCtx, { docId, newQu
     if (!(((doc.status === "calculated") || (doc.status === "confirmed")))) throw new Error("Guard 0 failed");
     if (!((doc.calculatedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((newQuantity > 0))) throw new Error("Recalculated quantity must be positive");
-    if (!((((reason).trim()).length > 0))) throw new Error("Recalculation reason is required");
+    if (!((newQuantity > 0))) throw new Error("Enter a recalculated amount more than zero.");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're recalculating this.");
     const previousQuantity = doc.requiredQuantity;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -24210,7 +24210,7 @@ async function __runIngredientDemandSupersede(ctx: MutationCtx, { docId, reason,
     if (!((doc.calculatedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(checkRole(user, "inventoryManageAccess"))) throw new Error("Guard 3 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Supersede reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're replacing this.");
     const previousQuantity = doc.requiredQuantity;
     {
       const __cur = doc.status;
@@ -24376,9 +24376,9 @@ async function __runIngredientPriceObservationRecord(ctx: MutationCtx, { docId, 
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change confirmed ingredient prices");
     if (!(((doc.observedAt == null) || ((((((((doc.ingredientId === ingredientId) && (doc.vendorId === vendorId)) && (doc.vendorOrderId === vendorOrderId)) && (doc.vendorOrderLineId === vendorOrderLineId)) && (doc.receiptQuantity === receiptQuantity)) && (doc.cumulativeReceivedQuantity === cumulativeReceivedQuantity)) && (doc.unit === unit)) && (doc.unitPrice === unitPrice))))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((receiptQuantity > 0))) throw new Error("Price observation receipt quantity must be positive");
-    if (!((cumulativeReceivedQuantity > 0))) throw new Error("Price observation cumulative quantity must be positive");
-    if (!((unitPrice >= 0))) throw new Error("Price observation unit price cannot be negative");
+    if (!((receiptQuantity > 0))) throw new Error("This ingredient price entry needs a receipt quantity greater than zero.");
+    if (!((cumulativeReceivedQuantity > 0))) throw new Error("This ingredient price entry's running total has to be more than zero.");
+    if (!((unitPrice >= 0))) throw new Error("This ingredient price entry's unit price can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -24463,9 +24463,9 @@ export const IngredientPriceObservation_createViaRecord = mutation({
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change confirmed ingredient prices");
     if (!(((__draft.observedAt == null) || ((((((((__draft.ingredientId === ingredientId) && (__draft.vendorId === vendorId)) && (__draft.vendorOrderId === vendorOrderId)) && (__draft.vendorOrderLineId === vendorOrderLineId)) && (__draft.receiptQuantity === receiptQuantity)) && (__draft.cumulativeReceivedQuantity === cumulativeReceivedQuantity)) && (__draft.unit === unit)) && (__draft.unitPrice === unitPrice))))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((receiptQuantity > 0))) throw new Error("Price observation receipt quantity must be positive");
-    if (!((cumulativeReceivedQuantity > 0))) throw new Error("Price observation cumulative quantity must be positive");
-    if (!((unitPrice >= 0))) throw new Error("Price observation unit price cannot be negative");
+    if (!((receiptQuantity > 0))) throw new Error("This ingredient price entry needs a receipt quantity greater than zero.");
+    if (!((cumulativeReceivedQuantity > 0))) throw new Error("This ingredient price entry's running total has to be more than zero.");
+    if (!((unitPrice >= 0))) throw new Error("This ingredient price entry's unit price can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -24495,8 +24495,8 @@ async function __runIntegrationConnectionAuthorize(ctx: MutationCtx, { docId, pr
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see outside-service connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update outside-service connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change outside-service connections");
     if (!((doc.connectedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -24589,8 +24589,8 @@ export const IntegrationConnection_createViaAuthorize = mutation({
       scopes: args.scopes
     };
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see outside-service connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update outside-service connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change outside-service connections");
     if (!((__draft.connectedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -24625,8 +24625,8 @@ async function __runIntegrationConnectionDisconnect(ctx: MutationCtx, { docId, r
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see outside-service connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update outside-service connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change outside-service connections");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((user.id != null))) throw new Error("Guard 1 failed");
     {
@@ -24687,8 +24687,8 @@ async function __runIntegrationConnectionMarkConnected(ctx: MutationCtx, { docId
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see outside-service connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update outside-service connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change outside-service connections");
     if (!((doc.connectedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -24758,8 +24758,8 @@ async function __runIntegrationConnectionReauthorize(ctx: MutationCtx, { docId, 
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see outside-service connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update outside-service connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change outside-service connections");
     if (!((doc.connectedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -24819,11 +24819,11 @@ async function __runIntegrationConnectionRecordFailure(ctx: MutationCtx, { docId
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see outside-service connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update outside-service connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change outside-service connections");
     if (!((doc.connectedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Failure reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why the connection failed.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -24881,8 +24881,8 @@ async function __runIntegrationConnectionRecordSyncSuccess(ctx: MutationCtx, { d
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see outside-service connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update outside-service connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change outside-service connections");
     if (!((doc.connectedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     {
@@ -25174,10 +25174,10 @@ async function __runInventoryItemApplyReceiptCorrection(ctx: MutationCtx, { docI
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((ingredientId === doc.ingredientId))) throw new Error("Receipt ingredient must match stock");
-    if (!((locationId === doc.locationId))) throw new Error("Receipt location must match stock");
+    if (!((ingredientId === doc.ingredientId))) throw new Error("This delivery is for a different ingredient. Pick the ingredient already on this stock line.");
+    if (!((locationId === doc.locationId))) throw new Error("This delivery is for a different location. Pick the location already on this stock line.");
     if (!((((reason).trim()).length > 0))) throw new Error("Say why this count changed.");
-    if (!((((unit === doc.unit) || (((((unit === "gram") || (unit === "kilogram")) || (unit === "ounce")) || (unit === "pound")) && ((((doc.unit === "gram") || (doc.unit === "kilogram")) || (doc.unit === "ounce")) || (doc.unit === "pound")))) || (((((((((unit === "milliliter") || (unit === "liter")) || (unit === "teaspoon")) || (unit === "tablespoon")) || (unit === "cup")) || (unit === "pint")) || (unit === "quart")) || (unit === "gallon")) && ((((((((doc.unit === "milliliter") || (doc.unit === "liter")) || (doc.unit === "teaspoon")) || (doc.unit === "tablespoon")) || (doc.unit === "cup")) || (doc.unit === "pint")) || (doc.unit === "quart")) || (doc.unit === "gallon")))))) throw new Error("Receipt unit needs a measured conversion to the stock unit");
+    if (!((((unit === doc.unit) || (((((unit === "gram") || (unit === "kilogram")) || (unit === "ounce")) || (unit === "pound")) && ((((doc.unit === "gram") || (doc.unit === "kilogram")) || (doc.unit === "ounce")) || (doc.unit === "pound")))) || (((((((((unit === "milliliter") || (unit === "liter")) || (unit === "teaspoon")) || (unit === "tablespoon")) || (unit === "cup")) || (unit === "pint")) || (unit === "quart")) || (unit === "gallon")) && ((((((((doc.unit === "milliliter") || (doc.unit === "liter")) || (doc.unit === "teaspoon")) || (doc.unit === "tablespoon")) || (doc.unit === "cup")) || (doc.unit === "pint")) || (doc.unit === "quart")) || (doc.unit === "gallon")))))) throw new Error("This delivery's unit doesn't convert to the stock unit. Use a matching unit.");
     if (!(((doc.quantityOnHand + (delta * ((unit === doc.unit) ? 1 : (((((doc.unit === "gram") || (doc.unit === "kilogram")) || (doc.unit === "ounce")) || (doc.unit === "pound")) ? (((unit === "gram") ? 1 : ((unit === "kilogram") ? 1000 : ((unit === "ounce") ? 28.349523125 : ((unit === "pound") ? 453.59237 : 0)))) / ((doc.unit === "gram") ? 1 : ((doc.unit === "kilogram") ? 1000 : ((doc.unit === "ounce") ? 28.349523125 : ((doc.unit === "pound") ? 453.59237 : 0))))) : (((unit === "milliliter") ? 1 : ((unit === "liter") ? 1000 : ((unit === "teaspoon") ? 4.92892159375 : ((unit === "tablespoon") ? 14.78676478125 : ((unit === "cup") ? 236.5882365 : ((unit === "pint") ? 473.176473 : ((unit === "quart") ? 946.352946 : ((unit === "gallon") ? 3785.411784 : 0)))))))) / ((doc.unit === "milliliter") ? 1 : ((doc.unit === "liter") ? 1000 : ((doc.unit === "teaspoon") ? 4.92892159375 : ((doc.unit === "tablespoon") ? 14.78676478125 : ((doc.unit === "cup") ? 236.5882365 : ((doc.unit === "pint") ? 473.176473 : ((doc.unit === "quart") ? 946.352946 : ((doc.unit === "gallon") ? 3785.411784 : 0))))))))))))) >= 0))) throw new Error("This item's on-hand amount can't be negative. Use zero or more.");
     const stockUnit = doc.unit;
     const sourceMass = ((unit === "gram") ? 1 : ((unit === "kilogram") ? 1000 : ((unit === "ounce") ? 28.349523125 : ((unit === "pound") ? 453.59237 : 0))));
@@ -25240,9 +25240,9 @@ async function __runInventoryItemOpen(ctx: MutationCtx, { docId, ingredientId, l
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((ingredientId === doc.ingredientId))) throw new Error("Open ingredientId must match the seeded ingredient reference");
-    if (!((locationId === doc.locationId))) throw new Error("Open locationId must match the seeded location reference");
-    if (!(((__rel_ingredient != null) && (unit === __rel_ingredient.unit)))) throw new Error("Stock line unit must match the ingredient's catalog unit — units do not convert");
+    if (!((ingredientId === doc.ingredientId))) throw new Error("This stock line is for a different ingredient. Pick the ingredient already on this stock line.");
+    if (!((locationId === doc.locationId))) throw new Error("This stock line is for a different location. Pick the location already on this stock line.");
+    if (!(((__rel_ingredient != null) && (unit === __rel_ingredient.unit)))) throw new Error("This stock line's unit has to match the ingredient's catalog unit. Units don't convert automatically.");
     if (!(((quantityOnHand == null) || (quantityOnHand >= 0)))) throw new Error("This item's on-hand amount can't be negative. Use zero or more.");
     if (!(((parLevel == null) || (parLevel >= 0)))) throw new Error("This item's par level can't be negative. Use zero or more.");
     if (!(((reorderThreshold == null) || (reorderThreshold >= 0)))) throw new Error("This item's reorder threshold can't be negative. Use zero or more.");
@@ -25334,9 +25334,9 @@ export const InventoryItem_createViaOpen = mutation({
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((__draft.stockedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((ingredientId === __draft.ingredientId))) throw new Error("Open ingredientId must match the seeded ingredient reference");
-    if (!((locationId === __draft.locationId))) throw new Error("Open locationId must match the seeded location reference");
-    if (!(((__rel_ingredient != null) && (unit === __rel_ingredient.unit)))) throw new Error("Stock line unit must match the ingredient's catalog unit — units do not convert");
+    if (!((ingredientId === __draft.ingredientId))) throw new Error("This stock line is for a different ingredient. Pick the ingredient already on this stock line.");
+    if (!((locationId === __draft.locationId))) throw new Error("This stock line is for a different location. Pick the location already on this stock line.");
+    if (!(((__rel_ingredient != null) && (unit === __rel_ingredient.unit)))) throw new Error("This stock line's unit has to match the ingredient's catalog unit. Units don't convert automatically.");
     if (!(((quantityOnHand == null) || (quantityOnHand >= 0)))) throw new Error("This item's on-hand amount can't be negative. Use zero or more.");
     if (!(((parLevel == null) || (parLevel >= 0)))) throw new Error("This item's par level can't be negative. Use zero or more.");
     if (!(((reorderThreshold == null) || (reorderThreshold >= 0)))) throw new Error("This item's reorder threshold can't be negative. Use zero or more.");
@@ -25379,10 +25379,10 @@ async function __runInventoryItemReceiveDelivery(ctx: MutationCtx, { docId, ingr
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((ingredientId === doc.ingredientId))) throw new Error("Receipt ingredient must match stock");
-    if (!((locationId === doc.locationId))) throw new Error("Receipt location must match stock");
-    if (!(((quantity >= 0) && (unitCost >= 0)))) throw new Error("Receipt quantity and price cannot be negative");
-    if (!((((unit === ((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit)) || (((((unit === "gram") || (unit === "kilogram")) || (unit === "ounce")) || (unit === "pound")) && ((((((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "gram") || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "kilogram")) || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "ounce")) || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "pound")))) || (((((((((unit === "milliliter") || (unit === "liter")) || (unit === "teaspoon")) || (unit === "tablespoon")) || (unit === "cup")) || (unit === "pint")) || (unit === "quart")) || (unit === "gallon")) && ((((((((((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "milliliter") || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "liter")) || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "teaspoon")) || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "tablespoon")) || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "cup")) || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "pint")) || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "quart")) || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "gallon")))))) throw new Error("Receipt unit needs a measured conversion to the stock unit");
+    if (!((ingredientId === doc.ingredientId))) throw new Error("This delivery is for a different ingredient. Pick the ingredient already on this stock line.");
+    if (!((locationId === doc.locationId))) throw new Error("This delivery is for a different location. Pick the location already on this stock line.");
+    if (!(((quantity >= 0) && (unitCost >= 0)))) throw new Error("The delivered amount and price can't be negative. Use zero or more.");
+    if (!((((unit === ((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit)) || (((((unit === "gram") || (unit === "kilogram")) || (unit === "ounce")) || (unit === "pound")) && ((((((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "gram") || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "kilogram")) || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "ounce")) || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "pound")))) || (((((((((unit === "milliliter") || (unit === "liter")) || (unit === "teaspoon")) || (unit === "tablespoon")) || (unit === "cup")) || (unit === "pint")) || (unit === "quart")) || (unit === "gallon")) && ((((((((((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "milliliter") || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "liter")) || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "teaspoon")) || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "tablespoon")) || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "cup")) || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "pint")) || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "quart")) || (((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit) === "gallon")))))) throw new Error("This delivery's unit doesn't convert to the stock unit. Use a matching unit.");
     const stockUnit = ((doc.stockedAt != null) ? doc.unit : __rel_ingredient.unit);
     const sourceMass = ((unit === "gram") ? 1 : ((unit === "kilogram") ? 1000 : ((unit === "ounce") ? 28.349523125 : ((unit === "pound") ? 453.59237 : 0))));
     const sourceVolume = ((unit === "milliliter") ? 1 : ((unit === "liter") ? 1000 : ((unit === "teaspoon") ? 4.92892159375 : ((unit === "tablespoon") ? 14.78676478125 : ((unit === "cup") ? 236.5882365 : ((unit === "pint") ? 473.176473 : ((unit === "quart") ? 946.352946 : ((unit === "gallon") ? 3785.411784 : 0))))))));
@@ -25551,7 +25551,7 @@ async function __runInventoryItemRemove(ctx: MutationCtx, { docId, reason, versi
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "inventoryManageAccess"))) throw new Error("Guard 2 failed");
     if (!((((doc.reservations) ?? []).filter((r: Doc<"inventoryReservations">) => ((r.status === "active"))).length === 0))) throw new Error("Guard 3 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Removal reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're removing this.");
     const previousQuantity = doc.quantityOnHand;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -25601,7 +25601,7 @@ async function __runInventoryItemSetExpiry(ctx: MutationCtx, { docId, bestBefore
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((bestBeforeAt == null) || (useByAt == null)) || (bestBeforeAt <= useByAt)))) throw new Error("Best-before cannot be after use-by");
+    if (!((((bestBeforeAt == null) || (useByAt == null)) || (bestBeforeAt <= useByAt)))) throw new Error("The best-before date can't be after the use-by date.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -25809,10 +25809,10 @@ async function __runInventoryLotRecord(ctx: MutationCtx, { docId, supplierLotNum
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change receipt lots");
     if (!(((doc.receivedAt == null) || ((((((((((((doc.supplierLotNumber === supplierLotNumber) && (doc.vendorOrderLineId === vendorOrderLineId)) && (doc.vendorOrderId === vendorOrderId)) && (doc.vendorId === vendorId)) && (doc.ingredientId === ingredientId)) && (doc.ingredientDemandId === ingredientDemandId)) && (doc.eventId === eventId)) && (doc.locationId === locationId)) && (doc.receiptQuantity === receiptQuantity)) && (doc.cumulativeReceivedQuantity === cumulativeReceivedQuantity)) && (doc.unit === unit)) && (doc.unitCost === unitCost))))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((supplierLotNumber).trim()).length > 0))) throw new Error("Supplier lot number is required for traceability");
-    if (!((receiptQuantity > 0))) throw new Error("Inventory lot receipt quantity must be positive");
-    if (!((cumulativeReceivedQuantity > 0))) throw new Error("Inventory lot cumulative quantity must be positive");
-    if (!((unitCost >= 0))) throw new Error("Inventory lot unit cost cannot be negative");
+    if (!((((supplierLotNumber).trim()).length > 0))) throw new Error("Enter the supplier's lot number so this delivery can be traced.");
+    if (!((receiptQuantity > 0))) throw new Error("This receipt's quantity has to be more than zero.");
+    if (!((cumulativeReceivedQuantity > 0))) throw new Error("This receipt's running total has to be more than zero.");
+    if (!((unitCost >= 0))) throw new Error("This receipt's cost per unit can't be negative. Use zero or more.");
     const stockDelta = ((doc.receivedAt == null) ? receiptQuantity : 0);
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -25944,10 +25944,10 @@ export const InventoryLot_createViaRecord = mutation({
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change receipt lots");
     if (!(((__draft.receivedAt == null) || ((((((((((((__draft.supplierLotNumber === supplierLotNumber) && (__draft.vendorOrderLineId === vendorOrderLineId)) && (__draft.vendorOrderId === vendorOrderId)) && (__draft.vendorId === vendorId)) && (__draft.ingredientId === ingredientId)) && (__draft.ingredientDemandId === ingredientDemandId)) && (__draft.eventId === eventId)) && (__draft.locationId === locationId)) && (__draft.receiptQuantity === receiptQuantity)) && (__draft.cumulativeReceivedQuantity === cumulativeReceivedQuantity)) && (__draft.unit === unit)) && (__draft.unitCost === unitCost))))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((supplierLotNumber).trim()).length > 0))) throw new Error("Supplier lot number is required for traceability");
-    if (!((receiptQuantity > 0))) throw new Error("Inventory lot receipt quantity must be positive");
-    if (!((cumulativeReceivedQuantity > 0))) throw new Error("Inventory lot cumulative quantity must be positive");
-    if (!((unitCost >= 0))) throw new Error("Inventory lot unit cost cannot be negative");
+    if (!((((supplierLotNumber).trim()).length > 0))) throw new Error("Enter the supplier's lot number so this delivery can be traced.");
+    if (!((receiptQuantity > 0))) throw new Error("This receipt's quantity has to be more than zero.");
+    if (!((cumulativeReceivedQuantity > 0))) throw new Error("This receipt's running total has to be more than zero.");
+    if (!((unitCost >= 0))) throw new Error("This receipt's cost per unit can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -26083,7 +26083,7 @@ async function __runInventoryReservationRelease(ctx: MutationCtx, { docId, reaso
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.reservedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Release reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're releasing this.");
     const previousQuantity = doc.quantity;
     {
       const __cur = doc.status;
@@ -26161,11 +26161,11 @@ async function __runInventoryReservationReserve(ctx: MutationCtx, { docId, inven
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_event != null) && (((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
     if (!((((__rel_inventoryItem != null) && (__rel_inventoryItem.stockedAt != null)) && (__rel_inventoryItem.deletedAt == null)))) throw new Error("Guard 4 failed");
-    if (!((inventoryItemId === doc.inventoryItemId))) throw new Error("Reserve inventoryItemId must match the seeded stock reference");
-    if (!((eventId === doc.eventId))) throw new Error("Reserve eventId must match the seeded event reference");
-    if (!((ingredientId === __rel_inventoryItem.ingredientId))) throw new Error("Reserve ingredientId must match the stock ingredient");
-    if (!(((inventoryLotId == null) || ((((__rel_inventoryLot != null) && (__rel_inventoryLot.deletedAt == null)) && (__rel_inventoryLot.ingredientId === ingredientId)) && (__rel_inventoryLot.locationId === __rel_inventoryItem.locationId))))) throw new Error("Selected lot must match the reserved ingredient and stock location");
-    if (!((quantity > 0))) throw new Error("Reservation quantity must be positive");
+    if (!((inventoryItemId === doc.inventoryItemId))) throw new Error("This reservation is for a different stock item. Pick the stock item already on this reservation.");
+    if (!((eventId === doc.eventId))) throw new Error("This reservation is for a different event. Pick the event already on this reservation.");
+    if (!((ingredientId === __rel_inventoryItem.ingredientId))) throw new Error("This reservation's ingredient doesn't match its stock item's ingredient.");
+    if (!(((inventoryLotId == null) || ((((__rel_inventoryLot != null) && (__rel_inventoryLot.deletedAt == null)) && (__rel_inventoryLot.ingredientId === ingredientId)) && (__rel_inventoryLot.locationId === __rel_inventoryItem.locationId))))) throw new Error("This lot doesn't match the ingredient or location you're reserving.");
+    if (!((quantity > 0))) throw new Error("Enter a reservation amount more than zero.");
     if (!((((__rel_inventoryItem == null) || (((__rel_inventorySettings != null) && (__rel_inventorySettings.deletedAt == null)) && (__rel_inventorySettings.stockLevelsTracked === false))) || (quantity <= (__rel_inventoryItem.quantityOnHand - ((__rel_inventoryItem.reservations) ?? []).map((r: Doc<"inventoryReservations">) => (((r.status === "active") ? r.quantity : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))))) throw new Error("Not enough free stock: other events already hold some of it. Lower the amount, or turn off stock-level checks on the stock book.");
     {
       const __cur = doc.status;
@@ -26274,11 +26274,11 @@ export const InventoryReservation_createViaReserve = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_event != null) && (((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
     if (!((((__rel_inventoryItem != null) && (__rel_inventoryItem.stockedAt != null)) && (__rel_inventoryItem.deletedAt == null)))) throw new Error("Guard 4 failed");
-    if (!((inventoryItemId === __draft.inventoryItemId))) throw new Error("Reserve inventoryItemId must match the seeded stock reference");
-    if (!((eventId === __draft.eventId))) throw new Error("Reserve eventId must match the seeded event reference");
-    if (!((ingredientId === __rel_inventoryItem.ingredientId))) throw new Error("Reserve ingredientId must match the stock ingredient");
-    if (!(((inventoryLotId == null) || ((((__rel_inventoryLot != null) && (__rel_inventoryLot.deletedAt == null)) && (__rel_inventoryLot.ingredientId === ingredientId)) && (__rel_inventoryLot.locationId === __rel_inventoryItem.locationId))))) throw new Error("Selected lot must match the reserved ingredient and stock location");
-    if (!((quantity > 0))) throw new Error("Reservation quantity must be positive");
+    if (!((inventoryItemId === __draft.inventoryItemId))) throw new Error("This reservation is for a different stock item. Pick the stock item already on this reservation.");
+    if (!((eventId === __draft.eventId))) throw new Error("This reservation is for a different event. Pick the event already on this reservation.");
+    if (!((ingredientId === __rel_inventoryItem.ingredientId))) throw new Error("This reservation's ingredient doesn't match its stock item's ingredient.");
+    if (!(((inventoryLotId == null) || ((((__rel_inventoryLot != null) && (__rel_inventoryLot.deletedAt == null)) && (__rel_inventoryLot.ingredientId === ingredientId)) && (__rel_inventoryLot.locationId === __rel_inventoryItem.locationId))))) throw new Error("This lot doesn't match the ingredient or location you're reserving.");
+    if (!((quantity > 0))) throw new Error("Enter a reservation amount more than zero.");
     if (!((((__rel_inventoryItem == null) || (((__rel_inventorySettings != null) && (__rel_inventorySettings.deletedAt == null)) && (__rel_inventorySettings.stockLevelsTracked === false))) || (quantity <= (__rel_inventoryItem.quantityOnHand - ((__rel_inventoryItem.reservations) ?? []).map((r: Doc<"inventoryReservations">) => (((r.status === "active") ? r.quantity : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))))) throw new Error("Not enough free stock: other events already hold some of it. Lower the amount, or turn off stock-level checks on the stock book.");
     const doc: Record<string, any> = {
       ...__draft,
@@ -26439,9 +26439,9 @@ async function __runInvoiceApplyCredit(ctx: MutationCtx, { docId, creditAmount, 
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!(((((doc.status === "sent") || (doc.status === "viewed")) || (doc.status === "overdue")) || (doc.status === "partial")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((creditAmount > 0))) throw new Error("Applied credit must be positive");
+    if (!((creditAmount > 0))) throw new Error("The credit applied has to be more than zero");
     if (!((creditAmount <= doc.amountDue))) throw new Error("Applied credit cannot exceed the target invoice balance");
-    if (!((((creditMemoId).trim()).length > 0))) throw new Error("Credit memo id is required");
+    if (!((((creditMemoId).trim()).length > 0))) throw new Error("Say which credit memo this is for");
     const priorAmountCredited = ((doc.amountCredited != null) ? doc.amountCredited : 0);
     const nextAmountCredited = (priorAmountCredited + creditAmount);
     const nextDue = (doc.amountDue - creditAmount);
@@ -26508,7 +26508,7 @@ async function __runInvoiceApplyPayment(ctx: MutationCtx, { docId, paymentAmount
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!(((((doc.status === "sent") || (doc.status === "viewed")) || (doc.status === "overdue")) || (doc.status === "partial")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((paymentAmount > 0))) throw new Error("Payment amount must be positive");
+    if (!((paymentAmount > 0))) throw new Error("This payment's amount has to be more than zero. Enter how much was paid.");
     if (!((paymentAmount <= doc.amountDue))) throw new Error("Payment amount cannot exceed amount due");
     const nextPaid = (doc.amountPaid + paymentAmount);
     const nextDue = (doc.amountDue - paymentAmount);
@@ -26576,7 +26576,7 @@ async function __runInvoiceAssignNumber(ctx: MutationCtx, { docId, invoiceNumber
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.issuedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.sentAt == null))) throw new Error("Guard 2 failed");
-    if (!((((invoiceNumber).trim()).length > 0))) throw new Error("Invoice number is required");
+    if (!((((invoiceNumber).trim()).length > 0))) throw new Error("Give this invoice a number");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -26628,13 +26628,13 @@ async function __runInvoiceIssue(ctx: MutationCtx, { docId, clientId, invoiceNum
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_client != null))) throw new Error("Guard 3 failed");
-    if (!((clientId === doc.clientId))) throw new Error("Issue clientId must match the seeded client reference");
-    if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("Issue eventId must match the seeded event reference when both are set");
-    if (!((((invoiceNumber != null) && (((invoiceNumber).trim()).length > 0)) || (invoiceSequence != null)))) throw new Error("Invoice number is required");
-    if (!(((((subtotal >= 0) && (taxAmount >= 0)) && (discountAmount >= 0)) && (total >= 0)))) throw new Error("Invoice money amounts cannot be negative");
+    if (!((clientId === doc.clientId))) throw new Error("This invoice is for a different client. Use the client already on this invoice.");
+    if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("This invoice already has a different event. Use the same event, or leave it blank.");
+    if (!((((invoiceNumber != null) && (((invoiceNumber).trim()).length > 0)) || (invoiceSequence != null)))) throw new Error("Give this invoice a number");
+    if (!(((((subtotal >= 0) && (taxAmount >= 0)) && (discountAmount >= 0)) && (total >= 0)))) throw new Error("This invoice's money amounts can't be negative. Use zero or more.");
     if (!((total === ((subtotal + taxAmount) - discountAmount)))) throw new Error("Invoice total must equal subtotal plus tax minus discount");
-    if (!(((currencyCode == null) || (((currencyCode).trim()).length === 3)))) throw new Error("Currency code must be a three-letter ISO 4217 code");
-    if (!(((exchangeRate == null) || (exchangeRate > 0)))) throw new Error("Exchange rate must be greater than zero");
+    if (!(((currencyCode == null) || (((currencyCode).trim()).length === 3)))) throw new Error("Use a three-letter currency code, such as USD.");
+    if (!(((exchangeRate == null) || (exchangeRate > 0)))) throw new Error("This invoice's exchange rate has to be more than zero");
     const normalizedCurrencyCode = ((currencyCode != null) ? (currencyCode).toUpperCase() : null);
     const resolvedExchangeRate = ((exchangeRate != null) ? exchangeRate : 1);
     const resolvedInvoiceNumber = ((invoiceNumber != null) ? invoiceNumber : ("INV-" + (invoiceSequence + 1)));
@@ -26762,13 +26762,13 @@ export const Invoice_createViaIssue = mutation({
     if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_client != null))) throw new Error("Guard 3 failed");
-    if (!((clientId === __draft.clientId))) throw new Error("Issue clientId must match the seeded client reference");
-    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Issue eventId must match the seeded event reference when both are set");
-    if (!((((invoiceNumber != null) && (((invoiceNumber).trim()).length > 0)) || (invoiceSequence != null)))) throw new Error("Invoice number is required");
-    if (!(((((subtotal >= 0) && (taxAmount >= 0)) && (discountAmount >= 0)) && (total >= 0)))) throw new Error("Invoice money amounts cannot be negative");
+    if (!((clientId === __draft.clientId))) throw new Error("This invoice is for a different client. Use the client already on this invoice.");
+    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("This invoice already has a different event. Use the same event, or leave it blank.");
+    if (!((((invoiceNumber != null) && (((invoiceNumber).trim()).length > 0)) || (invoiceSequence != null)))) throw new Error("Give this invoice a number");
+    if (!(((((subtotal >= 0) && (taxAmount >= 0)) && (discountAmount >= 0)) && (total >= 0)))) throw new Error("This invoice's money amounts can't be negative. Use zero or more.");
     if (!((total === ((subtotal + taxAmount) - discountAmount)))) throw new Error("Invoice total must equal subtotal plus tax minus discount");
-    if (!(((currencyCode == null) || (((currencyCode).trim()).length === 3)))) throw new Error("Currency code must be a three-letter ISO 4217 code");
-    if (!(((exchangeRate == null) || (exchangeRate > 0)))) throw new Error("Exchange rate must be greater than zero");
+    if (!(((currencyCode == null) || (((currencyCode).trim()).length === 3)))) throw new Error("Use a three-letter currency code, such as USD.");
+    if (!(((exchangeRate == null) || (exchangeRate > 0)))) throw new Error("This invoice's exchange rate has to be more than zero");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -27007,7 +27007,7 @@ async function __runInvoiceMarkVoided(ctx: MutationCtx, { docId, reason, version
     if (!(((((doc.status === "draft") || (doc.status === "sent")) || (doc.status === "viewed")) || (doc.status === "overdue")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.amountPaid === 0))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Void reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give a reason for voiding this invoice");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -27128,8 +27128,8 @@ async function __runInvoiceRecordCreditMemo(ctx: MutationCtx, { docId, creditAmo
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!((doc.status === "paid"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((creditAmount > 0))) throw new Error("Credit memo amount must be positive");
-    if (!((((creditMemoId).trim()).length > 0))) throw new Error("Credit memo id is required");
+    if (!((creditAmount > 0))) throw new Error("This credit memo's amount has to be more than zero. Enter how much to credit.");
+    if (!((((creditMemoId).trim()).length > 0))) throw new Error("Say which credit memo this is for");
     if (!((creditAmount <= (doc.amountPaid - ((doc.creditMemoAmount != null) ? doc.creditMemoAmount : 0))))) throw new Error("Credit memos cannot exceed the amount paid on the source invoice");
     const priorCreditMemoAmount = ((doc.creditMemoAmount != null) ? doc.creditMemoAmount : 0);
     const nextCreditMemoAmount = (priorCreditMemoAmount + creditAmount);
@@ -27181,9 +27181,9 @@ async function __runInvoiceRecordRefund(ctx: MutationCtx, { docId, refundAmount,
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!(((doc.status === "paid") || (doc.status === "partial")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((refundAmount > 0))) throw new Error("Refund amount must be positive");
+    if (!((refundAmount > 0))) throw new Error("This refund amount has to be more than zero. Enter how much to refund.");
     if (!((refundAmount <= doc.amountPaid))) throw new Error("Refund amount cannot exceed amount paid");
-    if (!((((paymentId).trim()).length > 0))) throw new Error("Payment id is required for refund");
+    if (!((((paymentId).trim()).length > 0))) throw new Error("Say which payment this refund is for");
     const nextPaid = (doc.amountPaid - refundAmount);
     const nextDue = (doc.amountDue + refundAmount);
     {
@@ -27357,9 +27357,9 @@ async function __runInvoiceSetDeposit(ctx: MutationCtx, { docId, depositAmount, 
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.depositPaidAt == null))) throw new Error("Guard 1 failed");
-    if (!((depositAmount >= 0))) throw new Error("Deposit amount cannot be negative");
+    if (!((depositAmount >= 0))) throw new Error("This deposit amount can't be negative. Use zero or more.");
     if (!(((doc.total === 0) || (depositAmount <= doc.total)))) throw new Error("Deposit amount cannot exceed the invoice total");
-    if (!(((balanceReminderLeadDays == null) || (balanceReminderLeadDays >= 0)))) throw new Error("Reminder lead days cannot be negative");
+    if (!(((balanceReminderLeadDays == null) || (balanceReminderLeadDays >= 0)))) throw new Error("The reminder lead days can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -27462,8 +27462,8 @@ async function __runInvoiceWriteOff(ctx: MutationCtx, { docId, reason, writeOffA
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!(((doc.status === "overdue") || (doc.status === "partial")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Write-off reason is required");
-    if (!((writeOffAmount > 0))) throw new Error("Write-off amount must be positive");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give a reason for writing this off");
+    if (!((writeOffAmount > 0))) throw new Error("This write-off amount has to be more than zero");
     if (!((writeOffAmount <= doc.amountDue))) throw new Error("Write-off amount cannot exceed amount due");
     {
       const __cur = doc.status;
@@ -27529,7 +27529,7 @@ async function __runItemUnitMappingRecord(ctx: MutationCtx, { docId, kind, unit,
     if (!((doc.recordedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((ingredientId != null) || (componentId != null)))) throw new Error("A unit mapping needs an ingredient or a recipe");
-    if (!((equalsQuantity > 0))) throw new Error("Mapping quantity must be positive");
+    if (!((equalsQuantity > 0))) throw new Error("This conversion amount has to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -27625,7 +27625,7 @@ export const ItemUnitMapping_createViaRecord = mutation({
     if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((ingredientId != null) || (componentId != null)))) throw new Error("A unit mapping needs an ingredient or a recipe");
-    if (!((equalsQuantity > 0))) throw new Error("Mapping quantity must be positive");
+    if (!((equalsQuantity > 0))) throw new Error("This conversion amount has to be more than zero.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -27665,7 +27665,7 @@ async function __runItemUnitMappingRetire(ctx: MutationCtx, { docId, reason, ver
     if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory and managers may change unit mappings");
     if (!((doc.recordedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give a reason.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -27714,9 +27714,9 @@ async function __runLeadCapture(ctx: MutationCtx, { docId, leadType, source, ref
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change leads");
     if (!((doc.capturedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((((leadType === "company") && (companyName != null)) && (((companyName).trim()).length > 0)) || (((leadType === "person") && (givenName != null)) && (((givenName).trim()).length > 0))))) throw new Error("Company leads require a company name; person leads require a given name");
-    if (!((((source).trim()).length > 0))) throw new Error("Lead source is required");
-    if (!((estimatedValue >= 0))) throw new Error("Lead estimated value cannot be negative");
+    if (!(((((leadType === "company") && (companyName != null)) && (((companyName).trim()).length > 0)) || (((leadType === "person") && (givenName != null)) && (((givenName).trim()).length > 0))))) throw new Error("Give a company name for a company lead, or a given name for a person lead");
+    if (!((((source).trim()).length > 0))) throw new Error("Say where this lead came from");
+    if (!((estimatedValue >= 0))) throw new Error("This lead's estimated value can't be negative. Use zero or more.");
     if (!(((probability == null) || ((probability >= 0) && (probability <= 100))))) throw new Error("Lead probability must be between 0 and 100");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -27821,9 +27821,9 @@ export const Lead_createViaCapture = mutation({
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change leads");
     if (!((__draft.capturedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((((leadType === "company") && (companyName != null)) && (((companyName).trim()).length > 0)) || (((leadType === "person") && (givenName != null)) && (((givenName).trim()).length > 0))))) throw new Error("Company leads require a company name; person leads require a given name");
-    if (!((((source).trim()).length > 0))) throw new Error("Lead source is required");
-    if (!((estimatedValue >= 0))) throw new Error("Lead estimated value cannot be negative");
+    if (!(((((leadType === "company") && (companyName != null)) && (((companyName).trim()).length > 0)) || (((leadType === "person") && (givenName != null)) && (((givenName).trim()).length > 0))))) throw new Error("Give a company name for a company lead, or a given name for a person lead");
+    if (!((((source).trim()).length > 0))) throw new Error("Say where this lead came from");
+    if (!((estimatedValue >= 0))) throw new Error("This lead's estimated value can't be negative. Use zero or more.");
     if (!(((probability == null) || ((probability >= 0) && (probability <= 100))))) throw new Error("Lead probability must be between 0 and 100");
     const doc: Record<string, any> = {
       ...__draft,
@@ -27977,8 +27977,8 @@ async function __runLeadReviseDetails(ctx: MutationCtx, { docId, leadType, sourc
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change leads");
     if (!((doc.capturedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((((leadType === "company") && (companyName != null)) && (((companyName).trim()).length > 0)) || (((leadType === "person") && (givenName != null)) && (((givenName).trim()).length > 0))))) throw new Error("Company leads require a company name; person leads require a given name");
-    if (!((((source).trim()).length > 0))) throw new Error("Lead source is required");
+    if (!(((((leadType === "company") && (companyName != null)) && (((companyName).trim()).length > 0)) || (((leadType === "person") && (givenName != null)) && (((givenName).trim()).length > 0))))) throw new Error("Give a company name for a company lead, or a given name for a person lead");
+    if (!((((source).trim()).length > 0))) throw new Error("Say where this lead came from");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -28135,7 +28135,7 @@ async function __runLeadUpdatePipeline(ctx: MutationCtx, { docId, stage, estimat
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change leads");
     if (!((doc.capturedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((estimatedValue >= 0))) throw new Error("Lead estimated value cannot be negative");
+    if (!((estimatedValue >= 0))) throw new Error("This lead's estimated value can't be negative. Use zero or more.");
     if (!(((probability >= 0) && (probability <= 100)))) throw new Error("Lead probability must be between 0 and 100");
     const previousStage = doc.stage;
     if (version !== undefined && (doc as any).version !== version) {
@@ -28191,7 +28191,7 @@ async function __runMenuArchive(ctx: MutationCtx, { docId, reason, version }: an
     if (!(((doc.status === "draft") || (doc.status === "published")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "kitchenManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Archive reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're archiving this menu.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -28253,8 +28253,8 @@ async function __runMenuDraft(ctx: MutationCtx, { docId, name, description, cate
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change menus");
     if (!((doc.draftedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Menu name is required");
-    if (!((((basePrice == null) || (basePrice >= 0)) && ((pricePerPerson == null) || (pricePerPerson >= 0))))) throw new Error("Menu pricing cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this menu a name.");
+    if (!((((basePrice == null) || (basePrice >= 0)) && ((pricePerPerson == null) || (pricePerPerson >= 0))))) throw new Error("This menu's pricing can't be negative. Use zero or more.");
     if (!(((((minGuests == null) || (minGuests >= 0)) && ((maxGuests == null) || (maxGuests >= 0))) && ((((minGuests == null) || (maxGuests == null)) || (maxGuests === 0)) || (maxGuests >= minGuests))))) throw new Error("Menu max guests must be zero (unlimited) or at least min guests");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -28346,8 +28346,8 @@ export const Menu_createViaDraft = mutation({
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change menus");
     if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Menu name is required");
-    if (!((((basePrice == null) || (basePrice >= 0)) && ((pricePerPerson == null) || (pricePerPerson >= 0))))) throw new Error("Menu pricing cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this menu a name.");
+    if (!((((basePrice == null) || (basePrice >= 0)) && ((pricePerPerson == null) || (pricePerPerson >= 0))))) throw new Error("This menu's pricing can't be negative. Use zero or more.");
     if (!(((((minGuests == null) || (minGuests >= 0)) && ((maxGuests == null) || (maxGuests >= 0))) && ((((minGuests == null) || (maxGuests == null)) || (maxGuests === 0)) || (maxGuests >= minGuests))))) throw new Error("Menu max guests must be zero (unlimited) or at least min guests");
     const doc: Record<string, any> = {
       ...__draft,
@@ -28509,7 +28509,7 @@ async function __runMenuReviseDetails(ctx: MutationCtx, { docId, name, descripti
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change menus");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Menu name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this menu a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -28564,7 +28564,7 @@ async function __runMenuUnpublish(ctx: MutationCtx, { docId, reason, version }: 
     if (!((doc.status === "published"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "kitchenManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Unpublish reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're unpublishing this menu.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -28626,7 +28626,7 @@ async function __runMenuUpdatePricing(ctx: MutationCtx, { docId, basePrice, pric
     if (!(((doc.status === "draft") || (doc.status === "published")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "kitchenManageAccess"))) throw new Error("Guard 2 failed");
-    if (!(((basePrice >= 0) && (pricePerPerson >= 0)))) throw new Error("Menu pricing cannot be negative");
+    if (!(((basePrice >= 0) && (pricePerPerson >= 0)))) throw new Error("This menu's pricing can't be negative. Use zero or more.");
     if (!((((minGuests >= 0) && (maxGuests >= 0)) && ((maxGuests === 0) || (maxGuests >= minGuests))))) throw new Error("Menu max guests must be zero (unlimited) or at least min guests");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -28684,8 +28684,8 @@ async function __runMenuDishAdd(ctx: MutationCtx, { docId, menuId, dishId, sortO
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_menu != null) && (__rel_menu.status === "draft")))) throw new Error("Guard 2 failed");
-    if (!((menuId === doc.menuId))) throw new Error("Add menuId must match the seeded menu reference");
-    if (!(((sellingPrice == null) || (sellingPrice >= 0)))) throw new Error("Menu dish selling price cannot be negative");
+    if (!((menuId === doc.menuId))) throw new Error("This menu dish is for a different menu. Pick the menu already on this menu dish.");
+    if (!(((sellingPrice == null) || (sellingPrice >= 0)))) throw new Error("This menu dish's price can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -28773,8 +28773,8 @@ export const MenuDish_createViaAdd = mutation({
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_menu != null) && (__rel_menu.status === "draft")))) throw new Error("Guard 2 failed");
-    if (!((menuId === __draft.menuId))) throw new Error("Add menuId must match the seeded menu reference");
-    if (!(((sellingPrice == null) || (sellingPrice >= 0)))) throw new Error("Menu dish selling price cannot be negative");
+    if (!((menuId === __draft.menuId))) throw new Error("This menu dish is for a different menu. Pick the menu already on this menu dish.");
+    if (!(((sellingPrice == null) || (sellingPrice >= 0)))) throw new Error("This menu dish's price can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -28814,7 +28814,7 @@ async function __runMenuDishRemove(ctx: MutationCtx, { docId, reason, version }:
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_menu != null) && ((__rel_menu.status === "draft") || (__rel_menu.status === "published"))))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Removal reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're removing this.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -28923,7 +28923,7 @@ async function __runMenuDishUpdateSellingPrice(ctx: MutationCtx, { docId, sellin
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_menu != null) && ((__rel_menu.status === "draft") || (__rel_menu.status === "published"))))) throw new Error("Guard 2 failed");
     if (!(checkRole(user, "kitchenManageAccess"))) throw new Error("Guard 3 failed");
-    if (!((sellingPrice >= 0))) throw new Error("Menu dish selling price cannot be negative");
+    if (!((sellingPrice >= 0))) throw new Error("This menu dish's price can't be negative. Use zero or more.");
     const previousSellingPrice = doc.sellingPrice;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -28972,7 +28972,7 @@ async function __runMessagePost(ctx: MutationCtx, { docId, threadId, direction, 
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change messages");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((user.id != null))) throw new Error("Guard 1 failed");
-    if (!((((bodyText).trim()).length > 0))) throw new Error("Message text is required");
+    if (!((((bodyText).trim()).length > 0))) throw new Error("Write something in the message");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -29062,7 +29062,7 @@ export const Message_createViaPost = mutation({
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change messages");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((user.id != null))) throw new Error("Guard 1 failed");
-    if (!((((bodyText).trim()).length > 0))) throw new Error("Message text is required");
+    if (!((((bodyText).trim()).length > 0))) throw new Error("Write something in the message");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -29411,7 +29411,7 @@ async function __runOccasionDeactivate(ctx: MutationCtx, { docId, reason, versio
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Deactivation reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're deactivating this occasion.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -29473,9 +29473,9 @@ async function __runOccasionRegister(ctx: MutationCtx, { docId, name, code, sort
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change occasions");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Occasion name is required");
-    if (!((((code).trim()).length > 0))) throw new Error("Occasion code is required");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Display order cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this occasion a name.");
+    if (!((((code).trim()).length > 0))) throw new Error("Give this occasion a code.");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Display order can't be negative. Use zero or more.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -29563,9 +29563,9 @@ export const Occasion_createViaRegister = mutation({
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change occasions");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Occasion name is required");
-    if (!((((code).trim()).length > 0))) throw new Error("Occasion code is required");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Display order cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this occasion a name.");
+    if (!((((code).trim()).length > 0))) throw new Error("Give this occasion a code.");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Display order can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -29601,8 +29601,8 @@ async function __runOccasionReviseDetails(ctx: MutationCtx, { docId, name, descr
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Occasion name is required");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Display order cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this occasion a name.");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Display order can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -29786,7 +29786,7 @@ async function __runOneOnOneActionCapture(ctx: MutationCtx, { docId, oneOnOneId,
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_oneOnOne != null) && (__rel_oneOnOne.heldAt != null)))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((description).trim()).length > 0))) throw new Error("Action description is required");
+    if (!((((description).trim()).length > 0))) throw new Error("Give this action a description.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -29864,7 +29864,7 @@ export const OneOnOneAction_createViaCapture = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_oneOnOne != null) && (__rel_oneOnOne.heldAt != null)))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((description).trim()).length > 0))) throw new Error("Action description is required");
+    if (!((((description).trim()).length > 0))) throw new Error("Give this action a description.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -30127,7 +30127,7 @@ async function __runOrganizationRegister(ctx: MutationCtx, { docId, name, brandD
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Organization name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give your company a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -30206,7 +30206,7 @@ export const Organization_createViaRegister = mutation({
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Organization name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give your company a name.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -30240,7 +30240,7 @@ async function __runOrganizationRename(ctx: MutationCtx, { docId, name, version 
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Organization name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give your company a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -30334,7 +30334,7 @@ async function __runOrganizationSetDefaultCurrency(ctx: MutationCtx, { docId, cu
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((((currencyCode).trim()).length === 3))) throw new Error("Currency code must be a three-letter ISO 4217 code");
+    if (!((((currencyCode).trim()).length === 3))) throw new Error("Enter a three-letter currency code, like USD.");
     const normalizedCode = (currencyCode).toUpperCase();
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -30437,9 +30437,9 @@ async function __runOrganizationCapabilitySettingRegister(ctx: MutationCtx, { do
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("OrganizationCapabilitySetting not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("OrganizationCapabilitySetting not found");
-    if (!((user.id != null))) throw new Error("Authenticated staff may see capability settings");
-    if (!((user.id != null))) throw new Error("Authenticated staff may update capability settings");
-    if (!((user.id != null))) throw new Error("Authenticated staff may change capability settings");
+    if (!((user.id != null))) throw new Error("Signed-in staff may see capability settings");
+    if (!((user.id != null))) throw new Error("Signed-in staff may update capability settings");
+    if (!((user.id != null))) throw new Error("Signed-in staff may change capability settings");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.registeredAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 2 failed");
@@ -30502,9 +30502,9 @@ export const OrganizationCapabilitySetting_createViaRegister = mutation({
       enabled: args.enabled,
       updatedBy: args.updatedBy
     };
-    if (!((user.id != null))) throw new Error("Authenticated staff may see capability settings");
-    if (!((user.id != null))) throw new Error("Authenticated staff may update capability settings");
-    if (!((user.id != null))) throw new Error("Authenticated staff may change capability settings");
+    if (!((user.id != null))) throw new Error("Signed-in staff may see capability settings");
+    if (!((user.id != null))) throw new Error("Signed-in staff may update capability settings");
+    if (!((user.id != null))) throw new Error("Signed-in staff may change capability settings");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 2 failed");
@@ -30531,9 +30531,9 @@ async function __runOrganizationCapabilitySettingSetEnabled(ctx: MutationCtx, { 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("OrganizationCapabilitySetting not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("OrganizationCapabilitySetting not found");
-    if (!((user.id != null))) throw new Error("Authenticated staff may see capability settings");
-    if (!((user.id != null))) throw new Error("Authenticated staff may update capability settings");
-    if (!((user.id != null))) throw new Error("Authenticated staff may change capability settings");
+    if (!((user.id != null))) throw new Error("Signed-in staff may see capability settings");
+    if (!((user.id != null))) throw new Error("Signed-in staff may update capability settings");
+    if (!((user.id != null))) throw new Error("Signed-in staff may change capability settings");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -30713,7 +30713,7 @@ async function __runPackListCancel(ctx: MutationCtx, { docId, reason, version }:
     if (!(((((doc.status === "draft") || (doc.status === "packing")) || (doc.status === "packed")) || (doc.status === "loaded")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "logisticsManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Cancellation reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're cancelling this pack list.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -30997,8 +30997,8 @@ async function __runPackListOpen(ctx: MutationCtx, { docId, eventId, name, purpo
     if (!(((doc.status !== "cancelled") && (doc.status !== "dispatched")))) throw new Error("Guard 2 failed");
     if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!(((doc.openedAt == null) || (doc.eventId === eventId)))) throw new Error("Guard 4 failed");
-    if (!((eventId === doc.eventId))) throw new Error("Open eventId must match the seeded event reference");
-    if (!(((((name).trim()).length > 0) || (((doc.name).trim()).length > 0)))) throw new Error("Pack list name is required");
+    if (!((eventId === doc.eventId))) throw new Error("This pack list is for a different event. Pick the event already on this pack list.");
+    if (!(((((name).trim()).length > 0) || (((doc.name).trim()).length > 0)))) throw new Error("Give this pack list a name.");
     const wasOpen = (doc.openedAt != null);
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -31118,8 +31118,8 @@ export const PackList_createViaOpen = mutation({
     if (!(((__draft.status !== "cancelled") && (__draft.status !== "dispatched")))) throw new Error("Guard 2 failed");
     if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!(((__draft.openedAt == null) || (__draft.eventId === eventId)))) throw new Error("Guard 4 failed");
-    if (!((eventId === __draft.eventId))) throw new Error("Open eventId must match the seeded event reference");
-    if (!(((((name).trim()).length > 0) || (((__draft.name).trim()).length > 0)))) throw new Error("Pack list name is required");
+    if (!((eventId === __draft.eventId))) throw new Error("This pack list is for a different event. Pick the event already on this pack list.");
+    if (!(((((name).trim()).length > 0) || (((__draft.name).trim()).length > 0)))) throw new Error("Give this pack list a name.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -31512,8 +31512,8 @@ async function __runPackListItemAddItem(ctx: MutationCtx, { docId, packListId, d
     if (!((packListId === doc.packListId))) throw new Error("This pack item is for a different pack list. Pick the pack list already on this pack item.");
     if (!((((dishId == null) || (doc.dishId == null)) || (dishId === doc.dishId)))) throw new Error("This pack item is for a different dish. Pick the dish already on this pack item.");
     if (!((((productionBatchId == null) || (doc.productionBatchId == null)) || (productionBatchId === doc.productionBatchId)))) throw new Error("This pack item is for a different batch. Pick the batch already on this pack item.");
-    if (!((((description).trim()).length > 0))) throw new Error("Pack item description is required");
-    if (!((requiredQuantity > 0))) throw new Error("Required quantity must be positive");
+    if (!((((description).trim()).length > 0))) throw new Error("Give this pack item a description.");
+    if (!((requiredQuantity > 0))) throw new Error("This pack item's required amount has to be more than zero. Enter how much is needed.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -31617,8 +31617,8 @@ export const PackListItem_createViaAddItem = mutation({
     if (!((packListId === __draft.packListId))) throw new Error("This pack item is for a different pack list. Pick the pack list already on this pack item.");
     if (!((((dishId == null) || (__draft.dishId == null)) || (dishId === __draft.dishId)))) throw new Error("This pack item is for a different dish. Pick the dish already on this pack item.");
     if (!((((productionBatchId == null) || (__draft.productionBatchId == null)) || (productionBatchId === __draft.productionBatchId)))) throw new Error("This pack item is for a different batch. Pick the batch already on this pack item.");
-    if (!((((description).trim()).length > 0))) throw new Error("Pack item description is required");
-    if (!((requiredQuantity > 0))) throw new Error("Required quantity must be positive");
+    if (!((((description).trim()).length > 0))) throw new Error("Give this pack item a description.");
+    if (!((requiredQuantity > 0))) throw new Error("This pack item's required amount has to be more than zero. Enter how much is needed.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -31659,8 +31659,8 @@ async function __runPackListItemAdjustQuantity(ctx: MutationCtx, { docId, requir
     if (!((doc.listedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_packList != null) && ((__rel_packList.status === "draft") || (__rel_packList.status === "packing"))))) throw new Error("Guard 3 failed");
-    if (!((requiredQuantity > 0))) throw new Error("Required quantity must be positive");
-    if (!((requiredQuantity >= doc.packedQuantity))) throw new Error("Required quantity cannot be below packed quantity");
+    if (!((requiredQuantity > 0))) throw new Error("Enter a required amount more than zero.");
+    if (!((requiredQuantity >= doc.packedQuantity))) throw new Error("You can't set the required amount below what's already packed.");
     const previousRequired = doc.requiredQuantity;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -31734,10 +31734,10 @@ async function __runPackListItemAdoptContainerLink(ctx: MutationCtx, { docId, ev
     if (!((((doc.version === expectedItemVersion) && (__rel_packList.version === expectedPackListVersion)) && (__rel_dishContainer.version === expectedContainerVersion)))) throw new Error("Guard 6 failed");
     if (!((((((__rel_packList.event.eventDishes) ?? []).filter((item: Doc<"eventDishes">) => ((((((item._id === eventDishId) && (item.dishId === doc.dishId)) && (item.deletedAt == null)) && (item.quantityServings === containerServings)) && (item.version === expectedEventDishVersion))))) ?? []).length === 1))) throw new Error("Guard 7 failed");
     if (!((((((__rel_packList.items) ?? []).filter((item: Doc<"packListItems">) => (((((item._id !== doc._id) && (item.deletedAt == null)) && (item.eventDishId === eventDishId)) && (item.dishContainerId === doc.dishContainerId))))) ?? []).length === 0))) throw new Error("Guard 8 failed");
-    if (!(((doc.eventDishId == null) || (doc.eventDishId === eventDishId)))) throw new Error("Packing line already belongs to a different event dish");
-    if (!((containerServings >= 0))) throw new Error("Servings cannot be negative");
-    if (!((__rel_dishContainer.dishId === doc.dishId))) throw new Error("Container must match the packing dish");
-    if (!(((followsDishServings === false) || (doc.unit === __rel_dishContainer.unit)))) throw new Error("Automatic packing requires the container template unit");
+    if (!(((doc.eventDishId == null) || (doc.eventDishId === eventDishId)))) throw new Error("This packing line is for a different menu line. Pick the menu line already on this packing line.");
+    if (!((containerServings >= 0))) throw new Error("Servings can't be negative. Use zero or more.");
+    if (!((__rel_dishContainer.dishId === doc.dishId))) throw new Error("This container has to be for the same dish as this packing line.");
+    if (!(((followsDishServings === false) || (doc.unit === __rel_dishContainer.unit)))) throw new Error("Automatic packing needs the unit from the container template. Turn off automatic packing to use a different unit.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -31849,7 +31849,7 @@ async function __runPackListItemCorrectImportedFluidOunces(ctx: MutationCtx, { d
     if (!((((__rel_packList.event.stage !== "completed") && (__rel_packList.event.stage !== "closed_out")) && (__rel_packList.event.stage !== "cancelled")))) throw new Error("Guard 5 failed");
     if (!(((doc.dishContainerId == null) && (doc.followsDishServings !== true)))) throw new Error("Guard 6 failed");
     if (!(((doc.unit === "ounce") && (doc.unitCorrectionSource == null)))) throw new Error("Guard 7 failed");
-    if (!((((sourceReference).trim()).length > 0))) throw new Error("The original fluid-ounce source is required");
+    if (!((((sourceReference).trim()).length > 0))) throw new Error("Say where this fluid-ounce fix came from.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -31902,8 +31902,8 @@ async function __runPackListItemEnsureContainer(ctx: MutationCtx, { docId, packL
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((((__rel_packList != null) && (__rel_dishContainer != null)) && (__rel_eventDish != null)))) throw new Error("Guard 1 failed");
-    if (!(((((doc.packListId === packListId) && (doc.dishContainerId === dishContainerId)) && (doc.eventDishId === eventDishId)) && (doc.dishId === dishId)))) throw new Error("Container references must match the packing line");
-    if (!((((__rel_packList.eventId === __rel_eventDish.eventId) && (__rel_eventDish.dishId === dishId)) && (__rel_dishContainer.dishId === dishId)))) throw new Error("Container and menu line must belong to this event and dish");
+    if (!(((((doc.packListId === packListId) && (doc.dishContainerId === dishContainerId)) && (doc.eventDishId === eventDishId)) && (doc.dishId === dishId)))) throw new Error("This container's details don't match this line anymore. Refresh and try again.");
+    if (!((((__rel_packList.eventId === __rel_eventDish.eventId) && (__rel_eventDish.dishId === dishId)) && (__rel_dishContainer.dishId === dishId)))) throw new Error("This container and menu line have to be for the same event and dish.");
     const eligible = ((__rel_packList.status !== "dispatched") && (__rel_packList.status !== "cancelled"));
     const planned = ((quantityServings > 0) ? (Math.ceil((quantityServings / __rel_dishContainer.servingsPerContainer)) + __rel_dishContainer.baseQuantity) : 0);
     {
@@ -31982,7 +31982,7 @@ async function __runPackListItemEnsureKitItem(ctx: MutationCtx, { docId, packLis
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((__rel_packList != null))) throw new Error("Guard 1 failed");
-    if (!(((doc.packListId === packListId) && (doc.serviceStyleKitItemId === serviceStyleKitItemId)))) throw new Error("Kit references must match the packing line");
+    if (!(((doc.packListId === packListId) && (doc.serviceStyleKitItemId === serviceStyleKitItemId)))) throw new Error("This kit line doesn't match this packing line anymore.");
     const wasListed = (doc.listedAt != null);
     {
       const __cur = doc.status;
@@ -32127,8 +32127,8 @@ async function __runPackListItemMarkPacked(ctx: MutationCtx, { docId, packedQuan
     if (!((doc.listedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_packList != null) && ((((__rel_packList.status === "packing") || (__rel_packList.status === "packed")) || (__rel_packList.status === "loaded")) || (__rel_packList.status === "dispatched"))))) throw new Error("Guard 3 failed");
-    if (!((packedQuantity > 0))) throw new Error("Packed quantity must be positive");
-    if (!((packedQuantity <= doc.requiredQuantity))) throw new Error("Packed quantity cannot exceed required quantity");
+    if (!((packedQuantity > 0))) throw new Error("Enter a packed amount more than zero.");
+    if (!((packedQuantity <= doc.requiredQuantity))) throw new Error("You can't pack more than what's required. Enter a smaller amount.");
     if (!((packedQuantity === doc.requiredQuantity))) throw new Error("Save a short count on this line until you have the full amount");
     const previousStatus = doc.status;
     const previousPacked = doc.packedQuantity;
@@ -32198,7 +32198,7 @@ async function __runPackListItemRecordPackedCount(ctx: MutationCtx, { docId, pac
     if (!((doc.listedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_packList != null) && ((((__rel_packList.status === "packing") || (__rel_packList.status === "packed")) || (__rel_packList.status === "loaded")) || (__rel_packList.status === "dispatched"))))) throw new Error("Guard 3 failed");
-    if (!((packedQuantity > 0))) throw new Error("Packed quantity must be positive");
+    if (!((packedQuantity > 0))) throw new Error("Enter a packed amount more than zero.");
     if (!((packedQuantity < doc.requiredQuantity))) throw new Error("This is the full amount. Mark the line packed.");
     const previousPacked = doc.packedQuantity;
     if (version !== undefined && (doc as any).version !== version) {
@@ -32363,8 +32363,8 @@ async function __runPackListItemRestoreImportedAssociation(ctx: MutationCtx, { d
     if (!((((__rel_packList.event.stage !== "completed") && (__rel_packList.event.stage !== "closed_out")) && (__rel_packList.event.stage !== "cancelled")))) throw new Error("Guard 6 failed");
     if (!((((((doc.dishId == null) && (doc.eventDishId == null)) && (doc.dishContainerId == null)) && (doc.followsDishServings !== true)) && (doc.associationSource == null)))) throw new Error("Guard 7 failed");
     if (!((((((__rel_packList.event.eventDishes) ?? []).filter((item: Doc<"eventDishes">) => ((((((item._id === eventDishId) && (item.dishId === dishId)) && (item.deletedAt == null)) && (item.removedAt == null)) && (item.version === expectedEventDishVersion))))) ?? []).length === 1))) throw new Error("Guard 8 failed");
-    if (!((((sourceReference).trim()).length > 0))) throw new Error("The original packing association source is required");
-    if (!((doc.description === expectedDescription))) throw new Error("Packing description changed since source review");
+    if (!((((sourceReference).trim()).length > 0))) throw new Error("Say where this packing link came from.");
+    if (!((doc.description === expectedDescription))) throw new Error("This line's description changed since it was reviewed. Check it before continuing.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -32545,8 +32545,8 @@ async function __runPackListTemplateDefine(ctx: MutationCtx, { docId, name, desc
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change pack list templates");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Template name is required");
-    if (!((((guestCountMin == null) || (guestCountMax == null)) || (guestCountMax >= guestCountMin)))) throw new Error("Guest-count band max must be >= min");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this template a name.");
+    if (!((((guestCountMin == null) || (guestCountMax == null)) || (guestCountMax >= guestCountMin)))) throw new Error("The top of this guest-count range has to be the same as or bigger than the bottom. Fix the numbers.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -32637,8 +32637,8 @@ export const PackListTemplate_createViaDefine = mutation({
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change pack list templates");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Template name is required");
-    if (!((((guestCountMin == null) || (guestCountMax == null)) || (guestCountMax >= guestCountMin)))) throw new Error("Guest-count band max must be >= min");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this template a name.");
+    if (!((((guestCountMin == null) || (guestCountMax == null)) || (guestCountMax >= guestCountMin)))) throw new Error("The top of this guest-count range has to be the same as or bigger than the bottom. Fix the numbers.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -32737,8 +32737,8 @@ async function __runPackListTemplateRevise(ctx: MutationCtx, { docId, name, desc
     if (!((doc.definedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Template name is required");
-    if (!((((guestCountMin == null) || (guestCountMax == null)) || (guestCountMax >= guestCountMin)))) throw new Error("Guest-count band max must be >= min");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this template a name.");
+    if (!((((guestCountMin == null) || (guestCountMax == null)) || (guestCountMax >= guestCountMin)))) throw new Error("The top of this guest-count range has to be the same as or bigger than the bottom. Fix the numbers.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -32859,7 +32859,7 @@ async function __runPaymentDisputeReconciliation(ctx: MutationCtx, { docId, reas
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payments");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Dispute reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give a reason for this dispute");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -32909,7 +32909,7 @@ async function __runPaymentFail(ctx: MutationCtx, { docId, reason, version }: an
     if (!(((doc.status === "pending") || (doc.status === "processing")))) throw new Error("Guard 0 failed");
     if (!((doc.recordedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Failure reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give a reason this payment failed");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -32971,7 +32971,7 @@ async function __runPaymentMarkMatched(ctx: MutationCtx, { docId, source, extern
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payments");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Guard 1 failed");
-    if (!((((externalPaymentId).trim()).length > 0))) throw new Error("External payment ID is required for matching");
+    if (!((((externalPaymentId).trim()).length > 0))) throw new Error("Give the external payment ID to match this to");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -33092,9 +33092,9 @@ async function __runPaymentRecord(ctx: MutationCtx, { docId, invoiceId, clientId
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_invoice != null))) throw new Error("Guard 3 failed");
     if (!((__rel_client != null))) throw new Error("Guard 4 failed");
-    if (!((invoiceId === doc.invoiceId))) throw new Error("Record invoiceId must match the seeded invoice reference");
-    if (!((clientId === doc.clientId))) throw new Error("Record clientId must match the seeded client reference");
-    if (!((amount > 0))) throw new Error("Payment amount must be positive");
+    if (!((invoiceId === doc.invoiceId))) throw new Error("This payment is for a different invoice. Use the invoice already on this payment.");
+    if (!((clientId === doc.clientId))) throw new Error("This payment is for a different client. Use the client already on this payment.");
+    if (!((amount > 0))) throw new Error("This payment's amount has to be more than zero. Enter how much was paid.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -33187,9 +33187,9 @@ export const Payment_createViaRecord = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_invoice != null))) throw new Error("Guard 3 failed");
     if (!((__rel_client != null))) throw new Error("Guard 4 failed");
-    if (!((invoiceId === __draft.invoiceId))) throw new Error("Record invoiceId must match the seeded invoice reference");
-    if (!((clientId === __draft.clientId))) throw new Error("Record clientId must match the seeded client reference");
-    if (!((amount > 0))) throw new Error("Payment amount must be positive");
+    if (!((invoiceId === __draft.invoiceId))) throw new Error("This payment is for a different invoice. Use the invoice already on this payment.");
+    if (!((clientId === __draft.clientId))) throw new Error("This payment is for a different client. Use the client already on this payment.");
+    if (!((amount > 0))) throw new Error("This payment's amount has to be more than zero. Enter how much was paid.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -33226,7 +33226,7 @@ async function __runPaymentRefund(ctx: MutationCtx, { docId, reason, version }: 
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payments");
     if (!((doc.status === "completed"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Refund reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give a reason for this refund");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -33608,7 +33608,7 @@ async function __runPaymentMethodInvalidate(ctx: MutationCtx, { docId, reason, v
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change payment methods");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Invalidation reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give a reason for marking this invalid");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -33839,7 +33839,7 @@ async function __runPaymentMethodRegister(ctx: MutationCtx, { docId, clientId, m
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_client != null))) throw new Error("Guard 3 failed");
-    if (!((clientId === doc.clientId))) throw new Error("Register clientId must match the seeded client reference");
+    if (!((clientId === doc.clientId))) throw new Error("This payment method is for a different client. Use the client already on this payment method.");
     if (!(((lastFour == null) || (((lastFour).trim()).length <= 4)))) throw new Error("Last-four hint must be at most four characters");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -33926,7 +33926,7 @@ export const PaymentMethod_createViaRegister = mutation({
     if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_client != null))) throw new Error("Guard 3 failed");
-    if (!((clientId === __draft.clientId))) throw new Error("Register clientId must match the seeded client reference");
+    if (!((clientId === __draft.clientId))) throw new Error("This payment method is for a different client. Use the client already on this payment method.");
     if (!(((lastFour == null) || (((lastFour).trim()).length <= 4)))) throw new Error("Last-four hint must be at most four characters");
     const doc: Record<string, any> = {
       ...__draft,
@@ -34141,7 +34141,7 @@ async function __runPayrollInputMarkVoided(ctx: MutationCtx, { docId, reason, ve
     if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may change payroll inputs");
     if (!((((doc.status === "draft") || (doc.status === "prepared")) || (doc.status === "finalized")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Void reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're voiding this payroll input.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -34214,10 +34214,10 @@ async function __runPayrollInputPrepare(ctx: MutationCtx, { docId, personId, per
     if (!((personId === doc.personId))) throw new Error("This payroll input is for a different person. Pick the person already on this payroll input.");
     if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("This payroll input is for a different event. Pick the event already on this payroll input.");
     if (!((((shiftId == null) || (doc.shiftId == null)) || (shiftId === doc.shiftId)))) throw new Error("This payroll input is for a different shift. Pick the shift already on this payroll input.");
-    if (!((periodEnd >= periodStart))) throw new Error("Payroll period end must be at or after period start");
-    if (!((((regularMinutes >= 0) && (overtimeMinutes >= 0)) && (totalMinutes >= 0)))) throw new Error("Payroll minutes cannot be negative");
-    if (!((totalMinutes === (regularMinutes + overtimeMinutes)))) throw new Error("Total minutes must equal regular plus overtime");
-    if (!(((((hourlyRate == null) || (hourlyRate >= 0)) && ((overtimeRate == null) || (overtimeRate >= 0))) && ((grossAmount == null) || (grossAmount >= 0))))) throw new Error("Payroll rate and amount fields cannot be negative");
+    if (!((periodEnd >= periodStart))) throw new Error("This payroll input's period has to end on or after it starts.");
+    if (!((((regularMinutes >= 0) && (overtimeMinutes >= 0)) && (totalMinutes >= 0)))) throw new Error("This payroll input's minutes can't be negative. Use zero or more.");
+    if (!((totalMinutes === (regularMinutes + overtimeMinutes)))) throw new Error("This payroll input's total minutes has to equal regular plus overtime minutes.");
+    if (!(((((hourlyRate == null) || (hourlyRate >= 0)) && ((overtimeRate == null) || (overtimeRate >= 0))) && ((grossAmount == null) || (grossAmount >= 0))))) throw new Error("This payroll input's rate and amount fields can't be negative. Use zero or more.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -34346,10 +34346,10 @@ export const PayrollInput_createViaPrepare = mutation({
     if (!((personId === __draft.personId))) throw new Error("This payroll input is for a different person. Pick the person already on this payroll input.");
     if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("This payroll input is for a different event. Pick the event already on this payroll input.");
     if (!((((shiftId == null) || (__draft.shiftId == null)) || (shiftId === __draft.shiftId)))) throw new Error("This payroll input is for a different shift. Pick the shift already on this payroll input.");
-    if (!((periodEnd >= periodStart))) throw new Error("Payroll period end must be at or after period start");
-    if (!((((regularMinutes >= 0) && (overtimeMinutes >= 0)) && (totalMinutes >= 0)))) throw new Error("Payroll minutes cannot be negative");
-    if (!((totalMinutes === (regularMinutes + overtimeMinutes)))) throw new Error("Total minutes must equal regular plus overtime");
-    if (!(((((hourlyRate == null) || (hourlyRate >= 0)) && ((overtimeRate == null) || (overtimeRate >= 0))) && ((grossAmount == null) || (grossAmount >= 0))))) throw new Error("Payroll rate and amount fields cannot be negative");
+    if (!((periodEnd >= periodStart))) throw new Error("This payroll input's period has to end on or after it starts.");
+    if (!((((regularMinutes >= 0) && (overtimeMinutes >= 0)) && (totalMinutes >= 0)))) throw new Error("This payroll input's minutes can't be negative. Use zero or more.");
+    if (!((totalMinutes === (regularMinutes + overtimeMinutes)))) throw new Error("This payroll input's total minutes has to equal regular plus overtime minutes.");
+    if (!(((((hourlyRate == null) || (hourlyRate >= 0)) && ((overtimeRate == null) || (overtimeRate >= 0))) && ((grossAmount == null) || (grossAmount >= 0))))) throw new Error("This payroll input's rate and amount fields can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -34398,10 +34398,10 @@ async function __runPerformanceReviewRecord(ctx: MutationCtx, { docId, personId,
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 2 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 3 failed");
-    if (!((personId === doc.personId))) throw new Error("Review person must match the selected staff member");
-    if (!(((reliabilityRating >= 1) && (reliabilityRating <= 5)))) throw new Error("Reliability rating must be between 1 and 5");
-    if (!(((qualityRating >= 1) && (qualityRating <= 5)))) throw new Error("Quality rating must be between 1 and 5");
-    if (!(((teamworkRating >= 1) && (teamworkRating <= 5)))) throw new Error("Teamwork rating must be between 1 and 5");
+    if (!((personId === doc.personId))) throw new Error("This review is for a different person. Pick the staff member already on this review.");
+    if (!(((reliabilityRating >= 1) && (reliabilityRating <= 5)))) throw new Error("Give a reliability rating between 1 and 5.");
+    if (!(((qualityRating >= 1) && (qualityRating <= 5)))) throw new Error("Give a quality rating between 1 and 5.");
+    if (!(((teamworkRating >= 1) && (teamworkRating <= 5)))) throw new Error("Give a teamwork rating between 1 and 5.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -34495,10 +34495,10 @@ export const PerformanceReview_createViaRecord = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 2 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 3 failed");
-    if (!((personId === __draft.personId))) throw new Error("Review person must match the selected staff member");
-    if (!(((reliabilityRating >= 1) && (reliabilityRating <= 5)))) throw new Error("Reliability rating must be between 1 and 5");
-    if (!(((qualityRating >= 1) && (qualityRating <= 5)))) throw new Error("Quality rating must be between 1 and 5");
-    if (!(((teamworkRating >= 1) && (teamworkRating <= 5)))) throw new Error("Teamwork rating must be between 1 and 5");
+    if (!((personId === __draft.personId))) throw new Error("This review is for a different person. Pick the staff member already on this review.");
+    if (!(((reliabilityRating >= 1) && (reliabilityRating <= 5)))) throw new Error("Give a reliability rating between 1 and 5.");
+    if (!(((qualityRating >= 1) && (qualityRating <= 5)))) throw new Error("Give a quality rating between 1 and 5.");
+    if (!(((teamworkRating >= 1) && (teamworkRating <= 5)))) throw new Error("Give a teamwork rating between 1 and 5.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -34649,7 +34649,7 @@ async function __runPersonCorrectEmail(ctx: MutationCtx, { docId, email, version
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status !== "terminated"))) throw new Error("Guard 1 failed");
-    if (!((((email).trim()).length > 0))) throw new Error("Email is required");
+    if (!((((email).trim()).length > 0))) throw new Error("Give this person an email.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -34701,8 +34701,8 @@ async function __runPersonCorrectIdentity(ctx: MutationCtx, { docId, givenName, 
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((givenName).trim()).length > 0))) throw new Error("First name is required");
-    if (!((((familyName).trim()).length > 0))) throw new Error("Last name is required");
+    if (!((((givenName).trim()).length > 0))) throw new Error("Give this person a first name.");
+    if (!((((familyName).trim()).length > 0))) throw new Error("Give this person a last name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -34819,9 +34819,9 @@ async function __runPersonHire(ctx: MutationCtx, { docId, givenName, familyName,
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((((givenName).trim()).length > 0))) throw new Error("First name is required");
-    if (!((((familyName).trim()).length > 0))) throw new Error("Last name is required");
-    if (!((((email).trim()).length > 0))) throw new Error("Email is required");
+    if (!((((givenName).trim()).length > 0))) throw new Error("Give this person a first name.");
+    if (!((((familyName).trim()).length > 0))) throw new Error("Give this person a last name.");
+    if (!((((email).trim()).length > 0))) throw new Error("Give this person an email.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -34915,9 +34915,9 @@ export const Person_createViaHire = mutation({
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((((givenName).trim()).length > 0))) throw new Error("First name is required");
-    if (!((((familyName).trim()).length > 0))) throw new Error("Last name is required");
-    if (!((((email).trim()).length > 0))) throw new Error("Email is required");
+    if (!((((givenName).trim()).length > 0))) throw new Error("Give this person a first name.");
+    if (!((((familyName).trim()).length > 0))) throw new Error("Give this person a last name.");
+    if (!((((email).trim()).length > 0))) throw new Error("Give this person an email.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -35073,7 +35073,7 @@ async function __runPersonSetEmployeeNumber(ctx: MutationCtx, { docId, employeeN
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((((employeeNumber).trim()).length > 0))) throw new Error("Employee number is required");
+    if (!((((employeeNumber).trim()).length > 0))) throw new Error("Give this person an employee number.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -35124,7 +35124,7 @@ async function __runPersonSetPayRate(ctx: MutationCtx, { docId, hourlyRate, vers
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((hourlyRate >= 0))) throw new Error("Hourly rate must be zero or more");
+    if (!((hourlyRate >= 0))) throw new Error("This person's hourly rate can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -35343,7 +35343,7 @@ async function __runPrepTaskAssign(ctx: MutationCtx, { docId, personId, version 
     if (!(((((doc.status === "pending") || (doc.status === "claimed")) || (doc.status === "in_progress")) || (doc.status === "blocked")))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((personId != null))) throw new Error("Guard 3 failed");
-    if (!((doc.quantity > 0))) throw new Error("Prep quantity must be positive before assign");
+    if (!((doc.quantity > 0))) throw new Error("This task needs an amount more than zero before you can assign it.");
     const previousStatus = doc.status;
     const previousAssignee = doc.assignedToId;
     const nextStatus = ((doc.status === "in_progress") ? "in_progress" : ((doc.status === "blocked") ? "blocked" : "claimed"));
@@ -35409,7 +35409,7 @@ async function __runPrepTaskCancel(ctx: MutationCtx, { docId, reason, version }:
     if (!(((((doc.status === "pending") || (doc.status === "claimed")) || (doc.status === "in_progress")) || (doc.status === "blocked")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "kitchenLeadAccess"))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Cancellation reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're cancelling this.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -35474,7 +35474,7 @@ async function __runPrepTaskClaim(ctx: MutationCtx, { docId, version }: any, __c
     if (!(((doc.resolution == null) || (doc.resolution !== "choice_pending")))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.personId != null))) throw new Error("Guard 3 failed");
-    if (!((doc.quantity > 0))) throw new Error("Prep quantity must be positive before claim");
+    if (!((doc.quantity > 0))) throw new Error("This task needs an amount more than zero before you can claim it.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -35537,7 +35537,7 @@ async function __runPrepTaskComplete(ctx: MutationCtx, { docId, completedQuantit
     if (!((doc.status === "in_progress"))) throw new Error("Guard 0 failed");
     if (!((doc.startedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((completedQuantity == null) || (completedQuantity >= 0)))) throw new Error("Completed quantity cannot be negative");
+    if (!(((completedQuantity == null) || (completedQuantity >= 0)))) throw new Error("The completed amount can't be negative. Use zero or more.");
     const previousStatus = doc.status;
     const nextCompleted = ((completedQuantity != null) ? completedQuantity : doc.quantity);
     {
@@ -35610,7 +35610,7 @@ async function __runPrepTaskLinkRecipe(ctx: MutationCtx, { docId, dishTaskId, di
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(((doc.dishTaskId == null) || (doc.dishTaskId === dishTaskId)))) throw new Error("Prep already belongs to a different recipe step");
     if (!(((doc.dishId == null) || (doc.dishId === dishId)))) throw new Error("Prep already belongs to a different dish");
-    if (!(((__rel_eventDish == null) || (__rel_eventDish.dishId === dishId)))) throw new Error("Recipe dish must match the event menu line");
+    if (!(((__rel_eventDish == null) || (__rel_eventDish.dishId === dishId)))) throw new Error("This recipe's dish doesn't match this event's menu line.");
     if (!(((doc.componentId == null) || (doc.componentId === componentId)))) throw new Error("Prep already belongs to a different component");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -35659,7 +35659,7 @@ async function __runPrepTaskMarkBlocked(ctx: MutationCtx, { docId, reason, versi
     if (!((((doc.status === "pending") || (doc.status === "claimed")) || (doc.status === "in_progress")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "kitchenLeadAccess"))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Block reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're blocking this.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -35722,8 +35722,8 @@ async function __runPrepTaskMarkOverride(ctx: MutationCtx, { docId, overrideOfDi
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((((doc.status === "pending") || (doc.status === "claimed")) || (doc.status === "blocked")))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Override reason is required");
-    if (!(((name == null) || (((name).trim()).length > 0)))) throw new Error("Prep task name cannot be blank");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're overriding this.");
+    if (!(((name == null) || (((name).trim()).length > 0)))) throw new Error("Give this prep task a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -35784,11 +35784,11 @@ async function __runPrepTaskOpen(ctx: MutationCtx, { docId, eventDishId, eventId
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((doc.eventDishId != null))) throw new Error("Guard 3 failed");
     if (!((doc.eventId != null))) throw new Error("Guard 4 failed");
-    if (!((eventDishId === doc.eventDishId))) throw new Error("Open eventDishId must match the seeded event dish reference");
-    if (!((eventId === doc.eventId))) throw new Error("Open eventId must match the seeded event reference");
-    if (!(((__rel_eventDish == null) || (eventId === __rel_eventDish.eventId)))) throw new Error("PrepTask eventId must match EventDish.eventId");
-    if (!((((name).trim()).length > 0))) throw new Error("Prep task name is required");
-    if (!((quantity >= 0))) throw new Error("Prep quantity cannot be negative");
+    if (!((eventDishId === doc.eventDishId))) throw new Error("This prep task is for a different menu line. Pick the menu line already on this task.");
+    if (!((eventId === doc.eventId))) throw new Error("This prep task is for a different event. Pick the event already on this task.");
+    if (!(((__rel_eventDish == null) || (eventId === __rel_eventDish.eventId)))) throw new Error("This prep task's event doesn't match its menu line's event.");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this prep task a name.");
+    if (!((quantity >= 0))) throw new Error("This task's amount can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -35931,11 +35931,11 @@ export const PrepTask_createViaOpen = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__draft.eventDishId != null))) throw new Error("Guard 3 failed");
     if (!((__draft.eventId != null))) throw new Error("Guard 4 failed");
-    if (!((eventDishId === __draft.eventDishId))) throw new Error("Open eventDishId must match the seeded event dish reference");
-    if (!((eventId === __draft.eventId))) throw new Error("Open eventId must match the seeded event reference");
-    if (!(((__rel_eventDish == null) || (eventId === __rel_eventDish.eventId)))) throw new Error("PrepTask eventId must match EventDish.eventId");
-    if (!((((name).trim()).length > 0))) throw new Error("Prep task name is required");
-    if (!((quantity >= 0))) throw new Error("Prep quantity cannot be negative");
+    if (!((eventDishId === __draft.eventDishId))) throw new Error("This prep task is for a different menu line. Pick the menu line already on this task.");
+    if (!((eventId === __draft.eventId))) throw new Error("This prep task is for a different event. Pick the event already on this task.");
+    if (!(((__rel_eventDish == null) || (eventId === __rel_eventDish.eventId)))) throw new Error("This prep task's event doesn't match its menu line's event.");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this prep task a name.");
+    if (!((quantity >= 0))) throw new Error("This task's amount can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -36069,7 +36069,7 @@ async function __runPrepTaskRefreshGenerated(ctx: MutationCtx, { docId, quantity
     if (!((doc.status === "pending"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.isGenerated === true))) throw new Error("Guard 2 failed");
-    if (!((quantity >= 0))) throw new Error("Generated prep task quantity cannot be negative");
+    if (!((quantity >= 0))) throw new Error("This task's amount can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -36291,8 +36291,8 @@ async function __runPrepTaskResolveChoice(ctx: MutationCtx, { docId, choice, ver
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.resolution === "choice_pending"))) throw new Error("Guard 1 failed");
-    if (!((((choice).trim()).length > 0))) throw new Error("A choice is required");
-    if (!(((doc.choiceOptions == null) || doc.choiceOptions.includes(choice)))) throw new Error("Choice must be one of the listed options");
+    if (!((((choice).trim()).length > 0))) throw new Error("Pick a choice.");
+    if (!(((doc.choiceOptions == null) || doc.choiceOptions.includes(choice)))) throw new Error("Pick one of the listed choices.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -36405,8 +36405,8 @@ async function __runPrepTaskRevise(ctx: MutationCtx, { docId, name, quantity, un
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!(((((doc.status === "pending") || (doc.status === "claimed")) || (doc.status === "in_progress")) || (doc.status === "blocked")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((name == null) || (((name).trim()).length > 0)))) throw new Error("Prep task name cannot be blank");
-    if (!(((quantity == null) || (quantity > 0)))) throw new Error("Prep quantity must be positive");
+    if (!(((name == null) || (((name).trim()).length > 0)))) throw new Error("Give this prep task a name.");
+    if (!(((quantity == null) || (quantity > 0)))) throw new Error("Enter an amount more than zero for this prep task.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -36513,7 +36513,7 @@ async function __runPrepTaskStandDown(ctx: MutationCtx, { docId, reason, version
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((checkRole(user, "kitchenLeadAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Stand-down reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're standing this down.");
     const previousStatus = doc.status;
     const alreadySettled = ((doc.status === "completed") || (doc.status === "cancelled"));
     {
@@ -36582,7 +36582,7 @@ async function __runPrepTaskStart(ctx: MutationCtx, { docId, version }: any, __c
     if (!((doc.claimedAt != null))) throw new Error("Guard 2 failed");
     if (!((doc.assignedToId != null))) throw new Error("Guard 3 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 4 failed");
-    if (!((((doc.incomingDependencies) ?? []).filter((dependency: Doc<"prepTaskDependencies">) => ((dependency.isSatisfied === false))).length === 0))) throw new Error("Required predecessor prep tasks must be complete before this task can start");
+    if (!((((doc.incomingDependencies) ?? []).filter((dependency: Doc<"prepTaskDependencies">) => ((dependency.isSatisfied === false))).length === 0))) throw new Error("Finish the prep tasks this one depends on before you start it.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -36709,7 +36709,7 @@ async function __runPrepTaskCommentEdit(ctx: MutationCtx, { docId, body, version
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.postedAt != null))) throw new Error("Guard 1 failed");
     if (!(((doc.authorAuthSubjectId === user.id) || checkRole(user, "kitchenLeadAccess")))) throw new Error("Guard 2 failed");
-    if (!((((body).trim()).length > 0))) throw new Error("Comment text is required");
+    if (!((((body).trim()).length > 0))) throw new Error("Write something before you post this comment.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -36758,9 +36758,9 @@ async function __runPrepTaskCommentPost(ctx: MutationCtx, { docId, prepTaskId, e
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.postedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((body).trim()).length > 0))) throw new Error("Comment text is required");
-    if (!(((authorName == null) || (((authorName).trim()).length > 0)))) throw new Error("Author name cannot be blank");
-    if (!(((taskOwnerAuthSubjectId == null) || (taskOwnerAuthSubjectId !== user.id)))) throw new Error("Task owners cannot post comments that notify themselves");
+    if (!((((body).trim()).length > 0))) throw new Error("Write something before you post this comment.");
+    if (!(((authorName == null) || (((authorName).trim()).length > 0)))) throw new Error("Give this comment an author name.");
+    if (!(((taskOwnerAuthSubjectId == null) || (taskOwnerAuthSubjectId !== user.id)))) throw new Error("A task owner can't post a comment that notifies themselves.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -36856,9 +36856,9 @@ export const PrepTaskComment_createViaPost = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.postedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((body).trim()).length > 0))) throw new Error("Comment text is required");
-    if (!(((authorName == null) || (((authorName).trim()).length > 0)))) throw new Error("Author name cannot be blank");
-    if (!(((taskOwnerAuthSubjectId == null) || (taskOwnerAuthSubjectId !== user.id)))) throw new Error("Task owners cannot post comments that notify themselves");
+    if (!((((body).trim()).length > 0))) throw new Error("Write something before you post this comment.");
+    if (!(((authorName == null) || (((authorName).trim()).length > 0)))) throw new Error("Give this comment an author name.");
+    if (!(((taskOwnerAuthSubjectId == null) || (taskOwnerAuthSubjectId !== user.id)))) throw new Error("A task owner can't post a comment that notifies themselves.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -36904,7 +36904,7 @@ async function __runPrepTaskDependencyDeclare(ctx: MutationCtx, { docId, depende
     if (!((__rel_predecessorTask != null))) throw new Error("Guard 1 failed");
     if (!((__rel_dependentTask.status === "pending"))) throw new Error("Guard 2 failed");
     if (!((dependentTaskId !== predecessorTaskId))) throw new Error("A prep task cannot depend on itself");
-    if (!((__rel_dependentTask.eventId === __rel_predecessorTask.eventId))) throw new Error("Predecessor prep tasks must belong to the same event");
+    if (!((__rel_dependentTask.eventId === __rel_predecessorTask.eventId))) throw new Error("The task this depends on has to belong to the same event.");
     const updates = {
       dependentTaskId: dependentTaskId,
       predecessorTaskId: predecessorTaskId,
@@ -36970,7 +36970,7 @@ export const PrepTaskDependency_createViaDeclare = mutation({
     if (!((__rel_predecessorTask != null))) throw new Error("Guard 1 failed");
     if (!((__rel_dependentTask.status === "pending"))) throw new Error("Guard 2 failed");
     if (!((dependentTaskId !== predecessorTaskId))) throw new Error("A prep task cannot depend on itself");
-    if (!((__rel_dependentTask.eventId === __rel_predecessorTask.eventId))) throw new Error("Predecessor prep tasks must belong to the same event");
+    if (!((__rel_dependentTask.eventId === __rel_predecessorTask.eventId))) throw new Error("The task this depends on has to belong to the same event.");
     const doc: Record<string, any> = {
       ...__draft,
     };
@@ -37085,7 +37085,7 @@ async function __runPrepTaskMaterialLink(ctx: MutationCtx, { docId, prepTaskId, 
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep task materials");
     if (!((doc.linkedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((((eventIngredientContributionId != null) || (productionBatchAllocationId != null)) || (dishIngredientId != null)) || (dishComponentId != null)))) throw new Error("A prep task material must point at a requirement or allocation");
+    if (!(((((eventIngredientContributionId != null) || (productionBatchAllocationId != null)) || (dishIngredientId != null)) || (dishComponentId != null)))) throw new Error("Link this to a requirement or an allocation.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -37171,7 +37171,7 @@ export const PrepTaskMaterial_createViaLink = mutation({
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep task materials");
     if (!((__draft.linkedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((((eventIngredientContributionId != null) || (productionBatchAllocationId != null)) || (dishIngredientId != null)) || (dishComponentId != null)))) throw new Error("A prep task material must point at a requirement or allocation");
+    if (!(((((eventIngredientContributionId != null) || (productionBatchAllocationId != null)) || (dishIngredientId != null)) || (dishComponentId != null)))) throw new Error("Link this to a requirement or an allocation.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -37208,7 +37208,7 @@ async function __runPrepTaskMaterialUnlink(ctx: MutationCtx, { docId, reason, ve
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep task materials");
     if (!((doc.linkedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're unlinking this.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -37257,7 +37257,7 @@ async function __runProductionBatchCancel(ctx: MutationCtx, { docId, reason, ver
     if (!(((doc.status === "planned") || (doc.status === "in_progress")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "kitchenLeadAccess"))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Cancellation reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're cancelling this batch.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -37321,7 +37321,7 @@ async function __runProductionBatchComplete(ctx: MutationCtx, { docId, actualYie
     if (!((doc.status === "in_progress"))) throw new Error("Guard 0 failed");
     if (!((doc.startedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((actualYield >= 0))) throw new Error("Actual yield cannot be negative");
+    if (!((actualYield >= 0))) throw new Error("The actual yield can't be negative. Use zero or more.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -37394,9 +37394,9 @@ async function __runProductionBatchPlan(ctx: MutationCtx, { docId, componentId, 
     if (!((doc.status === "planned"))) throw new Error("Guard 1 failed");
     if (!(((doc.plannedAt == null) || (doc.componentId === componentId)))) throw new Error("Guard 2 failed");
     if (!(((doc.plannedAt != null) || ((__rel_component != null) && (__rel_component.status === "published"))))) throw new Error("Guard 3 failed");
-    if (!((componentId === doc.componentId))) throw new Error("Plan componentId must match the seeded component reference");
-    if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("Plan eventId must match the seeded event reference when provided");
-    if (!(((plannedYield > 0) || (doc.plannedYield > 0)))) throw new Error("Planned yield must be positive");
+    if (!((componentId === doc.componentId))) throw new Error("This batch is for a different component. Pick the component already on this batch.");
+    if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("This batch is for a different event. Pick the event already on this batch, or leave it blank.");
+    if (!(((plannedYield > 0) || (doc.plannedYield > 0)))) throw new Error("Enter a planned yield more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -37478,9 +37478,9 @@ export const ProductionBatch_createViaPlan = mutation({
     if (!((__draft.status === "planned"))) throw new Error("Guard 1 failed");
     if (!(((__draft.plannedAt == null) || (__draft.componentId === componentId)))) throw new Error("Guard 2 failed");
     if (!(((__draft.plannedAt != null) || ((__rel_component != null) && (__rel_component.status === "published"))))) throw new Error("Guard 3 failed");
-    if (!((componentId === __draft.componentId))) throw new Error("Plan componentId must match the seeded component reference");
-    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Plan eventId must match the seeded event reference when provided");
-    if (!(((plannedYield > 0) || (__draft.plannedYield > 0)))) throw new Error("Planned yield must be positive");
+    if (!((componentId === __draft.componentId))) throw new Error("This batch is for a different component. Pick the component already on this batch.");
+    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("This batch is for a different event. Pick the event already on this batch, or leave it blank.");
+    if (!(((plannedYield > 0) || (__draft.plannedYield > 0)))) throw new Error("Enter a planned yield more than zero.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -37516,8 +37516,8 @@ async function __runProductionBatchReconcilePlan(ctx: MutationCtx, { docId, plan
     if (!((doc.status === "planned"))) throw new Error("Guard 0 failed");
     if (!((doc.plannedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((plannedExact >= 0))) throw new Error("Exact quantity cannot be negative");
-    if (!((plannedRounded >= plannedExact))) throw new Error("Rounded quantity cannot be below the exact need");
+    if (!((plannedExact >= 0))) throw new Error("The exact amount can't be negative. Use zero or more.");
+    if (!((plannedRounded >= plannedExact))) throw new Error("The rounded amount can't be less than the exact amount needed.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -37636,9 +37636,9 @@ async function __runProductionBatchAllocationAllocate(ctx: MutationCtx, { docId,
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change batch allocations");
     if (!((doc.allocatedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((allocatedQuantity >= 0))) throw new Error("Allocated quantity cannot be negative");
-    if (!((formulaShare >= 0))) throw new Error("Formula share cannot be negative");
-    if (!((((isSurplus != null) && isSurplus) || (eventId != null)))) throw new Error("An allocation belongs to an event or is surplus");
+    if (!((allocatedQuantity >= 0))) throw new Error("The allocated amount can't be negative. Use zero or more.");
+    if (!((formulaShare >= 0))) throw new Error("The formula share can't be negative. Use zero or more.");
+    if (!((((isSurplus != null) && isSurplus) || (eventId != null)))) throw new Error("This allocation has to belong to an event, or be marked as surplus.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -37725,9 +37725,9 @@ export const ProductionBatchAllocation_createViaAllocate = mutation({
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change batch allocations");
     if (!((__draft.allocatedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((allocatedQuantity >= 0))) throw new Error("Allocated quantity cannot be negative");
-    if (!((formulaShare >= 0))) throw new Error("Formula share cannot be negative");
-    if (!((((isSurplus != null) && isSurplus) || (eventId != null)))) throw new Error("An allocation belongs to an event or is surplus");
+    if (!((allocatedQuantity >= 0))) throw new Error("The allocated amount can't be negative. Use zero or more.");
+    if (!((formulaShare >= 0))) throw new Error("The formula share can't be negative. Use zero or more.");
+    if (!((((isSurplus != null) && isSurplus) || (eventId != null)))) throw new Error("This allocation has to belong to an event, or be marked as surplus.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -37872,7 +37872,7 @@ async function __runProductionBatchAllocationRelease(ctx: MutationCtx, { docId, 
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change batch allocations");
     if (!(((doc.status === "planned") || (doc.status === "produced")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Release reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're releasing this.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -38130,10 +38130,10 @@ async function __runProposalDraft(ctx: MutationCtx, { docId, clientId, title, su
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_client != null))) throw new Error("Guard 3 failed");
-    if (!((clientId === doc.clientId))) throw new Error("Draft clientId must match the seeded client reference");
-    if (!((((title).trim()).length > 0))) throw new Error("Proposal title is required");
-    if (!(((guestCount == null) || (guestCount >= 0)))) throw new Error("Guest count cannot be negative");
-    if (!(((((subtotal >= 0) && (taxAmount >= 0)) && (discountAmount >= 0)) && (total >= 0)))) throw new Error("Proposal money amounts cannot be negative");
+    if (!((clientId === doc.clientId))) throw new Error("This proposal is for a different client. Use the client already on this proposal.");
+    if (!((((title).trim()).length > 0))) throw new Error("Give this proposal a title");
+    if (!(((guestCount == null) || (guestCount >= 0)))) throw new Error("The guest count can't be negative. Use zero or more.");
+    if (!(((((subtotal >= 0) && (taxAmount >= 0)) && (discountAmount >= 0)) && (total >= 0)))) throw new Error("This proposal's money amounts can't be negative. Use zero or more.");
     if (!((total === ((subtotal + taxAmount) - discountAmount)))) throw new Error("Proposal total must equal subtotal plus tax minus discount");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -38272,10 +38272,10 @@ export const Proposal_createViaDraft = mutation({
     if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_client != null))) throw new Error("Guard 3 failed");
-    if (!((clientId === __draft.clientId))) throw new Error("Draft clientId must match the seeded client reference");
-    if (!((((title).trim()).length > 0))) throw new Error("Proposal title is required");
-    if (!(((guestCount == null) || (guestCount >= 0)))) throw new Error("Guest count cannot be negative");
-    if (!(((((subtotal >= 0) && (taxAmount >= 0)) && (discountAmount >= 0)) && (total >= 0)))) throw new Error("Proposal money amounts cannot be negative");
+    if (!((clientId === __draft.clientId))) throw new Error("This proposal is for a different client. Use the client already on this proposal.");
+    if (!((((title).trim()).length > 0))) throw new Error("Give this proposal a title");
+    if (!(((guestCount == null) || (guestCount >= 0)))) throw new Error("The guest count can't be negative. Use zero or more.");
+    if (!(((((subtotal >= 0) && (taxAmount >= 0)) && (discountAmount >= 0)) && (total >= 0)))) throw new Error("This proposal's money amounts can't be negative. Use zero or more.");
     if (!((total === ((subtotal + taxAmount) - discountAmount)))) throw new Error("Proposal total must equal subtotal plus tax minus discount");
     const doc: Record<string, any> = {
       ...__draft,
@@ -38588,7 +38588,7 @@ async function __runProposalSend(ctx: MutationCtx, { docId, version }: any, __cr
     if (!((doc.draftedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_client != null) && (__rel_client.status === "active")))) throw new Error("Guard 3 failed");
-    if (!((((doc.title).trim()).length > 0))) throw new Error("Proposal title is required before send");
+    if (!((((doc.title).trim()).length > 0))) throw new Error("Give this proposal a title before you send it");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -38816,7 +38816,7 @@ async function __runProposalDishSelectionAdjustServings(ctx: MutationCtx, { docI
     if (!((doc.selectedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_proposal != null) && (((__rel_proposal.status === "draft") || (__rel_proposal.status === "sent")) || (__rel_proposal.status === "viewed"))))) throw new Error("Guard 2 failed");
-    if (!((quantityServings > 0))) throw new Error("Selection servings must be positive");
+    if (!((quantityServings > 0))) throw new Error("The number of servings has to be more than zero");
     const previousQuantityServings = doc.quantityServings;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -38924,8 +38924,8 @@ async function __runProposalDishSelectionSelect(ctx: MutationCtx, { docId, propo
     if (!(((__rel_proposal != null) && (((__rel_proposal.status === "draft") || (__rel_proposal.status === "sent")) || (__rel_proposal.status === "viewed"))))) throw new Error("Guard 2 failed");
     if (!(((__rel_menu != null) && (__rel_menu.status === "published")))) throw new Error("Guard 3 failed");
     if (!(((__rel_dish != null) && (__rel_dish.status === "active")))) throw new Error("Guard 4 failed");
-    if (!((proposalId === doc.proposalId))) throw new Error("Select proposalId must match the seeded proposal reference");
-    if (!((quantityServings > 0))) throw new Error("Selection servings must be positive");
+    if (!((proposalId === doc.proposalId))) throw new Error("This selection is for a different proposal. Use the proposal already on this selection.");
+    if (!((quantityServings > 0))) throw new Error("The number of servings has to be more than zero");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -39017,8 +39017,8 @@ export const ProposalDishSelection_createViaSelect = mutation({
     if (!(((__rel_proposal != null) && (((__rel_proposal.status === "draft") || (__rel_proposal.status === "sent")) || (__rel_proposal.status === "viewed"))))) throw new Error("Guard 2 failed");
     if (!(((__rel_menu != null) && (__rel_menu.status === "published")))) throw new Error("Guard 3 failed");
     if (!(((__rel_dish != null) && (__rel_dish.status === "active")))) throw new Error("Guard 4 failed");
-    if (!((proposalId === __draft.proposalId))) throw new Error("Select proposalId must match the seeded proposal reference");
-    if (!((quantityServings > 0))) throw new Error("Selection servings must be positive");
+    if (!((proposalId === __draft.proposalId))) throw new Error("This selection is for a different proposal. Use the proposal already on this selection.");
+    if (!((quantityServings > 0))) throw new Error("The number of servings has to be more than zero");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -39058,9 +39058,9 @@ async function __runProposalEnhancementOffer(ctx: MutationCtx, { docId, proposal
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_proposal != null) && (__rel_proposal.status === "draft")))) throw new Error("Guard 2 failed");
-    if (!((proposalId === doc.proposalId))) throw new Error("Offer proposalId must match the seeded proposal reference");
-    if (!((((name).trim()).length > 0))) throw new Error("Enhancement name is required");
-    if (!((price >= 0))) throw new Error("Enhancement price cannot be negative");
+    if (!((proposalId === doc.proposalId))) throw new Error("This enhancement is for a different proposal. Use the proposal already on this enhancement.");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this enhancement a name");
+    if (!((price >= 0))) throw new Error("This enhancement's price can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -39140,9 +39140,9 @@ export const ProposalEnhancement_createViaOffer = mutation({
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_proposal != null) && (__rel_proposal.status === "draft")))) throw new Error("Guard 2 failed");
-    if (!((proposalId === __draft.proposalId))) throw new Error("Offer proposalId must match the seeded proposal reference");
-    if (!((((name).trim()).length > 0))) throw new Error("Enhancement name is required");
-    if (!((price >= 0))) throw new Error("Enhancement price cannot be negative");
+    if (!((proposalId === __draft.proposalId))) throw new Error("This enhancement is for a different proposal. Use the proposal already on this enhancement.");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this enhancement a name");
+    if (!((price >= 0))) throw new Error("This enhancement's price can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -39181,8 +39181,8 @@ async function __runProposalEnhancementRevise(ctx: MutationCtx, { docId, name, p
     if (!((doc.removedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_proposal != null) && (__rel_proposal.status === "draft")))) throw new Error("Guard 3 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Enhancement name is required");
-    if (!((price >= 0))) throw new Error("Enhancement price cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this enhancement a name");
+    if (!((price >= 0))) throw new Error("This enhancement's price can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -39290,10 +39290,10 @@ async function __runProposalLineItemAddLine(ctx: MutationCtx, { docId, proposalI
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_proposal != null) && (__rel_proposal.status === "draft")))) throw new Error("Guard 2 failed");
-    if (!((proposalId === doc.proposalId))) throw new Error("Add line proposalId must match the seeded proposal reference");
-    if (!((((description).trim()).length > 0))) throw new Error("Line description is required");
-    if (!(((unitPrice >= 0) && (amount >= 0)))) throw new Error("Line money cannot be negative");
-    if (!(((quantity == null) || (quantity >= 0)))) throw new Error("Line quantity cannot be negative");
+    if (!((proposalId === doc.proposalId))) throw new Error("This line is for a different proposal. Use the proposal already on this line.");
+    if (!((((description).trim()).length > 0))) throw new Error("Give this line a description");
+    if (!(((unitPrice >= 0) && (amount >= 0)))) throw new Error("This line's price can't be negative. Use zero or more.");
+    if (!(((quantity == null) || (quantity >= 0)))) throw new Error("This line's quantity can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -39397,10 +39397,10 @@ export const ProposalLineItem_createViaAddLine = mutation({
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_proposal != null) && (__rel_proposal.status === "draft")))) throw new Error("Guard 2 failed");
-    if (!((proposalId === __draft.proposalId))) throw new Error("Add line proposalId must match the seeded proposal reference");
-    if (!((((description).trim()).length > 0))) throw new Error("Line description is required");
-    if (!(((unitPrice >= 0) && (amount >= 0)))) throw new Error("Line money cannot be negative");
-    if (!(((quantity == null) || (quantity >= 0)))) throw new Error("Line quantity cannot be negative");
+    if (!((proposalId === __draft.proposalId))) throw new Error("This line is for a different proposal. Use the proposal already on this line.");
+    if (!((((description).trim()).length > 0))) throw new Error("Give this line a description");
+    if (!(((unitPrice >= 0) && (amount >= 0)))) throw new Error("This line's price can't be negative. Use zero or more.");
+    if (!(((quantity == null) || (quantity >= 0)))) throw new Error("This line's quantity can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -39494,9 +39494,9 @@ async function __runProposalLineItemReviseLine(ctx: MutationCtx, { docId, descri
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_proposal != null) && (__rel_proposal.status === "draft")))) throw new Error("Guard 2 failed");
-    if (!((((description).trim()).length > 0))) throw new Error("Line description is required");
-    if (!(((unitPrice >= 0) && (amount >= 0)))) throw new Error("Line money cannot be negative");
-    if (!(((quantity == null) || (quantity >= 0)))) throw new Error("Line quantity cannot be negative");
+    if (!((((description).trim()).length > 0))) throw new Error("Give this line a description");
+    if (!(((unitPrice >= 0) && (amount >= 0)))) throw new Error("This line's price can't be negative. Use zero or more.");
+    if (!(((quantity == null) || (quantity >= 0)))) throw new Error("This line's quantity can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -39563,7 +39563,7 @@ async function __runProposalRevisionCapture(ctx: MutationCtx, { docId, proposalI
     if (!((doc.capturedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((snapshot).trim()).length > 0))) throw new Error("Snapshot payload is required");
+    if (!((((snapshot).trim()).length > 0))) throw new Error("Couldn't save what the proposal looked like for this revision");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -39643,7 +39643,7 @@ export const ProposalRevision_createViaCapture = mutation({
     if (!((__draft.capturedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((snapshot).trim()).length > 0))) throw new Error("Snapshot payload is required");
+    if (!((((snapshot).trim()).length > 0))) throw new Error("Couldn't save what the proposal looked like for this revision");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -39681,7 +39681,7 @@ async function __runProposalTemplateArchive(ctx: MutationCtx, { docId, reason, v
     if (!((doc.definedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Archive reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give a reason for archiving this template");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -39745,7 +39745,7 @@ async function __runProposalTemplateDefine(ctx: MutationCtx, { docId, name, desc
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Template name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this template a name");
     if (!(((defaultTaxRate == null) || ((defaultTaxRate >= 0) && (defaultTaxRate <= 1))))) throw new Error("Tax rate must be between 0 and 100%");
     if (!(((defaultServiceChargePercent == null) || ((defaultServiceChargePercent >= 0) && (defaultServiceChargePercent <= 1))))) throw new Error("Service charge must be between 0 and 100%");
     if (!(((validityDays == null) || ((validityDays >= 1) && (validityDays <= 365))))) throw new Error("Validity days must be between 1 and 365");
@@ -39841,7 +39841,7 @@ export const ProposalTemplate_createViaDefine = mutation({
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Template name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this template a name");
     if (!(((defaultTaxRate == null) || ((defaultTaxRate >= 0) && (defaultTaxRate <= 1))))) throw new Error("Tax rate must be between 0 and 100%");
     if (!(((defaultServiceChargePercent == null) || ((defaultServiceChargePercent >= 0) && (defaultServiceChargePercent <= 1))))) throw new Error("Service charge must be between 0 and 100%");
     if (!(((validityDays == null) || ((validityDays >= 1) && (validityDays <= 365))))) throw new Error("Validity days must be between 1 and 365");
@@ -39948,7 +39948,7 @@ async function __runProposalTemplateRevise(ctx: MutationCtx, { docId, name, desc
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Template name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this template a name");
     if (!(((defaultTaxRate == null) || ((defaultTaxRate >= 0) && (defaultTaxRate <= 1))))) throw new Error("Tax rate must be between 0 and 100%");
     if (!(((defaultServiceChargePercent == null) || ((defaultServiceChargePercent >= 0) && (defaultServiceChargePercent <= 1))))) throw new Error("Service charge must be between 0 and 100%");
     if (!(((validityDays == null) || ((validityDays >= 1) && (validityDays <= 365))))) throw new Error("Validity days must be between 1 and 365");
@@ -40070,7 +40070,7 @@ async function __runPurchaseNeedCancel(ctx: MutationCtx, { docId, reason, versio
     if (!(((doc.status === "open") || (doc.status === "ordered")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "inventoryManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Cancellation reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're cancelling this need.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -40153,7 +40153,7 @@ async function __runPurchaseNeedCreate(ctx: MutationCtx, args: any) {
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change purchase needs");
     if (!(((args.openedAt == null) || ((args.eventId === args.eventId) && (args.ingredientDemandId === args.ingredientDemandId))))) throw new Error("Guard 0 failed");
     if (!((args.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((args.requiredQuantity > 0))) throw new Error("Required quantity must be positive");
+    if (!((args.requiredQuantity > 0))) throw new Error("The amount needed has to be more than zero.");
     const _id = await ctx.db.insert("purchaseNeeds", doc as any);
     const payload: Record<string, any> = { _id, id: _id, ...doc, result: { _id, id: _id, ...doc }, purchaseNeedId: _id, tenantId: doc.tenantId, eventId: doc.eventId, ingredientDemandId: doc.ingredientDemandId, ingredientId: doc.ingredientId, preferredVendorId: doc.preferredVendorId, requiredQuantity: doc.requiredQuantity, unit: doc.unit, purchasingWeekStart: doc.purchasingWeekStart, status: "open", _subject: { entity: "PurchaseNeed", command: "create", id: _id } };
     const __manifestEvent0 = { type: "PurchaseNeedOpened", entity: "PurchaseNeed", entityId: _id, payload: { purchaseNeedId: _id, tenantId: doc.tenantId, eventId: doc.eventId, ingredientDemandId: doc.ingredientDemandId, ingredientId: doc.ingredientId, preferredVendorId: doc.preferredVendorId, requiredQuantity: doc.requiredQuantity, unit: doc.unit, purchasingWeekStart: doc.purchasingWeekStart, status: "open" }, createdAt: Date.now() };
@@ -40521,7 +40521,7 @@ async function __runPurchaseNeedReviseRequired(ctx: MutationCtx, { docId, requir
     if (!((((doc.status === "open") || (doc.status === "ordered")) || (doc.status === "fulfilled")))) throw new Error("Guard 0 failed");
     if (!((doc.openedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((requiredQuantity >= 0))) throw new Error("Required quantity cannot be negative");
+    if (!((requiredQuantity >= 0))) throw new Error("The amount needed can't be negative. Use zero or more.");
     const incomingUnit = ((unit != null) ? unit : doc.unit);
     const sourceMass = ((incomingUnit === "gram") ? 1 : ((incomingUnit === "kilogram") ? 1000 : ((incomingUnit === "ounce") ? 28.349523125 : ((incomingUnit === "pound") ? 453.59237 : 0))));
     const sourceVolume = ((incomingUnit === "milliliter") ? 1 : ((incomingUnit === "liter") ? 1000 : ((incomingUnit === "teaspoon") ? 4.92892159375 : ((incomingUnit === "tablespoon") ? 14.78676478125 : ((incomingUnit === "cup") ? 236.5882365 : ((incomingUnit === "pint") ? 473.176473 : ((incomingUnit === "quart") ? 946.352946 : ((incomingUnit === "gallon") ? 3785.411784 : 0))))))));
@@ -40651,8 +40651,8 @@ async function __runPushSubscriptionRegister(ctx: MutationCtx, { docId, endpoint
     if (!((user.id != null))) throw new Error("Guard 0 failed");
     if (!((user.personId != null))) throw new Error("Guard 1 failed");
     if (!((doc.authSubjectId == null))) throw new Error("Guard 2 failed");
-    if (!((((endpoint).trim()).length > 0))) throw new Error("Endpoint is required");
-    if (!(((((p256dh).trim()).length > 0) && (((auth).trim()).length > 0)))) throw new Error("Push keys are required");
+    if (!((((endpoint).trim()).length > 0))) throw new Error("This device is missing its push address. Try turning notifications on again.");
+    if (!(((((p256dh).trim()).length > 0) && (((auth).trim()).length > 0)))) throw new Error("This device is missing its notification keys. Try turning notifications on again.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -40728,8 +40728,8 @@ export const PushSubscription_createViaRegister = mutation({
     if (!((user.id != null))) throw new Error("Guard 0 failed");
     if (!((user.personId != null))) throw new Error("Guard 1 failed");
     if (!((__draft.authSubjectId == null))) throw new Error("Guard 2 failed");
-    if (!((((endpoint).trim()).length > 0))) throw new Error("Endpoint is required");
-    if (!(((((p256dh).trim()).length > 0) && (((auth).trim()).length > 0)))) throw new Error("Push keys are required");
+    if (!((((endpoint).trim()).length > 0))) throw new Error("This device is missing its push address. Try turning notifications on again.");
+    if (!(((((p256dh).trim()).length > 0) && (((auth).trim()).length > 0)))) throw new Error("This device is missing its notification keys. Try turning notifications on again.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -40882,10 +40882,10 @@ async function __runQualificationGrant(ctx: MutationCtx, { docId, personId, name
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 3 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 4 failed");
     if (!((personId === doc.personId))) throw new Error("This qualification is for a different person. Pick the person already on this qualification.");
-    if (!((((name).trim()).length > 0))) throw new Error("Qualification name is required");
-    if (!((((certificationType).trim()).length > 0))) throw new Error("Certification type is required");
-    if (!((((issuingBody).trim()).length > 0))) throw new Error("Issuing body is required");
-    if (!(((expiresAt == null) || (expiresAt > issuedAt)))) throw new Error("Qualification expiry must be after issued date");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this certification a name.");
+    if (!((((certificationType).trim()).length > 0))) throw new Error("Pick a certification type.");
+    if (!((((issuingBody).trim()).length > 0))) throw new Error("Say who issued this certification.");
+    if (!(((expiresAt == null) || (expiresAt > issuedAt)))) throw new Error("This certification's expiry has to be after its issue date.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -40982,10 +40982,10 @@ export const Qualification_createViaGrant = mutation({
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 3 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 4 failed");
     if (!((personId === __draft.personId))) throw new Error("This qualification is for a different person. Pick the person already on this qualification.");
-    if (!((((name).trim()).length > 0))) throw new Error("Qualification name is required");
-    if (!((((certificationType).trim()).length > 0))) throw new Error("Certification type is required");
-    if (!((((issuingBody).trim()).length > 0))) throw new Error("Issuing body is required");
-    if (!(((expiresAt == null) || (expiresAt > issuedAt)))) throw new Error("Qualification expiry must be after issued date");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this certification a name.");
+    if (!((((certificationType).trim()).length > 0))) throw new Error("Pick a certification type.");
+    if (!((((issuingBody).trim()).length > 0))) throw new Error("Say who issued this certification.");
+    if (!(((expiresAt == null) || (expiresAt > issuedAt)))) throw new Error("This certification's expiry has to be after its issue date.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -41160,9 +41160,9 @@ async function __runQualityCheckOpen(ctx: MutationCtx, { docId, prepTaskId, prod
     if (!((doc.openedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((((prepTaskId != null) || (productionBatchId != null)) || (doc.prepTaskId != null)) || (doc.productionBatchId != null)))) throw new Error("Quality check must reference a PrepTask or ProductionBatch");
-    if (!((((prepTaskId == null) || (doc.prepTaskId == null)) || (prepTaskId === doc.prepTaskId)))) throw new Error("Open prepTaskId must match the seeded prep task reference when provided");
-    if (!((((productionBatchId == null) || (doc.productionBatchId == null)) || (productionBatchId === doc.productionBatchId)))) throw new Error("Open productionBatchId must match the seeded batch reference when provided");
+    if (!(((((prepTaskId != null) || (productionBatchId != null)) || (doc.prepTaskId != null)) || (doc.productionBatchId != null)))) throw new Error("Link this quality check to a prep task or a production batch.");
+    if (!((((prepTaskId == null) || (doc.prepTaskId == null)) || (prepTaskId === doc.prepTaskId)))) throw new Error("This quality check is for a different prep task. Pick the prep task already on this check, or leave it blank.");
+    if (!((((productionBatchId == null) || (doc.productionBatchId == null)) || (productionBatchId === doc.productionBatchId)))) throw new Error("This quality check is for a different batch. Pick the batch already on this check, or leave it blank.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -41234,9 +41234,9 @@ export const QualityCheck_createViaOpen = mutation({
     if (!((__draft.openedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((((prepTaskId != null) || (productionBatchId != null)) || (__draft.prepTaskId != null)) || (__draft.productionBatchId != null)))) throw new Error("Quality check must reference a PrepTask or ProductionBatch");
-    if (!((((prepTaskId == null) || (__draft.prepTaskId == null)) || (prepTaskId === __draft.prepTaskId)))) throw new Error("Open prepTaskId must match the seeded prep task reference when provided");
-    if (!((((productionBatchId == null) || (__draft.productionBatchId == null)) || (productionBatchId === __draft.productionBatchId)))) throw new Error("Open productionBatchId must match the seeded batch reference when provided");
+    if (!(((((prepTaskId != null) || (productionBatchId != null)) || (__draft.prepTaskId != null)) || (__draft.productionBatchId != null)))) throw new Error("Link this quality check to a prep task or a production batch.");
+    if (!((((prepTaskId == null) || (__draft.prepTaskId == null)) || (prepTaskId === __draft.prepTaskId)))) throw new Error("This quality check is for a different prep task. Pick the prep task already on this check, or leave it blank.");
+    if (!((((productionBatchId == null) || (__draft.productionBatchId == null)) || (productionBatchId === __draft.productionBatchId)))) throw new Error("This quality check is for a different batch. Pick the batch already on this check, or leave it blank.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -41484,10 +41484,10 @@ async function __runQuoteSubmissionCreate(ctx: MutationCtx, args: any) {
     if (!(true)) throw new Error("Anyone may send a quote request");
     if (!((args.submittedAt == null))) throw new Error("Guard 0 failed");
     if (!((args.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((args.dedupKey).trim()).length > 0))) throw new Error("Deduplication key is required");
-    if (!((((args.clientName).trim()).length > 0))) throw new Error("Client name is required");
-    if (!((((args.email).trim()).length > 0))) throw new Error("Email address is required");
-    if (!((args.guestCount > 0))) throw new Error("Guest count must be positive");
+    if (!((((args.dedupKey).trim()).length > 0))) throw new Error("This quote request is missing the ID used to catch duplicates");
+    if (!((((args.clientName).trim()).length > 0))) throw new Error("Give the client's name");
+    if (!((((args.email).trim()).length > 0))) throw new Error("Give an email address");
+    if (!((args.guestCount > 0))) throw new Error("The guest count has to be more than zero");
     const _id = await ctx.db.insert("quoteSubmissions", doc as any);
     const payload: Record<string, any> = { _id, id: _id, ...doc, result: { _id, id: _id, ...doc }, submissionId: _id, tenantId: doc.tenantId, dedupKey: doc.dedupKey, clientName: doc.clientName, email: doc.email, eventDate: doc.eventDate, guestCount: doc.guestCount, _subject: { entity: "QuoteSubmission", command: "create", id: _id } };
     const __manifestEvent0 = { type: "QuoteSubmitted", entity: "QuoteSubmission", entityId: _id, payload: { submissionId: _id, tenantId: doc.tenantId, dedupKey: doc.dedupKey, clientName: doc.clientName, email: doc.email, eventDate: doc.eventDate, guestCount: doc.guestCount }, createdAt: Date.now() };
@@ -41552,7 +41552,7 @@ async function __runQuoteSubmissionDismiss(ctx: MutationCtx, { docId, reason, ve
     if (!((doc.submittedAt != null))) throw new Error("Guard 0 failed");
     if (!(((doc.status === "pending") || (doc.status === "failed")))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Dismissal reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give a reason for dismissing this");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -41900,8 +41900,8 @@ async function __runRecurringAvailabilityDeclare(ctx: MutationCtx, { docId, pers
     if (!((user.id != null))) throw new Error("Guard 3 failed");
     if (!((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     if (!((personId === doc.personId))) throw new Error("This availability is for a different person. Pick the person already on this availability.");
-    if (!(((dayOfWeek >= 0) && (dayOfWeek <= 6)))) throw new Error("Day of week must be 0 (Sunday) through 6 (Saturday)");
-    if (!((((startMinute >= 0) && (endMinute <= 1440)) && (endMinute > startMinute)))) throw new Error("Time band must fall within the day and end after it starts");
+    if (!(((dayOfWeek >= 0) && (dayOfWeek <= 6)))) throw new Error("Pick a day 0 through 6, Sunday through Saturday.");
+    if (!((((startMinute >= 0) && (endMinute <= 1440)) && (endMinute > startMinute)))) throw new Error("Pick a start and end time within the day, with the end after the start.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -41985,8 +41985,8 @@ export const RecurringAvailability_createViaDeclare = mutation({
     if (!((user.id != null))) throw new Error("Guard 3 failed");
     if (!((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     if (!((personId === __draft.personId))) throw new Error("This availability is for a different person. Pick the person already on this availability.");
-    if (!(((dayOfWeek >= 0) && (dayOfWeek <= 6)))) throw new Error("Day of week must be 0 (Sunday) through 6 (Saturday)");
-    if (!((((startMinute >= 0) && (endMinute <= 1440)) && (endMinute > startMinute)))) throw new Error("Time band must fall within the day and end after it starts");
+    if (!(((dayOfWeek >= 0) && (dayOfWeek <= 6)))) throw new Error("Pick a day 0 through 6, Sunday through Saturday.");
+    if (!((((startMinute >= 0) && (endMinute <= 1440)) && (endMinute > startMinute)))) throw new Error("Pick a start and end time within the day, with the end after the start.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -42149,7 +42149,7 @@ async function __runReferralSourceDeactivate(ctx: MutationCtx, { docId, reason, 
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Deactivation reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Give a reason for deactivating this");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -42211,9 +42211,9 @@ async function __runReferralSourceRegister(ctx: MutationCtx, { docId, name, code
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Sales managers may change referral sources");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Referral source name is required");
-    if (!((((code).trim()).length > 0))) throw new Error("Referral source code is required");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Display order cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this referral source a name");
+    if (!((((code).trim()).length > 0))) throw new Error("Give this referral source a code");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("The display order can't be negative. Use zero or more.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -42301,9 +42301,9 @@ export const ReferralSource_createViaRegister = mutation({
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Sales managers may change referral sources");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Referral source name is required");
-    if (!((((code).trim()).length > 0))) throw new Error("Referral source code is required");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Display order cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this referral source a name");
+    if (!((((code).trim()).length > 0))) throw new Error("Give this referral source a code");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("The display order can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -42339,8 +42339,8 @@ async function __runReferralSourceReviseDetails(ctx: MutationCtx, { docId, name,
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Referral source name is required");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Display order cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this referral source a name");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("The display order can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -42816,7 +42816,7 @@ async function __runReviewFlagMarkResolved(ctx: MutationCtx, { docId, resolution
     if (!((doc.status === "open"))) throw new Error("Guard 0 failed");
     if (!((doc.raisedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((resolution).trim()).length > 0))) throw new Error("Record the decision that settles the flag");
+    if (!((((resolution).trim()).length > 0))) throw new Error("Say what was decided to settle this flag.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -42883,7 +42883,7 @@ async function __runReviewFlagRaise(ctx: MutationCtx, { docId, eventId, targetKi
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_event != null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((eventId === doc.eventId))) throw new Error("Raise eventId must match the seeded event reference");
+    if (!((eventId === doc.eventId))) throw new Error("This flag is for a different event. Pick the event already on this flag.");
     if (!((((question).trim()).length > 0))) throw new Error("Say what needs a decision");
     {
       const __cur = doc.status;
@@ -42980,7 +42980,7 @@ export const ReviewFlag_createViaRaise = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_event != null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((eventId === __draft.eventId))) throw new Error("Raise eventId must match the seeded event reference");
+    if (!((eventId === __draft.eventId))) throw new Error("This flag is for a different event. Pick the event already on this flag.");
     if (!((((question).trim()).length > 0))) throw new Error("Say what needs a decision");
     const doc: Record<string, any> = {
       ...__draft,
@@ -43122,7 +43122,7 @@ async function __runRoleScorecardArchive(ctx: MutationCtx, { docId, reason, vers
     if (!((doc.definedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Archive reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're archiving this scorecard.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -43186,7 +43186,7 @@ async function __runRoleScorecardDefine(ctx: MutationCtx, { docId, role, title, 
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((title).trim()).length > 0))) throw new Error("Scorecard title is required");
+    if (!((((title).trim()).length > 0))) throw new Error("Give this scorecard a title.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -43262,7 +43262,7 @@ export const RoleScorecard_createViaDefine = mutation({
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((title).trim()).length > 0))) throw new Error("Scorecard title is required");
+    if (!((((title).trim()).length > 0))) throw new Error("Give this scorecard a title.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -43473,8 +43473,8 @@ async function __runSavedReportDefinitionCreateDefinition(ctx: MutationCtx, { do
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.personId != null))) throw new Error("Guard 3 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Report name is required");
-    if (!((((chartType).trim()).length > 0))) throw new Error("Chart type is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this report a name.");
+    if (!((((chartType).trim()).length > 0))) throw new Error("Pick a chart type.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -43556,8 +43556,8 @@ export const SavedReportDefinition_createViaCreateDefinition = mutation({
     if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.personId != null))) throw new Error("Guard 3 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Report name is required");
-    if (!((((chartType).trim()).length > 0))) throw new Error("Chart type is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this report a name.");
+    if (!((((chartType).trim()).length > 0))) throw new Error("Pick a chart type.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -43596,7 +43596,7 @@ async function __runSavedReportDefinitionRename(ctx: MutationCtx, { docId, name,
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
     if (!(((doc.ownerId === user.personId) || checkRole(user, "manageAccess")))) throw new Error("Guard 4 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Report name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this report a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -43710,7 +43710,7 @@ async function __runSavedReportDefinitionUpdateDefinition(ctx: MutationCtx, { do
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
     if (!(((doc.ownerId === user.personId) || checkRole(user, "manageAccess")))) throw new Error("Guard 4 failed");
-    if (!(((chartType == null) || (((chartType).trim()).length > 0)))) throw new Error("Chart type cannot be blank");
+    if (!(((chartType == null) || (((chartType).trim()).length > 0)))) throw new Error("Pick a chart type.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -43824,7 +43824,7 @@ async function __runServiceStyleDeactivate(ctx: MutationCtx, { docId, reason, ve
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Deactivation reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're deactivating this service style.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -43886,9 +43886,9 @@ async function __runServiceStyleRegister(ctx: MutationCtx, { docId, name, code, 
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change service styles");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Service style name is required");
-    if (!((((code).trim()).length > 0))) throw new Error("Service style code is required");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Display order cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this service style a name.");
+    if (!((((code).trim()).length > 0))) throw new Error("Give this service style a code.");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Display order can't be negative. Use zero or more.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -43976,9 +43976,9 @@ export const ServiceStyle_createViaRegister = mutation({
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change service styles");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Service style name is required");
-    if (!((((code).trim()).length > 0))) throw new Error("Service style code is required");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Display order cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this service style a name.");
+    if (!((((code).trim()).length > 0))) throw new Error("Give this service style a code.");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Display order can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -44014,8 +44014,8 @@ async function __runServiceStyleReviseDetails(ctx: MutationCtx, { docId, name, d
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Service style name is required");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Display order cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this service style a name.");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Display order can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -44070,7 +44070,7 @@ async function __runServiceStyleKitItemAdd(ctx: MutationCtx, { docId, serviceSty
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_serviceStyle != null) && (__rel_serviceStyle.deletedAt == null)))) throw new Error("Guard 2 failed");
-    if (!((((description).trim()).length > 0))) throw new Error("Kit line description is required");
+    if (!((((description).trim()).length > 0))) throw new Error("Give this kit line a description.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -44161,7 +44161,7 @@ export const ServiceStyleKitItem_createViaAdd = mutation({
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_serviceStyle != null) && (__rel_serviceStyle.deletedAt == null)))) throw new Error("Guard 2 failed");
-    if (!((((description).trim()).length > 0))) throw new Error("Kit line description is required");
+    if (!((((description).trim()).length > 0))) throw new Error("Give this kit line a description.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -44322,7 +44322,7 @@ async function __runServiceStyleKitItemRevise(ctx: MutationCtx, { docId, descrip
     if (!(((checkRole(user, "eventManageAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event managers, logistics staff and managers may change service style kits");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((description).trim()).length > 0))) throw new Error("Kit line description is required");
+    if (!((((description).trim()).length > 0))) throw new Error("Give this kit line a description.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -44510,11 +44510,11 @@ async function __runShiftApplyApprovedSwap(ctx: MutationCtx, { docId, version }:
     if (!((__rel_swapTargetPerson.authSubjectId != null))) throw new Error("Guard 6 failed");
     if (!(((doc.swapTargetQualificationId == null) || (((__rel_swapTargetQualification != null) && (__rel_swapTargetQualification.deletedAt == null)) && (__rel_swapTargetQualification.status === "active"))))) throw new Error("Guard 7 failed");
     if (!(((doc.swapTargetTrainingCompletionId == null) || (((__rel_swapTargetTrainingCompletion != null) && (__rel_swapTargetTrainingCompletion.deletedAt == null)) && (__rel_swapTargetTrainingCompletion.recordedAt != null))))) throw new Error("Guard 8 failed");
-    if (!((__rel_swapAuthorization.requesterPersonId === doc.personId))) throw new Error("Swap approval does not match the assigned staff member");
-    if (!((__rel_swapAuthorization.recipientPersonId === doc.swapTargetPersonId))) throw new Error("Swap approval does not match the recipient");
+    if (!((__rel_swapAuthorization.requesterPersonId === doc.personId))) throw new Error("This swap approval doesn't match the staff member assigned to this shift.");
+    if (!((__rel_swapAuthorization.recipientPersonId === doc.swapTargetPersonId))) throw new Error("This swap approval doesn't match the person receiving the shift.");
     if (!((__rel_swapAuthorization.sourceQualificationId === doc.requiredQualificationId))) throw new Error("The shift certification requirement changed after approval");
-    if (!((__rel_swapAuthorization.targetQualificationId === doc.swapTargetQualificationId))) throw new Error("Swap approval does not match the replacement certification");
-    if (!((__rel_swapAuthorization.targetTrainingCompletionId === doc.swapTargetTrainingCompletionId))) throw new Error("Swap approval does not match the recipient training proof");
+    if (!((__rel_swapAuthorization.targetQualificationId === doc.swapTargetQualificationId))) throw new Error("This swap approval doesn't match the new certification.");
+    if (!((__rel_swapAuthorization.targetTrainingCompletionId === doc.swapTargetTrainingCompletionId))) throw new Error("This swap approval doesn't match the new person's training.");
     const previousPersonId = doc.personId;
     const shiftSwapRequestId = doc.swapAuthorizationId;
     if (version !== undefined && (doc as any).version !== version) {
@@ -44573,7 +44573,7 @@ async function __runShiftCancel(ctx: MutationCtx, { docId, reason, version }: an
     if (!(((doc.status === "scheduled") || (doc.status === "started")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "workforceManageAccess") || (((doc.eventId != null) && checkRole(user, "workforceSelfAccess")) && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Cancellation reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're cancelling this shift.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -44768,7 +44768,7 @@ async function __runShiftPlanEventTiming(ctx: MutationCtx, { docId, startsAt, en
     if (!((doc.status === "scheduled"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((checkRole(user, "workforceManageAccess") || (((doc.eventId != null) && checkRole(user, "workforceSelfAccess")) && (checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))))) throw new Error("Guard 3 failed");
-    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("Shift end must be after its start");
+    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("This shift's end has to be after its start.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -44897,7 +44897,7 @@ async function __runShiftReschedule(ctx: MutationCtx, { docId, startsAt, endsAt,
     if (!((doc.status === "scheduled"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "workforceManageAccess") || (((doc.eventId != null) && checkRole(user, "workforceSelfAccess")) && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 2 failed");
-    if (!((endsAt > startsAt))) throw new Error("Shift end must be after its start");
+    if (!((endsAt > startsAt))) throw new Error("This shift's end has to be after its start.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -45033,14 +45033,14 @@ async function __runShiftSchedule(ctx: MutationCtx, { docId, personId, startsAt,
     if (!((personId === doc.personId))) throw new Error("This shift is for a different person. Pick the person already on this shift.");
     if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("This shift is for a different event. Pick the event already on this shift.");
     if (!((((eventId == null) && (doc.eventId == null)) || ((__rel_event != null) && (__rel_event.deletedAt == null))))) throw new Error("Select an event in this workspace");
-    if (!((endsAt > startsAt))) throw new Error("Shift end must be after its start");
-    if (!(((shiftTypeId == null) || (((__rel_shiftType != null) && (__rel_shiftType.deletedAt == null)) && (__rel_shiftType.status === "active"))))) throw new Error("Selected shift type must be active");
-    if (!(((((shiftTypeId == null) || (__rel_shiftType == null)) || (__rel_shiftType.requiredTrainingModuleId == null)) || (requiredTrainingCompletionId != null)))) throw new Error("This shift type requires completed training before scheduling");
-    if (!(((requiredTrainingCompletionId == null) || ((((__rel_requiredTrainingCompletion != null) && (__rel_requiredTrainingCompletion.deletedAt == null)) && (__rel_requiredTrainingCompletion.recordedAt != null)) && (__rel_requiredTrainingCompletion.personId === personId))))) throw new Error("Training completion must be recorded for the selected person");
-    if (!(((requiredTrainingCompletionId == null) || ((((__rel_shiftType != null) && (__rel_shiftType.requiredTrainingModuleId != null)) && (__rel_requiredTrainingCompletion != null)) && (__rel_requiredTrainingCompletion.trainingModuleId === __rel_shiftType.requiredTrainingModuleId))))) throw new Error("Training completion must match the module required by the shift type");
-    if (!(((requiredQualificationId == null) || ((__rel_requiredQualification != null) && (__rel_requiredQualification.personId === personId))))) throw new Error("Required certification must belong to the selected person");
-    if (!(((requiredQualificationId == null) || (((__rel_requiredQualification != null) && (__rel_requiredQualification.deletedAt == null)) && (__rel_requiredQualification.status === "active"))))) throw new Error("Required certification must be active");
-    if (!(((requiredQualificationId == null) || ((__rel_requiredQualification != null) && ((__rel_requiredQualification.expiresAt == null) || (__rel_requiredQualification.expiresAt >= endsAt)))))) throw new Error("Required certification must remain valid through the shift");
+    if (!((endsAt > startsAt))) throw new Error("This shift's end has to be after its start.");
+    if (!(((shiftTypeId == null) || (((__rel_shiftType != null) && (__rel_shiftType.deletedAt == null)) && (__rel_shiftType.status === "active"))))) throw new Error("Pick a shift type that's still active.");
+    if (!(((((shiftTypeId == null) || (__rel_shiftType == null)) || (__rel_shiftType.requiredTrainingModuleId == null)) || (requiredTrainingCompletionId != null)))) throw new Error("This shift type needs proof of training before you can schedule someone for it.");
+    if (!(((requiredTrainingCompletionId == null) || ((((__rel_requiredTrainingCompletion != null) && (__rel_requiredTrainingCompletion.deletedAt == null)) && (__rel_requiredTrainingCompletion.recordedAt != null)) && (__rel_requiredTrainingCompletion.personId === personId))))) throw new Error("This training needs to be on file for the selected person.");
+    if (!(((requiredTrainingCompletionId == null) || ((((__rel_shiftType != null) && (__rel_shiftType.requiredTrainingModuleId != null)) && (__rel_requiredTrainingCompletion != null)) && (__rel_requiredTrainingCompletion.trainingModuleId === __rel_shiftType.requiredTrainingModuleId))))) throw new Error("This training has to match what the shift type requires.");
+    if (!(((requiredQualificationId == null) || ((__rel_requiredQualification != null) && (__rel_requiredQualification.personId === personId))))) throw new Error("This certification has to belong to the selected person.");
+    if (!(((requiredQualificationId == null) || (((__rel_requiredQualification != null) && (__rel_requiredQualification.deletedAt == null)) && (__rel_requiredQualification.status === "active"))))) throw new Error("Pick a certification that's still active.");
+    if (!(((requiredQualificationId == null) || ((__rel_requiredQualification != null) && ((__rel_requiredQualification.expiresAt == null) || (__rel_requiredQualification.expiresAt >= endsAt)))))) throw new Error("Pick a certification that stays valid through the whole shift.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -45153,14 +45153,14 @@ export const Shift_createViaSchedule = mutation({
     if (!((personId === __draft.personId))) throw new Error("This shift is for a different person. Pick the person already on this shift.");
     if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("This shift is for a different event. Pick the event already on this shift.");
     if (!((((eventId == null) && (__draft.eventId == null)) || ((__rel_event != null) && (__rel_event.deletedAt == null))))) throw new Error("Select an event in this workspace");
-    if (!((endsAt > startsAt))) throw new Error("Shift end must be after its start");
-    if (!(((shiftTypeId == null) || (((__rel_shiftType != null) && (__rel_shiftType.deletedAt == null)) && (__rel_shiftType.status === "active"))))) throw new Error("Selected shift type must be active");
-    if (!(((((shiftTypeId == null) || (__rel_shiftType == null)) || (__rel_shiftType.requiredTrainingModuleId == null)) || (requiredTrainingCompletionId != null)))) throw new Error("This shift type requires completed training before scheduling");
-    if (!(((requiredTrainingCompletionId == null) || ((((__rel_requiredTrainingCompletion != null) && (__rel_requiredTrainingCompletion.deletedAt == null)) && (__rel_requiredTrainingCompletion.recordedAt != null)) && (__rel_requiredTrainingCompletion.personId === personId))))) throw new Error("Training completion must be recorded for the selected person");
-    if (!(((requiredTrainingCompletionId == null) || ((((__rel_shiftType != null) && (__rel_shiftType.requiredTrainingModuleId != null)) && (__rel_requiredTrainingCompletion != null)) && (__rel_requiredTrainingCompletion.trainingModuleId === __rel_shiftType.requiredTrainingModuleId))))) throw new Error("Training completion must match the module required by the shift type");
-    if (!(((requiredQualificationId == null) || ((__rel_requiredQualification != null) && (__rel_requiredQualification.personId === personId))))) throw new Error("Required certification must belong to the selected person");
-    if (!(((requiredQualificationId == null) || (((__rel_requiredQualification != null) && (__rel_requiredQualification.deletedAt == null)) && (__rel_requiredQualification.status === "active"))))) throw new Error("Required certification must be active");
-    if (!(((requiredQualificationId == null) || ((__rel_requiredQualification != null) && ((__rel_requiredQualification.expiresAt == null) || (__rel_requiredQualification.expiresAt >= endsAt)))))) throw new Error("Required certification must remain valid through the shift");
+    if (!((endsAt > startsAt))) throw new Error("This shift's end has to be after its start.");
+    if (!(((shiftTypeId == null) || (((__rel_shiftType != null) && (__rel_shiftType.deletedAt == null)) && (__rel_shiftType.status === "active"))))) throw new Error("Pick a shift type that's still active.");
+    if (!(((((shiftTypeId == null) || (__rel_shiftType == null)) || (__rel_shiftType.requiredTrainingModuleId == null)) || (requiredTrainingCompletionId != null)))) throw new Error("This shift type needs proof of training before you can schedule someone for it.");
+    if (!(((requiredTrainingCompletionId == null) || ((((__rel_requiredTrainingCompletion != null) && (__rel_requiredTrainingCompletion.deletedAt == null)) && (__rel_requiredTrainingCompletion.recordedAt != null)) && (__rel_requiredTrainingCompletion.personId === personId))))) throw new Error("This training needs to be on file for the selected person.");
+    if (!(((requiredTrainingCompletionId == null) || ((((__rel_shiftType != null) && (__rel_shiftType.requiredTrainingModuleId != null)) && (__rel_requiredTrainingCompletion != null)) && (__rel_requiredTrainingCompletion.trainingModuleId === __rel_shiftType.requiredTrainingModuleId))))) throw new Error("This training has to match what the shift type requires.");
+    if (!(((requiredQualificationId == null) || ((__rel_requiredQualification != null) && (__rel_requiredQualification.personId === personId))))) throw new Error("This certification has to belong to the selected person.");
+    if (!(((requiredQualificationId == null) || (((__rel_requiredQualification != null) && (__rel_requiredQualification.deletedAt == null)) && (__rel_requiredQualification.status === "active"))))) throw new Error("Pick a certification that's still active.");
+    if (!(((requiredQualificationId == null) || ((__rel_requiredQualification != null) && ((__rel_requiredQualification.expiresAt == null) || (__rel_requiredQualification.expiresAt >= endsAt)))))) throw new Error("Pick a certification that stays valid through the whole shift.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -45607,9 +45607,9 @@ async function __runShiftSwapRequestPropose(ctx: MutationCtx, { docId, shiftId, 
     if (!(((requesterPersonId === doc.requesterPersonId) && (__rel_shift.personId === requesterPersonId)))) throw new Error("Only the assigned staff member may propose this swap");
     if (!((recipientPersonId === doc.recipientPersonId))) throw new Error("This swap is for a different person. Pick the person already on this swap.");
     if (!((requesterPersonId !== recipientPersonId))) throw new Error("Choose another staff member for the swap");
-    if (!((shiftTypeId === __rel_shift.shiftTypeId))) throw new Error("Shift type must match the scheduled shift");
-    if (!((sourceQualificationId === __rel_shift.requiredQualificationId))) throw new Error("Source certification must match the scheduled shift");
-    if (!(((sourceQualificationId == null) || (__rel_sourceQualification.personId === requesterPersonId)))) throw new Error("Source certification must belong to the assigned staff member");
+    if (!((shiftTypeId === __rel_shift.shiftTypeId))) throw new Error("This swap's shift type has to match the scheduled shift.");
+    if (!((sourceQualificationId === __rel_shift.requiredQualificationId))) throw new Error("This certification has to match what the scheduled shift needs.");
+    if (!(((sourceQualificationId == null) || (__rel_sourceQualification.personId === requesterPersonId)))) throw new Error("This certification has to belong to the staff member assigned to this shift.");
     if (!(((sourceQualificationId == null) || (targetQualificationId != null)))) throw new Error("This person needs a current matching certification for the shift. Pick someone who already has it.");
     if (!(((targetQualificationId == null) || (__rel_targetQualification.personId === recipientPersonId)))) throw new Error("This certification is for a different person. Pick a certification that belongs to this person.");
     if (!(((sourceQualificationId == null) || ((__rel_targetQualification.name === __rel_sourceQualification.name) && (__rel_targetQualification.certificationType === __rel_sourceQualification.certificationType))))) throw new Error("This person's certification doesn't match what the shift needs. Pick someone with the same certification.");
@@ -45731,9 +45731,9 @@ export const ShiftSwapRequest_createViaPropose = mutation({
     if (!(((requesterPersonId === __draft.requesterPersonId) && (__rel_shift.personId === requesterPersonId)))) throw new Error("Only the assigned staff member may propose this swap");
     if (!((recipientPersonId === __draft.recipientPersonId))) throw new Error("This swap is for a different person. Pick the person already on this swap.");
     if (!((requesterPersonId !== recipientPersonId))) throw new Error("Choose another staff member for the swap");
-    if (!((shiftTypeId === __rel_shift.shiftTypeId))) throw new Error("Shift type must match the scheduled shift");
-    if (!((sourceQualificationId === __rel_shift.requiredQualificationId))) throw new Error("Source certification must match the scheduled shift");
-    if (!(((sourceQualificationId == null) || (__rel_sourceQualification.personId === requesterPersonId)))) throw new Error("Source certification must belong to the assigned staff member");
+    if (!((shiftTypeId === __rel_shift.shiftTypeId))) throw new Error("This swap's shift type has to match the scheduled shift.");
+    if (!((sourceQualificationId === __rel_shift.requiredQualificationId))) throw new Error("This certification has to match what the scheduled shift needs.");
+    if (!(((sourceQualificationId == null) || (__rel_sourceQualification.personId === requesterPersonId)))) throw new Error("This certification has to belong to the staff member assigned to this shift.");
     if (!(((sourceQualificationId == null) || (targetQualificationId != null)))) throw new Error("This person needs a current matching certification for the shift. Pick someone who already has it.");
     if (!(((targetQualificationId == null) || (__rel_targetQualification.personId === recipientPersonId)))) throw new Error("This certification is for a different person. Pick a certification that belongs to this person.");
     if (!(((sourceQualificationId == null) || ((__rel_targetQualification.name === __rel_sourceQualification.name) && (__rel_targetQualification.certificationType === __rel_sourceQualification.certificationType))))) throw new Error("This person's certification doesn't match what the shift needs. Pick someone with the same certification.");
@@ -45916,7 +45916,7 @@ async function __runShiftTypeDefine(ctx: MutationCtx, { docId, name, description
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
     if (!(((requiredTrainingModuleId == null) || (((__rel_requiredTrainingModule != null) && (__rel_requiredTrainingModule.status === "active")) && (__rel_requiredTrainingModule.deletedAt == null))))) throw new Error("Guard 3 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Shift type name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this shift type a name.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -46003,7 +46003,7 @@ export const ShiftType_createViaDefine = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
     if (!(((requiredTrainingModuleId == null) || (((__rel_requiredTrainingModule != null) && (__rel_requiredTrainingModule.status === "active")) && (__rel_requiredTrainingModule.deletedAt == null))))) throw new Error("Guard 3 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Shift type name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this shift type a name.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -46506,8 +46506,8 @@ async function __runStaffChatReadCursorOpen(ctx: MutationCtx, { docId, channelKe
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may mark chat channels read for themselves");
     if (!((user.id != null))) throw new Error("Guard 0 failed");
     if (!((doc.authSubjectId == null))) throw new Error("Guard 1 failed");
-    if (!((((channelKey).trim()).length > 0))) throw new Error("Channel is required");
-    if (!((readUpTo <= Date.now()))) throw new Error("Read position cannot be in the future");
+    if (!((((channelKey).trim()).length > 0))) throw new Error("Pick a channel.");
+    if (!((readUpTo <= Date.now()))) throw new Error("You can't mark a chat read before now.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -46572,8 +46572,8 @@ export const StaffChatReadCursor_createViaOpen = mutation({
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may mark chat channels read for themselves");
     if (!((user.id != null))) throw new Error("Guard 0 failed");
     if (!((__draft.authSubjectId == null))) throw new Error("Guard 1 failed");
-    if (!((((channelKey).trim()).length > 0))) throw new Error("Channel is required");
-    if (!((readUpTo <= Date.now()))) throw new Error("Read position cannot be in the future");
+    if (!((((channelKey).trim()).length > 0))) throw new Error("Pick a channel.");
+    if (!((readUpTo <= Date.now()))) throw new Error("You can't mark a chat read before now.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -46605,7 +46605,7 @@ async function __runStaffChatReadCursorTouch(ctx: MutationCtx, { docId, readUpTo
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may mark chat channels read for themselves");
     if (!((user.id != null))) throw new Error("Guard 0 failed");
     if (!((doc.authSubjectId === user.id))) throw new Error("Guard 1 failed");
-    if (!((readUpTo <= Date.now()))) throw new Error("Read position cannot be in the future");
+    if (!((readUpTo <= Date.now()))) throw new Error("You can't mark a chat read before now.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -46655,7 +46655,7 @@ async function __runStaffMessageEdit(ctx: MutationCtx, { docId, body, mentionedP
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((user.id != null))) throw new Error("Guard 1 failed");
     if (!(((user.personId != null) && (doc.senderPersonId === user.personId)))) throw new Error("Guard 2 failed");
-    if (!(((((body).trim()).length > 0) || (doc.attachmentCount > 0)))) throw new Error("Message text or a file is required");
+    if (!(((((body).trim()).length > 0) || (doc.attachmentCount > 0)))) throw new Error("Add message text or a file.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -46817,7 +46817,7 @@ async function __runStaffMessageSend(ctx: MutationCtx, { docId, recipientPersonI
     if (!(((doc.eventId == null) || (__rel_event != null)))) throw new Error("Guard 4 failed");
     if (!(((doc.recipientPersonId == null) || (__rel_recipient != null)))) throw new Error("Guard 5 failed");
     if (!((((recipientPersonId != null) || (eventId != null)) && ((recipientPersonId == null) || (eventId == null))))) throw new Error("Pick a teammate or an event channel, not both");
-    if (!((((body).trim()).length > 0))) throw new Error("Message text is required");
+    if (!((((body).trim()).length > 0))) throw new Error("Add message text.");
     if (!(((recipientPersonId == null) || (recipientPersonId !== user.personId)))) throw new Error("You cannot message yourself");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -46903,7 +46903,7 @@ export const StaffMessage_createViaSend = mutation({
     if (!(((__draft.eventId == null) || (__rel_event != null)))) throw new Error("Guard 4 failed");
     if (!(((__draft.recipientPersonId == null) || (__rel_recipient != null)))) throw new Error("Guard 5 failed");
     if (!((((recipientPersonId != null) || (eventId != null)) && ((recipientPersonId == null) || (eventId == null))))) throw new Error("Pick a teammate or an event channel, not both");
-    if (!((((body).trim()).length > 0))) throw new Error("Message text is required");
+    if (!((((body).trim()).length > 0))) throw new Error("Add message text.");
     if (!(((recipientPersonId == null) || (recipientPersonId !== user.personId)))) throw new Error("You cannot message yourself");
     const doc: Record<string, any> = {
       ...__draft,
@@ -46941,7 +46941,7 @@ async function __runStationDefine(ctx: MutationCtx, { docId, name, sortOrder, al
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change stations");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Station name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this station a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -47012,7 +47012,7 @@ export const Station_createViaDefine = mutation({
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change stations");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Station name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this station a name.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -47099,7 +47099,7 @@ async function __runStationRename(ctx: MutationCtx, { docId, name, sortOrder, al
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change stations");
     if (!((doc.definedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Station name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this station a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -47151,7 +47151,7 @@ async function __runStationRetire(ctx: MutationCtx, { docId, reason, version }: 
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change stations");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're retiring this station.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -47283,11 +47283,11 @@ async function __runStockCountLineFreeze(ctx: MutationCtx, { docId, stockCountSe
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((((__rel_session != null) && (__rel_session.status === "in_progress")) && (__rel_session.deletedAt == null)))) throw new Error("Guard 3 failed");
     if (!((((__rel_inventoryItem != null) && (__rel_inventoryItem.stockedAt != null)) && (__rel_inventoryItem.deletedAt == null)))) throw new Error("Guard 4 failed");
-    if (!((stockCountSessionId === doc.stockCountSessionId))) throw new Error("Count session must match the seeded session reference");
-    if (!((inventoryItemId === doc.inventoryItemId))) throw new Error("Stock line must match the seeded inventory reference");
-    if (!(((locationId === doc.locationId) && (locationId === __rel_inventoryItem.locationId)))) throw new Error("Count location must match the stock line location");
-    if (!(((ingredientId === doc.ingredientId) && (ingredientId === __rel_inventoryItem.ingredientId)))) throw new Error("Count ingredient must match the stock line ingredient");
-    if (!(((unit === doc.unit) && (unit === __rel_inventoryItem.unit)))) throw new Error("Count unit must match the stock line unit");
+    if (!((stockCountSessionId === doc.stockCountSessionId))) throw new Error("This line is for a different count session. Pick the session already on this line.");
+    if (!((inventoryItemId === doc.inventoryItemId))) throw new Error("This line is for a different stock item. Pick the stock item already on this line.");
+    if (!(((locationId === doc.locationId) && (locationId === __rel_inventoryItem.locationId)))) throw new Error("This line's location doesn't match its stock item's location.");
+    if (!(((ingredientId === doc.ingredientId) && (ingredientId === __rel_inventoryItem.ingredientId)))) throw new Error("This line's ingredient doesn't match its stock item's ingredient.");
+    if (!(((unit === doc.unit) && (unit === __rel_inventoryItem.unit)))) throw new Error("This line's unit doesn't match its stock item's unit.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -47377,11 +47377,11 @@ export const StockCountLine_createViaFreeze = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((((__rel_session != null) && (__rel_session.status === "in_progress")) && (__rel_session.deletedAt == null)))) throw new Error("Guard 3 failed");
     if (!((((__rel_inventoryItem != null) && (__rel_inventoryItem.stockedAt != null)) && (__rel_inventoryItem.deletedAt == null)))) throw new Error("Guard 4 failed");
-    if (!((stockCountSessionId === __draft.stockCountSessionId))) throw new Error("Count session must match the seeded session reference");
-    if (!((inventoryItemId === __draft.inventoryItemId))) throw new Error("Stock line must match the seeded inventory reference");
-    if (!(((locationId === __draft.locationId) && (locationId === __rel_inventoryItem.locationId)))) throw new Error("Count location must match the stock line location");
-    if (!(((ingredientId === __draft.ingredientId) && (ingredientId === __rel_inventoryItem.ingredientId)))) throw new Error("Count ingredient must match the stock line ingredient");
-    if (!(((unit === __draft.unit) && (unit === __rel_inventoryItem.unit)))) throw new Error("Count unit must match the stock line unit");
+    if (!((stockCountSessionId === __draft.stockCountSessionId))) throw new Error("This line is for a different count session. Pick the session already on this line.");
+    if (!((inventoryItemId === __draft.inventoryItemId))) throw new Error("This line is for a different stock item. Pick the stock item already on this line.");
+    if (!(((locationId === __draft.locationId) && (locationId === __rel_inventoryItem.locationId)))) throw new Error("This line's location doesn't match its stock item's location.");
+    if (!(((ingredientId === __draft.ingredientId) && (ingredientId === __rel_inventoryItem.ingredientId)))) throw new Error("This line's ingredient doesn't match its stock item's ingredient.");
+    if (!(((unit === __draft.unit) && (unit === __rel_inventoryItem.unit)))) throw new Error("This line's unit doesn't match its stock item's unit.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -47501,7 +47501,7 @@ async function __runStockCountLineRecordCount(ctx: MutationCtx, { docId, counted
     if (!((doc.frozenAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_session != null) && (__rel_session.status === "in_progress")))) throw new Error("Guard 3 failed");
-    if (!((countedQuantity >= 0))) throw new Error("Counted quantity cannot be negative");
+    if (!((countedQuantity >= 0))) throw new Error("The counted amount can't be negative. Use zero or more.");
     const varianceQuantity = (countedQuantity - doc.expectedQuantity);
     {
       const __cur = doc.status;
@@ -47571,7 +47571,7 @@ async function __runStockCountLineReviseCount(ctx: MutationCtx, { docId, counted
     if (!((doc.status === "counted"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_session != null) && (__rel_session.status === "in_progress")))) throw new Error("Guard 2 failed");
-    if (!((countedQuantity >= 0))) throw new Error("Counted quantity cannot be negative");
+    if (!((countedQuantity >= 0))) throw new Error("The counted amount can't be negative. Use zero or more.");
     const varianceQuantity = (countedQuantity - doc.expectedQuantity);
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -47691,10 +47691,10 @@ async function __runStockCountSessionStart(ctx: MutationCtx, { docId, label, loc
     if (!((doc.startedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "in_progress"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((label).trim()).length > 0))) throw new Error("Count session name is required");
+    if (!((((label).trim()).length > 0))) throw new Error("Give this count session a name.");
     if (!((((locationIds).trim()).length > 2))) throw new Error("Choose at least one storage location");
-    if (!((((locationNames).trim()).length > 0))) throw new Error("Count session locations are required");
-    if (!((lineCount >= 0))) throw new Error("Count line total cannot be negative");
+    if (!((((locationNames).trim()).length > 0))) throw new Error("Give this count session its location names.");
+    if (!((lineCount >= 0))) throw new Error("The line total can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -47771,10 +47771,10 @@ export const StockCountSession_createViaStart = mutation({
     if (!((__draft.startedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "in_progress"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((label).trim()).length > 0))) throw new Error("Count session name is required");
+    if (!((((label).trim()).length > 0))) throw new Error("Give this count session a name.");
     if (!((((locationIds).trim()).length > 2))) throw new Error("Choose at least one storage location");
-    if (!((((locationNames).trim()).length > 0))) throw new Error("Count session locations are required");
-    if (!((lineCount >= 0))) throw new Error("Count line total cannot be negative");
+    if (!((((locationNames).trim()).length > 0))) throw new Error("Give this count session its location names.");
+    if (!((lineCount >= 0))) throw new Error("The line total can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -47819,11 +47819,11 @@ async function __runStockTransferRecord(ctx: MutationCtx, { docId, sourceInvento
     if (!((destinationInventoryItemId === doc.destinationInventoryItemId))) throw new Error("This transfer is sending to a different stock item. Pick the stock item already on this transfer.");
     if (!((sourceInventoryItemId !== destinationInventoryItemId))) throw new Error("This transfer can't send to the same stock item it takes from. Pick a different send-to item.");
     if (!((ingredientId === __rel_sourceItem.ingredientId))) throw new Error("This transfer's ingredient doesn't match the send-from stock item. Pick the ingredient that stock item holds.");
-    if (!((__rel_sourceItem.ingredientId === __rel_destinationItem.ingredientId))) throw new Error("Source and destination must hold the same ingredient");
-    if (!((sourceLocationId === __rel_sourceItem.locationId))) throw new Error("Transfer sourceLocationId must match the source stock location");
-    if (!((destinationLocationId === __rel_destinationItem.locationId))) throw new Error("Transfer destinationLocationId must match the destination stock location");
-    if (!((sourceLocationId !== destinationLocationId))) throw new Error("Source and destination locations must differ");
-    if (!((__rel_sourceItem.unit === __rel_destinationItem.unit))) throw new Error("Source and destination stock lines must use the same unit");
+    if (!((__rel_sourceItem.ingredientId === __rel_destinationItem.ingredientId))) throw new Error("This transfer's source and destination have to hold the same ingredient.");
+    if (!((sourceLocationId === __rel_sourceItem.locationId))) throw new Error("This transfer's source location doesn't match the source stock item's location.");
+    if (!((destinationLocationId === __rel_destinationItem.locationId))) throw new Error("This transfer's destination location doesn't match the destination stock item's location.");
+    if (!((sourceLocationId !== destinationLocationId))) throw new Error("This transfer's source and destination locations have to be different.");
+    if (!((__rel_sourceItem.unit === __rel_destinationItem.unit))) throw new Error("This transfer's source and destination stock lines have to use the same unit.");
     if (!((quantity > 0))) throw new Error("This transfer's amount has to be more than zero. Enter how much to move.");
     if (!((__rel_sourceItem.quantityOnHand >= quantity))) throw new Error("This transfer can't move more than the send-from stock has on hand. Enter a smaller amount.");
     if (version !== undefined && (doc as any).version !== version) {
@@ -47928,11 +47928,11 @@ export const StockTransfer_createViaRecord = mutation({
     if (!((destinationInventoryItemId === __draft.destinationInventoryItemId))) throw new Error("This transfer is sending to a different stock item. Pick the stock item already on this transfer.");
     if (!((sourceInventoryItemId !== destinationInventoryItemId))) throw new Error("This transfer can't send to the same stock item it takes from. Pick a different send-to item.");
     if (!((ingredientId === __rel_sourceItem.ingredientId))) throw new Error("This transfer's ingredient doesn't match the send-from stock item. Pick the ingredient that stock item holds.");
-    if (!((__rel_sourceItem.ingredientId === __rel_destinationItem.ingredientId))) throw new Error("Source and destination must hold the same ingredient");
-    if (!((sourceLocationId === __rel_sourceItem.locationId))) throw new Error("Transfer sourceLocationId must match the source stock location");
-    if (!((destinationLocationId === __rel_destinationItem.locationId))) throw new Error("Transfer destinationLocationId must match the destination stock location");
-    if (!((sourceLocationId !== destinationLocationId))) throw new Error("Source and destination locations must differ");
-    if (!((__rel_sourceItem.unit === __rel_destinationItem.unit))) throw new Error("Source and destination stock lines must use the same unit");
+    if (!((__rel_sourceItem.ingredientId === __rel_destinationItem.ingredientId))) throw new Error("This transfer's source and destination have to hold the same ingredient.");
+    if (!((sourceLocationId === __rel_sourceItem.locationId))) throw new Error("This transfer's source location doesn't match the source stock item's location.");
+    if (!((destinationLocationId === __rel_destinationItem.locationId))) throw new Error("This transfer's destination location doesn't match the destination stock item's location.");
+    if (!((sourceLocationId !== destinationLocationId))) throw new Error("This transfer's source and destination locations have to be different.");
+    if (!((__rel_sourceItem.unit === __rel_destinationItem.unit))) throw new Error("This transfer's source and destination stock lines have to use the same unit.");
     if (!((quantity > 0))) throw new Error("This transfer's amount has to be more than zero. Enter how much to move.");
     if (!((__rel_sourceItem.quantityOnHand >= quantity))) throw new Error("This transfer can't move more than the send-from stock has on hand. Enter a smaller amount.");
     const doc: Record<string, any> = {
@@ -48040,7 +48040,7 @@ async function __runStorageLocationDeactivate(ctx: MutationCtx, { docId, reason,
     if (!((doc.registeredAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(checkRole(user, "inventoryManageAccess"))) throw new Error("Guard 3 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Deactivation reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're deactivating this location.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -48102,7 +48102,7 @@ async function __runStorageLocationRegister(ctx: MutationCtx, { docId, name, loc
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change storage locations");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Storage location name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this storage location a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -48185,7 +48185,7 @@ export const StorageLocation_createViaRegister = mutation({
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change storage locations");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Storage location name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this storage location a name.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -48222,7 +48222,7 @@ async function __runStorageLocationReviseDetails(ctx: MutationCtx, { docId, name
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Storage location name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this storage location a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -48500,7 +48500,7 @@ async function __runTaxRateDefine(ctx: MutationCtx, { docId, name, percentage, a
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change tax rates");
     if (!((doc.configuredAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Tax rate name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this tax rate a name");
     if (!(((percentage > 0) && (percentage <= 100)))) throw new Error("Tax rate percentage must be greater than 0 and no more than 100");
     if (!(((appliesToFood || appliesToService) || appliesToRental))) throw new Error("Select at least one line-item category");
     if (version !== undefined && (doc as any).version !== version) {
@@ -48581,7 +48581,7 @@ export const TaxRate_createViaDefine = mutation({
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change tax rates");
     if (!((__draft.configuredAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Tax rate name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this tax rate a name");
     if (!(((percentage > 0) && (percentage <= 100)))) throw new Error("Tax rate percentage must be greater than 0 and no more than 100");
     if (!(((appliesToFood || appliesToService) || appliesToRental))) throw new Error("Select at least one line-item category");
     const doc: Record<string, any> = {
@@ -48619,7 +48619,7 @@ async function __runTaxRateRevise(ctx: MutationCtx, { docId, name, percentage, a
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change tax rates");
     if (!((doc.configuredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Tax rate name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this tax rate a name");
     if (!(((percentage > 0) && (percentage <= 100)))) throw new Error("Tax rate percentage must be greater than 0 and no more than 100");
     if (!(((appliesToFood || appliesToService) || appliesToRental))) throw new Error("Select at least one line-item category");
     if (version !== undefined && (doc as any).version !== version) {
@@ -49120,7 +49120,7 @@ async function __runTimeRecordClockOut(ctx: MutationCtx, { docId, breakMinutes, 
     if (!((doc.deletedAt == null))) throw new Error("Guard 3 failed");
     if (!((user.id != null))) throw new Error("Guard 4 failed");
     if (!((((doc.personId === user.personId) || ((user.personId == null) && (doc.personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 5 failed");
-    if (!(((breakMinutes == null) || (breakMinutes >= 0)))) throw new Error("Break minutes must be non-negative");
+    if (!(((breakMinutes == null) || (breakMinutes >= 0)))) throw new Error("Break minutes can't be negative. Use zero or more.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -49189,8 +49189,8 @@ async function __runTimeRecordCorrect(ctx: MutationCtx, { docId, clockInAt, cloc
     if (!((doc.clockOutAt != null))) throw new Error("Guard 2 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 3 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 4 failed");
-    if (!((clockOutAt >= clockInAt))) throw new Error("Corrected clock-out must be at or after clock-in");
-    if (!(((breakMinutes == null) || (breakMinutes >= 0)))) throw new Error("Break minutes must be non-negative");
+    if (!((clockOutAt >= clockInAt))) throw new Error("The corrected clock-out has to be at or after the clock-in.");
+    if (!(((breakMinutes == null) || (breakMinutes >= 0)))) throw new Error("Break minutes can't be negative. Use zero or more.");
     const previousClockInAt = doc.clockInAt;
     const previousClockOutAt = doc.clockOutAt;
     const previousBreakMinutes = doc.breakMinutes;
@@ -49262,10 +49262,10 @@ async function __runTrailerRegister(ctx: MutationCtx, { docId, make, model, regi
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change trailers");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((make).trim()).length > 0))) throw new Error("Trailer make is required");
-    if (!((((model).trim()).length > 0))) throw new Error("Trailer model is required");
-    if (!((((registration).trim()).length > 0))) throw new Error("Trailer registration is required");
-    if (!((payloadCapacityKg > 0))) throw new Error("Trailer payload capacity must be positive");
+    if (!((((make).trim()).length > 0))) throw new Error("Give this trailer a make.");
+    if (!((((model).trim()).length > 0))) throw new Error("Give this trailer a model.");
+    if (!((((registration).trim()).length > 0))) throw new Error("Give this trailer a registration.");
+    if (!((payloadCapacityKg > 0))) throw new Error("This trailer's payload capacity has to be more than zero.");
     {
       const __cur = doc.operationalStatus;
       if (__cur !== undefined) {
@@ -49360,10 +49360,10 @@ export const Trailer_createViaRegister = mutation({
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change trailers");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((make).trim()).length > 0))) throw new Error("Trailer make is required");
-    if (!((((model).trim()).length > 0))) throw new Error("Trailer model is required");
-    if (!((((registration).trim()).length > 0))) throw new Error("Trailer registration is required");
-    if (!((payloadCapacityKg > 0))) throw new Error("Trailer payload capacity must be positive");
+    if (!((((make).trim()).length > 0))) throw new Error("Give this trailer a make.");
+    if (!((((model).trim()).length > 0))) throw new Error("Give this trailer a model.");
+    if (!((((registration).trim()).length > 0))) throw new Error("Give this trailer a registration.");
+    if (!((payloadCapacityKg > 0))) throw new Error("This trailer's payload capacity has to be more than zero.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -49400,10 +49400,10 @@ async function __runTrailerReviseDetails(ctx: MutationCtx, { docId, make, model,
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change trailers");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((make).trim()).length > 0))) throw new Error("Trailer make is required");
-    if (!((((model).trim()).length > 0))) throw new Error("Trailer model is required");
-    if (!((((registration).trim()).length > 0))) throw new Error("Trailer registration is required");
-    if (!((payloadCapacityKg > 0))) throw new Error("Trailer payload capacity must be positive");
+    if (!((((make).trim()).length > 0))) throw new Error("Give this trailer a make.");
+    if (!((((model).trim()).length > 0))) throw new Error("Give this trailer a model.");
+    if (!((((registration).trim()).length > 0))) throw new Error("Give this trailer a registration.");
+    if (!((payloadCapacityKg > 0))) throw new Error("This trailer's payload capacity has to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -49457,9 +49457,9 @@ async function __runTrailerUpdateInsurance(ctx: MutationCtx, { docId, insuranceP
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change trailers");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((insuranceProvider).trim()).length > 0))) throw new Error("Insurance provider is required");
-    if (!((((insurancePolicyNumber).trim()).length > 0))) throw new Error("Insurance policy number is required");
-    if (!((insuranceExpiresAt > Date.now()))) throw new Error("Insurance expiry must be in the future");
+    if (!((((insuranceProvider).trim()).length > 0))) throw new Error("Give this trailer an insurance provider.");
+    if (!((((insurancePolicyNumber).trim()).length > 0))) throw new Error("Give this trailer an insurance policy number.");
+    if (!((insuranceExpiresAt > Date.now()))) throw new Error("This trailer's insurance expiry has to be a future date.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -49574,8 +49574,8 @@ async function __runTrailerUpdateRegistration(ctx: MutationCtx, { docId, registr
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change trailers");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((registrationNumber).trim()).length > 0))) throw new Error("Registration number is required");
-    if (!((registrationExpiresAt > Date.now()))) throw new Error("Registration expiry must be in the future");
+    if (!((((registrationNumber).trim()).length > 0))) throw new Error("Give this trailer a registration number.");
+    if (!((registrationExpiresAt > Date.now()))) throw new Error("This trailer's registration expiry has to be a future date.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -49633,10 +49633,10 @@ async function __runTrainingCompletionRecord(ctx: MutationCtx, { docId, personId
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 2 failed");
     if (!((((__rel_trainingModule != null) && (__rel_trainingModule.status === "active")) && (__rel_trainingModule.deletedAt == null)))) throw new Error("Guard 3 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 4 failed");
-    if (!((personId === doc.personId))) throw new Error("Completion person must match the selected staff member");
-    if (!((trainingModuleId === doc.trainingModuleId))) throw new Error("Completion module must match the selected training module");
-    if (!(((assessmentScore >= 0) && (assessmentScore <= 100)))) throw new Error("Assessment score must be between 0 and 100");
-    if (!((assessmentScore >= __rel_trainingModule.passingScore))) throw new Error("Assessment score must meet the module passing score");
+    if (!((personId === doc.personId))) throw new Error("This training completion is for a different person. Pick the staff member already on this training completion.");
+    if (!((trainingModuleId === doc.trainingModuleId))) throw new Error("This training completion is for a different module. Pick the training module already on this completion.");
+    if (!(((assessmentScore >= 0) && (assessmentScore <= 100)))) throw new Error("Give an assessment score between 0 and 100.");
+    if (!((assessmentScore >= __rel_trainingModule.passingScore))) throw new Error("This score needs to meet the training module's passing score.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -49720,10 +49720,10 @@ export const TrainingCompletion_createViaRecord = mutation({
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 2 failed");
     if (!((((__rel_trainingModule != null) && (__rel_trainingModule.status === "active")) && (__rel_trainingModule.deletedAt == null)))) throw new Error("Guard 3 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 4 failed");
-    if (!((personId === __draft.personId))) throw new Error("Completion person must match the selected staff member");
-    if (!((trainingModuleId === __draft.trainingModuleId))) throw new Error("Completion module must match the selected training module");
-    if (!(((assessmentScore >= 0) && (assessmentScore <= 100)))) throw new Error("Assessment score must be between 0 and 100");
-    if (!((assessmentScore >= __rel_trainingModule.passingScore))) throw new Error("Assessment score must meet the module passing score");
+    if (!((personId === __draft.personId))) throw new Error("This training completion is for a different person. Pick the staff member already on this training completion.");
+    if (!((trainingModuleId === __draft.trainingModuleId))) throw new Error("This training completion is for a different module. Pick the training module already on this completion.");
+    if (!(((assessmentScore >= 0) && (assessmentScore <= 100)))) throw new Error("Give an assessment score between 0 and 100.");
+    if (!((assessmentScore >= __rel_trainingModule.passingScore))) throw new Error("This score needs to meet the training module's passing score.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -49760,8 +49760,8 @@ async function __runTrainingModuleDefine(ctx: MutationCtx, { docId, name, catego
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Training module name is required");
-    if (!(((passingScore >= 0) && (passingScore <= 100)))) throw new Error("Passing score must be between 0 and 100");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this training module a name.");
+    if (!(((passingScore >= 0) && (passingScore <= 100)))) throw new Error("Set a passing score between 0 and 100.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -49850,8 +49850,8 @@ export const TrainingModule_createViaDefine = mutation({
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Training module name is required");
-    if (!(((passingScore >= 0) && (passingScore <= 100)))) throw new Error("Passing score must be between 0 and 100");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this training module a name.");
+    if (!(((passingScore >= 0) && (passingScore <= 100)))) throw new Error("Set a passing score between 0 and 100.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -50007,10 +50007,10 @@ async function __runVehicleRegister(ctx: MutationCtx, { docId, make, model, regi
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change vehicles");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((make).trim()).length > 0))) throw new Error("Vehicle make is required");
-    if (!((((model).trim()).length > 0))) throw new Error("Vehicle model is required");
-    if (!((((registration).trim()).length > 0))) throw new Error("Vehicle registration is required");
-    if (!((payloadCapacityKg > 0))) throw new Error("Vehicle payload capacity must be positive");
+    if (!((((make).trim()).length > 0))) throw new Error("Give this vehicle a make.");
+    if (!((((model).trim()).length > 0))) throw new Error("Give this vehicle a model.");
+    if (!((((registration).trim()).length > 0))) throw new Error("Give this vehicle a registration.");
+    if (!((payloadCapacityKg > 0))) throw new Error("This vehicle's payload capacity has to be more than zero.");
     {
       const __cur = doc.operationalStatus;
       if (__cur !== undefined) {
@@ -50109,10 +50109,10 @@ export const Vehicle_createViaRegister = mutation({
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change vehicles");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((make).trim()).length > 0))) throw new Error("Vehicle make is required");
-    if (!((((model).trim()).length > 0))) throw new Error("Vehicle model is required");
-    if (!((((registration).trim()).length > 0))) throw new Error("Vehicle registration is required");
-    if (!((payloadCapacityKg > 0))) throw new Error("Vehicle payload capacity must be positive");
+    if (!((((make).trim()).length > 0))) throw new Error("Give this vehicle a make.");
+    if (!((((model).trim()).length > 0))) throw new Error("Give this vehicle a model.");
+    if (!((((registration).trim()).length > 0))) throw new Error("Give this vehicle a registration.");
+    if (!((payloadCapacityKg > 0))) throw new Error("This vehicle's payload capacity has to be more than zero.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -50150,10 +50150,10 @@ async function __runVehicleReviseDetails(ctx: MutationCtx, { docId, make, model,
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change vehicles");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((make).trim()).length > 0))) throw new Error("Vehicle make is required");
-    if (!((((model).trim()).length > 0))) throw new Error("Vehicle model is required");
-    if (!((((registration).trim()).length > 0))) throw new Error("Vehicle registration is required");
-    if (!((payloadCapacityKg > 0))) throw new Error("Vehicle payload capacity must be positive");
+    if (!((((make).trim()).length > 0))) throw new Error("Give this vehicle a make.");
+    if (!((((model).trim()).length > 0))) throw new Error("Give this vehicle a model.");
+    if (!((((registration).trim()).length > 0))) throw new Error("Give this vehicle a registration.");
+    if (!((payloadCapacityKg > 0))) throw new Error("This vehicle's payload capacity has to be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -50209,9 +50209,9 @@ async function __runVehicleUpdateInsurance(ctx: MutationCtx, { docId, insuranceP
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change vehicles");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((insuranceProvider).trim()).length > 0))) throw new Error("Insurance provider is required");
-    if (!((((insurancePolicyNumber).trim()).length > 0))) throw new Error("Insurance policy number is required");
-    if (!((insuranceExpiresAt > Date.now()))) throw new Error("Insurance expiry must be in the future");
+    if (!((((insuranceProvider).trim()).length > 0))) throw new Error("Give this vehicle an insurance provider.");
+    if (!((((insurancePolicyNumber).trim()).length > 0))) throw new Error("Give this vehicle an insurance policy number.");
+    if (!((insuranceExpiresAt > Date.now()))) throw new Error("This vehicle's insurance expiry has to be a future date.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -50326,8 +50326,8 @@ async function __runVehicleUpdateRegistration(ctx: MutationCtx, { docId, registr
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change vehicles");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((registrationNumber).trim()).length > 0))) throw new Error("Registration number is required");
-    if (!((registrationExpiresAt > Date.now()))) throw new Error("Registration expiry must be in the future");
+    if (!((((registrationNumber).trim()).length > 0))) throw new Error("Give this vehicle a registration number.");
+    if (!((registrationExpiresAt > Date.now()))) throw new Error("This vehicle's registration expiry has to be a future date.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -50380,10 +50380,10 @@ async function __runVehicleFuelLogRecord(ctx: MutationCtx, { docId, vehicleId, o
     if (!((doc.loggedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_vehicle != null))) throw new Error("Guard 2 failed");
-    if (!((vehicleId === doc.vehicleId))) throw new Error("Fuel log vehicle must match the selected vehicle");
-    if (!((odometer >= 0))) throw new Error("Odometer reading cannot be negative");
-    if (!((fuelCost >= 0))) throw new Error("Fuel cost cannot be negative");
-    if (!((filledAt <= Date.now()))) throw new Error("Fuel fill time cannot be in the future");
+    if (!((vehicleId === doc.vehicleId))) throw new Error("This fuel log is for a different vehicle. Pick the vehicle already on this fuel log.");
+    if (!((odometer >= 0))) throw new Error("The odometer reading can't be negative. Use zero or more.");
+    if (!((fuelCost >= 0))) throw new Error("The fuel cost can't be negative. Use zero or more.");
+    if (!((filledAt <= Date.now()))) throw new Error("The fill time can't be in the future.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -50462,10 +50462,10 @@ export const VehicleFuelLog_createViaRecord = mutation({
     if (!((__draft.loggedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_vehicle != null))) throw new Error("Guard 2 failed");
-    if (!((vehicleId === __draft.vehicleId))) throw new Error("Fuel log vehicle must match the selected vehicle");
-    if (!((odometer >= 0))) throw new Error("Odometer reading cannot be negative");
-    if (!((fuelCost >= 0))) throw new Error("Fuel cost cannot be negative");
-    if (!((filledAt <= Date.now()))) throw new Error("Fuel fill time cannot be in the future");
+    if (!((vehicleId === __draft.vehicleId))) throw new Error("This fuel log is for a different vehicle. Pick the vehicle already on this fuel log.");
+    if (!((odometer >= 0))) throw new Error("The odometer reading can't be negative. Use zero or more.");
+    if (!((fuelCost >= 0))) throw new Error("The fuel cost can't be negative. Use zero or more.");
+    if (!((filledAt <= Date.now()))) throw new Error("The fill time can't be in the future.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -50556,9 +50556,9 @@ async function __runVehicleMaintenanceScheduleSchedule(ctx: MutationCtx, { docId
     if (!((doc.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_vehicle != null))) throw new Error("Guard 2 failed");
-    if (!((vehicleId === doc.vehicleId))) throw new Error("Maintenance vehicle must match the selected vehicle");
-    if (!((((taskName).trim()).length > 0))) throw new Error("Maintenance task is required");
-    if (!(((((intervalType === "time") && (nextDueAt != null)) && ((intervalDays == null) || (intervalDays > 0))) || (((intervalType === "mileage") && (nextDueMileage != null)) && ((intervalMiles == null) || (intervalMiles > 0)))))) throw new Error("Time schedules need a first due date; mileage schedules need a due odometer");
+    if (!((vehicleId === doc.vehicleId))) throw new Error("This maintenance is for a different vehicle. Pick the vehicle already on this maintenance.");
+    if (!((((taskName).trim()).length > 0))) throw new Error("Give this maintenance a task name.");
+    if (!(((((intervalType === "time") && (nextDueAt != null)) && ((intervalDays == null) || (intervalDays > 0))) || (((intervalType === "mileage") && (nextDueMileage != null)) && ((intervalMiles == null) || (intervalMiles > 0)))))) throw new Error("A time-based schedule needs a first due date. A mileage-based schedule needs a due odometer reading.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -50649,9 +50649,9 @@ export const VehicleMaintenanceSchedule_createViaSchedule = mutation({
     if (!((__draft.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_vehicle != null))) throw new Error("Guard 2 failed");
-    if (!((vehicleId === __draft.vehicleId))) throw new Error("Maintenance vehicle must match the selected vehicle");
-    if (!((((taskName).trim()).length > 0))) throw new Error("Maintenance task is required");
-    if (!(((((intervalType === "time") && (nextDueAt != null)) && ((intervalDays == null) || (intervalDays > 0))) || (((intervalType === "mileage") && (nextDueMileage != null)) && ((intervalMiles == null) || (intervalMiles > 0)))))) throw new Error("Time schedules need a first due date; mileage schedules need a due odometer");
+    if (!((vehicleId === __draft.vehicleId))) throw new Error("This maintenance is for a different vehicle. Pick the vehicle already on this maintenance.");
+    if (!((((taskName).trim()).length > 0))) throw new Error("Give this maintenance a task name.");
+    if (!(((((intervalType === "time") && (nextDueAt != null)) && ((intervalDays == null) || (intervalDays > 0))) || (((intervalType === "mileage") && (nextDueMileage != null)) && ((intervalMiles == null) || (intervalMiles > 0)))))) throw new Error("A time-based schedule needs a first due date. A mileage-based schedule needs a due odometer reading.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -50694,12 +50694,12 @@ async function __runVehicleServiceEntryRecord(ctx: MutationCtx, { docId, mainten
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_maintenanceSchedule != null))) throw new Error("Guard 2 failed");
     if (!((__rel_vehicle != null))) throw new Error("Guard 3 failed");
-    if (!((maintenanceScheduleId === doc.maintenanceScheduleId))) throw new Error("Service entry must match the selected maintenance schedule");
-    if (!(((vehicleId === doc.vehicleId) && (__rel_maintenanceSchedule.vehicleId === vehicleId)))) throw new Error("Service entry vehicle must match its maintenance schedule");
-    if (!((((vendor).trim()).length > 0))) throw new Error("Vendor is required");
-    if (!((cost >= 0))) throw new Error("Service cost cannot be negative");
-    if (!((odometer >= 0))) throw new Error("Odometer reading cannot be negative");
-    if (!((completedAt <= Date.now()))) throw new Error("Service completion cannot be in the future");
+    if (!((maintenanceScheduleId === doc.maintenanceScheduleId))) throw new Error("This service is for a different maintenance schedule. Pick the schedule already on this service.");
+    if (!(((vehicleId === doc.vehicleId) && (__rel_maintenanceSchedule.vehicleId === vehicleId)))) throw new Error("This service's vehicle doesn't match its maintenance schedule.");
+    if (!((((vendor).trim()).length > 0))) throw new Error("Give this service a vendor.");
+    if (!((cost >= 0))) throw new Error("The service cost can't be negative. Use zero or more.");
+    if (!((odometer >= 0))) throw new Error("The odometer reading can't be negative. Use zero or more.");
+    if (!((completedAt <= Date.now()))) throw new Error("The completion time can't be in the future.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -50798,12 +50798,12 @@ export const VehicleServiceEntry_createViaRecord = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_maintenanceSchedule != null))) throw new Error("Guard 2 failed");
     if (!((__rel_vehicle != null))) throw new Error("Guard 3 failed");
-    if (!((maintenanceScheduleId === __draft.maintenanceScheduleId))) throw new Error("Service entry must match the selected maintenance schedule");
-    if (!(((vehicleId === __draft.vehicleId) && (__rel_maintenanceSchedule.vehicleId === vehicleId)))) throw new Error("Service entry vehicle must match its maintenance schedule");
-    if (!((((vendor).trim()).length > 0))) throw new Error("Vendor is required");
-    if (!((cost >= 0))) throw new Error("Service cost cannot be negative");
-    if (!((odometer >= 0))) throw new Error("Odometer reading cannot be negative");
-    if (!((completedAt <= Date.now()))) throw new Error("Service completion cannot be in the future");
+    if (!((maintenanceScheduleId === __draft.maintenanceScheduleId))) throw new Error("This service is for a different maintenance schedule. Pick the schedule already on this service.");
+    if (!(((vehicleId === __draft.vehicleId) && (__rel_maintenanceSchedule.vehicleId === vehicleId)))) throw new Error("This service's vehicle doesn't match its maintenance schedule.");
+    if (!((((vendor).trim()).length > 0))) throw new Error("Give this service a vendor.");
+    if (!((cost >= 0))) throw new Error("The service cost can't be negative. Use zero or more.");
+    if (!((odometer >= 0))) throw new Error("The odometer reading can't be negative. Use zero or more.");
+    if (!((completedAt <= Date.now()))) throw new Error("The completion time can't be in the future.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -50844,9 +50844,9 @@ async function __runVendorOnboard(ctx: MutationCtx, { docId, name, email, phone,
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendors");
     if (!((doc.onboardedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Vendor name is required");
-    if (!(((paymentTermsDays == null) || ((paymentTermsDays >= 0) && (paymentTermsDays <= 365))))) throw new Error("Payment terms must be between 0 and 365 days");
-    if (!(((countryCode == null) || (((countryCode).trim()).length === 2)))) throw new Error("Country code must contain two characters");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this vendor a name.");
+    if (!(((paymentTermsDays == null) || ((paymentTermsDays >= 0) && (paymentTermsDays <= 365))))) throw new Error("Set payment terms between 0 and 365 days.");
+    if (!(((countryCode == null) || (((countryCode).trim()).length === 2)))) throw new Error("Country code needs to be exactly two letters.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -50946,9 +50946,9 @@ export const Vendor_createViaOnboard = mutation({
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendors");
     if (!((__draft.onboardedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Vendor name is required");
-    if (!(((paymentTermsDays == null) || ((paymentTermsDays >= 0) && (paymentTermsDays <= 365))))) throw new Error("Payment terms must be between 0 and 365 days");
-    if (!(((countryCode == null) || (((countryCode).trim()).length === 2)))) throw new Error("Country code must contain two characters");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this vendor a name.");
+    if (!(((paymentTermsDays == null) || ((paymentTermsDays >= 0) && (paymentTermsDays <= 365))))) throw new Error("Set payment terms between 0 and 365 days.");
+    if (!(((countryCode == null) || (((countryCode).trim()).length === 2)))) throw new Error("Country code needs to be exactly two letters.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -51056,7 +51056,7 @@ async function __runVendorSuspend(ctx: MutationCtx, { docId, reason, version }: 
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(checkRole(user, "inventoryManageAccess"))) throw new Error("Guard 3 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Suspension reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're suspending this vendor.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -51122,7 +51122,7 @@ async function __runVendorTerminate(ctx: MutationCtx, { docId, reason, version }
     if (!(((doc.status === "active") || (doc.status === "suspended")))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(checkRole(user, "inventoryManageAccess"))) throw new Error("Guard 3 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Termination reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're terminating this vendor.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -51188,9 +51188,9 @@ async function __runVendorUpdateDetails(ctx: MutationCtx, { docId, name, email, 
     if (!((doc.onboardedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Vendor name is required");
-    if (!(((paymentTermsDays == null) || ((paymentTermsDays >= 0) && (paymentTermsDays <= 365))))) throw new Error("Payment terms must be between 0 and 365 days");
-    if (!(((countryCode == null) || (((countryCode).trim()).length === 2)))) throw new Error("Country code must contain two characters");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this vendor a name.");
+    if (!(((paymentTermsDays == null) || ((paymentTermsDays >= 0) && (paymentTermsDays <= 365))))) throw new Error("Set payment terms between 0 and 365 days.");
+    if (!(((countryCode == null) || (((countryCode).trim()).length === 2)))) throw new Error("Country code needs to be exactly two letters.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -51261,8 +51261,8 @@ async function __runVendorContactAdd(ctx: MutationCtx, { docId, vendorId, name, 
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendor != null) && (__rel_vendor.deletedAt == null)))) throw new Error("Guard 2 failed");
-    if (!((vendorId === doc.vendorId))) throw new Error("Add contact vendorId must match the seeded vendor reference");
-    if (!((((name).trim()).length > 0))) throw new Error("Contact name is required");
+    if (!((vendorId === doc.vendorId))) throw new Error("This contact is for a different vendor. Pick the vendor already on this contact.");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this contact a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -51347,8 +51347,8 @@ export const VendorContact_createViaAdd = mutation({
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendor != null) && (__rel_vendor.deletedAt == null)))) throw new Error("Guard 2 failed");
-    if (!((vendorId === __draft.vendorId))) throw new Error("Add contact vendorId must match the seeded vendor reference");
-    if (!((((name).trim()).length > 0))) throw new Error("Contact name is required");
+    if (!((vendorId === __draft.vendorId))) throw new Error("This contact is for a different vendor. Pick the vendor already on this contact.");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this contact a name.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -51434,7 +51434,7 @@ async function __runVendorContactUpdate(ctx: MutationCtx, { docId, name, role, e
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendor contacts");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Contact name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this contact a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -51493,7 +51493,7 @@ async function __runVendorContractActivate(ctx: MutationCtx, { docId, version }:
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((doc.startsAt != null) && (doc.endsAt != null)))) throw new Error("Guard 3 failed");
-    if (!((doc.endsAt > Date.now()))) throw new Error("Cannot activate a contract whose period has already ended");
+    if (!((doc.endsAt > Date.now()))) throw new Error("You can't activate a contract whose period has already ended.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -51556,11 +51556,11 @@ async function __runVendorContractDraft(ctx: MutationCtx, { docId, vendorId, tit
     if (!((doc.draftedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendor != null) && (__rel_vendor.deletedAt == null)))) throw new Error("Guard 2 failed");
-    if (!((vendorId === doc.vendorId))) throw new Error("Draft vendorId must match the seeded vendor reference");
-    if (!((((title).trim()).length > 0))) throw new Error("Contract title is required");
-    if (!((endsAt > startsAt))) throw new Error("Contract end must be after the start");
-    if (!(((paymentTermsDays == null) || ((paymentTermsDays >= 0) && (paymentTermsDays <= 365))))) throw new Error("Payment terms must be between 0 and 365 days");
-    if (!(((deliveryLeadTimeDays == null) || ((deliveryLeadTimeDays >= 0) && (deliveryLeadTimeDays <= 365))))) throw new Error("Delivery lead time must be between 0 and 365 days");
+    if (!((vendorId === doc.vendorId))) throw new Error("This contract is for a different vendor. Pick the vendor already on this contract.");
+    if (!((((title).trim()).length > 0))) throw new Error("Give this contract a title.");
+    if (!((endsAt > startsAt))) throw new Error("This contract's end has to be after its start.");
+    if (!(((paymentTermsDays == null) || ((paymentTermsDays >= 0) && (paymentTermsDays <= 365))))) throw new Error("Set payment terms between 0 and 365 days.");
+    if (!(((deliveryLeadTimeDays == null) || ((deliveryLeadTimeDays >= 0) && (deliveryLeadTimeDays <= 365))))) throw new Error("Set delivery lead time between 0 and 365 days.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -51657,11 +51657,11 @@ export const VendorContract_createViaDraft = mutation({
     if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendor != null) && (__rel_vendor.deletedAt == null)))) throw new Error("Guard 2 failed");
-    if (!((vendorId === __draft.vendorId))) throw new Error("Draft vendorId must match the seeded vendor reference");
-    if (!((((title).trim()).length > 0))) throw new Error("Contract title is required");
-    if (!((endsAt > startsAt))) throw new Error("Contract end must be after the start");
-    if (!(((paymentTermsDays == null) || ((paymentTermsDays >= 0) && (paymentTermsDays <= 365))))) throw new Error("Payment terms must be between 0 and 365 days");
-    if (!(((deliveryLeadTimeDays == null) || ((deliveryLeadTimeDays >= 0) && (deliveryLeadTimeDays <= 365))))) throw new Error("Delivery lead time must be between 0 and 365 days");
+    if (!((vendorId === __draft.vendorId))) throw new Error("This contract is for a different vendor. Pick the vendor already on this contract.");
+    if (!((((title).trim()).length > 0))) throw new Error("Give this contract a title.");
+    if (!((endsAt > startsAt))) throw new Error("This contract's end has to be after its start.");
+    if (!(((paymentTermsDays == null) || ((paymentTermsDays >= 0) && (paymentTermsDays <= 365))))) throw new Error("Set payment terms between 0 and 365 days.");
+    if (!(((deliveryLeadTimeDays == null) || ((deliveryLeadTimeDays >= 0) && (deliveryLeadTimeDays <= 365))))) throw new Error("Set delivery lead time between 0 and 365 days.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -51760,7 +51760,7 @@ async function __runVendorContractTerminate(ctx: MutationCtx, { docId, reason, v
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendor contracts");
     if (!(((doc.status === "draft") || (doc.status === "active")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Termination reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're terminating this contract.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -51823,10 +51823,10 @@ async function __runVendorContractUpdateTerms(ctx: MutationCtx, { docId, title, 
     if (!((doc.draftedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((title).trim()).length > 0))) throw new Error("Contract title is required");
-    if (!((endsAt > startsAt))) throw new Error("Contract end must be after the start");
-    if (!(((paymentTermsDays == null) || ((paymentTermsDays >= 0) && (paymentTermsDays <= 365))))) throw new Error("Payment terms must be between 0 and 365 days");
-    if (!(((deliveryLeadTimeDays == null) || ((deliveryLeadTimeDays >= 0) && (deliveryLeadTimeDays <= 365))))) throw new Error("Delivery lead time must be between 0 and 365 days");
+    if (!((((title).trim()).length > 0))) throw new Error("Give this contract a title.");
+    if (!((endsAt > startsAt))) throw new Error("This contract's end has to be after its start.");
+    if (!(((paymentTermsDays == null) || ((paymentTermsDays >= 0) && (paymentTermsDays <= 365))))) throw new Error("Set payment terms between 0 and 365 days.");
+    if (!(((deliveryLeadTimeDays == null) || ((deliveryLeadTimeDays >= 0) && (deliveryLeadTimeDays <= 365))))) throw new Error("Set delivery lead time between 0 and 365 days.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -51892,10 +51892,10 @@ async function __runVendorContractPriceTierAdd(ctx: MutationCtx, { docId, contra
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_contract != null) && (__rel_contract.deletedAt == null)))) throw new Error("Guard 2 failed");
     if (!((__rel_contract.status === "draft"))) throw new Error("Guard 3 failed");
-    if (!((contractId === doc.contractId))) throw new Error("Add tier contractId must match the seeded contract reference");
-    if (!((((itemName).trim()).length > 0))) throw new Error("Item name is required");
-    if (!(((minQuantity == null) || (minQuantity >= 0)))) throw new Error("Minimum quantity cannot be negative");
-    if (!((unitPrice >= 0))) throw new Error("Unit price cannot be negative");
+    if (!((contractId === doc.contractId))) throw new Error("This price tier is for a different contract. Pick the contract already on this price tier.");
+    if (!((((itemName).trim()).length > 0))) throw new Error("Give this item a name.");
+    if (!(((minQuantity == null) || (minQuantity >= 0)))) throw new Error("Minimum quantity can't be negative. Use zero or more.");
+    if (!((unitPrice >= 0))) throw new Error("Unit price can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -51980,10 +51980,10 @@ export const VendorContractPriceTier_createViaAdd = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_contract != null) && (__rel_contract.deletedAt == null)))) throw new Error("Guard 2 failed");
     if (!((__rel_contract.status === "draft"))) throw new Error("Guard 3 failed");
-    if (!((contractId === __draft.contractId))) throw new Error("Add tier contractId must match the seeded contract reference");
-    if (!((((itemName).trim()).length > 0))) throw new Error("Item name is required");
-    if (!(((minQuantity == null) || (minQuantity >= 0)))) throw new Error("Minimum quantity cannot be negative");
-    if (!((unitPrice >= 0))) throw new Error("Unit price cannot be negative");
+    if (!((contractId === __draft.contractId))) throw new Error("This price tier is for a different contract. Pick the contract already on this price tier.");
+    if (!((((itemName).trim()).length > 0))) throw new Error("Give this item a name.");
+    if (!(((minQuantity == null) || (minQuantity >= 0)))) throw new Error("Minimum quantity can't be negative. Use zero or more.");
+    if (!((unitPrice >= 0))) throw new Error("Unit price can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -52071,9 +52071,9 @@ async function __runVendorContractPriceTierUpdate(ctx: MutationCtx, { docId, ite
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_contract != null) && (__rel_contract.status === "draft")))) throw new Error("Guard 2 failed");
-    if (!((((itemName).trim()).length > 0))) throw new Error("Item name is required");
-    if (!(((minQuantity == null) || (minQuantity >= 0)))) throw new Error("Minimum quantity cannot be negative");
-    if (!((unitPrice >= 0))) throw new Error("Unit price cannot be negative");
+    if (!((((itemName).trim()).length > 0))) throw new Error("Give this item a name.");
+    if (!(((minQuantity == null) || (minQuantity >= 0)))) throw new Error("Minimum quantity can't be negative. Use zero or more.");
+    if (!((unitPrice >= 0))) throw new Error("Unit price can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -52207,7 +52207,7 @@ async function __runVendorOrderCancel(ctx: MutationCtx, { docId, reason, version
     if (!((((((doc.status === "draft") || (doc.status === "pending_approval")) || (doc.status === "submitted")) || (doc.status === "confirmed")) || (doc.status === "partially_received")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "inventoryManageAccess") || (((doc.status === "draft") || (doc.status === "pending_approval")) && checkRole(user, "procurementAccess"))))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Cancellation reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're cancelling this order.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -52624,10 +52624,10 @@ async function __runVendorOrderOpen(ctx: MutationCtx, { docId, vendorId, eventId
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((((__rel_vendor != null) && (__rel_vendor.status === "active")) && (__rel_vendor.onboardedAt != null)))) throw new Error("Guard 3 failed");
-    if (!((vendorId === doc.vendorId))) throw new Error("Open vendorId must match the seeded vendor reference");
-    if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("Open eventId must match the seeded event reference when provided");
-    if (!((((sourceRangeStart == null) && (sourceRangeEnd == null)) || ((sourceRangeStart != null) && (sourceRangeEnd != null))))) throw new Error("Open source range requires both a start and end");
-    if (!((((sourceRangeStart == null) || (sourceRangeEnd == null)) || (sourceRangeStart <= sourceRangeEnd)))) throw new Error("Open source range end must not precede its start");
+    if (!((vendorId === doc.vendorId))) throw new Error("This order is for a different vendor. Pick the vendor already on this order.");
+    if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("This order is for a different event. Pick the event already on this order.");
+    if (!((((sourceRangeStart == null) && (sourceRangeEnd == null)) || ((sourceRangeStart != null) && (sourceRangeEnd != null))))) throw new Error("Give this order both a start and an end date, or leave both blank.");
+    if (!((((sourceRangeStart == null) || (sourceRangeEnd == null)) || (sourceRangeStart <= sourceRangeEnd)))) throw new Error("This order's date range end can't be before its start.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -52717,10 +52717,10 @@ export const VendorOrder_createViaOpen = mutation({
     if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((((__rel_vendor != null) && (__rel_vendor.status === "active")) && (__rel_vendor.onboardedAt != null)))) throw new Error("Guard 3 failed");
-    if (!((vendorId === __draft.vendorId))) throw new Error("Open vendorId must match the seeded vendor reference");
-    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Open eventId must match the seeded event reference when provided");
-    if (!((((sourceRangeStart == null) && (sourceRangeEnd == null)) || ((sourceRangeStart != null) && (sourceRangeEnd != null))))) throw new Error("Open source range requires both a start and end");
-    if (!((((sourceRangeStart == null) || (sourceRangeEnd == null)) || (sourceRangeStart <= sourceRangeEnd)))) throw new Error("Open source range end must not precede its start");
+    if (!((vendorId === __draft.vendorId))) throw new Error("This order is for a different vendor. Pick the vendor already on this order.");
+    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("This order is for a different event. Pick the event already on this order.");
+    if (!((((sourceRangeStart == null) && (sourceRangeEnd == null)) || ((sourceRangeStart != null) && (sourceRangeEnd != null))))) throw new Error("Give this order both a start and an end date, or leave both blank.");
+    if (!((((sourceRangeStart == null) || (sourceRangeEnd == null)) || (sourceRangeStart <= sourceRangeEnd)))) throw new Error("This order's date range end can't be before its start.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -52757,7 +52757,7 @@ async function __runVendorOrderRequestChanges(ctx: MutationCtx, { docId, notes, 
     if (!((doc.status === "pending_approval"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((notes).trim()).length > 0))) throw new Error("Modification request notes are required");
+    if (!((((notes).trim()).length > 0))) throw new Error("Say what needs to change.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -52898,7 +52898,7 @@ async function __runVendorOrderSubmit(ctx: MutationCtx, { docId, version }: any,
     if (!((doc.openedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((__rel_purchasingConfig == null) || (__rel_purchasingConfig.orderApprovalThresholdAmount == null)) || (doc.totalAmount <= __rel_purchasingConfig.orderApprovalThresholdAmount)))) throw new Error("Orders above the spend approval threshold need manager approval — use submit for approval");
+    if (!((((__rel_purchasingConfig == null) || (__rel_purchasingConfig.orderApprovalThresholdAmount == null)) || (doc.totalAmount <= __rel_purchasingConfig.orderApprovalThresholdAmount)))) throw new Error("This order is over the spend limit that needs manager approval. Send it for approval instead.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -53037,7 +53037,7 @@ async function __runVendorOrderSyncLineTotals(ctx: MutationCtx, { docId, lineSub
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor orders");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(((doc.status === "draft") || (doc.status === "submitted")))) throw new Error("Guard 1 failed");
-    if (!((lineSubtotal >= 0))) throw new Error("Order money amounts cannot be negative");
+    if (!((lineSubtotal >= 0))) throw new Error("Order money amounts can't be negative. Use zero or more.");
     const previousTotal = doc.totalAmount;
     const nextTotal = ((lineSubtotal + doc.taxAmount) + doc.shippingAmount);
     if (version !== undefined && (doc as any).version !== version) {
@@ -53089,7 +53089,7 @@ async function __runVendorOrderUpdateTotals(ctx: MutationCtx, { docId, subtotal,
     if (!((doc.openedAt != null))) throw new Error("Guard 0 failed");
     if (!(((doc.status === "draft") || (doc.status === "submitted")))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((subtotal >= 0) && (taxAmount >= 0)) && (shippingAmount >= 0)))) throw new Error("Order money amounts cannot be negative");
+    if (!((((subtotal >= 0) && (taxAmount >= 0)) && (shippingAmount >= 0)))) throw new Error("Order money amounts can't be negative. Use zero or more.");
     const previousTotal = doc.totalAmount;
     const nextTotal = ((subtotal + taxAmount) + shippingAmount);
     if (version !== undefined && (doc as any).version !== version) {
@@ -53151,10 +53151,10 @@ async function __runVendorOrderLineAddLine(ctx: MutationCtx, { docId, vendorOrde
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")) && (__rel_vendorOrder.openedAt != null)))) throw new Error("Guard 3 failed");
     if (!(((__rel_ingredient != null) && (__rel_ingredient.status === "active")))) throw new Error("Guard 4 failed");
-    if (!((vendorOrderId === doc.vendorOrderId))) throw new Error("Add line vendorOrderId must match the seeded order reference");
-    if (!((ingredientId === doc.ingredientId))) throw new Error("Add line ingredientId must match the seeded ingredient reference");
-    if (!((((ingredientDemandId == null) || (doc.ingredientDemandId == null)) || (ingredientDemandId === doc.ingredientDemandId)))) throw new Error("Add line ingredientDemandId must match the seeded demand reference when provided");
-    if (!((((locationId == null) || (doc.locationId == null)) || (locationId === doc.locationId)))) throw new Error("Add line locationId must match the seeded location reference when provided");
+    if (!((vendorOrderId === doc.vendorOrderId))) throw new Error("This line is for a different order. Pick the order already on this line.");
+    if (!((ingredientId === doc.ingredientId))) throw new Error("This line is for a different ingredient. Pick the ingredient already on this line.");
+    if (!((((ingredientDemandId == null) || (doc.ingredientDemandId == null)) || (ingredientDemandId === doc.ingredientDemandId)))) throw new Error("This line is for a different need. Pick the need already on this line.");
+    if (!((((locationId == null) || (doc.locationId == null)) || (locationId === doc.locationId)))) throw new Error("This line is for a different location. Pick the location already on this line.");
     if (!((orderedQuantity > 0))) throw new Error("This order line's ordered amount has to be more than zero. Enter how much to order.");
     if (!((unitCost >= 0))) throw new Error("This order line's cost per unit can't be negative. Use zero or more.");
     {
@@ -53274,10 +53274,10 @@ export const VendorOrderLine_createViaAddLine = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")) && (__rel_vendorOrder.openedAt != null)))) throw new Error("Guard 3 failed");
     if (!(((__rel_ingredient != null) && (__rel_ingredient.status === "active")))) throw new Error("Guard 4 failed");
-    if (!((vendorOrderId === __draft.vendorOrderId))) throw new Error("Add line vendorOrderId must match the seeded order reference");
-    if (!((ingredientId === __draft.ingredientId))) throw new Error("Add line ingredientId must match the seeded ingredient reference");
-    if (!((((ingredientDemandId == null) || (__draft.ingredientDemandId == null)) || (ingredientDemandId === __draft.ingredientDemandId)))) throw new Error("Add line ingredientDemandId must match the seeded demand reference when provided");
-    if (!((((locationId == null) || (__draft.locationId == null)) || (locationId === __draft.locationId)))) throw new Error("Add line locationId must match the seeded location reference when provided");
+    if (!((vendorOrderId === __draft.vendorOrderId))) throw new Error("This line is for a different order. Pick the order already on this line.");
+    if (!((ingredientId === __draft.ingredientId))) throw new Error("This line is for a different ingredient. Pick the ingredient already on this line.");
+    if (!((((ingredientDemandId == null) || (__draft.ingredientDemandId == null)) || (ingredientDemandId === __draft.ingredientDemandId)))) throw new Error("This line is for a different need. Pick the need already on this line.");
+    if (!((((locationId == null) || (__draft.locationId == null)) || (locationId === __draft.locationId)))) throw new Error("This line is for a different location. Pick the location already on this line.");
     if (!((orderedQuantity > 0))) throw new Error("This order line's ordered amount has to be more than zero. Enter how much to order.");
     if (!((unitCost >= 0))) throw new Error("This order line's cost per unit can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
@@ -53333,7 +53333,7 @@ async function __runVendorOrderLineCancelLine(ctx: MutationCtx, { docId, reason,
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_vendorOrder != null) && (((__rel_vendorOrder.status === "draft") || (__rel_vendorOrder.status === "submitted")) || (__rel_vendorOrder.status === "confirmed"))))) throw new Error("Guard 3 failed");
     if (!((checkRole(user, "inventoryManageAccess") || ((__rel_vendorOrder.status === "draft") && checkRole(user, "procurementAccess"))))) throw new Error("Guard 4 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Cancellation reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're cancelling this line.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -53678,8 +53678,8 @@ async function __runVendorOrderLineReconcileDraftRequirement(ctx: MutationCtx, {
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")))) throw new Error("Guard 2 failed");
     if (!((doc.receivedQuantity === 0))) throw new Error("Guard 3 failed");
-    if (!(((plannedQuantity == null) || (plannedQuantity >= 0)))) throw new Error("Planned quantity cannot be negative");
-    if (!(((quantityIsManual !== false) || (plannedQuantity != null)))) throw new Error("An automatic draft needs a calculated quantity");
+    if (!(((plannedQuantity == null) || (plannedQuantity >= 0)))) throw new Error("Planned quantity can't be negative. Use zero or more.");
+    if (!(((quantityIsManual !== false) || (plannedQuantity != null)))) throw new Error("This automatically calculated line needs a quantity.");
     const nextQuantity = ((quantityIsManual === false) ? plannedQuantity : doc.orderedQuantity);
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -53747,12 +53747,12 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
     if (!(((doc.status === "added") || (doc.status === "receiving")))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_vendorOrder != null) && ((__rel_vendorOrder.status === "confirmed") || (__rel_vendorOrder.status === "partially_received"))))) throw new Error("Guard 3 failed");
-    if (!(((doc.locationId == null) || (locationId === doc.locationId)))) throw new Error("Receipt locationId must match the seeded location when one was pre-set");
+    if (!(((doc.locationId == null) || (locationId === doc.locationId)))) throw new Error("This receipt is for a different location. Pick the location already set on this line.");
     if (!((quantity > 0))) throw new Error("This order line's received amount has to be more than zero. Enter how much arrived.");
     if (!(((doc.receivedQuantity + quantity) <= doc.orderedQuantity))) throw new Error("This order line can't receive more than was ordered. Enter a smaller amount.");
     if (!((unitPrice >= 0))) throw new Error("This order line's price per unit can't be negative. Use zero or more.");
-    if (!((((supplierLotNumber).trim()).length > 0))) throw new Error("Supplier lot number is required for traceability");
-    if (!(((discrepancyQuantity == null) || (discrepancyQuantity >= 0)))) throw new Error("Discrepancy quantity cannot be negative");
+    if (!((((supplierLotNumber).trim()).length > 0))) throw new Error("Enter the supplier's lot number so this delivery can be traced.");
+    if (!(((discrepancyQuantity == null) || (discrepancyQuantity >= 0)))) throw new Error("The discrepancy amount can't be negative. Use zero or more.");
     const previousReceived = doc.receivedQuantity;
     const nextReceived = (doc.receivedQuantity + quantity);
     const nextStatus = ((nextReceived === doc.orderedQuantity) ? "complete" : "receiving");
@@ -54359,7 +54359,7 @@ async function __runVenueChangeCapacity(ctx: MutationCtx, { docId, capacity, ver
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((capacity >= 0))) throw new Error("Venue capacity cannot be negative");
+    if (!((capacity >= 0))) throw new Error("Venue capacity can't be negative. Use zero or more.");
     const previousCapacity = doc.capacity;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -54411,7 +54411,7 @@ async function __runVenueDeactivate(ctx: MutationCtx, { docId, reason, version }
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Venue deactivation reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're taking this venue out of service.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -54476,8 +54476,8 @@ async function __runVenueRegister(ctx: MutationCtx, { docId, name, venueType, ca
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Venue name is required");
-    if (!((capacity >= 0))) throw new Error("Venue capacity cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this venue a name.");
+    if (!((capacity >= 0))) throw new Error("Venue capacity can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -54654,8 +54654,8 @@ export const Venue_createViaRegister = mutation({
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Venue name is required");
-    if (!((capacity >= 0))) throw new Error("Venue capacity cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this venue a name.");
+    if (!((capacity >= 0))) throw new Error("Venue capacity can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -54716,7 +54716,7 @@ async function __runVenueUpdateDetails(ctx: MutationCtx, { docId, name, venueTyp
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Venue name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this venue a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -55076,7 +55076,7 @@ async function __runVenueLayoutTemplateDefine(ctx: MutationCtx, { docId, venueId
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue layout templates");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Template name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this template a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -55151,7 +55151,7 @@ export const VenueLayoutTemplate_createViaDefine = mutation({
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue layout templates");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Template name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this template a name.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -55246,7 +55246,7 @@ async function __runVenueLayoutTemplateRevise(ctx: MutationCtx, { docId, name, d
     if (!((doc.definedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Template name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this template a name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -55346,8 +55346,8 @@ async function __runVenueNotePost(ctx: MutationCtx, { docId, venueId, eventId, a
     if (!((doc.postedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((content).trim()).length > 0))) throw new Error("Note content is required");
-    if (!((((authorName).trim()).length > 0))) throw new Error("Author name is required");
+    if (!((((content).trim()).length > 0))) throw new Error("Write something in this note.");
+    if (!((((authorName).trim()).length > 0))) throw new Error("Give this note an author name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -55439,8 +55439,8 @@ export const VenueNote_createViaPost = mutation({
     if (!((__draft.postedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((content).trim()).length > 0))) throw new Error("Note content is required");
-    if (!((((authorName).trim()).length > 0))) throw new Error("Author name is required");
+    if (!((((content).trim()).length > 0))) throw new Error("Write something in this note.");
+    if (!((((authorName).trim()).length > 0))) throw new Error("Give this note an author name.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -55526,7 +55526,7 @@ async function __runVenueNoteRevise(ctx: MutationCtx, { docId, content, category
     if (!((doc.postedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((content).trim()).length > 0))) throw new Error("Note content is required");
+    if (!((((content).trim()).length > 0))) throw new Error("Write something in this note.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -55626,8 +55626,8 @@ async function __runVenueRoomAdd(ctx: MutationCtx, { docId, venueId, name, roomT
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Room name is required");
-    if (!((capacity >= 0))) throw new Error("Room capacity cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this room a name.");
+    if (!((capacity >= 0))) throw new Error("Room capacity can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -55710,8 +55710,8 @@ export const VenueRoom_createViaAdd = mutation({
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Room name is required");
-    if (!((capacity >= 0))) throw new Error("Room capacity cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this room a name.");
+    if (!((capacity >= 0))) throw new Error("Room capacity can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -55794,8 +55794,8 @@ async function __runVenueRoomRevise(ctx: MutationCtx, { docId, name, roomType, c
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Room name is required");
-    if (!((capacity >= 0))) throw new Error("Room capacity cannot be negative");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this room a name.");
+    if (!((capacity >= 0))) throw new Error("Room capacity can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -55850,8 +55850,8 @@ async function __runVenueVendorRelationshipEstablish(ctx: MutationCtx, { docId, 
     if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may update venue vendor relationships");
     if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may change venue vendor relationships");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!(((venueId != null) && (((venueId).trim()).length > 0)))) throw new Error("Venue is required");
-    if (!(((vendorId != null) && (((vendorId).trim()).length > 0)))) throw new Error("Vendor is required");
+    if (!(((venueId != null) && (((venueId).trim()).length > 0)))) throw new Error("Pick a venue.");
+    if (!(((vendorId != null) && (((vendorId).trim()).length > 0)))) throw new Error("Pick a vendor.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -55979,8 +55979,8 @@ export const VenueVendorRelationship_createViaEstablish = mutation({
     if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may update venue vendor relationships");
     if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may change venue vendor relationships");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!(((venueId != null) && (((venueId).trim()).length > 0)))) throw new Error("Venue is required");
-    if (!(((vendorId != null) && (((vendorId).trim()).length > 0)))) throw new Error("Vendor is required");
+    if (!(((venueId != null) && (((venueId).trim()).length > 0)))) throw new Error("Pick a venue.");
+    if (!(((vendorId != null) && (((vendorId).trim()).length > 0)))) throw new Error("Pick a vendor.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -56023,7 +56023,7 @@ async function __runVenueVendorRelationshipRetire(ctx: MutationCtx, { docId, rea
     if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may update venue vendor relationships");
     if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may change venue vendor relationships");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Retirement reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're retiring this.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -56207,11 +56207,11 @@ async function __runWasteRecordRecord(ctx: MutationCtx, { docId, ingredientId, l
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_ingredient != null) && (__rel_ingredient.status === "active")))) throw new Error("Guard 3 failed");
     if (!(((__rel_location != null) && (__rel_location.status === "active")))) throw new Error("Guard 4 failed");
-    if (!((ingredientId === doc.ingredientId))) throw new Error("Record ingredientId must match the seeded ingredient reference");
-    if (!((locationId === doc.locationId))) throw new Error("Record locationId must match the seeded location reference");
-    if (!((((inventoryItemId == null) || (doc.inventoryItemId == null)) || (inventoryItemId === doc.inventoryItemId)))) throw new Error("Record inventoryItemId must match the seeded stock reference when provided");
-    if (!((quantity > 0))) throw new Error("Waste quantity must be positive");
-    if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("Waste unit cost cannot be negative");
+    if (!((ingredientId === doc.ingredientId))) throw new Error("This waste entry is for a different ingredient. Pick the ingredient already on this entry.");
+    if (!((locationId === doc.locationId))) throw new Error("This waste entry is for a different location. Pick the location already on this entry.");
+    if (!((((inventoryItemId == null) || (doc.inventoryItemId == null)) || (inventoryItemId === doc.inventoryItemId)))) throw new Error("This waste entry is for a different stock item. Pick the stock item already on this entry, or leave it blank.");
+    if (!((quantity > 0))) throw new Error("Enter a waste amount more than zero.");
+    if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("The waste unit cost can't be negative. Use zero or more.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -56327,11 +56327,11 @@ export const WasteRecord_createViaRecord = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_ingredient != null) && (__rel_ingredient.status === "active")))) throw new Error("Guard 3 failed");
     if (!(((__rel_location != null) && (__rel_location.status === "active")))) throw new Error("Guard 4 failed");
-    if (!((ingredientId === __draft.ingredientId))) throw new Error("Record ingredientId must match the seeded ingredient reference");
-    if (!((locationId === __draft.locationId))) throw new Error("Record locationId must match the seeded location reference");
-    if (!((((inventoryItemId == null) || (__draft.inventoryItemId == null)) || (inventoryItemId === __draft.inventoryItemId)))) throw new Error("Record inventoryItemId must match the seeded stock reference when provided");
-    if (!((quantity > 0))) throw new Error("Waste quantity must be positive");
-    if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("Waste unit cost cannot be negative");
+    if (!((ingredientId === __draft.ingredientId))) throw new Error("This waste entry is for a different ingredient. Pick the ingredient already on this entry.");
+    if (!((locationId === __draft.locationId))) throw new Error("This waste entry is for a different location. Pick the location already on this entry.");
+    if (!((((inventoryItemId == null) || (__draft.inventoryItemId == null)) || (inventoryItemId === __draft.inventoryItemId)))) throw new Error("This waste entry is for a different stock item. Pick the stock item already on this entry, or leave it blank.");
+    if (!((quantity > 0))) throw new Error("Enter a waste amount more than zero.");
+    if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("The waste unit cost can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -56376,7 +56376,7 @@ async function __runWasteRecordVoidRecord(ctx: MutationCtx, { docId, reason, ver
     if (!((doc.recordedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(checkRole(user, "inventoryManageAccess"))) throw new Error("Guard 3 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Void reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("Say why you're voiding this.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -56704,9 +56704,9 @@ async function __runWeeklyScheduleNoticePublishSchedule(ctx: MutationCtx, { docI
     if (!((__rel_person != null))) throw new Error("Guard 2 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 3 failed");
     if (!((personId === doc.personId))) throw new Error("This schedule notice is for a different person. Pick the person already on this schedule notice.");
-    if (!((weekEndsAt > weekStartsAt))) throw new Error("Work week end must be after its start");
-    if (!((shiftCount > 0))) throw new Error("Publish requires at least one scheduled shift");
-    if (!((((shiftSummary).trim()).length > 0))) throw new Error("Publish requires a shift summary");
+    if (!((weekEndsAt > weekStartsAt))) throw new Error("This work week's end has to be after its start.");
+    if (!((shiftCount > 0))) throw new Error("Add at least one scheduled shift before you publish.");
+    if (!((((shiftSummary).trim()).length > 0))) throw new Error("Add a shift summary before you publish.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -56793,9 +56793,9 @@ export const WeeklyScheduleNotice_createViaPublishSchedule = mutation({
     if (!((__rel_person != null))) throw new Error("Guard 2 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 3 failed");
     if (!((personId === __draft.personId))) throw new Error("This schedule notice is for a different person. Pick the person already on this schedule notice.");
-    if (!((weekEndsAt > weekStartsAt))) throw new Error("Work week end must be after its start");
-    if (!((shiftCount > 0))) throw new Error("Publish requires at least one scheduled shift");
-    if (!((((shiftSummary).trim()).length > 0))) throw new Error("Publish requires a shift summary");
+    if (!((weekEndsAt > weekStartsAt))) throw new Error("This work week's end has to be after its start.");
+    if (!((shiftCount > 0))) throw new Error("Add at least one scheduled shift before you publish.");
+    if (!((((shiftSummary).trim()).length > 0))) throw new Error("Add a shift summary before you publish.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -56833,8 +56833,8 @@ async function __runWeeklyScheduleNoticeRepublishSchedule(ctx: MutationCtx, { do
     if (!((doc.publishedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((shiftCount > 0))) throw new Error("Publish requires at least one scheduled shift");
-    if (!((((shiftSummary).trim()).length > 0))) throw new Error("Publish requires a shift summary");
+    if (!((shiftCount > 0))) throw new Error("Add at least one scheduled shift before you publish.");
+    if (!((((shiftSummary).trim()).length > 0))) throw new Error("Add a shift summary before you publish.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -56953,9 +56953,9 @@ export const Event_createViaCaptureDraft = mutation({
     if (!((__draft.plannedAt == null))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__draft.draftCapturedAt == null))) throw new Error("Guard 3 failed");
-    if (!((((title).trim()).length > 0))) throw new Error("Draft title is required");
+    if (!((((title).trim()).length > 0))) throw new Error("Give this draft a title.");
     if (!(((expectedHeadcount == null) || ((expectedHeadcount >= 0) && (expectedHeadcount <= 100000))))) throw new Error("Headcount must be between 0 and 100000 when known");
-    if (!((((budgetAmount == null) || (budgetAmount >= 0)) && ((quotedPrice == null) || (quotedPrice >= 0))))) throw new Error("Event pricing cannot be negative");
+    if (!((((budgetAmount == null) || (budgetAmount >= 0)) && ((quotedPrice == null) || (quotedPrice >= 0))))) throw new Error("This event's pricing can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,

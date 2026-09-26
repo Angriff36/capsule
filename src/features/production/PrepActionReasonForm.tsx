@@ -44,7 +44,7 @@ export function PrepActionReasonForm({
           <p id={helperId} className="mt-1 text-sm text-ink-2">
             {isBlocking
               ? `Explain what is stopping ${taskName} so the next cook knows what to resolve.`
-              : `Record why ${taskName} is being removed from the production sheet.`}
+              : `Explain why ${taskName} is being removed from the production sheet.`}
           </p>
         </div>
         <button

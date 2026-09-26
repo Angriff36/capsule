@@ -49,7 +49,7 @@ export function ClientContactEditForm({
     run(`${contact._id}:details`, async () => {
       const givenName = text(data.get("givenName"));
       if (!givenName) {
-        throw new Error("Contact given name is required.");
+        throw new Error("Give this contact a first name.");
       }
       await updateDetails({
         docId: contact._id,
