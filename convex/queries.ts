@@ -7097,7 +7097,7 @@ export const listIngredient = query({
   handler: async (ctx) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("ingredientRead", "Ingredient", () => checkRole(user, "kitchenAccess"))) return [];
+    if (!__allowsRead("ingredientRead", "Ingredient", () => ((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("ingredients").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
@@ -7111,7 +7111,7 @@ export const getIngredient = query({
   handler: async (ctx, { id }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("ingredientRead", "Ingredient", () => checkRole(user, "kitchenAccess"))) return null;
+    if (!__allowsRead("ingredientRead", "Ingredient", () => ((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (doc && (doc as any).tenantId !== __tenant) return null;
@@ -7132,7 +7132,7 @@ export const listIngredientByTenantId = query({
   handler: async (ctx, { tenantId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("ingredientRead", "Ingredient", () => checkRole(user, "kitchenAccess"))) return [];
+    if (!__allowsRead("ingredientRead", "Ingredient", () => ((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("ingredients").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
@@ -7147,7 +7147,7 @@ export const listIngredientByCanonicalIngredientId = query({
   handler: async (ctx, { canonicalIngredientId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("ingredientRead", "Ingredient", () => checkRole(user, "kitchenAccess"))) return [];
+    if (!__allowsRead("ingredientRead", "Ingredient", () => ((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("ingredients").withIndex("by_canonicalIngredientId", (q) => q.eq("canonicalIngredientId", canonicalIngredientId)).collect();
@@ -7163,7 +7163,7 @@ export const listIngredientByMergedIntoIngredientId = query({
   handler: async (ctx, { mergedIntoIngredientId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("ingredientRead", "Ingredient", () => checkRole(user, "kitchenAccess"))) return [];
+    if (!__allowsRead("ingredientRead", "Ingredient", () => ((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("ingredients").withIndex("by_mergedIntoIngredientId", (q) => q.eq("mergedIntoIngredientId", mergedIntoIngredientId)).collect();
@@ -7179,7 +7179,7 @@ export const listIngredientByPrimaryImageStorageId = query({
   handler: async (ctx, { primaryImageStorageId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("ingredientRead", "Ingredient", () => checkRole(user, "kitchenAccess"))) return [];
+    if (!__allowsRead("ingredientRead", "Ingredient", () => ((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "manageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("ingredients").withIndex("by_primaryImageStorageId", (q) => q.eq("primaryImageStorageId", primaryImageStorageId)).collect();

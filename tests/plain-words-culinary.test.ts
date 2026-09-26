@@ -180,7 +180,7 @@ describe("plain words on culinary manifests", () => {
       "Kitchen staff and managers may see dish task templates",
       "Kitchen staff and managers may see task materials",
       "Kitchen staff may see dish containers",
-      "Kitchen staff may see ingredients",
+      "Kitchen, inventory and managers may see ingredients",
       "Kitchen, inventory and managers may see unit mappings",
       "Kitchen and sales staff may see menus",
       "Kitchen and sales staff may see menu dish lines",

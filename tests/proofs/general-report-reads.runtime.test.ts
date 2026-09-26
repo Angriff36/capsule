@@ -297,12 +297,11 @@ describe("runtime proof: General reports follow each record's read policy (AC-21
     ])
       await refused(finance, reportId);
 
-    // Stock staff read stock and storage locations but not ingredients: the
-    // ingredient name stays blank.
+    // Stock staff read stock, storage locations and ingredient names.
     const stock = as("inventory_staff");
     const stockRows = await text(stock, "inventory-in-stock");
     expect(stockRows).toContain("Walk-in Cooler");
-    expect(stockRows).not.toContain("Saffron Threads");
+    expect(stockRows).toContain("Saffron Threads");
     await refused(stock, "mailing-labels");
     await refused(stock, "vendor-phone-list");
 
@@ -312,7 +311,7 @@ describe("runtime proof: General reports follow each record's read policy (AC-21
     );
 
     // An event manager reads closeouts, venues and (as a manager) stock
-    // items, not clients, ingredients or storage locations.
+    // items and ingredient names, not clients or storage locations.
     const eventManager = as("event_manager");
     expect(await text(eventManager, "post-event-notes")).toContain(
       "Gala went well",
@@ -322,7 +321,7 @@ describe("runtime proof: General reports follow each record's read policy (AC-21
       await text(eventManager, "events-pending-final-confirmation"),
     ).toContain("Pier Hall");
     const managerStock = await text(eventManager, "inventory-in-stock");
-    expect(managerStock).not.toContain("Saffron Threads");
+    expect(managerStock).toContain("Saffron Threads");
     expect(managerStock).not.toContain("Walk-in Cooler");
     await refused(eventManager, "mailing-labels");
     await refused(eventManager, "contact-task-notes");

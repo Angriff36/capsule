@@ -18,10 +18,10 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "9b3be12a98ee0566827d0d8138b551597b209d0e018847d15d615c9d14bc9d1a"
+      "sha256": "cfa329d365988e992a5e8aeadb5251b1fc7802592b60ed5a3f5f90c21f1bd2af"
     },
     "convex/queries.ts": {
-      "sha256": "f18ab7ebbce6e68c19b5fc848087171e2817670a49d9d49440162dda6bd44e01"
+      "sha256": "b7f453c49212e1ab48dfc88033a0e742cd365d092e2d1c4877f4d4161fff575a"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
@@ -30,7 +30,7 @@
       "sha256": "eb8b632bc0f4d9e93edb03a01a69abf2b72e91d439a1b52846fe463001d98dbf"
     },
     "manifest-context-summary.json": {
-      "sha256": "d548f670213f73c5c82f37ad7c71f70ede8e8771a0eb5f0974759c4092b501e9"
+      "sha256": "4e818242b6e8163f6e3a281648445d02844eca0026e4d79f033a0c742f31fcf3"
     },
     "package.json": {
       "sha256": "45588d8e74712acf430f18aba8275548aac7ced9b70fe6c134def6f1e7fec6cc"
@@ -45,10 +45,10 @@
       "sha256": "7b0a06a6400cb045c7adccc26bc0a37fab8d0b2d752b9ed6a7f93dd3d5b6761e"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "7debe7385413ce6e3180e78a58094a56d952c259b0a673e7716ec5e47afa7ec3"
+      "sha256": "767cbd4aaf10de86084e0b464d6752faa2491a671f3b8ed73ad60913e7d01c9f"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "0e01ab520741eb1f5f7ec369f6e20d604e0105419c7eeaa277af82c85f916e7d"
+      "sha256": "a596a08478dd0ab8e80586429539d4b906b0ccb281f1b32499496f95d20dfbef"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "1120fa0bf097901985b960cf9e1979e15878d3905696a327cf1a14e8f1367c9d"
@@ -57,7 +57,7 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "e3dfff451b07fa5bf70dbaf541e0b2a4523bc1c742a10d07001eb01d9dc46623"
+      "sha256": "c472d8d05de9f133cde84d13b5f0177b7b50e2be42cbf85633425404782c262e"
     }
   },
   "package": {
