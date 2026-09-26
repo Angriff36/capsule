@@ -62,10 +62,10 @@ describe("service style catalog fallback", () => {
 describe("create event client-required copy", () => {
   it("explains a disabled Create when the client is missing", () => {
     expect(eventCreateDisabledReason({ busy: false, clientId: "" })).toBe(
-      "Client is required",
+      "Pick a client for this event.",
     );
     expect(eventCreateDisabledReason({ busy: false, clientId: "   " })).toBe(
-      "Client is required",
+      "Pick a client for this event.",
     );
     expect(
       eventCreateDisabledReason({ busy: false, clientId: "client1" }),

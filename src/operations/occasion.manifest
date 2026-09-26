@@ -40,8 +40,8 @@ entity Occasion mixin TenantScoped, SoftDeletable {
   computed isActive: boolean = self.status == "active"
 
   constraint occasionIdentityComplete: self.registeredAt == null or (length(trim(self.name)) > 0 and length(trim(self.code)) > 0) "Occasions require a name and code"
-  constraint occasionSortNonnegative: self.sortOrder >= 0 "Display order cannot be negative"
-  constraint occasionCodeUnique: self.registeredAt == null or count_of(query("Occasion"), (o) => o.tenantId == self.tenantId and o.code == self.code and o.id != self.id and o.deletedAt == null) == 0 "Occasion code must be unique within tenant"
+  constraint occasionSortNonnegative: self.sortOrder >= 0 "Display order can't be negative. Use zero or more."
+  constraint occasionCodeUnique: self.registeredAt == null or count_of(query("Occasion"), (o) => o.tenantId == self.tenantId and o.code == self.code and o.id != self.id and o.deletedAt == null) == 0 "Another occasion already uses this code. Pick a different one."
 
   transition status from "active" to ["inactive"]
   transition status from "inactive" to ["active"]
@@ -58,9 +58,9 @@ entity Occasion mixin TenantScoped, SoftDeletable {
   ) {
     guard self.registeredAt == null
     guard self.deletedAt == null
-    constraint registerOccasionName: length(trim(name)) > 0 "Occasion name is required"
-    constraint registerOccasionCode: length(trim(code)) > 0 "Occasion code is required"
-    constraint registerOccasionSort: sortOrder == null or sortOrder >= 0 "Display order cannot be negative"
+    constraint registerOccasionName: length(trim(name)) > 0 "Give this occasion a name."
+    constraint registerOccasionCode: length(trim(code)) > 0 "Give this occasion a code."
+    constraint registerOccasionSort: sortOrder == null or sortOrder >= 0 "Display order can't be negative. Use zero or more."
     mutate name = name
     mutate code = code
     mutate sortOrder = sortOrder != null ? sortOrder : 0
@@ -84,8 +84,8 @@ entity Occasion mixin TenantScoped, SoftDeletable {
     guard self.registeredAt != null
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint reviseOccasionName: length(trim(name)) > 0 "Occasion name is required"
-    constraint reviseOccasionSort: sortOrder == null or sortOrder >= 0 "Display order cannot be negative"
+    constraint reviseOccasionName: length(trim(name)) > 0 "Give this occasion a name."
+    constraint reviseOccasionSort: sortOrder == null or sortOrder >= 0 "Display order can't be negative. Use zero or more."
     mutate name = name
     mutate description = description
     mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
@@ -101,7 +101,7 @@ entity Occasion mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
-    constraint deactivateOccasionReason: length(trim(reason)) > 0 "Deactivation reason is required"
+    constraint deactivateOccasionReason: length(trim(reason)) > 0 "Say why you're deactivating this occasion."
     mutate status = "inactive"
     mutate deactivatedAt = now()
     mutate deactivationReason = reason

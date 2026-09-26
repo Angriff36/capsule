@@ -166,10 +166,10 @@ describe("plain words on leftover procurement manifests", () => {
       "Recorded inventory lots require a supplier lot number and positive receipt quantities",
     );
     expect(visible).toContain(
-      "Receipt lots require a supplier lot number and positive receipt quantities",
+      "Give this receipt a supplier lot number and a receipt quantity greater than zero.",
     );
     expectPlain(
-      "Receipt lots require a supplier lot number and positive receipt quantities",
+      "Give this receipt a supplier lot number and a receipt quantity greater than zero.",
     );
 
     // already-landed write/read leftovers must stay put
@@ -184,6 +184,8 @@ describe("plain words on leftover procurement manifests", () => {
     );
 
     // later leftover, unchanged
-    expect(visible).toContain("Inventory lot unit cost cannot be negative");
+    expect(visible).toContain(
+      "This receipt's cost per unit can't be negative. Use zero or more.",
+    );
   });
 });

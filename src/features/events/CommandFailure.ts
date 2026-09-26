@@ -174,9 +174,9 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
   if (/No tenant|authentication context|not authenticated/i.test(detail)) {
     return {
       category: "denied",
-      title: "Workspace access required",
+      title: "Sign in again",
       detail:
-        "Your session does not include the workspace access this action requires.",
+        "We couldn't tell which workspace you're in. Sign out, sign back in, then try again.",
     };
   }
   if (
@@ -186,7 +186,7 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
   ) {
     return {
       category: "unexpected",
-      title: "Secure field storage failed",
+      title: "Contact details couldn't be read",
       detail: requestId
         ? `Contact and address details could not be read (ask the office with this code: ${requestId}). Refresh once. If it happens again, ask the office to check Capsule's secure storage.`
         : "Contact and address details could not be read. Refresh once. If it happens again, ask the office to check Capsule's secure storage.",
@@ -232,8 +232,8 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
       category: "unexpected",
       title: "Action failed unexpectedly",
       detail: requestId
-        ? `The server rejected this action without a usable reason (Request ID: ${requestId}). Confirm you are signed into a workspace, refresh, and retry. If it keeps failing, share that request ID.`
-        : "The server rejected this action without a usable reason. Refresh and retry.",
+        ? `This didn't go through, and no reason came back (Request ID: ${requestId}). Make sure you're signed in, refresh, and try again. If it keeps happening, send that request ID to the office.`
+        : "This didn't go through, and no reason came back. Refresh and try again.",
       action: REFRESH_ACTION,
     };
   }

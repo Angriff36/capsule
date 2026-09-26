@@ -50,7 +50,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
   ref vendorOrder: VendorOrder fields [tenantId, vendorOrderId] references [tenantId, id]
   ref vendorOrderLine: VendorOrderLine fields [tenantId, vendorOrderLineId] references [tenantId, id]
 
-  constraint needQuantityPositive: self.openedAt == null or self.requiredQuantity >= 0 "Required quantity cannot be negative"
+  constraint needQuantityPositive: self.openedAt == null or self.requiredQuantity >= 0 "The amount needed can't be negative. Use zero or more."
 
   transition status from "open" to ["ordered", "cancelled"]
   transition status from "ordered" to ["open", "fulfilled", "cancelled"]
@@ -78,7 +78,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     // Idempotent create: EventApproved may re-run; unique demand key still binds.
     guard self.openedAt == null or (self.eventId == eventId and self.ingredientDemandId == ingredientDemandId)
     guard self.deletedAt == null
-    constraint createNeedQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
+    constraint createNeedQuantityPositive: requiredQuantity > 0 "The amount needed has to be more than zero."
     // Full event requirement — weekly line applies on-hand once across consolidated needs.
     mutate requiredQuantity = self.openedAt != null ? self.requiredQuantity : requiredQuantity
     mutate purchasingWeekStart = self.openedAt != null ? self.purchasingWeekStart : purchasingWeekStart
@@ -154,7 +154,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     guard self.status == "open" or self.status == "ordered" or self.status == "fulfilled"
     guard self.openedAt != null
     guard self.deletedAt == null
-    constraint reviseNeedQuantityPositive: requiredQuantity >= 0 "Required quantity cannot be negative"
+    constraint reviseNeedQuantityPositive: requiredQuantity >= 0 "The amount needed can't be negative. Use zero or more."
     // Preserve the purchasing unit for compatible recipe measurements.
     // Exact factors mirror src/lib/recipeUnitConversion.ts.
     compute incomingUnit = unit != null ? unit : self.unit
@@ -227,7 +227,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     guard self.status == "open" or self.status == "ordered"
     guard self.deletedAt == null
     guard roleAllows(user.role, "inventoryManageAccess")
-    constraint cancelNeedReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancelNeedReason: length(trim(reason)) > 0 "Say why you're cancelling this need."
     compute previousStatus = self.status
     mutate status = "cancelled"
     mutate cancelledAt = now()

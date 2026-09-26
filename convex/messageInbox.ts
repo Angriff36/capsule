@@ -153,8 +153,8 @@ export const ingestInboundMessage = action({
       );
     }
     if (!bodyText) {
-      await recordSyncError("missing_field", "Message text is required");
-      throw new ConvexError("Message text is required");
+      await recordSyncError("missing_field", "Type a message before sending.");
+      throw new ConvexError("Type a message before sending.");
     }
 
     // Ingest core (thread resolve → message post). Any unexpected failure here

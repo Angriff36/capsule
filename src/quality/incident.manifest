@@ -66,7 +66,7 @@ entity Incident mixin TenantScoped, SoftDeletable {
   belongsTo delivery: Delivery fields [tenantId, deliveryId] references [tenantId, id]
   belongsTo shift: Shift fields [tenantId, shiftId] references [tenantId, id]
 
-  constraint incidentDescriptionPresent: self.reportedAt == null or length(trim(self.description)) > 0 "Reported incidents require a description"
+  constraint incidentDescriptionPresent: self.reportedAt == null or length(trim(self.description)) > 0 "A reported incident needs a description."
 
   transition status from "open" to ["investigating", "resolved", "dismissed"]
   transition status from "investigating" to ["resolved", "dismissed"]
@@ -91,11 +91,11 @@ entity Incident mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.event != null
     guard user.id != null
-    constraint reportEventMatch: eventId == self.eventId "Report eventId must match the seeded event reference"
-    constraint reportPrepMatch: prepTaskId == null or self.prepTaskId == null or prepTaskId == self.prepTaskId "Report prepTaskId must match the seeded prep task reference when provided"
-    constraint reportDeliveryMatch: deliveryId == null or self.deliveryId == null or deliveryId == self.deliveryId "Report deliveryId must match the seeded delivery reference when provided"
-    constraint reportShiftMatch: shiftId == null or self.shiftId == null or shiftId == self.shiftId "Report shiftId must match the seeded shift reference when provided"
-    constraint reportDescriptionPresent: length(trim(description)) > 0 "Incident description is required"
+    constraint reportEventMatch: eventId == self.eventId "This incident is for a different event. Pick the event already on this incident."
+    constraint reportPrepMatch: prepTaskId == null or self.prepTaskId == null or prepTaskId == self.prepTaskId "This incident is for a different prep task. Pick the prep task already on this incident, or leave that blank."
+    constraint reportDeliveryMatch: deliveryId == null or self.deliveryId == null or deliveryId == self.deliveryId "This incident is for a different delivery. Pick the delivery already on this incident, or leave that blank."
+    constraint reportShiftMatch: shiftId == null or self.shiftId == null or shiftId == self.shiftId "This incident is for a different shift. Pick the shift already on this incident, or leave that blank."
+    constraint reportDescriptionPresent: length(trim(description)) > 0 "Say what happened."
     mutate eventId = eventId
     mutate prepTaskId = prepTaskId != null ? prepTaskId : self.prepTaskId
     mutate deliveryId = deliveryId != null ? deliveryId : self.deliveryId
@@ -140,7 +140,7 @@ entity Incident mixin TenantScoped, SoftDeletable {
     guard self.reportedAt != null
     guard self.deletedAt == null
     constraint resolveCorrectiveActionClosed: self.correctiveActionRequired != true "Allergen incidents stay locked until the corrective action is closed"
-    constraint resolveTextPresent: length(trim(resolution)) > 0 "Resolution is required"
+    constraint resolveTextPresent: length(trim(resolution)) > 0 "Say how this was resolved."
     compute previousStatus = self.status
     mutate resolution = resolution
     mutate status = "resolved"
@@ -162,7 +162,7 @@ entity Incident mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "kitchenManageAccess")
     constraint dismissCorrectiveActionClosed: self.correctiveActionRequired != true "Allergen incidents stay locked until the corrective action is closed"
-    constraint dismissReasonPresent: length(trim(reason)) > 0 "Dismissal reason is required"
+    constraint dismissReasonPresent: length(trim(reason)) > 0 "Say why you're dismissing this incident."
     compute previousStatus = self.status
     mutate dismissalReason = reason
     mutate status = "dismissed"
@@ -218,7 +218,7 @@ entity CorrectiveAction mixin TenantScoped, SoftDeletable {
   belongsTo incident: Incident fields [tenantId, incidentId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
-  constraint correctiveDescriptionPresent: self.openedAt == null or length(trim(self.description)) > 0 "Corrective actions require a description"
+  constraint correctiveDescriptionPresent: self.openedAt == null or length(trim(self.description)) > 0 "A corrective action needs a description."
 
   transition status from "open" to ["closed"]
   transition status from "closed" to []
@@ -232,9 +232,9 @@ entity CorrectiveAction mixin TenantScoped, SoftDeletable {
     guard self.status == "open"
     guard self.deletedAt == null
     guard user.id != null
-    constraint openIncidentMatch: incidentId == self.incidentId "Open incidentId must match the seeded incident reference"
-    constraint openEventMatch: eventId == self.eventId "Open eventId must match the seeded event reference"
-    constraint openDescriptionPresent: length(trim(description)) > 0 "Corrective action description is required"
+    constraint openIncidentMatch: incidentId == self.incidentId "This corrective action is for a different incident. Pick the incident already on this corrective action."
+    constraint openEventMatch: eventId == self.eventId "This corrective action is for a different event. Pick the event already on this corrective action."
+    constraint openDescriptionPresent: length(trim(description)) > 0 "Say what needs to be done."
     mutate incidentId = incidentId
     mutate eventId = eventId
     mutate description = description
@@ -255,7 +255,7 @@ entity CorrectiveAction mixin TenantScoped, SoftDeletable {
     guard self.openedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    constraint closeNotesPresent: length(trim(resolutionNotes)) > 0 "Resolution notes are required"
+    constraint closeNotesPresent: length(trim(resolutionNotes)) > 0 "Say how this was resolved."
     mutate resolutionNotes = resolutionNotes
     mutate closedById = user.id
     mutate status = "closed"

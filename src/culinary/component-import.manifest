@@ -72,7 +72,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
   constraint importBatchPositive: self.parsedBatchMultiplier == null or self.parsedBatchMultiplier > 0 "When you enter a batch size, it must be more than zero."
   constraint importLineCountsNonnegative: self.parsedLineCount >= 0 and self.resolvedLineCount >= 0 "This recipe's line counts can't be negative. Use zero or more."
   constraint importResolvedWithinParsed: self.resolvedLineCount <= self.parsedLineCount "You can't finish more lines than this recipe has. Check the numbers."
-  constraint importCompletionRequiresComponent: self.completedAt == null or self.resultingComponentId != null "Completed imports require a resulting recipe"
+  constraint importCompletionRequiresComponent: self.completedAt == null or self.resultingComponentId != null "This import needs a finished recipe attached before it can complete."
 
   transition status from "uploaded" to ["parsed", "failed", "cancelled"]
   transition status from "parsed" to ["reviewing", "failed", "cancelled"]
@@ -133,7 +133,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     guard self.status == "uploaded"
     guard self.uploadedAt != null
     guard self.deletedAt == null
-    constraint parseNamePresent: length(trim(parsedName)) > 0 "Parsed recipe name is required"
+    constraint parseNamePresent: length(trim(parsedName)) > 0 "Give this parsed recipe a name."
     constraint parseLineCountNonnegative: parsedLineCount >= 0 "This recipe can't have a negative number of lines. Use zero or more."
     constraint parseYieldPositive: parsedYieldQuantity == null or parsedYieldQuantity > 0 "When you enter a yield, it must be more than zero."
     constraint parseBatchPositive: parsedBatchMultiplier == null or parsedBatchMultiplier > 0 "When you enter a batch size, it must be more than zero."
@@ -188,7 +188,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     guard self.reviewStartedAt != null
     guard self.reviewRevision == expectedReviewRevision
     guard self.deletedAt == null
-    constraint reviseNamePresent: length(trim(parsedName)) > 0 "Reviewed recipe name is required"
+    constraint reviseNamePresent: length(trim(parsedName)) > 0 "Give this reviewed recipe a name."
     constraint reviseYieldPositive: parsedYieldQuantity == null or parsedYieldQuantity > 0 "When you enter a yield on this review, it must be more than zero."
     constraint reviseBatchPositive: parsedBatchMultiplier == null or parsedBatchMultiplier > 0 "When you enter a batch size on this review, it must be more than zero."
     mutate parsedName = parsedName
@@ -271,7 +271,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     guard self.status != "completed"
     guard self.status != "cancelled"
     guard self.deletedAt == null
-    constraint failureDetailPresent: length(trim(failureDetail)) > 0 "Failure detail is required"
+    constraint failureDetailPresent: length(trim(failureDetail)) > 0 "Say what went wrong."
     compute previousStatus = self.status
     mutate status = "failed"
     mutate failedAt = now()
@@ -327,7 +327,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
   command cancel(reason: string) {
     guard self.status != "completed"
     guard self.deletedAt == null
-    constraint cancelReasonPresent: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancelReasonPresent: length(trim(reason)) > 0 "Say why you're cancelling this."
     compute previousStatus = self.status
     mutate status = "cancelled"
     mutate cancelledAt = now()
@@ -540,7 +540,7 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
 
   command discard(reason: string) {
     guard self.deletedAt == null
-    constraint discardReasonPresent: length(trim(reason)) > 0 "Discard reason is required"
+    constraint discardReasonPresent: length(trim(reason)) > 0 "Say why you're discarding this line."
     mutate deletedAt = now()
     emit ComponentImportLineDiscarded {
       componentImportLineId: self.id

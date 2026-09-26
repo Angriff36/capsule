@@ -305,8 +305,8 @@ entity RecurringAvailability mixin TenantScoped, SoftDeletable {
     guard user.id != null
     guard personId == user.personId or (user.personId == null and personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     constraint declarePersonMatch: personId == self.personId "This availability is for a different person. Pick the person already on this availability."
-    constraint declareDayOfWeek: dayOfWeek >= 0 and dayOfWeek <= 6 "Day of week must be 0 (Sunday) through 6 (Saturday)"
-    constraint declareMinutes: startMinute >= 0 and endMinute <= 1440 and endMinute > startMinute "Time band must fall within the day and end after it starts"
+    constraint declareDayOfWeek: dayOfWeek >= 0 and dayOfWeek <= 6 "Pick a day 0 through 6, Sunday through Saturday."
+    constraint declareMinutes: startMinute >= 0 and endMinute <= 1440 and endMinute > startMinute "Pick a start and end time within the day, with the end after the start."
     mutate personId = personId
     mutate dayOfWeek = dayOfWeek
     mutate startMinute = startMinute

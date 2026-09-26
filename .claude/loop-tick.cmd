@@ -1,5 +1,5 @@
 @echo off
-REM tick-model: GLM 5.2 via z.ai (MiniMax-M3 fallback) - zero Anthropic quota
+REM tick-model: Opus 5.5 on the Anthropic plan (GLM 5.3 flash, then MiniMax-M3 fallback) - Ryan 2026-09-25
 REM Each round: the MAKER makes one fix and stops; then loop-land.ps1 (plain code +
 REM a reviewer from a different provider) checks it and lands it on dev. The maker
 REM never checks or lands its own work. Up to 4 rounds per tick; a round with no
@@ -21,10 +21,15 @@ for /L %%i in (1,1,4) do (
     )
   )
   echo [%date% %time%] tick round %%i start >> ".claude\loop-tick.log"
-  type ".claude\loop-tick-prompt.txt" | pwsh -NoProfile -ExecutionPolicy Bypass -File "C:\Users\Ryan\.claude\claude-glm.ps1" -p --settings ".claude\loop-maker-settings.json" >> ".claude\loop-tick.log" 2>&1
+  type ".claude\loop-tick-prompt.txt" | claude -p --model claude-opus-5-5 --settings ".claude\loop-maker-settings.json" >> ".claude\loop-tick.log" 2>&1
   if errorlevel 1 (
-    echo [%date% %time%] GLM tick failed - retrying on MiniMax >> ".claude\loop-tick.log"
-    type ".claude\loop-tick-prompt.txt" | pwsh -NoProfile -ExecutionPolicy Bypass -File "C:\Users\Ryan\.claude\claude-minimax.ps1" -p --settings ".claude\loop-maker-settings.json" >> ".claude\loop-tick.log" 2>&1
+    echo [%date% %time%] Opus tick failed - retrying on GLM flash >> ".claude\loop-tick.log"
+    REM On the GLM plan the haiku alias maps to glm-5.3-flash.
+    type ".claude\loop-tick-prompt.txt" | pwsh -NoProfile -ExecutionPolicy Bypass -File "C:\Users\Ryan\.claude\claude-glm.ps1" -p --model haiku --settings ".claude\loop-maker-settings.json" >> ".claude\loop-tick.log" 2>&1
+    if errorlevel 1 (
+      echo [%date% %time%] GLM flash tick failed - retrying on MiniMax >> ".claude\loop-tick.log"
+      type ".claude\loop-tick-prompt.txt" | pwsh -NoProfile -ExecutionPolicy Bypass -File "C:\Users\Ryan\.claude\claude-minimax.ps1" -p --settings ".claude\loop-maker-settings.json" >> ".claude\loop-tick.log" 2>&1
+    )
   )
   if not exist ".loop-worktrees\_handoff\*.json" exit /b 0
   pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-land.ps1" >> ".claude\loop-tick.log" 2>&1

@@ -26,7 +26,7 @@ const MONTHS_IN_YEAR = 12;
 
 const COUNT_SERIES: ReportTrendSeries = {
   dataKey: "value",
-  name: "Records",
+  name: "Total",
   color: "var(--color-brand)",
   valueKind: "count",
 };
@@ -65,7 +65,7 @@ function buildEventsReport(
   const quoted = sum(rows, "quotedPrice");
   return model({
     subject: "events",
-    sourceLabel: "Event records",
+    sourceLabel: "Events",
     sourceDescription:
       "Current event plans supply guest counts, stages, budgets, and quoted revenue.",
     sourcePath: "/events",
@@ -130,7 +130,7 @@ function buildSalesReport(
   const accepted = rows.filter((row) => row.status === "accepted");
   return model({
     subject: "sales",
-    sourceLabel: "Proposal records",
+    sourceLabel: "Proposals",
     sourceDescription:
       "Current proposals supply pipeline status, guest counts, and proposed value.",
     sourcePath: "/clients/proposals",
@@ -198,9 +198,9 @@ function buildInventoryReport(
   ).length;
   return model({
     subject: "inventory",
-    sourceLabel: "Ingredient demand records",
+    sourceLabel: "Ingredient demand",
     sourceDescription:
-      "Demand lines supply quantities and purchasing status. Units stay separate; ingredient and event references remain permission-safe identifiers.",
+      "Demand lines supply quantities and purchasing status. Units stay separate, and the ingredient and event they belong to only show what you're allowed to see.",
     sourcePath: "/inventory/demand",
     effectiveWindow: dateWindow,
     kpis: [
@@ -248,7 +248,7 @@ function buildProductionReport(
   const blocked = rows.filter((row) => row.status === "blocked").length;
   return model({
     subject: "production",
-    sourceLabel: "Prep task records",
+    sourceLabel: "Prep tasks",
     sourceDescription:
       "Current prep tasks supply kitchen workload, stations, quantities, and completion status.",
     sourcePath: "/kitchen/prep",
@@ -312,7 +312,7 @@ function buildWorkforceReport(
   const noShows = rows.filter((row) => row.status === "no_show").length;
   return model({
     subject: "workforce",
-    sourceLabel: "Shift records",
+    sourceLabel: "Shifts",
     sourceDescription:
       "Current shifts supply scheduled hours, operational roles, and attendance status. Pay rates and labor cost are excluded.",
     sourcePath: "/staff/roster",
@@ -377,9 +377,9 @@ function buildLogisticsReport(
   const rows = filterRows(sourceRows, dateWindow, dateOf);
   return model({
     subject: "logistics",
-    sourceLabel: "Delivery records",
+    sourceLabel: "Deliveries",
     sourceDescription:
-      "Current deliveries supply schedule, destination, driver references, and delivery status. Notes and failure details are excluded.",
+      "Current deliveries supply schedule, destination, who's driving, and delivery status. Notes and failure details are excluded.",
     sourcePath: "/logistics/deliveries",
     effectiveWindow: dateWindow,
     kpis: [
@@ -434,9 +434,9 @@ function buildFinanceReport(
   const overdue = rows.filter(isOverdue).length;
   return model({
     subject: "finance",
-    sourceLabel: "Invoice records",
+    sourceLabel: "Invoices",
     sourceDescription:
-      "Current invoices supply issued value, payments received, outstanding balances, and payment status in functional-currency amounts. Collected is the invoice payment total (Invoice.amountPaid), so applied credit memos and written-off balances lower Outstanding without counting as cash and Collected plus Outstanding can be less than Invoiced. Voided invoices stay visible as evidence but contribute $0 to the KPIs.",
+      "Current invoices supply issued value, payments received, outstanding balances, and payment status in functional-currency amounts. Collected is the total paid so far on the invoice, so applied credit memos and written-off balances lower Outstanding without counting as cash, and Collected plus Outstanding can be less than Invoiced. Voided invoices stay visible as evidence but contribute $0 to the KPIs.",
     sourcePath: "/finance/invoices",
     effectiveWindow: dateWindow,
     kpis: [

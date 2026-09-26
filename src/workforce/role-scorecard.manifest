@@ -42,7 +42,7 @@ entity RoleScorecard mixin TenantScoped, SoftDeletable {
   property archivedAt: datetime?
   property archiveReason: string?
 
-  constraint scorecardComplete: self.definedAt == null or length(trim(self.title)) > 0 "Defined scorecards require a title"
+  constraint scorecardComplete: self.definedAt == null or length(trim(self.title)) > 0 "Give this scorecard a title."
 
   transition status from "active" to ["archived"]
   transition status from "archived" to ["active"]
@@ -60,7 +60,7 @@ entity RoleScorecard mixin TenantScoped, SoftDeletable {
     guard self.definedAt == null
     guard self.deletedAt == null
     guard user.id != null
-    constraint defineTitle: length(trim(title)) > 0 "Scorecard title is required"
+    constraint defineTitle: length(trim(title)) > 0 "Give this scorecard a title."
     mutate role = role
     mutate title = title
     mutate expectations = expectations != null ? expectations : "[]"
@@ -79,7 +79,7 @@ entity RoleScorecard mixin TenantScoped, SoftDeletable {
     guard self.definedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    constraint archiveScorecardReason: length(trim(reason)) > 0 "Archive reason is required"
+    constraint archiveScorecardReason: length(trim(reason)) > 0 "Say why you're archiving this scorecard."
     mutate status = "archived"
     mutate archivedAt = now()
     mutate archiveReason = reason

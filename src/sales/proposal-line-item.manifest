@@ -68,7 +68,7 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
 
   belongsTo proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
 
-  constraint lineComplete: self.addedAt == null or (length(trim(self.description)) > 0 and self.unitPrice >= 0 and self.quantity >= 0 and self.amount >= 0) "Priced lines require a description and non-negative money and quantity"
+  constraint lineComplete: self.addedAt == null or (length(trim(self.description)) > 0 and self.unitPrice >= 0 and self.quantity >= 0 and self.amount >= 0) "Give this line a description, and make sure the price and quantity are zero or more"
 
   default policy proposalLineItemRead read: roleAllows(user.role, "salesAccess") "Sales staff may see proposal line items"
   default policy proposalLineItemWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update proposal line items"
@@ -94,10 +94,10 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     guard self.addedAt == null
     guard self.deletedAt == null
     guard self.proposal != null and self.proposal.status == "draft"
-    constraint addLineProposalMatch: proposalId == self.proposalId "Add line proposalId must match the seeded proposal reference"
-    constraint addLineDescription: length(trim(description)) > 0 "Line description is required"
-    constraint addLineNonnegative: unitPrice >= 0 and amount >= 0 "Line money cannot be negative"
-    constraint addLineQuantityNonnegative: quantity == null or quantity >= 0 "Line quantity cannot be negative"
+    constraint addLineProposalMatch: proposalId == self.proposalId "This line is for a different proposal. Use the proposal already on this line."
+    constraint addLineDescription: length(trim(description)) > 0 "Give this line a description"
+    constraint addLineNonnegative: unitPrice >= 0 and amount >= 0 "This line's price can't be negative. Use zero or more."
+    constraint addLineQuantityNonnegative: quantity == null or quantity >= 0 "This line's quantity can't be negative. Use zero or more."
     mutate proposalId = proposalId
     mutate description = description
     mutate pricingBasis = pricingBasis
@@ -136,9 +136,9 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     guard self.addedAt != null
     guard self.deletedAt == null
     guard self.proposal != null and self.proposal.status == "draft"
-    constraint reviseLineDescription: length(trim(description)) > 0 "Line description is required"
-    constraint reviseLineNonnegative: unitPrice >= 0 and amount >= 0 "Line money cannot be negative"
-    constraint reviseLineQuantityNonnegative: quantity == null or quantity >= 0 "Line quantity cannot be negative"
+    constraint reviseLineDescription: length(trim(description)) > 0 "Give this line a description"
+    constraint reviseLineNonnegative: unitPrice >= 0 and amount >= 0 "This line's price can't be negative. Use zero or more."
+    constraint reviseLineQuantityNonnegative: quantity == null or quantity >= 0 "This line's quantity can't be negative. Use zero or more."
     mutate description = description
     mutate pricingBasis = pricingBasis
     mutate unitPrice = unitPrice

@@ -347,7 +347,9 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
       });
       const ingredientId = createdIngredientId(created);
       if (!ingredientId) {
-        setError("Ingredient was created but no id came back.");
+        setError(
+          "The ingredient was saved but didn't show up yet. Search for it and add it again.",
+        );
         return;
       }
       applySearchState(
@@ -386,7 +388,9 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
     const name = String(data.get("containerName") ?? "").trim();
     const servingsPerContainer = Number(data.get("servingsPerContainer") ?? 0);
     if (!name || servingsPerContainer < 1) {
-      setError("Container name and servings per pan are required.");
+      setError(
+        "Give this container a name and say how many servings fit in one pan.",
+      );
       return;
     }
     setBusy("add-container");

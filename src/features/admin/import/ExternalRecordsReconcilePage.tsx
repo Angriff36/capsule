@@ -330,7 +330,7 @@ export function ExternalRecordsReconcilePage() {
                 <th className="text-left py-3 px-4 font-medium">Old system</th>
                 <th className="text-left py-3 px-4 font-medium">Type</th>
                 <th className="text-left py-3 px-4 font-medium">
-                  Reference in the old system
+                  ID in the old system
                 </th>
                 <th className="text-left py-3 px-4 font-medium">
                   In Capsule as
@@ -492,8 +492,8 @@ export function ExternalRecordsReconcilePage() {
           <h3 className="font-medium text-xs mb-2">Actions</h3>
           <ul className="text-xs text-ink-2 space-y-1">
             <li>
-              • <strong>Match</strong>: Link an imported payment reference to an
-              existing Capsule payment, then mark it resolved.
+              • <strong>Match</strong>: Link an imported payment to an existing
+              Capsule payment, then mark it resolved.
             </li>
             <li>
               • <strong>Verify</strong>: Confirm a match is correct; the item is

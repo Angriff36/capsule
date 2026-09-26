@@ -363,11 +363,22 @@ export function PackListDetailPage() {
       }
       void run(`list:${key}`, async () => {
         const args = { docId: packList._id, version: packList.version };
-        if (key === "startPacking") await startPacking(args);
-        if (key === "markPacked") await markPacked(args);
-        if (key === "markLoaded") await markLoaded(args);
-        if (key === "dispatch") await dispatch(args);
-        setNotice(`Pack list updated (${key}).`);
+        if (key === "startPacking") {
+          await startPacking(args);
+          setNotice("Packing started.");
+        }
+        if (key === "markPacked") {
+          await markPacked(args);
+          setNotice("Pack list marked packed.");
+        }
+        if (key === "markLoaded") {
+          await markLoaded(args);
+          setNotice("Pack list marked loaded.");
+        }
+        if (key === "dispatch") {
+          await dispatch(args);
+          setNotice("Pack list dispatched.");
+        }
       });
     })();
   };
@@ -496,7 +507,7 @@ export function PackListDetailPage() {
         });
         setNotice(
           packedQuantity < required
-            ? `Recorded ${packedQuantity} of ${required}. This line stays open until the rest is packed.${started}`
+            ? `Packed ${packedQuantity} of ${required} so far. This line stays open until the rest is packed.${started}`
             : `Item marked packed.${started}`,
         );
       });
@@ -507,7 +518,7 @@ export function PackListDetailPage() {
         const started = await ensurePacking();
         await markItemMissing({ docId: item._id, version: item.version });
         setNotice(
-          `Item marked missing — resolve it in its owning system.${started}`,
+          `Item marked missing. Fix it wherever this item is tracked.${started}`,
         );
       });
       return;

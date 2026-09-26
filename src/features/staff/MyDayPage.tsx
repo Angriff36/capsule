@@ -519,9 +519,9 @@ export function MyDayPage() {
       {hasUnscopedQueuedWork() && (
         <div className="text-base text-warn">
           <p role="status">
-            Older unsynced actions have no account information and cannot be
-            replayed safely. They remain stored on this device unless you
-            discard them.
+            Some older offline actions aren't linked to an account, so they
+            can't be replayed safely. They stay on this device until you discard
+            them.
           </p>
           <button
             type="button"
@@ -586,7 +586,7 @@ export function MyDayPage() {
                     ))}
                   </div>
                   <p className="my-day-hours-note">
-                    Closed records · net of breaks
+                    Closed shifts · net of breaks
                   </p>
                   <p className="text-base text-ink-2">
                     {openRecord

@@ -51,10 +51,10 @@ export function ChatRecordPicker({
       </p>
     );
   } else if (results.length === 0) {
-    body = <p className="chat-picker-note">No matching records</p>;
+    body = <p className="chat-picker-note">No matches</p>;
   } else {
     body = (
-      <div role="listbox" aria-label="Records">
+      <div role="listbox" aria-label="Items">
         {results.map((target, index) => {
           const Icon = chatKindIcon(target.kind);
           return (

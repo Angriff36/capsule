@@ -70,7 +70,7 @@ function LifecycleButtons({
     void (async () => {
       const confirmed = await prompt.askConfirm({
         title: `Retire ${noun}`,
-        description: `${name} stops being offered on new work. Records that already use it keep it.`,
+        description: `${name} stops being offered on new work. Anything that already uses it keeps it.`,
         confirmLabel: `Retire ${noun}`,
         tone: "danger",
       });

@@ -130,8 +130,8 @@ export function VenueScorecardPanel({ venueId }: { venueId: string }) {
           <p className="text-sm text-ink-3">Loading event history…</p>
         ) : metrics.totalEvents === 0 ? (
           <p className="text-sm text-ink-3">
-            No events have been booked at this venue yet. Metrics appear once
-            events reference it.
+            No events have been booked at this venue yet. Numbers show up once
+            an event is booked here.
           </p>
         ) : (
           <dl className="grid content-start gap-3 rounded-sm border border-line bg-inset p-4 text-sm sm:grid-cols-2 sm:gap-x-8">

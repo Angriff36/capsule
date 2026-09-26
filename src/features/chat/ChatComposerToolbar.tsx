@@ -10,7 +10,7 @@ type Props = {
   readonly sending: boolean;
 };
 
-/** Attach · Link a record · Send — the composer's bottom row. */
+/** Attach · Link an item · Send — the composer's bottom row. */
 export function ChatComposerToolbar({
   onAttach,
   toolbarOpen,
@@ -50,7 +50,7 @@ export function ChatComposerToolbar({
         onClick={onToggleToolbar}
       >
         <LinkIcon width={14} height={14} />
-        Link a record
+        Link an item
       </button>
       <button
         type="submit"

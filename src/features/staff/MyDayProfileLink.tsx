@@ -32,10 +32,10 @@ export function MyDayProfileLink({
   }, [hasLinkedProfile, linkSelf, attempt]);
   const messages: Record<string, string> = {
     linking: "Opening your Capsule profile…",
-    already: "Your Capsule profile is ready. Loading your records…",
-    matched: "Your Capsule profile is ready. Loading your records…",
+    already: "Your Capsule profile is ready. Loading your info…",
+    matched: "Your Capsule profile is ready. Loading your info…",
     no_match:
-      "Your account does not have workspace access yet. Imported staff records do not grant account access.",
+      "Your account does not have workspace access yet. Being on the imported staff list doesn't grant account access.",
     released:
       "Access to this workspace was removed. Contact your workspace administrator to restore access.",
     ambiguous:

@@ -417,15 +417,17 @@ export const submitQuote = action({
       throw new ConvexError("Guest count must be between 1 and 100,000");
     }
     if (!args.clientName?.trim()) {
-      throw new ConvexError("Client name is required");
+      throw new ConvexError("Enter your name.");
     }
     if (!args.email?.trim()) {
-      throw new ConvexError("Email address is required");
+      throw new ConvexError("Enter your email address.");
     }
     // Consent is validated server-side, not just by the client checkbox — a
     // direct API caller cannot stamp a submission as consented without it.
     if (!args.consent) {
-      throw new ConvexError("Data processing consent is required");
+      throw new ConvexError(
+        "Agree to the privacy notice to send this request.",
+      );
     }
 
     if (

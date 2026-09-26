@@ -102,7 +102,7 @@ export function BrandingPage() {
     const accentColor = String(data.get("accentColor") ?? "").trim();
 
     if (!displayName || !address) {
-      setError("Display name and business address are required.");
+      setError("Give this business a display name and an address.");
       return;
     }
     if (!isValidBrandColor(primaryColor) || !isValidBrandColor(accentColor)) {
@@ -114,7 +114,7 @@ export function BrandingPage() {
       return;
     }
     if (logoFile && logoFile.size > MAX_LOGO_BYTES) {
-      setError("The logo must be 10 MB or smaller.");
+      setError("This logo has to be 10 MB or smaller. Pick a smaller file.");
       return;
     }
 
@@ -190,7 +190,7 @@ export function BrandingPage() {
     }
     if (!record) {
       setCurrencyError(
-        "Save branding first so the organization record exists before setting a currency.",
+        "Save branding first so this business is on file before setting a currency.",
       );
       return;
     }

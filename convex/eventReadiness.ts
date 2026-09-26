@@ -14,6 +14,7 @@ import {
   projectEventReadiness,
   type EventReadinessFacts,
 } from "./lib/eventReadinessProjection";
+import { openReconciliationFlags } from "./lib/reconciliationFlags";
 
 const live = (row: { deletedAt?: unknown }) => row.deletedAt == null;
 
@@ -70,6 +71,8 @@ export const getEventReadiness = query({
       purchaseNeeds,
       eventPacketIssues,
       eventCloseouts,
+      invoices,
+      proposals,
     ] = await Promise.all([
       byEvent(ctx, "eventDishes", tenantId, id),
       byEvent(ctx, "eventAssignments", tenantId, id),
@@ -79,7 +82,30 @@ export const getEventReadiness = query({
       byEvent(ctx, "purchaseNeeds", tenantId, id),
       byEvent(ctx, "eventPacketIssues", tenantId, id),
       byEvent(ctx, "eventCloseouts", tenantId, id),
+      byEvent(ctx, "invoices", tenantId, id),
+      byEvent(ctx, "proposals", tenantId, id),
     ]);
+    const reconciliationFlags = (
+      await Promise.all([
+        openReconciliationFlags(ctx, tenantId, id, event, "invoice", invoices),
+        openReconciliationFlags(
+          ctx,
+          tenantId,
+          id,
+          event,
+          "proposal",
+          proposals,
+        ),
+        openReconciliationFlags(
+          ctx,
+          tenantId,
+          id,
+          event,
+          "closeout",
+          eventCloseouts,
+        ),
+      ])
+    ).flat();
 
     const presentId = (value: unknown): string | null => {
       const raw = value == null ? "" : String(value);
@@ -135,6 +161,7 @@ export const getEventReadiness = query({
         .map((row: any) => String(row._id)),
       closeoutId: closeout ? String(closeout._id) : null,
       closeoutStatus: closeout ? (closeout.status ?? null) : null,
+      reconciliationFlags,
     };
 
     return projectEventReadiness(facts);

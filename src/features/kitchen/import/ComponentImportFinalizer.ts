@@ -73,14 +73,14 @@ export class ComponentImportFinalizer {
     operationKey?: string,
   ): Promise<ComponentImportFinalizeResult> {
     const name = review.name.trim();
-    if (!name) throw new Error("Recipe name is required");
+    if (!name) throw new Error("Give this recipe a name.");
     const yieldQuantity = requireMeasuredQuantity(
       review.yieldQuantity,
-      "Recipe yield quantity must be positive",
+      "This recipe's yield has to be more than zero. Enter how much it makes.",
     );
     const yieldUnit = requireMeasuredUnit(
       review.yieldUnit,
-      "Recipe yield unit is required",
+      "Pick a unit for this recipe's yield.",
     );
     if (review.lines.length === 0) {
       throw new Error("Add at least one ingredient line before saving");
@@ -95,13 +95,13 @@ export class ComponentImportFinalizer {
       line,
       quantity: requireMeasuredQuantity(
         line.quantity,
-        `Quantity must be positive for ${line.name}`,
+        `${line.name}'s quantity has to be more than zero.`,
       ),
-      unit: requireMeasuredUnit(line.unit, `Unit is required for ${line.name}`),
+      unit: requireMeasuredUnit(line.unit, `Pick a unit for ${line.name}.`),
     }));
     for (const { line } of measuredLines) {
       if (!isLineResolved(line)) {
-        throw new Error(`${line.name} is not resolved`);
+        throw new Error(`${line.name} still needs review.`);
       }
     }
 
@@ -160,7 +160,7 @@ export class ComponentImportFinalizer {
       } else if (line.matchedIngredientId) {
         ingredientIds.push(line.matchedIngredientId);
       } else {
-        throw new Error(`${line.name} is missing a matched ingredient`);
+        throw new Error(`Pick an ingredient for ${line.name} before saving.`);
       }
     }
 

@@ -102,7 +102,7 @@ export function eventAllowsDraftPoFromNeeds(stage: string): boolean {
 
 export function eventDraftPoBlockedReason(stage: string): string | null {
   if (eventAllowsDraftPoFromNeeds(stage)) return null;
-  return `Cannot draft a PO while the event is ${String(stage).replaceAll("_", " ")}.`;
+  return `This event is ${String(stage).replaceAll("_", " ")}, so you can't draft a PO for it now.`;
 }
 
 export class EventDraftPoCoordinator {

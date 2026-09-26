@@ -158,7 +158,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
     event.preventDefault();
     const name = taskName.trim();
     if (!name) {
-      setError("A task name is required.");
+      setError("Give this task a name.");
       return;
     }
 

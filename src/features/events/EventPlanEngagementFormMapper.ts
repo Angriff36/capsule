@@ -49,10 +49,10 @@ export class EventPlanEngagementFormMapper {
     // schema, so the form collects it explicitly.
     const eventType = input.eventTypeRaw.trim();
     const primaryContactName = input.primaryContactName.trim();
-    if (!title) throw new Error("Event title is required.");
-    if (!eventType) throw new Error("Event type is required.");
+    if (!title) throw new Error("Give this event a title.");
+    if (!eventType) throw new Error("Pick what type of event this is.");
     if (!primaryContactName) {
-      throw new Error("Primary contact name is required.");
+      throw new Error("Give this event a primary contact name.");
     }
 
     const args: Record<string, unknown> = {
@@ -101,10 +101,10 @@ export class EventPlanEngagementFormMapper {
     const startsAt = Date.parse(input.startsAtRaw);
     const endsAt = Date.parse(input.endsAtRaw);
     if (!Number.isFinite(startsAt) || !Number.isFinite(endsAt)) {
-      throw new TypeError("Start and end must be valid dates.");
+      throw new TypeError("Enter valid start and end dates.");
     }
     if (endsAt <= startsAt) {
-      throw new Error("Event end must be after its start.");
+      throw new Error("This event's end time has to be after its start time.");
     }
 
     const expectedHeadcount = Number(input.expectedHeadcountRaw);
@@ -113,7 +113,7 @@ export class EventPlanEngagementFormMapper {
       expectedHeadcount < 1 ||
       expectedHeadcount > 100000
     ) {
-      throw new Error("Headcount must be a number between 1 and 100000.");
+      throw new Error("Enter a headcount between 1 and 100,000.");
     }
 
     const budgetAmount = Number(input.budgetAmountRaw);
@@ -124,7 +124,9 @@ export class EventPlanEngagementFormMapper {
       budgetAmount < 0 ||
       quotedPrice < 0
     ) {
-      throw new Error("Budget and quoted price must be zero or greater.");
+      throw new Error(
+        "Budget and quoted price can't be negative. Use zero or more.",
+      );
     }
 
     return { startsAt, endsAt, expectedHeadcount, budgetAmount, quotedPrice };

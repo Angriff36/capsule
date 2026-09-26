@@ -67,7 +67,7 @@ entity PaymentMethod mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard self.client != null
-    constraint registerClientMatch: clientId == self.clientId "Register clientId must match the seeded client reference"
+    constraint registerClientMatch: clientId == self.clientId "This payment method is for a different client. Use the client already on this payment method."
     constraint registerLastFour: lastFour == null or length(trim(lastFour)) <= 4 "Last-four hint must be at most four characters"
     mutate clientId = clientId
     mutate methodType = methodType
@@ -136,7 +136,7 @@ entity PaymentMethod mixin TenantScoped, SoftDeletable {
   command invalidate(reason: string) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint invalidateReason: length(trim(reason)) > 0 "Invalidation reason is required"
+    constraint invalidateReason: length(trim(reason)) > 0 "Give a reason for marking this invalid"
     mutate status = "invalid"
     mutate invalidatedAt = now()
     mutate notes = reason

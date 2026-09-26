@@ -45,7 +45,7 @@ entity ProposalRevision mixin TenantScoped, SoftDeletable {
     guard self.capturedAt == null
     guard self.deletedAt == null
     guard user.id != null
-    constraint captureSnapshotPayload: length(trim(snapshot)) > 0 "Snapshot payload is required"
+    constraint captureSnapshotPayload: length(trim(snapshot)) > 0 "Couldn't save what the proposal looked like for this revision"
     mutate proposalId = proposalId
     mutate revisionNumber = revisionNumber
     mutate capturedByName = capturedByName

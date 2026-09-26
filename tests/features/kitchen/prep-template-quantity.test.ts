@@ -64,7 +64,8 @@ describe("prep template batch-total leftover: persist derived per-guest", () => 
       PrepTemplateQuantityCoordinator.persist("fixed", "", "", ""),
     ).toEqual({
       ok: false,
-      error: "Fixed amount must be greater than zero.",
+      error:
+        "This fixed amount has to be more than zero. Enter how much to use.",
     });
     expect(
       PrepTemplateQuantityCoordinator.persist("fixed", "", "12", ""),

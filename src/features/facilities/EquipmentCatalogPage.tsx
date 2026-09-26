@@ -107,7 +107,7 @@ export function EquipmentCatalogPage() {
       if (key === "recount") {
         const values = await prompt.askFields({
           title: "Recount equipment",
-          description: `Record the actual counted quantity for ${item.name}.`,
+          description: `Enter the actual counted quantity for ${item.name}.`,
           fields: [
             {
               name: "quantity",

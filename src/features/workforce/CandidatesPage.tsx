@@ -405,7 +405,7 @@ export function CandidatesPage() {
             disabled={busy || !kmJson.trim()}
             onClick={runIngest}
           >
-            {busy ? "Importing…" : "Ingest KM export"}
+            {busy ? "Importing…" : "Import KM export"}
           </button>
         </div>
       </section>

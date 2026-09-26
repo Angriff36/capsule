@@ -86,7 +86,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   ref supersededBy: Proposal fields [tenantId, supersededById] references [tenantId, id]
   ref replacesProposal: Proposal fields [tenantId, replacesProposalId] references [tenantId, id]
 
-  constraint proposalDraftComplete: self.draftedAt == null or (length(trim(self.title)) > 0 and self.guestCount >= 0 and self.subtotal >= 0 and self.taxAmount >= 0 and self.discountAmount >= 0 and self.total >= 0) "Drafted proposals require a title and non-negative money and guest counts"
+  constraint proposalDraftComplete: self.draftedAt == null or (length(trim(self.title)) > 0 and self.guestCount >= 0 and self.subtotal >= 0 and self.taxAmount >= 0 and self.discountAmount >= 0 and self.total >= 0) "Give this proposal a title, and make sure the money amounts and guest count are zero or more"
   constraint proposalTotalsConsistent: self.draftedAt == null or self.total == self.subtotal + self.taxAmount - self.discountAmount "Proposal total must equal subtotal plus tax minus discount"
 
   transition status from "draft" to ["sent"]
@@ -126,10 +126,10 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     guard self.status == "draft"
     guard self.deletedAt == null
     guard self.client != null
-    constraint draftClientMatch: clientId == self.clientId "Draft clientId must match the seeded client reference"
-    constraint draftTitle: length(trim(title)) > 0 "Proposal title is required"
-    constraint draftGuestCount: guestCount == null or guestCount >= 0 "Guest count cannot be negative"
-    constraint draftMoneyNonnegative: subtotal >= 0 and taxAmount >= 0 and discountAmount >= 0 and total >= 0 "Proposal money amounts cannot be negative"
+    constraint draftClientMatch: clientId == self.clientId "This proposal is for a different client. Use the client already on this proposal."
+    constraint draftTitle: length(trim(title)) > 0 "Give this proposal a title"
+    constraint draftGuestCount: guestCount == null or guestCount >= 0 "The guest count can't be negative. Use zero or more."
+    constraint draftMoneyNonnegative: subtotal >= 0 and taxAmount >= 0 and discountAmount >= 0 and total >= 0 "This proposal's money amounts can't be negative. Use zero or more."
     constraint draftTotalMatch: total == subtotal + taxAmount - discountAmount "Proposal total must equal subtotal plus tax minus discount"
     mutate clientId = clientId
     mutate title = title
@@ -173,12 +173,41 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     mutate replacesProposalId = self.replacesProposalId
   }
 
+  // Event.changeHeadcount follow-through (AC-388 proposal draft slice): an
+  // unsent draft still sized for the event's old guest count follows the new
+  // count. convex/lib/proposalReconciliation.ts prices it with the central
+  // calc (src/lib/pricing.ts); tax and discount stay as the person set them.
+  command followEventHeadcount(guestCount: number, subtotal: money(12, 2), total: money(12, 2)) {
+    guard self.status == "draft"
+    guard self.draftedAt != null
+    guard self.deletedAt == null
+    guard self.eventId != null
+    constraint followGuestCount: guestCount >= 0 "The guest count can't be negative. Use zero or more."
+    constraint followMoneyNonnegative: subtotal >= 0 and total >= 0 "This proposal's money amounts can't be negative. Use zero or more."
+    constraint followTotalMatch: total == subtotal + self.taxAmount - self.discountAmount "Proposal total must equal subtotal plus tax minus discount"
+    compute previousGuestCount = self.guestCount
+    compute previousTotal = self.total
+    mutate guestCount = guestCount
+    mutate subtotal = subtotal
+    mutate total = total
+    emit ProposalEventHeadcountFollowed {
+      proposalId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
+      previousGuestCount: previousGuestCount
+      guestCount: guestCount
+      previousTotal: previousTotal
+      total: total
+    }
+  }
+
   command send() {
     guard self.status == "draft"
     guard self.draftedAt != null
     guard self.deletedAt == null
     guard self.client != null and self.client.status == "active"
-    constraint sendTitle: length(trim(self.title)) > 0 "Proposal title is required before send"
+    constraint sendTitle: length(trim(self.title)) > 0 "Give this proposal a title before you send it"
     mutate status = "sent"
     mutate sentAt = now()
     emit ProposalSent {
@@ -382,6 +411,17 @@ event ProposalDrafted: "proposal.drafted" {
   tenantId: string
   clientId: string
   title: string
+  total: money(12, 2)
+}
+
+event ProposalEventHeadcountFollowed: "proposal.event_headcount_followed" {
+  proposalId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+  previousGuestCount: number
+  guestCount: number
+  previousTotal: money(12, 2)
   total: money(12, 2)
 }
 

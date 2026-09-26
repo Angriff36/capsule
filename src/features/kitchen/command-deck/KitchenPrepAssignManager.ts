@@ -26,7 +26,9 @@ export class KitchenPrepAssignManager {
 
   async assignOne(task: PrepTaskLike, personId: string): Promise<void> {
     if (!KitchenPrepAssignManager.canAssign(task)) {
-      throw new Error("A finished or cancelled task cannot change hands");
+      throw new Error(
+        "This task is finished or cancelled, so it can't change hands. Pick another task.",
+      );
     }
     await this.assignFn({
       docId: task._id,
@@ -52,7 +54,9 @@ export class KitchenPrepAssignManager {
 
   async releaseOne(task: PrepTaskLike): Promise<void> {
     if (task.status !== "claimed") {
-      throw new Error("Only claimed tasks can be released");
+      throw new Error(
+        "This task hasn't been claimed, so it can't be released.",
+      );
     }
     await this.releaseFn({ docId: task._id, version: task.version });
   }

@@ -136,11 +136,11 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
   ref sourceImportRun: ImportRun fields [tenantId, sourceImportRunId] references [tenantId, id]
 
   // Constraints
-  constraint linkSourceSystemPresent: self.sourceSystem != null "Source system is required"
-  constraint linkExternalIdPresent: length(trim(self.externalId)) > 0 "External ID is required"
-  constraint linkDatesOrdered: self.effectiveStartDate == null or self.effectiveEndDate == null or self.effectiveStartDate <= self.effectiveEndDate "Effective start date must be before or equal to end date"
-  constraint linkVerifiedRequiresUser: self.verified == false or self.verifiedByUserId != null "Verified status requires a verifying user"
-  constraint linkResolvedRequiresUser: self.conflictStatus == "resolved" or self.resolvedByUserId == null "Resolved status requires a resolving user"
+  constraint linkSourceSystemPresent: self.sourceSystem != null "Pick a source system for this match."
+  constraint linkExternalIdPresent: length(trim(self.externalId)) > 0 "Give this match an external ID."
+  constraint linkDatesOrdered: self.effectiveStartDate == null or self.effectiveEndDate == null or self.effectiveStartDate <= self.effectiveEndDate "This match's start date has to be on or before its end date."
+  constraint linkVerifiedRequiresUser: self.verified == false or self.verifiedByUserId != null "This match can't be marked verified without picking who verified it."
+  constraint linkResolvedRequiresUser: self.conflictStatus == "resolved" or self.resolvedByUserId == null "This match can't be marked resolved without picking who resolved it."
 
   // Policies
   default policy externalRecordLinkRead read: roleAllows(user.role, "importAccess") "Staff may see import matches"
@@ -172,11 +172,11 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     // No `self.createdAt == null` guard: timestamps fill createdAt into the
     // draft before guards run, so that guard failed on every create (#371).
     guard self.deletedAt == null
-    constraint linkSourceSystemPresent: sourceSystem != null "Source system is required"
-    constraint linkExternalIdPresent: length(trim(externalId)) > 0 "External ID is required"
-    constraint linkCapsuleIdPresent: length(trim(capsuleId)) > 0 "Capsule ID is required"
-    constraint linkVerifiedRequiresUser: verified == null or verified == false or (verifiedByUserId != null and length(trim(verifiedByUserId)) > 0) "Verified status requires a verifying user"
-    constraint linkDatesOrdered: effectiveStartDate == null or effectiveEndDate == null or effectiveStartDate <= effectiveEndDate "Effective start date must be before or equal to end date"
+    constraint linkSourceSystemPresent: sourceSystem != null "Pick a source system for this match."
+    constraint linkExternalIdPresent: length(trim(externalId)) > 0 "Give this match an external ID."
+    constraint linkCapsuleIdPresent: length(trim(capsuleId)) > 0 "Give this match a Capsule ID."
+    constraint linkVerifiedRequiresUser: verified == null or verified == false or (verifiedByUserId != null and length(trim(verifiedByUserId)) > 0) "This match can't be marked verified without picking who verified it."
+    constraint linkDatesOrdered: effectiveStartDate == null or effectiveEndDate == null or effectiveStartDate <= effectiveEndDate "This match's start date has to be on or before its end date."
     mutate sourceSystem = sourceSystem
     mutate recordType = recordType != null ? recordType : ""
     mutate externalId = externalId
@@ -242,7 +242,7 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
   command decide(decision: LinkDecision, decidedByUserId: string) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint decideUserPresent: length(trim(decidedByUserId)) > 0 "Deciding user is required"
+    constraint decideUserPresent: length(trim(decidedByUserId)) > 0 "Pick who decided this."
     mutate decision = decision
     mutate decidedByUserId = decidedByUserId
     mutate decidedAt = now()
@@ -261,7 +261,7 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint verifyUserPresent: length(trim(verifiedByUserId)) > 0 "Verifying user is required"
+    constraint verifyUserPresent: length(trim(verifiedByUserId)) > 0 "Pick who verified this."
     mutate verified = verified != null ? verified : true
     mutate verifiedByUserId = verifiedByUserId
     mutate lastVerifiedAt = now()
@@ -285,7 +285,7 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint unlinkReasonPresent: length(trim(reason)) > 0 "Unlink reason is required"
+    constraint unlinkReasonPresent: length(trim(reason)) > 0 "Say why you're taking this match off."
     mutate deletedAt = now()
     mutate effectiveEndDate = effectiveEndDate != null ? effectiveEndDate : now()
     emit ExternalRecordUnlinked {
@@ -304,7 +304,7 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
   command updateCapsuleId(capsuleId: string) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint updateCapsuleIdPresent: length(trim(capsuleId)) > 0 "Capsule ID is required"
+    constraint updateCapsuleIdPresent: length(trim(capsuleId)) > 0 "Give this match a Capsule ID."
     compute previousCapsuleId = self.capsuleId
     mutate capsuleId = capsuleId
     mutate lastVerifiedAt = now()
@@ -326,7 +326,7 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint resolveUserPresent: length(trim(resolvedByUserId)) > 0 "Resolving user is required"
+    constraint resolveUserPresent: length(trim(resolvedByUserId)) > 0 "Pick who resolved this."
     mutate conflictStatus = conflictStatus
     mutate resolvedByUserId = resolvedByUserId
     mutate resolutionNote = resolutionNote
@@ -357,7 +357,7 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
   // discard - Soft delete a link
   command discard(reason: string) {
     guard self.deletedAt == null
-    constraint discardReasonPresent: length(trim(reason)) > 0 "Discard reason is required"
+    constraint discardReasonPresent: length(trim(reason)) > 0 "Say why you're deleting this match."
     mutate deletedAt = now()
     mutate effectiveEndDate = effectiveEndDate != null ? effectiveEndDate : now()
     emit ExternalRecordDiscarded {
@@ -533,7 +533,7 @@ entity ImportConflict mixin TenantScoped, SoftDeletable {
 
   belongsTo externalRecordLink: ExternalRecordLink fields [tenantId, externalRecordLinkId] references [tenantId, id]
 
-  constraint conflictFieldPresent: self.raisedAt == null or length(trim(self.field)) > 0 "Conflict field is required"
+  constraint conflictFieldPresent: self.raisedAt == null or length(trim(self.field)) > 0 "Say which field is in conflict."
 
   transition status from "pending" to ["keep_capsule", "take_source", "manual"]
   transition status from "keep_capsule" to ["pending"]
@@ -554,7 +554,7 @@ entity ImportConflict mixin TenantScoped, SoftDeletable {
   ) {
     guard self.raisedAt == null
     guard self.deletedAt == null
-    constraint raiseFieldPresent: length(trim(field)) > 0 "Conflict field is required"
+    constraint raiseFieldPresent: length(trim(field)) > 0 "Say which field is in conflict."
     mutate externalRecordLinkId = externalRecordLinkId
     mutate field = field
     mutate appliedValue = appliedValue
@@ -585,8 +585,8 @@ entity ImportConflict mixin TenantScoped, SoftDeletable {
     guard self.raisedAt != null
     guard self.deletedAt == null
     guard self.status == "pending"
-    constraint settleUserPresent: length(trim(resolvedByUserId)) > 0 "Resolving user is required"
-    constraint settleNotPending: resolution != "pending" "Resolution must pick keep_capsule, take_source or manual"
+    constraint settleUserPresent: length(trim(resolvedByUserId)) > 0 "Pick who resolved this disagreement."
+    constraint settleNotPending: resolution != "pending" "Pick how you resolved this: keep the current value, use the new value, or fix it another way."
     mutate status = resolution
     mutate resolvedByUserId = resolvedByUserId
     mutate resolvedAt = now()

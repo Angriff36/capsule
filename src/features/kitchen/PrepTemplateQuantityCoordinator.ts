@@ -115,7 +115,8 @@ export class PrepTemplateQuantityCoordinator {
       if (amount == null) {
         return {
           ok: false,
-          error: "Fixed amount must be greater than zero.",
+          error:
+            "This fixed amount has to be more than zero. Enter how much to use.",
         };
       }
       return { ok: true, perGuest: amount };
@@ -126,7 +127,8 @@ export class PrepTemplateQuantityCoordinator {
       if (perGuest == null) {
         return {
           ok: false,
-          error: "Per-guest quantity must be greater than zero.",
+          error:
+            "This per-guest quantity has to be more than zero. Enter how much per guest.",
         };
       }
       return { ok: true, perGuest };
@@ -137,13 +139,15 @@ export class PrepTemplateQuantityCoordinator {
     if (total == null) {
       return {
         ok: false,
-        error: "Batch total must be greater than zero.",
+        error:
+          "This batch total has to be more than zero. Enter how much the batch makes.",
       };
     }
     if (servings == null) {
       return {
         ok: false,
-        error: "Serving count must be a whole number greater than zero.",
+        error:
+          "This serving count has to be a whole number more than zero. Enter how many servings.",
       };
     }
     const perGuest = PrepTemplateQuantityCoordinator.perGuestFromBatch(
@@ -154,7 +158,7 @@ export class PrepTemplateQuantityCoordinator {
       return {
         ok: false,
         error:
-          "Could not derive a per-guest rate from that total and serving count.",
+          "Can't work out a per-guest amount from that total and serving count.",
       };
     }
     return { ok: true, perGuest };

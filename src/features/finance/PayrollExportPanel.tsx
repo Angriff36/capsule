@@ -204,7 +204,7 @@ function PayrollExportPreview({
                 <th>Employee</th>
                 <th>Regular</th>
                 <th>Overtime</th>
-                <th>Recorded</th>
+                <th>Clocked</th>
                 <th>Manual adjustment</th>
                 <th>Est. gross</th>
               </tr>

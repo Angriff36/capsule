@@ -59,7 +59,7 @@ entity ProposalTemplate mixin TenantScoped, SoftDeletable {
 
   computed isActive: boolean = self.status == "active"
 
-  constraint templateComplete: self.definedAt == null or (length(trim(self.name)) > 0) "Defined templates require a name"
+  constraint templateComplete: self.definedAt == null or (length(trim(self.name)) > 0) "Give this template a name"
   constraint validityDaysRange: self.validityDays == null or (self.validityDays >= 1 and self.validityDays <= 365) "Validity days must be between 1 and 365"
   constraint taxRateRange: self.defaultTaxRate == null or (self.defaultTaxRate >= 0 and self.defaultTaxRate <= 1) "Tax rate must be between 0 and 1 (100%)"
   constraint serviceChargeRange: self.defaultServiceChargePercent == null or (self.defaultServiceChargePercent >= 0 and self.defaultServiceChargePercent <= 1) "Service charge must be between 0 and 1 (100%)"
@@ -84,7 +84,7 @@ entity ProposalTemplate mixin TenantScoped, SoftDeletable {
     guard self.definedAt == null
     guard self.deletedAt == null
     guard user.id != null
-    constraint defineTemplateName: length(trim(name)) > 0 "Template name is required"
+    constraint defineTemplateName: length(trim(name)) > 0 "Give this template a name"
     constraint defineTaxRate: defaultTaxRate == null or (defaultTaxRate >= 0 and defaultTaxRate <= 1) "Tax rate must be between 0 and 100%"
     constraint defineServiceCharge: defaultServiceChargePercent == null or (defaultServiceChargePercent >= 0 and defaultServiceChargePercent <= 1) "Service charge must be between 0 and 100%"
     constraint defineValidityDays: validityDays == null or (validityDays >= 1 and validityDays <= 365) "Validity days must be between 1 and 365"
@@ -120,7 +120,7 @@ entity ProposalTemplate mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard user.id != null
-    constraint reviseTemplateName: length(trim(name)) > 0 "Template name is required"
+    constraint reviseTemplateName: length(trim(name)) > 0 "Give this template a name"
     constraint reviseTaxRate: defaultTaxRate == null or (defaultTaxRate >= 0 and defaultTaxRate <= 1) "Tax rate must be between 0 and 100%"
     constraint reviseServiceCharge: defaultServiceChargePercent == null or (defaultServiceChargePercent >= 0 and defaultServiceChargePercent <= 1) "Service charge must be between 0 and 100%"
     constraint reviseValidityDays: validityDays == null or (validityDays >= 1 and validityDays <= 365) "Validity days must be between 1 and 365"
@@ -147,7 +147,7 @@ entity ProposalTemplate mixin TenantScoped, SoftDeletable {
     guard self.definedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    constraint archiveTemplateReason: length(trim(reason)) > 0 "Archive reason is required"
+    constraint archiveTemplateReason: length(trim(reason)) > 0 "Give a reason for archiving this template"
     mutate status = "archived"
     mutate archivedAt = now()
     mutate archiveReason = reason

@@ -79,8 +79,8 @@ export function AppShell() {
           {!online && (
             <div className="flex items-center gap-2 border-b border-warn/30 bg-warn-soft px-4 py-1.5 text-sm font-medium text-warn">
               <WifiOffIcon width={13} height={13} />
-              Offline — showing the last synced data. Changes will fail until
-              the connection returns.
+              You're offline — showing what was last loaded. Changes won't save
+              until you're back online.
             </div>
           )}
           <AnnouncementBanner />

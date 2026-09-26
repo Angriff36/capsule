@@ -177,6 +177,7 @@ import {
   EventCloseOutParamsSchema,
   EventCloseoutCaptureParamsSchema,
   EventCloseoutFinalizeParamsSchema,
+  EventCloseoutFollowEventCommercialParamsSchema,
   EventCompleteParamsSchema,
   EventConfigureRecurrenceParamsSchema,
   EventConfigureTimingParamsSchema,
@@ -349,6 +350,7 @@ import {
   InvoiceApplyCreditParamsSchema,
   InvoiceApplyPaymentParamsSchema,
   InvoiceAssignNumberParamsSchema,
+  InvoiceFollowEventPriceParamsSchema,
   InvoiceIssueParamsSchema,
   InvoiceMarkDepositPaidParamsSchema,
   InvoiceMarkOverdueParamsSchema,
@@ -519,6 +521,7 @@ import {
   ProposalEnhancementReviseParamsSchema,
   ProposalEnhancementWithdrawParamsSchema,
   ProposalExpireParamsSchema,
+  ProposalFollowEventHeadcountParamsSchema,
   ProposalLineItemAddLineParamsSchema,
   ProposalLineItemRemoveLineParamsSchema,
   ProposalLineItemReviseLineParamsSchema,
@@ -3543,6 +3546,16 @@ export function useEventCloseoutFinalize() {
   };
 }
 
+/** Mutation hook for EventCloseout.followEventCommercial. */
+export function useEventCloseoutFollowEventCommercial() {
+  const mutate = useMutation(api.mutations.EventCloseout_followEventCommercial);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventCloseoutFollowEventCommercialParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Governed creation hook for EventCloseout.capture. */
 export function useCreateEventCloseout() {
   const mutate = useMutation(api.mutations.EventCloseout_createViaCapture);
@@ -5633,6 +5646,16 @@ export function useInvoiceAssignNumber() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = InvoiceAssignNumberParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Invoice.followEventPrice. */
+export function useInvoiceFollowEventPrice() {
+  const mutate = useMutation(api.mutations.Invoice_followEventPrice);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceFollowEventPriceParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -7828,6 +7851,16 @@ export function useProposalExpire() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ProposalExpireParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Proposal.followEventHeadcount. */
+export function useProposalFollowEventHeadcount() {
+  const mutate = useMutation(api.mutations.Proposal_followEventHeadcount);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalFollowEventHeadcountParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11367,4 +11400,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1209 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1212 as const;

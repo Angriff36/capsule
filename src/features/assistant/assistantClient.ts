@@ -246,7 +246,7 @@ export async function executeAssistantToolCall(
     if (call.execution.kind === "event-import") {
       if (!context)
         throw new Error(
-          "The event import requires its original source context.",
+          "This import needs the original BEO. Attach it again and try once more.",
         );
       let source = context;
       let existingEventId: string | undefined;

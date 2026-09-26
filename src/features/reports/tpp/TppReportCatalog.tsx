@@ -112,8 +112,8 @@ export function TppReportCatalog() {
           <p className="live-report-eyebrow">Total Party Planner reports</p>
           <h1 className="display-title">Reports</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            The complete TPP report library, using current Capsule records.
-            Choose a report, set its filters, then print or export the result.
+            The complete TPP report library, using current Capsule data. Choose
+            a report, set its filters, then print or export the result.
           </p>
         </div>
         <span className="tpp-report-count">89 reports</span>

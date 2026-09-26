@@ -383,7 +383,7 @@ function ClientPortalDocumentLibrary({
               kind="contract"
               eyebrow="Signed contract"
               title={contract.title}
-              reference={contract.contractNumber || "Executed agreement"}
+              reference={contract.contractNumber || "Signed agreement"}
               detail={`Signed ${formatDocumentDate(contract.signedAt)}`}
               state={downloadState}
               onDownload={() =>
@@ -635,7 +635,7 @@ function formatTimeRange(startsAt: number, endsAt: number | null): string {
 }
 
 function formatDocumentDate(value: number | null | undefined): string {
-  if (value == null) return "date not recorded";
+  if (value == null) return "no date on file";
   return new Intl.DateTimeFormat(undefined, {
     month: "short",
     day: "numeric",

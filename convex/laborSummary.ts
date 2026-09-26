@@ -162,6 +162,10 @@ export const eventLaborSummary = query({
   handler: async (ctx, args): Promise<EventLaborSummary | null> => {
     const auth = await getAuthContext(ctx);
     if (!canReadLaborAggregates(auth.role)) return null;
+    // An event of another workspace, or a missing one, reads as not found.
+    const event = await ctx.db.get(args.eventId);
+    if (!event || event.tenantId !== auth.tenantId || event.deletedAt != null)
+      return null;
     const eventId = String(args.eventId);
     const [people, records, shifts] = await Promise.all([
       tenantPeople(ctx, auth.tenantId),

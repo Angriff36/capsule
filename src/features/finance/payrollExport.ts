@@ -254,7 +254,7 @@ export function buildPayrollExport({
     throw new Error("Choose a valid payroll period.");
   }
   if (endAt < startAt) {
-    throw new Error("Payroll period end must be on or after its start.");
+    throw new Error("Set the payroll period end on or after its start.");
   }
   const endExclusiveAt = localDayEndExclusive(periodEnd);
   const accumulators = new Map<string, Accumulator>();

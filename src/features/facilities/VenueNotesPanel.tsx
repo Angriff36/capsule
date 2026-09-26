@@ -90,7 +90,7 @@ export function VenueNotesPanel({ venueId }: Props) {
       <div>
         <h3 className="text-lg font-semibold text-ink">Venue Notes</h3>
         <p className="text-base text-ink-3">
-          Structured notes about this venue for institutional memory.
+          Notes about this venue so the whole team knows what to expect.
         </p>
       </div>
 
@@ -257,8 +257,8 @@ export function VenueNotesPanel({ venueId }: Props) {
         ))}
         {venueNotes.length === 0 ? (
           <li className="px-3 py-3 text-base text-ink-3">
-            No notes yet. Add a note to record important information about this
-            venue.
+            No notes yet. Add a note to keep important information about this
+            venue on file.
           </li>
         ) : null}
       </ul>

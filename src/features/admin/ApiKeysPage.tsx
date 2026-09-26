@@ -94,7 +94,7 @@ export function ApiKeysPage() {
     <div className="page">
       <PageHeader
         title="API keys"
-        lead="Give a remote agent one key. It then uses the command API as you — same tenant, same permissions — until you revoke the key here."
+        lead="Give a remote agent one key. It then acts as you when it calls the API — same business, same permissions — until you revoke the key here."
       />
       <AdminWorkspaceNav />
       {error ? <ErrorState title="API keys" detail={error} /> : null}

@@ -76,9 +76,9 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   // with null lineTotalAmount contribute 0 until next touched.
   computed liveTotalAmount: money(12, 2) = sum(self.lines, (line) => (line.deletedAt == null and line.lineTotalAmount != null) ? line.lineTotalAmount : 0) + self.taxAmount + self.shippingAmount
 
-  constraint orderMoneyNonnegative: self.subtotal >= 0 and self.taxAmount >= 0 and self.shippingAmount >= 0 and self.totalAmount >= 0 "Order money amounts cannot be negative"
-  constraint orderSourceRangeComplete: (self.sourceRangeStart == null and self.sourceRangeEnd == null) or (self.sourceRangeStart != null and self.sourceRangeEnd != null) "Order source range requires both a start and end"
-  constraint orderSourceRangeOrdered: self.sourceRangeStart == null or self.sourceRangeEnd == null or self.sourceRangeStart <= self.sourceRangeEnd "Order source range end must not precede its start"
+  constraint orderMoneyNonnegative: self.subtotal >= 0 and self.taxAmount >= 0 and self.shippingAmount >= 0 and self.totalAmount >= 0 "Order money amounts can't be negative. Use zero or more."
+  constraint orderSourceRangeComplete: (self.sourceRangeStart == null and self.sourceRangeEnd == null) or (self.sourceRangeStart != null and self.sourceRangeEnd != null) "Give this order both a start and an end date, or leave both blank."
+  constraint orderSourceRangeOrdered: self.sourceRangeStart == null or self.sourceRangeEnd == null or self.sourceRangeStart <= self.sourceRangeEnd "This order's date range end can't be before its start."
 
   transition status from "draft" to ["submitted", "pending_approval", "cancelled"]
   transition status from "pending_approval" to ["submitted", "draft", "cancelled"]
@@ -106,10 +106,10 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     guard self.status == "draft"
     guard self.deletedAt == null
     guard self.vendor != null and self.vendor.status == "active" and self.vendor.onboardedAt != null
-    constraint openVendorMatch: vendorId == self.vendorId "Open vendorId must match the seeded vendor reference"
-    constraint openEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Open eventId must match the seeded event reference when provided"
-    constraint openSourceRangeComplete: (sourceRangeStart == null and sourceRangeEnd == null) or (sourceRangeStart != null and sourceRangeEnd != null) "Open source range requires both a start and end"
-    constraint openSourceRangeOrdered: sourceRangeStart == null or sourceRangeEnd == null or sourceRangeStart <= sourceRangeEnd "Open source range end must not precede its start"
+    constraint openVendorMatch: vendorId == self.vendorId "This order is for a different vendor. Pick the vendor already on this order."
+    constraint openEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "This order is for a different event. Pick the event already on this order."
+    constraint openSourceRangeComplete: (sourceRangeStart == null and sourceRangeEnd == null) or (sourceRangeStart != null and sourceRangeEnd != null) "Give this order both a start and an end date, or leave both blank."
+    constraint openSourceRangeOrdered: sourceRangeStart == null or sourceRangeEnd == null or sourceRangeStart <= sourceRangeEnd "This order's date range end can't be before its start."
     mutate vendorId = vendorId
     mutate eventId = eventId != null ? eventId : self.eventId
     mutate sourceRangeStart = sourceRangeStart != null ? sourceRangeStart : self.sourceRangeStart
@@ -173,7 +173,7 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     guard self.openedAt != null
     guard self.status == "draft" or self.status == "submitted"
     guard self.deletedAt == null
-    constraint totalsNonnegative: subtotal >= 0 and taxAmount >= 0 and shippingAmount >= 0 "Order money amounts cannot be negative"
+    constraint totalsNonnegative: subtotal >= 0 and taxAmount >= 0 and shippingAmount >= 0 "Order money amounts can't be negative. Use zero or more."
     compute previousTotal = self.totalAmount
     compute nextTotal = subtotal + taxAmount + shippingAmount
     mutate subtotal = subtotal
@@ -207,7 +207,7 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   command syncLineTotals(lineSubtotal: money(12, 2)) {
     guard self.deletedAt == null
     guard self.status == "draft" or self.status == "submitted"
-    constraint syncLineSubtotalNonnegative: lineSubtotal >= 0 "Order money amounts cannot be negative"
+    constraint syncLineSubtotalNonnegative: lineSubtotal >= 0 "Order money amounts can't be negative. Use zero or more."
     compute previousTotal = self.totalAmount
     compute nextTotal = lineSubtotal + self.taxAmount + self.shippingAmount
     mutate subtotal = lineSubtotal
@@ -229,7 +229,7 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     guard self.openedAt != null
     guard self.status == "draft"
     guard self.deletedAt == null
-    constraint submitUnderApprovalThreshold: self.purchasingConfig == null or self.purchasingConfig.orderApprovalThresholdAmount == null or self.totalAmount <= self.purchasingConfig.orderApprovalThresholdAmount "Orders above the spend approval threshold need manager approval — use submit for approval"
+    constraint submitUnderApprovalThreshold: self.purchasingConfig == null or self.purchasingConfig.orderApprovalThresholdAmount == null or self.totalAmount <= self.purchasingConfig.orderApprovalThresholdAmount "This order is over the spend limit that needs manager approval. Send it for approval instead."
     compute previousStatus = self.status
     mutate status = "submitted"
     mutate submittedAt = now()
@@ -296,7 +296,7 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     guard self.status == "pending_approval"
     guard self.deletedAt == null
     guard roleAllows(user.role, "manageAccess")
-    constraint requestChangesNotes: length(trim(notes)) > 0 "Modification request notes are required"
+    constraint requestChangesNotes: length(trim(notes)) > 0 "Say what needs to change."
     mutate status = "draft"
     mutate approvalNotes = notes
     mutate approvalRequestedAt = null
@@ -370,7 +370,7 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     // cancel stays manage-gated. Pending-approval orders are still pre-send, so the
     // buyer may pull them back too.
     guard roleAllows(user.role, "inventoryManageAccess") or ((self.status == "draft" or self.status == "pending_approval") and roleAllows(user.role, "procurementAccess"))
-    constraint cancelOrderReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancelOrderReason: length(trim(reason)) > 0 "Say why you're cancelling this order."
     compute previousStatus = self.status
     mutate status = "cancelled"
     mutate cancelledAt = now()
@@ -504,10 +504,10 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.vendorOrder != null and self.vendorOrder.status == "draft" and self.vendorOrder.openedAt != null
     guard self.ingredient != null and self.ingredient.status == "active"
-    constraint addLineOrderMatch: vendorOrderId == self.vendorOrderId "Add line vendorOrderId must match the seeded order reference"
-    constraint addLineIngredientMatch: ingredientId == self.ingredientId "Add line ingredientId must match the seeded ingredient reference"
-    constraint addLineDemandMatch: ingredientDemandId == null or self.ingredientDemandId == null or ingredientDemandId == self.ingredientDemandId "Add line ingredientDemandId must match the seeded demand reference when provided"
-    constraint addLineLocationMatch: locationId == null or self.locationId == null or locationId == self.locationId "Add line locationId must match the seeded location reference when provided"
+    constraint addLineOrderMatch: vendorOrderId == self.vendorOrderId "This line is for a different order. Pick the order already on this line."
+    constraint addLineIngredientMatch: ingredientId == self.ingredientId "This line is for a different ingredient. Pick the ingredient already on this line."
+    constraint addLineDemandMatch: ingredientDemandId == null or self.ingredientDemandId == null or ingredientDemandId == self.ingredientDemandId "This line is for a different need. Pick the need already on this line."
+    constraint addLineLocationMatch: locationId == null or self.locationId == null or locationId == self.locationId "This line is for a different location. Pick the location already on this line."
     constraint addLineQuantityPositive: orderedQuantity > 0 "This order line's ordered amount has to be more than zero. Enter how much to order."
     constraint addLineCostNonnegative: unitCost >= 0 "This order line's cost per unit can't be negative. Use zero or more."
     mutate vendorOrderId = vendorOrderId
@@ -652,8 +652,8 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.vendorOrder != null and self.vendorOrder.status == "draft"
     guard self.receivedQuantity == 0
-    constraint reconcilePlannedNonnegative: plannedQuantity == null or plannedQuantity >= 0 "Planned quantity cannot be negative"
-    constraint reconcileKnownAutomaticQuantity: quantityIsManual != false or plannedQuantity != null "An automatic draft needs a calculated quantity"
+    constraint reconcilePlannedNonnegative: plannedQuantity == null or plannedQuantity >= 0 "Planned quantity can't be negative. Use zero or more."
+    constraint reconcileKnownAutomaticQuantity: quantityIsManual != false or plannedQuantity != null "This automatically calculated line needs a quantity."
     compute nextQuantity = quantityIsManual == false ? plannedQuantity : self.orderedQuantity
     mutate plannedQuantity = plannedQuantity
     mutate quantityIsManual = quantityIsManual
@@ -685,12 +685,12 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     guard self.status == "added" or self.status == "receiving"
     guard self.deletedAt == null
     guard self.vendorOrder != null and (self.vendorOrder.status == "confirmed" or self.vendorOrder.status == "partially_received")
-    constraint receiptLocationMatch: self.locationId == null or locationId == self.locationId "Receipt locationId must match the seeded location when one was pre-set"
+    constraint receiptLocationMatch: self.locationId == null or locationId == self.locationId "This receipt is for a different location. Pick the location already set on this line."
     constraint receiptQuantityPositive: quantity > 0 "This order line's received amount has to be more than zero. Enter how much arrived."
     constraint receiptNotOver: self.receivedQuantity + quantity <= self.orderedQuantity "This order line can't receive more than was ordered. Enter a smaller amount."
     constraint receiptPriceNonnegative: unitPrice >= 0 "This order line's price per unit can't be negative. Use zero or more."
-    constraint receiptSupplierLotRequired: length(trim(supplierLotNumber)) > 0 "Supplier lot number is required for traceability"
-    constraint receiptDiscrepancyNonnegative: discrepancyQuantity == null or discrepancyQuantity >= 0 "Discrepancy quantity cannot be negative"
+    constraint receiptSupplierLotRequired: length(trim(supplierLotNumber)) > 0 "Enter the supplier's lot number so this delivery can be traced."
+    constraint receiptDiscrepancyNonnegative: discrepancyQuantity == null or discrepancyQuantity >= 0 "The discrepancy amount can't be negative. Use zero or more."
     compute previousReceived = self.receivedQuantity
     compute nextReceived = self.receivedQuantity + quantity
     compute nextStatus = nextReceived == self.orderedQuantity ? "complete" : "receiving"
@@ -776,7 +776,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     guard self.vendorOrder != null and (self.vendorOrder.status == "draft" or self.vendorOrder.status == "submitted" or self.vendorOrder.status == "confirmed")
     // Draft-line abort for prep-list generate rollback; later-stage cancel stays manage-gated.
     guard roleAllows(user.role, "inventoryManageAccess") or (self.vendorOrder.status == "draft" and roleAllows(user.role, "procurementAccess"))
-    constraint cancelLineReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancelLineReason: length(trim(reason)) > 0 "Say why you're cancelling this line."
     mutate status = "cancelled"
     mutate cancelledAt = now()
     mutate deletedAt = now()
@@ -846,8 +846,8 @@ entity InventoryLot mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
 
-  constraint inventoryLotComplete: self.receivedAt == null or (length(trim(self.supplierLotNumber)) > 0 and self.receiptQuantity > 0 and self.cumulativeReceivedQuantity > 0) "Receipt lots require a supplier lot number and positive receipt quantities"
-  constraint inventoryLotCostNonnegative: self.unitCost >= 0 "Inventory lot unit cost cannot be negative"
+  constraint inventoryLotComplete: self.receivedAt == null or (length(trim(self.supplierLotNumber)) > 0 and self.receiptQuantity > 0 and self.cumulativeReceivedQuantity > 0) "Give this receipt a supplier lot number and a receipt quantity greater than zero."
+  constraint inventoryLotCostNonnegative: self.unitCost >= 0 "This receipt's cost per unit can't be negative. Use zero or more."
 
   default policy inventoryLotRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Inventory, procurement, and managers may see receipt lots"
   default policy inventoryLotWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may update receipt lots"
@@ -869,10 +869,10 @@ entity InventoryLot mixin TenantScoped, SoftDeletable {
   ) {
     guard self.receivedAt == null or (self.supplierLotNumber == supplierLotNumber and self.vendorOrderLineId == vendorOrderLineId and self.vendorOrderId == vendorOrderId and self.vendorId == vendorId and self.ingredientId == ingredientId and self.ingredientDemandId == ingredientDemandId and self.eventId == eventId and self.locationId == locationId and self.receiptQuantity == receiptQuantity and self.cumulativeReceivedQuantity == cumulativeReceivedQuantity and self.unit == unit and self.unitCost == unitCost)
     guard self.deletedAt == null
-    constraint recordInventoryLotNumberRequired: length(trim(supplierLotNumber)) > 0 "Supplier lot number is required for traceability"
-    constraint recordInventoryLotReceiptPositive: receiptQuantity > 0 "Inventory lot receipt quantity must be positive"
-    constraint recordInventoryLotCumulativePositive: cumulativeReceivedQuantity > 0 "Inventory lot cumulative quantity must be positive"
-    constraint recordInventoryLotCostNonnegative: unitCost >= 0 "Inventory lot unit cost cannot be negative"
+    constraint recordInventoryLotNumberRequired: length(trim(supplierLotNumber)) > 0 "Enter the supplier's lot number so this delivery can be traced."
+    constraint recordInventoryLotReceiptPositive: receiptQuantity > 0 "This receipt's quantity has to be more than zero."
+    constraint recordInventoryLotCumulativePositive: cumulativeReceivedQuantity > 0 "This receipt's running total has to be more than zero."
+    constraint recordInventoryLotCostNonnegative: unitCost >= 0 "This receipt's cost per unit can't be negative. Use zero or more."
     compute stockDelta = self.receivedAt == null ? receiptQuantity : 0
     mutate supplierLotNumber = supplierLotNumber
     mutate vendorOrderLineId = vendorOrderLineId
@@ -1022,9 +1022,9 @@ entity IngredientPriceObservation mixin TenantScoped, SoftDeletable {
   belongsTo vendorOrder: VendorOrder fields [tenantId, vendorOrderId] references [tenantId, id]
   belongsTo vendorOrderLine: VendorOrderLine fields [tenantId, vendorOrderLineId] references [tenantId, id]
 
-  constraint observationReceiptPositive: self.observedAt == null or self.receiptQuantity > 0 "Price observation receipt quantity must be positive"
-  constraint observationCumulativePositive: self.observedAt == null or self.cumulativeReceivedQuantity > 0 "Price observation cumulative quantity must be positive"
-  constraint observationPriceNonnegative: self.unitPrice >= 0 "Price observation unit price cannot be negative"
+  constraint observationReceiptPositive: self.observedAt == null or self.receiptQuantity > 0 "This ingredient price entry needs a receipt quantity greater than zero."
+  constraint observationCumulativePositive: self.observedAt == null or self.cumulativeReceivedQuantity > 0 "This ingredient price entry's running total has to be more than zero."
+  constraint observationPriceNonnegative: self.unitPrice >= 0 "This ingredient price entry's unit price can't be negative. Use zero or more."
 
   default policy ingredientPriceObservationRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Kitchen, procurement, and managers may see confirmed ingredient prices"
   default policy ingredientPriceObservationWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may update confirmed ingredient prices"
@@ -1042,9 +1042,9 @@ entity IngredientPriceObservation mixin TenantScoped, SoftDeletable {
   ) {
     guard self.observedAt == null or (self.ingredientId == ingredientId and self.vendorId == vendorId and self.vendorOrderId == vendorOrderId and self.vendorOrderLineId == vendorOrderLineId and self.receiptQuantity == receiptQuantity and self.cumulativeReceivedQuantity == cumulativeReceivedQuantity and self.unit == unit and self.unitPrice == unitPrice)
     guard self.deletedAt == null
-    constraint recordObservationReceiptPositive: receiptQuantity > 0 "Price observation receipt quantity must be positive"
-    constraint recordObservationCumulativePositive: cumulativeReceivedQuantity > 0 "Price observation cumulative quantity must be positive"
-    constraint recordObservationPriceNonnegative: unitPrice >= 0 "Price observation unit price cannot be negative"
+    constraint recordObservationReceiptPositive: receiptQuantity > 0 "This ingredient price entry needs a receipt quantity greater than zero."
+    constraint recordObservationCumulativePositive: cumulativeReceivedQuantity > 0 "This ingredient price entry's running total has to be more than zero."
+    constraint recordObservationPriceNonnegative: unitPrice >= 0 "This ingredient price entry's unit price can't be negative. Use zero or more."
     mutate ingredientId = ingredientId
     mutate vendorId = vendorId
     mutate vendorOrderId = vendorOrderId

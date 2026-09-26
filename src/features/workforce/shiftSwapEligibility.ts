@@ -117,7 +117,7 @@ export function evaluateShiftSwapCandidate({
       reasons.push(
         sourceQualification
           ? `Needs ${sourceQualification.name} through the end of the shift.`
-          : "The shift certification requirement cannot be verified.",
+          : "The shift's certification requirement can't be verified.",
       );
     }
   }

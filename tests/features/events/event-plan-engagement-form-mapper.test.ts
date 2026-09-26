@@ -46,7 +46,7 @@ describe("EventPlanEngagementFormMapper", () => {
       new EventPlanEngagementFormMapper().toCommandArgs(
         validInput({ eventTypeRaw: "   " }),
       ),
-    ).toThrow("Event type is required.");
+    ).toThrow("Pick what type of event this is.");
   });
 
   it("stamps the trimmed service style name next to the style id", () => {

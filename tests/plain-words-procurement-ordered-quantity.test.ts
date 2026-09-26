@@ -54,6 +54,8 @@ describe("plain words on leftover order-line ordered quantity copy", () => {
       "This order line's ordered amount has to be more than zero. Enter how much to order.",
     );
     // Later leftovers on this same file are pinned, not rewritten.
-    expect(visible).toContain("Discrepancy quantity cannot be negative");
+    expect(visible).toContain(
+      "The discrepancy amount can't be negative. Use zero or more.",
+    );
   });
 });

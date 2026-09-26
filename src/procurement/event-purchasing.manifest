@@ -40,7 +40,7 @@ entity WeeklyPurchasingConfig mixin TenantScoped, SoftDeletable {
   command setOrderApprovalThreshold(optional amount: money(12, 2)) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "manageAccess")
-    constraint approvalThresholdNonnegative: amount == null or amount >= 0 "Approval threshold cannot be negative"
+    constraint approvalThresholdNonnegative: amount == null or amount >= 0 "The order amount that needs a manager's OK can't be negative. Use zero or more, or leave it blank."
     mutate orderApprovalThresholdAmount = amount
   }
 
@@ -235,8 +235,8 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     optional productionBatchAllocationId: uuid
   ) {
     guard self.deletedAt == null
-    constraint recordQuantityPositive: quantity >= 0 "Contribution quantity cannot be negative"
-    constraint recordServingsNonnegative: servings >= 0 "Contribution servings cannot be negative"
+    constraint recordQuantityPositive: quantity >= 0 "This event's ingredient amount can't be negative. Use zero or more."
+    constraint recordServingsNonnegative: servings >= 0 "This event's serving count can't be negative. Use zero or more."
     // A legacy reaction (no sourceKey) that matches a batch-owned share must
     // leave it untouched: the batch owns that quantity, not the serving count.
     compute batchKeep = sourceKey == null and (self.ownership == "batch_allocation" or self.ownership == "batch_surplus")
@@ -293,7 +293,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   command revise(quantity: decimal(12, 4), servings: decimal(12, 4)) {
     guard self.recordedAt != null
     guard self.deletedAt == null
-    constraint reviseQuantityPositive: quantity >= 0 "Contribution quantity cannot be negative"
+    constraint reviseQuantityPositive: quantity >= 0 "This event's ingredient amount can't be negative. Use zero or more."
     // Batch-owned shares are sized by their allocation, not by servings; a
     // headcount change never rewrites them (replan the batch instead).
     compute batchOwned = self.ownership == "batch_allocation" or self.ownership == "batch_surplus"
@@ -316,7 +316,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   command retire(reason: string) {
     guard self.recordedAt != null
     guard self.deletedAt == null
-    constraint retireReason: length(trim(reason)) > 0 "Retire reason is required"
+    constraint retireReason: length(trim(reason)) > 0 "Say why you're retiring this."
     mutate deletedAt = now()
     mutate quantity = 0
     mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
@@ -338,7 +338,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   command supersede(reason: string, optional supersededBySourceKey: string) {
     guard self.recordedAt != null
     guard self.deletedAt == null
-    constraint supersedeReason: length(trim(reason)) > 0 "Supersede reason is required"
+    constraint supersedeReason: length(trim(reason)) > 0 "Say why this is being replaced."
     mutate supersededAt = now()
     mutate supersededBySourceKey = supersededBySourceKey
     mutate deletedAt = now()

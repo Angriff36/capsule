@@ -73,11 +73,11 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
   ref occasion: Occasion fields [tenantId, occasionId] references [tenantId, id]
 
   // Constraints
-  constraint dedupKeyPresent: length(trim(self.dedupKey)) > 0 "Deduplication key is required"
-  constraint clientNamePresent: length(trim(self.clientName)) > 0 "Client name is required"
-  constraint emailPresent: length(trim(self.email)) > 0 "Email address is required"
-  constraint guestCountPositive: self.guestCount > 0 "Guest count must be positive"
-  constraint consentRequired: self.consentGrantedAt != null "Data processing consent is required"
+  constraint dedupKeyPresent: length(trim(self.dedupKey)) > 0 "This quote request is missing the ID used to catch duplicates"
+  constraint clientNamePresent: length(trim(self.clientName)) > 0 "Give the client's name"
+  constraint emailPresent: length(trim(self.email)) > 0 "Give an email address"
+  constraint guestCountPositive: self.guestCount > 0 "The guest count has to be more than zero"
+  constraint consentRequired: self.consentGrantedAt != null "The client needs to agree to how we use their information"
 
   // Policies - public access for quote submission
   default policy quoteSubmissionRead read: true "Anyone may check a quote request"
@@ -106,10 +106,10 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null "Cannot create a deleted quote submission"
 
     // Validate inputs
-    constraint createDedupKey: length(trim(dedupKey)) > 0 "Deduplication key is required"
-    constraint createClientName: length(trim(clientName)) > 0 "Client name is required"
-    constraint createEmail: length(trim(email)) > 0 "Email address is required"
-    constraint createGuestCount: guestCount > 0 "Guest count must be positive"
+    constraint createDedupKey: length(trim(dedupKey)) > 0 "This quote request is missing the ID used to catch duplicates"
+    constraint createClientName: length(trim(clientName)) > 0 "Give the client's name"
+    constraint createEmail: length(trim(email)) > 0 "Give an email address"
+    constraint createGuestCount: guestCount > 0 "The guest count has to be more than zero"
 
     mutate dedupKey = dedupKey
     mutate clientName = clientName
@@ -201,7 +201,7 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     guard self.status == "pending" or self.status == "failed" "Only pending or failed submissions can be dismissed"
     guard self.deletedAt == null "Cannot dismiss a deleted quote submission"
 
-    constraint dismissReasonRequired: length(trim(reason)) > 0 "Dismissal reason is required"
+    constraint dismissReasonRequired: length(trim(reason)) > 0 "Give a reason for dismissing this"
 
     mutate status = "dismissed"
     mutate errorMessage = reason

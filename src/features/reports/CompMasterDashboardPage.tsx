@@ -100,7 +100,7 @@ export function CompMasterDashboardPage() {
           }}
           rows={[
             {
-              label: "Applied records",
+              label: "Applied lines",
               value: appliedRows.length,
               format: "number" as const,
             },
@@ -168,7 +168,7 @@ export function CompMasterDashboardPage() {
     {
       id: "records",
       size: "full",
-      title: "Applied Sales Commission Records",
+      title: "Applied Sales Commission List",
       content: (
         <TableDisplay
           columns={[
@@ -199,7 +199,7 @@ export function CompMasterDashboardPage() {
     <div className="operations-stage supply-stage">
       <PageHeader
         title="Comp Master Dashboard"
-        lead="Applied sales commission allocations, shown directly from revenue attribution records."
+        lead="Applied sales commission allocations, taken straight from revenue attribution."
       />
       <DashboardGrid items={dashboardItems} />
       <div className="mt-6 rounded-sm border border-line bg-panel p-4">
@@ -207,8 +207,8 @@ export function CompMasterDashboardPage() {
           Where these numbers come from
         </h4>
         <p className="mt-2 text-xs text-ink-2">
-          Only RevenueAttribution records whose type is sales commission and
-          whose status is applied are included. Allocated amount is already the
+          Only revenue attribution entries marked as sales commission with a
+          status of applied are included. Allocated amount is already the
           commission amount; no percentage or payment status is inferred.
           Cancelled events are excluded consistently.
         </p>

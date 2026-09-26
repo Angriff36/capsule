@@ -196,10 +196,10 @@ describe("plain words on workforce manifests", () => {
       "Closed or corrected time records require clock-out at or after clock-in",
     );
     expect(visible).toContain(
-      "Closed or corrected time entries require clock-out at or after clock-in",
+      "This time entry's clock-out has to be at or after its clock-in.",
     );
     expectPlain(
-      "Closed or corrected time entries require clock-out at or after clock-in",
+      "This time entry's clock-out has to be at or after its clock-in.",
     );
 
     // already-landed write/read leftovers must stay put
@@ -214,7 +214,9 @@ describe("plain words on workforce manifests", () => {
     );
 
     // later leftover, unchanged
-    expect(visible).toContain("Break minutes must be non-negative");
+    expect(visible).toContain(
+      "Break minutes can't be negative. Use zero or more.",
+    );
   });
 
   it("keeps leftover workforce clock-in match copy free of personId jargon", () => {
@@ -252,13 +254,15 @@ describe("plain words on workforce manifests", () => {
       "Workforce staff or the linked person may change time entries",
     );
     expect(visible).toContain(
-      "Closed or corrected time entries require clock-out at or after clock-in",
+      "This time entry's clock-out has to be at or after its clock-in.",
     );
 
     // later leftovers, unchanged
-    expect(visible).toContain("Break minutes must be non-negative");
     expect(visible).toContain(
-      "Corrected clock-out must be at or after clock-in",
+      "Break minutes can't be negative. Use zero or more.",
+    );
+    expect(visible).toContain(
+      "The corrected clock-out has to be at or after the clock-in.",
     );
   });
 
@@ -291,7 +295,7 @@ describe("plain words on workforce manifests", () => {
       "This clock-in is for a different event. Leave the event blank or pick the one already on this time entry.",
     );
     expect(visible).toContain(
-      "Closed or corrected time entries require clock-out at or after clock-in",
+      "This time entry's clock-out has to be at or after its clock-in.",
     );
     expect(visible).toContain(
       "Workforce staff or the linked person may see time entries",
@@ -304,9 +308,11 @@ describe("plain words on workforce manifests", () => {
     );
 
     // later leftovers, unchanged
-    expect(visible).toContain("Break minutes must be non-negative");
     expect(visible).toContain(
-      "Corrected clock-out must be at or after clock-in",
+      "Break minutes can't be negative. Use zero or more.",
+    );
+    expect(visible).toContain(
+      "The corrected clock-out has to be at or after the clock-in.",
     );
   });
 

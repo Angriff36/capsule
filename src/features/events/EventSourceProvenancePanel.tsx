@@ -67,7 +67,7 @@ export function EventSourceProvenancePanel({
             </div>
             <dl className="mt-2 grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
               <div>
-                <dt className="text-ink-3">Reference in the old system</dt>
+                <dt className="text-ink-3">ID in the old system</dt>
                 <dd className="break-all text-ink-2">
                   {link.externalId || "—"}
                 </dd>

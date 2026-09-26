@@ -13,10 +13,7 @@ export class WorkspaceMembershipPolicy {
   }
 
   missingRequirements(status: AuthStatusSnapshot): string {
-    return [
-      !status.hasTenant && "a workspace (tenantId)",
-      !status.hasRole && "an operational role",
-    ]
+    return [!status.hasTenant && "a workspace", !status.hasRole && "a job role"]
       .filter(Boolean)
       .join(" and ");
   }

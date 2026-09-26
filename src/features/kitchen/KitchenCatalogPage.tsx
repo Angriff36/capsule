@@ -451,7 +451,7 @@ function KitchenCatalogPageContent({
         // Validate guest range before submission (matches Manifest constraint wording)
         if (minGuests > 0 && maxGuests > 0 && minGuests > maxGuests) {
           throw new Error(
-            "Menu max guests must be zero (unlimited) or at least min guests",
+            "This menu's max guests can't be less than min guests. Set it to zero for no limit, or raise it to match min guests.",
           );
         }
 

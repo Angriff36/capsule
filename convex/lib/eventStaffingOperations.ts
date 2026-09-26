@@ -550,7 +550,7 @@ async function coverageChangeWindows(ctx: MutationCtx, need: Doc<"eventStaffNeed
   }
   for (const window of windows) {
     if (window.startsAt != null && window.endsAt != null && window.endsAt <= window.startsAt)
-      throw new ConvexError("Coverage end must be after its start.");
+      throw new ConvexError("Set the coverage end after its start.");
     const sourceShifts = relevant.filter((shift) => window.followsEventTiming || need.coverageStartsAt != null || need.coverageEndsAt != null ||
       window.startsAt == null || window.endsAt == null || shift.startsAt == null || shift.endsAt == null ||
       (shift.startsAt < window.endsAt && shift.endsAt > window.startsAt));

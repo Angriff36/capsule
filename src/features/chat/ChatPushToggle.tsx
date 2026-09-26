@@ -13,7 +13,7 @@ export function ChatPushToggle() {
   const status = push.error
     ? push.error
     : push.keyMissing
-      ? "Notifications are not set up on this deployment yet."
+      ? "Notifications aren't set up for Capsule yet."
       : push.needsHomeScreen
         ? "On iPhone, add Capsule to your Home Screen first, then turn this on from there."
         : !push.accountEnabled

@@ -74,7 +74,7 @@ entity Payment mixin TenantScoped, SoftDeletable {
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
   ref paymentMethod: PaymentMethod fields [tenantId, paymentMethodId] references [tenantId, id]
 
-  constraint paymentAmountPositive: self.recordedAt == null or self.amount > 0 "Payment amount must be positive"
+  constraint paymentAmountPositive: self.recordedAt == null or self.amount > 0 "This payment's amount has to be more than zero. Enter how much was paid."
 
   transition status from "pending" to ["processing", "completed", "failed"]
   transition status from "processing" to ["completed", "failed"]
@@ -100,9 +100,9 @@ entity Payment mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.invoice != null
     guard self.client != null
-    constraint recordInvoiceMatch: invoiceId == self.invoiceId "Record invoiceId must match the seeded invoice reference"
-    constraint recordClientMatch: clientId == self.clientId "Record clientId must match the seeded client reference"
-    constraint recordPositive: amount > 0 "Payment amount must be positive"
+    constraint recordInvoiceMatch: invoiceId == self.invoiceId "This payment is for a different invoice. Use the invoice already on this payment."
+    constraint recordClientMatch: clientId == self.clientId "This payment is for a different client. Use the client already on this payment."
+    constraint recordPositive: amount > 0 "This payment's amount has to be more than zero. Enter how much was paid."
     mutate invoiceId = invoiceId
     mutate clientId = clientId
     mutate eventId = eventId != null ? eventId : self.eventId
@@ -156,7 +156,7 @@ entity Payment mixin TenantScoped, SoftDeletable {
     guard self.status == "pending" or self.status == "processing"
     guard self.recordedAt != null
     guard self.deletedAt == null
-    constraint failReasonPresent: length(trim(reason)) > 0 "Failure reason is required"
+    constraint failReasonPresent: length(trim(reason)) > 0 "Give a reason this payment failed"
     mutate status = "failed"
     mutate failedAt = now()
     mutate failureReason = reason
@@ -172,7 +172,7 @@ entity Payment mixin TenantScoped, SoftDeletable {
   command refund(reason: string) {
     guard self.status == "completed"
     guard self.deletedAt == null
-    constraint refundReasonPresent: length(trim(reason)) > 0 "Refund reason is required"
+    constraint refundReasonPresent: length(trim(reason)) > 0 "Give a reason for this refund"
     mutate status = "refunded"
     mutate refundedAt = now()
     mutate refundReason = reason
@@ -228,7 +228,7 @@ entity Payment mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "financeAccess")
-    constraint matchRequiresExternalId: length(trim(externalPaymentId)) > 0 "External payment ID is required for matching"
+    constraint matchRequiresExternalId: length(trim(externalPaymentId)) > 0 "Give the external payment ID to match this to"
     mutate reconciliationStatus = "matched"
     mutate externalSource = source
     mutate externalPaymentId = externalPaymentId
@@ -264,7 +264,7 @@ entity Payment mixin TenantScoped, SoftDeletable {
   command disputeReconciliation(reason: string) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "financeAccess")
-    constraint disputeRequiresReason: length(trim(reason)) > 0 "Dispute reason is required"
+    constraint disputeRequiresReason: length(trim(reason)) > 0 "Give a reason for this dispute"
     mutate reconciliationStatus = "disputed"
     mutate reconciliationDetails = reason
     emit PaymentReconciliationDisputed {

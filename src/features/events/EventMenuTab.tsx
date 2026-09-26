@@ -496,7 +496,9 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
       !Number.isSafeInteger(servings) ||
       servings <= 0
     )
-      throw new Error("Enter a positive whole-number serving count.");
+      throw new Error(
+        "Enter how many servings, as a whole number more than zero.",
+      );
     return servings;
   };
 
