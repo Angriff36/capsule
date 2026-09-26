@@ -415,6 +415,33 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Event.changePricing keeps the unsent auto-made draft on the event's new
+  // price (AC-388 invoice slice). The pricing reconciliation seam
+  // (convex/lib/invoicePricingReconciliation.ts) only calls this for a draft
+  // still in its auto-made shape; a draft finance changed (tax, discount,
+  // deposit, payment, credit) is left as it is and flagged on the receipt.
+  command followEventPrice(total: money(12, 2)) {
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    guard self.sentAt == null
+    guard self.amountPaid == 0
+    guard self.taxAmount == 0 and self.discountAmount == 0
+    guard self.amountCredited == null or self.amountCredited == 0
+    constraint followEventPriceNonnegative: total >= 0 "This invoice's money amounts can't be negative. Use zero or more."
+    compute previousTotal = self.total
+    mutate subtotal = total
+    mutate total = total
+    mutate amountDue = total
+    emit InvoiceEventPriceFollowed {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
+      previousTotal: previousTotal
+      total: total
+    }
+  }
+
   command writeOff(reason: string, writeOffAmount: money(12, 2)) {
     guard self.status == "overdue" or self.status == "partial"
     guard self.deletedAt == null
@@ -495,6 +522,15 @@ event InvoiceIssued: "invoice.issued" {
   amountDue: money(12, 2)
   currencyCode: string?
   exchangeRate: decimal(18, 8)?
+}
+
+event InvoiceEventPriceFollowed: "invoice.event_price_followed" {
+  invoiceId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+  previousTotal: money(12, 2)
+  total: money(12, 2)
 }
 
 event InvoiceNumberAssigned: "invoice.number_assigned" {

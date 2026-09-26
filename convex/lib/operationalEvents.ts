@@ -18,6 +18,7 @@ import { eventRecipeReconciliation } from "./recipeReconciliation";
 import { eventVenueReconciliation } from "./venueReconciliation";
 import { eventStyleReconciliation } from "./styleReconciliation";
 import { eventRentalReconciliation } from "./rentalReconciliation";
+import { eventInvoicePricingReconciliation } from "./invoicePricingReconciliation";
 import {
   reconcileEventStaffing, reflectManualEventShiftTiming, validateAutomaticEventShift,
   validateEventStaffingReferences, validateEventStaffingTiming,
@@ -247,6 +248,17 @@ export async function handleManifestEvent(
             ? null
             : String(event.payload.serviceStyleName),
       },
+    );
+    return;
+  }
+  if (event.entity === "Event" && event.type === "EventPricingChanged") {
+    // The unsent auto-made draft invoice follows the new quoted price; a
+    // changed or sent invoice stays as it is and is flagged on the receipt.
+    await eventInvoicePricingReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      Number(event.payload.quotedPrice),
     );
     return;
   }

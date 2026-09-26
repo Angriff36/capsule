@@ -349,6 +349,7 @@ import {
   InvoiceApplyCreditParamsSchema,
   InvoiceApplyPaymentParamsSchema,
   InvoiceAssignNumberParamsSchema,
+  InvoiceFollowEventPriceParamsSchema,
   InvoiceIssueParamsSchema,
   InvoiceMarkDepositPaidParamsSchema,
   InvoiceMarkOverdueParamsSchema,
@@ -5633,6 +5634,16 @@ export function useInvoiceAssignNumber() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = InvoiceAssignNumberParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Invoice.followEventPrice. */
+export function useInvoiceFollowEventPrice() {
+  const mutate = useMutation(api.mutations.Invoice_followEventPrice);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceFollowEventPriceParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11367,4 +11378,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1209 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1210 as const;

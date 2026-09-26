@@ -7108,6 +7108,13 @@ export const InvoiceAssignNumberParamsSchema = z.object({
 
 export type InvoiceAssignNumberParams = z.infer<typeof InvoiceAssignNumberParamsSchema>;
 
+// Command: followEventPrice on Invoice
+export const InvoiceFollowEventPriceParamsSchema = z.object({
+  total: z.number(),
+});
+
+export type InvoiceFollowEventPriceParams = z.infer<typeof InvoiceFollowEventPriceParamsSchema>;
+
 // Command: issue on Invoice
 export const InvoiceIssueParamsSchema = z.object({
   clientId: z.string().min(1),
