@@ -140,6 +140,32 @@ entity EventCloseout mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // AC-388 closeout draft slice: Event.correctCommercial restates the budget
+  // after closeOut. A draft still in the zero-actual shape the EventClosedOut
+  // reaction seeded follows the corrected budget; a draft finance already
+  // captured, and a finalized closeout, are never rewritten here.
+  command followEventCommercial(budgetedRevenue: money(12, 2), budgetedCost: money(12, 2)) {
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    guard self.actualRevenue == 0 and self.totalActualCost == 0 and self.actualHeadcount == 0
+    constraint followCommercialNonnegative: budgetedRevenue >= 0 and budgetedCost >= 0 "This closeout's money amounts can't be negative. Use zero or more."
+    compute previousBudgetedRevenue = self.budgetedRevenue
+    compute previousBudgetedCost = self.budgetedCost
+    mutate budgetedRevenue = budgetedRevenue
+    mutate revenueVariance = budgetedRevenue
+    mutate budgetedCost = budgetedCost
+    mutate costVariance = budgetedCost
+    emit EventCloseoutCommercialFollowed {
+      closeoutId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      previousBudgetedRevenue: previousBudgetedRevenue
+      budgetedRevenue: budgetedRevenue
+      previousBudgetedCost: previousBudgetedCost
+      budgetedCost: budgetedCost
+    }
+  }
+
   command finalize() {
     guard self.status == "draft"
     guard self.capturedAt != null
@@ -172,6 +198,16 @@ event EventCloseoutCaptured: "event_closeout.captured" {
   grossProfit: money(12, 2)
   actualHeadcount: number
   status: string
+}
+
+event EventCloseoutCommercialFollowed: "event_closeout.commercial_followed" {
+  closeoutId: string
+  tenantId: string
+  eventId: string
+  previousBudgetedRevenue: money(12, 2)
+  budgetedRevenue: money(12, 2)
+  previousBudgetedCost: money(12, 2)
+  budgetedCost: money(12, 2)
 }
 
 event EventCloseoutFinalized: "event_closeout.finalized" {

@@ -5813,6 +5813,14 @@ export const EventCloseoutFinalizeParamsSchema = z.object({});
 
 export type EventCloseoutFinalizeParams = z.infer<typeof EventCloseoutFinalizeParamsSchema>;
 
+// Command: followEventCommercial on EventCloseout
+export const EventCloseoutFollowEventCommercialParamsSchema = z.object({
+  budgetedRevenue: z.number(),
+  budgetedCost: z.number(),
+});
+
+export type EventCloseoutFollowEventCommercialParams = z.infer<typeof EventCloseoutFollowEventCommercialParamsSchema>;
+
 // Command: addToEvent on EventDish
 export const EventDishAddToEventParamsSchema = z.object({
   eventId: z.string().min(1),
