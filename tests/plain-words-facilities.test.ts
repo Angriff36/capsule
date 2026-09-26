@@ -97,5 +97,9 @@ describe("plain words on leftover facilities equipment manifests", () => {
     expect(visible).toContain(
       "This equipment's amount has to be more than zero. Enter how many you have.",
     );
+
+    // blank equipment name at register/reviseDetails now reads in plain words
+    expect(visible).not.toContain("Equipment name is required");
+    expect(visible).toContain("Give this equipment a name.");
   });
 });

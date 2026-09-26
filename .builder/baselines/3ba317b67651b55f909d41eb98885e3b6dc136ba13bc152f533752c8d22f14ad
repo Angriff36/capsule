@@ -11025,7 +11025,7 @@ async function __runEquipmentRegister(ctx: MutationCtx, { docId, name, assetTag,
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Equipment name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this equipment a name.");
     if (!((((assetTag).trim()).length > 0))) throw new Error("Asset tag is required");
     if (!((((category).trim()).length > 0))) throw new Error("Category is required");
     if (!(((quantity == null) || (quantity > 0)))) throw new Error("This equipment's amount has to be more than zero. Enter how many you have.");
@@ -11116,7 +11116,7 @@ export const Equipment_createViaRegister = mutation({
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Equipment name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this equipment a name.");
     if (!((((assetTag).trim()).length > 0))) throw new Error("Asset tag is required");
     if (!((((category).trim()).length > 0))) throw new Error("Category is required");
     if (!(((quantity == null) || (quantity > 0)))) throw new Error("This equipment's amount has to be more than zero. Enter how many you have.");
@@ -11222,7 +11222,7 @@ async function __runEquipmentReviseDetails(ctx: MutationCtx, { docId, name, cate
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Equipment name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Give this equipment a name.");
     if (!((((category).trim()).length > 0))) throw new Error("Category is required");
     if (!(((purchaseValue == null) || (purchaseValue >= 0)))) throw new Error("This equipment's purchase value can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
