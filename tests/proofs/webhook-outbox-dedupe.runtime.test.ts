@@ -187,6 +187,49 @@ describe("webhook outbox delivers each event once per endpoint", () => {
     expect(calls).toHaveLength(1);
   });
 
+  it("only the newest dispatch chain keeps running; older chains end", async () => {
+    const t = setup();
+    const calls = stubFetch(200);
+    await registerEndpoint(t, TENANT, "ep-a", "https://hooks.example.test/a");
+    await registerEndpoint(t, TENANT, "ep-b", "https://hooks.example.test/b");
+    await t.mutation(internal.webhookIntegrations.recordChainStart, {
+      tenantId: TENANT,
+      chainId: "chain-old",
+    });
+    await t.mutation(internal.webhookIntegrations.recordChainStart, {
+      tenantId: TENANT,
+      chainId: "chain-new",
+    });
+    await emitApproved(t, TENANT, "event-1");
+
+    const chainTick = (chainId?: string) =>
+      t.action(internal.webhookIntegrations.dispatchPending, {
+        tenantId: TENANT,
+        scheduleNext: true,
+        chainId,
+      });
+    const scheduledChains = () =>
+      t.run(async (ctx) =>
+        (await ctx.db.system.query("_scheduled_functions").collect()).map(
+          (job) => (job.args[0] as { chainId?: string }).chainId,
+        ),
+      );
+
+    expect(await chainTick("chain-old")).toEqual({
+      delivered: 0,
+      attempted: 0,
+    });
+    expect(await chainTick(undefined)).toEqual({ delivered: 0, attempted: 0 });
+    expect(await scheduledChains()).toEqual([]);
+    expect(calls).toHaveLength(0);
+
+    expect(await chainTick("chain-new")).toEqual({
+      delivered: 2,
+      attempted: 2,
+    });
+    expect(await scheduledChains()).toEqual(["chain-new"]);
+  });
+
   it("events of one tenant never reach the endpoint of another tenant", async () => {
     const t = setup();
     const calls = stubFetch(200);
