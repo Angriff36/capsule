@@ -276,7 +276,7 @@ entity EquipmentReservation mixin TenantScoped, SoftDeletable {
   command checkOut(condition: EquipmentCondition, optional note: string) {
     guard self.status == "reserved"
     guard self.deletedAt == null
-    constraint checkoutEquipmentServiceable: self.equipment != null and self.equipment.condition != "out_of_service" "Equipment marked out of service cannot be checked out"
+    constraint checkoutEquipmentServiceable: self.equipment != null and self.equipment.condition != "out_of_service" "This equipment is marked out of service, so it can't be checked out. Pick other equipment."
     mutate status = "checked_out"
     mutate checkoutCondition = condition
     mutate checkoutNote = note

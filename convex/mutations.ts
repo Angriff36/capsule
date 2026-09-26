@@ -11566,7 +11566,7 @@ async function __runEquipmentReservationCheckOut(ctx: MutationCtx, { docId, cond
     if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event");
     if (!((doc.status === "reserved"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((__rel_equipment != null) && (__rel_equipment.condition !== "out_of_service")))) throw new Error("Equipment marked out of service cannot be checked out");
+    if (!(((__rel_equipment != null) && (__rel_equipment.condition !== "out_of_service")))) throw new Error("This equipment is marked out of service, so it can't be checked out. Pick other equipment.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {

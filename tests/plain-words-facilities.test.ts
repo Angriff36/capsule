@@ -111,5 +111,13 @@ describe("plain words on leftover facilities equipment manifests", () => {
     // blank retire reason now reads in plain words
     expect(visible).not.toContain("Retirement reason is required");
     expect(visible).toContain("Say why you're retiring this equipment.");
+
+    // out-of-service checkout refusal now reads in plain words
+    expect(visible).not.toContain(
+      "Equipment marked out of service cannot be checked out",
+    );
+    expect(visible).toContain(
+      "This equipment is marked out of service, so it can't be checked out. Pick other equipment.",
+    );
   });
 });
