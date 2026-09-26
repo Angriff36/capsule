@@ -5,6 +5,8 @@ import type {
   TppRow,
 } from "../../src/features/reports/tpp/types";
 import { query, type QueryCtx } from "../_generated/server";
+import { getAuthContext } from "../lib/authContext";
+import { canRead } from "../search";
 import {
   REPORT_ROW_LIMIT,
   decryptReportFields,
@@ -17,6 +19,34 @@ import {
 const REPORT_IDS = new Set(TPP_CONTACT_REPORTS.map((report) => report.id));
 
 type Parameters = Record<string, string | string[] | boolean | number>;
+
+// Generated read policies (convex/queries.ts) of the records these reports
+// show. A report opens only for a caller who may read its main records; data
+// joined in from other records shows only when the caller may read those too.
+const CLIENT_READ = ["salesAccess", "financeAccess"];
+const EVENT_READ = ["staffAccess"];
+const DISH_READ = ["kitchenAccess", "salesAccess", "manageAccess"];
+const VENUE_READ = ["eventAccess"];
+const INVOICE_READ = ["financeAccess", "manageAccess"];
+const PROPOSAL_READ = ["salesAccess"];
+const CONTRACT_READ = ["salesAccess"];
+const CLIENT_REPORTS = new Set([
+  "address-phone-list",
+  "birthday-list",
+  "contact-activity",
+  "contact-letter-builder",
+]);
+
+/** Every read policy the report's main records need (all must pass). */
+function reportReads(reportId: string): string[][] {
+  if (CLIENT_REPORTS.has(reportId)) return [CLIENT_READ];
+  if (reportId === "event-menu" || reportId === "packing-slip")
+    return [EVENT_READ, DISH_READ];
+  if (reportId === "invoice-event") return [EVENT_READ, INVOICE_READ];
+  if (reportId === "proposal-of-service") return [EVENT_READ, PROPOSAL_READ];
+  if (reportId === "contract-for-service") return [EVENT_READ, CONTRACT_READ];
+  return [EVENT_READ];
+}
 
 function title(reportId: string): string {
   return (
@@ -114,6 +144,7 @@ async function eventBundle(
   ctx: QueryCtx,
   tenantId: string,
   rawEventId: unknown,
+  see: { clients: boolean; venues: boolean; dishes: boolean },
 ) {
   const eventId =
     typeof rawEventId === "string"
@@ -123,19 +154,20 @@ async function eventBundle(
   const eventRaw = await ctx.db.get(eventId);
   if (!eventRaw || !isLiveTenantRow(eventRaw, tenantId))
     throw new Error("Event not found");
-  const event = await resolveReportEventVenue(
+  const plainEvent = await decryptReportFields(
     ctx,
-    tenantId,
-    await decryptReportFields(
-      ctx,
-      "Event",
-      ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
-      eventRaw,
-    ),
+    "Event",
+    ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
+    eventRaw,
   );
+  // The event's own venue snapshot is event data; filling it from the Venue
+  // record follows the venue read policy.
+  const event = see.venues
+    ? await resolveReportEventVenue(ctx, tenantId, plainEvent)
+    : plainEvent;
   const [client, invoices, proposals, contracts, eventDishes] =
     await Promise.all([
-      event.clientId ? ctx.db.get(event.clientId) : null,
+      see.clients && event.clientId ? ctx.db.get(event.clientId) : null,
       ctx.db
         .query("invoices")
         .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
@@ -153,8 +185,11 @@ async function eventBundle(
         .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
         .take(REPORT_ROW_LIMIT),
     ]);
+  const menuLines = see.dishes
+    ? eventDishes.filter((row) => isLiveTenantRow(row, tenantId))
+    : [];
   const dishes = await Promise.all(
-    eventDishes.map((item) => ctx.db.get(item.dishId)),
+    menuLines.map((item) => ctx.db.get(item.dishId)),
   );
   const plainClient =
     client && isLiveTenantRow(client, tenantId)
@@ -180,7 +215,7 @@ async function eventBundle(
     invoices: invoices.filter((row) => isLiveTenantRow(row, tenantId)),
     proposals: proposals.filter((row) => isLiveTenantRow(row, tenantId)),
     contracts: contracts.filter((row) => isLiveTenantRow(row, tenantId)),
-    menu: eventDishes.flatMap((item, index) => {
+    menu: menuLines.flatMap((item, index) => {
       const dish = dishes[index];
       return dish && isLiveTenantRow(dish, tenantId)
         ? [
@@ -202,6 +237,12 @@ export const run = query({
     const tenantId = await requireReportTenant(ctx);
     if (!REPORT_IDS.has(args.reportId))
       throw new Error("Unknown Contacts report");
+    const auth = await getAuthContext(ctx);
+    if (!reportReads(args.reportId).every((read) => canRead(auth, read)))
+      throw new Error(
+        "Your role can't open this report. Ask someone who works with these records to run it.",
+      );
+    const seeClients = canRead(auth, CLIENT_READ);
     const parameters = (args.parameters ?? {}) as Parameters;
 
     if (
@@ -342,10 +383,12 @@ export const run = query({
           .query("events")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
           .take(REPORT_ROW_LIMIT),
-        ctx.db
-          .query("clients")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+        seeClients
+          ? ctx.db
+              .query("clients")
+              .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+              .take(REPORT_ROW_LIMIT)
+          : [],
       ]);
       const plainEvents = await Promise.all(
         events.map((event) =>
@@ -362,7 +405,9 @@ export const run = query({
         ),
       );
       const clientsById = new Map(
-        clients.map((client) => [String(client._id), clientName(client)]),
+        clients
+          .filter((client) => isLiveTenantRow(client, tenantId))
+          .map((client) => [String(client._id), clientName(client)]),
       );
       const start = Number(parameters.dateRangeStart ?? 0);
       const end = Number(parameters.dateRangeEnd ?? Number.MAX_SAFE_INTEGER);
@@ -397,7 +442,11 @@ export const run = query({
       );
     }
 
-    const bundle = await eventBundle(ctx, tenantId, parameters.eventId);
+    const bundle = await eventBundle(ctx, tenantId, parameters.eventId, {
+      clients: seeClients,
+      venues: canRead(auth, VENUE_READ),
+      dishes: canRead(auth, DISH_READ),
+    });
     const contact = bundle.client
       ? clientName(bundle.client)
       : (bundle.event.primaryContactName ?? "");

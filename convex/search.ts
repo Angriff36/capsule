@@ -29,6 +29,7 @@ import {
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 const ALL_READS = [
+  "eventAccess",
   "financeAccess",
   "kitchenAccess",
   "manageAccess",
@@ -50,8 +51,8 @@ const ROLE_READS: Record<string, readonly string[]> = {
   manager: ["manageAccess", "staffAccess"],
   staff: ["staffAccess"],
   driver: ["staffAccess"],
-  event_manager: ["manageAccess", "staffAccess"],
-  event_staff: ["staffAccess"],
+  event_manager: ["eventAccess", "manageAccess", "staffAccess"],
+  event_staff: ["eventAccess", "staffAccess"],
   finance_manager: ["financeAccess", "manageAccess", "staffAccess"],
   finance_staff: ["financeAccess", "staffAccess"],
   inventory_manager: ["manageAccess", "procurementAccess", "staffAccess"],
