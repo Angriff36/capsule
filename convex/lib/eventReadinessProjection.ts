@@ -58,7 +58,125 @@ export type EventReadinessFacts = {
   openPacketIssueIds: string[];
   closeoutId: string | null;
   closeoutStatus: "draft" | "finalized" | null;
+  /** Open change flags from the invoice, proposal and closeout
+   * reconciliations (convex/lib/reconciliationFlags.ts). */
+  reconciliationFlags?: EventReconciliationFlag[];
 };
+
+export type EventReconciliationFlag = {
+  domain: "invoice" | "proposal" | "closeout";
+  code: string;
+  recordId: string;
+  /** The flagged record status now. */
+  status: string;
+  /** Invoices only: Invoice.followEventPrice may run on this draft. */
+  canFollowPrice?: boolean;
+};
+
+type FlagText = {
+  domain: EventReadinessDomain;
+  reason: string;
+  /** The command that settles the flag, legal in the record status now. */
+  resolvingAction: string;
+};
+
+const flagText = (
+  domain: EventReadinessDomain,
+  reason: string,
+  resolvingAction: string,
+): FlagText => ({ domain, reason, resolvingAction });
+
+/** Plain words for each reconciliation flag code in the status the record
+ * has now, and the command a person uses to settle it in that status. A code
+ * and status with no entry is skipped, never guessed. */
+function reconciliationFlagText(flag: EventReconciliationFlag): FlagText | null {
+  const code = flag.code;
+  const status = flag.status;
+  const billReason =
+    "The event price changed after this bill went to the client. The bill was not changed.";
+  switch (code) {
+    case "invoice_review":
+      if (status !== "draft") return null;
+      // A draft with only a deposit or lines can still take the new price.
+      if (flag.canFollowPrice)
+        return flagText(
+          "commercial",
+          "The event price changed, but this draft bill was changed by hand, so it kept its old amount. Check it, or move it to the new price.",
+          "Invoice.followEventPrice",
+        );
+      return flagText(
+        "commercial",
+        "The event price changed, but this draft bill has tax, a discount, a payment or a credit, so it kept its old amount. Check it, or cancel it and make a new bill.",
+        "Invoice.markVoided",
+      );
+    case "invoice_change_required":
+      if (status === "sent" || status === "viewed" || status === "overdue")
+        return flagText(
+          "commercial",
+          billReason + " Cancel it and send a new bill.",
+          "Invoice.markVoided",
+        );
+      if (status === "partial")
+        return flagText(
+          "commercial",
+          billReason + " Part of it is paid, so correct it with a credit.",
+          "Invoice.applyCredit",
+        );
+      if (status === "paid")
+        return flagText(
+          "commercial",
+          billReason + " It is paid, so correct it with a credit memo.",
+          "Invoice.recordCreditMemo",
+        );
+      return null;
+    case "proposal_review":
+      // Open on every unsent drafted proposal linked to the event.
+      if (status === "draft")
+        return flagText(
+          "commercial",
+          "The guest count changed, but this draft proposal was set to another count by hand, so it kept its count. Check it, or move it to the event count.",
+          "Proposal.followEventHeadcount",
+        );
+      return null;
+    case "proposal_change_required":
+      if (status === "sent" || status === "viewed")
+        return flagText(
+          "commercial",
+          "The guest count changed after the client saw this proposal. The proposal was not changed. Replace it with a new proposal.",
+          "Proposal.supersede",
+        );
+      // An accepted proposal is final; a change draft (Proposal.draft with
+      // replacesProposalId) is the way to change it.
+      if (status === "accepted")
+        return flagText(
+          "commercial",
+          "The guest count changed after the client accepted this proposal. The proposal was not changed. Start a change to it.",
+          "Proposal.draft",
+        );
+      return null;
+    case "closeout_review":
+      if (status === "draft")
+        return flagText(
+          "closeout",
+          "The event budget changed after actuals went on this closeout, so it kept its old budget. Check it and save the closeout again.",
+          "EventCloseout.capture",
+        );
+      return null;
+    case "closeout_change_required":
+      // No command changes a finalized closeout; the difference can only be
+      // settled on the event itself.
+      if (status === "finalized")
+        return flagText(
+          "closeout",
+          "The event budget changed after this closeout was finalized. A finalized closeout cannot be changed. If the budget change was a mistake, set the event budget back.",
+          "Event.correctCommercial",
+        );
+      return null;
+    default:
+      return null;
+  }
+}
+
 
 /** An id is present only when it is a non-empty, non-blank string. */
 function hasId(id: unknown): id is string {
@@ -285,6 +403,20 @@ export function projectEventReadiness(
       "warning",
       "This event's closeout is still a draft.",
       "EventCloseout.finalize",
+    );
+  }
+
+  // change flags — a record the reconciliation kept instead of rewriting.
+  for (const flag of facts.reconciliationFlags ?? []) {
+    const text = reconciliationFlagText(flag);
+    if (!text) continue;
+    add(
+      text.domain,
+      text.domain + "." + flag.code,
+      [flag.recordId],
+      "warning",
+      text.reason,
+      text.resolvingAction,
     );
   }
 

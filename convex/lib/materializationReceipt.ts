@@ -1,6 +1,6 @@
 import type { MutationCtx } from "../_generated/server";
 
-const requestKey = (tenantId: string, family: string, operationKey: string) =>
+export const requestKey = (tenantId: string, family: string, operationKey: string) =>
   `${tenantId}:exact:${family}:${operationKey}`;
 const scopeOf = (operationKey: string) =>
   operationKey.slice(0, operationKey.lastIndexOf(":"));
