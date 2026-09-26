@@ -62,10 +62,11 @@ interface ScanContext {
   recipients: Recipient[];
   triggers: Trigger[];
   alreadySent: string[]; // `${triggerKey}::${personId}`, sent or out of tries
+  currentChainId: string | null; // chain id of the newest SmsAlertsEnabled row
 }
 
 interface ScanResult {
-  status: "ok" | "disabled" | "partial";
+  status: "ok" | "disabled" | "partial" | "superseded";
   sent: number;
   skipped: number;
   failed: number;
@@ -193,14 +194,19 @@ export const enableAlerts = action({
     const tenantId = requireTenant(auth);
     requireManager(auth.role);
     requireTwilioConfig(); // fail early with a clear message if unconfigured
+    // The newest enable owns the tenant's scan chain; older chains end at
+    // their next scan, so enabling twice never leaves two chains running.
+    const chainId = crypto.randomUUID();
     await ctx.runMutation(internal.smsAlerts.recordConfigEvent, {
       tenantId,
       type: "SmsAlertsEnabled",
       actorId: auth.id,
+      payload: { chainId },
     });
     await ctx.scheduler.runAfter(0, internal.smsAlerts.scanTenant, {
       tenantId,
       scheduleNext: true,
+      chainId,
     });
     return { enabled: true };
   },
@@ -282,11 +288,30 @@ export const loadScanContext = internalQuery({
       .query("manifestEvents")
       .withIndex("by_entityId", (q) => q.eq("entityId", args.tenantId))
       .collect();
-    const enabled = latestConfigEnabled(
-      ledger.filter((row) => row.entity === CONFIG_ENTITY),
-    );
+    const configRows = ledger.filter((row) => row.entity === CONFIG_ENTITY);
+    const enabled = latestConfigEnabled(configRows);
     if (!enabled) {
-      return { enabled: false, recipients: [], triggers: [], alreadySent: [] };
+      return {
+        enabled: false,
+        recipients: [],
+        triggers: [],
+        alreadySent: [],
+        currentChainId: null,
+      };
+    }
+    let currentChainId: string | null = null;
+    let chainAt = -Infinity;
+    for (const row of configRows) {
+      const chainId = asRecord(row.payload).chainId;
+      // Rows come in insertion order, so a same-time later row is newer.
+      if (
+        row.type === "SmsAlertsEnabled" &&
+        typeof chainId === "string" &&
+        row.createdAt >= chainAt
+      ) {
+        currentChainId = chainId;
+        chainAt = row.createdAt;
+      }
     }
 
     const now = Date.now();
@@ -394,12 +419,16 @@ export const loadScanContext = internalQuery({
       }
     }
 
-    return { enabled: true, recipients, triggers, alreadySent };
+    return { enabled: true, recipients, triggers, alreadySent, currentChainId };
   },
 });
 
 export const scanTenant = internalAction({
-  args: { tenantId: v.string(), scheduleNext: v.boolean() },
+  args: {
+    tenantId: v.string(),
+    scheduleNext: v.boolean(),
+    chainId: v.optional(v.string()),
+  },
   handler: async (ctx, args): Promise<ScanResult> => {
     const context: ScanContext = await ctx.runQuery(
       internal.smsAlerts.loadScanContext,
@@ -407,6 +436,14 @@ export const scanTenant = internalAction({
     );
     if (!context.enabled) {
       return { status: "disabled", sent: 0, skipped: 0, failed: 0 };
+    }
+    // A newer chain owns this tenant: end this one without sends or reschedule.
+    if (
+      args.scheduleNext &&
+      context.currentChainId != null &&
+      args.chainId !== context.currentChainId
+    ) {
+      return { status: "superseded", sent: 0, skipped: 0, failed: 0 };
     }
 
     const sentKeys = new Set(context.alreadySent);
@@ -478,7 +515,7 @@ export const scanTenant = internalAction({
     });
 
     if (args.scheduleNext) {
-      await scheduleNextScan(ctx, args.tenantId);
+      await scheduleNextScan(ctx, args.tenantId, args.chainId);
     }
     return result;
   },
@@ -487,6 +524,7 @@ export const scanTenant = internalAction({
 async function scheduleNextScan(
   ctx: ActionCtx,
   tenantId: string,
+  chainId: string | undefined,
 ): Promise<void> {
   const stillEnabled: boolean = await ctx.runQuery(
     internal.smsAlerts.isEnabled,
@@ -499,6 +537,7 @@ async function scheduleNextScan(
       {
         tenantId,
         scheduleNext: true,
+        chainId,
       },
     );
   }

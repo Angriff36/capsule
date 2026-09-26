@@ -177,4 +177,49 @@ describe("SMS outbox sends each alert once per person", () => {
     expect(calls.map((call) => call.to)).toEqual(["+15551110001"]);
     expect((await alertRows(t)).map((row) => row.tenantId)).toEqual([TENANT]);
   });
+
+  it("only the newest scan chain keeps running; older chains end", async () => {
+    const t = setup();
+    const calls = stubTwilio(true);
+    for (const chainId of ["chain-old", "chain-new"]) {
+      await t.mutation(internal.smsAlerts.recordConfigEvent, {
+        tenantId: TENANT,
+        type: "SmsAlertsEnabled",
+        actorId: "proof-manager",
+        payload: { chainId },
+      });
+    }
+    await addPerson(t, TENANT, "5551110001");
+    await addEventSoon(t, TENANT);
+
+    const chainScan = (chainId?: string) =>
+      t.action(internal.smsAlerts.scanTenant, {
+        tenantId: TENANT,
+        scheduleNext: true,
+        chainId,
+      });
+    const scheduledChains = () =>
+      t.run(async (ctx) =>
+        (await ctx.db.system.query("_scheduled_functions").collect()).map(
+          (job) => (job.args[0] as { chainId?: string }).chainId,
+        ),
+      );
+
+    expect(await chainScan("chain-old")).toMatchObject({
+      status: "superseded",
+      sent: 0,
+    });
+    expect(await chainScan(undefined)).toMatchObject({
+      status: "superseded",
+      sent: 0,
+    });
+    expect(await scheduledChains()).toEqual([]);
+    expect(calls).toHaveLength(0);
+
+    expect(await chainScan("chain-new")).toMatchObject({
+      status: "ok",
+      sent: 1,
+    });
+    expect(await scheduledChains()).toEqual(["chain-new"]);
+  });
 });
