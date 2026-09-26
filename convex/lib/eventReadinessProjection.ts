@@ -56,6 +56,9 @@ export type EventReadinessFacts = {
   inFlightDeliveryIds: string[];
   openPurchaseNeedIds: string[];
   openPacketIssueIds: string[];
+  /** The newest printed packet revision when the event changed after it was
+   * printed (no revision holds the current snapshot); null otherwise. */
+  packetOutOfDateRevisionId?: string | null;
   closeoutId: string | null;
   closeoutStatus: "draft" | "finalized" | null;
   /** Open change flags from the invoice, proposal and closeout
@@ -346,6 +349,18 @@ export function projectEventReadiness(
       "warning",
       "An open issue is on this event's packet.",
       "EventPacketIssue.resolve",
+    );
+  }
+  // The printed packet is history (§14.1): it is never rewritten, so the
+  // office prepares a new revision from the event as it is now.
+  if (hasId(facts.packetOutOfDateRevisionId)) {
+    add(
+      "packet",
+      "packet.out_of_date",
+      [facts.packetOutOfDateRevisionId],
+      "warning",
+      "The event changed after its packet was printed. The printed packet was not changed. Prepare the packet again.",
+      "EventPacket.recordPacketRevision",
     );
   }
 
