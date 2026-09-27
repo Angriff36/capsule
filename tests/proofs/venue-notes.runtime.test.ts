@@ -55,7 +55,6 @@ describe("runtime proof: venue note post/pin/revise/remove (AC-316)", () => {
       proof,
       staff,
       venueId,
-      authorHire.personId,
       "Riley Author",
       "Dock is on the alley",
       {
@@ -164,7 +163,6 @@ describe("runtime proof: venue note post/pin/revise/remove (AC-316)", () => {
       proof,
       author,
       venueId,
-      authorHire.personId,
       "Riley Author",
       "Side gate sticks",
     );
@@ -172,7 +170,6 @@ describe("runtime proof: venue note post/pin/revise/remove (AC-316)", () => {
       proof,
       author,
       venueId,
-      authorHire.personId,
       "Riley Author",
       "Elevator needs a key",
     );
@@ -241,7 +238,6 @@ describe("runtime proof: venue note post/pin/revise/remove (AC-316)", () => {
     await expect(
       proof.executeCommand(staff, M.VenueNote_createViaPost, {
         venueId,
-        authorPersonId: authorHire.personId,
         authorName: "Riley Author",
         category: "other" as const,
         content: "",
@@ -250,7 +246,6 @@ describe("runtime proof: venue note post/pin/revise/remove (AC-316)", () => {
     await expect(
       proof.executeCommand(staff, M.VenueNote_createViaPost, {
         venueId,
-        authorPersonId: authorHire.personId,
         authorName: "Riley Author",
         category: "other" as const,
         content: "   ",
@@ -266,7 +261,6 @@ describe("runtime proof: venue note post/pin/revise/remove (AC-316)", () => {
       proof,
       staff,
       venueId,
-      authorHire.personId,
       "Riley Author",
       "Gate code changed to 7712",
     );

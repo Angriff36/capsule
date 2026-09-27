@@ -10302,7 +10302,6 @@ export type VenueNotePinParams = z.infer<typeof VenueNotePinParamsSchema>;
 export const VenueNotePostParamsSchema = z.object({
   venueId: z.string().min(1),
   eventId: z.string().min(1).optional(),
-  authorPersonId: z.string().min(1),
   authorName: z.string(),
   category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "other"]),
   content: z.string(),

@@ -55461,7 +55461,7 @@ export const VenueNote_pin = mutation({
   },
 });
 
-async function __runVenueNotePost(ctx: MutationCtx, { docId, venueId, eventId, authorPersonId, authorName, category, content, visibility, isPinned, version }: any, __creation = false) {
+async function __runVenueNotePost(ctx: MutationCtx, { docId, venueId, eventId, authorName, category, content, visibility, isPinned, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -55473,6 +55473,7 @@ async function __runVenueNotePost(ctx: MutationCtx, { docId, venueId, eventId, a
     if (!((doc.postedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
+    if (!((user.personId != null))) throw new Error("Guard 3 failed");
     if (!((((content).trim()).length > 0))) throw new Error("Write something in this note.");
     if (!((((authorName).trim()).length > 0))) throw new Error("Give this note an author name.");
     if (version !== undefined && (doc as any).version !== version) {
@@ -55481,7 +55482,7 @@ async function __runVenueNotePost(ctx: MutationCtx, { docId, venueId, eventId, a
     const updates = {
       venueId: venueId,
       eventId: eventId,
-      authorPersonId: authorPersonId,
+      authorPersonId: user.personId,
       authorName: authorName,
       authorAuthSubjectId: user.id,
       category: category,
@@ -55505,7 +55506,6 @@ export const VenueNote_post = mutation({
     docId: v.id("venueNotes"),
     venueId: v.string(),
     eventId: v.optional(v.string()),
-    authorPersonId: v.string(),
     authorName: v.string(),
     category: v.any(),
     content: v.string(),
@@ -55531,7 +55531,6 @@ export const VenueNote_createViaPost = mutation({
   args: {
     venueId: v.string(),
     eventId: v.optional(v.string()),
-    authorPersonId: v.string(),
     authorName: v.string(),
     category: v.any(),
     content: v.string(),
@@ -55546,7 +55545,7 @@ export const VenueNote_createViaPost = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { venueId, eventId, authorPersonId, authorName, category, content, visibility, isPinned } = args;
+    const { venueId, eventId, authorName, category, content, visibility, isPinned } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       isPinned: args.isPinned !== undefined ? args.isPinned : false,
@@ -55554,7 +55553,6 @@ export const VenueNote_createViaPost = mutation({
       createdAt: Date.now(),
       updatedAt: Date.now(),
       authorName: args.authorName,
-      authorPersonId: args.authorPersonId,
       category: args.category,
       content: args.content,
       eventId: args.eventId,
@@ -55566,6 +55564,7 @@ export const VenueNote_createViaPost = mutation({
     if (!((__draft.postedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
+    if (!((user.personId != null))) throw new Error("Guard 3 failed");
     if (!((((content).trim()).length > 0))) throw new Error("Write something in this note.");
     if (!((((authorName).trim()).length > 0))) throw new Error("Give this note an author name.");
     const doc: Record<string, any> = {
@@ -55574,7 +55573,7 @@ export const VenueNote_createViaPost = mutation({
     };
     doc.venueId = venueId;
     doc.eventId = eventId;
-    doc.authorPersonId = authorPersonId;
+    doc.authorPersonId = user.personId;
     doc.authorName = authorName;
     doc.authorAuthSubjectId = user.id;
     doc.category = category;

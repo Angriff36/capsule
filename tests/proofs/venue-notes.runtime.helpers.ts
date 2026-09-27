@@ -107,7 +107,6 @@ export async function postNote(
   proof: ReturnType<typeof harness>,
   actor: Actor,
   venueId: string,
-  authorPersonId: string,
   authorName: string,
   content: string,
   extra?: {
@@ -116,13 +115,13 @@ export async function postNote(
     visibility?: "public" | "internal" | "management_only";
   },
 ) {
+  // The server records the signed-in person as the author.
   const created = (await proof.executeCommand(
     actor,
     M.VenueNote_createViaPost,
     {
       venueId,
       eventId: extra?.eventId,
-      authorPersonId,
       authorName,
       category: extra?.category ?? ("other" as const),
       content,

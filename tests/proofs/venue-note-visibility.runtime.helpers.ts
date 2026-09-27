@@ -66,17 +66,16 @@ async function postNote(
   proof: Proof,
   actor: Actor,
   venueId: string,
-  authorPersonId: string,
   authorName: string,
   visibility: "internal" | "management_only",
   content: string,
 ) {
+  // The server records the signed-in person as the author.
   const created = (await proof.executeCommand(
     actor,
     M.VenueNote_createViaPost,
     {
       venueId,
-      authorPersonId,
       authorName,
       category: "access" as const,
       content,
@@ -183,14 +182,11 @@ async function postMarkerNotes(
   staff: Actor,
   manager: Actor,
   venueId: string,
-  staffPersonId: string,
-  mgrPersonId: string,
 ) {
   const internalId = await postNote(
     proof,
     staff,
     venueId,
-    staffPersonId,
     "Riley Ac317crew",
     "internal",
     S.internalMarker,
@@ -199,7 +195,6 @@ async function postMarkerNotes(
     proof,
     manager,
     venueId,
-    mgrPersonId,
     "Riley Ac317mgr",
     "management_only",
     S.mgmtMarker,
@@ -286,8 +281,6 @@ export async function setupAc317Fixture(proof: Proof) {
     actors.staff,
     actors.manager,
     venueId,
-    actors.staffHirePersonId,
-    actors.mgrHirePersonId,
   );
   const { proposalId, revisionId, linkId } = await publishSharedProposal(
     proof,
