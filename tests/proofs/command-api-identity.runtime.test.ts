@@ -16,6 +16,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
+import { hireStaff } from "./venue-notes.runtime.helpers";
 
 function harness() {
   // One raw instance shared with the proof-kit root, so the anonymous caller
@@ -146,5 +147,49 @@ describe("runtime proof: command API identity comes from the sign-in", () => {
       ctx.db.get(clientId as never),
     )) as { version: number };
     expect(afterOwn.version).toBe(row.version + 1);
+  });
+
+  it("stores the signed-in person on a recipe version saved through the API, not the person the body names", async () => {
+    const proof = harness();
+    const home = "tenant-command-api-saver";
+    const other = "tenant-command-api-saver-other";
+    // The caller is linked to one staff profile; the body names another.
+    const saver = await hireStaff(proof as never, home, "saver", "admin");
+    const someoneElse = await hireStaff(proof as never, home, "other", "admin");
+    const staff = proof.asRole({
+      subject: saver.authSubjectId,
+      role: "admin",
+      tenantId: home,
+    });
+    const recipe = await post(staff, "Component", "draft", {
+      name: "Command API recipe",
+      yieldQuantity: 1,
+      yieldUnit: "batch",
+    });
+    expect(recipe.status).toBe(200);
+
+    const saved = await post(staff, "ComponentSnapshot", "capture", {
+      componentId: recipe.data?.docId,
+      versionNumber: 1,
+      changeSummary: "Before edit",
+      snapshot: JSON.stringify({ name: "Command API recipe", lines: [] }),
+      capturedByName: "Riley other",
+      capturedByAuthSubjectId: someoneElse.authSubjectId,
+      tenantId: other,
+      userId: someoneElse.authSubjectId,
+      actorId: someoneElse.authSubjectId,
+      user: { id: someoneElse.authSubjectId, role: "admin", tenantId: other },
+    });
+    expect(saved.status).toBe(200);
+    const row = (await staff.run(async (ctx) =>
+      ctx.db.get(saved.data?.docId as never),
+    )) as {
+      capturedByName: string;
+      capturedByAuthSubjectId: string;
+      tenantId: string;
+    };
+    expect(row.capturedByName).toBe("Riley saver");
+    expect(row.capturedByAuthSubjectId).toBe(saver.authSubjectId);
+    expect(row.tenantId).toBe(home);
   });
 });
