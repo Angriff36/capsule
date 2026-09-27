@@ -6288,7 +6288,6 @@ export type EventTimelineActivityUseCalculatedTimingParams = z.infer<typeof Even
 // Command: post on EventTimelineComment
 export const EventTimelineCommentPostParamsSchema = z.object({
   eventId: z.string().min(1),
-  authorPersonId: z.string().min(1),
   authorName: z.string(),
   body: z.string(),
   activityId: z.string().optional(),

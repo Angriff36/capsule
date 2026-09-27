@@ -19944,7 +19944,7 @@ export const EventTimelineActivity_useCalculatedTiming = mutation({
   },
 });
 
-async function __runEventTimelineCommentPost(ctx: MutationCtx, { docId, eventId, authorPersonId, authorName, body, activityId, version }: any, __creation = false) {
+async function __runEventTimelineCommentPost(ctx: MutationCtx, { docId, eventId, authorName, body, activityId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -19956,6 +19956,7 @@ async function __runEventTimelineCommentPost(ctx: MutationCtx, { docId, eventId,
     if (!((doc.postedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
+    if (!((user.personId != null))) throw new Error("Guard 3 failed");
     if (!((((body).trim()).length > 0))) throw new Error("Write something in this comment.");
     if (!((((authorName).trim()).length > 0))) throw new Error("Give this comment an author name.");
     if (version !== undefined && (doc as any).version !== version) {
@@ -19964,7 +19965,7 @@ async function __runEventTimelineCommentPost(ctx: MutationCtx, { docId, eventId,
     const updates = {
       eventId: eventId,
       activityId: activityId,
-      authorPersonId: authorPersonId,
+      authorPersonId: user.personId,
       authorName: authorName,
       authorAuthSubjectId: user.id,
       body: body,
@@ -19973,8 +19974,8 @@ async function __runEventTimelineCommentPost(ctx: MutationCtx, { docId, eventId,
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, commentId: docId, tenantId: __after.tenantId, eventId: eventId, authorPersonId: authorPersonId, _subject: { entity: "EventTimelineComment", command: "post", id: docId } };
-    const __manifestEvent0 = { type: "EventTimelineCommentPosted", entity: "EventTimelineComment", entityId: docId, payload: { commentId: docId, tenantId: __after.tenantId, eventId: eventId, authorPersonId: authorPersonId }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, commentId: docId, tenantId: __after.tenantId, eventId: eventId, authorPersonId: user.personId, _subject: { entity: "EventTimelineComment", command: "post", id: docId } };
+    const __manifestEvent0 = { type: "EventTimelineCommentPosted", entity: "EventTimelineComment", entityId: docId, payload: { commentId: docId, tenantId: __after.tenantId, eventId: eventId, authorPersonId: user.personId }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "post", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -19984,7 +19985,6 @@ export const EventTimelineComment_post = mutation({
   args: {
     docId: v.id("eventTimelineComments"),
     eventId: v.string(),
-    authorPersonId: v.string(),
     authorName: v.string(),
     body: v.string(),
     activityId: v.optional(v.string()),
@@ -20007,7 +20007,6 @@ export const EventTimelineComment_post = mutation({
 export const EventTimelineComment_createViaPost = mutation({
   args: {
     eventId: v.string(),
-    authorPersonId: v.string(),
     authorName: v.string(),
     body: v.string(),
     activityId: v.optional(v.string()),
@@ -20020,14 +20019,13 @@ export const EventTimelineComment_createViaPost = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { eventId, authorPersonId, authorName, body, activityId } = args;
+    const { eventId, authorName, body, activityId } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
       activityId: args.activityId,
       authorName: args.authorName,
-      authorPersonId: args.authorPersonId,
       body: args.body,
       eventId: args.eventId
     };
@@ -20037,6 +20035,7 @@ export const EventTimelineComment_createViaPost = mutation({
     if (!((__draft.postedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
+    if (!((user.personId != null))) throw new Error("Guard 3 failed");
     if (!((((body).trim()).length > 0))) throw new Error("Write something in this comment.");
     if (!((((authorName).trim()).length > 0))) throw new Error("Give this comment an author name.");
     const doc: Record<string, any> = {
@@ -20045,14 +20044,14 @@ export const EventTimelineComment_createViaPost = mutation({
     };
     doc.eventId = eventId;
     doc.activityId = activityId;
-    doc.authorPersonId = authorPersonId;
+    doc.authorPersonId = user.personId;
     doc.authorName = authorName;
     doc.authorAuthSubjectId = user.id;
     doc.body = body;
     doc.postedAt = Date.now();
     const docId = await ctx.db.insert("eventTimelineComments", doc as any);
-    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, commentId: docId, tenantId: doc.tenantId, eventId: eventId, authorPersonId: authorPersonId, _subject: { entity: "EventTimelineComment", command: "post", id: docId } };
-    const __manifestEvent0 = { type: "EventTimelineCommentPosted", entity: "EventTimelineComment", entityId: docId, payload: { commentId: docId, tenantId: doc.tenantId, eventId: eventId, authorPersonId: authorPersonId }, createdAt: Date.now() };
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, commentId: docId, tenantId: doc.tenantId, eventId: eventId, authorPersonId: user.personId, _subject: { entity: "EventTimelineComment", command: "post", id: docId } };
+    const __manifestEvent0 = { type: "EventTimelineCommentPosted", entity: "EventTimelineComment", entityId: docId, payload: { commentId: docId, tenantId: doc.tenantId, eventId: eventId, authorPersonId: user.personId }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "post", emitIndex: 0 });
     const __result = { docId };

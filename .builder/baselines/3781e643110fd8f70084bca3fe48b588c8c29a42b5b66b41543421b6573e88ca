@@ -286,9 +286,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // EventTimelineComment has multiple initialization commands (post, remove); using the selected initialization command: post.
   // EventTimelineComment → api.mutations.EventTimelineComment_createViaPost
   rowsAttempted += 1;
-  await client.mutation(api.mutations.EventTimelineComment_createViaPost, { "eventId": "eventId-event-timeline-comment-1", "activityId": "activityId-event-timeline-comment-1", "authorPersonId": "authorPersonId-event-timeline-comment-1", "authorName": "EventTimelineComment 1", "body": "demo-body-1" } as any);
+  await client.mutation(api.mutations.EventTimelineComment_createViaPost, { "eventId": "eventId-event-timeline-comment-1", "activityId": "activityId-event-timeline-comment-1", "authorName": "EventTimelineComment 1", "body": "demo-body-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.EventTimelineComment_createViaPost, { "eventId": "eventId-event-timeline-comment-2", "activityId": "activityId-event-timeline-comment-2", "authorPersonId": "authorPersonId-event-timeline-comment-2", "authorName": "EventTimelineComment 2", "body": "demo-body-2" } as any);
+  await client.mutation(api.mutations.EventTimelineComment_createViaPost, { "eventId": "eventId-event-timeline-comment-2", "activityId": "activityId-event-timeline-comment-2", "authorName": "EventTimelineComment 2", "body": "demo-body-2" } as any);
   // EventVehicleAssignment has multiple initialization commands (assign, release); using the selected initialization command: assign.
   // EventVehicleAssignment → api.mutations.EventVehicleAssignment_createViaAssign
   rowsAttempted += 1;

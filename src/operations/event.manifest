@@ -2039,9 +2039,9 @@ entity EventTimelineComment mixin TenantScoped, SoftDeletable {
   default policy eventTimelineCommentWrite write: roleAllows(user.role, "eventAccess") "Event staff may add timeline comments"
   default policy eventTimelineCommentExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change timeline comments"
 
+  // The author is the signed-in person's staff profile, never a caller-sent id.
   command post(
     eventId: uuid,
-    authorPersonId: uuid,
     authorName: string,
     body: string,
     optional activityId: string
@@ -2049,11 +2049,12 @@ entity EventTimelineComment mixin TenantScoped, SoftDeletable {
     guard self.postedAt == null
     guard self.deletedAt == null
     guard user.id != null
+    guard user.personId != null
     constraint postTimelineCommentBody: length(trim(body)) > 0 "Write something in this comment."
     constraint postTimelineCommentAuthor: length(trim(authorName)) > 0 "Give this comment an author name."
     mutate eventId = eventId
     mutate activityId = activityId
-    mutate authorPersonId = authorPersonId
+    mutate authorPersonId = user.personId
     mutate authorName = authorName
     mutate authorAuthSubjectId = user.id
     mutate body = body
@@ -2062,7 +2063,7 @@ entity EventTimelineComment mixin TenantScoped, SoftDeletable {
       commentId: self.id
       tenantId: self.tenantId
       eventId: eventId
-      authorPersonId: authorPersonId
+      authorPersonId: user.personId
     }
   }
 

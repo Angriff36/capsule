@@ -1266,8 +1266,8 @@ const COMMAND_DISPATCH = {
   },
   "EventTimelineComment.post": {
     ref: api.mutations.EventTimelineComment_createViaPost,
-    params: ["eventId","authorPersonId","authorName","body","activityId","idempotencyKey"] as const,
-    paramMeta: [{"name":"eventId","type":"uuid","required":true},{"name":"authorPersonId","type":"uuid","required":true},{"name":"authorName","type":"string","required":true},{"name":"body","type":"string","required":true},{"name":"activityId","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["eventId","authorName","body","activityId","idempotencyKey"] as const,
+    paramMeta: [{"name":"eventId","type":"uuid","required":true},{"name":"authorName","type":"string","required":true},{"name":"body","type":"string","required":true},{"name":"activityId","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "EventTimelineComment.remove": {
     ref: api.mutations.EventTimelineComment_remove,
