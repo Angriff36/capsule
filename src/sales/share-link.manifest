@@ -94,6 +94,13 @@ entity ShareLink mixin TenantScoped, SoftDeletable {
     mutate status = "active"
     mutate expiresAt = expiresAt
     mutate createdByPersonId = user.id
+    // Revoke and view tracking belong to revoke and the public view seam.
+    mutate revokedAt = null
+    mutate revokedByPersonId = null
+    mutate viewCount = 0
+    mutate firstViewedAt = null
+    mutate lastViewedAt = null
+    mutate lastViewerIdentity = null
     emit ShareLinkCreated {
       shareLinkId: self.id
       tenantId: self.tenantId

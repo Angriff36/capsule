@@ -130,6 +130,14 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     mutate submittedAt = now()
     mutate consentGrantedAt = now()
     mutate status = "pending"
+    // What processing made of the request is written by processing, not here.
+    mutate clientId = null
+    mutate leadId = null
+    mutate eventId = null
+    mutate proposalId = null
+    mutate completedAt = null
+    mutate errorMessage = null
+    mutate processingErrors = null
 
     emit QuoteSubmitted {
       submissionId: self.id

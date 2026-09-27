@@ -84,6 +84,15 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     mutate purchasingWeekStart = self.openedAt != null ? self.purchasingWeekStart : purchasingWeekStart
     mutate preferredVendorId = self.openedAt != null ? self.preferredVendorId : preferredVendorId
     mutate openedAt = self.openedAt != null ? self.openedAt : now()
+    // A new need is open; ordering, receiving and cancelling are their own steps.
+    mutate status = "open"
+    mutate orderedQuantity = null
+    mutate vendorOrderId = null
+    mutate vendorOrderLineId = null
+    mutate orderedAt = null
+    mutate fulfilledAt = null
+    mutate cancelledAt = null
+    mutate cancellationReason = null
     emit PurchaseNeedOpened {
       purchaseNeedId: self.id
       tenantId: self.tenantId

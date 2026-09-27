@@ -44,6 +44,7 @@ entity ClientPortalLink mixin TenantScoped, SoftDeletable {
     mutate status = "active"
     mutate expiresAt = expiresAt
     mutate issuedBySubject = user.id
+    mutate revokedAt = null
   }
 
   command revoke() {

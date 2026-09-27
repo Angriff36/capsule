@@ -3414,13 +3414,13 @@ async function __runClientPortalLinkCreate(ctx: MutationCtx, args: any) {
     const doc: Record<string, any> = {
       tenantId: __auth.tenantId,
       deletedAt: args.deletedAt,
-      revokedAt: args.revokedAt,
       createdAt: args.createdAt,
       updatedAt: args.updatedAt,
       eventId: args.eventId,
       status: "active",
       expiresAt: args.expiresAt,
       issuedBySubject: user.id,
+      revokedAt: null,
       version: 1
     };
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see which client links are open");
@@ -3436,7 +3436,6 @@ async function __runClientPortalLinkCreate(ctx: MutationCtx, args: any) {
 export const ClientPortalLink_create = mutation({
   args: {
     deletedAt: v.optional(v.union(v.number(), v.null())),
-    revokedAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     eventId: v.string(),
@@ -29204,8 +29203,6 @@ async function __runMessageThreadCreate(ctx: MutationCtx, args: any) {
     const doc: Record<string, any> = {
       tenantId: __auth.tenantId,
       deletedAt: args.deletedAt,
-      leadId: args.leadId,
-      status: args.status ?? "active",
       createdAt: args.createdAt,
       updatedAt: args.updatedAt,
       provider: args.provider,
@@ -29215,6 +29212,8 @@ async function __runMessageThreadCreate(ctx: MutationCtx, args: any) {
       senderIdentity: args.senderIdentity,
       contactId: args.contactId,
       openedByAuthSubjectId: user.id,
+      status: "active",
+      leadId: null,
       version: 1
     };
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see message threads");
@@ -29234,8 +29233,6 @@ async function __runMessageThreadCreate(ctx: MutationCtx, args: any) {
 export const MessageThread_create = mutation({
   args: {
     deletedAt: v.optional(v.union(v.number(), v.null())),
-    leadId: v.optional(v.union(v.id("leads"), v.null())),
-    status: v.optional(v.union(v.literal("active"), v.literal("non_lead"), v.literal("archived"))),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     provider: v.any(),
@@ -40239,20 +40236,20 @@ async function __runPurchaseNeedCreate(ctx: MutationCtx, args: any) {
       ingredientDemandId: args.ingredientDemandId,
       ingredientId: args.ingredientId,
       unit: args.unit ?? "each",
-      orderedQuantity: args.orderedQuantity,
-      vendorOrderId: args.vendorOrderId,
-      vendorOrderLineId: args.vendorOrderLineId,
-      status: args.status ?? "open",
-      orderedAt: args.orderedAt,
-      fulfilledAt: args.fulfilledAt,
-      cancelledAt: args.cancelledAt,
-      cancellationReason: args.cancellationReason,
       createdAt: args.createdAt,
       updatedAt: args.updatedAt,
       requiredQuantity: ((args.openedAt != null) ? args.requiredQuantity : args.requiredQuantity),
       purchasingWeekStart: ((args.openedAt != null) ? args.purchasingWeekStart : args.purchasingWeekStart),
       preferredVendorId: ((args.openedAt != null) ? args.preferredVendorId : args.preferredVendorId),
       openedAt: ((args.openedAt != null) ? args.openedAt : Date.now()),
+      status: "open",
+      orderedQuantity: null,
+      vendorOrderId: null,
+      vendorOrderLineId: null,
+      orderedAt: null,
+      fulfilledAt: null,
+      cancelledAt: null,
+      cancellationReason: null,
       version: 1
     };
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may see purchase needs");
@@ -40284,14 +40281,6 @@ export const PurchaseNeed_create = mutation({
     ingredientDemandId: v.id("ingredientDemands"),
     ingredientId: v.id("ingredients"),
     unit: v.optional(v.union(v.literal("each"), v.literal("gram"), v.literal("kilogram"), v.literal("ounce"), v.literal("pound"), v.literal("milliliter"), v.literal("liter"), v.literal("teaspoon"), v.literal("tablespoon"), v.literal("cup"), v.literal("pint"), v.literal("quart"), v.literal("gallon"), v.literal("portion"), v.literal("serving"), v.literal("batch"), v.literal("melon"), v.literal("bottle"), v.literal("fluid_ounce"), v.literal("piece"), v.literal("slice"), v.literal("pizza"), v.literal("package"), v.literal("case"), v.literal("can"), v.literal("tub"))),
-    orderedQuantity: v.optional(v.union(v.number(), v.null())),
-    vendorOrderId: v.optional(v.union(v.id("vendorOrders"), v.null())),
-    vendorOrderLineId: v.optional(v.union(v.id("vendorOrderLines"), v.null())),
-    status: v.optional(v.union(v.literal("open"), v.literal("ordered"), v.literal("fulfilled"), v.literal("cancelled"))),
-    orderedAt: v.optional(v.union(v.number(), v.null())),
-    fulfilledAt: v.optional(v.union(v.number(), v.null())),
-    cancelledAt: v.optional(v.union(v.number(), v.null())),
-    cancellationReason: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     requiredQuantity: v.number(),
@@ -41556,13 +41545,6 @@ async function __runQuoteSubmissionCreate(ctx: MutationCtx, args: any) {
     const doc: Record<string, any> = {
       tenantId: __auth.tenantId,
       deletedAt: args.deletedAt,
-      clientId: args.clientId,
-      leadId: args.leadId,
-      eventId: args.eventId,
-      proposalId: args.proposalId,
-      completedAt: args.completedAt,
-      errorMessage: args.errorMessage,
-      processingErrors: args.processingErrors,
       createdAt: args.createdAt,
       updatedAt: args.updatedAt,
       dedupKey: args.dedupKey,
@@ -41584,6 +41566,13 @@ async function __runQuoteSubmissionCreate(ctx: MutationCtx, args: any) {
       submittedAt: Date.now(),
       consentGrantedAt: Date.now(),
       status: "pending",
+      clientId: null,
+      leadId: null,
+      eventId: null,
+      proposalId: null,
+      completedAt: null,
+      errorMessage: null,
+      processingErrors: null,
       version: 1
     };
     if (!(true)) throw new Error("Anyone may check a quote request");
@@ -41607,13 +41596,6 @@ async function __runQuoteSubmissionCreate(ctx: MutationCtx, args: any) {
 export const QuoteSubmission_create = mutation({
   args: {
     deletedAt: v.optional(v.union(v.number(), v.null())),
-    clientId: v.optional(v.union(v.id("clients"), v.null())),
-    leadId: v.optional(v.union(v.id("leads"), v.null())),
-    eventId: v.optional(v.union(v.id("events"), v.null())),
-    proposalId: v.optional(v.union(v.id("proposals"), v.null())),
-    completedAt: v.optional(v.union(v.number(), v.null())),
-    errorMessage: v.optional(v.union(v.string(), v.null())),
-    processingErrors: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     dedupKey: v.string(),
@@ -42559,6 +42541,7 @@ async function __runRevenueAttributionApprove(ctx: MutationCtx, { docId, version
     if (!((doc.status === "pending_approval"))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "salesManageAccess")))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
+    if (!((user.personId != null))) throw new Error("Link your account to a staff profile before you approve a revenue attribution.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -42576,7 +42559,7 @@ async function __runRevenueAttributionApprove(ctx: MutationCtx, { docId, version
     }
     const updates = {
       status: "approved",
-      approvedById: user.id,
+      approvedById: user.personId,
       approvedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -42609,12 +42592,7 @@ async function __runRevenueAttributionCreate(ctx: MutationCtx, args: any) {
     const doc: Record<string, any> = {
       tenantId: __auth.tenantId,
       deletedAt: args.deletedAt,
-      allocatedAmount: args.allocatedAmount ?? 0,
-      approvedById: args.approvedById,
-      approvedAt: args.approvedAt,
-      rejectionReason: args.rejectionReason,
       notes: args.notes,
-      appliedAt: args.appliedAt,
       createdAt: args.createdAt,
       updatedAt: args.updatedAt,
       eventId: args.eventId,
@@ -42631,8 +42609,13 @@ async function __runRevenueAttributionCreate(ctx: MutationCtx, args: any) {
       effectiveEndDate: args.effectiveEndDate,
       reason: args.reason,
       status: "draft",
-      requestedById: user.id,
+      requestedById: user.personId,
       requestedAt: Date.now(),
+      allocatedAmount: 0,
+      approvedById: null,
+      approvedAt: null,
+      rejectionReason: null,
+      appliedAt: null,
       version: 1
     };
     if (!((checkRole(user, "financeAccess") || checkRole(user, "salesAccess")))) throw new Error("Finance and sales staff may see attributions");
@@ -42640,6 +42623,7 @@ async function __runRevenueAttributionCreate(ctx: MutationCtx, args: any) {
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change attributions");
     if (!((args.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((user.id != null))) throw new Error("Guard 1 failed");
+    if (!((user.personId != null))) throw new Error("Link your account to a staff profile before you add a revenue attribution.");
     const _id = await ctx.db.insert("revenueAttributions", doc as any);
     return { _id, ...doc };
 
@@ -42648,12 +42632,7 @@ async function __runRevenueAttributionCreate(ctx: MutationCtx, args: any) {
 export const RevenueAttribution_create = mutation({
   args: {
     deletedAt: v.optional(v.union(v.number(), v.null())),
-    allocatedAmount: v.optional(v.number()),
-    approvedById: v.optional(v.union(v.id("people"), v.null())),
-    approvedAt: v.optional(v.union(v.number(), v.null())),
-    rejectionReason: v.optional(v.union(v.string(), v.null())),
     notes: v.optional(v.union(v.string(), v.null())),
-    appliedAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     eventId: v.string(),
@@ -44482,12 +44461,6 @@ async function __runShareLinkCreate(ctx: MutationCtx, args: any) {
     const doc: Record<string, any> = {
       tenantId: __auth.tenantId,
       deletedAt: args.deletedAt,
-      revokedAt: args.revokedAt,
-      revokedByPersonId: args.revokedByPersonId,
-      viewCount: args.viewCount ?? 0,
-      firstViewedAt: args.firstViewedAt,
-      lastViewedAt: args.lastViewedAt,
-      lastViewerIdentity: args.lastViewerIdentity,
       createdAt: args.createdAt,
       updatedAt: args.updatedAt,
       proposalId: args.proposalId,
@@ -44495,6 +44468,12 @@ async function __runShareLinkCreate(ctx: MutationCtx, args: any) {
       status: "active",
       expiresAt: args.expiresAt,
       createdByPersonId: user.id,
+      revokedAt: null,
+      revokedByPersonId: null,
+      viewCount: 0,
+      firstViewedAt: null,
+      lastViewedAt: null,
+      lastViewerIdentity: null,
       version: 1
     };
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see share links");
@@ -44515,12 +44494,6 @@ async function __runShareLinkCreate(ctx: MutationCtx, args: any) {
 export const ShareLink_create = mutation({
   args: {
     deletedAt: v.optional(v.union(v.number(), v.null())),
-    revokedAt: v.optional(v.union(v.number(), v.null())),
-    revokedByPersonId: v.optional(v.union(v.string(), v.null())),
-    viewCount: v.optional(v.number()),
-    firstViewedAt: v.optional(v.union(v.number(), v.null())),
-    lastViewedAt: v.optional(v.union(v.number(), v.null())),
-    lastViewerIdentity: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     proposalId: v.string(),
