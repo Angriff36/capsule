@@ -47,11 +47,11 @@ entity VenueNote mixin TenantScoped, SoftDeletable {
   default policy venueNoteWrite write: roleAllows(user.role, "eventAccess") "Event staff may update venue notes"
   default policy venueNoteExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change venue notes"
 
-  // The author is the signed-in person's staff profile, never a caller-sent id.
+  // The author and the author's name come from the signed-in person's staff
+  // profile, never from the caller.
   command post(
     venueId: uuid,
     optional eventId: uuid,
-    authorName: string,
     category: VenueNoteCategory,
     content: string,
     optional visibility: VenueNoteVisibility,
@@ -62,11 +62,10 @@ entity VenueNote mixin TenantScoped, SoftDeletable {
     guard user.id != null
     guard user.personId != null
     constraint postVenueNoteContent: length(trim(content)) > 0 "Write something in this note."
-    constraint postVenueNoteAuthor: length(trim(authorName)) > 0 "Give this note an author name."
     mutate venueId = venueId
     mutate eventId = eventId
     mutate authorPersonId = user.personId
-    mutate authorName = authorName
+    mutate authorName = user.personName != null ? user.personName : ""
     mutate authorAuthSubjectId = user.id
     mutate category = category
     mutate content = content

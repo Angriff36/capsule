@@ -54,7 +54,6 @@ entity PrepTaskComment mixin TenantScoped, SoftDeletable {
     body: string,
     optional eventDishId: uuid,
     optional category: PrepTaskCommentCategory,
-    optional authorName: string,
     optional taskOwnerAssignedToId: uuid,
     optional taskOwnerAuthSubjectId: string
   ) {
@@ -63,7 +62,6 @@ entity PrepTaskComment mixin TenantScoped, SoftDeletable {
     guard user.id != null
     guard user.personId != null
     constraint postBodyPresent: length(trim(body)) > 0 "Write something before you post this comment."
-    constraint postAuthorName: authorName == null or length(trim(authorName)) > 0 "Give this comment an author name."
     constraint postNotSelf: taskOwnerAuthSubjectId == null or taskOwnerAuthSubjectId != user.id "A task owner can't post a comment that notifies themselves."
     mutate prepTaskId = prepTaskId
     mutate eventId = eventId
@@ -72,7 +70,7 @@ entity PrepTaskComment mixin TenantScoped, SoftDeletable {
     mutate taskOwnerAuthSubjectId = taskOwnerAuthSubjectId
     mutate authorPersonId = user.personId
     mutate authorAuthSubjectId = user.id
-    mutate authorName = authorName != null ? authorName : self.authorName
+    mutate authorName = user.personName != null ? user.personName : ""
     mutate category = category != null ? category : "note"
     mutate body = body
     mutate postedAt = now()
@@ -84,7 +82,7 @@ entity PrepTaskComment mixin TenantScoped, SoftDeletable {
       eventDishId: eventDishId != null ? eventDishId : self.eventDishId
       taskOwnerAuthSubjectId: taskOwnerAuthSubjectId
       authorPersonId: user.personId
-      authorName: authorName != null ? authorName : self.authorName
+      authorName: user.personName != null ? user.personName : ""
       category: category != null ? category : "note"
       body: body
     }

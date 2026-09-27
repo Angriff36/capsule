@@ -134,35 +134,50 @@ describe("runtime proof: prep task comments record the signed-in author (AC-210 
           body: "Posted as someone else",
           category: "blocker",
           authorPersonId: otherPersonId,
+        } as never),
+      ),
+    ).toBe(true);
+    // Nor under another person's name.
+    expect(
+      await refused(() =>
+        author.mutation(api.mutations.PrepTaskComment_createViaPost, {
+          ...task,
+          body: "Posted under someone else's name",
+          category: "blocker",
           authorName: "Blake Proof",
         } as never),
       ),
     ).toBe(true);
 
-    // Without it (what the prep thread screen sends), the comment records the
-    // signed-in person's profile, on the row and on the posted entry.
+    // Without them (what the prep thread screen sends), the comment records
+    // the signed-in person's profile and its name, on the row and on the
+    // posted entry.
     const { docId } = (await author.mutation(
       api.mutations.PrepTaskComment_createViaPost,
       {
         ...task,
         body: "Out of shallots, using red onion",
         category: "substitution",
-        authorName: "Avery Proof",
       } as never,
     )) as { docId: string };
     const row = (await author.run(async (ctx) =>
       ctx.db.get(docId as never),
-    )) as { authorPersonId: string; authorAuthSubjectId: string };
+    )) as {
+      authorPersonId: string;
+      authorName: string;
+      authorAuthSubjectId: string;
+    };
     expect(row.authorPersonId).toBe(authorPersonId);
+    expect(row.authorName).toBe("Avery Proof");
     expect(row.authorAuthSubjectId).toBe("prep-comment-author-linked");
     const posted = (await author.run(async (ctx) =>
       (await ctx.db.query("manifestEvents").collect()).filter(
         (e) => e.type === "PrepTaskCommentPosted",
       ),
-    )) as Array<{ payload: { authorPersonId: string } }>;
-    expect(posted.map((e) => e.payload.authorPersonId)).toEqual([
-      authorPersonId,
-    ]);
+    )) as Array<{ payload: { authorPersonId: string; authorName: string } }>;
+    expect(
+      posted.map((e) => [e.payload.authorPersonId, e.payload.authorName]),
+    ).toEqual([[authorPersonId, "Avery Proof"]]);
 
     // An account with no staff profile cannot post a prep task comment.
     const unlinked = proof.asRole({
@@ -175,7 +190,6 @@ describe("runtime proof: prep task comments record the signed-in author (AC-210 
         unlinked.mutation(api.mutations.PrepTaskComment_createViaPost, {
           ...task,
           body: "No profile",
-          authorName: "Nobody",
         } as never),
       ),
     ).toBe(true);

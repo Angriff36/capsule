@@ -53,9 +53,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.Client_createViaRegister, { "clientType": "demo-clientType-2", "companyName": "Client 2", "givenName": "Client 2", "familyName": "Client 2", "email": "user2@example.com", "phone": "demo-phone-2", "website": "demo-website-2", "addressLine1": "demo-addressLine1-2", "addressLine2": "demo-addressLine2-2", "city": "demo-city-2", "region": "demo-region-2", "postalCode": "demo-postalCode-2", "countryCode": "demo-countryCode-2", "taxId": "taxId-client-2", "taxExempt": false, "paymentTermsDays": 2, "notes": "demo-notes-2", "assignedToId": "assignedToId-client-2" } as any);
   // ClientCommunication → api.mutations.ClientCommunication_createViaRecord
   rowsAttempted += 1;
-  await client.mutation(api.mutations.ClientCommunication_createViaRecord, { "clientContactId": "clientContactId-client-communication-1", "eventId": "eventId-client-communication-1", "occurredAt": 1767268800000, "medium": "demo-medium-1", "summary": "demo-summary-1", "authorName": "ClientCommunication 1" } as any);
+  await client.mutation(api.mutations.ClientCommunication_createViaRecord, { "clientContactId": "clientContactId-client-communication-1", "eventId": "eventId-client-communication-1", "occurredAt": 1767268800000, "medium": "demo-medium-1", "summary": "demo-summary-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.ClientCommunication_createViaRecord, { "clientContactId": "clientContactId-client-communication-2", "eventId": "eventId-client-communication-2", "occurredAt": 1767355200000, "medium": "demo-medium-2", "summary": "demo-summary-2", "authorName": "ClientCommunication 2" } as any);
+  await client.mutation(api.mutations.ClientCommunication_createViaRecord, { "clientContactId": "clientContactId-client-communication-2", "eventId": "eventId-client-communication-2", "occurredAt": 1767355200000, "medium": "demo-medium-2", "summary": "demo-summary-2" } as any);
   // ClientContact → api.mutations.ClientContact_createViaAdd
   rowsAttempted += 1;
   await client.mutation(api.mutations.ClientContact_createViaAdd, { "clientId": "clientId-client-contact-1", "givenName": "ClientContact 1", "familyName": "ClientContact 1", "title": "ClientContact 1", "email": "user1@example.com", "phone": "demo-phone-1", "mobile": "demo-mobile-1", "isPrimary": false, "isBillingContact": false, "notes": "demo-notes-1" } as any);
@@ -286,9 +286,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // EventTimelineComment has multiple initialization commands (post, remove); using the selected initialization command: post.
   // EventTimelineComment → api.mutations.EventTimelineComment_createViaPost
   rowsAttempted += 1;
-  await client.mutation(api.mutations.EventTimelineComment_createViaPost, { "eventId": "eventId-event-timeline-comment-1", "activityId": "activityId-event-timeline-comment-1", "authorName": "EventTimelineComment 1", "body": "demo-body-1" } as any);
+  await client.mutation(api.mutations.EventTimelineComment_createViaPost, { "eventId": "eventId-event-timeline-comment-1", "activityId": "activityId-event-timeline-comment-1", "body": "demo-body-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.EventTimelineComment_createViaPost, { "eventId": "eventId-event-timeline-comment-2", "activityId": "activityId-event-timeline-comment-2", "authorName": "EventTimelineComment 2", "body": "demo-body-2" } as any);
+  await client.mutation(api.mutations.EventTimelineComment_createViaPost, { "eventId": "eventId-event-timeline-comment-2", "activityId": "activityId-event-timeline-comment-2", "body": "demo-body-2" } as any);
   // EventVehicleAssignment has multiple initialization commands (assign, release); using the selected initialization command: assign.
   // EventVehicleAssignment → api.mutations.EventVehicleAssignment_createViaAssign
   rowsAttempted += 1;
@@ -478,9 +478,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // PrepTaskComment has multiple initialization commands (edit, post); using the selected initialization command: post.
   // PrepTaskComment → api.mutations.PrepTaskComment_createViaPost
   rowsAttempted += 1;
-  await client.mutation(api.mutations.PrepTaskComment_createViaPost, { "prepTaskId": "prepTaskId-prep-task-comment-1", "eventId": "eventId-prep-task-comment-1", "eventDishId": "eventDishId-prep-task-comment-1", "taskOwnerAssignedToId": "taskOwnerAssignedToId-prep-task-comment-1", "taskOwnerAuthSubjectId": "taskOwnerAuthSubjectId-prep-task-comment-1", "authorName": "PrepTaskComment 1", "category": "demo-category-1", "body": "demo-body-1" } as any);
+  await client.mutation(api.mutations.PrepTaskComment_createViaPost, { "prepTaskId": "prepTaskId-prep-task-comment-1", "eventId": "eventId-prep-task-comment-1", "eventDishId": "eventDishId-prep-task-comment-1", "taskOwnerAssignedToId": "taskOwnerAssignedToId-prep-task-comment-1", "taskOwnerAuthSubjectId": "taskOwnerAuthSubjectId-prep-task-comment-1", "category": "demo-category-1", "body": "demo-body-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.PrepTaskComment_createViaPost, { "prepTaskId": "prepTaskId-prep-task-comment-2", "eventId": "eventId-prep-task-comment-2", "eventDishId": "eventDishId-prep-task-comment-2", "taskOwnerAssignedToId": "taskOwnerAssignedToId-prep-task-comment-2", "taskOwnerAuthSubjectId": "taskOwnerAuthSubjectId-prep-task-comment-2", "authorName": "PrepTaskComment 2", "category": "demo-category-2", "body": "demo-body-2" } as any);
+  await client.mutation(api.mutations.PrepTaskComment_createViaPost, { "prepTaskId": "prepTaskId-prep-task-comment-2", "eventId": "eventId-prep-task-comment-2", "eventDishId": "eventDishId-prep-task-comment-2", "taskOwnerAssignedToId": "taskOwnerAssignedToId-prep-task-comment-2", "taskOwnerAuthSubjectId": "taskOwnerAuthSubjectId-prep-task-comment-2", "category": "demo-category-2", "body": "demo-body-2" } as any);
   // PrepTaskDependency → api.mutations.PrepTaskDependency_createViaDeclare
   rowsAttempted += 1;
   await client.mutation(api.mutations.PrepTaskDependency_createViaDeclare, { "dependentTaskId": "dependentTaskId-prep-task-dependency-1", "predecessorTaskId": "predecessorTaskId-prep-task-dependency-1" } as any);
@@ -787,9 +787,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // VenueNote has multiple initialization commands (post, remove); using the selected initialization command: post.
   // VenueNote → api.mutations.VenueNote_createViaPost
   rowsAttempted += 1;
-  await client.mutation(api.mutations.VenueNote_createViaPost, { "venueId": "venueId-venue-note-1", "eventId": "event-1", "authorName": "VenueNote 1", "category": "demo-category-1", "content": "demo-content-1", "isPinned": false, "visibility": "demo-visibility-1" } as any);
+  await client.mutation(api.mutations.VenueNote_createViaPost, { "venueId": "venueId-venue-note-1", "eventId": "event-1", "category": "demo-category-1", "content": "demo-content-1", "isPinned": false, "visibility": "demo-visibility-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.VenueNote_createViaPost, { "venueId": "venueId-venue-note-2", "eventId": "event-2", "authorName": "VenueNote 2", "category": "demo-category-2", "content": "demo-content-2", "isPinned": false, "visibility": "demo-visibility-2" } as any);
+  await client.mutation(api.mutations.VenueNote_createViaPost, { "venueId": "venueId-venue-note-2", "eventId": "event-2", "category": "demo-category-2", "content": "demo-content-2", "isPinned": false, "visibility": "demo-visibility-2" } as any);
   // VenueRoom has multiple initialization commands (add, remove); using the selected initialization command: add.
   // VenueRoom → api.mutations.VenueRoom_createViaAdd
   rowsAttempted += 1;
@@ -799,9 +799,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // VenueVendorRelationship has multiple initialization commands (establish, retire); using the selected initialization command: establish.
   // VenueVendorRelationship → api.mutations.VenueVendorRelationship_createViaEstablish
   rowsAttempted += 1;
-  await client.mutation(api.mutations.VenueVendorRelationship_createViaEstablish, { "venueId": "venueId-venue-vendor-relationship-1", "vendorId": "vendorId-venue-vendor-relationship-1", "category": "demo-category-1", "status": "demo-status-1", "effectiveFrom": 1767268800000, "effectiveUntil": 1767268800000, "primaryContactId": "primaryContactId-venue-vendor-relationship-1", "insuranceCertificate": "demo-insuranceCertificate-1", "insuranceExpiry": 1767268800000, "complianceNotes": "demo-complianceNotes-1", "discountPercent": 1, "paymentTerms": "demo-paymentTerms-1", "minimumOrder": 1, "notes": "demo-notes-1", "establishedByPersonId": "establishedByPersonId-venue-vendor-relationship-1" } as any);
+  await client.mutation(api.mutations.VenueVendorRelationship_createViaEstablish, { "venueId": "venueId-venue-vendor-relationship-1", "vendorId": "vendorId-venue-vendor-relationship-1", "category": "demo-category-1", "status": "demo-status-1", "effectiveFrom": 1767268800000, "effectiveUntil": 1767268800000, "primaryContactId": "primaryContactId-venue-vendor-relationship-1", "insuranceCertificate": "demo-insuranceCertificate-1", "insuranceExpiry": 1767268800000, "complianceNotes": "demo-complianceNotes-1", "discountPercent": 1, "paymentTerms": "demo-paymentTerms-1", "minimumOrder": 1, "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.VenueVendorRelationship_createViaEstablish, { "venueId": "venueId-venue-vendor-relationship-2", "vendorId": "vendorId-venue-vendor-relationship-2", "category": "demo-category-2", "status": "demo-status-2", "effectiveFrom": 1767355200000, "effectiveUntil": 1767355200000, "primaryContactId": "primaryContactId-venue-vendor-relationship-2", "insuranceCertificate": "demo-insuranceCertificate-2", "insuranceExpiry": 1767355200000, "complianceNotes": "demo-complianceNotes-2", "discountPercent": 2, "paymentTerms": "demo-paymentTerms-2", "minimumOrder": 2, "notes": "demo-notes-2", "establishedByPersonId": "establishedByPersonId-venue-vendor-relationship-2" } as any);
+  await client.mutation(api.mutations.VenueVendorRelationship_createViaEstablish, { "venueId": "venueId-venue-vendor-relationship-2", "vendorId": "vendorId-venue-vendor-relationship-2", "category": "demo-category-2", "status": "demo-status-2", "effectiveFrom": 1767355200000, "effectiveUntil": 1767355200000, "primaryContactId": "primaryContactId-venue-vendor-relationship-2", "insuranceCertificate": "demo-insuranceCertificate-2", "insuranceExpiry": 1767355200000, "complianceNotes": "demo-complianceNotes-2", "discountPercent": 2, "paymentTerms": "demo-paymentTerms-2", "minimumOrder": 2, "notes": "demo-notes-2" } as any);
   // WasteRecord → api.mutations.WasteRecord_createViaRecord
   rowsAttempted += 1;
   await client.mutation(api.mutations.WasteRecord_createViaRecord, { "ingredientId": "ingredientId-waste-record-1", "locationId": "locationId-waste-record-1", "eventId": "eventId-waste-record-1", "inventoryItemId": "inventoryItemId-waste-record-1", "quantity": 1, "unit": "demo-unit-1", "reason": "demo-reason-1", "unitCost": 1, "notes": "demo-notes-1" } as any);

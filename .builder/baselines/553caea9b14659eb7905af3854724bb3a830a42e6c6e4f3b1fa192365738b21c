@@ -4295,7 +4295,6 @@ export const ClientCommunicationRecordParamsSchema = z.object({
   occurredAt: z.coerce.date(),
   medium: z.enum(["call", "email", "meeting"]),
   summary: z.string(),
-  authorName: z.string(),
 });
 
 export type ClientCommunicationRecordParams = z.infer<typeof ClientCommunicationRecordParamsSchema>;
@@ -6288,7 +6287,6 @@ export type EventTimelineActivityUseCalculatedTimingParams = z.infer<typeof Even
 // Command: post on EventTimelineComment
 export const EventTimelineCommentPostParamsSchema = z.object({
   eventId: z.string().min(1),
-  authorName: z.string(),
   body: z.string(),
   activityId: z.string().optional(),
 });
@@ -8271,7 +8269,6 @@ export const PrepTaskCommentPostParamsSchema = z.object({
   body: z.string(),
   eventDishId: z.string().min(1).optional(),
   category: z.enum(["note", "blocker", "substitution", "status_update"]).optional(),
-  authorName: z.string().optional(),
   taskOwnerAssignedToId: z.string().min(1).optional(),
   taskOwnerAuthSubjectId: z.string().optional(),
 });
@@ -10301,7 +10298,6 @@ export type VenueNotePinParams = z.infer<typeof VenueNotePinParamsSchema>;
 export const VenueNotePostParamsSchema = z.object({
   venueId: z.string().min(1),
   eventId: z.string().min(1).optional(),
-  authorName: z.string(),
   category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "other"]),
   content: z.string(),
   visibility: z.enum(["public", "internal", "management_only"]).optional(),
@@ -10373,7 +10369,6 @@ export const VenueVendorRelationshipEstablishParamsSchema = z.object({
   paymentTerms: z.string().optional(),
   minimumOrder: z.number().optional(),
   notes: z.string().optional(),
-  establishedByPersonId: z.string().optional(),
 });
 
 export type VenueVendorRelationshipEstablishParams = z.infer<typeof VenueVendorRelationshipEstablishParamsSchema>;
@@ -10398,7 +10393,6 @@ export const VenueVendorRelationshipReviseDetailsParamsSchema = z.object({
   paymentTerms: z.string().optional(),
   minimumOrder: z.number().optional(),
   notes: z.string().optional(),
-  revisedByPersonId: z.string().optional(),
 });
 
 export type VenueVendorRelationshipReviseDetailsParams = z.infer<typeof VenueVendorRelationshipReviseDetailsParamsSchema>;

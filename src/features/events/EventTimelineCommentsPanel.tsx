@@ -106,7 +106,6 @@ export function EventTimelineCommentsPanel({ eventId }: Props) {
             void run("comment", async () => {
               await postComment({
                 eventId,
-                authorName: myName,
                 body: commentBody.trim(),
               });
               setCommentBody("");

@@ -104,7 +104,6 @@ export function EventTimelineBlockQuestions({ eventId, activityId }: Props) {
                   await postComment({
                     eventId,
                     activityId,
-                    authorName: myName,
                     body: body.trim(),
                   });
                   setBody("");

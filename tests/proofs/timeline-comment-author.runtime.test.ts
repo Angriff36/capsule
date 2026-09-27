@@ -105,26 +105,39 @@ describe("runtime proof: timeline comments record the signed-in author (AC-210 /
         author.mutation(api.mutations.EventTimelineComment_createViaPost, {
           eventId: event.docId,
           authorPersonId: otherPersonId,
-          authorName: "Blake Proof",
           body: "Posted as someone else",
         } as never),
       ),
     ).toBe(true);
+    // Nor under another person's name.
+    expect(
+      await refused(() =>
+        author.mutation(api.mutations.EventTimelineComment_createViaPost, {
+          eventId: event.docId,
+          authorName: "Blake Proof",
+          body: "Posted under someone else's name",
+        } as never),
+      ),
+    ).toBe(true);
 
-    // Without it (what the Overview and Timeline screens send), the note
-    // records the signed-in person's profile.
+    // Without them (what the Overview and Timeline screens send), the note
+    // records the signed-in person's profile and the name on that profile.
     const { docId } = (await author.mutation(
       api.mutations.EventTimelineComment_createViaPost,
       {
         eventId: event.docId,
-        authorName: "Avery Proof",
         body: "Load-in is at the back door",
       } as never,
     )) as { docId: string };
     const row = (await author.run(async (ctx) =>
       ctx.db.get(docId as never),
-    )) as { authorPersonId: string; authorAuthSubjectId: string | null };
+    )) as {
+      authorPersonId: string;
+      authorName: string;
+      authorAuthSubjectId: string | null;
+    };
     expect(row.authorPersonId).toBe(authorPersonId);
+    expect(row.authorName).toBe("Avery Proof");
     expect(row.authorAuthSubjectId).toBe("timeline-author-linked");
 
     // An account with no staff profile cannot post a note.
@@ -137,7 +150,6 @@ describe("runtime proof: timeline comments record the signed-in author (AC-210 /
       await refused(() =>
         unlinked.mutation(api.mutations.EventTimelineComment_createViaPost, {
           eventId: event.docId,
-          authorName: "Nobody",
           body: "No profile",
         } as never),
       ),

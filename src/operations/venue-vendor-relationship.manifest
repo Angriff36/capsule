@@ -114,12 +114,13 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
   transition status from "restricted" to ["preferred", "approved", "banned"]
   transition status from "banned" to ["preferred", "approved", "restricted"]
 
-  // Read: facility staff can read relationships
-  default policy venueVendorRelationshipRead read: roleAllows(user.role, "facilityAccess") "Facility staff may see venue vendor relationships"
-  // Write: facility managers can establish/revise relationships
-  default policy venueVendorRelationshipWrite write: roleAllows(user.role, "facilityManageAccess") "Facility managers may update venue vendor relationships"
-  // Execute: facility managers can change status
-  default policy venueVendorRelationshipExecute execute: roleAllows(user.role, "facilityManageAccess") "Facility managers may change venue vendor relationships"
+  // No role was ever given facilityAccess / facilityManageAccess, so these
+  // records could not be seen or set up by anyone. They follow the venue
+  // itself: event staff see them; event managers (and admins, owners) set up
+  // and change the supplier terms.
+  default policy venueVendorRelationshipRead read: roleAllows(user.role, "eventAccess") "Event staff may see venue suppliers"
+  default policy venueVendorRelationshipWrite write: roleAllows(user.role, "eventManageAccess") "Event managers may update venue suppliers"
+  default policy venueVendorRelationshipExecute execute: roleAllows(user.role, "eventManageAccess") "Event managers may change venue suppliers"
 
   command establish(
     venueId: string,
@@ -135,8 +136,7 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     optional discountPercent: float,
     optional paymentTerms: string,
     optional minimumOrder: money,
-    optional notes: string,
-    optional establishedByPersonId: string
+    optional notes: string
   ) {
     // No `guard self.createdAt == null`: createdAt is auto-populated by the
     // `timestamps` mixin, so that guard always threw in the creation path and
@@ -159,7 +159,9 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     mutate paymentTerms = paymentTerms
     mutate minimumOrder = minimumOrder
     mutate notes = notes
-    mutate establishedByPersonId = establishedByPersonId
+    // Who set this up is the signed-in person's staff profile, never a
+    // caller-sent id.
+    mutate establishedByPersonId = user.personId
     emit VenueVendorRelationshipEstablished {
       relationshipId: self.id
       tenantId: self.tenantId
@@ -196,8 +198,7 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     optional discountPercent: float,
     optional paymentTerms: string,
     optional minimumOrder: money,
-    optional notes: string,
-    optional revisedByPersonId: string
+    optional notes: string
   ) {
     guard self.deletedAt == null
     constraint reviseEffectiveDates: (effectiveFrom == null or effectiveUntil == null or effectiveFrom <= effectiveUntil) "Effective from must be before effective until"
@@ -213,14 +214,16 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     mutate paymentTerms = paymentTerms != null ? paymentTerms : self.paymentTerms
     mutate minimumOrder = minimumOrder != null ? minimumOrder : self.minimumOrder
     mutate notes = notes != null ? notes : self.notes
-    mutate revisedByPersonId = revisedByPersonId != null ? revisedByPersonId : self.revisedByPersonId
+    // Who changed it is the signed-in person's staff profile, never a
+    // caller-sent id.
+    mutate revisedByPersonId = user.personId != null ? user.personId : self.revisedByPersonId
     mutate revisedAt = now()
     emit VenueVendorRelationshipRevised {
       relationshipId: self.id
       tenantId: self.tenantId
       venueId: self.venueId
       vendorId: self.vendorId
-      revisedBy: revisedByPersonId != null ? revisedByPersonId : self.revisedByPersonId
+      revisedBy: user.personId != null ? user.personId : self.revisedByPersonId
     }
   }
 

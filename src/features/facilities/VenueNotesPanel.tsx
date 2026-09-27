@@ -112,7 +112,6 @@ export function VenueNotesPanel({ venueId }: Props) {
             void run("post", async () => {
               await postNote({
                 venueId,
-                authorName: myName,
                 category: category as any,
                 content: noteContent.trim(),
                 visibility: visibility as any,

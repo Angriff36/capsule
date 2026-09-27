@@ -126,8 +126,8 @@ const COMMAND_DISPATCH = {
   },
   "ClientCommunication.record": {
     ref: api.mutations.ClientCommunication_createViaRecord,
-    params: ["clientContactId","eventId","occurredAt","medium","summary","authorName","idempotencyKey"] as const,
-    paramMeta: [{"name":"clientContactId","type":"uuid","required":false},{"name":"eventId","type":"uuid","required":false},{"name":"occurredAt","type":"datetime","required":true},{"name":"medium","type":"ClientCommunicationMedium","required":true},{"name":"summary","type":"string","required":true},{"name":"authorName","type":"string","required":true},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["clientContactId","eventId","occurredAt","medium","summary","idempotencyKey"] as const,
+    paramMeta: [{"name":"clientContactId","type":"uuid","required":false},{"name":"eventId","type":"uuid","required":false},{"name":"occurredAt","type":"datetime","required":true},{"name":"medium","type":"ClientCommunicationMedium","required":true},{"name":"summary","type":"string","required":true},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "ClientContact.add": {
     ref: api.mutations.ClientContact_createViaAdd,
@@ -1266,8 +1266,8 @@ const COMMAND_DISPATCH = {
   },
   "EventTimelineComment.post": {
     ref: api.mutations.EventTimelineComment_createViaPost,
-    params: ["eventId","authorName","body","activityId","idempotencyKey"] as const,
-    paramMeta: [{"name":"eventId","type":"uuid","required":true},{"name":"authorName","type":"string","required":true},{"name":"body","type":"string","required":true},{"name":"activityId","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["eventId","body","activityId","idempotencyKey"] as const,
+    paramMeta: [{"name":"eventId","type":"uuid","required":true},{"name":"body","type":"string","required":true},{"name":"activityId","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "EventTimelineComment.remove": {
     ref: api.mutations.EventTimelineComment_remove,
@@ -2476,8 +2476,8 @@ const COMMAND_DISPATCH = {
   },
   "PrepTaskComment.post": {
     ref: api.mutations.PrepTaskComment_createViaPost,
-    params: ["prepTaskId","eventId","body","eventDishId","category","authorName","taskOwnerAssignedToId","taskOwnerAuthSubjectId","idempotencyKey"] as const,
-    paramMeta: [{"name":"prepTaskId","type":"uuid","required":true},{"name":"eventId","type":"uuid","required":true},{"name":"body","type":"string","required":true},{"name":"eventDishId","type":"uuid","required":false},{"name":"category","type":"PrepTaskCommentCategory","required":false},{"name":"authorName","type":"string","required":false},{"name":"taskOwnerAssignedToId","type":"uuid","required":false},{"name":"taskOwnerAuthSubjectId","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["prepTaskId","eventId","body","eventDishId","category","taskOwnerAssignedToId","taskOwnerAuthSubjectId","idempotencyKey"] as const,
+    paramMeta: [{"name":"prepTaskId","type":"uuid","required":true},{"name":"eventId","type":"uuid","required":true},{"name":"body","type":"string","required":true},{"name":"eventDishId","type":"uuid","required":false},{"name":"category","type":"PrepTaskCommentCategory","required":false},{"name":"taskOwnerAssignedToId","type":"uuid","required":false},{"name":"taskOwnerAuthSubjectId","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "PrepTaskDependency.declare": {
     ref: api.mutations.PrepTaskDependency_createViaDeclare,
@@ -3656,8 +3656,8 @@ const COMMAND_DISPATCH = {
   },
   "VenueNote.post": {
     ref: api.mutations.VenueNote_createViaPost,
-    params: ["venueId","eventId","authorName","category","content","visibility","isPinned","idempotencyKey"] as const,
-    paramMeta: [{"name":"venueId","type":"uuid","required":true},{"name":"eventId","type":"uuid","required":false},{"name":"authorName","type":"string","required":true},{"name":"category","type":"VenueNoteCategory","required":true},{"name":"content","type":"string","required":true},{"name":"visibility","type":"VenueNoteVisibility","required":false},{"name":"isPinned","type":"boolean","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["venueId","eventId","category","content","visibility","isPinned","idempotencyKey"] as const,
+    paramMeta: [{"name":"venueId","type":"uuid","required":true},{"name":"eventId","type":"uuid","required":false},{"name":"category","type":"VenueNoteCategory","required":true},{"name":"content","type":"string","required":true},{"name":"visibility","type":"VenueNoteVisibility","required":false},{"name":"isPinned","type":"boolean","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "VenueNote.remove": {
     ref: api.mutations.VenueNote_remove,
@@ -3691,8 +3691,8 @@ const COMMAND_DISPATCH = {
   },
   "VenueVendorRelationship.establish": {
     ref: api.mutations.VenueVendorRelationship_createViaEstablish,
-    params: ["venueId","vendorId","category","status","effectiveFrom","effectiveUntil","primaryContactId","insuranceCertificate","insuranceExpiry","complianceNotes","discountPercent","paymentTerms","minimumOrder","notes","establishedByPersonId","idempotencyKey"] as const,
-    paramMeta: [{"name":"venueId","type":"string","required":true},{"name":"vendorId","type":"string","required":true},{"name":"category","type":"VenueVendorCategory","required":true},{"name":"status","type":"VenueVendorStatus","required":false},{"name":"effectiveFrom","type":"datetime","required":false},{"name":"effectiveUntil","type":"datetime","required":false},{"name":"primaryContactId","type":"string","required":false},{"name":"insuranceCertificate","type":"string","required":false},{"name":"insuranceExpiry","type":"datetime","required":false},{"name":"complianceNotes","type":"string","required":false},{"name":"discountPercent","type":"float","required":false},{"name":"paymentTerms","type":"string","required":false},{"name":"minimumOrder","type":"money","required":false},{"name":"notes","type":"string","required":false},{"name":"establishedByPersonId","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["venueId","vendorId","category","status","effectiveFrom","effectiveUntil","primaryContactId","insuranceCertificate","insuranceExpiry","complianceNotes","discountPercent","paymentTerms","minimumOrder","notes","idempotencyKey"] as const,
+    paramMeta: [{"name":"venueId","type":"string","required":true},{"name":"vendorId","type":"string","required":true},{"name":"category","type":"VenueVendorCategory","required":true},{"name":"status","type":"VenueVendorStatus","required":false},{"name":"effectiveFrom","type":"datetime","required":false},{"name":"effectiveUntil","type":"datetime","required":false},{"name":"primaryContactId","type":"string","required":false},{"name":"insuranceCertificate","type":"string","required":false},{"name":"insuranceExpiry","type":"datetime","required":false},{"name":"complianceNotes","type":"string","required":false},{"name":"discountPercent","type":"float","required":false},{"name":"paymentTerms","type":"string","required":false},{"name":"minimumOrder","type":"money","required":false},{"name":"notes","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "VenueVendorRelationship.retire": {
     ref: api.mutations.VenueVendorRelationship_retire,
@@ -3701,8 +3701,8 @@ const COMMAND_DISPATCH = {
   },
   "VenueVendorRelationship.reviseDetails": {
     ref: api.mutations.VenueVendorRelationship_reviseDetails,
-    params: ["docId","category","effectiveFrom","effectiveUntil","primaryContactId","insuranceCertificate","insuranceExpiry","complianceNotes","discountPercent","paymentTerms","minimumOrder","notes","revisedByPersonId","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"category","type":"VenueVendorCategory","required":false},{"name":"effectiveFrom","type":"datetime","required":false},{"name":"effectiveUntil","type":"datetime","required":false},{"name":"primaryContactId","type":"string","required":false},{"name":"insuranceCertificate","type":"string","required":false},{"name":"insuranceExpiry","type":"datetime","required":false},{"name":"complianceNotes","type":"string","required":false},{"name":"discountPercent","type":"float","required":false},{"name":"paymentTerms","type":"string","required":false},{"name":"minimumOrder","type":"money","required":false},{"name":"notes","type":"string","required":false},{"name":"revisedByPersonId","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","category","effectiveFrom","effectiveUntil","primaryContactId","insuranceCertificate","insuranceExpiry","complianceNotes","discountPercent","paymentTerms","minimumOrder","notes","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"category","type":"VenueVendorCategory","required":false},{"name":"effectiveFrom","type":"datetime","required":false},{"name":"effectiveUntil","type":"datetime","required":false},{"name":"primaryContactId","type":"string","required":false},{"name":"insuranceCertificate","type":"string","required":false},{"name":"insuranceExpiry","type":"datetime","required":false},{"name":"complianceNotes","type":"string","required":false},{"name":"discountPercent","type":"float","required":false},{"name":"paymentTerms","type":"string","required":false},{"name":"minimumOrder","type":"money","required":false},{"name":"notes","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "VenueVendorRelationship.reviseStatus": {
     ref: api.mutations.VenueVendorRelationship_reviseStatus,

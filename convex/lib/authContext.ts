@@ -32,6 +32,8 @@ export interface AppAuthContext {
   /** Where `role` came from — useful for UI/debug. */
   roleSource: "person" | "idp" | "anonymous";
   personId?: string;
+  /** The linked Person's own name, so notes record who wrote them. */
+  personName?: string;
   /** Org capability ids explicitly disabled for this tenant (kill-switches). */
   disabledCapabilities: OrgCapabilityId[];
 }
@@ -51,6 +53,8 @@ type PersonRow = {
   status?: string;
   deletedAt?: number | null;
   authSubjectId?: string | null;
+  givenName?: string;
+  familyName?: string;
 };
 
 /** Convex query/mutation ctx — `db` typed loosely so author seam stays free of generated DataModel imports. */
@@ -93,6 +97,7 @@ export async function getAuthContext(ctx: {
       tenantId: linked.tenantId,
       roleSource: "person",
       personId: linked.personId,
+      personName: linked.personName,
       disabledCapabilities: ctx.db
         ? await loadDisabledOrgCapabilities(ctx.db, linked.tenantId)
         : [],
@@ -135,7 +140,12 @@ async function loadPersonBySubject(
   db: { query: (table: "people") => any },
   authSubjectId: string,
   tenantId?: string,
-): Promise<{ role: string; personId: string; tenantId: string } | null> {
+): Promise<{
+  role: string;
+  personId: string;
+  personName: string;
+  tenantId: string;
+} | null> {
   const rows = (await db
     .query("people")
     .withIndex(
@@ -161,6 +171,10 @@ async function loadPersonBySubject(
   return {
     role: person.role,
     personId: String(person._id),
+    personName: [person.givenName, person.familyName]
+      .map((part) => part?.trim() ?? "")
+      .filter((part) => part.length > 0)
+      .join(" "),
     tenantId: person.tenantId,
   };
 }

@@ -95,21 +95,31 @@ describe("runtime proof: venue notes record the signed-in author (AC-210 / AC-37
         author.mutation(api.mutations.VenueNote_createViaPost, {
           venueId: venue.docId,
           authorPersonId: otherPersonId,
-          authorName: "Blake Proof",
           category: "access",
           visibility: "internal",
           content: "Posted as someone else",
         } as never),
       ),
     ).toBe(true);
+    // Nor under another person's name.
+    expect(
+      await refused(() =>
+        author.mutation(api.mutations.VenueNote_createViaPost, {
+          venueId: venue.docId,
+          authorName: "Blake Proof",
+          category: "access",
+          visibility: "internal",
+          content: "Posted under someone else's name",
+        } as never),
+      ),
+    ).toBe(true);
 
-    // Without it (what the venue notes screen sends), the note records the
-    // signed-in person's profile.
+    // Without them (what the venue notes screen sends), the note records the
+    // signed-in person's profile and the name on that profile.
     const { docId } = (await author.mutation(
       api.mutations.VenueNote_createViaPost,
       {
         venueId: venue.docId,
-        authorName: "Avery Proof",
         category: "access",
         visibility: "internal",
         content: "Load-in is at the back door",
@@ -117,8 +127,13 @@ describe("runtime proof: venue notes record the signed-in author (AC-210 / AC-37
     )) as { docId: string };
     const row = (await author.run(async (ctx) =>
       ctx.db.get(docId as never),
-    )) as { authorPersonId: string; authorAuthSubjectId: string | null };
+    )) as {
+      authorPersonId: string;
+      authorName: string;
+      authorAuthSubjectId: string | null;
+    };
     expect(row.authorPersonId).toBe(authorPersonId);
+    expect(row.authorName).toBe("Avery Proof");
     expect(row.authorAuthSubjectId).toBe("venue-note-author-linked");
 
     // An account with no staff profile cannot post a venue note.
@@ -131,7 +146,6 @@ describe("runtime proof: venue notes record the signed-in author (AC-210 / AC-37
       await refused(() =>
         unlinked.mutation(api.mutations.VenueNote_createViaPost, {
           venueId: venue.docId,
-          authorName: "Nobody",
           category: "access",
           visibility: "internal",
           content: "No profile",

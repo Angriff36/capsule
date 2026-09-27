@@ -30,7 +30,6 @@ export interface ClientCommunicationDraft {
   occurredAt: Date;
   medium: string;
   summary: string;
-  authorName: string;
 }
 
 function contactName(contact: Doc<"clientContacts">): string {
@@ -161,7 +160,6 @@ export function ClientCommunicationPanelView({
       occurredAt,
       medium: String(data.get("medium") ?? "call"),
       summary,
-      authorName,
     })
       .then(() => {
         form.reset();

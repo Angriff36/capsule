@@ -66,17 +66,15 @@ async function postNote(
   proof: Proof,
   actor: Actor,
   venueId: string,
-  authorName: string,
   visibility: "internal" | "management_only",
   content: string,
 ) {
-  // The server records the signed-in person as the author.
+  // The server records the signed-in person and their name as the author.
   const created = (await proof.executeCommand(
     actor,
     M.VenueNote_createViaPost,
     {
       venueId,
-      authorName,
       category: "access" as const,
       content,
       visibility,
@@ -187,7 +185,6 @@ async function postMarkerNotes(
     proof,
     staff,
     venueId,
-    "Riley Ac317crew",
     "internal",
     S.internalMarker,
   );
@@ -195,7 +192,6 @@ async function postMarkerNotes(
     proof,
     manager,
     venueId,
-    "Riley Ac317mgr",
     "management_only",
     S.mgmtMarker,
   );

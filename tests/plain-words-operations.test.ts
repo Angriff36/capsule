@@ -60,8 +60,8 @@ describe("plain words on leftover operations manifests", () => {
       "Event staff may change venue rooms",
       "Event staff may update venue layout templates",
       "Event staff may change venue layout templates",
-      "Facility managers may update venue vendor relationships",
-      "Facility managers may change venue vendor relationships",
+      "Event managers may update venue suppliers",
+      "Event managers may change venue suppliers",
       "Event managers may update service styles",
       "Event managers may change service styles",
       "Event managers may update occasions",
@@ -109,7 +109,7 @@ describe("plain words on leftover operations manifests", () => {
       "Staff may see service style kits",
       "Event staff may see venue rooms",
       "Event staff may see venue layout templates",
-      "Facility staff may see venue vendor relationships",
+      "Event staff may see venue suppliers",
       "Event and sales staff may see service styles",
       "Event and sales staff may see occasions",
       "Event and sales staff may see event templates",
@@ -131,12 +131,8 @@ describe("plain words on leftover operations manifests", () => {
     expect(visible).toContain("Event staff may change venue rooms");
     expect(visible).toContain("Event staff may update venue layout templates");
     expect(visible).toContain("Event staff may change venue layout templates");
-    expect(visible).toContain(
-      "Facility managers may update venue vendor relationships",
-    );
-    expect(visible).toContain(
-      "Facility managers may change venue vendor relationships",
-    );
+    expect(visible).toContain("Event managers may update venue suppliers");
+    expect(visible).toContain("Event managers may change venue suppliers");
     expect(visible).toContain("Event managers may update service styles");
     expect(visible).toContain("Event managers may change service styles");
     expect(visible).toContain("Event managers may update occasions");

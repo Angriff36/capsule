@@ -2385,7 +2385,7 @@ export const Client_stageClientMerge = mutation({
   },
 });
 
-async function __runClientCommunicationRecord(ctx: MutationCtx, { docId, clientContactId, eventId, occurredAt, medium, summary, authorName, version }: any, __creation = false) {
+async function __runClientCommunicationRecord(ctx: MutationCtx, { docId, clientContactId, eventId, occurredAt, medium, summary, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -2403,7 +2403,6 @@ async function __runClientCommunicationRecord(ctx: MutationCtx, { docId, clientC
     if (!(((doc.eventId == null) || (__rel_event != null)))) throw new Error("Guard 2 failed");
     if (!((((clientContactId != null) && (eventId == null)) || ((clientContactId == null) && (eventId != null))))) throw new Error("Choose one contact or event");
     if (!((((summary).trim()).length > 0))) throw new Error("Give this note a summary");
-    if (!((((authorName).trim()).length > 0))) throw new Error("Say who wrote this note");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -2414,7 +2413,7 @@ async function __runClientCommunicationRecord(ctx: MutationCtx, { docId, clientC
       medium: medium,
       summary: summary,
       authorId: user.id,
-      authorName: authorName,
+      authorName: (((user.personName != null) && (((user.personName).trim()).length > 0)) ? user.personName : "Staff member"),
       recordedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -2435,7 +2434,6 @@ export const ClientCommunication_record = mutation({
     occurredAt: v.number(),
     medium: v.any(),
     summary: v.string(),
-    authorName: v.string(),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -2459,7 +2457,6 @@ export const ClientCommunication_createViaRecord = mutation({
     occurredAt: v.number(),
     medium: v.any(),
     summary: v.string(),
-    authorName: v.string(),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -2469,12 +2466,11 @@ export const ClientCommunication_createViaRecord = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { clientContactId, eventId, occurredAt, medium, summary, authorName } = args;
+    const { clientContactId, eventId, occurredAt, medium, summary } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      authorName: args.authorName,
       clientContactId: args.clientContactId,
       eventId: args.eventId,
       medium: args.medium,
@@ -2491,7 +2487,6 @@ export const ClientCommunication_createViaRecord = mutation({
     if (!(((__draft.eventId == null) || (__rel_event != null)))) throw new Error("Guard 2 failed");
     if (!((((clientContactId != null) && (eventId == null)) || ((clientContactId == null) && (eventId != null))))) throw new Error("Choose one contact or event");
     if (!((((summary).trim()).length > 0))) throw new Error("Give this note a summary");
-    if (!((((authorName).trim()).length > 0))) throw new Error("Say who wrote this note");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -2502,7 +2497,7 @@ export const ClientCommunication_createViaRecord = mutation({
     doc.medium = medium;
     doc.summary = summary;
     doc.authorId = user.id;
-    doc.authorName = authorName;
+    doc.authorName = (((user.personName != null) && (((user.personName).trim()).length > 0)) ? user.personName : "Staff member");
     doc.recordedAt = Date.now();
     const docId = await ctx.db.insert("clientCommunications", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, clientCommunicationId: docId, tenantId: doc.tenantId, clientContactId: clientContactId, eventId: eventId, occurredAt: occurredAt, medium: medium, authorId: user.id, _subject: { entity: "ClientCommunication", command: "record", id: docId } };
@@ -19944,7 +19939,7 @@ export const EventTimelineActivity_useCalculatedTiming = mutation({
   },
 });
 
-async function __runEventTimelineCommentPost(ctx: MutationCtx, { docId, eventId, authorName, body, activityId, version }: any, __creation = false) {
+async function __runEventTimelineCommentPost(ctx: MutationCtx, { docId, eventId, body, activityId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -19958,7 +19953,6 @@ async function __runEventTimelineCommentPost(ctx: MutationCtx, { docId, eventId,
     if (!((user.id != null))) throw new Error("Guard 2 failed");
     if (!((user.personId != null))) throw new Error("Guard 3 failed");
     if (!((((body).trim()).length > 0))) throw new Error("Write something in this comment.");
-    if (!((((authorName).trim()).length > 0))) throw new Error("Give this comment an author name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -19966,7 +19960,7 @@ async function __runEventTimelineCommentPost(ctx: MutationCtx, { docId, eventId,
       eventId: eventId,
       activityId: activityId,
       authorPersonId: user.personId,
-      authorName: authorName,
+      authorName: ((user.personName != null) ? user.personName : ""),
       authorAuthSubjectId: user.id,
       body: body,
       postedAt: Date.now(),
@@ -19985,7 +19979,6 @@ export const EventTimelineComment_post = mutation({
   args: {
     docId: v.id("eventTimelineComments"),
     eventId: v.string(),
-    authorName: v.string(),
     body: v.string(),
     activityId: v.optional(v.string()),
     version: v.optional(v.number()),
@@ -20007,7 +20000,6 @@ export const EventTimelineComment_post = mutation({
 export const EventTimelineComment_createViaPost = mutation({
   args: {
     eventId: v.string(),
-    authorName: v.string(),
     body: v.string(),
     activityId: v.optional(v.string()),
     idempotencyKey: v.optional(v.string())
@@ -20019,13 +20011,12 @@ export const EventTimelineComment_createViaPost = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { eventId, authorName, body, activityId } = args;
+    const { eventId, body, activityId } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
       activityId: args.activityId,
-      authorName: args.authorName,
       body: args.body,
       eventId: args.eventId
     };
@@ -20037,7 +20028,6 @@ export const EventTimelineComment_createViaPost = mutation({
     if (!((user.id != null))) throw new Error("Guard 2 failed");
     if (!((user.personId != null))) throw new Error("Guard 3 failed");
     if (!((((body).trim()).length > 0))) throw new Error("Write something in this comment.");
-    if (!((((authorName).trim()).length > 0))) throw new Error("Give this comment an author name.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -20045,7 +20035,7 @@ export const EventTimelineComment_createViaPost = mutation({
     doc.eventId = eventId;
     doc.activityId = activityId;
     doc.authorPersonId = user.personId;
-    doc.authorName = authorName;
+    doc.authorName = ((user.personName != null) ? user.personName : "");
     doc.authorAuthSubjectId = user.id;
     doc.body = body;
     doc.postedAt = Date.now();
@@ -36815,7 +36805,7 @@ export const PrepTaskComment_edit = mutation({
   },
 });
 
-async function __runPrepTaskCommentPost(ctx: MutationCtx, { docId, prepTaskId, eventId, body, eventDishId, category, authorName, taskOwnerAssignedToId, taskOwnerAuthSubjectId, version }: any, __creation = false) {
+async function __runPrepTaskCommentPost(ctx: MutationCtx, { docId, prepTaskId, eventId, body, eventDishId, category, taskOwnerAssignedToId, taskOwnerAuthSubjectId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -36829,7 +36819,6 @@ async function __runPrepTaskCommentPost(ctx: MutationCtx, { docId, prepTaskId, e
     if (!((user.id != null))) throw new Error("Guard 2 failed");
     if (!((user.personId != null))) throw new Error("Guard 3 failed");
     if (!((((body).trim()).length > 0))) throw new Error("Write something before you post this comment.");
-    if (!(((authorName == null) || (((authorName).trim()).length > 0)))) throw new Error("Give this comment an author name.");
     if (!(((taskOwnerAuthSubjectId == null) || (taskOwnerAuthSubjectId !== user.id)))) throw new Error("A task owner can't post a comment that notifies themselves.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -36842,7 +36831,7 @@ async function __runPrepTaskCommentPost(ctx: MutationCtx, { docId, prepTaskId, e
       taskOwnerAuthSubjectId: taskOwnerAuthSubjectId,
       authorPersonId: user.personId,
       authorAuthSubjectId: user.id,
-      authorName: ((authorName != null) ? authorName : doc.authorName),
+      authorName: ((user.personName != null) ? user.personName : ""),
       category: ((category != null) ? category : "note"),
       body: body,
       postedAt: Date.now(),
@@ -36850,8 +36839,8 @@ async function __runPrepTaskCommentPost(ctx: MutationCtx, { docId, prepTaskId, e
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, prepTaskCommentId: docId, tenantId: __after.tenantId, prepTaskId: prepTaskId, eventId: eventId, eventDishId: ((eventDishId != null) ? eventDishId : __after.eventDishId), taskOwnerAuthSubjectId: taskOwnerAuthSubjectId, authorPersonId: user.personId, authorName: ((authorName != null) ? authorName : __after.authorName), category: ((category != null) ? category : "note"), body: body, _subject: { entity: "PrepTaskComment", command: "post", id: docId } };
-    const __manifestEvent0 = { type: "PrepTaskCommentPosted", entity: "PrepTaskComment", entityId: docId, payload: { prepTaskCommentId: docId, tenantId: __after.tenantId, prepTaskId: prepTaskId, eventId: eventId, eventDishId: ((eventDishId != null) ? eventDishId : __after.eventDishId), taskOwnerAuthSubjectId: taskOwnerAuthSubjectId, authorPersonId: user.personId, authorName: ((authorName != null) ? authorName : __after.authorName), category: ((category != null) ? category : "note"), body: body }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, prepTaskCommentId: docId, tenantId: __after.tenantId, prepTaskId: prepTaskId, eventId: eventId, eventDishId: ((eventDishId != null) ? eventDishId : __after.eventDishId), taskOwnerAuthSubjectId: taskOwnerAuthSubjectId, authorPersonId: user.personId, authorName: ((user.personName != null) ? user.personName : ""), category: ((category != null) ? category : "note"), body: body, _subject: { entity: "PrepTaskComment", command: "post", id: docId } };
+    const __manifestEvent0 = { type: "PrepTaskCommentPosted", entity: "PrepTaskComment", entityId: docId, payload: { prepTaskCommentId: docId, tenantId: __after.tenantId, prepTaskId: prepTaskId, eventId: eventId, eventDishId: ((eventDishId != null) ? eventDishId : __after.eventDishId), taskOwnerAuthSubjectId: taskOwnerAuthSubjectId, authorPersonId: user.personId, authorName: ((user.personName != null) ? user.personName : ""), category: ((category != null) ? category : "note"), body: body }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "post", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -36865,7 +36854,6 @@ export const PrepTaskComment_post = mutation({
     body: v.string(),
     eventDishId: v.optional(v.string()),
     category: v.optional(v.any()),
-    authorName: v.optional(v.string()),
     taskOwnerAssignedToId: v.optional(v.string()),
     taskOwnerAuthSubjectId: v.optional(v.string()),
     version: v.optional(v.number()),
@@ -36891,7 +36879,6 @@ export const PrepTaskComment_createViaPost = mutation({
     body: v.string(),
     eventDishId: v.optional(v.string()),
     category: v.optional(v.any()),
-    authorName: v.optional(v.string()),
     taskOwnerAssignedToId: v.optional(v.string()),
     taskOwnerAuthSubjectId: v.optional(v.string()),
     idempotencyKey: v.optional(v.string())
@@ -36903,13 +36890,12 @@ export const PrepTaskComment_createViaPost = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { prepTaskId, eventId, body, eventDishId, category, authorName, taskOwnerAssignedToId, taskOwnerAuthSubjectId } = args;
+    const { prepTaskId, eventId, body, eventDishId, category, taskOwnerAssignedToId, taskOwnerAuthSubjectId } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       category: args.category !== undefined ? args.category : "note",
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      authorName: args.authorName,
       body: args.body,
       eventDishId: args.eventDishId,
       eventId: args.eventId,
@@ -36925,7 +36911,6 @@ export const PrepTaskComment_createViaPost = mutation({
     if (!((user.id != null))) throw new Error("Guard 2 failed");
     if (!((user.personId != null))) throw new Error("Guard 3 failed");
     if (!((((body).trim()).length > 0))) throw new Error("Write something before you post this comment.");
-    if (!(((authorName == null) || (((authorName).trim()).length > 0)))) throw new Error("Give this comment an author name.");
     if (!(((taskOwnerAuthSubjectId == null) || (taskOwnerAuthSubjectId !== user.id)))) throw new Error("A task owner can't post a comment that notifies themselves.");
     const doc: Record<string, any> = {
       ...__draft,
@@ -36938,13 +36923,13 @@ export const PrepTaskComment_createViaPost = mutation({
     doc.taskOwnerAuthSubjectId = taskOwnerAuthSubjectId;
     doc.authorPersonId = user.personId;
     doc.authorAuthSubjectId = user.id;
-    doc.authorName = ((authorName != null) ? authorName : doc.authorName);
+    doc.authorName = ((user.personName != null) ? user.personName : "");
     doc.category = ((category != null) ? category : "note");
     doc.body = body;
     doc.postedAt = Date.now();
     const docId = await ctx.db.insert("prepTaskComments", doc as any);
-    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, prepTaskCommentId: docId, tenantId: doc.tenantId, prepTaskId: prepTaskId, eventId: eventId, eventDishId: ((eventDishId != null) ? eventDishId : doc.eventDishId), taskOwnerAuthSubjectId: taskOwnerAuthSubjectId, authorPersonId: user.personId, authorName: ((authorName != null) ? authorName : doc.authorName), category: ((category != null) ? category : "note"), body: body, _subject: { entity: "PrepTaskComment", command: "post", id: docId } };
-    const __manifestEvent0 = { type: "PrepTaskCommentPosted", entity: "PrepTaskComment", entityId: docId, payload: { prepTaskCommentId: docId, tenantId: doc.tenantId, prepTaskId: prepTaskId, eventId: eventId, eventDishId: ((eventDishId != null) ? eventDishId : doc.eventDishId), taskOwnerAuthSubjectId: taskOwnerAuthSubjectId, authorPersonId: user.personId, authorName: ((authorName != null) ? authorName : doc.authorName), category: ((category != null) ? category : "note"), body: body }, createdAt: Date.now() };
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, prepTaskCommentId: docId, tenantId: doc.tenantId, prepTaskId: prepTaskId, eventId: eventId, eventDishId: ((eventDishId != null) ? eventDishId : doc.eventDishId), taskOwnerAuthSubjectId: taskOwnerAuthSubjectId, authorPersonId: user.personId, authorName: ((user.personName != null) ? user.personName : ""), category: ((category != null) ? category : "note"), body: body, _subject: { entity: "PrepTaskComment", command: "post", id: docId } };
+    const __manifestEvent0 = { type: "PrepTaskCommentPosted", entity: "PrepTaskComment", entityId: docId, payload: { prepTaskCommentId: docId, tenantId: doc.tenantId, prepTaskId: prepTaskId, eventId: eventId, eventDishId: ((eventDishId != null) ? eventDishId : doc.eventDishId), taskOwnerAuthSubjectId: taskOwnerAuthSubjectId, authorPersonId: user.personId, authorName: ((user.personName != null) ? user.personName : ""), category: ((category != null) ? category : "note"), body: body }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "post", emitIndex: 0 });
     const __result = { docId };
@@ -55460,7 +55445,7 @@ export const VenueNote_pin = mutation({
   },
 });
 
-async function __runVenueNotePost(ctx: MutationCtx, { docId, venueId, eventId, authorName, category, content, visibility, isPinned, version }: any, __creation = false) {
+async function __runVenueNotePost(ctx: MutationCtx, { docId, venueId, eventId, category, content, visibility, isPinned, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -55474,7 +55459,6 @@ async function __runVenueNotePost(ctx: MutationCtx, { docId, venueId, eventId, a
     if (!((user.id != null))) throw new Error("Guard 2 failed");
     if (!((user.personId != null))) throw new Error("Guard 3 failed");
     if (!((((content).trim()).length > 0))) throw new Error("Write something in this note.");
-    if (!((((authorName).trim()).length > 0))) throw new Error("Give this note an author name.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -55482,7 +55466,7 @@ async function __runVenueNotePost(ctx: MutationCtx, { docId, venueId, eventId, a
       venueId: venueId,
       eventId: eventId,
       authorPersonId: user.personId,
-      authorName: authorName,
+      authorName: ((user.personName != null) ? user.personName : ""),
       authorAuthSubjectId: user.id,
       category: category,
       content: content,
@@ -55505,7 +55489,6 @@ export const VenueNote_post = mutation({
     docId: v.id("venueNotes"),
     venueId: v.string(),
     eventId: v.optional(v.string()),
-    authorName: v.string(),
     category: v.any(),
     content: v.string(),
     visibility: v.optional(v.any()),
@@ -55530,7 +55513,6 @@ export const VenueNote_createViaPost = mutation({
   args: {
     venueId: v.string(),
     eventId: v.optional(v.string()),
-    authorName: v.string(),
     category: v.any(),
     content: v.string(),
     visibility: v.optional(v.any()),
@@ -55544,14 +55526,13 @@ export const VenueNote_createViaPost = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { venueId, eventId, authorName, category, content, visibility, isPinned } = args;
+    const { venueId, eventId, category, content, visibility, isPinned } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       isPinned: args.isPinned !== undefined ? args.isPinned : false,
       visibility: args.visibility !== undefined ? args.visibility : "internal",
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      authorName: args.authorName,
       category: args.category,
       content: args.content,
       eventId: args.eventId,
@@ -55565,7 +55546,6 @@ export const VenueNote_createViaPost = mutation({
     if (!((user.id != null))) throw new Error("Guard 2 failed");
     if (!((user.personId != null))) throw new Error("Guard 3 failed");
     if (!((((content).trim()).length > 0))) throw new Error("Write something in this note.");
-    if (!((((authorName).trim()).length > 0))) throw new Error("Give this note an author name.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -55573,7 +55553,7 @@ export const VenueNote_createViaPost = mutation({
     doc.venueId = venueId;
     doc.eventId = eventId;
     doc.authorPersonId = user.personId;
-    doc.authorName = authorName;
+    doc.authorName = ((user.personName != null) ? user.personName : "");
     doc.authorAuthSubjectId = user.id;
     doc.category = category;
     doc.content = content;
@@ -55965,15 +55945,15 @@ export const VenueRoom_revise = mutation({
   },
 });
 
-async function __runVenueVendorRelationshipEstablish(ctx: MutationCtx, { docId, venueId, vendorId, category, status, effectiveFrom, effectiveUntil, primaryContactId, insuranceCertificate, insuranceExpiry, complianceNotes, discountPercent, paymentTerms, minimumOrder, notes, establishedByPersonId, version }: any, __creation = false) {
+async function __runVenueVendorRelationshipEstablish(ctx: MutationCtx, { docId, venueId, vendorId, category, status, effectiveFrom, effectiveUntil, primaryContactId, insuranceCertificate, insuranceExpiry, complianceNotes, discountPercent, paymentTerms, minimumOrder, notes, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueVendorRelationship not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueVendorRelationship not found");
-    if (!(checkRole(user, "facilityAccess"))) throw new Error("Facility staff may see venue vendor relationships");
-    if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may update venue vendor relationships");
-    if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may change venue vendor relationships");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venue suppliers");
+    if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update venue suppliers");
+    if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change venue suppliers");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(((venueId != null) && (((venueId).trim()).length > 0)))) throw new Error("Pick a venue.");
     if (!(((vendorId != null) && (((vendorId).trim()).length > 0)))) throw new Error("Pick a vendor.");
@@ -56007,7 +55987,7 @@ async function __runVenueVendorRelationshipEstablish(ctx: MutationCtx, { docId, 
       paymentTerms: paymentTerms,
       minimumOrder: minimumOrder,
       notes: notes,
-      establishedByPersonId: establishedByPersonId,
+      establishedByPersonId: user.personId,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -56036,7 +56016,6 @@ export const VenueVendorRelationship_establish = mutation({
     paymentTerms: v.optional(v.string()),
     minimumOrder: v.optional(v.number()),
     notes: v.optional(v.string()),
-    establishedByPersonId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -56069,7 +56048,6 @@ export const VenueVendorRelationship_createViaEstablish = mutation({
     paymentTerms: v.optional(v.string()),
     minimumOrder: v.optional(v.number()),
     notes: v.optional(v.string()),
-    establishedByPersonId: v.optional(v.string()),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -56079,7 +56057,7 @@ export const VenueVendorRelationship_createViaEstablish = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { venueId, vendorId, category, status, effectiveFrom, effectiveUntil, primaryContactId, insuranceCertificate, insuranceExpiry, complianceNotes, discountPercent, paymentTerms, minimumOrder, notes, establishedByPersonId } = args;
+    const { venueId, vendorId, category, status, effectiveFrom, effectiveUntil, primaryContactId, insuranceCertificate, insuranceExpiry, complianceNotes, discountPercent, paymentTerms, minimumOrder, notes } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       status: args.status !== undefined ? args.status : "approved",
@@ -56090,7 +56068,6 @@ export const VenueVendorRelationship_createViaEstablish = mutation({
       discountPercent: args.discountPercent,
       effectiveFrom: args.effectiveFrom,
       effectiveUntil: args.effectiveUntil,
-      establishedByPersonId: args.establishedByPersonId,
       insuranceCertificate: args.insuranceCertificate,
       insuranceExpiry: args.insuranceExpiry,
       minimumOrder: args.minimumOrder,
@@ -56100,9 +56077,9 @@ export const VenueVendorRelationship_createViaEstablish = mutation({
       vendorId: args.vendorId,
       venueId: args.venueId
     };
-    if (!(checkRole(user, "facilityAccess"))) throw new Error("Facility staff may see venue vendor relationships");
-    if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may update venue vendor relationships");
-    if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may change venue vendor relationships");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venue suppliers");
+    if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update venue suppliers");
+    if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change venue suppliers");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(((venueId != null) && (((venueId).trim()).length > 0)))) throw new Error("Pick a venue.");
     if (!(((vendorId != null) && (((vendorId).trim()).length > 0)))) throw new Error("Pick a vendor.");
@@ -56124,7 +56101,7 @@ export const VenueVendorRelationship_createViaEstablish = mutation({
     doc.paymentTerms = paymentTerms;
     doc.minimumOrder = minimumOrder;
     doc.notes = notes;
-    doc.establishedByPersonId = establishedByPersonId;
+    doc.establishedByPersonId = user.personId;
     const docId = await ctx.db.insert("venueVendorRelationships", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, relationshipId: docId, tenantId: doc.tenantId, venueId: venueId, vendorId: vendorId, category: category, status: ((status != null) ? status : "approved"), _subject: { entity: "VenueVendorRelationship", command: "establish", id: docId } };
     const __manifestEvent0 = { type: "VenueVendorRelationshipEstablished", entity: "VenueVendorRelationship", entityId: docId, payload: { relationshipId: docId, tenantId: doc.tenantId, venueId: venueId, vendorId: vendorId, category: category, status: ((status != null) ? status : "approved") }, createdAt: Date.now() };
@@ -56144,9 +56121,9 @@ async function __runVenueVendorRelationshipRetire(ctx: MutationCtx, { docId, rea
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueVendorRelationship not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueVendorRelationship not found");
-    if (!(checkRole(user, "facilityAccess"))) throw new Error("Facility staff may see venue vendor relationships");
-    if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may update venue vendor relationships");
-    if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may change venue vendor relationships");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venue suppliers");
+    if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update venue suppliers");
+    if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change venue suppliers");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Say why you're retiring this.");
     if (version !== undefined && (doc as any).version !== version) {
@@ -56185,15 +56162,15 @@ export const VenueVendorRelationship_retire = mutation({
   },
 });
 
-async function __runVenueVendorRelationshipReviseDetails(ctx: MutationCtx, { docId, category, effectiveFrom, effectiveUntil, primaryContactId, insuranceCertificate, insuranceExpiry, complianceNotes, discountPercent, paymentTerms, minimumOrder, notes, revisedByPersonId, version }: any, __creation = false) {
+async function __runVenueVendorRelationshipReviseDetails(ctx: MutationCtx, { docId, category, effectiveFrom, effectiveUntil, primaryContactId, insuranceCertificate, insuranceExpiry, complianceNotes, discountPercent, paymentTerms, minimumOrder, notes, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueVendorRelationship not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueVendorRelationship not found");
-    if (!(checkRole(user, "facilityAccess"))) throw new Error("Facility staff may see venue vendor relationships");
-    if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may update venue vendor relationships");
-    if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may change venue vendor relationships");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venue suppliers");
+    if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update venue suppliers");
+    if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change venue suppliers");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((((effectiveFrom == null) || (effectiveUntil == null)) || (effectiveFrom <= effectiveUntil)))) throw new Error("Effective from must be before effective until");
     if (!(((discountPercent == null) || ((discountPercent >= 0) && (discountPercent <= 100))))) throw new Error("Discount percent must be between 0 and 100");
@@ -56212,14 +56189,14 @@ async function __runVenueVendorRelationshipReviseDetails(ctx: MutationCtx, { doc
       paymentTerms: ((paymentTerms != null) ? paymentTerms : doc.paymentTerms),
       minimumOrder: ((minimumOrder != null) ? minimumOrder : doc.minimumOrder),
       notes: ((notes != null) ? notes : doc.notes),
-      revisedByPersonId: ((revisedByPersonId != null) ? revisedByPersonId : doc.revisedByPersonId),
+      revisedByPersonId: ((user.personId != null) ? user.personId : doc.revisedByPersonId),
       revisedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, relationshipId: docId, tenantId: __after.tenantId, venueId: __after.venueId, vendorId: __after.vendorId, revisedBy: ((revisedByPersonId != null) ? revisedByPersonId : __after.revisedByPersonId), _subject: { entity: "VenueVendorRelationship", command: "reviseDetails", id: docId } };
-    const __manifestEvent0 = { type: "VenueVendorRelationshipRevised", entity: "VenueVendorRelationship", entityId: docId, payload: { relationshipId: docId, tenantId: __after.tenantId, venueId: __after.venueId, vendorId: __after.vendorId, revisedBy: ((revisedByPersonId != null) ? revisedByPersonId : __after.revisedByPersonId) }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, relationshipId: docId, tenantId: __after.tenantId, venueId: __after.venueId, vendorId: __after.vendorId, revisedBy: ((user.personId != null) ? user.personId : __after.revisedByPersonId), _subject: { entity: "VenueVendorRelationship", command: "reviseDetails", id: docId } };
+    const __manifestEvent0 = { type: "VenueVendorRelationshipRevised", entity: "VenueVendorRelationship", entityId: docId, payload: { relationshipId: docId, tenantId: __after.tenantId, venueId: __after.venueId, vendorId: __after.vendorId, revisedBy: ((user.personId != null) ? user.personId : __after.revisedByPersonId) }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "reviseDetails", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -56239,7 +56216,6 @@ export const VenueVendorRelationship_reviseDetails = mutation({
     paymentTerms: v.optional(v.string()),
     minimumOrder: v.optional(v.number()),
     notes: v.optional(v.string()),
-    revisedByPersonId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -56262,9 +56238,9 @@ async function __runVenueVendorRelationshipReviseStatus(ctx: MutationCtx, { docI
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueVendorRelationship not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueVendorRelationship not found");
-    if (!(checkRole(user, "facilityAccess"))) throw new Error("Facility staff may see venue vendor relationships");
-    if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may update venue vendor relationships");
-    if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may change venue vendor relationships");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venue suppliers");
+    if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update venue suppliers");
+    if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change venue suppliers");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     {
       const __cur = doc.status;

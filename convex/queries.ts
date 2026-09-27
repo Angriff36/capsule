@@ -15354,7 +15354,7 @@ export const listVenueVendorRelationship = query({
   handler: async (ctx) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("venueVendorRelationshipRead", "VenueVendorRelationship", () => checkRole(user, "facilityAccess"))) return [];
+    if (!__allowsRead("venueVendorRelationshipRead", "VenueVendorRelationship", () => checkRole(user, "eventAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("venueVendorRelationships").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
@@ -15368,7 +15368,7 @@ export const getVenueVendorRelationship = query({
   handler: async (ctx, { id }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("venueVendorRelationshipRead", "VenueVendorRelationship", () => checkRole(user, "facilityAccess"))) return null;
+    if (!__allowsRead("venueVendorRelationshipRead", "VenueVendorRelationship", () => checkRole(user, "eventAccess"))) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (doc && (doc as any).tenantId !== __tenant) return null;
@@ -15391,7 +15391,7 @@ export const listVenueVendorRelationshipByTenantId = query({
   handler: async (ctx, { tenantId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("venueVendorRelationshipRead", "VenueVendorRelationship", () => checkRole(user, "facilityAccess"))) return [];
+    if (!__allowsRead("venueVendorRelationshipRead", "VenueVendorRelationship", () => checkRole(user, "eventAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("venueVendorRelationships").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
@@ -15406,7 +15406,7 @@ export const listVenueVendorRelationshipByVenueId = query({
   handler: async (ctx, { venueId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("venueVendorRelationshipRead", "VenueVendorRelationship", () => checkRole(user, "facilityAccess"))) return [];
+    if (!__allowsRead("venueVendorRelationshipRead", "VenueVendorRelationship", () => checkRole(user, "eventAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("venueVendorRelationships").withIndex("by_venueId", (q) => q.eq("venueId", venueId)).collect();
@@ -15422,7 +15422,7 @@ export const listVenueVendorRelationshipByVendorId = query({
   handler: async (ctx, { vendorId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("venueVendorRelationshipRead", "VenueVendorRelationship", () => checkRole(user, "facilityAccess"))) return [];
+    if (!__allowsRead("venueVendorRelationshipRead", "VenueVendorRelationship", () => checkRole(user, "eventAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("venueVendorRelationships").withIndex("by_vendorId", (q) => q.eq("vendorId", vendorId)).collect();
@@ -15438,7 +15438,7 @@ export const listVenueVendorRelationshipByPrimaryContactId = query({
   handler: async (ctx, { primaryContactId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("venueVendorRelationshipRead", "VenueVendorRelationship", () => checkRole(user, "facilityAccess"))) return [];
+    if (!__allowsRead("venueVendorRelationshipRead", "VenueVendorRelationship", () => checkRole(user, "eventAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("venueVendorRelationships").withIndex("by_primaryContactId", (q) => q.eq("primaryContactId", primaryContactId)).collect();
@@ -15454,7 +15454,7 @@ export const listVenueVendorRelationshipByEstablishedByPersonId = query({
   handler: async (ctx, { establishedByPersonId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("venueVendorRelationshipRead", "VenueVendorRelationship", () => checkRole(user, "facilityAccess"))) return [];
+    if (!__allowsRead("venueVendorRelationshipRead", "VenueVendorRelationship", () => checkRole(user, "eventAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("venueVendorRelationships").withIndex("by_establishedByPersonId", (q) => q.eq("establishedByPersonId", establishedByPersonId)).collect();
@@ -15470,7 +15470,7 @@ export const listVenueVendorRelationshipByRevisedByPersonId = query({
   handler: async (ctx, { revisedByPersonId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("venueVendorRelationshipRead", "VenueVendorRelationship", () => checkRole(user, "facilityAccess"))) return [];
+    if (!__allowsRead("venueVendorRelationshipRead", "VenueVendorRelationship", () => checkRole(user, "eventAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("venueVendorRelationships").withIndex("by_revisedByPersonId", (q) => q.eq("revisedByPersonId", revisedByPersonId)).collect();

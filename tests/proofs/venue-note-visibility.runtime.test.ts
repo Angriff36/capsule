@@ -73,17 +73,15 @@ async function postNote(
   proof: ReturnType<typeof harness>,
   actor: Actor,
   venueId: string,
-  authorName: string,
   visibility: "public" | "internal" | "management_only",
   content: string,
 ) {
-  // The server records the signed-in person as the author.
+  // The server records the signed-in person and their name as the author.
   const created = (await proof.executeCommand(
     actor,
     api.mutations.VenueNote_createViaPost,
     {
       venueId,
-      authorName,
       category: "access" as const,
       content,
       visibility,
@@ -129,7 +127,6 @@ describe("runtime proof: venue note visibility read policy (#385)", () => {
       proof,
       staff,
       venueId,
-      "Riley Crew",
       "public",
       "Street parking fills before 5pm",
     );
@@ -137,7 +134,6 @@ describe("runtime proof: venue note visibility read policy (#385)", () => {
       proof,
       staff,
       venueId,
-      "Riley Crew",
       "internal",
       "Loading dock opens at 6am",
     );
@@ -145,7 +141,6 @@ describe("runtime proof: venue note visibility read policy (#385)", () => {
       proof,
       manager,
       venueId,
-      "Robin Coordinator",
       "management_only",
       "Rate negotiation history for the venue owner",
     );
