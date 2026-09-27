@@ -8271,7 +8271,6 @@ export const PrepTaskCommentPostParamsSchema = z.object({
   body: z.string(),
   eventDishId: z.string().min(1).optional(),
   category: z.enum(["note", "blocker", "substitution", "status_update"]).optional(),
-  authorPersonId: z.string().min(1).optional(),
   authorName: z.string().optional(),
   taskOwnerAssignedToId: z.string().min(1).optional(),
   taskOwnerAuthSubjectId: z.string().optional(),

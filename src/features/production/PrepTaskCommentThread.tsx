@@ -132,7 +132,6 @@ export function PrepTaskCommentThread({ task }: { task: PrepTaskLike }) {
       eventDishId: task.eventDishId ?? undefined,
       category,
       body,
-      authorPersonId: myPersonId ?? undefined,
       authorName: myName || undefined,
       taskOwnerAssignedToId: ownerIsMe
         ? undefined

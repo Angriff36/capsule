@@ -36815,7 +36815,7 @@ export const PrepTaskComment_edit = mutation({
   },
 });
 
-async function __runPrepTaskCommentPost(ctx: MutationCtx, { docId, prepTaskId, eventId, body, eventDishId, category, authorPersonId, authorName, taskOwnerAssignedToId, taskOwnerAuthSubjectId, version }: any, __creation = false) {
+async function __runPrepTaskCommentPost(ctx: MutationCtx, { docId, prepTaskId, eventId, body, eventDishId, category, authorName, taskOwnerAssignedToId, taskOwnerAuthSubjectId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -36827,6 +36827,7 @@ async function __runPrepTaskCommentPost(ctx: MutationCtx, { docId, prepTaskId, e
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.postedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
+    if (!((user.personId != null))) throw new Error("Guard 3 failed");
     if (!((((body).trim()).length > 0))) throw new Error("Write something before you post this comment.");
     if (!(((authorName == null) || (((authorName).trim()).length > 0)))) throw new Error("Give this comment an author name.");
     if (!(((taskOwnerAuthSubjectId == null) || (taskOwnerAuthSubjectId !== user.id)))) throw new Error("A task owner can't post a comment that notifies themselves.");
@@ -36839,7 +36840,7 @@ async function __runPrepTaskCommentPost(ctx: MutationCtx, { docId, prepTaskId, e
       eventDishId: ((eventDishId != null) ? eventDishId : doc.eventDishId),
       taskOwnerAssignedToId: taskOwnerAssignedToId,
       taskOwnerAuthSubjectId: taskOwnerAuthSubjectId,
-      authorPersonId: ((authorPersonId != null) ? authorPersonId : doc.authorPersonId),
+      authorPersonId: user.personId,
       authorAuthSubjectId: user.id,
       authorName: ((authorName != null) ? authorName : doc.authorName),
       category: ((category != null) ? category : "note"),
@@ -36849,8 +36850,8 @@ async function __runPrepTaskCommentPost(ctx: MutationCtx, { docId, prepTaskId, e
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, prepTaskCommentId: docId, tenantId: __after.tenantId, prepTaskId: prepTaskId, eventId: eventId, eventDishId: ((eventDishId != null) ? eventDishId : __after.eventDishId), taskOwnerAuthSubjectId: taskOwnerAuthSubjectId, authorPersonId: ((authorPersonId != null) ? authorPersonId : __after.authorPersonId), authorName: ((authorName != null) ? authorName : __after.authorName), category: ((category != null) ? category : "note"), body: body, _subject: { entity: "PrepTaskComment", command: "post", id: docId } };
-    const __manifestEvent0 = { type: "PrepTaskCommentPosted", entity: "PrepTaskComment", entityId: docId, payload: { prepTaskCommentId: docId, tenantId: __after.tenantId, prepTaskId: prepTaskId, eventId: eventId, eventDishId: ((eventDishId != null) ? eventDishId : __after.eventDishId), taskOwnerAuthSubjectId: taskOwnerAuthSubjectId, authorPersonId: ((authorPersonId != null) ? authorPersonId : __after.authorPersonId), authorName: ((authorName != null) ? authorName : __after.authorName), category: ((category != null) ? category : "note"), body: body }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, prepTaskCommentId: docId, tenantId: __after.tenantId, prepTaskId: prepTaskId, eventId: eventId, eventDishId: ((eventDishId != null) ? eventDishId : __after.eventDishId), taskOwnerAuthSubjectId: taskOwnerAuthSubjectId, authorPersonId: user.personId, authorName: ((authorName != null) ? authorName : __after.authorName), category: ((category != null) ? category : "note"), body: body, _subject: { entity: "PrepTaskComment", command: "post", id: docId } };
+    const __manifestEvent0 = { type: "PrepTaskCommentPosted", entity: "PrepTaskComment", entityId: docId, payload: { prepTaskCommentId: docId, tenantId: __after.tenantId, prepTaskId: prepTaskId, eventId: eventId, eventDishId: ((eventDishId != null) ? eventDishId : __after.eventDishId), taskOwnerAuthSubjectId: taskOwnerAuthSubjectId, authorPersonId: user.personId, authorName: ((authorName != null) ? authorName : __after.authorName), category: ((category != null) ? category : "note"), body: body }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "post", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -36864,7 +36865,6 @@ export const PrepTaskComment_post = mutation({
     body: v.string(),
     eventDishId: v.optional(v.string()),
     category: v.optional(v.any()),
-    authorPersonId: v.optional(v.string()),
     authorName: v.optional(v.string()),
     taskOwnerAssignedToId: v.optional(v.string()),
     taskOwnerAuthSubjectId: v.optional(v.string()),
@@ -36891,7 +36891,6 @@ export const PrepTaskComment_createViaPost = mutation({
     body: v.string(),
     eventDishId: v.optional(v.string()),
     category: v.optional(v.any()),
-    authorPersonId: v.optional(v.string()),
     authorName: v.optional(v.string()),
     taskOwnerAssignedToId: v.optional(v.string()),
     taskOwnerAuthSubjectId: v.optional(v.string()),
@@ -36904,14 +36903,13 @@ export const PrepTaskComment_createViaPost = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { prepTaskId, eventId, body, eventDishId, category, authorPersonId, authorName, taskOwnerAssignedToId, taskOwnerAuthSubjectId } = args;
+    const { prepTaskId, eventId, body, eventDishId, category, authorName, taskOwnerAssignedToId, taskOwnerAuthSubjectId } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       category: args.category !== undefined ? args.category : "note",
       createdAt: Date.now(),
       updatedAt: Date.now(),
       authorName: args.authorName,
-      authorPersonId: args.authorPersonId,
       body: args.body,
       eventDishId: args.eventDishId,
       eventId: args.eventId,
@@ -36925,6 +36923,7 @@ export const PrepTaskComment_createViaPost = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.postedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
+    if (!((user.personId != null))) throw new Error("Guard 3 failed");
     if (!((((body).trim()).length > 0))) throw new Error("Write something before you post this comment.");
     if (!(((authorName == null) || (((authorName).trim()).length > 0)))) throw new Error("Give this comment an author name.");
     if (!(((taskOwnerAuthSubjectId == null) || (taskOwnerAuthSubjectId !== user.id)))) throw new Error("A task owner can't post a comment that notifies themselves.");
@@ -36937,15 +36936,15 @@ export const PrepTaskComment_createViaPost = mutation({
     doc.eventDishId = ((eventDishId != null) ? eventDishId : doc.eventDishId);
     doc.taskOwnerAssignedToId = taskOwnerAssignedToId;
     doc.taskOwnerAuthSubjectId = taskOwnerAuthSubjectId;
-    doc.authorPersonId = ((authorPersonId != null) ? authorPersonId : doc.authorPersonId);
+    doc.authorPersonId = user.personId;
     doc.authorAuthSubjectId = user.id;
     doc.authorName = ((authorName != null) ? authorName : doc.authorName);
     doc.category = ((category != null) ? category : "note");
     doc.body = body;
     doc.postedAt = Date.now();
     const docId = await ctx.db.insert("prepTaskComments", doc as any);
-    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, prepTaskCommentId: docId, tenantId: doc.tenantId, prepTaskId: prepTaskId, eventId: eventId, eventDishId: ((eventDishId != null) ? eventDishId : doc.eventDishId), taskOwnerAuthSubjectId: taskOwnerAuthSubjectId, authorPersonId: ((authorPersonId != null) ? authorPersonId : doc.authorPersonId), authorName: ((authorName != null) ? authorName : doc.authorName), category: ((category != null) ? category : "note"), body: body, _subject: { entity: "PrepTaskComment", command: "post", id: docId } };
-    const __manifestEvent0 = { type: "PrepTaskCommentPosted", entity: "PrepTaskComment", entityId: docId, payload: { prepTaskCommentId: docId, tenantId: doc.tenantId, prepTaskId: prepTaskId, eventId: eventId, eventDishId: ((eventDishId != null) ? eventDishId : doc.eventDishId), taskOwnerAuthSubjectId: taskOwnerAuthSubjectId, authorPersonId: ((authorPersonId != null) ? authorPersonId : doc.authorPersonId), authorName: ((authorName != null) ? authorName : doc.authorName), category: ((category != null) ? category : "note"), body: body }, createdAt: Date.now() };
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, prepTaskCommentId: docId, tenantId: doc.tenantId, prepTaskId: prepTaskId, eventId: eventId, eventDishId: ((eventDishId != null) ? eventDishId : doc.eventDishId), taskOwnerAuthSubjectId: taskOwnerAuthSubjectId, authorPersonId: user.personId, authorName: ((authorName != null) ? authorName : doc.authorName), category: ((category != null) ? category : "note"), body: body, _subject: { entity: "PrepTaskComment", command: "post", id: docId } };
+    const __manifestEvent0 = { type: "PrepTaskCommentPosted", entity: "PrepTaskComment", entityId: docId, payload: { prepTaskCommentId: docId, tenantId: doc.tenantId, prepTaskId: prepTaskId, eventId: eventId, eventDishId: ((eventDishId != null) ? eventDishId : doc.eventDishId), taskOwnerAuthSubjectId: taskOwnerAuthSubjectId, authorPersonId: user.personId, authorName: ((authorName != null) ? authorName : doc.authorName), category: ((category != null) ? category : "note"), body: body }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "post", emitIndex: 0 });
     const __result = { docId };
