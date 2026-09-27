@@ -364,12 +364,13 @@ export const turn = action({
 
     // Tenant settings row wins (set in-app under Administration → Assistant);
     // deployment env vars are the fallback.
-    const settings = await ctx.runQuery(
-      internal.assistantConfig.readForSubject,
-      {
-        subject: identity.subject,
-      },
-    );
+    const caller = await ctx.runQuery(internal.assistantConfig.readForSubject, {
+      subject: identity.subject,
+    });
+    if (!caller.staff) {
+      throw new Error("No staff profile is linked to your account.");
+    }
+    const settings = caller.settings;
     const baseUrl = settings?.baseUrl ?? process.env.ASSISTANT_LLM_BASE_URL;
     const apiKey = settings?.apiKey ?? process.env.ASSISTANT_LLM_API_KEY;
     const model = settings?.model ?? process.env.ASSISTANT_LLM_MODEL;

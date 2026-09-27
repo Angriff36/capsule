@@ -68,15 +68,21 @@ export const forCaller = query({
 export const readForSubject = internalQuery({
   args: { subject: v.string() },
   handler: async (ctx, { subject }) => {
+    // `staff: false` (no live staff profile) must stop the turn; only live
+    // staff without company settings may fall back to the deployment key.
     const tenantId = await personTenantId(ctx, subject);
-    if (tenantId == null) return null;
+    if (tenantId == null) return { staff: false as const };
     const rows = await ctx.db
       .query("assistantLlmConfigs")
       .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
       .collect();
     const row = rows.find((r) => r.deletedAt == null);
-    if (!row) return null;
-    return { baseUrl: row.baseUrl, apiKey: row.apiKey, model: row.model };
+    return {
+      staff: true as const,
+      settings: row
+        ? { baseUrl: row.baseUrl, apiKey: row.apiKey, model: row.model }
+        : null,
+    };
   },
 });
 

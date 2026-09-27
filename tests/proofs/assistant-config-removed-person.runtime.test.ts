@@ -6,7 +6,7 @@
  * live-person rule as sign-in. Synthetic workspace only.
  */
 import { convexTest } from "convex-test";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { api, internal } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { modules } from "./convex-test-modules";
@@ -59,7 +59,7 @@ describe("assistant settings follow only active staff profiles", () => {
       await t.query(internal.assistantConfig.readForSubject, {
         subject: "active-a",
       }),
-    ).toMatchObject({ apiKey: "proof-key" });
+    ).toMatchObject({ staff: true, settings: { apiKey: "proof-key" } });
 
     expect(
       await as("removed-a").query(api.assistantConfig.forCaller, {}),
@@ -70,6 +70,64 @@ describe("assistant settings follow only active staff profiles", () => {
       await t.query(internal.assistantConfig.readForSubject, {
         subject: "removed-a",
       }),
-    ).toBeNull();
+    ).toEqual({ staff: false });
+  });
+
+  it("the assistant turn refuses removed and unlinked people even when a fallback key is set", async () => {
+    const t = convexTest(schema, modules);
+    await t.run(async (ctx) => {
+      for (const [subject, status] of [
+        ["live-b", "active"],
+        ["removed-b", "inactive"],
+      ] as const) {
+        await ctx.db.insert("people", {
+          tenantId: "tenant-b",
+          givenName: "Proof",
+          familyName: subject,
+          email: `${subject}@example.test`,
+          role: "owner",
+          employmentType: "full_time",
+          status,
+          authSubjectId: subject,
+          version: 1,
+        } as never);
+      }
+    });
+    const as = (subject: string) =>
+      t.withIdentity({ subject, tokenIdentifier: `proof|${subject}` });
+    const keysSent: string[] = [];
+    vi.stubEnv("ASSISTANT_LLM_BASE_URL", "https://fallback.example.test/v1");
+    vi.stubEnv("ASSISTANT_LLM_API_KEY", "fallback-key");
+    vi.stubEnv("ASSISTANT_LLM_MODEL", "fallback-model");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_url: string, init: RequestInit) => {
+        keysSent.push(
+          String((init.headers as Record<string, string>).Authorization),
+        );
+        return new Response(
+          JSON.stringify({ choices: [{ message: { content: "hello" } }] }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        );
+      }),
+    );
+    try {
+      const messages = [{ role: "user" as const, content: "hi" }];
+      for (const subject of ["removed-b", "never-linked"]) {
+        await expect(
+          as(subject).action(api.assistantTurn.turn, { messages }),
+        ).rejects.toThrow(/No staff profile is linked/);
+      }
+      expect(keysSent).toEqual([]);
+
+      // Control: live staff with no company settings still use the fallback.
+      expect(
+        await as("live-b").action(api.assistantTurn.turn, { messages }),
+      ).toMatchObject({ content: "hello" });
+      expect(keysSent).toEqual(["Bearer fallback-key"]);
+    } finally {
+      vi.unstubAllGlobals();
+      vi.unstubAllEnvs();
+    }
   });
 });
