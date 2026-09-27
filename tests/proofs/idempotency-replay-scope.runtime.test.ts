@@ -385,6 +385,61 @@ describe("saved step answers replay only in their own workspace (PL-AUTH)", () =
     ).rejects.toThrow(/earlier version of the app/);
   });
 
+  it("refuses inbox receipts saved under the old unprefixed keys instead of creating a second thread, message or lead", async () => {
+    const t = convexTest(schema, modules);
+    const owner = t.withIdentity({
+      subject: "replay-inbox-owner",
+      tokenIdentifier: "replay|inbox-owner",
+      role: "org:owner",
+      tenantId: "tenant-replay-inbox",
+    });
+    const legacyReceipt = (key: string, command: string) =>
+      t.run((ctx) =>
+        ctx.db.insert("commandIdempotencyKeys", {
+          key,
+          command,
+          result: { _id: "from-old-version", docId: "from-old-version" },
+          createdAt: Date.now(),
+        } as never),
+      );
+    const ingest = (providerThreadId: string, providerMessageId: string) =>
+      owner.action(api.messageInbox.ingestInboundMessage, {
+        provider: "email",
+        providerThreadId,
+        providerMessageId,
+        bodyText: "Can you cater 40 guests in June?",
+        subject: "June party",
+      });
+    const count = (table: "messageThreads" | "messages" | "leads") =>
+      t.run(async (ctx) => (await ctx.db.query(table).collect()).length);
+
+    // Thread: the earlier version opened it under the unprefixed key.
+    await legacyReceipt("mt:email::old-thread", "MessageThread_create");
+    await expect(ingest("old-thread", "m-1")).rejects.toThrow(
+      /earlier version of the app/,
+    );
+    expect(await count("messageThreads")).toBe(0);
+
+    // Message: the thread exists; the earlier version posted m-2 under the
+    // unprefixed key.
+    const opened = await ingest("new-thread", "m-1");
+    expect(await count("messages")).toBe(1);
+    await legacyReceipt(`msg:${opened.threadId}:m-2`, "Message_createViaPost");
+    await expect(ingest("new-thread", "m-2")).rejects.toThrow(
+      /earlier version of the app/,
+    );
+    expect(await count("messages")).toBe(1);
+
+    // Lead: the earlier version qualified the thread under the unprefixed key.
+    await legacyReceipt(`qualify:${opened.threadId}`, "Lead_createViaCapture");
+    await expect(
+      owner.action(api.messageInbox.qualifyThreadAsLead, {
+        threadId: opened.threadId,
+      }),
+    ).rejects.toThrow(/earlier version of the app/);
+    expect(await count("leads")).toBe(0);
+  });
+
   it("replays a saved answer before the link check, and rejects malformed and wrong-table links alike", async () => {
     const t = convexTest(schema, modules);
     const tenantId = "tenant-replay-links";

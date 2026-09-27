@@ -21,8 +21,9 @@
  *
  * A signed-out caller, or a sign-in with no workspace, gets no reservation:
  * nothing is saved or replayed. A receipt saved before the reservation
- * rewrite (stored under the raw retry key) cannot be attributed to a caller,
- * so a retry that hits one is refused with guidance instead of replayed or
+ * rewrite (stored under the raw retry key, or for a tenant-shared key under
+ * the same key without its prefix) cannot be attributed to a caller, so a
+ * retry that hits one is refused with guidance instead of replayed or
  * re-executed.
  *
  * The regen patch scripts/apply-own-workspace-links.ts works the scope out
@@ -96,13 +97,20 @@ export async function lookupCommandIdempotency(
     .withIndex("by_key", (q) => q.eq("key", scope.reservationKey))
     .first();
   if (row === null) {
-    const legacy = await ctx.db
-      .query("commandIdempotencyKeys")
-      .withIndex("by_key", (q) => q.eq("key", rawKey))
-      .first();
-    return legacy === null
-      ? { kind: "miss" }
-      : { kind: "refuse", reason: LEGACY_REFUSAL };
+    // Raw-key era receipts: the key exactly as sent, and for a tenant-shared
+    // key also the key without its prefix (the app's own flows sent those
+    // unprefixed before the rename).
+    const legacyKeys = scope.shared
+      ? [rawKey, rawKey.slice(SHARED_KEY_PREFIX.length)]
+      : [rawKey];
+    for (const legacyKey of legacyKeys) {
+      const legacy = await ctx.db
+        .query("commandIdempotencyKeys")
+        .withIndex("by_key", (q) => q.eq("key", legacyKey))
+        .first();
+      if (legacy !== null) return { kind: "refuse", reason: LEGACY_REFUSAL };
+    }
+    return { kind: "miss" };
   }
   if (row.command === `${scope.command}|${scope.callerScope}`) {
     return { kind: "replay", result: row.result };

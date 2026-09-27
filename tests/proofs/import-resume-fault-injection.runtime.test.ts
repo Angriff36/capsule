@@ -564,6 +564,55 @@ describe("runtime proof: import resume with fault injection (AC-024)", () => {
     });
   });
 
+  it("a receipt saved under the old unprefixed import key is refused, never re-run", async () => {
+    const tenantId = "tenant-import-legacy-receipt";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "import-legacy-owner",
+      role: "owner",
+      tenantId,
+    });
+    const venueRows = [1, 2].map((n) => ({
+      VenueID: `V-00${n}`,
+      VenueName: `Legacy Venue ${n}`,
+      VenueType: "Office",
+      Capacity: 50,
+    }));
+    const runId = await startRun(owner, "venues");
+    await walkToCommitting(owner, runId, "venues", venueRows.length);
+    // The earlier version created V-001 under the key without the
+    // tenant-shared/ prefix, then died before the link was written.
+    await owner.run((ctx) =>
+      ctx.db.insert("commandIdempotencyKeys", {
+        key: `import:${runId}:venue:V-001`,
+        command: "Venue_createViaRegister",
+        result: { docId: "venue-from-old-version" },
+        createdAt: Date.now(),
+      } as never),
+    );
+
+    const result = await commit(owner, {
+      importRunId: runId,
+      rawRows: venueRows,
+    });
+    expect(result.committed).toBe(1);
+
+    // V-001 did not run again: only V-002 was created, and V-001 waits in the
+    // review queue with the refusal.
+    const venues = (await owner.run(async (ctx) =>
+      (await ctx.db.query("venues").collect()).filter(
+        (row) => (row as { tenantId: string }).tenantId === tenantId,
+      ),
+    )) as unknown as Array<{ name: string }>;
+    expect(venues.map((venue) => venue.name)).toEqual(["Legacy Venue 2"]);
+    const v1 = (await linksFor(owner, tenantId, "venue")).find(
+      (link) => link.externalId === "V-001",
+    ) as (LinkRow & { resolutionNote?: string }) | undefined;
+    expect(v1?.capsuleId).toBe("");
+    expect(v1?.conflictStatus).toBe("pending_conflict");
+    expect(v1?.resolutionNote).toContain("earlier version of the app");
+  });
+
   it("completion counts large runs in bounded pages across transactions", async () => {
     const tenantId = "tenant-import-resume-pagination";
     const proof = harness();
