@@ -677,7 +677,10 @@ describe("accepted revision link (AC-413 / AC-434)", () => {
           docId: proposalId,
           acceptedRevisionId: revisionId,
         }),
-      ).rejects.toThrow("Accepted revision not found");
+      ).rejects.toThrow(
+        // Another workspace's record is refused before the step runs.
+        /Accepted revision not found|A linked record was not found/,
+      );
 
       // Atomic refusal: the proposal stays viewed (markViewed already ran on
       // this target), stores no reference, and no acceptance reached the

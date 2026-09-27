@@ -109,6 +109,9 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
     // The event, its dish line and the recipe part must all be this
     // workspace's: the recipe lines below are read by component alone.
     guard self.event != null and self.eventDish != null and self.component != null
+    // A seed may not be pointed at other records: the links sent must be the
+    // seed's own (checked above). Automatic seeds always send the same links.
+    guard eventId == self.eventId and eventDishId == self.eventDishId and dishId == self.dishId and componentId == self.componentId
     guard self.seededAt == null
     guard self.deletedAt == null
     mutate eventId = eventId

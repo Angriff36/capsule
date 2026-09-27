@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { applyAggregateCompositeIndexes } from "./apply-aggregate-composite-indexes.ts";
 import { applyOrgCapabilityCheckRole } from "./apply-org-capability-check-role.ts";
 import { applyEventServiceStyleReferenceGuard } from "./apply-event-service-style-reference-guard.ts";
+import { applyOwnWorkspaceLinks } from "./apply-own-workspace-links.ts";
 import { ManifestLineEndingNormalizer } from "./normalizeManifestLineEndings.ts";
 import { syncBuilderBaselines } from "./sync-builder-baselines.ts";
 
@@ -45,6 +46,7 @@ export function regenerate(passthrough: string[] = []): number {
     ...applyOrgCapabilityCheckRole(CAPSULE_ROOT),
     ...applyEventServiceStyleReferenceGuard(CAPSULE_ROOT),
     ...applyAggregateCompositeIndexes(CAPSULE_ROOT),
+    ...applyOwnWorkspaceLinks(CAPSULE_ROOT),
   ];
   if (touched.length > 0) {
     console.log(

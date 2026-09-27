@@ -6,6 +6,7 @@ import { v } from "convex/values";
 import { handleManifestEvent as __handleManifestEvent } from "./lib/operationalEvents";
 import type { Doc } from "./_generated/dataModel";
 import { getAuthContext } from "./lib/authContext";
+import { assertOwnWorkspaceLinks as __assertOwnWorkspaceLinks } from "./lib/ownWorkspaceLinks";
 import { encrypt, decrypt } from "./lib/encryption";
 
 async function __encryptDoc(ctx: any, entity: string, fields: readonly string[], doc: Record<string, any>): Promise<Record<string, any>> {
@@ -661,6 +662,7 @@ export const Announcement_post = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -682,6 +684,7 @@ export const Announcement_createViaPost = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -761,6 +764,7 @@ export const Announcement_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -809,6 +813,7 @@ export const AnnouncementDismissal_dismiss = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -827,6 +832,7 @@ export const AnnouncementDismissal_createViaDismiss = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -903,6 +909,7 @@ export const AssistantLlmConfig_configure = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -923,6 +930,7 @@ export const AssistantLlmConfig_createViaConfigure = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1015,6 +1023,7 @@ export const Attachment_attach = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1039,6 +1048,7 @@ export const Attachment_createViaAttach = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1126,6 +1136,7 @@ export const Attachment_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1167,6 +1178,7 @@ export const Attachment_setSurveySelection = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1230,6 +1242,7 @@ export const AvailabilityWindow_declare = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1252,6 +1265,7 @@ export const AvailabilityWindow_createViaDeclare = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1357,6 +1371,7 @@ export const AvailabilityWindow_withdraw = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1408,6 +1423,7 @@ export const Candidate_advance = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1471,6 +1487,7 @@ export const Candidate_apply = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1495,6 +1512,7 @@ export const Candidate_createViaApply = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1587,6 +1605,7 @@ export const Candidate_hire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1638,6 +1657,7 @@ export const Candidate_reject = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1691,6 +1711,7 @@ export const Candidate_revokeHire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1757,6 +1778,7 @@ export const Client_archive = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1808,6 +1830,7 @@ export const Client_assignOwner = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1865,6 +1888,7 @@ export const Client_changeBillingProfile = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -1933,6 +1957,7 @@ export const Client_changeContact = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -2012,6 +2037,7 @@ export const Client_markMerged = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -2076,6 +2102,7 @@ export const Client_reactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -2165,6 +2192,7 @@ export const Client_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -2200,6 +2228,7 @@ export const Client_createViaRegister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -2316,6 +2345,7 @@ export const Client_setBirthday = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -2373,6 +2403,7 @@ export const Client_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -2439,6 +2470,7 @@ export const ClientCommunication_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -2461,6 +2493,7 @@ export const ClientCommunication_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -2576,6 +2609,7 @@ export const ClientContact_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -2603,6 +2637,7 @@ export const ClientContact_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -2714,6 +2749,7 @@ export const ClientContact_reassignClient = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -2776,6 +2812,7 @@ export const ClientContact_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -2825,6 +2862,7 @@ export const ClientContact_setPrimary = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -2880,6 +2918,7 @@ export const ClientContact_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -2945,6 +2984,7 @@ export const ClientContact_updateDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -3057,6 +3097,7 @@ export const ClientMerge_merge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -3076,6 +3117,7 @@ export const ClientMerge_createViaMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -3223,6 +3265,7 @@ export const ClientOutreachTask_complete = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -3283,6 +3326,7 @@ export const ClientOutreachTask_dismiss = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -3347,6 +3391,7 @@ export const ClientOutreachTask_open = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -3366,6 +3411,7 @@ export const ClientOutreachTask_createViaOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -3443,6 +3489,7 @@ export const ClientPortalLink_create = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -3485,6 +3532,7 @@ export const ClientPortalLink_revoke = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -3558,6 +3606,7 @@ export const Component_draft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -3586,6 +3635,7 @@ export const Component_createViaDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -3696,6 +3746,7 @@ export const Component_publishVersion = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -3757,6 +3808,7 @@ export const Component_purge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -3820,6 +3872,7 @@ export const Component_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -3882,6 +3935,7 @@ export const Component_retract = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -3949,6 +4003,7 @@ export const Component_reviseDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -3996,6 +4051,7 @@ export const Component_setServesPerYield = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -4045,6 +4101,7 @@ export const Component_setStorageWindow = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -4110,6 +4167,7 @@ export const ComponentComponent_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -4135,6 +4193,7 @@ export const ComponentComponent_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -4228,6 +4287,7 @@ export const ComponentComponent_adjustQuantity = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -4276,6 +4336,7 @@ export const ComponentComponent_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -4338,6 +4399,7 @@ export const ComponentImport_approveReview = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -4400,6 +4462,7 @@ export const ComponentImport_beginFinalization = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -4460,6 +4523,7 @@ export const ComponentImport_beginReview = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -4522,6 +4586,7 @@ export const ComponentImport_cancel = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -4596,6 +4661,7 @@ export const ComponentImport_complete = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -4662,6 +4728,7 @@ export const ComponentImport_markFailed = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -4710,6 +4777,7 @@ export const ComponentImport_recordComponent = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -4793,6 +4861,7 @@ export const ComponentImport_recordParse = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -4843,6 +4912,7 @@ export const ComponentImport_recordResolutionProgress = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -4905,6 +4975,7 @@ export const ComponentImport_resumeReview = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -4973,6 +5044,7 @@ export const ComponentImport_reviseReview = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5049,6 +5121,7 @@ export const ComponentImport_upload = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5073,6 +5146,7 @@ export const ComponentImport_createViaUpload = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5166,6 +5240,7 @@ export const ComponentImportLine_attachCreatedIngredient = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5219,6 +5294,7 @@ export const ComponentImportLine_confirmExisting = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5267,6 +5343,7 @@ export const ComponentImportLine_confirmNew = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5314,6 +5391,7 @@ export const ComponentImportLine_discard = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5362,6 +5440,7 @@ export const ComponentImportLine_markNew = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5410,6 +5489,7 @@ export const ComponentImportLine_resetResolution = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5469,6 +5549,7 @@ export const ComponentImportLine_reviseMeasurements = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5535,6 +5616,7 @@ export const ComponentImportLine_stage = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5559,6 +5641,7 @@ export const ComponentImportLine_createViaStage = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5651,6 +5734,7 @@ export const ComponentImportLine_suggestExactMatch = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5700,6 +5784,7 @@ export const ComponentImportLine_suggestPossibleMatches = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5768,6 +5853,7 @@ export const ComponentIngredient_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5792,6 +5878,7 @@ export const ComponentIngredient_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5903,6 +5990,7 @@ export const ComponentIngredient_adjustQuantity = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -5960,6 +6048,7 @@ export const ComponentIngredient_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6008,6 +6097,7 @@ export const ComponentIngredient_setWasteFactor = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6069,6 +6159,7 @@ export const ComponentPortionSpec_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6092,6 +6183,7 @@ export const ComponentPortionSpec_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6178,6 +6270,7 @@ export const ComponentPortionSpec_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6235,6 +6328,7 @@ export const ComponentPortionSpec_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6293,6 +6387,7 @@ export const ComponentSnapshot_capture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6314,6 +6409,7 @@ export const ComponentSnapshot_createViaCapture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6405,6 +6501,7 @@ export const ComponentStep_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6426,6 +6523,7 @@ export const ComponentStep_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6507,6 +6605,7 @@ export const ComponentStep_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6560,6 +6659,7 @@ export const ComponentStep_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6630,6 +6730,7 @@ export const Contract_draft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6654,6 +6755,7 @@ export const Contract_createViaDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6758,6 +6860,7 @@ export const Contract_expire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6817,6 +6920,7 @@ export const Contract_markViewed = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6879,6 +6983,7 @@ export const Contract_markVoided = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6938,6 +7043,7 @@ export const Contract_reassignClient = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -6999,6 +7105,7 @@ export const Contract_send = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -7062,6 +7169,7 @@ export const Contract_sign = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -7115,6 +7223,7 @@ export const Contract_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -7183,6 +7292,7 @@ export const CorrectiveAction_close = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -7241,6 +7351,7 @@ export const CorrectiveAction_open = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -7261,6 +7372,7 @@ export const CorrectiveAction_createViaOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -7408,6 +7520,7 @@ export const CreditMemo_issue = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -7433,6 +7546,7 @@ export const CreditMemo_createViaIssue = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -7566,6 +7680,7 @@ export const CreditMemo_reassignClient = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -7619,6 +7734,7 @@ export const CreditMemo_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -7663,6 +7779,7 @@ export const CutoverDecision_create = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -7703,6 +7820,7 @@ export const CutoverDecision_execute = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -7743,6 +7861,7 @@ export const CutoverDecision_recordApprovals = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -7783,6 +7902,7 @@ export const CutoverDecision_rollback = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -7820,6 +7940,7 @@ export const CutoverDecision_setTppReadOnly = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -7886,6 +8007,7 @@ export const Delivery_cancel = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -7951,6 +8073,7 @@ export const Delivery_confirmDelivery = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8018,6 +8141,7 @@ export const Delivery_markFailed = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8092,6 +8216,7 @@ export const Delivery_schedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8116,6 +8241,7 @@ export const Delivery_createViaSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8232,6 +8358,7 @@ export const Delivery_standDownWithEvent = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8298,6 +8425,7 @@ export const Delivery_startTransit = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8345,6 +8473,7 @@ export const Dish_classifyAllergens = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8391,6 +8520,7 @@ export const Dish_classifyKind = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8438,6 +8568,7 @@ export const Dish_clearPrimaryImage = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8504,6 +8635,7 @@ export const Dish_introduce = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8530,6 +8662,7 @@ export const Dish_createViaIntroduce = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8627,6 +8760,7 @@ export const Dish_linkAsEdition = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8694,6 +8828,7 @@ export const Dish_mergeInto = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8755,6 +8890,7 @@ export const Dish_purge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8816,6 +8952,7 @@ export const Dish_reinstate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8879,6 +9016,7 @@ export const Dish_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8937,6 +9075,7 @@ export const Dish_reviseDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -8990,6 +9129,7 @@ export const Dish_saveRecipe = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -9040,6 +9180,7 @@ export const Dish_saveServiceInstructions = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -9090,6 +9231,7 @@ export const Dish_setPrimaryImage = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -9142,6 +9284,7 @@ export const Dish_updatePortioning = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -9233,6 +9376,7 @@ export const DishComponent_attach = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -9256,6 +9400,7 @@ export const DishComponent_createViaAttach = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -9389,6 +9534,7 @@ export const DishComponent_detach = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -9441,6 +9587,7 @@ export const DishComponent_setPortionSpec = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -9514,6 +9661,7 @@ export const DishContainer_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -9540,6 +9688,7 @@ export const DishContainer_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -9630,6 +9779,7 @@ export const DishContainer_refreshActiveKey = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -9701,6 +9851,7 @@ export const DishContainer_reinstate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -9768,6 +9919,7 @@ export const DishContainer_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -9842,6 +9994,7 @@ export const DishContainer_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -9931,6 +10084,7 @@ export const DishIngredient_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -9955,6 +10109,7 @@ export const DishIngredient_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -10099,6 +10254,7 @@ export const DishIngredient_adjustQuantity = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -10156,6 +10312,7 @@ export const DishIngredient_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -10234,6 +10391,7 @@ export const DishTask_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -10263,6 +10421,7 @@ export const DishTask_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -10356,6 +10515,7 @@ export const DishTask_backfillActiveKey = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -10419,6 +10579,7 @@ export const DishTask_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -10492,6 +10653,7 @@ export const DishTask_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -10553,6 +10715,7 @@ export const DishTask_specifyWork = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -10613,6 +10776,7 @@ export const DishTaskMaterial_link = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -10636,6 +10800,7 @@ export const DishTaskMaterial_createViaLink = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -10721,6 +10886,7 @@ export const DishTaskMaterial_unlink = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -10777,6 +10943,7 @@ export const EmailNotificationSubscription_configure = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -10798,6 +10965,7 @@ export const EmailNotificationSubscription_createViaConfigure = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -10885,6 +11053,7 @@ export const EmailNotificationSubscription_updateSubscriptions = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -10946,6 +11115,7 @@ export const Equipment_reactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -10995,6 +11165,7 @@ export const Equipment_recount = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -11060,6 +11231,7 @@ export const Equipment_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -11084,6 +11256,7 @@ export const Equipment_createViaRegister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -11191,6 +11364,7 @@ export const Equipment_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -11252,6 +11426,7 @@ export const Equipment_reviseDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -11302,6 +11477,7 @@ export const Equipment_updateCondition = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -11353,6 +11529,7 @@ export const EquipmentMaintenanceTask_applyService = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -11414,6 +11591,7 @@ export const EquipmentMaintenanceTask_schedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -11436,6 +11614,7 @@ export const EquipmentMaintenanceTask_createViaSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -11534,6 +11713,7 @@ export const EquipmentReservation_cancel = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -11600,6 +11780,7 @@ export const EquipmentReservation_checkOut = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -11671,6 +11852,7 @@ export const EquipmentReservation_markReturned = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -11744,6 +11926,7 @@ export const EquipmentServiceEntry_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -11768,6 +11951,7 @@ export const EquipmentServiceEntry_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -11964,6 +12148,7 @@ export const Event_approve = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -12017,6 +12202,7 @@ export const Event_archive = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -12069,6 +12255,7 @@ export const Event_assignOwner = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -12132,6 +12319,7 @@ export const Event_beginExecution = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -12219,6 +12407,7 @@ export const Event_cancel = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -12324,6 +12513,7 @@ export const Event_captureDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -12382,6 +12572,7 @@ export const Event_changeHeadcount = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -12436,6 +12627,7 @@ export const Event_changePricing = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -12491,6 +12683,7 @@ export const Event_changePrimaryContact = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -12545,6 +12738,7 @@ export const Event_changeRequirements = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -12615,6 +12809,7 @@ export const Event_changeServiceStyle = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -12672,6 +12867,7 @@ export const Event_changeVenue = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -12721,6 +12917,7 @@ export const Event_clearBinderBuilt = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -12818,6 +13015,7 @@ export const Event_closeOut = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -12897,6 +13095,7 @@ export const Event_complete = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -12970,6 +13169,7 @@ export const Event_configureRecurrence = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -13040,6 +13240,7 @@ export const Event_configureTiming = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -13103,6 +13304,7 @@ export const Event_confirmSalesLock = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -13159,6 +13361,7 @@ export const Event_correctCommercial = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -13222,6 +13425,7 @@ export const Event_finalizeEvent = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -13290,6 +13494,7 @@ export const Event_lockForSales = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -13338,6 +13543,7 @@ export const Event_markBinderBuilt = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -13390,6 +13596,7 @@ export const Event_normalizePurchasingWeek = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -13513,6 +13720,7 @@ export const Event_planEngagement = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -13556,6 +13764,7 @@ export const Event_createViaPlanEngagement = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -13696,6 +13905,7 @@ export const Event_reactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -13758,6 +13968,7 @@ export const Event_reassignClient = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -13819,6 +14030,7 @@ export const Event_reschedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -13884,6 +14096,7 @@ export const Event_returnToPlanning = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -13933,6 +14146,7 @@ export const Event_setEventNumber = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -13989,6 +14203,7 @@ export const Event_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -14040,6 +14255,7 @@ export const Event_stopRecurrence = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -14102,6 +14318,7 @@ export const Event_submitForApproval = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -14181,6 +14398,7 @@ export const Event_updateDaySheet = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -14281,6 +14499,7 @@ export const Event_updateImportDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -14340,6 +14559,7 @@ export const Event_updateSetupNotes = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -14405,6 +14625,7 @@ export const Event_updateTaskBreakdown = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -14487,6 +14708,7 @@ export const EventAllergenCheck_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -14510,6 +14732,7 @@ export const EventAllergenCheck_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -14626,6 +14849,7 @@ export const EventAssignment_applyApprovedShiftSwap = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -14699,6 +14923,7 @@ export const EventAssignment_assign = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -14722,6 +14947,7 @@ export const EventAssignment_createViaAssign = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -14835,6 +15061,7 @@ export const EventAssignment_checkIn = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -14900,6 +15127,7 @@ export const EventAssignment_checkOut = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -14965,6 +15193,7 @@ export const EventAssignment_confirm = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -15029,6 +15258,7 @@ export const EventAssignment_markNoShow = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -15085,6 +15315,7 @@ export const EventAssignment_planTiming = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -15149,6 +15380,7 @@ export const EventAssignment_unassign = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -15240,6 +15472,7 @@ export const EventCloseout_capture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -15274,6 +15507,7 @@ export const EventCloseout_createViaCapture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -15403,6 +15637,7 @@ export const EventCloseout_finalize = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -15458,6 +15693,7 @@ export const EventCloseout_followEventCommercial = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -15624,6 +15860,7 @@ export const EventDish_addToEvent = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -15649,6 +15886,7 @@ export const EventDish_createViaAddToEvent = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -15856,6 +16094,7 @@ export const EventDish_adjustServings = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -15909,6 +16148,7 @@ export const EventDish_changeCourse = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -16032,6 +16272,7 @@ export const EventDish_confirmFromProposal = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -16072,6 +16313,7 @@ export const EventDish_refreshRecipeSync = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -16137,6 +16379,7 @@ export const EventDish_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -16184,6 +16427,7 @@ export const EventDish_reorder = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -16238,6 +16482,7 @@ export const EventDish_requestCatalogPacking = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -16318,6 +16563,7 @@ export const EventDish_requestContainerPack = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -16387,6 +16633,7 @@ export const EventDish_setHeadcountOverride = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -16453,6 +16700,7 @@ export const EventDish_syncHeadcount = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -16504,6 +16752,7 @@ export const EventDish_updateInstructions = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -16575,6 +16824,7 @@ export const EventDishComponentSeed_refresh = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -16611,6 +16861,7 @@ export const EventDishComponentSeed_refreshRecipeSync = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -16647,6 +16898,7 @@ export const EventDishComponentSeed_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -16673,8 +16925,9 @@ async function __runEventDishComponentSeedSeed(ctx: MutationCtx, { docId, eventI
     ((doc as any) as any).component = __rel_component;
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Guard 0 failed");
     if (!((((__rel_event != null) && (__rel_eventDish != null)) && (__rel_component != null)))) throw new Error("Guard 1 failed");
-    if (!((doc.seededAt == null))) throw new Error("Guard 2 failed");
-    if (!((doc.deletedAt == null))) throw new Error("Guard 3 failed");
+    if (!(((((eventId === doc.eventId) && (eventDishId === doc.eventDishId)) && (dishId === doc.dishId)) && (componentId === doc.componentId)))) throw new Error("Guard 2 failed");
+    if (!((doc.seededAt == null))) throw new Error("Guard 3 failed");
+    if (!((doc.deletedAt == null))) throw new Error("Guard 4 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -16742,6 +16995,7 @@ export const EventDishComponentSeed_seed = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -16767,6 +17021,7 @@ export const EventDishComponentSeed_createViaSeed = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -16792,8 +17047,9 @@ export const EventDishComponentSeed_createViaSeed = mutation({
     const __rel_component = await __resolveRelation(ctx, "components", [__auth.tenantId, __draft.componentId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Guard 0 failed");
     if (!((((__rel_event != null) && (__rel_eventDish != null)) && (__rel_component != null)))) throw new Error("Guard 1 failed");
-    if (!((__draft.seededAt == null))) throw new Error("Guard 2 failed");
-    if (!((__draft.deletedAt == null))) throw new Error("Guard 3 failed");
+    if (!(((((eventId === __draft.eventId) && (eventDishId === __draft.eventDishId)) && (dishId === __draft.dishId)) && (componentId === __draft.componentId)))) throw new Error("Guard 2 failed");
+    if (!((__draft.seededAt == null))) throw new Error("Guard 3 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 4 failed");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -16913,6 +17169,7 @@ export const EventDishLineOverride_apply = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -16943,6 +17200,7 @@ export const EventDishLineOverride_createViaApply = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -17046,6 +17304,7 @@ export const EventDishLineOverride_revoke = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -17096,6 +17355,7 @@ export const EventGuest_assignTable = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -17146,6 +17406,7 @@ export const EventGuest_checkIn = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -17224,6 +17485,7 @@ export const EventGuest_invite = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -17249,6 +17511,7 @@ export const EventGuest_createViaInvite = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -17354,6 +17617,7 @@ export const EventGuest_rsvpConfirm = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -17417,6 +17681,7 @@ export const EventGuest_rsvpDecline = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -17466,6 +17731,7 @@ export const EventGuest_withdraw = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -17624,6 +17890,7 @@ export const EventIngredientContribution_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -17662,6 +17929,7 @@ export const EventIngredientContribution_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -17838,6 +18106,7 @@ export const EventIngredientContribution_refreshRecipeSync = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -17952,6 +18221,7 @@ export const EventIngredientContribution_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -18065,6 +18335,7 @@ export const EventIngredientContribution_retirePreviousUnit = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -18182,6 +18453,7 @@ export const EventIngredientContribution_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -18299,6 +18571,7 @@ export const EventIngredientContribution_supersede = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -18355,6 +18628,7 @@ export const EventLayoutSection_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -18376,6 +18650,7 @@ export const EventLayoutSection_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -18454,6 +18729,7 @@ export const EventLayoutSection_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -18507,6 +18783,7 @@ export const EventLayoutSection_update = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -18562,6 +18839,7 @@ export const EventStaffNeed_applyApprovedShiftSwap = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -18625,6 +18903,7 @@ export const EventStaffNeed_cancel = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -18696,6 +18975,7 @@ export const EventStaffNeed_changeCoverage = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -18759,6 +19039,7 @@ export const EventStaffNeed_claim = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -18823,6 +19104,7 @@ export const EventStaffNeed_fill = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -18877,6 +19159,7 @@ export const EventStaffNeed_planTiming = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -18957,6 +19240,7 @@ export const EventStaffNeed_postOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -18983,6 +19267,7 @@ export const EventStaffNeed_createViaPostOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -19077,6 +19362,7 @@ export const EventStaffNeed_prepareCoverageContinuation = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -19138,6 +19424,7 @@ export const EventStaffNeed_releaseClaim = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -19201,6 +19488,7 @@ export const EventTemplate_archive = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -19268,6 +19556,7 @@ export const EventTemplate_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -19294,6 +19583,7 @@ export const EventTemplate_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -19399,6 +19689,7 @@ export const EventTemplate_reactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -19464,6 +19755,7 @@ export const EventTemplate_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -19539,6 +19831,7 @@ export const EventTimelineActivity_adjust = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -19587,6 +19880,7 @@ export const EventTimelineActivity_complete = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -19646,6 +19940,7 @@ export const EventTimelineActivity_planTiming = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -19692,6 +19987,7 @@ export const EventTimelineActivity_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -19738,6 +20034,7 @@ export const EventTimelineActivity_reopen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -19810,6 +20107,7 @@ export const EventTimelineActivity_schedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -19838,6 +20136,7 @@ export const EventTimelineActivity_createViaSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -19938,6 +20237,7 @@ export const EventTimelineActivity_useCalculatedTiming = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -19996,6 +20296,7 @@ export const EventTimelineComment_post = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20016,6 +20317,7 @@ export const EventTimelineComment_createViaPost = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20097,6 +20399,7 @@ export const EventTimelineComment_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20169,6 +20472,7 @@ export const EventVehicleAssignment_assign = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20192,6 +20496,7 @@ export const EventVehicleAssignment_createViaAssign = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20282,6 +20587,7 @@ export const EventVehicleAssignment_clearPreloaded = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20329,6 +20635,7 @@ export const EventVehicleAssignment_markPreloaded = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20377,6 +20684,7 @@ export const EventVehicleAssignment_release = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20426,6 +20734,7 @@ export const ExternalRecordLink_decide = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20474,6 +20783,7 @@ export const ExternalRecordLink_discard = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20563,6 +20873,7 @@ export const ExternalRecordLink_link = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20598,6 +20909,7 @@ export const ExternalRecordLink_createViaLink = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20711,6 +21023,7 @@ export const ExternalRecordLink_observe = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20758,6 +21071,7 @@ export const ExternalRecordLink_recordApplied = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20809,6 +21123,7 @@ export const ExternalRecordLink_resolveConflict = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20859,6 +21174,7 @@ export const ExternalRecordLink_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20908,6 +21224,7 @@ export const ExternalRecordLink_unlinkExternalRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -20959,6 +21276,7 @@ export const ExternalRecordLink_updateCapsuleId = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21012,6 +21330,7 @@ export const ExternalRecordLink_verifyLink = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21067,6 +21386,7 @@ export const ImportArtifact_classify = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21118,6 +21438,7 @@ export const ImportArtifact_recordParse = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21186,6 +21507,7 @@ export const ImportArtifact_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21258,6 +21580,7 @@ export const ImportConflict_raise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21281,6 +21604,7 @@ export const ImportConflict_createViaRaise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21383,6 +21707,7 @@ export const ImportConflict_settle = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21442,6 +21767,7 @@ export const ImportConflict_updateSource = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21487,6 +21813,7 @@ export const ImportDataset_activate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21532,6 +21859,7 @@ export const ImportDataset_deactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21579,6 +21907,7 @@ export const ImportDataset_recordLastImport = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21645,6 +21974,7 @@ export const ImportDataset_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21698,6 +22028,7 @@ export const ImportDataset_updateConfig = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21762,6 +22093,7 @@ export const ImportRun_approveReview = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21823,6 +22155,7 @@ export const ImportRun_beginReview = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21889,6 +22222,7 @@ export const ImportRun_commit = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -21939,6 +22273,7 @@ export const ImportRun_explainArchiveDiscrepancy = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22004,6 +22339,7 @@ export const ImportRun_markFailed = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22065,6 +22401,7 @@ export const ImportRun_recordArchiveInventory = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22115,6 +22452,7 @@ export const ImportRun_recordCommitCheckpoint = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22168,6 +22506,7 @@ export const ImportRun_recordDispositionSummary = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22231,6 +22570,7 @@ export const ImportRun_recordParse = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22293,6 +22633,7 @@ export const ImportRun_revert = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22359,6 +22700,7 @@ export const ImportRun_start = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22420,6 +22762,7 @@ export const ImportRun_validate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22481,6 +22824,7 @@ export const Incident_beginInvestigation = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22526,6 +22870,7 @@ export const Incident_clearCorrectiveActionLock = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22592,6 +22937,7 @@ export const Incident_dismiss = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22657,6 +23003,7 @@ export const Incident_markResolved = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22729,6 +23076,7 @@ export const Incident_report = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22753,6 +23101,7 @@ export const Incident_createViaReport = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22851,6 +23200,7 @@ export const Ingredient_classifyAllergens = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22898,6 +23248,7 @@ export const Ingredient_clearPrimaryImage = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -22940,6 +23291,7 @@ export const Ingredient_configureSubstitutes = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23003,6 +23355,7 @@ export const Ingredient_discontinue = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23065,6 +23418,7 @@ export const Ingredient_introduce = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23089,6 +23443,7 @@ export const Ingredient_createViaIntroduce = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23184,6 +23539,7 @@ export const Ingredient_linkAsEdition = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23251,6 +23607,7 @@ export const Ingredient_mergeInto = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23312,6 +23669,7 @@ export const Ingredient_purge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23373,6 +23731,7 @@ export const Ingredient_reinstate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23445,6 +23804,7 @@ export const Ingredient_setNutrition = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23487,6 +23847,7 @@ export const Ingredient_setPreferredVendor = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23531,6 +23892,7 @@ export const Ingredient_setPreferredVendors = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23581,6 +23943,7 @@ export const Ingredient_setPrimaryImage = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23631,6 +23994,7 @@ export const Ingredient_updateCosting = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23683,6 +24047,7 @@ export const Ingredient_updateDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23728,6 +24093,7 @@ export const IngredientDemand_alignPurchasingWeek = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23827,6 +24193,7 @@ export const IngredientDemand_calculate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23853,6 +24220,7 @@ export const IngredientDemand_createViaCalculate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -23983,6 +24351,7 @@ export const IngredientDemand_confirm = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -24027,6 +24396,7 @@ export const IngredientDemand_ensurePurchaseEligible = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -24088,6 +24458,7 @@ export const IngredientDemand_fulfill = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -24151,6 +24522,7 @@ export const IngredientDemand_markReleased = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -24204,6 +24576,7 @@ export const IngredientDemand_recalculate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -24270,6 +24643,7 @@ export const IngredientDemand_supersede = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -24372,6 +24746,7 @@ export const IngredientDemand_syncFromContributions = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -24432,6 +24807,7 @@ export const IngredientPriceObservation_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -24457,6 +24833,7 @@ export const IngredientPriceObservation_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -24565,6 +24942,7 @@ export const IntegrationConnection_authorize = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -24587,6 +24965,7 @@ export const IntegrationConnection_createViaAuthorize = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -24687,6 +25066,7 @@ export const IntegrationConnection_disconnect = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -24758,6 +25138,7 @@ export const IntegrationConnection_markConnected = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -24819,6 +25200,7 @@ export const IntegrationConnection_reauthorize = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -24881,6 +25263,7 @@ export const IntegrationConnection_recordFailure = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -24942,6 +25325,7 @@ export const IntegrationConnection_recordSyncSuccess = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -24994,6 +25378,7 @@ export const Interview_recordOutcome = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -25056,6 +25441,7 @@ export const Interview_schedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -25079,6 +25465,7 @@ export const Interview_createViaSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -25170,6 +25557,7 @@ export const InventoryItem_adjustQuantity = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -25234,6 +25622,7 @@ export const InventoryItem_applyReceiptCorrection = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -25304,6 +25693,7 @@ export const InventoryItem_open = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -25328,6 +25718,7 @@ export const InventoryItem_createViaOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -25441,6 +25832,7 @@ export const InventoryItem_receiveDelivery = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -25494,6 +25886,7 @@ export const InventoryItem_receiveStock = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -25543,6 +25936,7 @@ export const InventoryItem_recount = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -25597,6 +25991,7 @@ export const InventoryItem_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -25647,6 +26042,7 @@ export const InventoryItem_setExpiry = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -25698,6 +26094,7 @@ export const InventoryItem_transferIn = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -25750,6 +26147,7 @@ export const InventoryItem_transferOut = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -25805,6 +26203,7 @@ export const InventoryItem_updateLevels = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -25905,6 +26304,7 @@ export const InventoryLot_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -25934,6 +26334,7 @@ export const InventoryLot_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -26078,6 +26479,7 @@ export const InventoryReservation_consume = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -26142,6 +26544,7 @@ export const InventoryReservation_release = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -26232,6 +26635,7 @@ export const InventoryReservation_reserve = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -26254,6 +26658,7 @@ export const InventoryReservation_createViaReserve = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -26354,6 +26759,7 @@ export const InventorySettings_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -26372,6 +26778,7 @@ export const InventorySettings_createViaRegister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -26435,6 +26842,7 @@ export const InventorySettings_setStockTracking = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -26504,6 +26912,7 @@ export const Invoice_applyCredit = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -26571,6 +26980,7 @@ export const Invoice_applyPayment = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -26620,6 +27030,7 @@ export const Invoice_assignNumber = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -26675,6 +27086,7 @@ export const Invoice_followEventPrice = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -26769,6 +27181,7 @@ export const Invoice_issue = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -26801,6 +27214,7 @@ export const Invoice_createViaIssue = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -26938,6 +27352,7 @@ export const Invoice_markDepositPaid = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -26998,6 +27413,7 @@ export const Invoice_markOverdue = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -27057,6 +27473,7 @@ export const Invoice_markViewed = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -27120,6 +27537,7 @@ export const Invoice_markVoided = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -27179,6 +27597,7 @@ export const Invoice_reassignClient = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -27232,6 +27651,7 @@ export const Invoice_recordCreditMemo = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -27300,6 +27720,7 @@ export const Invoice_recordRefund = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -27361,6 +27782,7 @@ export const Invoice_send = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -27408,6 +27830,7 @@ export const Invoice_sendBalanceReminder = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -27460,6 +27883,7 @@ export const Invoice_setDeposit = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -27513,6 +27937,7 @@ export const Invoice_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -27579,6 +28004,7 @@ export const Invoice_writeOff = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -27646,6 +28072,7 @@ export const ItemUnitMapping_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -27672,6 +28099,7 @@ export const ItemUnitMapping_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -27764,6 +28192,7 @@ export const ItemUnitMapping_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -27839,6 +28268,7 @@ export const Lead_capture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -27867,6 +28297,7 @@ export const Lead_createViaCapture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -27972,6 +28403,7 @@ export const Lead_confirmConversion = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28027,6 +28459,7 @@ export const Lead_confirmProposalSent = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28094,6 +28527,7 @@ export const Lead_reviseDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28140,6 +28574,7 @@ export const Lead_stageConversion = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28185,6 +28620,7 @@ export const Lead_stageProposal = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28241,6 +28677,7 @@ export const Lead_updatePipeline = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28304,6 +28741,7 @@ export const Menu_archive = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28369,6 +28807,7 @@ export const Menu_draft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28394,6 +28833,7 @@ export const Menu_createViaDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28498,6 +28938,7 @@ export const Menu_markPublished = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28560,6 +29001,7 @@ export const Menu_restore = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28614,6 +29056,7 @@ export const Menu_reviseDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28676,6 +29119,7 @@ export const Menu_unpublish = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28732,6 +29176,7 @@ export const Menu_updatePricing = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28797,6 +29242,7 @@ export const MenuDish_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28821,6 +29267,7 @@ export const MenuDish_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28914,6 +29361,7 @@ export const MenuDish_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -28970,6 +29418,7 @@ export const MenuDish_updateDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29023,6 +29472,7 @@ export const MenuDish_updateSellingPrice = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29086,6 +29536,7 @@ export const Message_post = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29111,6 +29562,7 @@ export const Message_createViaPost = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29198,6 +29650,7 @@ export const Message_setDelivery = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29257,6 +29710,7 @@ export const MessageThread_create = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29304,6 +29758,7 @@ export const MessageThread_linkContact = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29351,6 +29806,7 @@ export const MessageThread_linkLead = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29398,6 +29854,7 @@ export const MessageThread_setStatus = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29459,6 +29916,7 @@ export const Occasion_activate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29522,6 +29980,7 @@ export const Occasion_deactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29592,6 +30051,7 @@ export const Occasion_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29613,6 +30073,7 @@ export const Occasion_createViaRegister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29703,6 +30164,7 @@ export const Occasion_reviseDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29766,6 +30228,7 @@ export const OneOnOne_hold = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29791,6 +30254,7 @@ export const OneOnOne_createViaHold = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29890,6 +30354,7 @@ export const OneOnOneAction_capture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -29911,6 +30376,7 @@ export const OneOnOneAction_createViaCapture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30008,6 +30474,7 @@ export const OneOnOneAction_close = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30060,6 +30527,7 @@ export const Organization_configureBranding = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30118,6 +30586,7 @@ export const Organization_deactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30176,6 +30645,7 @@ export const Organization_reactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30232,6 +30702,7 @@ export const Organization_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30254,6 +30725,7 @@ export const Organization_createViaRegister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30337,6 +30809,7 @@ export const Organization_rename = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30384,6 +30857,7 @@ export const Organization_setBrandLogo = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30432,6 +30906,7 @@ export const Organization_setDefaultCurrency = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30491,6 +30966,7 @@ export const Organization_suspend = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30538,6 +31014,7 @@ export const OrganizationCapabilitySetting_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30557,6 +31034,7 @@ export const OrganizationCapabilitySetting_createViaRegister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30625,6 +31103,7 @@ export const OrganizationCapabilitySetting_setEnabled = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30679,6 +31158,7 @@ export const PackList_acknowledgePackingRequirement = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30756,6 +31236,7 @@ export const PackList_applyServiceStyleKit = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30823,6 +31304,7 @@ export const PackList_cancel = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30887,6 +31369,7 @@ export const PackList_dispatch = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -30950,6 +31433,7 @@ export const PackList_markLoaded = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -31036,6 +31520,7 @@ export const PackList_markPacked = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -31139,6 +31624,7 @@ export const PackList_open = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -31160,6 +31646,7 @@ export const PackList_createViaOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -31287,6 +31774,7 @@ export const PackList_requestAssistance = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -31370,6 +31858,7 @@ export const PackList_requestDishContainers = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -31419,6 +31908,7 @@ export const PackList_resolveAssistance = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -31487,6 +31977,7 @@ export const PackList_standDownWithEvent = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -31550,6 +32041,7 @@ export const PackList_startPacking = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -31631,6 +32123,7 @@ export const PackListItem_addItem = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -31654,6 +32147,7 @@ export const PackListItem_createViaAddItem = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -31755,6 +32249,7 @@ export const PackListItem_adjustQuantity = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -31833,6 +32328,7 @@ export const PackListItem_adoptContainerLink = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -31879,6 +32375,7 @@ export const PackListItem_annotate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -31941,6 +32438,7 @@ export const PackListItem_correctImportedFluidOunces = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -32025,6 +32523,7 @@ export const PackListItem_ensureContainer = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -32104,6 +32603,7 @@ export const PackListItem_ensureKitItem = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -32168,6 +32668,7 @@ export const PackListItem_markMissing = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -32239,6 +32740,7 @@ export const PackListItem_markPacked = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -32294,6 +32796,7 @@ export const PackListItem_recordPackedCount = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -32340,6 +32843,7 @@ export const PackListItem_recordSentInstead = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -32388,6 +32892,7 @@ export const PackListItem_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -32461,6 +32966,7 @@ export const PackListItem_restoreImportedAssociation = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -32528,6 +33034,7 @@ export const PackListItem_syncContainerServings = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -32590,6 +33097,7 @@ export const PackListTemplate_archive = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -32654,6 +33162,7 @@ export const PackListTemplate_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -32679,6 +33188,7 @@ export const PackListTemplate_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -32781,6 +33291,7 @@ export const PackListTemplate_reactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -32845,6 +33356,7 @@ export const PackListTemplate_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -32904,6 +33416,7 @@ export const Payment_beginProcessing = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -32953,6 +33466,7 @@ export const Payment_disputeReconciliation = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33016,6 +33530,7 @@ export const Payment_fail = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33071,6 +33586,7 @@ export const Payment_markMatched = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33130,6 +33646,7 @@ export const Payment_reassignClient = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33200,6 +33717,7 @@ export const Payment_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33224,6 +33742,7 @@ export const Payment_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33333,6 +33852,7 @@ export const Payment_refund = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33396,6 +33916,7 @@ export const Payment_settle = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33449,6 +33970,7 @@ export const Payment_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33496,6 +34018,7 @@ export const Payment_updateProviderTransactionIds = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33547,6 +34070,7 @@ export const Payment_verifyReconciliation = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33594,6 +34118,7 @@ export const PaymentMethod_clearDefault = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33653,6 +34178,7 @@ export const PaymentMethod_expire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33715,6 +34241,7 @@ export const PaymentMethod_invalidate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33762,6 +34289,7 @@ export const PaymentMethod_makeDefault = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33821,6 +34349,7 @@ export const PaymentMethod_reactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33880,6 +34409,7 @@ export const PaymentMethod_reassignClient = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33944,6 +34474,7 @@ export const PaymentMethod_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -33967,6 +34498,7 @@ export const PaymentMethod_createViaRegister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -34068,6 +34600,7 @@ export const PaymentMethod_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -34121,6 +34654,7 @@ export const PaymentMethod_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -34185,6 +34719,7 @@ export const PayrollInput_finalize = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -34251,6 +34786,7 @@ export const PayrollInput_markVoided = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -34349,6 +34885,7 @@ export const PayrollInput_prepare = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -34378,6 +34915,7 @@ export const PayrollInput_createViaPrepare = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -34510,6 +35048,7 @@ export const PerformanceReview_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -34535,6 +35074,7 @@ export const PerformanceReview_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -34634,6 +35174,7 @@ export const Person_assignRole = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -34693,6 +35234,7 @@ export const Person_changeAddress = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -34745,6 +35287,7 @@ export const Person_correctEmail = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -34802,6 +35345,7 @@ export const Person_correctIdentity = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -34864,6 +35408,7 @@ export const Person_deactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -34933,6 +35478,7 @@ export const Person_hire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -34958,6 +35504,7 @@ export const Person_createViaHire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -35056,6 +35603,7 @@ export const Person_linkAccount = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -35118,6 +35666,7 @@ export const Person_reactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -35169,6 +35718,7 @@ export const Person_setEmployeeNumber = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -35220,6 +35770,7 @@ export const Person_setPayRate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -35270,6 +35821,7 @@ export const Person_setSmsAlerts = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -35335,6 +35887,7 @@ export const Person_terminate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -35386,6 +35939,7 @@ export const Person_unlinkAccount = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -35453,6 +36007,7 @@ export const PrepTask_assign = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -35517,6 +36072,7 @@ export const PrepTask_cancel = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -35581,6 +36137,7 @@ export const PrepTask_claim = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -35652,6 +36209,7 @@ export const PrepTask_complete = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -35703,6 +36261,7 @@ export const PrepTask_linkRecipe = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -35767,6 +36326,7 @@ export const PrepTask_markBlocked = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -35823,6 +36383,7 @@ export const PrepTask_markOverride = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -35921,6 +36482,7 @@ export const PrepTask_open = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -35957,6 +36519,7 @@ export const PrepTask_createViaOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -36113,6 +36676,7 @@ export const PrepTask_reconcileRemainingWork = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -36166,6 +36730,7 @@ export const PrepTask_refreshGenerated = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -36228,6 +36793,7 @@ export const PrepTask_refreshRecipeTemplate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -36292,6 +36858,7 @@ export const PrepTask_release = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -36336,6 +36903,7 @@ export const PrepTask_replaceRecipeComponent = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -36386,6 +36954,7 @@ export const PrepTask_resolveChoice = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -36450,6 +37019,7 @@ export const PrepTask_retireWithTemplate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -36514,6 +37084,7 @@ export const PrepTask_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -36558,6 +37129,7 @@ export const PrepTask_setChoice = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -36622,6 +37194,7 @@ export const PrepTask_standDown = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -36688,6 +37261,7 @@ export const PrepTask_start = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -36753,6 +37327,7 @@ export const PrepTask_unblock = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -36802,6 +37377,7 @@ export const PrepTaskComment_edit = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -36869,6 +37445,7 @@ export const PrepTaskComment_post = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -36893,6 +37470,7 @@ export const PrepTaskComment_createViaPost = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -36990,6 +37568,7 @@ export const PrepTaskDependency_declare = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37009,6 +37588,7 @@ export const PrepTaskDependency_createViaDeclare = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37080,6 +37660,7 @@ export const PrepTaskDependency_releaseRetiredRequirement = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37124,6 +37705,7 @@ export const PrepTaskDependency_satisfy = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37185,6 +37767,7 @@ export const PrepTaskMaterial_link = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37209,6 +37792,7 @@ export const PrepTaskMaterial_createViaLink = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37295,6 +37879,7 @@ export const PrepTaskMaterial_unlink = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37359,6 +37944,7 @@ export const ProductionBatch_cancel = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37429,6 +38015,7 @@ export const ProductionBatch_complete = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37492,6 +38079,7 @@ export const ProductionBatch_plan = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37514,6 +38102,7 @@ export const ProductionBatch_createViaPlan = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37614,6 +38203,7 @@ export const ProductionBatch_reconcilePlan = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37675,6 +38265,7 @@ export const ProductionBatch_start = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37738,6 +38329,7 @@ export const ProductionBatchAllocation_allocate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37762,6 +38354,7 @@ export const ProductionBatchAllocation_createViaAllocate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37857,6 +38450,7 @@ export const ProductionBatchAllocation_markPortioned = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37911,6 +38505,7 @@ export const ProductionBatchAllocation_markProduced = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -37968,6 +38563,7 @@ export const ProductionBatchAllocation_release = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -38058,6 +38654,7 @@ export const Proposal_accept = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -38106,6 +38703,7 @@ export const Proposal_confirmChangeSource = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -38165,6 +38763,7 @@ export const Proposal_decline = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -38258,6 +38857,7 @@ export const Proposal_draft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -38294,6 +38894,7 @@ export const Proposal_createViaDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -38423,6 +39024,7 @@ export const Proposal_expire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -38481,6 +39083,7 @@ export const Proposal_followEventHeadcount = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -38563,6 +39166,7 @@ export const Proposal_linkEvent = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -38622,6 +39226,7 @@ export const Proposal_markViewed = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -38681,6 +39286,7 @@ export const Proposal_reassignClient = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -38745,6 +39351,7 @@ export const Proposal_send = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -38798,6 +39405,7 @@ export const Proposal_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -38846,6 +39454,7 @@ export const Proposal_stageEventLink = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -38910,6 +39519,7 @@ export const Proposal_supersede = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -38962,6 +39572,7 @@ export const ProposalDishSelection_adjustServings = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -39012,6 +39623,7 @@ export const ProposalDishSelection_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -39083,6 +39695,7 @@ export const ProposalDishSelection_select = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -39107,6 +39720,7 @@ export const ProposalDishSelection_createViaSelect = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -39214,6 +39828,7 @@ export const ProposalEnhancement_offer = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -39236,6 +39851,7 @@ export const ProposalEnhancement_createViaOffer = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -39333,6 +39949,7 @@ export const ProposalEnhancement_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -39384,6 +40001,7 @@ export const ProposalEnhancement_withdraw = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -39459,6 +40077,7 @@ export const ProposalLineItem_addLine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -39487,6 +40106,7 @@ export const ProposalLineItem_createViaAddLine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -39588,6 +40208,7 @@ export const ProposalLineItem_removeLine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -39659,6 +40280,7 @@ export const ProposalLineItem_reviseLine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -39717,6 +40339,7 @@ export const ProposalRevision_capture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -39738,6 +40361,7 @@ export const ProposalRevision_createViaCapture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -39838,6 +40462,7 @@ export const ProposalTemplate_archive = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -39906,6 +40531,7 @@ export const ProposalTemplate_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -39931,6 +40557,7 @@ export const ProposalTemplate_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -40040,6 +40667,7 @@ export const ProposalTemplate_reactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -40109,6 +40737,7 @@ export const ProposalTemplate_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -40163,6 +40792,7 @@ export const PurchaseNeed_assignToDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -40227,6 +40857,7 @@ export const PurchaseNeed_cancel = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -40302,6 +40933,7 @@ export const PurchaseNeed_create = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -40368,6 +41000,7 @@ export const PurchaseNeed_markDraftOrdered = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -40429,6 +41062,7 @@ export const PurchaseNeed_markFulfilled = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -40495,6 +41129,7 @@ export const PurchaseNeed_markOrdered = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -40554,6 +41189,7 @@ export const PurchaseNeed_moveToWeek = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -40606,6 +41242,7 @@ export const PurchaseNeed_releaseCancelledDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -40671,6 +41308,7 @@ export const PurchaseNeed_reviseRequired = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -40736,6 +41374,7 @@ export const PurchaseNeed_standDownWithEvent = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -40794,6 +41433,7 @@ export const PushSubscription_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -40815,6 +41455,7 @@ export const PushSubscription_createViaRegister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -40896,6 +41537,7 @@ export const PushSubscription_unregister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -40961,6 +41603,7 @@ export const Qualification_expire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -41035,6 +41678,7 @@ export const Qualification_grant = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -41060,6 +41704,7 @@ export const Qualification_createViaGrant = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -41176,6 +41821,7 @@ export const Qualification_revoke = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -41245,6 +41891,7 @@ export const QualityCheck_fail = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -41301,6 +41948,7 @@ export const QualityCheck_open = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -41321,6 +41969,7 @@ export const QualityCheck_createViaOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -41421,6 +42070,7 @@ export const QualityCheck_pass = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -41485,6 +42135,7 @@ export const QualityCheck_reinspect = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -41540,6 +42191,7 @@ export const QuoteSubmission_complete = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -41630,6 +42282,7 @@ export const QuoteSubmission_create = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -41675,6 +42328,7 @@ export const QuoteSubmission_dismiss = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -41726,6 +42380,7 @@ export const QuoteSubmission_fail = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -41770,6 +42425,7 @@ export const QuoteSubmission_retry = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -41812,6 +42468,7 @@ export const QuoteSubmission_startProcessing = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -41890,6 +42547,7 @@ export const ReceiptCorrection_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -41919,6 +42577,7 @@ export const ReceiptCorrection_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -42038,6 +42697,7 @@ export const RecurringAvailability_declare = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -42060,6 +42720,7 @@ export const RecurringAvailability_createViaDeclare = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -42166,6 +42827,7 @@ export const RecurringAvailability_withdraw = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -42227,6 +42889,7 @@ export const ReferralSource_activate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -42290,6 +42953,7 @@ export const ReferralSource_deactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -42360,6 +43024,7 @@ export const ReferralSource_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -42381,6 +43046,7 @@ export const ReferralSource_createViaRegister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -42471,6 +43137,7 @@ export const ReferralSource_reviseDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -42529,6 +43196,7 @@ export const RevenueAttribution_apply = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -42587,6 +43255,7 @@ export const RevenueAttribution_approve = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -42664,6 +43333,7 @@ export const RevenueAttribution_create = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -42721,6 +43391,7 @@ export const RevenueAttribution_reject = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -42774,6 +43445,7 @@ export const RevenueAttribution_requestApproval = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -42828,6 +43500,7 @@ export const RevenueAttribution_update = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -42891,6 +43564,7 @@ export const ReviewFlag_dismiss = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -42955,6 +43629,7 @@ export const ReviewFlag_markResolved = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43031,6 +43706,7 @@ export const ReviewFlag_raise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43053,6 +43729,7 @@ export const ReviewFlag_createViaRaise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43154,6 +43831,7 @@ export const ReviewFlag_reopen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43196,6 +43874,7 @@ export const ReviewFlag_reviseQuestion = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43261,6 +43940,7 @@ export const RoleScorecard_archive = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43317,6 +43997,7 @@ export const RoleScorecard_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43338,6 +44019,7 @@ export const RoleScorecard_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43434,6 +44116,7 @@ export const RoleScorecard_reactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43497,6 +44180,7 @@ export const SavedReportDefinition_archive = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43547,6 +44231,7 @@ export const SavedReportDefinition_changeSharing = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43608,6 +44293,7 @@ export const SavedReportDefinition_createDefinition = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43630,6 +44316,7 @@ export const SavedReportDefinition_createViaCreateDefinition = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43720,6 +44407,7 @@ export const SavedReportDefinition_rename = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43783,6 +44471,7 @@ export const SavedReportDefinition_restore = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43838,6 +44527,7 @@ export const SavedReportDefinition_updateDefinition = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43899,6 +44589,7 @@ export const ServiceStyle_activate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -43962,6 +44653,7 @@ export const ServiceStyle_deactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -44032,6 +44724,7 @@ export const ServiceStyle_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -44053,6 +44746,7 @@ export const ServiceStyle_createViaRegister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -44143,6 +44837,7 @@ export const ServiceStyle_reviseDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -44209,6 +44904,7 @@ export const ServiceStyleKitItem_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -44233,6 +44929,7 @@ export const ServiceStyleKitItem_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -44337,6 +45034,7 @@ export const ServiceStyleKitItem_reinstate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -44398,6 +45096,7 @@ export const ServiceStyleKitItem_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -44456,6 +45155,7 @@ export const ServiceStyleKitItem_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -44515,6 +45215,7 @@ export const ShareLink_create = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -44564,6 +45265,7 @@ export const ShareLink_revoke = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -44641,6 +45343,7 @@ export const Shift_applyApprovedSwap = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -44707,6 +45410,7 @@ export const Shift_cancel = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -44772,6 +45476,7 @@ export const Shift_complete = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -44835,6 +45540,7 @@ export const Shift_markNoShow = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -44894,6 +45600,7 @@ export const Shift_planEventTiming = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -44965,6 +45672,7 @@ export const Shift_removeStaffNeedCoverage = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -45020,6 +45728,7 @@ export const Shift_reschedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -45086,6 +45795,7 @@ export const Shift_retireEventTiming = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -45180,6 +45890,7 @@ export const Shift_schedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -45207,6 +45918,7 @@ export const Shift_createViaSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -45337,6 +46049,7 @@ export const Shift_stageApprovedSwap = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -45402,6 +46115,7 @@ export const Shift_start = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -45474,6 +46188,7 @@ export const ShiftSwapRequest_accept = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -45577,6 +46292,7 @@ export const ShiftSwapRequest_approve = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -45646,6 +46362,7 @@ export const ShiftSwapRequest_decline = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -45750,6 +46467,7 @@ export const ShiftSwapRequest_propose = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -45775,6 +46493,7 @@ export const ShiftSwapRequest_createViaPropose = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -45915,6 +46634,7 @@ export const ShiftSwapRequest_reject = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -45982,6 +46702,7 @@ export const ShiftSwapRequest_withdraw = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46052,6 +46773,7 @@ export const ShiftType_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46072,6 +46794,7 @@ export const ShiftType_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46167,6 +46890,7 @@ export const ShiftType_reactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46228,6 +46952,7 @@ export const ShiftType_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46300,6 +47025,7 @@ export const SignatureRequest_complete = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46361,6 +47087,7 @@ export const SignatureRequest_expire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46442,6 +47169,7 @@ export const SignatureRequest_requestSignature = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46467,6 +47195,7 @@ export const SignatureRequest_createViaRequestSignature = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46576,6 +47305,7 @@ export const SignatureRequest_revoke = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46628,6 +47358,7 @@ export const StaffChatReadCursor_open = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46647,6 +47378,7 @@ export const StaffChatReadCursor_createViaOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46723,6 +47455,7 @@ export const StaffChatReadCursor_touch = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46777,6 +47510,7 @@ export const StaffMessage_edit = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46828,6 +47562,7 @@ export const StaffMessage_markRead = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46877,6 +47612,7 @@ export const StaffMessage_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46946,6 +47682,7 @@ export const StaffMessage_send = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -46967,6 +47704,7 @@ export const StaffMessage_createViaSend = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -47064,6 +47802,7 @@ export const Station_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -47084,6 +47823,7 @@ export const Station_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -47169,6 +47909,7 @@ export const Station_reinstate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -47221,6 +47962,7 @@ export const Station_rename = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -47277,6 +48019,7 @@ export const Station_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -47346,6 +48089,7 @@ export const StockCountLine_confirmLedgerMatch = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -47420,6 +48164,7 @@ export const StockCountLine_freeze = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -47442,6 +48187,7 @@ export const StockCountLine_createViaFreeze = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -47567,6 +48313,7 @@ export const StockCountLine_reconcileVariance = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -47638,6 +48385,7 @@ export const StockCountLine_recordCount = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -47695,6 +48443,7 @@ export const StockCountLine_reviseCount = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -47760,6 +48509,7 @@ export const StockCountSession_close = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -47820,6 +48570,7 @@ export const StockCountSession_start = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -47841,6 +48592,7 @@ export const StockCountSession_createViaStart = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -47963,6 +48715,7 @@ export const StockTransfer_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -47988,6 +48741,7 @@ export const StockTransfer_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -48108,6 +48862,7 @@ export const StorageLocation_activate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -48172,6 +48927,7 @@ export const StorageLocation_deactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -48231,6 +48987,7 @@ export const StorageLocation_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -48254,6 +49011,7 @@ export const StorageLocation_createViaRegister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -48350,6 +49108,7 @@ export const StorageLocation_reviseDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -48396,6 +49155,7 @@ export const SyncError_markResolved = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -48455,6 +49215,7 @@ export const SyncError_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -48478,6 +49239,7 @@ export const SyncError_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -48570,6 +49332,7 @@ export const SyncError_reopen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -48630,6 +49393,7 @@ export const TaxRate_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -48652,6 +49416,7 @@ export const TaxRate_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -48747,6 +49512,7 @@ export const TaxRate_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -48794,6 +49560,7 @@ export const TaxRate_setActive = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -48861,6 +49628,7 @@ export const TimeOffRequest_approve = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -48928,6 +49696,7 @@ export const TimeOffRequest_decline = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -48994,6 +49763,7 @@ export const TimeOffRequest_submit = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -49015,6 +49785,7 @@ export const TimeOffRequest_createViaSubmit = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -49122,6 +49893,7 @@ export const TimeRecord_clockIn = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -49143,6 +49915,7 @@ export const TimeRecord_createViaClockIn = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -49255,6 +50028,7 @@ export const TimeRecord_clockOut = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -49332,6 +50106,7 @@ export const TimeRecord_correct = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -49407,6 +50182,7 @@ export const Trailer_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -49430,6 +50206,7 @@ export const Trailer_createViaRegister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -49527,6 +50304,7 @@ export const Trailer_reviseDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -49581,6 +50359,7 @@ export const Trailer_updateInsurance = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -49644,6 +50423,7 @@ export const Trailer_updateOperationalStatus = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -49695,6 +50475,7 @@ export const Trailer_updateRegistration = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -49764,6 +50545,7 @@ export const TrainingCompletion_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -49786,6 +50568,7 @@ export const TrainingCompletion_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -49899,6 +50682,7 @@ export const TrainingModule_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -49920,6 +50704,7 @@ export const TrainingModule_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -50016,6 +50801,7 @@ export const TrainingModule_reactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -50077,6 +50863,7 @@ export const TrainingModule_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -50154,6 +50941,7 @@ export const Vehicle_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -50178,6 +50966,7 @@ export const Vehicle_createViaRegister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -50279,6 +51068,7 @@ export const Vehicle_reviseDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -50333,6 +51123,7 @@ export const Vehicle_updateInsurance = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -50396,6 +51187,7 @@ export const Vehicle_updateOperationalStatus = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -50447,6 +51239,7 @@ export const Vehicle_updateRegistration = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -50509,6 +51302,7 @@ export const VehicleFuelLog_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -50531,6 +51325,7 @@ export const VehicleFuelLog_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -50623,6 +51418,7 @@ export const VehicleMaintenanceSchedule_applyService = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -50690,6 +51486,7 @@ export const VehicleMaintenanceSchedule_schedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -50715,6 +51512,7 @@ export const VehicleMaintenanceSchedule_createViaSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -50835,6 +51633,7 @@ export const VehicleServiceEntry_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -50861,6 +51660,7 @@ export const VehicleServiceEntry_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -50984,6 +51784,7 @@ export const Vendor_onboard = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -51011,6 +51812,7 @@ export const Vendor_createViaOnboard = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -51123,6 +51925,7 @@ export const Vendor_reinstate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -51189,6 +51992,7 @@ export const Vendor_suspend = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -51256,6 +52060,7 @@ export const Vendor_terminate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -51327,6 +52132,7 @@ export const Vendor_updateDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -51392,6 +52198,7 @@ export const VendorContact_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -51415,6 +52222,7 @@ export const VendorContact_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -51503,6 +52311,7 @@ export const VendorContact_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -51561,6 +52370,7 @@ export const VendorContact_update = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -51623,6 +52433,7 @@ export const VendorContract_activate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -51695,6 +52506,7 @@ export const VendorContract_draft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -51721,6 +52533,7 @@ export const VendorContract_createViaDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -51830,6 +52643,7 @@ export const VendorContract_markExpired = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -51892,6 +52706,7 @@ export const VendorContract_terminate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -51958,6 +52773,7 @@ export const VendorContract_updateTerms = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -52024,6 +52840,7 @@ export const VendorContractPriceTier_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -52047,6 +52864,7 @@ export const VendorContractPriceTier_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -52138,6 +52956,7 @@ export const VendorContractPriceTier_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -52199,6 +53018,7 @@ export const VendorContractPriceTier_update = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -52276,6 +53096,7 @@ export const VendorOrder_approve = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -52346,6 +53167,7 @@ export const VendorOrder_cancel = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -52407,6 +53229,7 @@ export const VendorOrder_confirm = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -52513,6 +53336,7 @@ export const VendorOrder_ensureWeeklyDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -52573,6 +53397,7 @@ export const VendorOrder_markPartiallyReceived = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -52634,6 +53459,7 @@ export const VendorOrder_markReceived = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -52690,6 +53516,7 @@ export const VendorOrder_noteReceiptCorrection = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -52756,6 +53583,7 @@ export const VendorOrder_open = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -52779,6 +53607,7 @@ export const VendorOrder_createViaOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -52895,6 +53724,7 @@ export const VendorOrder_requestChanges = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -52964,6 +53794,7 @@ export const VendorOrder_retireEmptyDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -53040,6 +53871,7 @@ export const VendorOrder_submit = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -53107,6 +53939,7 @@ export const VendorOrder_submitForApproval = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -53158,6 +53991,7 @@ export const VendorOrder_syncLineTotals = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -53214,6 +54048,7 @@ export const VendorOrder_updateTotals = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -53312,6 +54147,7 @@ export const VendorOrderLine_addLine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -53336,6 +54172,7 @@ export const VendorOrderLine_createViaAddLine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -53466,6 +54303,7 @@ export const VendorOrderLine_cancelLine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -53511,6 +54349,7 @@ export const VendorOrderLine_commitSupply = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -53619,6 +54458,7 @@ export const VendorOrderLine_correctReceipt = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -53744,6 +54584,7 @@ export const VendorOrderLine_ensureWeeklyLine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -53813,6 +54654,7 @@ export const VendorOrderLine_reconcileDraftRequirement = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -53946,6 +54788,7 @@ export const VendorOrderLine_recordReceipt = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -53987,6 +54830,7 @@ export const VendorOrderLine_releaseSupply = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -54061,6 +54905,7 @@ export const VendorOrderLine_retireEmptyDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -54126,6 +54971,7 @@ export const VendorOrderLine_reviseQuantity = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -54196,6 +55042,7 @@ export const VendorOrderLineDemand_link = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -54218,6 +55065,7 @@ export const VendorOrderLineDemand_createViaLink = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -54314,6 +55162,7 @@ export const VendorOrderLineDemand_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -54365,6 +55214,7 @@ export const VendorOrderLineDemand_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -54428,6 +55278,7 @@ export const Venue_activate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -54479,6 +55330,7 @@ export const Venue_changeCapacity = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -54544,6 +55396,7 @@ export const Venue_deactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -54653,6 +55506,7 @@ export const Venue_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -54699,6 +55553,7 @@ export const Venue_createViaRegister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -54889,6 +55744,7 @@ export const Venue_updateDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -54940,6 +55796,7 @@ export const VenueCommissionTerm_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -54962,6 +55819,7 @@ export const VenueCommissionTerm_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55036,6 +55894,7 @@ export const VenueCommissionTerm_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55084,6 +55943,7 @@ export const VenueCommissionTerm_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55146,6 +56006,7 @@ export const VenueLayoutTemplate_archive = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55201,6 +56062,7 @@ export const VenueLayoutTemplate_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55222,6 +56084,7 @@ export const VenueLayoutTemplate_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55315,6 +56178,7 @@ export const VenueLayoutTemplate_reactivate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55368,6 +56232,7 @@ export const VenueLayoutTemplate_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55415,6 +56280,7 @@ export const VenueNote_pin = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55479,6 +56345,7 @@ export const VenueNote_post = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55502,6 +56369,7 @@ export const VenueNote_createViaPost = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55589,6 +56457,7 @@ export const VenueNote_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55642,6 +56511,7 @@ export const VenueNote_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55689,6 +56559,7 @@ export const VenueNote_unpin = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55750,6 +56621,7 @@ export const VenueRoom_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55773,6 +56645,7 @@ export const VenueRoom_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55857,6 +56730,7 @@ export const VenueRoom_remove = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -55915,6 +56789,7 @@ export const VenueRoom_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56003,6 +56878,7 @@ export const VenueVendorRelationship_establish = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56034,6 +56910,7 @@ export const VenueVendorRelationship_createViaEstablish = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56137,6 +57014,7 @@ export const VenueVendorRelationship_retire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56208,6 +57086,7 @@ export const VenueVendorRelationship_reviseDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56269,6 +57148,7 @@ export const VenueVendorRelationship_reviseStatus = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56361,6 +57241,7 @@ export const WasteRecord_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56387,6 +57268,7 @@ export const WasteRecord_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56510,6 +57392,7 @@ export const WasteRecord_voidRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56555,6 +57438,7 @@ export const WeeklyPurchasingConfig_configure = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56573,6 +57457,7 @@ export const WeeklyPurchasingConfig_createViaConfigure = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56676,6 +57561,7 @@ export const WeeklyPurchasingConfig_routeNeed = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56719,6 +57605,7 @@ export const WeeklyPurchasingConfig_setOrderApprovalThreshold = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56768,6 +57655,7 @@ export const WeeklyScheduleNotice_acknowledge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56835,6 +57723,7 @@ export const WeeklyScheduleNotice_publishSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56858,6 +57747,7 @@ export const WeeklyScheduleNotice_createViaPublishSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56957,6 +57847,7 @@ export const WeeklyScheduleNotice_republishSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;
@@ -56999,6 +57890,7 @@ export const Event_createViaCaptureDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
       const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
       if (__cached !== undefined) return __cached;

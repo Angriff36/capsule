@@ -112,8 +112,20 @@ describe("create steps keep approval, totals and results server-owned (AC-372)",
         tenantId: "tenant-a",
       });
     const finance = signIn("finance-a");
+    // A real event of the workspace: links to missing records are refused.
+    const eventId = await t.run((ctx) =>
+      ctx.db.insert("events", {
+        tenantId: "tenant-a",
+        title: "Proof dinner",
+        eventType: "wedding",
+        stage: "approved",
+        startsAt: Date.UTC(2026, 9, 18, 17, 0),
+        endsAt: Date.UTC(2026, 9, 18, 22, 0),
+        version: 1,
+      }),
+    );
     const base = {
-      eventId: "7events",
+      eventId,
       attributionType: "venue_commission",
       allocationMethod: "percent",
       percentBasis: 10,
