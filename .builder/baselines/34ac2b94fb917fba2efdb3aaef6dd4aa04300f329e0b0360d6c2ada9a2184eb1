@@ -20389,7 +20389,7 @@ export const EventVehicleAssignment_release = mutation({
   },
 });
 
-async function __runExternalRecordLinkDecide(ctx: MutationCtx, { docId, decision, decidedByUserId, version }: any, __creation = false) {
+async function __runExternalRecordLinkDecide(ctx: MutationCtx, { docId, decision, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -20400,19 +20400,18 @@ async function __runExternalRecordLinkDecide(ctx: MutationCtx, { docId, decision
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
-    if (!((((decidedByUserId).trim()).length > 0))) throw new Error("Pick who decided this.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
       decision: decision,
-      decidedByUserId: decidedByUserId,
+      decidedByUserId: user.id,
       decidedAt: Date.now(),
       verified: (decision === "approved"),
-      verifiedByUserId: ((decision === "approved") ? decidedByUserId : doc.verifiedByUserId),
+      verifiedByUserId: ((decision === "approved") ? user.id : doc.verifiedByUserId),
       lastVerifiedAt: Date.now(),
       conflictStatus: ((decision === "approved") ? "resolved" : doc.conflictStatus),
-      resolvedByUserId: ((decision === "approved") ? decidedByUserId : doc.resolvedByUserId),
+      resolvedByUserId: ((decision === "approved") ? user.id : doc.resolvedByUserId),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -20423,7 +20422,6 @@ export const ExternalRecordLink_decide = mutation({
   args: {
     docId: v.id("externalRecordLinks"),
     decision: v.any(),
-    decidedByUserId: v.string(),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -20488,7 +20486,7 @@ export const ExternalRecordLink_discard = mutation({
   },
 });
 
-async function __runExternalRecordLinkLink(ctx: MutationCtx, { docId, sourceSystem, recordType, externalId, capsuleEntity, capsuleId, verified, verifiedByUserId, sourceImportRunId, effectiveStartDate, effectiveEndDate, rawSourceData, metadata, sourceAccount, role, ordinal, linkKey, decision, suggestedBy, sourceVersion, version }: any, __creation = false) {
+async function __runExternalRecordLinkLink(ctx: MutationCtx, { docId, sourceSystem, recordType, externalId, capsuleEntity, capsuleId, verified, sourceImportRunId, effectiveStartDate, effectiveEndDate, rawSourceData, metadata, sourceAccount, role, ordinal, linkKey, decision, suggestedBy, sourceVersion, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -20501,7 +20499,6 @@ async function __runExternalRecordLinkLink(ctx: MutationCtx, { docId, sourceSyst
     if (!((sourceSystem != null))) throw new Error("Pick a source system for this match.");
     if (!((((externalId).trim()).length > 0))) throw new Error("Give this match an external ID.");
     if (!((((capsuleId).trim()).length > 0))) throw new Error("Give this match a Capsule ID.");
-    if (!((((verified == null) || (verified === false)) || ((verifiedByUserId != null) && (((verifiedByUserId).trim()).length > 0))))) throw new Error("This match can't be marked verified without picking who verified it.");
     if (!((((effectiveStartDate == null) || (effectiveEndDate == null)) || (effectiveStartDate <= effectiveEndDate)))) throw new Error("This match's start date has to be on or before its end date.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -20513,7 +20510,7 @@ async function __runExternalRecordLinkLink(ctx: MutationCtx, { docId, sourceSyst
       capsuleEntity: capsuleEntity,
       capsuleId: capsuleId,
       verified: ((verified != null) ? verified : false),
-      verifiedByUserId: verifiedByUserId,
+      verifiedByUserId: (((verified != null) && verified) ? user.id : null),
       lastVerifiedAt: (((verified != null) && verified) ? Date.now() : null),
       sourceImportRunId: sourceImportRunId,
       effectiveStartDate: effectiveStartDate,
@@ -20550,7 +20547,6 @@ export const ExternalRecordLink_link = mutation({
     capsuleEntity: v.any(),
     capsuleId: v.string(),
     verified: v.optional(v.boolean()),
-    verifiedByUserId: v.optional(v.string()),
     sourceImportRunId: v.optional(v.string()),
     effectiveStartDate: v.optional(v.number()),
     effectiveEndDate: v.optional(v.number()),
@@ -20587,7 +20583,6 @@ export const ExternalRecordLink_createViaLink = mutation({
     capsuleEntity: v.any(),
     capsuleId: v.string(),
     verified: v.optional(v.boolean()),
-    verifiedByUserId: v.optional(v.string()),
     sourceImportRunId: v.optional(v.string()),
     effectiveStartDate: v.optional(v.number()),
     effectiveEndDate: v.optional(v.number()),
@@ -20609,7 +20604,7 @@ export const ExternalRecordLink_createViaLink = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { sourceSystem, recordType, externalId, capsuleEntity, capsuleId, verified, verifiedByUserId, sourceImportRunId, effectiveStartDate, effectiveEndDate, rawSourceData, metadata, sourceAccount, role, ordinal, linkKey, decision, suggestedBy, sourceVersion } = args;
+    const { sourceSystem, recordType, externalId, capsuleEntity, capsuleId, verified, sourceImportRunId, effectiveStartDate, effectiveEndDate, rawSourceData, metadata, sourceAccount, role, ordinal, linkKey, decision, suggestedBy, sourceVersion } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       verified: args.verified !== undefined ? args.verified : false,
@@ -20631,8 +20626,7 @@ export const ExternalRecordLink_createViaLink = mutation({
       sourceImportRunId: args.sourceImportRunId,
       sourceSystem: args.sourceSystem,
       sourceVersion: args.sourceVersion,
-      suggestedBy: args.suggestedBy,
-      verifiedByUserId: args.verifiedByUserId
+      suggestedBy: args.suggestedBy
     };
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import matches");
@@ -20641,7 +20635,6 @@ export const ExternalRecordLink_createViaLink = mutation({
     if (!((sourceSystem != null))) throw new Error("Pick a source system for this match.");
     if (!((((externalId).trim()).length > 0))) throw new Error("Give this match an external ID.");
     if (!((((capsuleId).trim()).length > 0))) throw new Error("Give this match a Capsule ID.");
-    if (!((((verified == null) || (verified === false)) || ((verifiedByUserId != null) && (((verifiedByUserId).trim()).length > 0))))) throw new Error("This match can't be marked verified without picking who verified it.");
     if (!((((effectiveStartDate == null) || (effectiveEndDate == null)) || (effectiveStartDate <= effectiveEndDate)))) throw new Error("This match's start date has to be on or before its end date.");
     const doc: Record<string, any> = {
       ...__draft,
@@ -20653,7 +20646,7 @@ export const ExternalRecordLink_createViaLink = mutation({
     doc.capsuleEntity = capsuleEntity;
     doc.capsuleId = capsuleId;
     doc.verified = ((verified != null) ? verified : false);
-    doc.verifiedByUserId = verifiedByUserId;
+    doc.verifiedByUserId = (((verified != null) && verified) ? user.id : null);
     doc.lastVerifiedAt = (((verified != null) && verified) ? Date.now() : null);
     doc.sourceImportRunId = sourceImportRunId;
     doc.effectiveStartDate = effectiveStartDate;
@@ -20777,7 +20770,7 @@ export const ExternalRecordLink_recordApplied = mutation({
   },
 });
 
-async function __runExternalRecordLinkResolveConflict(ctx: MutationCtx, { docId, conflictStatus, resolvedByUserId, resolutionNote, version }: any, __creation = false) {
+async function __runExternalRecordLinkResolveConflict(ctx: MutationCtx, { docId, conflictStatus, resolutionNote, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -20788,21 +20781,20 @@ async function __runExternalRecordLinkResolveConflict(ctx: MutationCtx, { docId,
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
-    if (!((((resolvedByUserId).trim()).length > 0))) throw new Error("Pick who resolved this.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
       conflictStatus: conflictStatus,
-      resolvedByUserId: resolvedByUserId,
+      resolvedByUserId: user.id,
       resolutionNote: resolutionNote,
       lastVerifiedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, externalRecordLinkId: docId, tenantId: __after.tenantId, conflictStatus: conflictStatus, resolvedByUserId: resolvedByUserId, _subject: { entity: "ExternalRecordLink", command: "resolveConflict", id: docId } };
-    const __manifestEvent0 = { type: "ExternalRecordConflictResolved", entity: "ExternalRecordLink", entityId: docId, payload: { externalRecordLinkId: docId, tenantId: __after.tenantId, conflictStatus: conflictStatus, resolvedByUserId: resolvedByUserId }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, externalRecordLinkId: docId, tenantId: __after.tenantId, conflictStatus: conflictStatus, resolvedByUserId: user.id, _subject: { entity: "ExternalRecordLink", command: "resolveConflict", id: docId } };
+    const __manifestEvent0 = { type: "ExternalRecordConflictResolved", entity: "ExternalRecordLink", entityId: docId, payload: { externalRecordLinkId: docId, tenantId: __after.tenantId, conflictStatus: conflictStatus, resolvedByUserId: user.id }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "resolveConflict", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -20812,7 +20804,6 @@ export const ExternalRecordLink_resolveConflict = mutation({
   args: {
     docId: v.id("externalRecordLinks"),
     conflictStatus: v.any(),
-    resolvedByUserId: v.string(),
     resolutionNote: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
@@ -20880,7 +20871,7 @@ export const ExternalRecordLink_retire = mutation({
   },
 });
 
-async function __runExternalRecordLinkUnlinkExternalRecord(ctx: MutationCtx, { docId, reason, unlinkedByUserId, version }: any, __creation = false) {
+async function __runExternalRecordLinkUnlinkExternalRecord(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -20902,8 +20893,8 @@ async function __runExternalRecordLinkUnlinkExternalRecord(ctx: MutationCtx, { d
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, externalRecordLinkId: docId, tenantId: __after.tenantId, reason: reason, unlinkedByUserId: ((unlinkedByUserId != null) ? unlinkedByUserId : ""), capsuleEntity: __after.capsuleEntity, capsuleId: __after.capsuleId, externalId: __after.externalId, sourceSystem: __after.sourceSystem, _subject: { entity: "ExternalRecordLink", command: "unlinkExternalRecord", id: docId } };
-    const __manifestEvent0 = { type: "ExternalRecordUnlinked", entity: "ExternalRecordLink", entityId: docId, payload: { externalRecordLinkId: docId, tenantId: __after.tenantId, reason: reason, unlinkedByUserId: ((unlinkedByUserId != null) ? unlinkedByUserId : ""), capsuleEntity: __after.capsuleEntity, capsuleId: __after.capsuleId, externalId: __after.externalId, sourceSystem: __after.sourceSystem }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, externalRecordLinkId: docId, tenantId: __after.tenantId, reason: reason, unlinkedByUserId: user.id, capsuleEntity: __after.capsuleEntity, capsuleId: __after.capsuleId, externalId: __after.externalId, sourceSystem: __after.sourceSystem, _subject: { entity: "ExternalRecordLink", command: "unlinkExternalRecord", id: docId } };
+    const __manifestEvent0 = { type: "ExternalRecordUnlinked", entity: "ExternalRecordLink", entityId: docId, payload: { externalRecordLinkId: docId, tenantId: __after.tenantId, reason: reason, unlinkedByUserId: user.id, capsuleEntity: __after.capsuleEntity, capsuleId: __after.capsuleId, externalId: __after.externalId, sourceSystem: __after.sourceSystem }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "unlinkExternalRecord", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -20913,7 +20904,6 @@ export const ExternalRecordLink_unlinkExternalRecord = mutation({
   args: {
     docId: v.id("externalRecordLinks"),
     reason: v.string(),
-    unlinkedByUserId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -20981,7 +20971,7 @@ export const ExternalRecordLink_updateCapsuleId = mutation({
   },
 });
 
-async function __runExternalRecordLinkVerifyLink(ctx: MutationCtx, { docId, verifiedByUserId, verified, metadata, version }: any, __creation = false) {
+async function __runExternalRecordLinkVerifyLink(ctx: MutationCtx, { docId, verified, metadata, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -20992,23 +20982,22 @@ async function __runExternalRecordLinkVerifyLink(ctx: MutationCtx, { docId, veri
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
-    if (!((((verifiedByUserId).trim()).length > 0))) throw new Error("Pick who verified this.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
       verified: ((verified != null) ? verified : true),
-      verifiedByUserId: verifiedByUserId,
+      verifiedByUserId: user.id,
       lastVerifiedAt: Date.now(),
       metadata: ((metadata != null) ? metadata : doc.metadata),
       conflictStatus: (((verified != null) && verified) ? "resolved" : doc.conflictStatus),
-      resolvedByUserId: (((verified != null) && verified) ? verifiedByUserId : doc.resolvedByUserId),
+      resolvedByUserId: (((verified != null) && verified) ? user.id : doc.resolvedByUserId),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, externalRecordLinkId: docId, tenantId: __after.tenantId, verified: ((verified != null) ? verified : true), verifiedByUserId: verifiedByUserId, capsuleEntity: __after.capsuleEntity, capsuleId: __after.capsuleId, _subject: { entity: "ExternalRecordLink", command: "verifyLink", id: docId } };
-    const __manifestEvent0 = { type: "ExternalRecordVerified", entity: "ExternalRecordLink", entityId: docId, payload: { externalRecordLinkId: docId, tenantId: __after.tenantId, verified: ((verified != null) ? verified : true), verifiedByUserId: verifiedByUserId, capsuleEntity: __after.capsuleEntity, capsuleId: __after.capsuleId }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, externalRecordLinkId: docId, tenantId: __after.tenantId, verified: ((verified != null) ? verified : true), verifiedByUserId: user.id, capsuleEntity: __after.capsuleEntity, capsuleId: __after.capsuleId, _subject: { entity: "ExternalRecordLink", command: "verifyLink", id: docId } };
+    const __manifestEvent0 = { type: "ExternalRecordVerified", entity: "ExternalRecordLink", entityId: docId, payload: { externalRecordLinkId: docId, tenantId: __after.tenantId, verified: ((verified != null) ? verified : true), verifiedByUserId: user.id, capsuleEntity: __after.capsuleEntity, capsuleId: __after.capsuleId }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "verifyLink", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -21017,7 +21006,6 @@ async function __runExternalRecordLinkVerifyLink(ctx: MutationCtx, { docId, veri
 export const ExternalRecordLink_verifyLink = mutation({
   args: {
     docId: v.id("externalRecordLinks"),
-    verifiedByUserId: v.string(),
     verified: v.optional(v.boolean()),
     metadata: v.optional(v.string()),
     version: v.optional(v.number()),
@@ -21343,7 +21331,7 @@ export const ImportConflict_createViaRaise = mutation({
   },
 });
 
-async function __runImportConflictSettle(ctx: MutationCtx, { docId, resolution, resolvedByUserId, version }: any, __creation = false) {
+async function __runImportConflictSettle(ctx: MutationCtx, { docId, resolution, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -21355,7 +21343,6 @@ async function __runImportConflictSettle(ctx: MutationCtx, { docId, resolution, 
     if (!((doc.raisedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.status === "pending"))) throw new Error("Guard 2 failed");
-    if (!((((resolvedByUserId).trim()).length > 0))) throw new Error("Pick who resolved this disagreement.");
     if (!((resolution !== "pending"))) throw new Error("Pick how you resolved this: keep the current value, use the new value, or fix it another way.");
     {
       const __cur = doc.status;
@@ -21374,7 +21361,7 @@ async function __runImportConflictSettle(ctx: MutationCtx, { docId, resolution, 
     }
     const updates = {
       status: resolution,
-      resolvedByUserId: resolvedByUserId,
+      resolvedByUserId: user.id,
       resolvedAt: Date.now(),
       resolvedOnSourceVersion: doc.sourceVersion,
       version: ((doc as any).version ?? 0) + 1
@@ -21392,7 +21379,6 @@ export const ImportConflict_settle = mutation({
   args: {
     docId: v.id("importConflicts"),
     resolution: v.any(),
-    resolvedByUserId: v.string(),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },

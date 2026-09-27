@@ -6331,7 +6331,6 @@ export type EventVehicleAssignmentReleaseParams = z.infer<typeof EventVehicleAss
 // Command: decide on ExternalRecordLink
 export const ExternalRecordLinkDecideParamsSchema = z.object({
   decision: z.enum(["suggested", "approved", "rejected"]),
-  decidedByUserId: z.string(),
 });
 
 export type ExternalRecordLinkDecideParams = z.infer<typeof ExternalRecordLinkDecideParamsSchema>;
@@ -6351,7 +6350,6 @@ export const ExternalRecordLinkLinkParamsSchema = z.object({
   capsuleEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task"]),
   capsuleId: z.string(),
   verified: z.boolean().optional(),
-  verifiedByUserId: z.string().optional(),
   sourceImportRunId: z.string().optional(),
   effectiveStartDate: z.coerce.date().optional(),
   effectiveEndDate: z.coerce.date().optional(),
@@ -6389,7 +6387,6 @@ export type ExternalRecordLinkRecordAppliedParams = z.infer<typeof ExternalRecor
 // Command: resolveConflict on ExternalRecordLink
 export const ExternalRecordLinkResolveConflictParamsSchema = z.object({
   conflictStatus: z.enum(["resolved", "pending_conflict", "superseded"]),
-  resolvedByUserId: z.string(),
   resolutionNote: z.string().optional(),
 });
 
@@ -6405,7 +6402,6 @@ export type ExternalRecordLinkRetireParams = z.infer<typeof ExternalRecordLinkRe
 // Command: unlinkExternalRecord on ExternalRecordLink
 export const ExternalRecordLinkUnlinkExternalRecordParamsSchema = z.object({
   reason: z.string(),
-  unlinkedByUserId: z.string().optional(),
 });
 
 export type ExternalRecordLinkUnlinkExternalRecordParams = z.infer<typeof ExternalRecordLinkUnlinkExternalRecordParamsSchema>;
@@ -6419,7 +6415,6 @@ export type ExternalRecordLinkUpdateCapsuleIdParams = z.infer<typeof ExternalRec
 
 // Command: verifyLink on ExternalRecordLink
 export const ExternalRecordLinkVerifyLinkParamsSchema = z.object({
-  verifiedByUserId: z.string(),
   verified: z.boolean().optional(),
   metadata: z.string().optional(),
 });
@@ -6471,7 +6466,6 @@ export type ImportConflictRaiseParams = z.infer<typeof ImportConflictRaiseParams
 // Command: settle on ImportConflict
 export const ImportConflictSettleParamsSchema = z.object({
   resolution: z.enum(["pending", "keep_capsule", "take_source", "manual"]),
-  resolvedByUserId: z.string(),
 });
 
 export type ImportConflictSettleParams = z.infer<typeof ImportConflictSettleParamsSchema>;

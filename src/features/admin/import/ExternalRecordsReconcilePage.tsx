@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { useUser } from "@clerk/react";
 import {
   useListExternalRecordLink,
   useListInvoice,
@@ -54,8 +53,6 @@ const CONFLICT_STATUS_LABELS: Record<string, string> = {
 };
 
 export function ExternalRecordsReconcilePage() {
-  const { user } = useUser();
-  const operatorId = user?.id ?? "";
   const [selectedSourceSystem, setSelectedSourceSystem] = useState<
     string | null
   >(null);
@@ -125,11 +122,10 @@ export function ExternalRecordsReconcilePage() {
     setNotice(null);
   }
 
-  // Verify selected records. The generated hook reads `docId` (not `id`) and
-  // verifyLink requires a non-empty `verifiedByUserId`; both were missing before,
-  // so every click threw before reaching the mutation.
+  // Verify selected records. The generated hook reads `docId` (not `id`); the
+  // server records the signed-in person as the one who checked each record.
   async function verifySelected() {
-    if (selectedIds.size === 0 || !operatorId) return;
+    if (selectedIds.size === 0) return;
     setBusy(true);
     setError(null);
     setNotice(null);
@@ -138,7 +134,6 @@ export function ExternalRecordsReconcilePage() {
       for (const id of selectedIds) {
         await verifyLink({
           docId: id,
-          verifiedByUserId: operatorId,
           verified: true,
         });
       }
@@ -155,7 +150,7 @@ export function ExternalRecordsReconcilePage() {
 
   // Skip selected records (mark as resolved with note).
   async function skipSelected() {
-    if (selectedIds.size === 0 || !operatorId) return;
+    if (selectedIds.size === 0) return;
     setBusy(true);
     setError(null);
     setNotice(null);
@@ -165,7 +160,6 @@ export function ExternalRecordsReconcilePage() {
         await resolveConflict({
           docId: id,
           conflictStatus: "resolved",
-          resolvedByUserId: operatorId,
           resolutionNote: "Skipped while matching leftover items",
         });
       }
@@ -185,7 +179,7 @@ export function ExternalRecordsReconcilePage() {
   // as pending_conflict links with capsuleId "" and a note saying "match via
   // markMatched" — this is the UI that finally performs that match.
   async function matchPayment(linkId: string) {
-    if (!matchPaymentId || !operatorId) return;
+    if (!matchPaymentId) return;
     setBusy(true);
     setError(null);
     setNotice(null);
@@ -195,7 +189,6 @@ export function ExternalRecordsReconcilePage() {
       await resolveConflict({
         docId: linkId,
         conflictStatus: "resolved",
-        resolvedByUserId: operatorId,
         resolutionNote:
           "Matched to a Capsule payment while matching leftover items",
       });

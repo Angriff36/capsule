@@ -155,7 +155,6 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     capsuleEntity: CapsuleEntityType,
     capsuleId: string,
     optional verified: boolean,
-    optional verifiedByUserId: string,
     optional sourceImportRunId: string,
     optional effectiveStartDate: datetime,
     optional effectiveEndDate: datetime,
@@ -175,7 +174,6 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     constraint linkSourceSystemPresent: sourceSystem != null "Pick a source system for this match."
     constraint linkExternalIdPresent: length(trim(externalId)) > 0 "Give this match an external ID."
     constraint linkCapsuleIdPresent: length(trim(capsuleId)) > 0 "Give this match a Capsule ID."
-    constraint linkVerifiedRequiresUser: verified == null or verified == false or (verifiedByUserId != null and length(trim(verifiedByUserId)) > 0) "This match can't be marked verified without picking who verified it."
     constraint linkDatesOrdered: effectiveStartDate == null or effectiveEndDate == null or effectiveStartDate <= effectiveEndDate "This match's start date has to be on or before its end date."
     mutate sourceSystem = sourceSystem
     mutate recordType = recordType != null ? recordType : ""
@@ -183,7 +181,7 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     mutate capsuleEntity = capsuleEntity
     mutate capsuleId = capsuleId
     mutate verified = verified != null ? verified : false
-    mutate verifiedByUserId = verifiedByUserId
+    mutate verifiedByUserId = verified != null and verified ? user.id : null
     mutate lastVerifiedAt = verified != null and verified ? now() : null
     mutate sourceImportRunId = sourceImportRunId
     mutate effectiveStartDate = effectiveStartDate
@@ -239,50 +237,46 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
 
   // Revision-2: approve or reject a suggested identity. Approval is what makes
   // the link an identity; a display name never is.
-  command decide(decision: LinkDecision, decidedByUserId: string) {
+  // The person who decides is the signed-in person (spec CF-15).
+  command decide(decision: LinkDecision) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint decideUserPresent: length(trim(decidedByUserId)) > 0 "Pick who decided this."
     mutate decision = decision
-    mutate decidedByUserId = decidedByUserId
+    mutate decidedByUserId = user.id
     mutate decidedAt = now()
     mutate verified = decision == "approved"
-    mutate verifiedByUserId = decision == "approved" ? decidedByUserId : self.verifiedByUserId
+    mutate verifiedByUserId = decision == "approved" ? user.id : self.verifiedByUserId
     mutate lastVerifiedAt = now()
     mutate conflictStatus = decision == "approved" ? "resolved" : self.conflictStatus
-    mutate resolvedByUserId = decision == "approved" ? decidedByUserId : self.resolvedByUserId
+    mutate resolvedByUserId = decision == "approved" ? user.id : self.resolvedByUserId
   }
 
-  // verifyLink - Mark a link as verified (e.g., after user confirmation)
+  // verifyLink - Mark a link as verified (e.g., after user confirmation).
+  // The person who checks it is the signed-in person (spec CF-15).
   command verifyLink(
-    verifiedByUserId: string,
     optional verified: boolean,
     optional metadata: string
   ) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint verifyUserPresent: length(trim(verifiedByUserId)) > 0 "Pick who verified this."
     mutate verified = verified != null ? verified : true
-    mutate verifiedByUserId = verifiedByUserId
+    mutate verifiedByUserId = user.id
     mutate lastVerifiedAt = now()
     mutate metadata = metadata != null ? metadata : self.metadata
     mutate conflictStatus = verified != null and verified ? "resolved" : self.conflictStatus
-    mutate resolvedByUserId = verified != null and verified ? verifiedByUserId : self.resolvedByUserId
+    mutate resolvedByUserId = verified != null and verified ? user.id : self.resolvedByUserId
     emit ExternalRecordVerified {
       externalRecordLinkId: self.id
       tenantId: self.tenantId
       verified: verified != null ? verified : true
-      verifiedByUserId: verifiedByUserId
+      verifiedByUserId: user.id
       capsuleEntity: self.capsuleEntity
       capsuleId: self.capsuleId
     }
   }
 
   // unlinkExternalRecord - Remove a link (soft delete via discard)
-  command unlinkExternalRecord(
-    reason: string,
-    optional unlinkedByUserId: string
-  ) {
+  command unlinkExternalRecord(reason: string) {
     guard self.deletedAt == null
     guard self.createdAt != null
     constraint unlinkReasonPresent: length(trim(reason)) > 0 "Say why you're taking this match off."
@@ -292,7 +286,7 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
       externalRecordLinkId: self.id
       tenantId: self.tenantId
       reason: reason
-      unlinkedByUserId: unlinkedByUserId != null ? unlinkedByUserId : ""
+      unlinkedByUserId: user.id
       capsuleEntity: self.capsuleEntity
       capsuleId: self.capsuleId
       externalId: self.externalId
@@ -318,24 +312,23 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // resolveConflict - Mark a conflict as resolved
+  // resolveConflict - Mark a conflict as resolved. The person who resolves it
+  // is the signed-in person (spec CF-15).
   command resolveConflict(
     conflictStatus: ConflictStatus,
-    resolvedByUserId: string,
     optional resolutionNote: string
   ) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint resolveUserPresent: length(trim(resolvedByUserId)) > 0 "Pick who resolved this."
     mutate conflictStatus = conflictStatus
-    mutate resolvedByUserId = resolvedByUserId
+    mutate resolvedByUserId = user.id
     mutate resolutionNote = resolutionNote
     mutate lastVerifiedAt = now()
     emit ExternalRecordConflictResolved {
       externalRecordLinkId: self.id
       tenantId: self.tenantId
       conflictStatus: conflictStatus
-      resolvedByUserId: resolvedByUserId
+      resolvedByUserId: user.id
     }
   }
 
@@ -581,14 +574,14 @@ entity ImportConflict mixin TenantScoped, SoftDeletable {
     mutate status = "pending"
   }
 
-  command settle(resolution: ImportConflictStatus, resolvedByUserId: string) {
+  // The person who settles it is the signed-in person (spec CF-15).
+  command settle(resolution: ImportConflictStatus) {
     guard self.raisedAt != null
     guard self.deletedAt == null
     guard self.status == "pending"
-    constraint settleUserPresent: length(trim(resolvedByUserId)) > 0 "Pick who resolved this disagreement."
     constraint settleNotPending: resolution != "pending" "Pick how you resolved this: keep the current value, use the new value, or fix it another way."
     mutate status = resolution
-    mutate resolvedByUserId = resolvedByUserId
+    mutate resolvedByUserId = user.id
     mutate resolvedAt = now()
     mutate resolvedOnSourceVersion = self.sourceVersion
     emit ImportConflictResolved {

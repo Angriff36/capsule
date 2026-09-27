@@ -1296,8 +1296,8 @@ const COMMAND_DISPATCH = {
   },
   "ExternalRecordLink.decide": {
     ref: api.mutations.ExternalRecordLink_decide,
-    params: ["docId","decision","decidedByUserId","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"decision","type":"LinkDecision","required":true},{"name":"decidedByUserId","type":"string","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","decision","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"decision","type":"LinkDecision","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "ExternalRecordLink.discard": {
     ref: api.mutations.ExternalRecordLink_discard,
@@ -1306,8 +1306,8 @@ const COMMAND_DISPATCH = {
   },
   "ExternalRecordLink.link": {
     ref: api.mutations.ExternalRecordLink_createViaLink,
-    params: ["sourceSystem","recordType","externalId","capsuleEntity","capsuleId","verified","verifiedByUserId","sourceImportRunId","effectiveStartDate","effectiveEndDate","rawSourceData","metadata","sourceAccount","role","ordinal","linkKey","decision","suggestedBy","sourceVersion","idempotencyKey"] as const,
-    paramMeta: [{"name":"sourceSystem","type":"ExternalSourceSystem","required":true},{"name":"recordType","type":"string","required":true},{"name":"externalId","type":"string","required":true},{"name":"capsuleEntity","type":"CapsuleEntityType","required":true},{"name":"capsuleId","type":"string","required":true},{"name":"verified","type":"boolean","required":false},{"name":"verifiedByUserId","type":"string","required":false},{"name":"sourceImportRunId","type":"string","required":false},{"name":"effectiveStartDate","type":"datetime","required":false},{"name":"effectiveEndDate","type":"datetime","required":false},{"name":"rawSourceData","type":"string","required":false},{"name":"metadata","type":"string","required":false},{"name":"sourceAccount","type":"string","required":false},{"name":"role","type":"string","required":false},{"name":"ordinal","type":"int","required":false},{"name":"linkKey","type":"string","required":false},{"name":"decision","type":"LinkDecision","required":false},{"name":"suggestedBy","type":"string","required":false},{"name":"sourceVersion","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["sourceSystem","recordType","externalId","capsuleEntity","capsuleId","verified","sourceImportRunId","effectiveStartDate","effectiveEndDate","rawSourceData","metadata","sourceAccount","role","ordinal","linkKey","decision","suggestedBy","sourceVersion","idempotencyKey"] as const,
+    paramMeta: [{"name":"sourceSystem","type":"ExternalSourceSystem","required":true},{"name":"recordType","type":"string","required":true},{"name":"externalId","type":"string","required":true},{"name":"capsuleEntity","type":"CapsuleEntityType","required":true},{"name":"capsuleId","type":"string","required":true},{"name":"verified","type":"boolean","required":false},{"name":"sourceImportRunId","type":"string","required":false},{"name":"effectiveStartDate","type":"datetime","required":false},{"name":"effectiveEndDate","type":"datetime","required":false},{"name":"rawSourceData","type":"string","required":false},{"name":"metadata","type":"string","required":false},{"name":"sourceAccount","type":"string","required":false},{"name":"role","type":"string","required":false},{"name":"ordinal","type":"int","required":false},{"name":"linkKey","type":"string","required":false},{"name":"decision","type":"LinkDecision","required":false},{"name":"suggestedBy","type":"string","required":false},{"name":"sourceVersion","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "ExternalRecordLink.observe": {
     ref: api.mutations.ExternalRecordLink_observe,
@@ -1321,8 +1321,8 @@ const COMMAND_DISPATCH = {
   },
   "ExternalRecordLink.resolveConflict": {
     ref: api.mutations.ExternalRecordLink_resolveConflict,
-    params: ["docId","conflictStatus","resolvedByUserId","resolutionNote","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"conflictStatus","type":"ConflictStatus","required":true},{"name":"resolvedByUserId","type":"string","required":true},{"name":"resolutionNote","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","conflictStatus","resolutionNote","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"conflictStatus","type":"ConflictStatus","required":true},{"name":"resolutionNote","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "ExternalRecordLink.retire": {
     ref: api.mutations.ExternalRecordLink_retire,
@@ -1331,8 +1331,8 @@ const COMMAND_DISPATCH = {
   },
   "ExternalRecordLink.unlinkExternalRecord": {
     ref: api.mutations.ExternalRecordLink_unlinkExternalRecord,
-    params: ["docId","reason","unlinkedByUserId","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"reason","type":"string","required":true},{"name":"unlinkedByUserId","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","reason","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"reason","type":"string","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "ExternalRecordLink.updateCapsuleId": {
     ref: api.mutations.ExternalRecordLink_updateCapsuleId,
@@ -1341,8 +1341,8 @@ const COMMAND_DISPATCH = {
   },
   "ExternalRecordLink.verifyLink": {
     ref: api.mutations.ExternalRecordLink_verifyLink,
-    params: ["docId","verifiedByUserId","verified","metadata","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"verifiedByUserId","type":"string","required":true},{"name":"verified","type":"boolean","required":false},{"name":"metadata","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","verified","metadata","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"verified","type":"boolean","required":false},{"name":"metadata","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "ImportArtifact.classify": {
     ref: api.mutations.ImportArtifact_classify,
@@ -1366,8 +1366,8 @@ const COMMAND_DISPATCH = {
   },
   "ImportConflict.settle": {
     ref: api.mutations.ImportConflict_settle,
-    params: ["docId","resolution","resolvedByUserId","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"resolution","type":"ImportConflictStatus","required":true},{"name":"resolvedByUserId","type":"string","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","resolution","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"resolution","type":"ImportConflictStatus","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "ImportConflict.updateSource": {
     ref: api.mutations.ImportConflict_updateSource,
