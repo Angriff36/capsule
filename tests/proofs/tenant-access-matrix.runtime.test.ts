@@ -8,15 +8,21 @@
  * Every public read and write in convex/ runs as each role of workspace B
  * (linked staff profiles), a workspace B sign-in with no staff profile, a
  * signed-out caller, and a removed person of workspace A. Arguments point at
- * workspace A: its id, its record ids, its parent ids. Each optional argument
- * that names a record or a workspace is also sent on its own.
+ * workspace A: its id, its record ids, its parent ids, its sign-ins, file
+ * addresses and outside keys (LINK_TABLE maps every link name the plural rule
+ * cannot read; an unmapped name fails the test). Each optional argument that
+ * names one of these is also sent on its own. Reads send the stored text and
+ * numbers (so filters match A's records); in outside writes, text, numbers,
+ * flags and choices differ from the stored ones.
  *
  * - Reads: the same caller runs the same call in a copy with NO workspace A
  *   records. The two answers (value or error text) must be identical, so no
  *   name, number, flag, record or "exists / does not exist" difference from
  *   workspace A reaches the caller. Workspace A's ids simply do not exist in
  *   the copy, so this is also the real-versus-missing id check for every read.
- * - Writes: no workspace A record changes, disappears or appears.
+ * - Writes: no workspace A record changes, disappears or appears, checked
+ *   after each accepted call and after each function; and the call gets the
+ *   same answer in the copy without workspace A.
  *
  * Per-function ledger (tenant-access-matrix.ledger.json): for each read,
  * whether workspace A's owner gets a different answer because of workspace
@@ -116,8 +122,181 @@ const tenantTables = Object.entries(tables)
   })
   .map(([name]) => name);
 
-/** The table a text link field names (eventId -> events, personId -> people). */
-function tableFor(field: string, seeded: Map<string, string>): string | null {
+const tenantTableSet = new Set(tenantTables);
+
+/**
+ * Text link names the plural rule below cannot read, each checked by hand
+ * against the .manifest source / convex seam (review 2026-09-27). Values:
+ * a workspace table, or
+ * - "@sign-in": holds a sign-in (user.id), filled with the workspace owner's;
+ * - "@file": a stored file address;
+ * - "@outside": a key from another system or a fixed list (provider ids,
+ *   tax number, report keys, webhook endpoint keys, package list).
+ * Sign-ins, files and outside keys get one value per workspace, so a record
+ * of workspace A and an argument aimed at it carry the same text.
+ * The test fails on any *Id / *Ids name that is neither here nor readable by
+ * the plural rule, so a new link name cannot be skipped silently.
+ */
+const LINK_TABLE: Record<string, string> = {
+  acceptedRevisionId: "proposalRevisions",
+  activeDishId: "dishes",
+  activeEventId: "events",
+  activeServiceStyleId: "serviceStyles",
+  activityId: "eventTimelineActivities",
+  actorId: "@sign-in",
+  apiKeyId: "@outside",
+  appliedImportRunId: "importRuns",
+  archiveStorageId: "@file",
+  archivedById: "@sign-in",
+  assignedToId: "people",
+  assigneePersonIds: "people",
+  authSubjectId: "@sign-in",
+  authorAuthSubjectId: "@sign-in",
+  authorId: "@sign-in",
+  brandLogoStorageId: "@file",
+  capsuleId: "events",
+  capturedByAuthSubjectId: "@sign-in",
+  childComponentId: "components",
+  closedById: "@sign-in",
+  completedByPersonId: "people",
+  confirmedByUserId: "@sign-in",
+  contactId: "clientContacts",
+  countedById: "@sign-in",
+  createdByPersonId: "people",
+  decidedByUserId: "@sign-in",
+  decisionId: "@outside",
+  defaultVendorId: "vendors",
+  definedById: "@sign-in",
+  dependentTaskId: "prepTasks",
+  destinationInventoryItemId: "inventoryItems",
+  destinationLocationId: "storageLocations",
+  driverId: "people",
+  duplicateClientId: "clients",
+  endpointId: "@outside",
+  entityId: "events",
+  eventStaffingPersonId: "people",
+  eventStaffingSourceIds: "eventStaffNeeds",
+  externalAccountId: "@outside",
+  externalCandidateId: "@outside",
+  externalId: "@outside",
+  externalInterviewId: "@outside",
+  externalPaymentId: "@outside",
+  hiredPersonId: "people",
+  importId: "componentImports",
+  interviewerPersonId: "people",
+  issueId: "eventPacketIssues",
+  lastImportRunId: "importRuns",
+  lastSeenImportRunId: "importRuns",
+  leadPersonId: "people",
+  locationId: "storageLocations",
+  locationIds: "storageLocations",
+  maintenanceScheduleId: "vehicleMaintenanceSchedules",
+  maintenanceTaskId: "equipmentMaintenanceTasks",
+  matchedIngredientId: "ingredients",
+  mentionedPersonIds: "people",
+  nativeTargetId: "events",
+  observationId: "@outside",
+  openedByAuthSubjectId: "@sign-in",
+  openedById: "@sign-in",
+  otherPersonId: "people",
+  overrideOfDishTaskId: "dishTasks",
+  ownerId: "@sign-in",
+  ownerPersonId: "people",
+  packageId: "@outside",
+  packedByPersonId: "people",
+  parentId: "events",
+  partnerClientId: "clients",
+  partnerPersonId: "people",
+  pdfStorageId: "@file",
+  portionSpecId: "componentPortionSpecs",
+  possibleMatchIngredientIds: "ingredients",
+  postedById: "@sign-in",
+  predecessorTaskId: "prepTasks",
+  preferredVendorId: "vendors",
+  preferredVendorIds: "vendors",
+  previousComponentId: "components",
+  previousStaffNeedId: "eventStaffNeeds",
+  primaryClientId: "clients",
+  primaryContactId: "vendorContacts",
+  primaryImageStorageId: "@file",
+  providerAccountId: "@outside",
+  providerIds: "@outside",
+  providerMessageId: "@outside",
+  providerThreadId: "@outside",
+  providerTransactionIds: "@outside",
+  purchaseEligibleEventId: "events",
+  raisedById: "@sign-in",
+  reactivatedById: "@sign-in",
+  realmId: "@outside",
+  recipeSyncComponentId: "components",
+  recipeSyncDishId: "dishes",
+  recipeSyncIngredientId: "ingredients",
+  recipientAuthSubjectId: "@sign-in",
+  recipientContactId: "clientContacts",
+  recipientPersonId: "people",
+  reconciledById: "@sign-in",
+  reconciledByUserId: "@sign-in",
+  recurrenceSeriesId: "@outside",
+  remainingSourceIds: "eventStaffNeeds",
+  replacesProposalId: "proposals",
+  reportId: "@outside",
+  reportedById: "@sign-in",
+  requesterAuthSubjectId: "@sign-in",
+  requesterPersonId: "people",
+  requiredQualificationId: "qualifications",
+  requiredTrainingCompletionId: "trainingCompletions",
+  requiredTrainingModuleId: "trainingModules",
+  resolvedByUserId: "@sign-in",
+  resultingComponentId: "components",
+  reviewedByAuthSubjectId: "@sign-in",
+  reviewerId: "people",
+  revisedById: "proposals",
+  revokedByPersonId: "people",
+  salespersonId: "people",
+  senderAuthSubjectId: "@sign-in",
+  sequenceAfterDishTaskId: "dishTasks",
+  seriesId: "@outside",
+  settledById: "@sign-in",
+  snapshotStorageId: "@file",
+  sourceDishComponentId: "dishComponents",
+  sourceDishId: "dishes",
+  sourceDishIngredientId: "dishIngredients",
+  sourceEventId: "events",
+  sourceImportRunId: "importRuns",
+  sourceIngredientId: "ingredients",
+  sourceInventoryItemId: "inventoryItems",
+  sourceInvoiceId: "invoices",
+  sourceLocationId: "storageLocations",
+  sourceQualificationId: "qualifications",
+  staffMemberId: "people",
+  staffNeedId: "eventStaffNeeds",
+  startedById: "@sign-in",
+  storageId: "@file",
+  storageIds: "@file",
+  subjectId: "clientContacts",
+  substituteIngredientIds: "ingredients",
+  targetDishComponentId: "dishComponents",
+  targetDishContainerId: "dishContainers",
+  targetDishId: "dishes",
+  targetDishIngredientId: "dishIngredients",
+  targetDishTaskId: "dishTasks",
+  targetId: "events",
+  targetIngredientId: "ingredients",
+  targetInvoiceId: "invoices",
+  targetQualificationId: "qualifications",
+  targetTrainingCompletionId: "trainingCompletions",
+  taskOwnerAssignedToId: "people",
+  taskOwnerAuthSubjectId: "@sign-in",
+  taxId: "@outside",
+  threadId: "messageThreads",
+  updatedById: "@sign-in",
+  uploadedByAuthSubjectId: "@sign-in",
+  uploadedById: "@sign-in",
+  verifiedByUserId: "@sign-in",
+};
+
+/** What a text field named like a link points at, or null when it is plain text. */
+function linkKind(field: string): string | null {
   const match = /^(.+?)Ids?$/.exec(field);
   if (!match || field === "tenantId") return null;
   const base = match[1]!;
@@ -125,27 +304,53 @@ function tableFor(field: string, seeded: Map<string, string>): string | null {
     base === "person"
       ? ["people"]
       : [`${base}s`, `${base}es`, `${base.replace(/y$/, "ie")}s`, base];
-  return candidates.find((name) => seeded.has(name)) ?? null;
+  return (
+    candidates.find((name) => tenantTableSet.has(name)) ??
+    LINK_TABLE[field] ??
+    null
+  );
 }
 
-/** One deterministic value for a field rule; used for records AND arguments. */
-function fill(rule: Json, field: string, side: Side): unknown {
+/** Sign-in of each workspace's active owner (see makeWorld). */
+function ownerSignIn(tenant: string): string {
+  return tenant === TENANT_A ? "matrix-owner-a" : "matrix-owner-b";
+}
+
+function linkValue(kind: string, side: Side): string {
+  if (kind === "@sign-in") return ownerSignIn(side.tenant);
+  if (kind === "@file") return `matrix-file-${side.tenant}`;
+  if (kind === "@outside") return `matrix-outside-${side.tenant}`;
+  // Not seeded yet during the first seeding pass; the second pass links it.
+  return side.seeded.get(kind) ?? MARK;
+}
+
+/** Values the arguments send where they do not aim at a record: never the stored ones. */
+const PROBE_TEXT = "matrix-probe-argument";
+const PROBE_NUMBER = 4242;
+
+/**
+ * One deterministic value for a field rule. Records use the workspace's own
+ * values; arguments (`probe`) aim links at the same records but send other
+ * text, numbers, flags and choices, so an accepted update cannot be a no-op.
+ */
+function fill(rule: Json, field: string, side: Side, probe = false): unknown {
   switch (rule.type) {
     case "string": {
       if (field === "tenantId") return side.tenant;
-      const table = tableFor(field, side.seeded);
-      return table ? side.seeded.get(table) : MARK;
+      const kind = linkKind(field);
+      if (kind) return linkValue(kind, side);
+      return probe ? PROBE_TEXT : MARK;
     }
     case "number":
-      return NUMBER[side.tenant];
+      return probe ? PROBE_NUMBER : NUMBER[side.tenant];
     case "bigint":
-      return BigInt(NUMBER[side.tenant]!);
+      return BigInt(probe ? PROBE_NUMBER : NUMBER[side.tenant]!);
     case "boolean":
-      return false;
+      return probe;
     case "null":
       return null;
     case "any":
-      return MARK;
+      return probe ? PROBE_TEXT : MARK;
     case "bytes":
       return new ArrayBuffer(1);
     case "id":
@@ -156,24 +361,57 @@ function fill(rule: Json, field: string, side: Side): unknown {
       const item = rule.value;
       const names =
         item.type === "id" ||
-        (item.type === "string" && tableFor(field, side.seeded) !== null);
-      return names ? [fill(item, field, side)] : [];
+        (item.type === "string" && linkKind(field) !== null);
+      return names ? [fill(item, field, side, probe)] : [];
     }
     case "record":
       return {};
     case "union": {
-      const first = rule.value.find((m) => m.type !== "null") ?? rule.value[0]!;
-      return fill(first, field, side);
+      const members = rule.value.filter((m) => m.type !== "null");
+      const pick = probe ? members.at(-1) : members[0];
+      return fill(pick ?? rule.value[0]!, field, side, probe);
     }
     case "object": {
       const out: Doc = {};
       for (const [key, spec] of Object.entries(rule.value)) {
         if (spec.optional) continue;
-        out[key] = fill(spec.fieldType, key, side);
+        out[key] = fill(spec.fieldType, key, side, probe);
       }
       return out;
     }
   }
+}
+
+/** True when a field rule is text (or a list / choice of text). */
+function isText(rule: Json): boolean {
+  if (rule.type === "string") return true;
+  if (rule.type === "array") return isText(rule.value);
+  if (rule.type === "union") return rule.value.some(isText);
+  return false;
+}
+
+/** Every text *Id / *Ids name in public arguments and workspace records the test cannot aim. */
+function unreadableLinkNames(entries: Entry[]): string[] {
+  const out = new Set<string>();
+  const check = (key: string, rule: Json, where: string) => {
+    if (key === "tenantId" || !/Ids?$/.test(key) || !isText(rule)) return;
+    const kind = linkKind(key);
+    if (!kind) out.add(`${key} (${where})`);
+    else if (!kind.startsWith("@") && !tenantTableSet.has(kind))
+      out.add(`${key} -> ${kind} is not a workspace table (${where})`);
+  };
+  for (const entry of entries) {
+    if (entry.args?.type !== "object") continue;
+    for (const [key, spec] of Object.entries(entry.args.value))
+      check(key, spec.fieldType, entry.path);
+  }
+  for (const table of tenantTables) {
+    const json = tables[table]!.validator.json;
+    if (json.type !== "object") continue;
+    for (const [key, spec] of Object.entries(json.value))
+      check(key, spec.fieldType, table);
+  }
+  return [...out].sort();
 }
 
 type Entry = { path: string; kind: "query" | "mutation"; args: Json | null };
@@ -213,14 +451,29 @@ const DEVICE_SECRET_ARGS: Record<string, string> = {
   "pushSubscriptions:register": "endpoint",
 };
 
-/** Optional arguments that name a record or a workspace. */
-function linkArgs(entry: Entry, side: Side): string[] {
+/**
+ * Writes whose answer may differ with workspace A present, with the reason.
+ * They still must not change any workspace A record.
+ */
+const ANSWER_MAY_DIFFER: Record<string, string> = {
+  // A stored-file address is a long random secret, like the phone alert
+  // address above. Refusing to register a file some record already uses is
+  // what stops anyone claiming another company's file (convex/assistantConfig.ts).
+  "assistantConfig:registerUpload": "stored-file address is a secret",
+};
+
+/**
+ * Optional arguments that name a record, a sign-in, a file, an outside key
+ * or a workspace. Every text *Id / *Ids name is readable (unreadableLinkNames
+ * must be empty), so each one gets its own variant.
+ */
+function linkArgs(entry: Entry): string[] {
   const rule = entry.args;
   if (!rule || rule.type !== "object") return [];
   return Object.entries(rule.value)
     .filter(([key, spec]) => {
       if (!spec.optional) return false;
-      if (key === "tenantId" || tableFor(key, side.seeded)) return true;
+      if (key === "tenantId" || linkKind(key)) return true;
       const t =
         spec.fieldType.type === "union"
           ? spec.fieldType.value.find((m) => m.type !== "null")
@@ -230,7 +483,12 @@ function linkArgs(entry: Entry, side: Side): string[] {
     .map(([key]) => key);
 }
 
-/** Arguments for one function; `extra` adds one optional argument. */
+/**
+ * Arguments for one function; `extra` adds one optional argument. Reads and
+ * the owner's own calls send the stored values, so a filter on a name or a
+ * number finds workspace A's record. Outside writes (`outsider`) send other
+ * text, numbers, flags and choices, so an accepted update cannot be a no-op.
+ */
 function argsFor(
   entry: Entry,
   side: Side,
@@ -245,13 +503,13 @@ function argsFor(
     out[key] =
       outsider && DEVICE_SECRET_ARGS[entry.path] === key
         ? "matrix-not-the-device-secret"
-        : fill(spec.fieldType, key, side);
+        : fill(spec.fieldType, key, side, outsider);
   }
   return out;
 }
 
-function variants(entry: Entry, side: Side): (string | null)[] {
-  return [null, ...linkArgs(entry, side)];
+function variants(entry: Entry): (string | null)[] {
+  return [null, ...linkArgs(entry)];
 }
 
 /**
@@ -283,12 +541,22 @@ function personRow(side: Side, extra: Doc): Doc {
   };
 }
 
+/**
+ * The seeded staff profile gets its own sign-in, so the owner sign-in that
+ * "@sign-in" fields name stays one live person (see makeWorld).
+ */
+function seedRow(table: string, side: Side): Doc {
+  const doc = fill(tables[table]!.validator.json, "", side) as Doc;
+  doc.tenantId = side.tenant;
+  if (table === "people") doc.authSubjectId = `matrix-seeded-${side.tenant}`;
+  return doc;
+}
+
 /** One record per workspace table; links resolved to this workspace's records. */
 async function seedSide(t: Harness, side: Side): Promise<string[]> {
   const failed: string[] = [];
   for (const table of tenantTables) {
-    const doc = fill(tables[table]!.validator.json, "", side) as Doc;
-    doc.tenantId = side.tenant;
+    const doc = seedRow(table, side);
     try {
       const id = await t.run((ctx) =>
         ctx.db.insert(table as never, doc as never),
@@ -300,8 +568,7 @@ async function seedSide(t: Harness, side: Side): Promise<string[]> {
   }
   // Second pass: every link now points at this workspace's own records.
   for (const [table, id] of side.seeded) {
-    const doc = fill(tables[table]!.validator.json, "", side) as Doc;
-    doc.tenantId = side.tenant;
+    const doc = seedRow(table, side);
     // Keep the seeded area switch on, so the probes are not all stopped by it.
     if (table === "organizationCapabilitySettings") doc.enabled = true;
     try {
@@ -313,7 +580,12 @@ async function seedSide(t: Harness, side: Side): Promise<string[]> {
   return failed;
 }
 
-/** Workspace B always; workspace A only when `withA`. B goes first so its ids match. */
+/**
+ * Workspace B always; workspace A only when `withA`. Record ids come from one
+ * running counter, so the copy without A still creates A's records and then
+ * deletes them: every later id matches between the copies, and A's ids point
+ * at nothing (rather than at a record some later call made).
+ */
 async function makeWorld(withA: boolean) {
   const t = convexTest(schema, modules);
   const b: Side = { tenant: TENANT_B, seeded: new Map() };
@@ -331,7 +603,7 @@ async function makeWorld(withA: boolean) {
       ),
     );
   }
-  if (withA) {
+  {
     failed.push(...(await seedSide(t, a)));
     await t.run(async (ctx) => {
       // A removed staff profile, still linked to a sign-in.
@@ -351,6 +623,17 @@ async function makeWorld(withA: boolean) {
           status: "active",
         }) as never,
       );
+    });
+  }
+  if (!withA) {
+    await t.run(async (ctx) => {
+      for (const table of tenantTables) {
+        for (const row of (await ctx.db
+          .query(table as never)
+          .collect()) as Doc[]) {
+          if (row.tenantId === TENANT_A) await ctx.db.delete(row._id as never);
+        }
+      }
     });
   }
   return { t, a, b, failed };
@@ -470,6 +753,8 @@ describe("PL-AUTH workspace and role matrix (AC-151 / PR12-10)", () => {
         ids.reduce((out, id) => out.split(id).join("<id>"), text).slice(0, 300);
 
       const entries = await publicFunctions();
+      // Every link-like argument or record field must be aimed at workspace A.
+      expect(unreadableLinkNames(entries)).toEqual([]);
       const queries = entries.filter((e) => e.kind === "query");
       const mutations = entries.filter((e) => e.kind === "mutation");
       const ledger: Ledger = { reads: {}, writes: {} };
@@ -481,17 +766,17 @@ describe("PL-AUTH workspace and role matrix (AC-151 / PR12-10)", () => {
         const withA = as(full.t, caller);
         const withoutA = as(empty.t, caller);
         for (const entry of queries) {
-          for (const extra of variants(entry, a)) {
+          for (const extra of variants(entry)) {
             const args = argsFor(entry, a, extra);
             const r1 = await run(withA, entry, args);
             readProbes += 1;
             const where = `${caller.label} -> ${entry.path}${extra ? ` [${extra}]` : ""}`;
             if (entry.path === PUBLIC_QUOTE_FORM) {
+              // Open to anyone, so also: only option names, never more.
               const extraFields =
                 "value" in r1 ? publicQuoteFormExtras(r1.value) : [];
               if (extraFields.length > 0)
                 readLeaks.push(`${where} (${extraFields.join(", ")})`);
-              continue;
             }
             const r0 = await run(withoutA, entry, args);
             if (show(r1) !== show(r0))
@@ -507,7 +792,7 @@ describe("PL-AUTH workspace and role matrix (AC-151 / PR12-10)", () => {
       const ownerWithout = as(empty.t, OWNER_A);
       for (const entry of queries) {
         let reason = "";
-        for (const extra of variants(entry, a)) {
+        for (const extra of variants(entry)) {
           const args = argsFor(entry, a, extra);
           const r1 = await run(ownerWith, entry, args);
           const r0 = await run(ownerWithout, entry, args);
@@ -523,34 +808,64 @@ describe("PL-AUTH workspace and role matrix (AC-151 / PR12-10)", () => {
         ledger.reads[entry.path] = reason;
       }
 
-      // Writes: no outside caller changes, removes or adds a workspace A record.
+      // Writes: no outside call changes, removes or adds a workspace A record,
+      // checked right after each accepted call and again after each function
+      // (a refused call is rolled back whole). The same call also runs in the
+      // copy without workspace A, and must get the same answer there, so a
+      // refusal cannot tell "exists in A" from "does not exist".
+      const idPattern = new RegExp(
+        `\\d{2,}(?:${Object.keys(tables)
+          .sort((x, y) => y.length - x.length)
+          .join("|")})`,
+        "g",
+      );
+      // Ids of records made by the calls, and one-time upload tokens.
+      const noIds = (text: string) =>
+        text.replace(idPattern, "<id>").replace(/token=[\d.]+/g, "token=<t>");
       const writeLeaks: string[] = [];
       let writeProbes = 0;
+      let current = await stateOfA(full.t);
+      const noteChanges = (where: string) =>
+        stateOfA(full.t).then((next) => {
+          for (const change of changes(current, next))
+            writeLeaks.push(`${where}: ${change}`);
+          current = next;
+        });
       for (const caller of OUTSIDERS) {
-        const h = as(full.t, caller);
-        const before = await stateOfA(full.t);
+        const withA = as(full.t, caller);
+        const withoutA = as(empty.t, caller);
         for (const entry of mutations) {
-          for (const extra of variants(entry, a)) {
-            await run(h, entry, argsFor(entry, a, extra, true));
+          for (const extra of variants(entry)) {
+            const args = argsFor(entry, a, extra, true);
+            const where = `${caller.label} -> ${entry.path}${extra ? ` [${extra}]` : ""}`;
+            const w1 = await run(withA, entry, args);
+            const w0 = await run(withoutA, entry, args);
             writeProbes += 1;
+            if ("value" in w1) await noteChanges(where);
+            if (
+              !ANSWER_MAY_DIFFER[entry.path] &&
+              noIds(show(w1)) !== noIds(show(w0))
+            )
+              writeLeaks.push(
+                `${where}: with A ${plain(noIds(show(w1)))} | without A ${plain(noIds(show(w0)))}`,
+              );
           }
+          await noteChanges(`${caller.label} -> ${entry.path}`);
         }
-        for (const change of changes(before, await stateOfA(full.t)))
-          writeLeaks.push(`${caller.label}: ${change}`);
       }
 
       // Ledger: does each write change workspace A records for A's own owner?
       const own = await makeWorld(true);
       const owner = as(own.t, OWNER_A);
-      let current = await stateOfA(own.t);
+      let ownState = await stateOfA(own.t);
       for (const entry of mutations) {
         let reason = "";
-        for (const extra of variants(entry, own.a)) {
+        for (const extra of variants(entry)) {
           const out = await run(owner, entry, argsFor(entry, own.a, extra));
           if ("value" in out) {
             const next = await stateOfA(own.t);
-            const changed = changes(current, next).length > 0;
-            current = next;
+            const changed = changes(ownState, next).length > 0;
+            ownState = next;
             if (changed) {
               reason = `changes workspace A records${extra ? ` via ${extra}` : ""}`;
               break;
