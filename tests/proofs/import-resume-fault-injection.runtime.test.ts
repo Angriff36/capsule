@@ -15,7 +15,8 @@
  *
  * - After parent create, before link (venues V-004): the venue is created
  *   directly through the generated Venue_createViaRegister with the EXACT
- *   idempotencyKey the action uses (import:<runId>:venue:<externalId>), and
+ *   idempotencyKey the action uses
+ *   (tenant-shared/import:<runId>:venue:<externalId>), and
  *   no link is written. Resume re-creates under the same key → the
  *   generated command's idempotency cache returns the ORIGINAL docId with
  *   ZERO writes → the link is recorded, no duplicate venue exists, and a
@@ -254,7 +255,7 @@ describe("runtime proof: import resume with fault injection (AC-024)", () => {
         name: "Crash Window Venue",
         venueType: "other",
         capacity: 40,
-        idempotencyKey: `import:${venuesRunId}:venue:V-004`,
+        idempotencyKey: `tenant-shared/import:${venuesRunId}:venue:V-004`,
       },
     )) as { docId: string };
     expect(crashWindowVenue.docId).toBeTruthy();
@@ -404,7 +405,7 @@ describe("runtime proof: import resume with fault injection (AC-024)", () => {
       {
         eventId: e100EventId,
         name: "Crash Window List",
-        idempotencyKey: `import:${packRunId}:pack_list:E-100`,
+        idempotencyKey: `tenant-shared/import:${packRunId}:pack_list:E-100`,
       },
     )) as { docId: string };
     const crashWindowItem = (await owner.mutation(
@@ -414,7 +415,7 @@ describe("runtime proof: import resume with fault injection (AC-024)", () => {
         description: "Chafing dish",
         requiredQuantity: 6,
         unit: "each",
-        idempotencyKey: `import:${packRunId}:pack_list:E-100:item:0`,
+        idempotencyKey: `tenant-shared/import:${packRunId}:pack_list:E-100:item:0`,
       },
     )) as { docId: string };
 

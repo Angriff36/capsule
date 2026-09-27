@@ -686,7 +686,7 @@ export const commitImportRun = action({
           continue;
         }
 
-        const idempotencyKey = `import:${args.importRunId}:contact:${contact.externalId}`;
+        const idempotencyKey = `tenant-shared/import:${args.importRunId}:contact:${contact.externalId}`;
         const notes =
           [contact.title, contact.notes].filter(Boolean).join(" — ") ||
           undefined;
@@ -901,7 +901,7 @@ export const commitImportRun = action({
         const budgetAmount = Math.max(0, event.budgetAmount ?? 0);
         const quotedPrice = Math.max(0, event.quotedRevenue ?? 0);
 
-        const idempotencyKey = `import:${args.importRunId}:event:${event.externalId}`;
+        const idempotencyKey = `tenant-shared/import:${args.importRunId}:event:${event.externalId}`;
         try {
           const created = await ctx.runMutation(
             api.mutations.Event_createViaPlanEngagement,
@@ -1039,7 +1039,7 @@ export const commitImportRun = action({
         // hardcodes stage "new" with no stage arg). Linking the lead to a
         // Capsule Client is the conversion workflow (stageConversion →
         // confirmConversion), a separate operator action.
-        const idempotencyKey = `import:${args.importRunId}:lead:${lead.externalId}`;
+        const idempotencyKey = `tenant-shared/import:${args.importRunId}:lead:${lead.externalId}`;
         const notes =
           [
             lead.stage !== "new" ? `TPP stage: ${lead.stage}` : null,
@@ -1314,7 +1314,7 @@ export const commitImportRun = action({
           continue;
         }
 
-        const idempotencyKey = `import:${args.importRunId}:menu:${menu.externalId}`;
+        const idempotencyKey = `tenant-shared/import:${args.importRunId}:menu:${menu.externalId}`;
         try {
           const created = await ctx.runMutation(
             api.mutations.Dish_createViaIntroduce,
@@ -1477,7 +1477,7 @@ export const commitImportRun = action({
         }
         const eventId: string = eventLink.capsuleId;
 
-        const idempotencyKey = `import:${args.importRunId}:pack_list:${packList.externalId}`;
+        const idempotencyKey = `tenant-shared/import:${args.importRunId}:pack_list:${packList.externalId}`;
         try {
           const created = await ctx.runMutation(
             api.mutations.PackList_createViaOpen,
@@ -1510,7 +1510,7 @@ export const commitImportRun = action({
                   // §6.3 idempotent-import requirement. Run-scoped to match the
                   // PackList/Dish create-key convention; cross-run dedup is the
                   // pack-list link check's job (findLink above).
-                  idempotencyKey: `import:${args.importRunId}:pack_list:${packList.externalId}:item:${itemIndex}`,
+                  idempotencyKey: `tenant-shared/import:${args.importRunId}:pack_list:${packList.externalId}:item:${itemIndex}`,
                 },
               );
               itemsAdded += 1;
@@ -1635,7 +1635,7 @@ export const commitImportRun = action({
         continue;
       }
 
-      const idempotencyKey = `import:${args.importRunId}:venue:${venue.externalId}`;
+      const idempotencyKey = `tenant-shared/import:${args.importRunId}:venue:${venue.externalId}`;
       try {
         const created = await ctx.runMutation(
           api.mutations.Venue_createViaRegister,

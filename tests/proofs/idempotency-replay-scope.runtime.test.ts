@@ -1,12 +1,16 @@
 /**
  * Runtime proof (PL-AUTH, AC-151): a saved step answer replays only for the
- * same workspace and the same step.
+ * same caller with the same access, while the reservation itself stays stable
+ * for the workspace so a retry never runs the step twice.
  *
- * Every generated mutation saves its answer under the caller's idempotency
- * key so a retry gets the first answer back. The key alone was the lookup, so
+ * Every generated mutation claims a reservation per workspace + step + retry
+ * key, and stores who saved the answer. The key alone was the lookup, so
  * workspace B (or a signed-out caller) sending workspace A's record id and a
  * known key got A's saved answer - here A's whole ingredient record - before
- * the step checked the record. Synthetic workspaces only.
+ * the step checked the record. A "tenant-shared/" key claims a
+ * tenant-workflow receipt: another signed-in caller in the same workspace
+ * recovers the original record reference (operator handoff), never the saved
+ * answer. Synthetic workspaces only.
  */
 import { convexTest } from "convex-test";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -109,9 +113,10 @@ describe("saved step answers replay only in their own workspace (PL-AUTH)", () =
     const first = (await discontinue(cook)) as { name?: string };
     expect(first.name).toBe("Secret saffron");
     expect(await discontinue(cook)).toEqual(first);
-    // Sales may not see ingredients: the kitchen's saved answer is not theirs.
+    // Sales sends the kitchen's key: the saved answer is not theirs, and the
+    // step does not run again either - the reservation refuses the run.
     await expect(discontinue(sales)).rejects.toThrow(
-      "Kitchen, inventory and managers may see ingredients",
+      "already used by a different sign-in",
     );
 
     // A staff profile linked to a sign-in that still carries the company's
@@ -211,6 +216,91 @@ describe("saved step answers replay only in their own workspace (PL-AUTH)", () =
     );
     await expect(selfRemove(keeper)).rejects.toThrow();
     await expect(selfRemove(t as never)).rejects.toThrow();
+  });
+
+  it("refuses a second operator on a claimed key without re-running the step, and recovers the original record for a tenant-shared key", async () => {
+    const t = convexTest(schema, modules);
+    const tenantId = "tenant-replay-handoff";
+    const ownerA = t.withIdentity({
+      subject: "replay-handoff-a",
+      tokenIdentifier: "replay|handoff-a",
+      role: "org:owner",
+      tenantId,
+    });
+    const ownerB = t.withIdentity({
+      subject: "replay-handoff-b",
+      tokenIdentifier: "replay|handoff-b",
+      role: "org:owner",
+      tenantId,
+    });
+    const introduce = (as: typeof ownerA, name: string) =>
+      as.mutation(api.mutations.Ingredient_createViaIntroduce, {
+        name,
+        unit: "kilogram",
+        costPerUnit: 3,
+      }) as Promise<{ docId: Id<"ingredients"> }>;
+    const discontinue = (
+      as: typeof ownerA,
+      docId: Id<"ingredients">,
+      idempotencyKey: string,
+    ) =>
+      as.mutation(api.mutations.Ingredient_discontinue, {
+        docId,
+        reason: "Out of season",
+        idempotencyKey,
+      });
+    const row = (id: Id<"ingredients">) =>
+      t.run((ctx) => ctx.db.get(id)) as Promise<{
+        status?: string;
+        version?: number;
+      } | null>;
+
+    // Operator A runs the step; the reservation is claimed for the workspace
+    // and the key, whoever sends it next.
+    const saffron = await introduce(ownerA, "Handoff saffron");
+    const first = (await discontinue(ownerA, saffron.docId, "crash-key")) as {
+      name?: string;
+    };
+    expect(first.name).toBe("Handoff saffron");
+    const afterFirst = await row(saffron.docId);
+
+    // Operator B sends the same ordinary key: A's saved answer is not B's,
+    // and the step does not run again - the record is untouched.
+    await expect(
+      discontinue(ownerB, saffron.docId, "crash-key"),
+    ).rejects.toThrow("already used by a different sign-in");
+    expect(await row(saffron.docId)).toEqual(afterFirst);
+    // Operator A's own retry still gets the full saved answer back.
+    expect(await discontinue(ownerA, saffron.docId, "crash-key")).toEqual(
+      first,
+    );
+
+    // Crash-window handoff: the same key under tenant-shared/ lets operator
+    // B recover the ORIGINAL record reference - not A's saved answer - so a
+    // resume continues the workflow instead of duplicating the record.
+    const truffle = await introduce(ownerA, "Handoff truffle");
+    const saved = (await discontinue(
+      ownerA,
+      truffle.docId,
+      "tenant-shared/handoff-key",
+    )) as { name?: string };
+    expect(saved.name).toBe("Handoff truffle");
+    const afterSaved = await row(truffle.docId);
+    const recovered = (await discontinue(
+      ownerB,
+      truffle.docId,
+      "tenant-shared/handoff-key",
+    )) as { docId?: string; _id?: string; name?: string };
+    expect(recovered.docId).toBe(truffle.docId);
+    expect(recovered._id).toBe(truffle.docId);
+    expect(recovered.name).toBeUndefined();
+    // The recovery neither re-ran the step nor changed the record.
+    expect(await row(truffle.docId)).toEqual(afterSaved);
+    // Operator A's own retry on the shared key is still the full answer.
+    expect(
+      await discontinue(ownerA, truffle.docId, "tenant-shared/handoff-key"),
+    ).toEqual(saved);
+    expect(await row(truffle.docId)).toEqual(afterSaved);
   });
 
   it("checks only the inputs the Manifest declares as links", async () => {

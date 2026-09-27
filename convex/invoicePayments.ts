@@ -412,12 +412,12 @@ export const syncStripePayments = action({
             method,
             ...(invoice.eventId ? { eventId: String(invoice.eventId) } : {}),
             notes: `Stripe Checkout ${session.sessionId}`,
-            idempotencyKey: `stripe-checkout/${session.sessionId}/record`,
+            idempotencyKey: `tenant-shared/stripe-checkout/${session.sessionId}/record`,
           },
         );
         await ctx.runMutation(api.mutations.Payment_settle, {
           docId: recordResult.docId,
-          idempotencyKey: `stripe-checkout/${session.sessionId}/settle`,
+          idempotencyKey: `tenant-shared/stripe-checkout/${session.sessionId}/settle`,
         });
         await ctx.runMutation(internal.invoicePayments.recordLedgerEvent, {
           type: EVENT.stripePaymentRecorded,

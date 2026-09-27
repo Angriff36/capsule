@@ -24,7 +24,7 @@ import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { mutation } from "./_generated/server";
 import { deleteBlobIfOrphan } from "./lib/blobs";
-import { scopedCommandKey } from "./lib/commandIdempotency";
+import { commandIdempotencyScope } from "./lib/commandIdempotency";
 import { chatAuth, encryptField, live } from "./lib/teamChatRead";
 
 /** Files per message; mirrors src/features/chat/chatTypes.ts CHAT_MAX_FILES. */
@@ -99,17 +99,19 @@ export const sendWithFiles = mutation({
     // BEFORE the caller's key and the key is last, so a draft key that happens
     // to end in ":file:0" can never collide with another message's file key.
     const messageKey = `${auth.tenantId}:${auth.id}:teamChat:message:${draftKey}`;
-    // The generated step saves its answer under the workspace-scoped key.
-    const savedKey = await scopedCommandKey(
+    // The generated step claims its reservation under the workspace-stable
+    // key and replays its answer only for this caller scope; existence here
+    // only decides whether this retry may still attach files.
+    const idemScope = await commandIdempotencyScope(
       ctx,
       "StaffMessage_createViaSend",
       messageKey,
     );
     const replay =
-      savedKey !== null &&
+      idemScope !== null &&
       (await ctx.db
         .query("commandIdempotencyKeys")
-        .withIndex("by_key", (q) => q.eq("key", savedKey))
+        .withIndex("by_key", (q) => q.eq("key", idemScope.reservationKey))
         .first()) !== null;
 
     const created = (await ctx.runMutation(

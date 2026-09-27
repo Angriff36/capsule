@@ -13,12 +13,18 @@
  *
  * The saved-answer (idempotency) cache is keyed by the caller's key alone in
  * generated output. This patch routes every lookup and store through
- * convex/lib/commandIdempotency.ts, which scopes the key to the caller's
- * workspace, sign-in, staff profile, role and switched-off areas, and the key
- * is worked out ONCE before the step runs (a step that changes its caller's
- * own access must not save under the changed access). Receipts saved by the
- * old single-key version cannot be attributed to a caller, so a retry that
- * hits one is refused with guidance instead of replayed or re-executed.
+ * convex/lib/commandIdempotency.ts: the reservation (commandIdempotencyKeys.key)
+ * is stable per workspace + step + retry key so a retry never re-executes the
+ * step whoever sends it, while the saved answer replays only for the caller
+ * scope that saved it (sign-in, staff profile, role, switched-off areas). A
+ * "tenant-shared/" retry key claims a tenant-workflow receipt: another signed-in
+ * caller in the workspace recovers the original record reference, so an
+ * operator handoff mid-workflow (import resume, inbox ingestion, payment sync)
+ * does not duplicate records. The scope is worked out ONCE before the step
+ * runs (a step that changes its caller's own access must not save under the
+ * changed access). Receipts saved by the old single-key version cannot be
+ * attributed to a caller, so a retry that hits one is refused with guidance
+ * instead of replayed or re-executed.
  *
  * The link check runs AFTER the replay lookup: a retry must get its saved
  * answer back even if one of its linked records was deleted since.
@@ -38,18 +44,22 @@ const IMPORT =
   'import { assertOwnWorkspaceLinks as __assertOwnWorkspaceLinks } from "./lib/ownWorkspaceLinks";\n';
 const HANDLER = /^ {2}handler: async \(ctx, args(?:: any)?\) => \{\n/m;
 const RUN_LINE = /^    const __result = await __run\w+\(ctx, args\);\n/m;
-const LEGACY_REFUSAL =
-  "This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.";
 
 /**
  * The generated idempotency cache is keyed by the caller's key alone and is
- * read before the step's role checks. The scoped key is worked out ONCE
- * before the step runs; on a miss, a receipt saved under the raw pre-upgrade
- * key is refused (it cannot be attributed to a caller) instead of replayed
- * or re-executed.
+ * read before the step's role checks. The reservation + caller scope are
+ * worked out ONCE before the step runs; a receipt hit answers from the saved
+ * answer per its caller scope (convex/lib/commandIdempotency.ts) and the step
+ * never runs again under that key.
  */
 const SCOPE_IMPORT =
-  'import { scopedCommandKey as __scopedCommandKey } from "./lib/commandIdempotency";\n';
+  "import {\n" +
+  "  commandIdempotencyScope as __commandIdempotencyScope,\n" +
+  "  lookupCommandIdempotency as __lookupCommandIdempotency,\n" +
+  "  saveCommandIdempotency as __saveCommandIdempotency,\n" +
+  '} from "./lib/commandIdempotency";\n';
+const REFUSE_LINE =
+  '      if (__hit.kind === "refuse") throw new Error(__hit.reason);\n';
 const MUTATION_START = /^export const (\w+) = mutation\(\{$/gm;
 const GET_BLOCK =
   "    if (args.idempotencyKey !== undefined) {\n" +
@@ -201,7 +211,7 @@ function patchMutations(
       block = block
         .replace(
           GET_BLOCK,
-          `    const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "${name}", args.idempotencyKey);\n    if (__idemKey !== null) {\n      const __cached = await __getCommandIdempotency(ctx, __idemKey);\n      if (__cached !== undefined) return __cached;\n      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);\n      if (__legacy !== undefined) throw new Error(${JSON.stringify(LEGACY_REFUSAL)});\n`,
+          `    const __idem = args.idempotencyKey === undefined ? null : await __commandIdempotencyScope(ctx, "${name}", args.idempotencyKey as string);\n    if (__idem !== null) {\n      const __hit = await __lookupCommandIdempotency(ctx, __idem, args.idempotencyKey as string);\n      if (__hit.kind === "replay") return __hit.result;\n${REFUSE_LINE}`,
         )
         .replace(SET_BLOCK, (_call, a: string, b: string, command: string) => {
           if (command !== name) {
@@ -209,7 +219,7 @@ function patchMutations(
               `apply-own-workspace-links: ${name} saves its answer as ${command}`,
             );
           }
-          return `${a}if (__idemKey !== null) {\n${b}await __setCommandIdempotency(ctx, __idemKey, "${name}", `;
+          return `${a}if (__idem !== null) {\n${b}await __saveCommandIdempotency(ctx, __idem, `;
         });
     } else if (
       /args\.idempotencyKey !== undefined/.test(block) ||
@@ -225,14 +235,12 @@ function patchMutations(
       const assertLine = `    await __assertOwnWorkspaceLinks(ctx, args, ${JSON.stringify(names)});\n`;
       if (RUN_LINE.test(block)) {
         block = block.replace(RUN_LINE, (line) => `${assertLine}${line}`);
-      } else if (
-        block.includes(`throw new Error(${JSON.stringify(LEGACY_REFUSAL)})`)
-      ) {
+      } else if (block.includes(REFUSE_LINE)) {
         // createVia steps inline their body: anchor right after the replay
         // prologue's closing brace instead of a delegated run call.
-        const LEGACY_BLOCK =
-          /^      if \(__legacy !== undefined\) throw new Error\([^\n]*\);\n    \}\n/m;
-        block = block.replace(LEGACY_BLOCK, (m) => `${m}${assertLine}`);
+        const REFUSE_END =
+          /^      if \(__hit\.kind === "refuse"\) throw new Error\(__hit\.reason\);\n    \}\n/m;
+        block = block.replace(REFUSE_END, (m) => `${m}${assertLine}`);
       } else {
         block = block.replace(HANDLER, (line) => `${line}${assertLine}`);
       }

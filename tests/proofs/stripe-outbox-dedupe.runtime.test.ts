@@ -212,7 +212,7 @@ describe("Stripe outbox records each paid session once", () => {
       amount: 400,
       method: "card",
       notes: `Stripe Checkout ${link.sessionId}`,
-      idempotencyKey: `stripe-checkout/${link.sessionId}/record`,
+      idempotencyKey: `tenant-shared/stripe-checkout/${link.sessionId}/record`,
     });
 
     expect(
