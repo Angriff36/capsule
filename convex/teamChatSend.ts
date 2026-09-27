@@ -24,6 +24,7 @@ import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { mutation } from "./_generated/server";
 import { deleteBlobIfOrphan } from "./lib/blobs";
+import { scopedCommandKey } from "./lib/commandIdempotency";
 import { chatAuth, encryptField, live } from "./lib/teamChatRead";
 
 /** Files per message; mirrors src/features/chat/chatTypes.ts CHAT_MAX_FILES. */
@@ -98,10 +99,16 @@ export const sendWithFiles = mutation({
     // BEFORE the caller's key and the key is last, so a draft key that happens
     // to end in ":file:0" can never collide with another message's file key.
     const messageKey = `${auth.tenantId}:${auth.id}:teamChat:message:${draftKey}`;
+    // The generated step saves its answer under the workspace-scoped key.
+    const savedKey = await scopedCommandKey(
+      ctx,
+      "StaffMessage_createViaSend",
+      messageKey,
+    );
     const replay =
       (await ctx.db
         .query("commandIdempotencyKeys")
-        .withIndex("by_key", (q) => q.eq("key", messageKey))
+        .withIndex("by_key", (q) => q.eq("key", savedKey))
         .first()) !== null;
 
     const created = (await ctx.runMutation(

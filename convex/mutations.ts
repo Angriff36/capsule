@@ -6,6 +6,7 @@ import { v } from "convex/values";
 import { handleManifestEvent as __handleManifestEvent } from "./lib/operationalEvents";
 import type { Doc } from "./_generated/dataModel";
 import { getAuthContext } from "./lib/authContext";
+import { scopedCommandKey as __scopedCommandKey } from "./lib/commandIdempotency";
 import { assertOwnWorkspaceLinks as __assertOwnWorkspaceLinks } from "./lib/ownWorkspaceLinks";
 import { encrypt, decrypt } from "./lib/encryption";
 
@@ -664,12 +665,12 @@ export const Announcement_post = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Announcement_post", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runAnnouncementPost(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Announcement_post", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Announcement_post", args.idempotencyKey), "Announcement_post", __result);
     }
     return __result;
   },
@@ -686,7 +687,7 @@ export const Announcement_createViaPost = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Announcement_createViaPost", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -724,7 +725,7 @@ export const Announcement_createViaPost = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "post", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Announcement_createViaPost", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Announcement_createViaPost", args.idempotencyKey), "Announcement_createViaPost", __result);
     }
     return __result;
   },
@@ -766,12 +767,12 @@ export const Announcement_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Announcement_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runAnnouncementRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Announcement_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Announcement_remove", args.idempotencyKey), "Announcement_remove", __result);
     }
     return __result;
   },
@@ -815,12 +816,12 @@ export const AnnouncementDismissal_dismiss = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "AnnouncementDismissal_dismiss", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runAnnouncementDismissalDismiss(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "AnnouncementDismissal_dismiss", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "AnnouncementDismissal_dismiss", args.idempotencyKey), "AnnouncementDismissal_dismiss", __result);
     }
     return __result;
   },
@@ -834,7 +835,7 @@ export const AnnouncementDismissal_createViaDismiss = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "AnnouncementDismissal_createViaDismiss", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -864,7 +865,7 @@ export const AnnouncementDismissal_createViaDismiss = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "dismiss", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "AnnouncementDismissal_createViaDismiss", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "AnnouncementDismissal_createViaDismiss", args.idempotencyKey), "AnnouncementDismissal_createViaDismiss", __result);
     }
     return __result;
   },
@@ -911,12 +912,12 @@ export const AssistantLlmConfig_configure = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "AssistantLlmConfig_configure", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runAssistantLlmConfigConfigure(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "AssistantLlmConfig_configure", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "AssistantLlmConfig_configure", args.idempotencyKey), "AssistantLlmConfig_configure", __result);
     }
     return __result;
   },
@@ -932,7 +933,7 @@ export const AssistantLlmConfig_createViaConfigure = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "AssistantLlmConfig_createViaConfigure", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -964,7 +965,7 @@ export const AssistantLlmConfig_createViaConfigure = mutation({
     const docId = await ctx.db.insert("assistantLlmConfigs", doc as any);
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "AssistantLlmConfig_createViaConfigure", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "AssistantLlmConfig_createViaConfigure", args.idempotencyKey), "AssistantLlmConfig_createViaConfigure", __result);
     }
     return __result;
   },
@@ -1025,12 +1026,12 @@ export const Attachment_attach = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Attachment_attach", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runAttachmentAttach(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Attachment_attach", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Attachment_attach", args.idempotencyKey), "Attachment_attach", __result);
     }
     return __result;
   },
@@ -1050,7 +1051,7 @@ export const Attachment_createViaAttach = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Attachment_createViaAttach", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -1097,7 +1098,7 @@ export const Attachment_createViaAttach = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "attach", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Attachment_createViaAttach", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Attachment_createViaAttach", args.idempotencyKey), "Attachment_createViaAttach", __result);
     }
     return __result;
   },
@@ -1138,12 +1139,12 @@ export const Attachment_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Attachment_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runAttachmentRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Attachment_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Attachment_remove", args.idempotencyKey), "Attachment_remove", __result);
     }
     return __result;
   },
@@ -1180,12 +1181,12 @@ export const Attachment_setSurveySelection = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Attachment_setSurveySelection", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runAttachmentSetSurveySelection(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Attachment_setSurveySelection", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Attachment_setSurveySelection", args.idempotencyKey), "Attachment_setSurveySelection", __result);
     }
     return __result;
   },
@@ -1244,12 +1245,12 @@ export const AvailabilityWindow_declare = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "AvailabilityWindow_declare", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runAvailabilityWindowDeclare(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "AvailabilityWindow_declare", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "AvailabilityWindow_declare", args.idempotencyKey), "AvailabilityWindow_declare", __result);
     }
     return __result;
   },
@@ -1267,7 +1268,7 @@ export const AvailabilityWindow_createViaDeclare = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "AvailabilityWindow_createViaDeclare", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -1312,7 +1313,7 @@ export const AvailabilityWindow_createViaDeclare = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "declare", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "AvailabilityWindow_createViaDeclare", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "AvailabilityWindow_createViaDeclare", args.idempotencyKey), "AvailabilityWindow_createViaDeclare", __result);
     }
     return __result;
   },
@@ -1373,12 +1374,12 @@ export const AvailabilityWindow_withdraw = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "AvailabilityWindow_withdraw", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runAvailabilityWindowWithdraw(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "AvailabilityWindow_withdraw", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "AvailabilityWindow_withdraw", args.idempotencyKey), "AvailabilityWindow_withdraw", __result);
     }
     return __result;
   },
@@ -1425,12 +1426,12 @@ export const Candidate_advance = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Candidate_advance", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runCandidateAdvance(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Candidate_advance", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Candidate_advance", args.idempotencyKey), "Candidate_advance", __result);
     }
     return __result;
   },
@@ -1489,12 +1490,12 @@ export const Candidate_apply = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Candidate_apply", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runCandidateApply(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Candidate_apply", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Candidate_apply", args.idempotencyKey), "Candidate_apply", __result);
     }
     return __result;
   },
@@ -1514,7 +1515,7 @@ export const Candidate_createViaApply = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Candidate_createViaApply", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -1560,7 +1561,7 @@ export const Candidate_createViaApply = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "apply", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Candidate_createViaApply", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Candidate_createViaApply", args.idempotencyKey), "Candidate_createViaApply", __result);
     }
     return __result;
   },
@@ -1607,12 +1608,12 @@ export const Candidate_hire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Candidate_hire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runCandidateHire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Candidate_hire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Candidate_hire", args.idempotencyKey), "Candidate_hire", __result);
     }
     return __result;
   },
@@ -1659,12 +1660,12 @@ export const Candidate_reject = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Candidate_reject", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runCandidateReject(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Candidate_reject", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Candidate_reject", args.idempotencyKey), "Candidate_reject", __result);
     }
     return __result;
   },
@@ -1713,12 +1714,12 @@ export const Candidate_revokeHire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Candidate_revokeHire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runCandidateRevokeHire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Candidate_revokeHire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Candidate_revokeHire", args.idempotencyKey), "Candidate_revokeHire", __result);
     }
     return __result;
   },
@@ -1780,12 +1781,12 @@ export const Client_archive = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_archive", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientArchive(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_archive", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_archive", args.idempotencyKey), "Client_archive", __result);
     }
     return __result;
   },
@@ -1832,12 +1833,12 @@ export const Client_assignOwner = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_assignOwner", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientAssignOwner(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_assignOwner", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_assignOwner", args.idempotencyKey), "Client_assignOwner", __result);
     }
     return __result;
   },
@@ -1890,12 +1891,12 @@ export const Client_changeBillingProfile = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_changeBillingProfile", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientChangeBillingProfile(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_changeBillingProfile", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_changeBillingProfile", args.idempotencyKey), "Client_changeBillingProfile", __result);
     }
     return __result;
   },
@@ -1959,12 +1960,12 @@ export const Client_changeContact = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_changeContact", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientChangeContact(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_changeContact", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_changeContact", args.idempotencyKey), "Client_changeContact", __result);
     }
     return __result;
   },
@@ -2039,12 +2040,12 @@ export const Client_markMerged = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_markMerged", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientMarkMerged(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_markMerged", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_markMerged", args.idempotencyKey), "Client_markMerged", __result);
     }
     return __result;
   },
@@ -2104,12 +2105,12 @@ export const Client_reactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_reactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientReactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_reactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_reactivate", args.idempotencyKey), "Client_reactivate", __result);
     }
     return __result;
   },
@@ -2194,12 +2195,12 @@ export const Client_register = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_register", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientRegister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_register", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_register", args.idempotencyKey), "Client_register", __result);
     }
     return __result;
   },
@@ -2230,7 +2231,7 @@ export const Client_createViaRegister = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_createViaRegister", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -2299,7 +2300,7 @@ export const Client_createViaRegister = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "register", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_createViaRegister", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_createViaRegister", args.idempotencyKey), "Client_createViaRegister", __result);
     }
     return __result;
   },
@@ -2347,12 +2348,12 @@ export const Client_setBirthday = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_setBirthday", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientSetBirthday(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_setBirthday", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_setBirthday", args.idempotencyKey), "Client_setBirthday", __result);
     }
     return __result;
   },
@@ -2405,12 +2406,12 @@ export const Client_stageClientMerge = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_stageClientMerge", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientStageClientMerge(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_stageClientMerge", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Client_stageClientMerge", args.idempotencyKey), "Client_stageClientMerge", __result);
     }
     return __result;
   },
@@ -2472,12 +2473,12 @@ export const ClientCommunication_record = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientCommunication_record", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientCommunicationRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientCommunication_record", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientCommunication_record", args.idempotencyKey), "ClientCommunication_record", __result);
     }
     return __result;
   },
@@ -2495,7 +2496,7 @@ export const ClientCommunication_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientCommunication_createViaRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -2541,7 +2542,7 @@ export const ClientCommunication_createViaRecord = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientCommunication_createViaRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientCommunication_createViaRecord", args.idempotencyKey), "ClientCommunication_createViaRecord", __result);
     }
     return __result;
   },
@@ -2611,12 +2612,12 @@ export const ClientContact_add = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientContact_add", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientContactAdd(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientContact_add", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientContact_add", args.idempotencyKey), "ClientContact_add", __result);
     }
     return __result;
   },
@@ -2639,7 +2640,7 @@ export const ClientContact_createViaAdd = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientContact_createViaAdd", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -2694,7 +2695,7 @@ export const ClientContact_createViaAdd = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "add", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientContact_createViaAdd", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientContact_createViaAdd", args.idempotencyKey), "ClientContact_createViaAdd", __result);
     }
     return __result;
   },
@@ -2751,12 +2752,12 @@ export const ClientContact_reassignClient = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientContact_reassignClient", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientContactReassignClient(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientContact_reassignClient", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientContact_reassignClient", args.idempotencyKey), "ClientContact_reassignClient", __result);
     }
     return __result;
   },
@@ -2814,12 +2815,12 @@ export const ClientContact_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientContact_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientContactRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientContact_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientContact_remove", args.idempotencyKey), "ClientContact_remove", __result);
     }
     return __result;
   },
@@ -2864,12 +2865,12 @@ export const ClientContact_setPrimary = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientContact_setPrimary", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientContactSetPrimary(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientContact_setPrimary", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientContact_setPrimary", args.idempotencyKey), "ClientContact_setPrimary", __result);
     }
     return __result;
   },
@@ -2920,12 +2921,12 @@ export const ClientContact_stageClientMerge = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientContact_stageClientMerge", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientContactStageClientMerge(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientContact_stageClientMerge", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientContact_stageClientMerge", args.idempotencyKey), "ClientContact_stageClientMerge", __result);
     }
     return __result;
   },
@@ -2986,12 +2987,12 @@ export const ClientContact_updateDetails = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientContact_updateDetails", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientContactUpdateDetails(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientContact_updateDetails", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientContact_updateDetails", args.idempotencyKey), "ClientContact_updateDetails", __result);
     }
     return __result;
   },
@@ -3099,12 +3100,12 @@ export const ClientMerge_merge = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientMerge_merge", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientMergeMerge(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientMerge_merge", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientMerge_merge", args.idempotencyKey), "ClientMerge_merge", __result);
     }
     return __result;
   },
@@ -3119,7 +3120,7 @@ export const ClientMerge_createViaMerge = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientMerge_createViaMerge", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -3211,7 +3212,7 @@ export const ClientMerge_createViaMerge = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "merge", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientMerge_createViaMerge", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientMerge_createViaMerge", args.idempotencyKey), "ClientMerge_createViaMerge", __result);
     }
     return __result;
   },
@@ -3267,12 +3268,12 @@ export const ClientOutreachTask_complete = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientOutreachTask_complete", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientOutreachTaskComplete(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientOutreachTask_complete", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientOutreachTask_complete", args.idempotencyKey), "ClientOutreachTask_complete", __result);
     }
     return __result;
   },
@@ -3328,12 +3329,12 @@ export const ClientOutreachTask_dismiss = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientOutreachTask_dismiss", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientOutreachTaskDismiss(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientOutreachTask_dismiss", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientOutreachTask_dismiss", args.idempotencyKey), "ClientOutreachTask_dismiss", __result);
     }
     return __result;
   },
@@ -3393,12 +3394,12 @@ export const ClientOutreachTask_open = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientOutreachTask_open", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientOutreachTaskOpen(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientOutreachTask_open", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientOutreachTask_open", args.idempotencyKey), "ClientOutreachTask_open", __result);
     }
     return __result;
   },
@@ -3413,7 +3414,7 @@ export const ClientOutreachTask_createViaOpen = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientOutreachTask_createViaOpen", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -3448,7 +3449,7 @@ export const ClientOutreachTask_createViaOpen = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "open", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientOutreachTask_createViaOpen", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientOutreachTask_createViaOpen", args.idempotencyKey), "ClientOutreachTask_createViaOpen", __result);
     }
     return __result;
   },
@@ -3491,12 +3492,12 @@ export const ClientPortalLink_create = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientPortalLink_create", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientPortalLinkCreate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientPortalLink_create", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientPortalLink_create", args.idempotencyKey), "ClientPortalLink_create", __result);
     }
     return __result;
   },
@@ -3534,12 +3535,12 @@ export const ClientPortalLink_revoke = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientPortalLink_revoke", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runClientPortalLinkRevoke(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientPortalLink_revoke", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ClientPortalLink_revoke", args.idempotencyKey), "ClientPortalLink_revoke", __result);
     }
     return __result;
   },
@@ -3608,12 +3609,12 @@ export const Component_draft = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_draft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentDraft(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Component_draft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_draft", args.idempotencyKey), "Component_draft", __result);
     }
     return __result;
   },
@@ -3637,7 +3638,7 @@ export const Component_createViaDraft = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_createViaDraft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -3691,7 +3692,7 @@ export const Component_createViaDraft = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "draft", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Component_createViaDraft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_createViaDraft", args.idempotencyKey), "Component_createViaDraft", __result);
     }
     return __result;
   },
@@ -3748,12 +3749,12 @@ export const Component_publishVersion = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_publishVersion", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentPublishVersion(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Component_publishVersion", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_publishVersion", args.idempotencyKey), "Component_publishVersion", __result);
     }
     return __result;
   },
@@ -3810,12 +3811,12 @@ export const Component_purge = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_purge", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentPurge(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Component_purge", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_purge", args.idempotencyKey), "Component_purge", __result);
     }
     return __result;
   },
@@ -3874,12 +3875,12 @@ export const Component_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Component_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_retire", args.idempotencyKey), "Component_retire", __result);
     }
     return __result;
   },
@@ -3937,12 +3938,12 @@ export const Component_retract = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_retract", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentRetract(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Component_retract", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_retract", args.idempotencyKey), "Component_retract", __result);
     }
     return __result;
   },
@@ -4005,12 +4006,12 @@ export const Component_reviseDraft = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_reviseDraft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentReviseDraft(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Component_reviseDraft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_reviseDraft", args.idempotencyKey), "Component_reviseDraft", __result);
     }
     return __result;
   },
@@ -4053,12 +4054,12 @@ export const Component_setServesPerYield = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_setServesPerYield", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentSetServesPerYield(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Component_setServesPerYield", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_setServesPerYield", args.idempotencyKey), "Component_setServesPerYield", __result);
     }
     return __result;
   },
@@ -4103,12 +4104,12 @@ export const Component_setStorageWindow = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_setStorageWindow", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentSetStorageWindow(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Component_setStorageWindow", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Component_setStorageWindow", args.idempotencyKey), "Component_setStorageWindow", __result);
     }
     return __result;
   },
@@ -4169,12 +4170,12 @@ export const ComponentComponent_add = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentComponent_add", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentComponentAdd(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentComponent_add", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentComponent_add", args.idempotencyKey), "ComponentComponent_add", __result);
     }
     return __result;
   },
@@ -4195,7 +4196,7 @@ export const ComponentComponent_createViaAdd = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentComponent_createViaAdd", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -4242,7 +4243,7 @@ export const ComponentComponent_createViaAdd = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "add", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentComponent_createViaAdd", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentComponent_createViaAdd", args.idempotencyKey), "ComponentComponent_createViaAdd", __result);
     }
     return __result;
   },
@@ -4289,12 +4290,12 @@ export const ComponentComponent_adjustQuantity = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentComponent_adjustQuantity", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentComponentAdjustQuantity(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentComponent_adjustQuantity", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentComponent_adjustQuantity", args.idempotencyKey), "ComponentComponent_adjustQuantity", __result);
     }
     return __result;
   },
@@ -4338,12 +4339,12 @@ export const ComponentComponent_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentComponent_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentComponentRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentComponent_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentComponent_remove", args.idempotencyKey), "ComponentComponent_remove", __result);
     }
     return __result;
   },
@@ -4401,12 +4402,12 @@ export const ComponentImport_approveReview = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_approveReview", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportApproveReview(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImport_approveReview", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_approveReview", args.idempotencyKey), "ComponentImport_approveReview", __result);
     }
     return __result;
   },
@@ -4464,12 +4465,12 @@ export const ComponentImport_beginFinalization = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_beginFinalization", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportBeginFinalization(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImport_beginFinalization", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_beginFinalization", args.idempotencyKey), "ComponentImport_beginFinalization", __result);
     }
     return __result;
   },
@@ -4525,12 +4526,12 @@ export const ComponentImport_beginReview = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_beginReview", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportBeginReview(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImport_beginReview", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_beginReview", args.idempotencyKey), "ComponentImport_beginReview", __result);
     }
     return __result;
   },
@@ -4588,12 +4589,12 @@ export const ComponentImport_cancel = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_cancel", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportCancel(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImport_cancel", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_cancel", args.idempotencyKey), "ComponentImport_cancel", __result);
     }
     return __result;
   },
@@ -4663,12 +4664,12 @@ export const ComponentImport_complete = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_complete", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportComplete(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImport_complete", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_complete", args.idempotencyKey), "ComponentImport_complete", __result);
     }
     return __result;
   },
@@ -4730,12 +4731,12 @@ export const ComponentImport_markFailed = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_markFailed", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportMarkFailed(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImport_markFailed", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_markFailed", args.idempotencyKey), "ComponentImport_markFailed", __result);
     }
     return __result;
   },
@@ -4779,12 +4780,12 @@ export const ComponentImport_recordComponent = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_recordComponent", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportRecordComponent(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImport_recordComponent", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_recordComponent", args.idempotencyKey), "ComponentImport_recordComponent", __result);
     }
     return __result;
   },
@@ -4863,12 +4864,12 @@ export const ComponentImport_recordParse = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_recordParse", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportRecordParse(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImport_recordParse", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_recordParse", args.idempotencyKey), "ComponentImport_recordParse", __result);
     }
     return __result;
   },
@@ -4914,12 +4915,12 @@ export const ComponentImport_recordResolutionProgress = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_recordResolutionProgress", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportRecordResolutionProgress(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImport_recordResolutionProgress", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_recordResolutionProgress", args.idempotencyKey), "ComponentImport_recordResolutionProgress", __result);
     }
     return __result;
   },
@@ -4977,12 +4978,12 @@ export const ComponentImport_resumeReview = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_resumeReview", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportResumeReview(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImport_resumeReview", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_resumeReview", args.idempotencyKey), "ComponentImport_resumeReview", __result);
     }
     return __result;
   },
@@ -5046,12 +5047,12 @@ export const ComponentImport_reviseReview = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_reviseReview", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportReviseReview(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImport_reviseReview", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_reviseReview", args.idempotencyKey), "ComponentImport_reviseReview", __result);
     }
     return __result;
   },
@@ -5123,12 +5124,12 @@ export const ComponentImport_upload = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_upload", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportUpload(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImport_upload", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_upload", args.idempotencyKey), "ComponentImport_upload", __result);
     }
     return __result;
   },
@@ -5148,7 +5149,7 @@ export const ComponentImport_createViaUpload = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_createViaUpload", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -5198,7 +5199,7 @@ export const ComponentImport_createViaUpload = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "upload", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImport_createViaUpload", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImport_createViaUpload", args.idempotencyKey), "ComponentImport_createViaUpload", __result);
     }
     return __result;
   },
@@ -5242,12 +5243,12 @@ export const ComponentImportLine_attachCreatedIngredient = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_attachCreatedIngredient", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportLineAttachCreatedIngredient(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImportLine_attachCreatedIngredient", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_attachCreatedIngredient", args.idempotencyKey), "ComponentImportLine_attachCreatedIngredient", __result);
     }
     return __result;
   },
@@ -5296,12 +5297,12 @@ export const ComponentImportLine_confirmExisting = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_confirmExisting", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportLineConfirmExisting(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImportLine_confirmExisting", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_confirmExisting", args.idempotencyKey), "ComponentImportLine_confirmExisting", __result);
     }
     return __result;
   },
@@ -5345,12 +5346,12 @@ export const ComponentImportLine_confirmNew = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_confirmNew", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportLineConfirmNew(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImportLine_confirmNew", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_confirmNew", args.idempotencyKey), "ComponentImportLine_confirmNew", __result);
     }
     return __result;
   },
@@ -5393,12 +5394,12 @@ export const ComponentImportLine_discard = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_discard", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportLineDiscard(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImportLine_discard", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_discard", args.idempotencyKey), "ComponentImportLine_discard", __result);
     }
     return __result;
   },
@@ -5442,12 +5443,12 @@ export const ComponentImportLine_markNew = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_markNew", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportLineMarkNew(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImportLine_markNew", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_markNew", args.idempotencyKey), "ComponentImportLine_markNew", __result);
     }
     return __result;
   },
@@ -5491,12 +5492,12 @@ export const ComponentImportLine_resetResolution = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_resetResolution", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportLineResetResolution(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImportLine_resetResolution", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_resetResolution", args.idempotencyKey), "ComponentImportLine_resetResolution", __result);
     }
     return __result;
   },
@@ -5551,12 +5552,12 @@ export const ComponentImportLine_reviseMeasurements = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_reviseMeasurements", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportLineReviseMeasurements(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImportLine_reviseMeasurements", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_reviseMeasurements", args.idempotencyKey), "ComponentImportLine_reviseMeasurements", __result);
     }
     return __result;
   },
@@ -5618,12 +5619,12 @@ export const ComponentImportLine_stage = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_stage", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportLineStage(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImportLine_stage", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_stage", args.idempotencyKey), "ComponentImportLine_stage", __result);
     }
     return __result;
   },
@@ -5643,7 +5644,7 @@ export const ComponentImportLine_createViaStage = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_createViaStage", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -5691,7 +5692,7 @@ export const ComponentImportLine_createViaStage = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "stage", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImportLine_createViaStage", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_createViaStage", args.idempotencyKey), "ComponentImportLine_createViaStage", __result);
     }
     return __result;
   },
@@ -5736,12 +5737,12 @@ export const ComponentImportLine_suggestExactMatch = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_suggestExactMatch", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportLineSuggestExactMatch(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImportLine_suggestExactMatch", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_suggestExactMatch", args.idempotencyKey), "ComponentImportLine_suggestExactMatch", __result);
     }
     return __result;
   },
@@ -5786,12 +5787,12 @@ export const ComponentImportLine_suggestPossibleMatches = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_suggestPossibleMatches", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentImportLineSuggestPossibleMatches(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentImportLine_suggestPossibleMatches", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentImportLine_suggestPossibleMatches", args.idempotencyKey), "ComponentImportLine_suggestPossibleMatches", __result);
     }
     return __result;
   },
@@ -5855,12 +5856,12 @@ export const ComponentIngredient_add = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentIngredient_add", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentIngredientAdd(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentIngredient_add", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentIngredient_add", args.idempotencyKey), "ComponentIngredient_add", __result);
     }
     return __result;
   },
@@ -5880,7 +5881,7 @@ export const ComponentIngredient_createViaAdd = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentIngredient_createViaAdd", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -5930,7 +5931,7 @@ export const ComponentIngredient_createViaAdd = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "add", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentIngredient_createViaAdd", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentIngredient_createViaAdd", args.idempotencyKey), "ComponentIngredient_createViaAdd", __result);
     }
     return __result;
   },
@@ -5992,12 +5993,12 @@ export const ComponentIngredient_adjustQuantity = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentIngredient_adjustQuantity", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentIngredientAdjustQuantity(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentIngredient_adjustQuantity", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentIngredient_adjustQuantity", args.idempotencyKey), "ComponentIngredient_adjustQuantity", __result);
     }
     return __result;
   },
@@ -6050,12 +6051,12 @@ export const ComponentIngredient_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentIngredient_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentIngredientRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentIngredient_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentIngredient_remove", args.idempotencyKey), "ComponentIngredient_remove", __result);
     }
     return __result;
   },
@@ -6099,12 +6100,12 @@ export const ComponentIngredient_setWasteFactor = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentIngredient_setWasteFactor", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentIngredientSetWasteFactor(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentIngredient_setWasteFactor", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentIngredient_setWasteFactor", args.idempotencyKey), "ComponentIngredient_setWasteFactor", __result);
     }
     return __result;
   },
@@ -6161,12 +6162,12 @@ export const ComponentPortionSpec_define = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentPortionSpec_define", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentPortionSpecDefine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentPortionSpec_define", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentPortionSpec_define", args.idempotencyKey), "ComponentPortionSpec_define", __result);
     }
     return __result;
   },
@@ -6185,7 +6186,7 @@ export const ComponentPortionSpec_createViaDefine = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentPortionSpec_createViaDefine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -6228,7 +6229,7 @@ export const ComponentPortionSpec_createViaDefine = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "define", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentPortionSpec_createViaDefine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentPortionSpec_createViaDefine", args.idempotencyKey), "ComponentPortionSpec_createViaDefine", __result);
     }
     return __result;
   },
@@ -6272,12 +6273,12 @@ export const ComponentPortionSpec_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentPortionSpec_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentPortionSpecRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentPortionSpec_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentPortionSpec_retire", args.idempotencyKey), "ComponentPortionSpec_retire", __result);
     }
     return __result;
   },
@@ -6330,12 +6331,12 @@ export const ComponentPortionSpec_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentPortionSpec_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentPortionSpecRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentPortionSpec_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentPortionSpec_revise", args.idempotencyKey), "ComponentPortionSpec_revise", __result);
     }
     return __result;
   },
@@ -6389,12 +6390,12 @@ export const ComponentSnapshot_capture = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentSnapshot_capture", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentSnapshotCapture(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentSnapshot_capture", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentSnapshot_capture", args.idempotencyKey), "ComponentSnapshot_capture", __result);
     }
     return __result;
   },
@@ -6411,7 +6412,7 @@ export const ComponentSnapshot_createViaCapture = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentSnapshot_createViaCapture", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -6451,7 +6452,7 @@ export const ComponentSnapshot_createViaCapture = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "capture", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentSnapshot_createViaCapture", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentSnapshot_createViaCapture", args.idempotencyKey), "ComponentSnapshot_createViaCapture", __result);
     }
     return __result;
   },
@@ -6503,12 +6504,12 @@ export const ComponentStep_add = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentStep_add", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentStepAdd(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentStep_add", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentStep_add", args.idempotencyKey), "ComponentStep_add", __result);
     }
     return __result;
   },
@@ -6525,7 +6526,7 @@ export const ComponentStep_createViaAdd = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentStep_createViaAdd", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -6563,7 +6564,7 @@ export const ComponentStep_createViaAdd = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "add", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentStep_createViaAdd", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentStep_createViaAdd", args.idempotencyKey), "ComponentStep_createViaAdd", __result);
     }
     return __result;
   },
@@ -6607,12 +6608,12 @@ export const ComponentStep_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentStep_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentStepRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentStep_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentStep_remove", args.idempotencyKey), "ComponentStep_remove", __result);
     }
     return __result;
   },
@@ -6661,12 +6662,12 @@ export const ComponentStep_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentStep_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runComponentStepRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ComponentStep_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ComponentStep_revise", args.idempotencyKey), "ComponentStep_revise", __result);
     }
     return __result;
   },
@@ -6732,12 +6733,12 @@ export const Contract_draft = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_draft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runContractDraft(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Contract_draft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_draft", args.idempotencyKey), "Contract_draft", __result);
     }
     return __result;
   },
@@ -6757,7 +6758,7 @@ export const Contract_createViaDraft = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_createViaDraft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -6808,7 +6809,7 @@ export const Contract_createViaDraft = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "draft", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Contract_createViaDraft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_createViaDraft", args.idempotencyKey), "Contract_createViaDraft", __result);
     }
     return __result;
   },
@@ -6862,12 +6863,12 @@ export const Contract_expire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_expire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runContractExpire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Contract_expire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_expire", args.idempotencyKey), "Contract_expire", __result);
     }
     return __result;
   },
@@ -6922,12 +6923,12 @@ export const Contract_markViewed = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_markViewed", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runContractMarkViewed(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Contract_markViewed", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_markViewed", args.idempotencyKey), "Contract_markViewed", __result);
     }
     return __result;
   },
@@ -6985,12 +6986,12 @@ export const Contract_markVoided = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_markVoided", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runContractMarkVoided(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Contract_markVoided", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_markVoided", args.idempotencyKey), "Contract_markVoided", __result);
     }
     return __result;
   },
@@ -7045,12 +7046,12 @@ export const Contract_reassignClient = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_reassignClient", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runContractReassignClient(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Contract_reassignClient", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_reassignClient", args.idempotencyKey), "Contract_reassignClient", __result);
     }
     return __result;
   },
@@ -7107,12 +7108,12 @@ export const Contract_send = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_send", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runContractSend(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Contract_send", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_send", args.idempotencyKey), "Contract_send", __result);
     }
     return __result;
   },
@@ -7171,12 +7172,12 @@ export const Contract_sign = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_sign", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runContractSign(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Contract_sign", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_sign", args.idempotencyKey), "Contract_sign", __result);
     }
     return __result;
   },
@@ -7225,12 +7226,12 @@ export const Contract_stageClientMerge = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_stageClientMerge", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runContractStageClientMerge(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Contract_stageClientMerge", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Contract_stageClientMerge", args.idempotencyKey), "Contract_stageClientMerge", __result);
     }
     return __result;
   },
@@ -7294,12 +7295,12 @@ export const CorrectiveAction_close = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CorrectiveAction_close", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runCorrectiveActionClose(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "CorrectiveAction_close", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CorrectiveAction_close", args.idempotencyKey), "CorrectiveAction_close", __result);
     }
     return __result;
   },
@@ -7353,12 +7354,12 @@ export const CorrectiveAction_open = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CorrectiveAction_open", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runCorrectiveActionOpen(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "CorrectiveAction_open", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CorrectiveAction_open", args.idempotencyKey), "CorrectiveAction_open", __result);
     }
     return __result;
   },
@@ -7374,7 +7375,7 @@ export const CorrectiveAction_createViaOpen = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CorrectiveAction_createViaOpen", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -7415,7 +7416,7 @@ export const CorrectiveAction_createViaOpen = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "open", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "CorrectiveAction_createViaOpen", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CorrectiveAction_createViaOpen", args.idempotencyKey), "CorrectiveAction_createViaOpen", __result);
     }
     return __result;
   },
@@ -7522,12 +7523,12 @@ export const CreditMemo_issue = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CreditMemo_issue", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runCreditMemoIssue(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "CreditMemo_issue", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CreditMemo_issue", args.idempotencyKey), "CreditMemo_issue", __result);
     }
     return __result;
   },
@@ -7548,7 +7549,7 @@ export const CreditMemo_createViaIssue = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CreditMemo_createViaIssue", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -7627,7 +7628,7 @@ export const CreditMemo_createViaIssue = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "issue", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "CreditMemo_createViaIssue", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CreditMemo_createViaIssue", args.idempotencyKey), "CreditMemo_createViaIssue", __result);
     }
     return __result;
   },
@@ -7682,12 +7683,12 @@ export const CreditMemo_reassignClient = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CreditMemo_reassignClient", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runCreditMemoReassignClient(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "CreditMemo_reassignClient", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CreditMemo_reassignClient", args.idempotencyKey), "CreditMemo_reassignClient", __result);
     }
     return __result;
   },
@@ -7736,12 +7737,12 @@ export const CreditMemo_stageClientMerge = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CreditMemo_stageClientMerge", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runCreditMemoStageClientMerge(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "CreditMemo_stageClientMerge", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CreditMemo_stageClientMerge", args.idempotencyKey), "CreditMemo_stageClientMerge", __result);
     }
     return __result;
   },
@@ -7781,12 +7782,12 @@ export const CutoverDecision_create = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CutoverDecision_create", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runCutoverDecisionCreate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "CutoverDecision_create", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CutoverDecision_create", args.idempotencyKey), "CutoverDecision_create", __result);
     }
     return __result;
   },
@@ -7822,12 +7823,12 @@ export const CutoverDecision_execute = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CutoverDecision_execute", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runCutoverDecisionExecute(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "CutoverDecision_execute", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CutoverDecision_execute", args.idempotencyKey), "CutoverDecision_execute", __result);
     }
     return __result;
   },
@@ -7863,12 +7864,12 @@ export const CutoverDecision_recordApprovals = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CutoverDecision_recordApprovals", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runCutoverDecisionRecordApprovals(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "CutoverDecision_recordApprovals", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CutoverDecision_recordApprovals", args.idempotencyKey), "CutoverDecision_recordApprovals", __result);
     }
     return __result;
   },
@@ -7904,12 +7905,12 @@ export const CutoverDecision_rollback = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CutoverDecision_rollback", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runCutoverDecisionRollback(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "CutoverDecision_rollback", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CutoverDecision_rollback", args.idempotencyKey), "CutoverDecision_rollback", __result);
     }
     return __result;
   },
@@ -7942,12 +7943,12 @@ export const CutoverDecision_setTppReadOnly = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CutoverDecision_setTppReadOnly", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runCutoverDecisionSetTppReadOnly(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "CutoverDecision_setTppReadOnly", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "CutoverDecision_setTppReadOnly", args.idempotencyKey), "CutoverDecision_setTppReadOnly", __result);
     }
     return __result;
   },
@@ -8009,12 +8010,12 @@ export const Delivery_cancel = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Delivery_cancel", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDeliveryCancel(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Delivery_cancel", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Delivery_cancel", args.idempotencyKey), "Delivery_cancel", __result);
     }
     return __result;
   },
@@ -8075,12 +8076,12 @@ export const Delivery_confirmDelivery = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Delivery_confirmDelivery", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDeliveryConfirmDelivery(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Delivery_confirmDelivery", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Delivery_confirmDelivery", args.idempotencyKey), "Delivery_confirmDelivery", __result);
     }
     return __result;
   },
@@ -8143,12 +8144,12 @@ export const Delivery_markFailed = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Delivery_markFailed", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDeliveryMarkFailed(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Delivery_markFailed", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Delivery_markFailed", args.idempotencyKey), "Delivery_markFailed", __result);
     }
     return __result;
   },
@@ -8218,12 +8219,12 @@ export const Delivery_schedule = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Delivery_schedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDeliverySchedule(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Delivery_schedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Delivery_schedule", args.idempotencyKey), "Delivery_schedule", __result);
     }
     return __result;
   },
@@ -8243,7 +8244,7 @@ export const Delivery_createViaSchedule = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Delivery_createViaSchedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -8297,7 +8298,7 @@ export const Delivery_createViaSchedule = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "schedule", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Delivery_createViaSchedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Delivery_createViaSchedule", args.idempotencyKey), "Delivery_createViaSchedule", __result);
     }
     return __result;
   },
@@ -8360,12 +8361,12 @@ export const Delivery_standDownWithEvent = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Delivery_standDownWithEvent", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDeliveryStandDownWithEvent(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Delivery_standDownWithEvent", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Delivery_standDownWithEvent", args.idempotencyKey), "Delivery_standDownWithEvent", __result);
     }
     return __result;
   },
@@ -8427,12 +8428,12 @@ export const Delivery_startTransit = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Delivery_startTransit", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDeliveryStartTransit(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Delivery_startTransit", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Delivery_startTransit", args.idempotencyKey), "Delivery_startTransit", __result);
     }
     return __result;
   },
@@ -8475,12 +8476,12 @@ export const Dish_classifyAllergens = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_classifyAllergens", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishClassifyAllergens(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_classifyAllergens", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_classifyAllergens", args.idempotencyKey), "Dish_classifyAllergens", __result);
     }
     return __result;
   },
@@ -8522,12 +8523,12 @@ export const Dish_classifyKind = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_classifyKind", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishClassifyKind(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_classifyKind", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_classifyKind", args.idempotencyKey), "Dish_classifyKind", __result);
     }
     return __result;
   },
@@ -8570,12 +8571,12 @@ export const Dish_clearPrimaryImage = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_clearPrimaryImage", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishClearPrimaryImage(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_clearPrimaryImage", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_clearPrimaryImage", args.idempotencyKey), "Dish_clearPrimaryImage", __result);
     }
     return __result;
   },
@@ -8637,12 +8638,12 @@ export const Dish_introduce = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_introduce", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishIntroduce(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_introduce", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_introduce", args.idempotencyKey), "Dish_introduce", __result);
     }
     return __result;
   },
@@ -8664,7 +8665,7 @@ export const Dish_createViaIntroduce = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_createViaIntroduce", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -8714,7 +8715,7 @@ export const Dish_createViaIntroduce = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "introduce", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_createViaIntroduce", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_createViaIntroduce", args.idempotencyKey), "Dish_createViaIntroduce", __result);
     }
     return __result;
   },
@@ -8762,12 +8763,12 @@ export const Dish_linkAsEdition = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_linkAsEdition", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishLinkAsEdition(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_linkAsEdition", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_linkAsEdition", args.idempotencyKey), "Dish_linkAsEdition", __result);
     }
     return __result;
   },
@@ -8830,12 +8831,12 @@ export const Dish_mergeInto = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_mergeInto", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishMergeInto(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_mergeInto", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_mergeInto", args.idempotencyKey), "Dish_mergeInto", __result);
     }
     return __result;
   },
@@ -8892,12 +8893,12 @@ export const Dish_purge = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_purge", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishPurge(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_purge", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_purge", args.idempotencyKey), "Dish_purge", __result);
     }
     return __result;
   },
@@ -8954,12 +8955,12 @@ export const Dish_reinstate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_reinstate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishReinstate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_reinstate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_reinstate", args.idempotencyKey), "Dish_reinstate", __result);
     }
     return __result;
   },
@@ -9018,12 +9019,12 @@ export const Dish_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_retire", args.idempotencyKey), "Dish_retire", __result);
     }
     return __result;
   },
@@ -9077,12 +9078,12 @@ export const Dish_reviseDetails = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_reviseDetails", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishReviseDetails(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_reviseDetails", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_reviseDetails", args.idempotencyKey), "Dish_reviseDetails", __result);
     }
     return __result;
   },
@@ -9131,12 +9132,12 @@ export const Dish_saveRecipe = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_saveRecipe", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishSaveRecipe(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_saveRecipe", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_saveRecipe", args.idempotencyKey), "Dish_saveRecipe", __result);
     }
     return __result;
   },
@@ -9182,12 +9183,12 @@ export const Dish_saveServiceInstructions = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_saveServiceInstructions", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishSaveServiceInstructions(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_saveServiceInstructions", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_saveServiceInstructions", args.idempotencyKey), "Dish_saveServiceInstructions", __result);
     }
     return __result;
   },
@@ -9233,12 +9234,12 @@ export const Dish_setPrimaryImage = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_setPrimaryImage", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishSetPrimaryImage(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_setPrimaryImage", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_setPrimaryImage", args.idempotencyKey), "Dish_setPrimaryImage", __result);
     }
     return __result;
   },
@@ -9286,12 +9287,12 @@ export const Dish_updatePortioning = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_updatePortioning", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishUpdatePortioning(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_updatePortioning", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Dish_updatePortioning", args.idempotencyKey), "Dish_updatePortioning", __result);
     }
     return __result;
   },
@@ -9378,12 +9379,12 @@ export const DishComponent_attach = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishComponent_attach", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishComponentAttach(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishComponent_attach", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishComponent_attach", args.idempotencyKey), "DishComponent_attach", __result);
     }
     return __result;
   },
@@ -9402,7 +9403,7 @@ export const DishComponent_createViaAttach = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishComponent_createViaAttach", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -9474,7 +9475,7 @@ export const DishComponent_createViaAttach = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "attach", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishComponent_createViaAttach", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishComponent_createViaAttach", args.idempotencyKey), "DishComponent_createViaAttach", __result);
     }
     return __result;
   },
@@ -9536,12 +9537,12 @@ export const DishComponent_detach = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishComponent_detach", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishComponentDetach(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishComponent_detach", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishComponent_detach", args.idempotencyKey), "DishComponent_detach", __result);
     }
     return __result;
   },
@@ -9589,12 +9590,12 @@ export const DishComponent_setPortionSpec = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishComponent_setPortionSpec", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishComponentSetPortionSpec(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishComponent_setPortionSpec", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishComponent_setPortionSpec", args.idempotencyKey), "DishComponent_setPortionSpec", __result);
     }
     return __result;
   },
@@ -9663,12 +9664,12 @@ export const DishContainer_define = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishContainer_define", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishContainerDefine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishContainer_define", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishContainer_define", args.idempotencyKey), "DishContainer_define", __result);
     }
     return __result;
   },
@@ -9690,7 +9691,7 @@ export const DishContainer_createViaDefine = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishContainer_createViaDefine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -9746,7 +9747,7 @@ export const DishContainer_createViaDefine = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "define", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishContainer_createViaDefine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishContainer_createViaDefine", args.idempotencyKey), "DishContainer_createViaDefine", __result);
     }
     return __result;
   },
@@ -9781,12 +9782,12 @@ export const DishContainer_refreshActiveKey = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishContainer_refreshActiveKey", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishContainerRefreshActiveKey(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishContainer_refreshActiveKey", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishContainer_refreshActiveKey", args.idempotencyKey), "DishContainer_refreshActiveKey", __result);
     }
     return __result;
   },
@@ -9853,12 +9854,12 @@ export const DishContainer_reinstate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishContainer_reinstate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishContainerReinstate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishContainer_reinstate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishContainer_reinstate", args.idempotencyKey), "DishContainer_reinstate", __result);
     }
     return __result;
   },
@@ -9921,12 +9922,12 @@ export const DishContainer_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishContainer_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishContainerRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishContainer_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishContainer_retire", args.idempotencyKey), "DishContainer_retire", __result);
     }
     return __result;
   },
@@ -9996,12 +9997,12 @@ export const DishContainer_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishContainer_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishContainerRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishContainer_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishContainer_revise", args.idempotencyKey), "DishContainer_revise", __result);
     }
     return __result;
   },
@@ -10086,12 +10087,12 @@ export const DishIngredient_add = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishIngredient_add", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishIngredientAdd(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishIngredient_add", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishIngredient_add", args.idempotencyKey), "DishIngredient_add", __result);
     }
     return __result;
   },
@@ -10111,7 +10112,7 @@ export const DishIngredient_createViaAdd = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishIngredient_createViaAdd", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -10182,7 +10183,7 @@ export const DishIngredient_createViaAdd = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "add", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishIngredient_createViaAdd", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishIngredient_createViaAdd", args.idempotencyKey), "DishIngredient_createViaAdd", __result);
     }
     return __result;
   },
@@ -10256,12 +10257,12 @@ export const DishIngredient_adjustQuantity = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishIngredient_adjustQuantity", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishIngredientAdjustQuantity(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishIngredient_adjustQuantity", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishIngredient_adjustQuantity", args.idempotencyKey), "DishIngredient_adjustQuantity", __result);
     }
     return __result;
   },
@@ -10314,12 +10315,12 @@ export const DishIngredient_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishIngredient_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishIngredientRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishIngredient_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishIngredient_remove", args.idempotencyKey), "DishIngredient_remove", __result);
     }
     return __result;
   },
@@ -10393,12 +10394,12 @@ export const DishTask_add = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTask_add", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishTaskAdd(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishTask_add", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTask_add", args.idempotencyKey), "DishTask_add", __result);
     }
     return __result;
   },
@@ -10423,7 +10424,7 @@ export const DishTask_createViaAdd = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTask_createViaAdd", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -10482,7 +10483,7 @@ export const DishTask_createViaAdd = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "add", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishTask_createViaAdd", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTask_createViaAdd", args.idempotencyKey), "DishTask_createViaAdd", __result);
     }
     return __result;
   },
@@ -10517,12 +10518,12 @@ export const DishTask_backfillActiveKey = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTask_backfillActiveKey", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishTaskBackfillActiveKey(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishTask_backfillActiveKey", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTask_backfillActiveKey", args.idempotencyKey), "DishTask_backfillActiveKey", __result);
     }
     return __result;
   },
@@ -10581,12 +10582,12 @@ export const DishTask_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTask_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishTaskRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishTask_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTask_retire", args.idempotencyKey), "DishTask_retire", __result);
     }
     return __result;
   },
@@ -10655,12 +10656,12 @@ export const DishTask_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTask_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishTaskRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishTask_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTask_revise", args.idempotencyKey), "DishTask_revise", __result);
     }
     return __result;
   },
@@ -10717,12 +10718,12 @@ export const DishTask_specifyWork = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTask_specifyWork", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishTaskSpecifyWork(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishTask_specifyWork", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTask_specifyWork", args.idempotencyKey), "DishTask_specifyWork", __result);
     }
     return __result;
   },
@@ -10778,12 +10779,12 @@ export const DishTaskMaterial_link = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTaskMaterial_link", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishTaskMaterialLink(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishTaskMaterial_link", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTaskMaterial_link", args.idempotencyKey), "DishTaskMaterial_link", __result);
     }
     return __result;
   },
@@ -10802,7 +10803,7 @@ export const DishTaskMaterial_createViaLink = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTaskMaterial_createViaLink", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -10844,7 +10845,7 @@ export const DishTaskMaterial_createViaLink = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "link", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishTaskMaterial_createViaLink", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTaskMaterial_createViaLink", args.idempotencyKey), "DishTaskMaterial_createViaLink", __result);
     }
     return __result;
   },
@@ -10888,12 +10889,12 @@ export const DishTaskMaterial_unlink = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTaskMaterial_unlink", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runDishTaskMaterialUnlink(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "DishTaskMaterial_unlink", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "DishTaskMaterial_unlink", args.idempotencyKey), "DishTaskMaterial_unlink", __result);
     }
     return __result;
   },
@@ -10945,12 +10946,12 @@ export const EmailNotificationSubscription_configure = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EmailNotificationSubscription_configure", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEmailNotificationSubscriptionConfigure(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EmailNotificationSubscription_configure", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EmailNotificationSubscription_configure", args.idempotencyKey), "EmailNotificationSubscription_configure", __result);
     }
     return __result;
   },
@@ -10967,7 +10968,7 @@ export const EmailNotificationSubscription_createViaConfigure = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EmailNotificationSubscription_createViaConfigure", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -11005,7 +11006,7 @@ export const EmailNotificationSubscription_createViaConfigure = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "configure", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EmailNotificationSubscription_createViaConfigure", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EmailNotificationSubscription_createViaConfigure", args.idempotencyKey), "EmailNotificationSubscription_createViaConfigure", __result);
     }
     return __result;
   },
@@ -11055,12 +11056,12 @@ export const EmailNotificationSubscription_updateSubscriptions = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EmailNotificationSubscription_updateSubscriptions", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEmailNotificationSubscriptionUpdateSubscriptions(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EmailNotificationSubscription_updateSubscriptions", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EmailNotificationSubscription_updateSubscriptions", args.idempotencyKey), "EmailNotificationSubscription_updateSubscriptions", __result);
     }
     return __result;
   },
@@ -11117,12 +11118,12 @@ export const Equipment_reactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Equipment_reactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEquipmentReactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Equipment_reactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Equipment_reactivate", args.idempotencyKey), "Equipment_reactivate", __result);
     }
     return __result;
   },
@@ -11167,12 +11168,12 @@ export const Equipment_recount = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Equipment_recount", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEquipmentRecount(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Equipment_recount", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Equipment_recount", args.idempotencyKey), "Equipment_recount", __result);
     }
     return __result;
   },
@@ -11233,12 +11234,12 @@ export const Equipment_register = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Equipment_register", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEquipmentRegister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Equipment_register", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Equipment_register", args.idempotencyKey), "Equipment_register", __result);
     }
     return __result;
   },
@@ -11258,7 +11259,7 @@ export const Equipment_createViaRegister = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Equipment_createViaRegister", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -11306,7 +11307,7 @@ export const Equipment_createViaRegister = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "register", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Equipment_createViaRegister", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Equipment_createViaRegister", args.idempotencyKey), "Equipment_createViaRegister", __result);
     }
     return __result;
   },
@@ -11366,12 +11367,12 @@ export const Equipment_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Equipment_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEquipmentRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Equipment_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Equipment_retire", args.idempotencyKey), "Equipment_retire", __result);
     }
     return __result;
   },
@@ -11428,12 +11429,12 @@ export const Equipment_reviseDetails = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Equipment_reviseDetails", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEquipmentReviseDetails(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Equipment_reviseDetails", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Equipment_reviseDetails", args.idempotencyKey), "Equipment_reviseDetails", __result);
     }
     return __result;
   },
@@ -11479,12 +11480,12 @@ export const Equipment_updateCondition = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Equipment_updateCondition", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEquipmentUpdateCondition(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Equipment_updateCondition", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Equipment_updateCondition", args.idempotencyKey), "Equipment_updateCondition", __result);
     }
     return __result;
   },
@@ -11531,12 +11532,12 @@ export const EquipmentMaintenanceTask_applyService = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EquipmentMaintenanceTask_applyService", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEquipmentMaintenanceTaskApplyService(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EquipmentMaintenanceTask_applyService", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EquipmentMaintenanceTask_applyService", args.idempotencyKey), "EquipmentMaintenanceTask_applyService", __result);
     }
     return __result;
   },
@@ -11593,12 +11594,12 @@ export const EquipmentMaintenanceTask_schedule = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EquipmentMaintenanceTask_schedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEquipmentMaintenanceTaskSchedule(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EquipmentMaintenanceTask_schedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EquipmentMaintenanceTask_schedule", args.idempotencyKey), "EquipmentMaintenanceTask_schedule", __result);
     }
     return __result;
   },
@@ -11616,7 +11617,7 @@ export const EquipmentMaintenanceTask_createViaSchedule = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EquipmentMaintenanceTask_createViaSchedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -11658,7 +11659,7 @@ export const EquipmentMaintenanceTask_createViaSchedule = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "schedule", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EquipmentMaintenanceTask_createViaSchedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EquipmentMaintenanceTask_createViaSchedule", args.idempotencyKey), "EquipmentMaintenanceTask_createViaSchedule", __result);
     }
     return __result;
   },
@@ -11715,12 +11716,12 @@ export const EquipmentReservation_cancel = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EquipmentReservation_cancel", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEquipmentReservationCancel(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EquipmentReservation_cancel", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EquipmentReservation_cancel", args.idempotencyKey), "EquipmentReservation_cancel", __result);
     }
     return __result;
   },
@@ -11782,12 +11783,12 @@ export const EquipmentReservation_checkOut = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EquipmentReservation_checkOut", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEquipmentReservationCheckOut(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EquipmentReservation_checkOut", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EquipmentReservation_checkOut", args.idempotencyKey), "EquipmentReservation_checkOut", __result);
     }
     return __result;
   },
@@ -11854,12 +11855,12 @@ export const EquipmentReservation_markReturned = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EquipmentReservation_markReturned", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEquipmentReservationMarkReturned(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EquipmentReservation_markReturned", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EquipmentReservation_markReturned", args.idempotencyKey), "EquipmentReservation_markReturned", __result);
     }
     return __result;
   },
@@ -11928,12 +11929,12 @@ export const EquipmentServiceEntry_record = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EquipmentServiceEntry_record", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEquipmentServiceEntryRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EquipmentServiceEntry_record", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EquipmentServiceEntry_record", args.idempotencyKey), "EquipmentServiceEntry_record", __result);
     }
     return __result;
   },
@@ -11953,7 +11954,7 @@ export const EquipmentServiceEntry_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EquipmentServiceEntry_createViaRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -12006,7 +12007,7 @@ export const EquipmentServiceEntry_createViaRecord = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EquipmentServiceEntry_createViaRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EquipmentServiceEntry_createViaRecord", args.idempotencyKey), "EquipmentServiceEntry_createViaRecord", __result);
     }
     return __result;
   },
@@ -12150,12 +12151,12 @@ export const Event_approve = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_approve", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventApprove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_approve", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_approve", args.idempotencyKey), "Event_approve", __result);
     }
     return __result;
   },
@@ -12204,12 +12205,12 @@ export const Event_archive = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_archive", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventArchive(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_archive", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_archive", args.idempotencyKey), "Event_archive", __result);
     }
     return __result;
   },
@@ -12257,12 +12258,12 @@ export const Event_assignOwner = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_assignOwner", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventAssignOwner(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_assignOwner", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_assignOwner", args.idempotencyKey), "Event_assignOwner", __result);
     }
     return __result;
   },
@@ -12321,12 +12322,12 @@ export const Event_beginExecution = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_beginExecution", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventBeginExecution(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_beginExecution", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_beginExecution", args.idempotencyKey), "Event_beginExecution", __result);
     }
     return __result;
   },
@@ -12409,12 +12410,12 @@ export const Event_cancel = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_cancel", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventCancel(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_cancel", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_cancel", args.idempotencyKey), "Event_cancel", __result);
     }
     return __result;
   },
@@ -12515,12 +12516,12 @@ export const Event_captureDraft = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_captureDraft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventCaptureDraft(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_captureDraft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_captureDraft", args.idempotencyKey), "Event_captureDraft", __result);
     }
     return __result;
   },
@@ -12574,12 +12575,12 @@ export const Event_changeHeadcount = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_changeHeadcount", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventChangeHeadcount(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_changeHeadcount", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_changeHeadcount", args.idempotencyKey), "Event_changeHeadcount", __result);
     }
     return __result;
   },
@@ -12629,12 +12630,12 @@ export const Event_changePricing = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_changePricing", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventChangePricing(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_changePricing", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_changePricing", args.idempotencyKey), "Event_changePricing", __result);
     }
     return __result;
   },
@@ -12685,12 +12686,12 @@ export const Event_changePrimaryContact = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_changePrimaryContact", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventChangePrimaryContact(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_changePrimaryContact", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_changePrimaryContact", args.idempotencyKey), "Event_changePrimaryContact", __result);
     }
     return __result;
   },
@@ -12740,12 +12741,12 @@ export const Event_changeRequirements = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_changeRequirements", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventChangeRequirements(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_changeRequirements", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_changeRequirements", args.idempotencyKey), "Event_changeRequirements", __result);
     }
     return __result;
   },
@@ -12811,12 +12812,12 @@ export const Event_changeServiceStyle = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_changeServiceStyle", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventChangeServiceStyle(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_changeServiceStyle", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_changeServiceStyle", args.idempotencyKey), "Event_changeServiceStyle", __result);
     }
     return __result;
   },
@@ -12869,12 +12870,12 @@ export const Event_changeVenue = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_changeVenue", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventChangeVenue(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_changeVenue", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_changeVenue", args.idempotencyKey), "Event_changeVenue", __result);
     }
     return __result;
   },
@@ -12919,12 +12920,12 @@ export const Event_clearBinderBuilt = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_clearBinderBuilt", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventClearBinderBuilt(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_clearBinderBuilt", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_clearBinderBuilt", args.idempotencyKey), "Event_clearBinderBuilt", __result);
     }
     return __result;
   },
@@ -13017,12 +13018,12 @@ export const Event_closeOut = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_closeOut", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventCloseOut(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_closeOut", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_closeOut", args.idempotencyKey), "Event_closeOut", __result);
     }
     return __result;
   },
@@ -13097,12 +13098,12 @@ export const Event_complete = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_complete", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventComplete(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_complete", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_complete", args.idempotencyKey), "Event_complete", __result);
     }
     return __result;
   },
@@ -13171,12 +13172,12 @@ export const Event_configureRecurrence = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_configureRecurrence", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventConfigureRecurrence(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_configureRecurrence", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_configureRecurrence", args.idempotencyKey), "Event_configureRecurrence", __result);
     }
     return __result;
   },
@@ -13242,12 +13243,12 @@ export const Event_configureTiming = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_configureTiming", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventConfigureTiming(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_configureTiming", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_configureTiming", args.idempotencyKey), "Event_configureTiming", __result);
     }
     return __result;
   },
@@ -13306,12 +13307,12 @@ export const Event_confirmSalesLock = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_confirmSalesLock", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventConfirmSalesLock(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_confirmSalesLock", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_confirmSalesLock", args.idempotencyKey), "Event_confirmSalesLock", __result);
     }
     return __result;
   },
@@ -13363,12 +13364,12 @@ export const Event_correctCommercial = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_correctCommercial", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventCorrectCommercial(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_correctCommercial", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_correctCommercial", args.idempotencyKey), "Event_correctCommercial", __result);
     }
     return __result;
   },
@@ -13427,12 +13428,12 @@ export const Event_finalizeEvent = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_finalizeEvent", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventFinalizeEvent(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_finalizeEvent", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_finalizeEvent", args.idempotencyKey), "Event_finalizeEvent", __result);
     }
     return __result;
   },
@@ -13496,12 +13497,12 @@ export const Event_lockForSales = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_lockForSales", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventLockForSales(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_lockForSales", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_lockForSales", args.idempotencyKey), "Event_lockForSales", __result);
     }
     return __result;
   },
@@ -13545,12 +13546,12 @@ export const Event_markBinderBuilt = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_markBinderBuilt", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventMarkBinderBuilt(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_markBinderBuilt", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_markBinderBuilt", args.idempotencyKey), "Event_markBinderBuilt", __result);
     }
     return __result;
   },
@@ -13598,12 +13599,12 @@ export const Event_normalizePurchasingWeek = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_normalizePurchasingWeek", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventNormalizePurchasingWeek(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_normalizePurchasingWeek", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_normalizePurchasingWeek", args.idempotencyKey), "Event_normalizePurchasingWeek", __result);
     }
     return __result;
   },
@@ -13722,12 +13723,12 @@ export const Event_planEngagement = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_planEngagement", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventPlanEngagement(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_planEngagement", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_planEngagement", args.idempotencyKey), "Event_planEngagement", __result);
     }
     return __result;
   },
@@ -13766,7 +13767,7 @@ export const Event_createViaPlanEngagement = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_createViaPlanEngagement", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -13860,7 +13861,7 @@ export const Event_createViaPlanEngagement = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "planEngagement", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_createViaPlanEngagement", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_createViaPlanEngagement", args.idempotencyKey), "Event_createViaPlanEngagement", __result);
     }
     return __result;
   },
@@ -13907,12 +13908,12 @@ export const Event_reactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_reactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventReactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_reactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_reactivate", args.idempotencyKey), "Event_reactivate", __result);
     }
     return __result;
   },
@@ -13970,12 +13971,12 @@ export const Event_reassignClient = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_reassignClient", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventReassignClient(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_reassignClient", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_reassignClient", args.idempotencyKey), "Event_reassignClient", __result);
     }
     return __result;
   },
@@ -14032,12 +14033,12 @@ export const Event_reschedule = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_reschedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventReschedule(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_reschedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_reschedule", args.idempotencyKey), "Event_reschedule", __result);
     }
     return __result;
   },
@@ -14098,12 +14099,12 @@ export const Event_returnToPlanning = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_returnToPlanning", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventReturnToPlanning(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_returnToPlanning", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_returnToPlanning", args.idempotencyKey), "Event_returnToPlanning", __result);
     }
     return __result;
   },
@@ -14148,12 +14149,12 @@ export const Event_setEventNumber = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_setEventNumber", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventSetEventNumber(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_setEventNumber", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_setEventNumber", args.idempotencyKey), "Event_setEventNumber", __result);
     }
     return __result;
   },
@@ -14205,12 +14206,12 @@ export const Event_stageClientMerge = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_stageClientMerge", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventStageClientMerge(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_stageClientMerge", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_stageClientMerge", args.idempotencyKey), "Event_stageClientMerge", __result);
     }
     return __result;
   },
@@ -14257,12 +14258,12 @@ export const Event_stopRecurrence = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_stopRecurrence", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventStopRecurrence(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_stopRecurrence", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_stopRecurrence", args.idempotencyKey), "Event_stopRecurrence", __result);
     }
     return __result;
   },
@@ -14320,12 +14321,12 @@ export const Event_submitForApproval = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_submitForApproval", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventSubmitForApproval(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_submitForApproval", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_submitForApproval", args.idempotencyKey), "Event_submitForApproval", __result);
     }
     return __result;
   },
@@ -14400,12 +14401,12 @@ export const Event_updateDaySheet = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_updateDaySheet", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventUpdateDaySheet(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_updateDaySheet", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_updateDaySheet", args.idempotencyKey), "Event_updateDaySheet", __result);
     }
     return __result;
   },
@@ -14501,12 +14502,12 @@ export const Event_updateImportDraft = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_updateImportDraft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventUpdateImportDraft(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_updateImportDraft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_updateImportDraft", args.idempotencyKey), "Event_updateImportDraft", __result);
     }
     return __result;
   },
@@ -14561,12 +14562,12 @@ export const Event_updateSetupNotes = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_updateSetupNotes", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventUpdateSetupNotes(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_updateSetupNotes", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_updateSetupNotes", args.idempotencyKey), "Event_updateSetupNotes", __result);
     }
     return __result;
   },
@@ -14627,12 +14628,12 @@ export const Event_updateTaskBreakdown = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_updateTaskBreakdown", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventUpdateTaskBreakdown(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_updateTaskBreakdown", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_updateTaskBreakdown", args.idempotencyKey), "Event_updateTaskBreakdown", __result);
     }
     return __result;
   },
@@ -14710,12 +14711,12 @@ export const EventAllergenCheck_record = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAllergenCheck_record", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventAllergenCheckRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAllergenCheck_record", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAllergenCheck_record", args.idempotencyKey), "EventAllergenCheck_record", __result);
     }
     return __result;
   },
@@ -14734,7 +14735,7 @@ export const EventAllergenCheck_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAllergenCheck_createViaRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -14786,7 +14787,7 @@ export const EventAllergenCheck_createViaRecord = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAllergenCheck_createViaRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAllergenCheck_createViaRecord", args.idempotencyKey), "EventAllergenCheck_createViaRecord", __result);
     }
     return __result;
   },
@@ -14851,12 +14852,12 @@ export const EventAssignment_applyApprovedShiftSwap = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_applyApprovedShiftSwap", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventAssignmentApplyApprovedShiftSwap(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAssignment_applyApprovedShiftSwap", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_applyApprovedShiftSwap", args.idempotencyKey), "EventAssignment_applyApprovedShiftSwap", __result);
     }
     return __result;
   },
@@ -14925,12 +14926,12 @@ export const EventAssignment_assign = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_assign", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventAssignmentAssign(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAssignment_assign", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_assign", args.idempotencyKey), "EventAssignment_assign", __result);
     }
     return __result;
   },
@@ -14949,7 +14950,7 @@ export const EventAssignment_createViaAssign = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_createViaAssign", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -15002,7 +15003,7 @@ export const EventAssignment_createViaAssign = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "assign", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAssignment_createViaAssign", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_createViaAssign", args.idempotencyKey), "EventAssignment_createViaAssign", __result);
     }
     return __result;
   },
@@ -15063,12 +15064,12 @@ export const EventAssignment_checkIn = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_checkIn", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventAssignmentCheckIn(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAssignment_checkIn", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_checkIn", args.idempotencyKey), "EventAssignment_checkIn", __result);
     }
     return __result;
   },
@@ -15129,12 +15130,12 @@ export const EventAssignment_checkOut = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_checkOut", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventAssignmentCheckOut(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAssignment_checkOut", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_checkOut", args.idempotencyKey), "EventAssignment_checkOut", __result);
     }
     return __result;
   },
@@ -15195,12 +15196,12 @@ export const EventAssignment_confirm = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_confirm", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventAssignmentConfirm(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAssignment_confirm", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_confirm", args.idempotencyKey), "EventAssignment_confirm", __result);
     }
     return __result;
   },
@@ -15260,12 +15261,12 @@ export const EventAssignment_markNoShow = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_markNoShow", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventAssignmentMarkNoShow(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAssignment_markNoShow", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_markNoShow", args.idempotencyKey), "EventAssignment_markNoShow", __result);
     }
     return __result;
   },
@@ -15317,12 +15318,12 @@ export const EventAssignment_planTiming = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_planTiming", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventAssignmentPlanTiming(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAssignment_planTiming", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_planTiming", args.idempotencyKey), "EventAssignment_planTiming", __result);
     }
     return __result;
   },
@@ -15382,12 +15383,12 @@ export const EventAssignment_unassign = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_unassign", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventAssignmentUnassign(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAssignment_unassign", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventAssignment_unassign", args.idempotencyKey), "EventAssignment_unassign", __result);
     }
     return __result;
   },
@@ -15474,12 +15475,12 @@ export const EventCloseout_capture = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventCloseout_capture", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventCloseoutCapture(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventCloseout_capture", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventCloseout_capture", args.idempotencyKey), "EventCloseout_capture", __result);
     }
     return __result;
   },
@@ -15509,7 +15510,7 @@ export const EventCloseout_createViaCapture = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventCloseout_createViaCapture", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -15582,7 +15583,7 @@ export const EventCloseout_createViaCapture = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "capture", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventCloseout_createViaCapture", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventCloseout_createViaCapture", args.idempotencyKey), "EventCloseout_createViaCapture", __result);
     }
     return __result;
   },
@@ -15639,12 +15640,12 @@ export const EventCloseout_finalize = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventCloseout_finalize", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventCloseoutFinalize(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventCloseout_finalize", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventCloseout_finalize", args.idempotencyKey), "EventCloseout_finalize", __result);
     }
     return __result;
   },
@@ -15695,12 +15696,12 @@ export const EventCloseout_followEventCommercial = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventCloseout_followEventCommercial", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventCloseoutFollowEventCommercial(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventCloseout_followEventCommercial", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventCloseout_followEventCommercial", args.idempotencyKey), "EventCloseout_followEventCommercial", __result);
     }
     return __result;
   },
@@ -15862,12 +15863,12 @@ export const EventDish_addToEvent = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_addToEvent", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishAddToEvent(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_addToEvent", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_addToEvent", args.idempotencyKey), "EventDish_addToEvent", __result);
     }
     return __result;
   },
@@ -15888,7 +15889,7 @@ export const EventDish_createViaAddToEvent = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_createViaAddToEvent", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -16034,7 +16035,7 @@ export const EventDish_createViaAddToEvent = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "addToEvent", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_createViaAddToEvent", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_createViaAddToEvent", args.idempotencyKey), "EventDish_createViaAddToEvent", __result);
     }
     return __result;
   },
@@ -16096,12 +16097,12 @@ export const EventDish_adjustServings = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_adjustServings", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishAdjustServings(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_adjustServings", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_adjustServings", args.idempotencyKey), "EventDish_adjustServings", __result);
     }
     return __result;
   },
@@ -16150,12 +16151,12 @@ export const EventDish_changeCourse = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_changeCourse", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishChangeCourse(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_changeCourse", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_changeCourse", args.idempotencyKey), "EventDish_changeCourse", __result);
     }
     return __result;
   },
@@ -16274,12 +16275,12 @@ export const EventDish_confirmFromProposal = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_confirmFromProposal", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishConfirmFromProposal(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_confirmFromProposal", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_confirmFromProposal", args.idempotencyKey), "EventDish_confirmFromProposal", __result);
     }
     return __result;
   },
@@ -16315,12 +16316,12 @@ export const EventDish_refreshRecipeSync = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_refreshRecipeSync", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishRefreshRecipeSync(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_refreshRecipeSync", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_refreshRecipeSync", args.idempotencyKey), "EventDish_refreshRecipeSync", __result);
     }
     return __result;
   },
@@ -16381,12 +16382,12 @@ export const EventDish_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_remove", args.idempotencyKey), "EventDish_remove", __result);
     }
     return __result;
   },
@@ -16429,12 +16430,12 @@ export const EventDish_reorder = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_reorder", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishReorder(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_reorder", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_reorder", args.idempotencyKey), "EventDish_reorder", __result);
     }
     return __result;
   },
@@ -16484,12 +16485,12 @@ export const EventDish_requestCatalogPacking = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_requestCatalogPacking", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishRequestCatalogPacking(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_requestCatalogPacking", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_requestCatalogPacking", args.idempotencyKey), "EventDish_requestCatalogPacking", __result);
     }
     return __result;
   },
@@ -16565,12 +16566,12 @@ export const EventDish_requestContainerPack = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_requestContainerPack", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishRequestContainerPack(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_requestContainerPack", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_requestContainerPack", args.idempotencyKey), "EventDish_requestContainerPack", __result);
     }
     return __result;
   },
@@ -16635,12 +16636,12 @@ export const EventDish_setHeadcountOverride = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_setHeadcountOverride", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishSetHeadcountOverride(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_setHeadcountOverride", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_setHeadcountOverride", args.idempotencyKey), "EventDish_setHeadcountOverride", __result);
     }
     return __result;
   },
@@ -16702,12 +16703,12 @@ export const EventDish_syncHeadcount = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_syncHeadcount", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishSyncHeadcount(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_syncHeadcount", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_syncHeadcount", args.idempotencyKey), "EventDish_syncHeadcount", __result);
     }
     return __result;
   },
@@ -16754,12 +16755,12 @@ export const EventDish_updateInstructions = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_updateInstructions", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishUpdateInstructions(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_updateInstructions", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDish_updateInstructions", args.idempotencyKey), "EventDish_updateInstructions", __result);
     }
     return __result;
   },
@@ -16826,12 +16827,12 @@ export const EventDishComponentSeed_refresh = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDishComponentSeed_refresh", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishComponentSeedRefresh(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDishComponentSeed_refresh", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDishComponentSeed_refresh", args.idempotencyKey), "EventDishComponentSeed_refresh", __result);
     }
     return __result;
   },
@@ -16863,12 +16864,12 @@ export const EventDishComponentSeed_refreshRecipeSync = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDishComponentSeed_refreshRecipeSync", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishComponentSeedRefreshRecipeSync(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDishComponentSeed_refreshRecipeSync", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDishComponentSeed_refreshRecipeSync", args.idempotencyKey), "EventDishComponentSeed_refreshRecipeSync", __result);
     }
     return __result;
   },
@@ -16900,12 +16901,12 @@ export const EventDishComponentSeed_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDishComponentSeed_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishComponentSeedRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDishComponentSeed_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDishComponentSeed_retire", args.idempotencyKey), "EventDishComponentSeed_retire", __result);
     }
     return __result;
   },
@@ -16997,12 +16998,12 @@ export const EventDishComponentSeed_seed = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDishComponentSeed_seed", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishComponentSeedSeed(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDishComponentSeed_seed", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDishComponentSeed_seed", args.idempotencyKey), "EventDishComponentSeed_seed", __result);
     }
     return __result;
   },
@@ -17023,7 +17024,7 @@ export const EventDishComponentSeed_createViaSeed = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDishComponentSeed_createViaSeed", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -17098,7 +17099,7 @@ export const EventDishComponentSeed_createViaSeed = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "seed", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDishComponentSeed_createViaSeed", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDishComponentSeed_createViaSeed", args.idempotencyKey), "EventDishComponentSeed_createViaSeed", __result);
     }
     return __result;
   },
@@ -17171,12 +17172,12 @@ export const EventDishLineOverride_apply = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDishLineOverride_apply", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishLineOverrideApply(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDishLineOverride_apply", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDishLineOverride_apply", args.idempotencyKey), "EventDishLineOverride_apply", __result);
     }
     return __result;
   },
@@ -17202,7 +17203,7 @@ export const EventDishLineOverride_createViaApply = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDishLineOverride_createViaApply", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -17261,7 +17262,7 @@ export const EventDishLineOverride_createViaApply = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "apply", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDishLineOverride_createViaApply", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDishLineOverride_createViaApply", args.idempotencyKey), "EventDishLineOverride_createViaApply", __result);
     }
     return __result;
   },
@@ -17306,12 +17307,12 @@ export const EventDishLineOverride_revoke = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDishLineOverride_revoke", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventDishLineOverrideRevoke(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDishLineOverride_revoke", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventDishLineOverride_revoke", args.idempotencyKey), "EventDishLineOverride_revoke", __result);
     }
     return __result;
   },
@@ -17357,12 +17358,12 @@ export const EventGuest_assignTable = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventGuest_assignTable", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventGuestAssignTable(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventGuest_assignTable", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventGuest_assignTable", args.idempotencyKey), "EventGuest_assignTable", __result);
     }
     return __result;
   },
@@ -17408,12 +17409,12 @@ export const EventGuest_checkIn = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventGuest_checkIn", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventGuestCheckIn(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventGuest_checkIn", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventGuest_checkIn", args.idempotencyKey), "EventGuest_checkIn", __result);
     }
     return __result;
   },
@@ -17487,12 +17488,12 @@ export const EventGuest_invite = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventGuest_invite", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventGuestInvite(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventGuest_invite", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventGuest_invite", args.idempotencyKey), "EventGuest_invite", __result);
     }
     return __result;
   },
@@ -17513,7 +17514,7 @@ export const EventGuest_createViaInvite = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventGuest_createViaInvite", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -17561,7 +17562,7 @@ export const EventGuest_createViaInvite = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "invite", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventGuest_createViaInvite", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventGuest_createViaInvite", args.idempotencyKey), "EventGuest_createViaInvite", __result);
     }
     return __result;
   },
@@ -17619,12 +17620,12 @@ export const EventGuest_rsvpConfirm = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventGuest_rsvpConfirm", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventGuestRsvpConfirm(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventGuest_rsvpConfirm", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventGuest_rsvpConfirm", args.idempotencyKey), "EventGuest_rsvpConfirm", __result);
     }
     return __result;
   },
@@ -17683,12 +17684,12 @@ export const EventGuest_rsvpDecline = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventGuest_rsvpDecline", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventGuestRsvpDecline(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventGuest_rsvpDecline", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventGuest_rsvpDecline", args.idempotencyKey), "EventGuest_rsvpDecline", __result);
     }
     return __result;
   },
@@ -17733,12 +17734,12 @@ export const EventGuest_withdraw = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventGuest_withdraw", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventGuestWithdraw(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventGuest_withdraw", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventGuest_withdraw", args.idempotencyKey), "EventGuest_withdraw", __result);
     }
     return __result;
   },
@@ -17892,12 +17893,12 @@ export const EventIngredientContribution_record = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventIngredientContribution_record", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventIngredientContributionRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventIngredientContribution_record", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventIngredientContribution_record", args.idempotencyKey), "EventIngredientContribution_record", __result);
     }
     return __result;
   },
@@ -17931,7 +17932,7 @@ export const EventIngredientContribution_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventIngredientContribution_createViaRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -18071,7 +18072,7 @@ export const EventIngredientContribution_createViaRecord = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventIngredientContribution_createViaRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventIngredientContribution_createViaRecord", args.idempotencyKey), "EventIngredientContribution_createViaRecord", __result);
     }
     return __result;
   },
@@ -18108,12 +18109,12 @@ export const EventIngredientContribution_refreshRecipeSync = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventIngredientContribution_refreshRecipeSync", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventIngredientContributionRefreshRecipeSync(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventIngredientContribution_refreshRecipeSync", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventIngredientContribution_refreshRecipeSync", args.idempotencyKey), "EventIngredientContribution_refreshRecipeSync", __result);
     }
     return __result;
   },
@@ -18223,12 +18224,12 @@ export const EventIngredientContribution_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventIngredientContribution_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventIngredientContributionRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventIngredientContribution_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventIngredientContribution_retire", args.idempotencyKey), "EventIngredientContribution_retire", __result);
     }
     return __result;
   },
@@ -18337,12 +18338,12 @@ export const EventIngredientContribution_retirePreviousUnit = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventIngredientContribution_retirePreviousUnit", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventIngredientContributionRetirePreviousUnit(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventIngredientContribution_retirePreviousUnit", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventIngredientContribution_retirePreviousUnit", args.idempotencyKey), "EventIngredientContribution_retirePreviousUnit", __result);
     }
     return __result;
   },
@@ -18455,12 +18456,12 @@ export const EventIngredientContribution_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventIngredientContribution_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventIngredientContributionRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventIngredientContribution_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventIngredientContribution_revise", args.idempotencyKey), "EventIngredientContribution_revise", __result);
     }
     return __result;
   },
@@ -18573,12 +18574,12 @@ export const EventIngredientContribution_supersede = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventIngredientContribution_supersede", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventIngredientContributionSupersede(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventIngredientContribution_supersede", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventIngredientContribution_supersede", args.idempotencyKey), "EventIngredientContribution_supersede", __result);
     }
     return __result;
   },
@@ -18630,12 +18631,12 @@ export const EventLayoutSection_add = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventLayoutSection_add", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventLayoutSectionAdd(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventLayoutSection_add", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventLayoutSection_add", args.idempotencyKey), "EventLayoutSection_add", __result);
     }
     return __result;
   },
@@ -18652,7 +18653,7 @@ export const EventLayoutSection_createViaAdd = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventLayoutSection_createViaAdd", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -18690,7 +18691,7 @@ export const EventLayoutSection_createViaAdd = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "add", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventLayoutSection_createViaAdd", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventLayoutSection_createViaAdd", args.idempotencyKey), "EventLayoutSection_createViaAdd", __result);
     }
     return __result;
   },
@@ -18731,12 +18732,12 @@ export const EventLayoutSection_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventLayoutSection_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventLayoutSectionRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventLayoutSection_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventLayoutSection_remove", args.idempotencyKey), "EventLayoutSection_remove", __result);
     }
     return __result;
   },
@@ -18785,12 +18786,12 @@ export const EventLayoutSection_update = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventLayoutSection_update", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventLayoutSectionUpdate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventLayoutSection_update", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventLayoutSection_update", args.idempotencyKey), "EventLayoutSection_update", __result);
     }
     return __result;
   },
@@ -18841,12 +18842,12 @@ export const EventStaffNeed_applyApprovedShiftSwap = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_applyApprovedShiftSwap", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventStaffNeedApplyApprovedShiftSwap(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventStaffNeed_applyApprovedShiftSwap", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_applyApprovedShiftSwap", args.idempotencyKey), "EventStaffNeed_applyApprovedShiftSwap", __result);
     }
     return __result;
   },
@@ -18905,12 +18906,12 @@ export const EventStaffNeed_cancel = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_cancel", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventStaffNeedCancel(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventStaffNeed_cancel", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_cancel", args.idempotencyKey), "EventStaffNeed_cancel", __result);
     }
     return __result;
   },
@@ -18977,12 +18978,12 @@ export const EventStaffNeed_changeCoverage = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_changeCoverage", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventStaffNeedChangeCoverage(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventStaffNeed_changeCoverage", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_changeCoverage", args.idempotencyKey), "EventStaffNeed_changeCoverage", __result);
     }
     return __result;
   },
@@ -19041,12 +19042,12 @@ export const EventStaffNeed_claim = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_claim", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventStaffNeedClaim(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventStaffNeed_claim", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_claim", args.idempotencyKey), "EventStaffNeed_claim", __result);
     }
     return __result;
   },
@@ -19106,12 +19107,12 @@ export const EventStaffNeed_fill = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_fill", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventStaffNeedFill(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventStaffNeed_fill", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_fill", args.idempotencyKey), "EventStaffNeed_fill", __result);
     }
     return __result;
   },
@@ -19161,12 +19162,12 @@ export const EventStaffNeed_planTiming = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_planTiming", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventStaffNeedPlanTiming(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventStaffNeed_planTiming", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_planTiming", args.idempotencyKey), "EventStaffNeed_planTiming", __result);
     }
     return __result;
   },
@@ -19242,12 +19243,12 @@ export const EventStaffNeed_postOpen = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_postOpen", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventStaffNeedPostOpen(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventStaffNeed_postOpen", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_postOpen", args.idempotencyKey), "EventStaffNeed_postOpen", __result);
     }
     return __result;
   },
@@ -19269,7 +19270,7 @@ export const EventStaffNeed_createViaPostOpen = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_createViaPostOpen", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -19320,7 +19321,7 @@ export const EventStaffNeed_createViaPostOpen = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "postOpen", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventStaffNeed_createViaPostOpen", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_createViaPostOpen", args.idempotencyKey), "EventStaffNeed_createViaPostOpen", __result);
     }
     return __result;
   },
@@ -19364,12 +19365,12 @@ export const EventStaffNeed_prepareCoverageContinuation = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_prepareCoverageContinuation", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventStaffNeedPrepareCoverageContinuation(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventStaffNeed_prepareCoverageContinuation", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_prepareCoverageContinuation", args.idempotencyKey), "EventStaffNeed_prepareCoverageContinuation", __result);
     }
     return __result;
   },
@@ -19426,12 +19427,12 @@ export const EventStaffNeed_releaseClaim = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_releaseClaim", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventStaffNeedReleaseClaim(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventStaffNeed_releaseClaim", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventStaffNeed_releaseClaim", args.idempotencyKey), "EventStaffNeed_releaseClaim", __result);
     }
     return __result;
   },
@@ -19490,12 +19491,12 @@ export const EventTemplate_archive = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTemplate_archive", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventTemplateArchive(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventTemplate_archive", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTemplate_archive", args.idempotencyKey), "EventTemplate_archive", __result);
     }
     return __result;
   },
@@ -19558,12 +19559,12 @@ export const EventTemplate_define = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTemplate_define", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventTemplateDefine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventTemplate_define", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTemplate_define", args.idempotencyKey), "EventTemplate_define", __result);
     }
     return __result;
   },
@@ -19585,7 +19586,7 @@ export const EventTemplate_createViaDefine = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTemplate_createViaDefine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -19635,7 +19636,7 @@ export const EventTemplate_createViaDefine = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "define", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventTemplate_createViaDefine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTemplate_createViaDefine", args.idempotencyKey), "EventTemplate_createViaDefine", __result);
     }
     return __result;
   },
@@ -19691,12 +19692,12 @@ export const EventTemplate_reactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTemplate_reactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventTemplateReactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventTemplate_reactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTemplate_reactivate", args.idempotencyKey), "EventTemplate_reactivate", __result);
     }
     return __result;
   },
@@ -19757,12 +19758,12 @@ export const EventTemplate_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTemplate_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventTemplateRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventTemplate_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTemplate_revise", args.idempotencyKey), "EventTemplate_revise", __result);
     }
     return __result;
   },
@@ -19833,12 +19834,12 @@ export const EventTimelineActivity_adjust = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineActivity_adjust", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventTimelineActivityAdjust(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventTimelineActivity_adjust", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineActivity_adjust", args.idempotencyKey), "EventTimelineActivity_adjust", __result);
     }
     return __result;
   },
@@ -19882,12 +19883,12 @@ export const EventTimelineActivity_complete = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineActivity_complete", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventTimelineActivityComplete(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventTimelineActivity_complete", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineActivity_complete", args.idempotencyKey), "EventTimelineActivity_complete", __result);
     }
     return __result;
   },
@@ -19942,12 +19943,12 @@ export const EventTimelineActivity_planTiming = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineActivity_planTiming", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventTimelineActivityPlanTiming(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventTimelineActivity_planTiming", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineActivity_planTiming", args.idempotencyKey), "EventTimelineActivity_planTiming", __result);
     }
     return __result;
   },
@@ -19989,12 +19990,12 @@ export const EventTimelineActivity_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineActivity_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventTimelineActivityRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventTimelineActivity_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineActivity_remove", args.idempotencyKey), "EventTimelineActivity_remove", __result);
     }
     return __result;
   },
@@ -20036,12 +20037,12 @@ export const EventTimelineActivity_reopen = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineActivity_reopen", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventTimelineActivityReopen(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventTimelineActivity_reopen", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineActivity_reopen", args.idempotencyKey), "EventTimelineActivity_reopen", __result);
     }
     return __result;
   },
@@ -20109,12 +20110,12 @@ export const EventTimelineActivity_schedule = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineActivity_schedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventTimelineActivitySchedule(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventTimelineActivity_schedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineActivity_schedule", args.idempotencyKey), "EventTimelineActivity_schedule", __result);
     }
     return __result;
   },
@@ -20138,7 +20139,7 @@ export const EventTimelineActivity_createViaSchedule = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineActivity_createViaSchedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -20192,7 +20193,7 @@ export const EventTimelineActivity_createViaSchedule = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "schedule", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventTimelineActivity_createViaSchedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineActivity_createViaSchedule", args.idempotencyKey), "EventTimelineActivity_createViaSchedule", __result);
     }
     return __result;
   },
@@ -20239,12 +20240,12 @@ export const EventTimelineActivity_useCalculatedTiming = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineActivity_useCalculatedTiming", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventTimelineActivityUseCalculatedTiming(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventTimelineActivity_useCalculatedTiming", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineActivity_useCalculatedTiming", args.idempotencyKey), "EventTimelineActivity_useCalculatedTiming", __result);
     }
     return __result;
   },
@@ -20298,12 +20299,12 @@ export const EventTimelineComment_post = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineComment_post", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventTimelineCommentPost(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventTimelineComment_post", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineComment_post", args.idempotencyKey), "EventTimelineComment_post", __result);
     }
     return __result;
   },
@@ -20319,7 +20320,7 @@ export const EventTimelineComment_createViaPost = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineComment_createViaPost", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -20359,7 +20360,7 @@ export const EventTimelineComment_createViaPost = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "post", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventTimelineComment_createViaPost", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineComment_createViaPost", args.idempotencyKey), "EventTimelineComment_createViaPost", __result);
     }
     return __result;
   },
@@ -20401,12 +20402,12 @@ export const EventTimelineComment_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineComment_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventTimelineCommentRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventTimelineComment_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventTimelineComment_remove", args.idempotencyKey), "EventTimelineComment_remove", __result);
     }
     return __result;
   },
@@ -20474,12 +20475,12 @@ export const EventVehicleAssignment_assign = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventVehicleAssignment_assign", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventVehicleAssignmentAssign(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventVehicleAssignment_assign", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventVehicleAssignment_assign", args.idempotencyKey), "EventVehicleAssignment_assign", __result);
     }
     return __result;
   },
@@ -20498,7 +20499,7 @@ export const EventVehicleAssignment_createViaAssign = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventVehicleAssignment_createViaAssign", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -20547,7 +20548,7 @@ export const EventVehicleAssignment_createViaAssign = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "assign", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventVehicleAssignment_createViaAssign", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventVehicleAssignment_createViaAssign", args.idempotencyKey), "EventVehicleAssignment_createViaAssign", __result);
     }
     return __result;
   },
@@ -20589,12 +20590,12 @@ export const EventVehicleAssignment_clearPreloaded = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventVehicleAssignment_clearPreloaded", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventVehicleAssignmentClearPreloaded(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventVehicleAssignment_clearPreloaded", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventVehicleAssignment_clearPreloaded", args.idempotencyKey), "EventVehicleAssignment_clearPreloaded", __result);
     }
     return __result;
   },
@@ -20637,12 +20638,12 @@ export const EventVehicleAssignment_markPreloaded = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventVehicleAssignment_markPreloaded", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventVehicleAssignmentMarkPreloaded(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventVehicleAssignment_markPreloaded", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventVehicleAssignment_markPreloaded", args.idempotencyKey), "EventVehicleAssignment_markPreloaded", __result);
     }
     return __result;
   },
@@ -20686,12 +20687,12 @@ export const EventVehicleAssignment_release = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventVehicleAssignment_release", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runEventVehicleAssignmentRelease(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventVehicleAssignment_release", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "EventVehicleAssignment_release", args.idempotencyKey), "EventVehicleAssignment_release", __result);
     }
     return __result;
   },
@@ -20736,12 +20737,12 @@ export const ExternalRecordLink_decide = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_decide", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runExternalRecordLinkDecide(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ExternalRecordLink_decide", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_decide", args.idempotencyKey), "ExternalRecordLink_decide", __result);
     }
     return __result;
   },
@@ -20785,12 +20786,12 @@ export const ExternalRecordLink_discard = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_discard", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runExternalRecordLinkDiscard(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ExternalRecordLink_discard", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_discard", args.idempotencyKey), "ExternalRecordLink_discard", __result);
     }
     return __result;
   },
@@ -20875,12 +20876,12 @@ export const ExternalRecordLink_link = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_link", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runExternalRecordLinkLink(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ExternalRecordLink_link", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_link", args.idempotencyKey), "ExternalRecordLink_link", __result);
     }
     return __result;
   },
@@ -20911,7 +20912,7 @@ export const ExternalRecordLink_createViaLink = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_createViaLink", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -20982,7 +20983,7 @@ export const ExternalRecordLink_createViaLink = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "link", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ExternalRecordLink_createViaLink", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_createViaLink", args.idempotencyKey), "ExternalRecordLink_createViaLink", __result);
     }
     return __result;
   },
@@ -21025,12 +21026,12 @@ export const ExternalRecordLink_observe = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_observe", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runExternalRecordLinkObserve(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ExternalRecordLink_observe", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_observe", args.idempotencyKey), "ExternalRecordLink_observe", __result);
     }
     return __result;
   },
@@ -21073,12 +21074,12 @@ export const ExternalRecordLink_recordApplied = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_recordApplied", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runExternalRecordLinkRecordApplied(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ExternalRecordLink_recordApplied", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_recordApplied", args.idempotencyKey), "ExternalRecordLink_recordApplied", __result);
     }
     return __result;
   },
@@ -21125,12 +21126,12 @@ export const ExternalRecordLink_resolveConflict = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_resolveConflict", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runExternalRecordLinkResolveConflict(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ExternalRecordLink_resolveConflict", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_resolveConflict", args.idempotencyKey), "ExternalRecordLink_resolveConflict", __result);
     }
     return __result;
   },
@@ -21176,12 +21177,12 @@ export const ExternalRecordLink_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runExternalRecordLinkRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ExternalRecordLink_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_retire", args.idempotencyKey), "ExternalRecordLink_retire", __result);
     }
     return __result;
   },
@@ -21226,12 +21227,12 @@ export const ExternalRecordLink_unlinkExternalRecord = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_unlinkExternalRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runExternalRecordLinkUnlinkExternalRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ExternalRecordLink_unlinkExternalRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_unlinkExternalRecord", args.idempotencyKey), "ExternalRecordLink_unlinkExternalRecord", __result);
     }
     return __result;
   },
@@ -21278,12 +21279,12 @@ export const ExternalRecordLink_updateCapsuleId = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_updateCapsuleId", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runExternalRecordLinkUpdateCapsuleId(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ExternalRecordLink_updateCapsuleId", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_updateCapsuleId", args.idempotencyKey), "ExternalRecordLink_updateCapsuleId", __result);
     }
     return __result;
   },
@@ -21332,12 +21333,12 @@ export const ExternalRecordLink_verifyLink = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_verifyLink", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runExternalRecordLinkVerifyLink(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ExternalRecordLink_verifyLink", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ExternalRecordLink_verifyLink", args.idempotencyKey), "ExternalRecordLink_verifyLink", __result);
     }
     return __result;
   },
@@ -21388,12 +21389,12 @@ export const ImportArtifact_classify = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportArtifact_classify", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportArtifactClassify(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportArtifact_classify", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportArtifact_classify", args.idempotencyKey), "ImportArtifact_classify", __result);
     }
     return __result;
   },
@@ -21440,12 +21441,12 @@ export const ImportArtifact_recordParse = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportArtifact_recordParse", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportArtifactRecordParse(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportArtifact_recordParse", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportArtifact_recordParse", args.idempotencyKey), "ImportArtifact_recordParse", __result);
     }
     return __result;
   },
@@ -21509,12 +21510,12 @@ export const ImportArtifact_register = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportArtifact_register", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportArtifactRegister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportArtifact_register", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportArtifact_register", args.idempotencyKey), "ImportArtifact_register", __result);
     }
     return __result;
   },
@@ -21582,12 +21583,12 @@ export const ImportConflict_raise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportConflict_raise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportConflictRaise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportConflict_raise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportConflict_raise", args.idempotencyKey), "ImportConflict_raise", __result);
     }
     return __result;
   },
@@ -21606,7 +21607,7 @@ export const ImportConflict_createViaRaise = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportConflict_createViaRaise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -21649,7 +21650,7 @@ export const ImportConflict_createViaRaise = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "raise", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportConflict_createViaRaise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportConflict_createViaRaise", args.idempotencyKey), "ImportConflict_createViaRaise", __result);
     }
     return __result;
   },
@@ -21709,12 +21710,12 @@ export const ImportConflict_settle = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportConflict_settle", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportConflictSettle(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportConflict_settle", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportConflict_settle", args.idempotencyKey), "ImportConflict_settle", __result);
     }
     return __result;
   },
@@ -21769,12 +21770,12 @@ export const ImportConflict_updateSource = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportConflict_updateSource", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportConflictUpdateSource(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportConflict_updateSource", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportConflict_updateSource", args.idempotencyKey), "ImportConflict_updateSource", __result);
     }
     return __result;
   },
@@ -21815,12 +21816,12 @@ export const ImportDataset_activate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportDataset_activate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportDatasetActivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportDataset_activate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportDataset_activate", args.idempotencyKey), "ImportDataset_activate", __result);
     }
     return __result;
   },
@@ -21861,12 +21862,12 @@ export const ImportDataset_deactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportDataset_deactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportDatasetDeactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportDataset_deactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportDataset_deactivate", args.idempotencyKey), "ImportDataset_deactivate", __result);
     }
     return __result;
   },
@@ -21909,12 +21910,12 @@ export const ImportDataset_recordLastImport = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportDataset_recordLastImport", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportDatasetRecordLastImport(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportDataset_recordLastImport", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportDataset_recordLastImport", args.idempotencyKey), "ImportDataset_recordLastImport", __result);
     }
     return __result;
   },
@@ -21976,12 +21977,12 @@ export const ImportDataset_register = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportDataset_register", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportDatasetRegister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportDataset_register", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportDataset_register", args.idempotencyKey), "ImportDataset_register", __result);
     }
     return __result;
   },
@@ -22030,12 +22031,12 @@ export const ImportDataset_updateConfig = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportDataset_updateConfig", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportDatasetUpdateConfig(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportDataset_updateConfig", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportDataset_updateConfig", args.idempotencyKey), "ImportDataset_updateConfig", __result);
     }
     return __result;
   },
@@ -22095,12 +22096,12 @@ export const ImportRun_approveReview = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_approveReview", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportRunApproveReview(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportRun_approveReview", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_approveReview", args.idempotencyKey), "ImportRun_approveReview", __result);
     }
     return __result;
   },
@@ -22157,12 +22158,12 @@ export const ImportRun_beginReview = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_beginReview", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportRunBeginReview(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportRun_beginReview", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_beginReview", args.idempotencyKey), "ImportRun_beginReview", __result);
     }
     return __result;
   },
@@ -22224,12 +22225,12 @@ export const ImportRun_commit = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_commit", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportRunCommit(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportRun_commit", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_commit", args.idempotencyKey), "ImportRun_commit", __result);
     }
     return __result;
   },
@@ -22275,12 +22276,12 @@ export const ImportRun_explainArchiveDiscrepancy = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_explainArchiveDiscrepancy", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportRunExplainArchiveDiscrepancy(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportRun_explainArchiveDiscrepancy", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_explainArchiveDiscrepancy", args.idempotencyKey), "ImportRun_explainArchiveDiscrepancy", __result);
     }
     return __result;
   },
@@ -22341,12 +22342,12 @@ export const ImportRun_markFailed = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_markFailed", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportRunMarkFailed(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportRun_markFailed", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_markFailed", args.idempotencyKey), "ImportRun_markFailed", __result);
     }
     return __result;
   },
@@ -22403,12 +22404,12 @@ export const ImportRun_recordArchiveInventory = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_recordArchiveInventory", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportRunRecordArchiveInventory(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportRun_recordArchiveInventory", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_recordArchiveInventory", args.idempotencyKey), "ImportRun_recordArchiveInventory", __result);
     }
     return __result;
   },
@@ -22454,12 +22455,12 @@ export const ImportRun_recordCommitCheckpoint = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_recordCommitCheckpoint", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportRunRecordCommitCheckpoint(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportRun_recordCommitCheckpoint", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_recordCommitCheckpoint", args.idempotencyKey), "ImportRun_recordCommitCheckpoint", __result);
     }
     return __result;
   },
@@ -22508,12 +22509,12 @@ export const ImportRun_recordDispositionSummary = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_recordDispositionSummary", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportRunRecordDispositionSummary(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportRun_recordDispositionSummary", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_recordDispositionSummary", args.idempotencyKey), "ImportRun_recordDispositionSummary", __result);
     }
     return __result;
   },
@@ -22572,12 +22573,12 @@ export const ImportRun_recordParse = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_recordParse", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportRunRecordParse(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportRun_recordParse", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_recordParse", args.idempotencyKey), "ImportRun_recordParse", __result);
     }
     return __result;
   },
@@ -22635,12 +22636,12 @@ export const ImportRun_revert = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_revert", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportRunRevert(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportRun_revert", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_revert", args.idempotencyKey), "ImportRun_revert", __result);
     }
     return __result;
   },
@@ -22702,12 +22703,12 @@ export const ImportRun_start = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_start", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportRunStart(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportRun_start", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_start", args.idempotencyKey), "ImportRun_start", __result);
     }
     return __result;
   },
@@ -22764,12 +22765,12 @@ export const ImportRun_validate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_validate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runImportRunValidate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ImportRun_validate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ImportRun_validate", args.idempotencyKey), "ImportRun_validate", __result);
     }
     return __result;
   },
@@ -22826,12 +22827,12 @@ export const Incident_beginInvestigation = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Incident_beginInvestigation", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIncidentBeginInvestigation(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Incident_beginInvestigation", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Incident_beginInvestigation", args.idempotencyKey), "Incident_beginInvestigation", __result);
     }
     return __result;
   },
@@ -22872,12 +22873,12 @@ export const Incident_clearCorrectiveActionLock = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Incident_clearCorrectiveActionLock", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIncidentClearCorrectiveActionLock(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Incident_clearCorrectiveActionLock", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Incident_clearCorrectiveActionLock", args.idempotencyKey), "Incident_clearCorrectiveActionLock", __result);
     }
     return __result;
   },
@@ -22939,12 +22940,12 @@ export const Incident_dismiss = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Incident_dismiss", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIncidentDismiss(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Incident_dismiss", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Incident_dismiss", args.idempotencyKey), "Incident_dismiss", __result);
     }
     return __result;
   },
@@ -23005,12 +23006,12 @@ export const Incident_markResolved = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Incident_markResolved", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIncidentMarkResolved(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Incident_markResolved", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Incident_markResolved", args.idempotencyKey), "Incident_markResolved", __result);
     }
     return __result;
   },
@@ -23078,12 +23079,12 @@ export const Incident_report = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Incident_report", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIncidentReport(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Incident_report", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Incident_report", args.idempotencyKey), "Incident_report", __result);
     }
     return __result;
   },
@@ -23103,7 +23104,7 @@ export const Incident_createViaReport = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Incident_createViaReport", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -23157,7 +23158,7 @@ export const Incident_createViaReport = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "report", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Incident_createViaReport", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Incident_createViaReport", args.idempotencyKey), "Incident_createViaReport", __result);
     }
     return __result;
   },
@@ -23202,12 +23203,12 @@ export const Ingredient_classifyAllergens = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_classifyAllergens", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientClassifyAllergens(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_classifyAllergens", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_classifyAllergens", args.idempotencyKey), "Ingredient_classifyAllergens", __result);
     }
     return __result;
   },
@@ -23250,12 +23251,12 @@ export const Ingredient_clearPrimaryImage = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_clearPrimaryImage", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientClearPrimaryImage(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_clearPrimaryImage", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_clearPrimaryImage", args.idempotencyKey), "Ingredient_clearPrimaryImage", __result);
     }
     return __result;
   },
@@ -23293,12 +23294,12 @@ export const Ingredient_configureSubstitutes = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_configureSubstitutes", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientConfigureSubstitutes(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_configureSubstitutes", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_configureSubstitutes", args.idempotencyKey), "Ingredient_configureSubstitutes", __result);
     }
     return __result;
   },
@@ -23357,12 +23358,12 @@ export const Ingredient_discontinue = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_discontinue", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientDiscontinue(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_discontinue", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_discontinue", args.idempotencyKey), "Ingredient_discontinue", __result);
     }
     return __result;
   },
@@ -23420,12 +23421,12 @@ export const Ingredient_introduce = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_introduce", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientIntroduce(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_introduce", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_introduce", args.idempotencyKey), "Ingredient_introduce", __result);
     }
     return __result;
   },
@@ -23445,7 +23446,7 @@ export const Ingredient_createViaIntroduce = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_createViaIntroduce", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -23493,7 +23494,7 @@ export const Ingredient_createViaIntroduce = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "introduce", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_createViaIntroduce", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_createViaIntroduce", args.idempotencyKey), "Ingredient_createViaIntroduce", __result);
     }
     return __result;
   },
@@ -23541,12 +23542,12 @@ export const Ingredient_linkAsEdition = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_linkAsEdition", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientLinkAsEdition(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_linkAsEdition", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_linkAsEdition", args.idempotencyKey), "Ingredient_linkAsEdition", __result);
     }
     return __result;
   },
@@ -23609,12 +23610,12 @@ export const Ingredient_mergeInto = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_mergeInto", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientMergeInto(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_mergeInto", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_mergeInto", args.idempotencyKey), "Ingredient_mergeInto", __result);
     }
     return __result;
   },
@@ -23671,12 +23672,12 @@ export const Ingredient_purge = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_purge", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientPurge(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_purge", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_purge", args.idempotencyKey), "Ingredient_purge", __result);
     }
     return __result;
   },
@@ -23733,12 +23734,12 @@ export const Ingredient_reinstate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_reinstate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientReinstate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_reinstate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_reinstate", args.idempotencyKey), "Ingredient_reinstate", __result);
     }
     return __result;
   },
@@ -23806,12 +23807,12 @@ export const Ingredient_setNutrition = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_setNutrition", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientSetNutrition(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_setNutrition", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_setNutrition", args.idempotencyKey), "Ingredient_setNutrition", __result);
     }
     return __result;
   },
@@ -23849,12 +23850,12 @@ export const Ingredient_setPreferredVendor = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_setPreferredVendor", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientSetPreferredVendor(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_setPreferredVendor", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_setPreferredVendor", args.idempotencyKey), "Ingredient_setPreferredVendor", __result);
     }
     return __result;
   },
@@ -23894,12 +23895,12 @@ export const Ingredient_setPreferredVendors = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_setPreferredVendors", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientSetPreferredVendors(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_setPreferredVendors", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_setPreferredVendors", args.idempotencyKey), "Ingredient_setPreferredVendors", __result);
     }
     return __result;
   },
@@ -23945,12 +23946,12 @@ export const Ingredient_setPrimaryImage = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_setPrimaryImage", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientSetPrimaryImage(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_setPrimaryImage", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_setPrimaryImage", args.idempotencyKey), "Ingredient_setPrimaryImage", __result);
     }
     return __result;
   },
@@ -23996,12 +23997,12 @@ export const Ingredient_updateCosting = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_updateCosting", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientUpdateCosting(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_updateCosting", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_updateCosting", args.idempotencyKey), "Ingredient_updateCosting", __result);
     }
     return __result;
   },
@@ -24049,12 +24050,12 @@ export const Ingredient_updateDetails = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_updateDetails", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientUpdateDetails(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_updateDetails", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Ingredient_updateDetails", args.idempotencyKey), "Ingredient_updateDetails", __result);
     }
     return __result;
   },
@@ -24095,12 +24096,12 @@ export const IngredientDemand_alignPurchasingWeek = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_alignPurchasingWeek", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientDemandAlignPurchasingWeek(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientDemand_alignPurchasingWeek", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_alignPurchasingWeek", args.idempotencyKey), "IngredientDemand_alignPurchasingWeek", __result);
     }
     return __result;
   },
@@ -24195,12 +24196,12 @@ export const IngredientDemand_calculate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_calculate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientDemandCalculate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientDemand_calculate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_calculate", args.idempotencyKey), "IngredientDemand_calculate", __result);
     }
     return __result;
   },
@@ -24222,7 +24223,7 @@ export const IngredientDemand_createViaCalculate = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_createViaCalculate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -24290,7 +24291,7 @@ export const IngredientDemand_createViaCalculate = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "calculate", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientDemand_createViaCalculate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_createViaCalculate", args.idempotencyKey), "IngredientDemand_createViaCalculate", __result);
     }
     return __result;
   },
@@ -24353,12 +24354,12 @@ export const IngredientDemand_confirm = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_confirm", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientDemandConfirm(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientDemand_confirm", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_confirm", args.idempotencyKey), "IngredientDemand_confirm", __result);
     }
     return __result;
   },
@@ -24398,12 +24399,12 @@ export const IngredientDemand_ensurePurchaseEligible = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_ensurePurchaseEligible", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientDemandEnsurePurchaseEligible(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientDemand_ensurePurchaseEligible", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_ensurePurchaseEligible", args.idempotencyKey), "IngredientDemand_ensurePurchaseEligible", __result);
     }
     return __result;
   },
@@ -24460,12 +24461,12 @@ export const IngredientDemand_fulfill = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_fulfill", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientDemandFulfill(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientDemand_fulfill", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_fulfill", args.idempotencyKey), "IngredientDemand_fulfill", __result);
     }
     return __result;
   },
@@ -24524,12 +24525,12 @@ export const IngredientDemand_markReleased = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_markReleased", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientDemandMarkReleased(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientDemand_markReleased", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_markReleased", args.idempotencyKey), "IngredientDemand_markReleased", __result);
     }
     return __result;
   },
@@ -24578,12 +24579,12 @@ export const IngredientDemand_recalculate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_recalculate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientDemandRecalculate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientDemand_recalculate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_recalculate", args.idempotencyKey), "IngredientDemand_recalculate", __result);
     }
     return __result;
   },
@@ -24645,12 +24646,12 @@ export const IngredientDemand_supersede = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_supersede", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientDemandSupersede(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientDemand_supersede", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_supersede", args.idempotencyKey), "IngredientDemand_supersede", __result);
     }
     return __result;
   },
@@ -24748,12 +24749,12 @@ export const IngredientDemand_syncFromContributions = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_syncFromContributions", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientDemandSyncFromContributions(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientDemand_syncFromContributions", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientDemand_syncFromContributions", args.idempotencyKey), "IngredientDemand_syncFromContributions", __result);
     }
     return __result;
   },
@@ -24809,12 +24810,12 @@ export const IngredientPriceObservation_record = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientPriceObservation_record", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIngredientPriceObservationRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientPriceObservation_record", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientPriceObservation_record", args.idempotencyKey), "IngredientPriceObservation_record", __result);
     }
     return __result;
   },
@@ -24835,7 +24836,7 @@ export const IngredientPriceObservation_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientPriceObservation_createViaRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -24878,7 +24879,7 @@ export const IngredientPriceObservation_createViaRecord = mutation({
     const docId = await ctx.db.insert("ingredientPriceObservations", doc as any);
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientPriceObservation_createViaRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IngredientPriceObservation_createViaRecord", args.idempotencyKey), "IngredientPriceObservation_createViaRecord", __result);
     }
     return __result;
   },
@@ -24944,12 +24945,12 @@ export const IntegrationConnection_authorize = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IntegrationConnection_authorize", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIntegrationConnectionAuthorize(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IntegrationConnection_authorize", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IntegrationConnection_authorize", args.idempotencyKey), "IntegrationConnection_authorize", __result);
     }
     return __result;
   },
@@ -24967,7 +24968,7 @@ export const IntegrationConnection_createViaAuthorize = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IntegrationConnection_createViaAuthorize", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -25010,7 +25011,7 @@ export const IntegrationConnection_createViaAuthorize = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "authorize", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IntegrationConnection_createViaAuthorize", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IntegrationConnection_createViaAuthorize", args.idempotencyKey), "IntegrationConnection_createViaAuthorize", __result);
     }
     return __result;
   },
@@ -25068,12 +25069,12 @@ export const IntegrationConnection_disconnect = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IntegrationConnection_disconnect", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIntegrationConnectionDisconnect(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IntegrationConnection_disconnect", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IntegrationConnection_disconnect", args.idempotencyKey), "IntegrationConnection_disconnect", __result);
     }
     return __result;
   },
@@ -25140,12 +25141,12 @@ export const IntegrationConnection_markConnected = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IntegrationConnection_markConnected", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIntegrationConnectionMarkConnected(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IntegrationConnection_markConnected", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IntegrationConnection_markConnected", args.idempotencyKey), "IntegrationConnection_markConnected", __result);
     }
     return __result;
   },
@@ -25202,12 +25203,12 @@ export const IntegrationConnection_reauthorize = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IntegrationConnection_reauthorize", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIntegrationConnectionReauthorize(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IntegrationConnection_reauthorize", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IntegrationConnection_reauthorize", args.idempotencyKey), "IntegrationConnection_reauthorize", __result);
     }
     return __result;
   },
@@ -25265,12 +25266,12 @@ export const IntegrationConnection_recordFailure = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IntegrationConnection_recordFailure", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIntegrationConnectionRecordFailure(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IntegrationConnection_recordFailure", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IntegrationConnection_recordFailure", args.idempotencyKey), "IntegrationConnection_recordFailure", __result);
     }
     return __result;
   },
@@ -25327,12 +25328,12 @@ export const IntegrationConnection_recordSyncSuccess = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IntegrationConnection_recordSyncSuccess", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runIntegrationConnectionRecordSyncSuccess(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "IntegrationConnection_recordSyncSuccess", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "IntegrationConnection_recordSyncSuccess", args.idempotencyKey), "IntegrationConnection_recordSyncSuccess", __result);
     }
     return __result;
   },
@@ -25380,12 +25381,12 @@ export const Interview_recordOutcome = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Interview_recordOutcome", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInterviewRecordOutcome(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Interview_recordOutcome", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Interview_recordOutcome", args.idempotencyKey), "Interview_recordOutcome", __result);
     }
     return __result;
   },
@@ -25443,12 +25444,12 @@ export const Interview_schedule = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Interview_schedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInterviewSchedule(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Interview_schedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Interview_schedule", args.idempotencyKey), "Interview_schedule", __result);
     }
     return __result;
   },
@@ -25467,7 +25468,7 @@ export const Interview_createViaSchedule = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Interview_createViaSchedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -25511,7 +25512,7 @@ export const Interview_createViaSchedule = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "schedule", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Interview_createViaSchedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Interview_createViaSchedule", args.idempotencyKey), "Interview_createViaSchedule", __result);
     }
     return __result;
   },
@@ -25559,12 +25560,12 @@ export const InventoryItem_adjustQuantity = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_adjustQuantity", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventoryItemAdjustQuantity(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_adjustQuantity", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_adjustQuantity", args.idempotencyKey), "InventoryItem_adjustQuantity", __result);
     }
     return __result;
   },
@@ -25624,12 +25625,12 @@ export const InventoryItem_applyReceiptCorrection = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_applyReceiptCorrection", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventoryItemApplyReceiptCorrection(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_applyReceiptCorrection", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_applyReceiptCorrection", args.idempotencyKey), "InventoryItem_applyReceiptCorrection", __result);
     }
     return __result;
   },
@@ -25695,12 +25696,12 @@ export const InventoryItem_open = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_open", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventoryItemOpen(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_open", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_open", args.idempotencyKey), "InventoryItem_open", __result);
     }
     return __result;
   },
@@ -25720,7 +25721,7 @@ export const InventoryItem_createViaOpen = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_createViaOpen", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -25771,7 +25772,7 @@ export const InventoryItem_createViaOpen = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "open", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_createViaOpen", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_createViaOpen", args.idempotencyKey), "InventoryItem_createViaOpen", __result);
     }
     return __result;
   },
@@ -25834,12 +25835,12 @@ export const InventoryItem_receiveDelivery = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_receiveDelivery", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventoryItemReceiveDelivery(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_receiveDelivery", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_receiveDelivery", args.idempotencyKey), "InventoryItem_receiveDelivery", __result);
     }
     return __result;
   },
@@ -25888,12 +25889,12 @@ export const InventoryItem_receiveStock = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_receiveStock", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventoryItemReceiveStock(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_receiveStock", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_receiveStock", args.idempotencyKey), "InventoryItem_receiveStock", __result);
     }
     return __result;
   },
@@ -25938,12 +25939,12 @@ export const InventoryItem_recount = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_recount", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventoryItemRecount(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_recount", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_recount", args.idempotencyKey), "InventoryItem_recount", __result);
     }
     return __result;
   },
@@ -25993,12 +25994,12 @@ export const InventoryItem_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventoryItemRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_remove", args.idempotencyKey), "InventoryItem_remove", __result);
     }
     return __result;
   },
@@ -26044,12 +26045,12 @@ export const InventoryItem_setExpiry = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_setExpiry", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventoryItemSetExpiry(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_setExpiry", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_setExpiry", args.idempotencyKey), "InventoryItem_setExpiry", __result);
     }
     return __result;
   },
@@ -26096,12 +26097,12 @@ export const InventoryItem_transferIn = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_transferIn", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventoryItemTransferIn(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_transferIn", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_transferIn", args.idempotencyKey), "InventoryItem_transferIn", __result);
     }
     return __result;
   },
@@ -26149,12 +26150,12 @@ export const InventoryItem_transferOut = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_transferOut", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventoryItemTransferOut(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_transferOut", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_transferOut", args.idempotencyKey), "InventoryItem_transferOut", __result);
     }
     return __result;
   },
@@ -26205,12 +26206,12 @@ export const InventoryItem_updateLevels = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_updateLevels", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventoryItemUpdateLevels(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_updateLevels", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryItem_updateLevels", args.idempotencyKey), "InventoryItem_updateLevels", __result);
     }
     return __result;
   },
@@ -26306,12 +26307,12 @@ export const InventoryLot_record = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryLot_record", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventoryLotRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryLot_record", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryLot_record", args.idempotencyKey), "InventoryLot_record", __result);
     }
     return __result;
   },
@@ -26336,7 +26337,7 @@ export const InventoryLot_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryLot_createViaRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -26418,7 +26419,7 @@ export const InventoryLot_createViaRecord = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryLot_createViaRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryLot_createViaRecord", args.idempotencyKey), "InventoryLot_createViaRecord", __result);
     }
     return __result;
   },
@@ -26481,12 +26482,12 @@ export const InventoryReservation_consume = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryReservation_consume", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventoryReservationConsume(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryReservation_consume", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryReservation_consume", args.idempotencyKey), "InventoryReservation_consume", __result);
     }
     return __result;
   },
@@ -26546,12 +26547,12 @@ export const InventoryReservation_release = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryReservation_release", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventoryReservationRelease(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryReservation_release", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryReservation_release", args.idempotencyKey), "InventoryReservation_release", __result);
     }
     return __result;
   },
@@ -26637,12 +26638,12 @@ export const InventoryReservation_reserve = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryReservation_reserve", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventoryReservationReserve(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryReservation_reserve", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryReservation_reserve", args.idempotencyKey), "InventoryReservation_reserve", __result);
     }
     return __result;
   },
@@ -26660,7 +26661,7 @@ export const InventoryReservation_createViaReserve = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryReservation_createViaReserve", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -26722,7 +26723,7 @@ export const InventoryReservation_createViaReserve = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "reserve", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryReservation_createViaReserve", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventoryReservation_createViaReserve", args.idempotencyKey), "InventoryReservation_createViaReserve", __result);
     }
     return __result;
   },
@@ -26761,12 +26762,12 @@ export const InventorySettings_register = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventorySettings_register", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventorySettingsRegister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventorySettings_register", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventorySettings_register", args.idempotencyKey), "InventorySettings_register", __result);
     }
     return __result;
   },
@@ -26780,7 +26781,7 @@ export const InventorySettings_createViaRegister = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventorySettings_createViaRegister", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -26806,7 +26807,7 @@ export const InventorySettings_createViaRegister = mutation({
     const docId = await ctx.db.insert("inventorySettings", doc as any);
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventorySettings_createViaRegister", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventorySettings_createViaRegister", args.idempotencyKey), "InventorySettings_createViaRegister", __result);
     }
     return __result;
   },
@@ -26844,12 +26845,12 @@ export const InventorySettings_setStockTracking = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventorySettings_setStockTracking", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInventorySettingsSetStockTracking(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventorySettings_setStockTracking", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "InventorySettings_setStockTracking", args.idempotencyKey), "InventorySettings_setStockTracking", __result);
     }
     return __result;
   },
@@ -26914,12 +26915,12 @@ export const Invoice_applyCredit = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_applyCredit", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceApplyCredit(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_applyCredit", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_applyCredit", args.idempotencyKey), "Invoice_applyCredit", __result);
     }
     return __result;
   },
@@ -26982,12 +26983,12 @@ export const Invoice_applyPayment = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_applyPayment", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceApplyPayment(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_applyPayment", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_applyPayment", args.idempotencyKey), "Invoice_applyPayment", __result);
     }
     return __result;
   },
@@ -27032,12 +27033,12 @@ export const Invoice_assignNumber = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_assignNumber", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceAssignNumber(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_assignNumber", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_assignNumber", args.idempotencyKey), "Invoice_assignNumber", __result);
     }
     return __result;
   },
@@ -27088,12 +27089,12 @@ export const Invoice_followEventPrice = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_followEventPrice", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceFollowEventPrice(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_followEventPrice", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_followEventPrice", args.idempotencyKey), "Invoice_followEventPrice", __result);
     }
     return __result;
   },
@@ -27183,12 +27184,12 @@ export const Invoice_issue = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_issue", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceIssue(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_issue", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_issue", args.idempotencyKey), "Invoice_issue", __result);
     }
     return __result;
   },
@@ -27216,7 +27217,7 @@ export const Invoice_createViaIssue = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_createViaIssue", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -27291,7 +27292,7 @@ export const Invoice_createViaIssue = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "issue", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_createViaIssue", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_createViaIssue", args.idempotencyKey), "Invoice_createViaIssue", __result);
     }
     return __result;
   },
@@ -27354,12 +27355,12 @@ export const Invoice_markDepositPaid = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_markDepositPaid", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceMarkDepositPaid(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_markDepositPaid", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_markDepositPaid", args.idempotencyKey), "Invoice_markDepositPaid", __result);
     }
     return __result;
   },
@@ -27415,12 +27416,12 @@ export const Invoice_markOverdue = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_markOverdue", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceMarkOverdue(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_markOverdue", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_markOverdue", args.idempotencyKey), "Invoice_markOverdue", __result);
     }
     return __result;
   },
@@ -27475,12 +27476,12 @@ export const Invoice_markViewed = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_markViewed", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceMarkViewed(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_markViewed", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_markViewed", args.idempotencyKey), "Invoice_markViewed", __result);
     }
     return __result;
   },
@@ -27539,12 +27540,12 @@ export const Invoice_markVoided = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_markVoided", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceMarkVoided(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_markVoided", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_markVoided", args.idempotencyKey), "Invoice_markVoided", __result);
     }
     return __result;
   },
@@ -27599,12 +27600,12 @@ export const Invoice_reassignClient = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_reassignClient", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceReassignClient(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_reassignClient", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_reassignClient", args.idempotencyKey), "Invoice_reassignClient", __result);
     }
     return __result;
   },
@@ -27653,12 +27654,12 @@ export const Invoice_recordCreditMemo = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_recordCreditMemo", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceRecordCreditMemo(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_recordCreditMemo", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_recordCreditMemo", args.idempotencyKey), "Invoice_recordCreditMemo", __result);
     }
     return __result;
   },
@@ -27722,12 +27723,12 @@ export const Invoice_recordRefund = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_recordRefund", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceRecordRefund(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_recordRefund", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_recordRefund", args.idempotencyKey), "Invoice_recordRefund", __result);
     }
     return __result;
   },
@@ -27784,12 +27785,12 @@ export const Invoice_send = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_send", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceSend(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_send", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_send", args.idempotencyKey), "Invoice_send", __result);
     }
     return __result;
   },
@@ -27832,12 +27833,12 @@ export const Invoice_sendBalanceReminder = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_sendBalanceReminder", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceSendBalanceReminder(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_sendBalanceReminder", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_sendBalanceReminder", args.idempotencyKey), "Invoice_sendBalanceReminder", __result);
     }
     return __result;
   },
@@ -27885,12 +27886,12 @@ export const Invoice_setDeposit = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_setDeposit", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceSetDeposit(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_setDeposit", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_setDeposit", args.idempotencyKey), "Invoice_setDeposit", __result);
     }
     return __result;
   },
@@ -27939,12 +27940,12 @@ export const Invoice_stageClientMerge = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_stageClientMerge", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceStageClientMerge(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_stageClientMerge", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_stageClientMerge", args.idempotencyKey), "Invoice_stageClientMerge", __result);
     }
     return __result;
   },
@@ -28006,12 +28007,12 @@ export const Invoice_writeOff = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_writeOff", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runInvoiceWriteOff(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_writeOff", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Invoice_writeOff", args.idempotencyKey), "Invoice_writeOff", __result);
     }
     return __result;
   },
@@ -28074,12 +28075,12 @@ export const ItemUnitMapping_record = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ItemUnitMapping_record", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runItemUnitMappingRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ItemUnitMapping_record", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ItemUnitMapping_record", args.idempotencyKey), "ItemUnitMapping_record", __result);
     }
     return __result;
   },
@@ -28101,7 +28102,7 @@ export const ItemUnitMapping_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ItemUnitMapping_createViaRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -28150,7 +28151,7 @@ export const ItemUnitMapping_createViaRecord = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ItemUnitMapping_createViaRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ItemUnitMapping_createViaRecord", args.idempotencyKey), "ItemUnitMapping_createViaRecord", __result);
     }
     return __result;
   },
@@ -28194,12 +28195,12 @@ export const ItemUnitMapping_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ItemUnitMapping_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runItemUnitMappingRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ItemUnitMapping_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ItemUnitMapping_retire", args.idempotencyKey), "ItemUnitMapping_retire", __result);
     }
     return __result;
   },
@@ -28270,12 +28271,12 @@ export const Lead_capture = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Lead_capture", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runLeadCapture(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Lead_capture", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Lead_capture", args.idempotencyKey), "Lead_capture", __result);
     }
     return __result;
   },
@@ -28299,7 +28300,7 @@ export const Lead_createViaCapture = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Lead_createViaCapture", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -28355,7 +28356,7 @@ export const Lead_createViaCapture = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "capture", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Lead_createViaCapture", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Lead_createViaCapture", args.idempotencyKey), "Lead_createViaCapture", __result);
     }
     return __result;
   },
@@ -28405,12 +28406,12 @@ export const Lead_confirmConversion = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Lead_confirmConversion", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runLeadConfirmConversion(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Lead_confirmConversion", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Lead_confirmConversion", args.idempotencyKey), "Lead_confirmConversion", __result);
     }
     return __result;
   },
@@ -28461,12 +28462,12 @@ export const Lead_confirmProposalSent = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Lead_confirmProposalSent", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runLeadConfirmProposalSent(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Lead_confirmProposalSent", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Lead_confirmProposalSent", args.idempotencyKey), "Lead_confirmProposalSent", __result);
     }
     return __result;
   },
@@ -28529,12 +28530,12 @@ export const Lead_reviseDetails = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Lead_reviseDetails", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runLeadReviseDetails(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Lead_reviseDetails", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Lead_reviseDetails", args.idempotencyKey), "Lead_reviseDetails", __result);
     }
     return __result;
   },
@@ -28576,12 +28577,12 @@ export const Lead_stageConversion = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Lead_stageConversion", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runLeadStageConversion(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Lead_stageConversion", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Lead_stageConversion", args.idempotencyKey), "Lead_stageConversion", __result);
     }
     return __result;
   },
@@ -28622,12 +28623,12 @@ export const Lead_stageProposal = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Lead_stageProposal", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runLeadStageProposal(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Lead_stageProposal", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Lead_stageProposal", args.idempotencyKey), "Lead_stageProposal", __result);
     }
     return __result;
   },
@@ -28679,12 +28680,12 @@ export const Lead_updatePipeline = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Lead_updatePipeline", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runLeadUpdatePipeline(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Lead_updatePipeline", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Lead_updatePipeline", args.idempotencyKey), "Lead_updatePipeline", __result);
     }
     return __result;
   },
@@ -28743,12 +28744,12 @@ export const Menu_archive = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Menu_archive", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMenuArchive(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Menu_archive", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Menu_archive", args.idempotencyKey), "Menu_archive", __result);
     }
     return __result;
   },
@@ -28809,12 +28810,12 @@ export const Menu_draft = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Menu_draft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMenuDraft(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Menu_draft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Menu_draft", args.idempotencyKey), "Menu_draft", __result);
     }
     return __result;
   },
@@ -28835,7 +28836,7 @@ export const Menu_createViaDraft = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Menu_createViaDraft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -28883,7 +28884,7 @@ export const Menu_createViaDraft = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "draft", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Menu_createViaDraft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Menu_createViaDraft", args.idempotencyKey), "Menu_createViaDraft", __result);
     }
     return __result;
   },
@@ -28940,12 +28941,12 @@ export const Menu_markPublished = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Menu_markPublished", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMenuMarkPublished(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Menu_markPublished", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Menu_markPublished", args.idempotencyKey), "Menu_markPublished", __result);
     }
     return __result;
   },
@@ -29003,12 +29004,12 @@ export const Menu_restore = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Menu_restore", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMenuRestore(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Menu_restore", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Menu_restore", args.idempotencyKey), "Menu_restore", __result);
     }
     return __result;
   },
@@ -29058,12 +29059,12 @@ export const Menu_reviseDetails = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Menu_reviseDetails", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMenuReviseDetails(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Menu_reviseDetails", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Menu_reviseDetails", args.idempotencyKey), "Menu_reviseDetails", __result);
     }
     return __result;
   },
@@ -29121,12 +29122,12 @@ export const Menu_unpublish = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Menu_unpublish", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMenuUnpublish(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Menu_unpublish", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Menu_unpublish", args.idempotencyKey), "Menu_unpublish", __result);
     }
     return __result;
   },
@@ -29178,12 +29179,12 @@ export const Menu_updatePricing = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Menu_updatePricing", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMenuUpdatePricing(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Menu_updatePricing", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Menu_updatePricing", args.idempotencyKey), "Menu_updatePricing", __result);
     }
     return __result;
   },
@@ -29244,12 +29245,12 @@ export const MenuDish_add = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MenuDish_add", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMenuDishAdd(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "MenuDish_add", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MenuDish_add", args.idempotencyKey), "MenuDish_add", __result);
     }
     return __result;
   },
@@ -29269,7 +29270,7 @@ export const MenuDish_createViaAdd = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MenuDish_createViaAdd", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -29315,7 +29316,7 @@ export const MenuDish_createViaAdd = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "add", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "MenuDish_createViaAdd", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MenuDish_createViaAdd", args.idempotencyKey), "MenuDish_createViaAdd", __result);
     }
     return __result;
   },
@@ -29363,12 +29364,12 @@ export const MenuDish_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MenuDish_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMenuDishRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "MenuDish_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MenuDish_remove", args.idempotencyKey), "MenuDish_remove", __result);
     }
     return __result;
   },
@@ -29420,12 +29421,12 @@ export const MenuDish_updateDetails = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MenuDish_updateDetails", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMenuDishUpdateDetails(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "MenuDish_updateDetails", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MenuDish_updateDetails", args.idempotencyKey), "MenuDish_updateDetails", __result);
     }
     return __result;
   },
@@ -29474,12 +29475,12 @@ export const MenuDish_updateSellingPrice = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MenuDish_updateSellingPrice", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMenuDishUpdateSellingPrice(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "MenuDish_updateSellingPrice", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MenuDish_updateSellingPrice", args.idempotencyKey), "MenuDish_updateSellingPrice", __result);
     }
     return __result;
   },
@@ -29538,12 +29539,12 @@ export const Message_post = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Message_post", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMessagePost(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Message_post", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Message_post", args.idempotencyKey), "Message_post", __result);
     }
     return __result;
   },
@@ -29564,7 +29565,7 @@ export const Message_createViaPost = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Message_createViaPost", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -29609,7 +29610,7 @@ export const Message_createViaPost = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "post", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Message_createViaPost", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Message_createViaPost", args.idempotencyKey), "Message_createViaPost", __result);
     }
     return __result;
   },
@@ -29652,12 +29653,12 @@ export const Message_setDelivery = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Message_setDelivery", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMessageSetDelivery(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Message_setDelivery", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Message_setDelivery", args.idempotencyKey), "Message_setDelivery", __result);
     }
     return __result;
   },
@@ -29712,12 +29713,12 @@ export const MessageThread_create = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MessageThread_create", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMessageThreadCreate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "MessageThread_create", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MessageThread_create", args.idempotencyKey), "MessageThread_create", __result);
     }
     return __result;
   },
@@ -29760,12 +29761,12 @@ export const MessageThread_linkContact = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MessageThread_linkContact", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMessageThreadLinkContact(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "MessageThread_linkContact", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MessageThread_linkContact", args.idempotencyKey), "MessageThread_linkContact", __result);
     }
     return __result;
   },
@@ -29808,12 +29809,12 @@ export const MessageThread_linkLead = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MessageThread_linkLead", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMessageThreadLinkLead(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "MessageThread_linkLead", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MessageThread_linkLead", args.idempotencyKey), "MessageThread_linkLead", __result);
     }
     return __result;
   },
@@ -29856,12 +29857,12 @@ export const MessageThread_setStatus = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MessageThread_setStatus", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runMessageThreadSetStatus(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "MessageThread_setStatus", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "MessageThread_setStatus", args.idempotencyKey), "MessageThread_setStatus", __result);
     }
     return __result;
   },
@@ -29918,12 +29919,12 @@ export const Occasion_activate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Occasion_activate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOccasionActivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Occasion_activate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Occasion_activate", args.idempotencyKey), "Occasion_activate", __result);
     }
     return __result;
   },
@@ -29982,12 +29983,12 @@ export const Occasion_deactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Occasion_deactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOccasionDeactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Occasion_deactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Occasion_deactivate", args.idempotencyKey), "Occasion_deactivate", __result);
     }
     return __result;
   },
@@ -30053,12 +30054,12 @@ export const Occasion_register = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Occasion_register", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOccasionRegister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Occasion_register", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Occasion_register", args.idempotencyKey), "Occasion_register", __result);
     }
     return __result;
   },
@@ -30075,7 +30076,7 @@ export const Occasion_createViaRegister = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Occasion_createViaRegister", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -30116,7 +30117,7 @@ export const Occasion_createViaRegister = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "register", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Occasion_createViaRegister", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Occasion_createViaRegister", args.idempotencyKey), "Occasion_createViaRegister", __result);
     }
     return __result;
   },
@@ -30166,12 +30167,12 @@ export const Occasion_reviseDetails = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Occasion_reviseDetails", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOccasionReviseDetails(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Occasion_reviseDetails", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Occasion_reviseDetails", args.idempotencyKey), "Occasion_reviseDetails", __result);
     }
     return __result;
   },
@@ -30230,12 +30231,12 @@ export const OneOnOne_hold = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "OneOnOne_hold", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOneOnOneHold(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "OneOnOne_hold", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "OneOnOne_hold", args.idempotencyKey), "OneOnOne_hold", __result);
     }
     return __result;
   },
@@ -30256,7 +30257,7 @@ export const OneOnOne_createViaHold = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "OneOnOne_createViaHold", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -30301,7 +30302,7 @@ export const OneOnOne_createViaHold = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "hold", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "OneOnOne_createViaHold", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "OneOnOne_createViaHold", args.idempotencyKey), "OneOnOne_createViaHold", __result);
     }
     return __result;
   },
@@ -30356,12 +30357,12 @@ export const OneOnOneAction_capture = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "OneOnOneAction_capture", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOneOnOneActionCapture(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "OneOnOneAction_capture", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "OneOnOneAction_capture", args.idempotencyKey), "OneOnOneAction_capture", __result);
     }
     return __result;
   },
@@ -30378,7 +30379,7 @@ export const OneOnOneAction_createViaCapture = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "OneOnOneAction_createViaCapture", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -30419,7 +30420,7 @@ export const OneOnOneAction_createViaCapture = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "capture", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "OneOnOneAction_createViaCapture", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "OneOnOneAction_createViaCapture", args.idempotencyKey), "OneOnOneAction_createViaCapture", __result);
     }
     return __result;
   },
@@ -30476,12 +30477,12 @@ export const OneOnOneAction_close = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "OneOnOneAction_close", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOneOnOneActionClose(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "OneOnOneAction_close", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "OneOnOneAction_close", args.idempotencyKey), "OneOnOneAction_close", __result);
     }
     return __result;
   },
@@ -30529,12 +30530,12 @@ export const Organization_configureBranding = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_configureBranding", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOrganizationConfigureBranding(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Organization_configureBranding", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_configureBranding", args.idempotencyKey), "Organization_configureBranding", __result);
     }
     return __result;
   },
@@ -30588,12 +30589,12 @@ export const Organization_deactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_deactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOrganizationDeactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Organization_deactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_deactivate", args.idempotencyKey), "Organization_deactivate", __result);
     }
     return __result;
   },
@@ -30647,12 +30648,12 @@ export const Organization_reactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_reactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOrganizationReactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Organization_reactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_reactivate", args.idempotencyKey), "Organization_reactivate", __result);
     }
     return __result;
   },
@@ -30704,12 +30705,12 @@ export const Organization_register = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_register", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOrganizationRegister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Organization_register", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_register", args.idempotencyKey), "Organization_register", __result);
     }
     return __result;
   },
@@ -30727,7 +30728,7 @@ export const Organization_createViaRegister = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_createViaRegister", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -30767,7 +30768,7 @@ export const Organization_createViaRegister = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "register", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Organization_createViaRegister", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_createViaRegister", args.idempotencyKey), "Organization_createViaRegister", __result);
     }
     return __result;
   },
@@ -30811,12 +30812,12 @@ export const Organization_rename = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_rename", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOrganizationRename(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Organization_rename", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_rename", args.idempotencyKey), "Organization_rename", __result);
     }
     return __result;
   },
@@ -30859,12 +30860,12 @@ export const Organization_setBrandLogo = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_setBrandLogo", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOrganizationSetBrandLogo(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Organization_setBrandLogo", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_setBrandLogo", args.idempotencyKey), "Organization_setBrandLogo", __result);
     }
     return __result;
   },
@@ -30908,12 +30909,12 @@ export const Organization_setDefaultCurrency = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_setDefaultCurrency", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOrganizationSetDefaultCurrency(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Organization_setDefaultCurrency", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_setDefaultCurrency", args.idempotencyKey), "Organization_setDefaultCurrency", __result);
     }
     return __result;
   },
@@ -30968,12 +30969,12 @@ export const Organization_suspend = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_suspend", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOrganizationSuspend(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Organization_suspend", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Organization_suspend", args.idempotencyKey), "Organization_suspend", __result);
     }
     return __result;
   },
@@ -31016,12 +31017,12 @@ export const OrganizationCapabilitySetting_register = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "OrganizationCapabilitySetting_register", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOrganizationCapabilitySettingRegister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "OrganizationCapabilitySetting_register", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "OrganizationCapabilitySetting_register", args.idempotencyKey), "OrganizationCapabilitySetting_register", __result);
     }
     return __result;
   },
@@ -31036,7 +31037,7 @@ export const OrganizationCapabilitySetting_createViaRegister = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "OrganizationCapabilitySetting_createViaRegister", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -31066,7 +31067,7 @@ export const OrganizationCapabilitySetting_createViaRegister = mutation({
     const docId = await ctx.db.insert("organizationCapabilitySettings", doc as any);
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "OrganizationCapabilitySetting_createViaRegister", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "OrganizationCapabilitySetting_createViaRegister", args.idempotencyKey), "OrganizationCapabilitySetting_createViaRegister", __result);
     }
     return __result;
   },
@@ -31105,12 +31106,12 @@ export const OrganizationCapabilitySetting_setEnabled = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "OrganizationCapabilitySetting_setEnabled", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runOrganizationCapabilitySettingSetEnabled(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "OrganizationCapabilitySetting_setEnabled", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "OrganizationCapabilitySetting_setEnabled", args.idempotencyKey), "OrganizationCapabilitySetting_setEnabled", __result);
     }
     return __result;
   },
@@ -31160,12 +31161,12 @@ export const PackList_acknowledgePackingRequirement = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_acknowledgePackingRequirement", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListAcknowledgePackingRequirement(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_acknowledgePackingRequirement", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_acknowledgePackingRequirement", args.idempotencyKey), "PackList_acknowledgePackingRequirement", __result);
     }
     return __result;
   },
@@ -31238,12 +31239,12 @@ export const PackList_applyServiceStyleKit = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_applyServiceStyleKit", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListApplyServiceStyleKit(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_applyServiceStyleKit", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_applyServiceStyleKit", args.idempotencyKey), "PackList_applyServiceStyleKit", __result);
     }
     return __result;
   },
@@ -31306,12 +31307,12 @@ export const PackList_cancel = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_cancel", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListCancel(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_cancel", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_cancel", args.idempotencyKey), "PackList_cancel", __result);
     }
     return __result;
   },
@@ -31371,12 +31372,12 @@ export const PackList_dispatch = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_dispatch", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListDispatch(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_dispatch", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_dispatch", args.idempotencyKey), "PackList_dispatch", __result);
     }
     return __result;
   },
@@ -31435,12 +31436,12 @@ export const PackList_markLoaded = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_markLoaded", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListMarkLoaded(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_markLoaded", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_markLoaded", args.idempotencyKey), "PackList_markLoaded", __result);
     }
     return __result;
   },
@@ -31522,12 +31523,12 @@ export const PackList_markPacked = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_markPacked", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListMarkPacked(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_markPacked", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_markPacked", args.idempotencyKey), "PackList_markPacked", __result);
     }
     return __result;
   },
@@ -31626,12 +31627,12 @@ export const PackList_open = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_open", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListOpen(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_open", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_open", args.idempotencyKey), "PackList_open", __result);
     }
     return __result;
   },
@@ -31648,7 +31649,7 @@ export const PackList_createViaOpen = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_createViaOpen", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -31731,7 +31732,7 @@ export const PackList_createViaOpen = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent1, eventId: __manifestEventId1, command: "open", emitIndex: 1 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_createViaOpen", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_createViaOpen", args.idempotencyKey), "PackList_createViaOpen", __result);
     }
     return __result;
   },
@@ -31776,12 +31777,12 @@ export const PackList_requestAssistance = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_requestAssistance", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListRequestAssistance(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_requestAssistance", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_requestAssistance", args.idempotencyKey), "PackList_requestAssistance", __result);
     }
     return __result;
   },
@@ -31860,12 +31861,12 @@ export const PackList_requestDishContainers = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_requestDishContainers", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListRequestDishContainers(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_requestDishContainers", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_requestDishContainers", args.idempotencyKey), "PackList_requestDishContainers", __result);
     }
     return __result;
   },
@@ -31910,12 +31911,12 @@ export const PackList_resolveAssistance = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_resolveAssistance", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListResolveAssistance(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_resolveAssistance", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_resolveAssistance", args.idempotencyKey), "PackList_resolveAssistance", __result);
     }
     return __result;
   },
@@ -31979,12 +31980,12 @@ export const PackList_standDownWithEvent = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_standDownWithEvent", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListStandDownWithEvent(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_standDownWithEvent", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_standDownWithEvent", args.idempotencyKey), "PackList_standDownWithEvent", __result);
     }
     return __result;
   },
@@ -32043,12 +32044,12 @@ export const PackList_startPacking = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_startPacking", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListStartPacking(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_startPacking", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackList_startPacking", args.idempotencyKey), "PackList_startPacking", __result);
     }
     return __result;
   },
@@ -32125,12 +32126,12 @@ export const PackListItem_addItem = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_addItem", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListItemAddItem(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_addItem", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_addItem", args.idempotencyKey), "PackListItem_addItem", __result);
     }
     return __result;
   },
@@ -32149,7 +32150,7 @@ export const PackListItem_createViaAddItem = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_createViaAddItem", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -32200,7 +32201,7 @@ export const PackListItem_createViaAddItem = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "addItem", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_createViaAddItem", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_createViaAddItem", args.idempotencyKey), "PackListItem_createViaAddItem", __result);
     }
     return __result;
   },
@@ -32251,12 +32252,12 @@ export const PackListItem_adjustQuantity = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_adjustQuantity", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListItemAdjustQuantity(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_adjustQuantity", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_adjustQuantity", args.idempotencyKey), "PackListItem_adjustQuantity", __result);
     }
     return __result;
   },
@@ -32330,12 +32331,12 @@ export const PackListItem_adoptContainerLink = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_adoptContainerLink", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListItemAdoptContainerLink(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_adoptContainerLink", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_adoptContainerLink", args.idempotencyKey), "PackListItem_adoptContainerLink", __result);
     }
     return __result;
   },
@@ -32377,12 +32378,12 @@ export const PackListItem_annotate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_annotate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListItemAnnotate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_annotate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_annotate", args.idempotencyKey), "PackListItem_annotate", __result);
     }
     return __result;
   },
@@ -32440,12 +32441,12 @@ export const PackListItem_correctImportedFluidOunces = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_correctImportedFluidOunces", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListItemCorrectImportedFluidOunces(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_correctImportedFluidOunces", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_correctImportedFluidOunces", args.idempotencyKey), "PackListItem_correctImportedFluidOunces", __result);
     }
     return __result;
   },
@@ -32525,12 +32526,12 @@ export const PackListItem_ensureContainer = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_ensureContainer", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListItemEnsureContainer(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_ensureContainer", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_ensureContainer", args.idempotencyKey), "PackListItem_ensureContainer", __result);
     }
     return __result;
   },
@@ -32605,12 +32606,12 @@ export const PackListItem_ensureKitItem = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_ensureKitItem", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListItemEnsureKitItem(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_ensureKitItem", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_ensureKitItem", args.idempotencyKey), "PackListItem_ensureKitItem", __result);
     }
     return __result;
   },
@@ -32670,12 +32671,12 @@ export const PackListItem_markMissing = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_markMissing", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListItemMarkMissing(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_markMissing", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_markMissing", args.idempotencyKey), "PackListItem_markMissing", __result);
     }
     return __result;
   },
@@ -32742,12 +32743,12 @@ export const PackListItem_markPacked = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_markPacked", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListItemMarkPacked(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_markPacked", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_markPacked", args.idempotencyKey), "PackListItem_markPacked", __result);
     }
     return __result;
   },
@@ -32798,12 +32799,12 @@ export const PackListItem_recordPackedCount = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_recordPackedCount", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListItemRecordPackedCount(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_recordPackedCount", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_recordPackedCount", args.idempotencyKey), "PackListItem_recordPackedCount", __result);
     }
     return __result;
   },
@@ -32845,12 +32846,12 @@ export const PackListItem_recordSentInstead = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_recordSentInstead", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListItemRecordSentInstead(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_recordSentInstead", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_recordSentInstead", args.idempotencyKey), "PackListItem_recordSentInstead", __result);
     }
     return __result;
   },
@@ -32894,12 +32895,12 @@ export const PackListItem_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListItemRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_remove", args.idempotencyKey), "PackListItem_remove", __result);
     }
     return __result;
   },
@@ -32968,12 +32969,12 @@ export const PackListItem_restoreImportedAssociation = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_restoreImportedAssociation", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListItemRestoreImportedAssociation(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_restoreImportedAssociation", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_restoreImportedAssociation", args.idempotencyKey), "PackListItem_restoreImportedAssociation", __result);
     }
     return __result;
   },
@@ -33036,12 +33037,12 @@ export const PackListItem_syncContainerServings = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_syncContainerServings", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListItemSyncContainerServings(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_syncContainerServings", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListItem_syncContainerServings", args.idempotencyKey), "PackListItem_syncContainerServings", __result);
     }
     return __result;
   },
@@ -33099,12 +33100,12 @@ export const PackListTemplate_archive = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListTemplate_archive", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListTemplateArchive(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListTemplate_archive", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListTemplate_archive", args.idempotencyKey), "PackListTemplate_archive", __result);
     }
     return __result;
   },
@@ -33164,12 +33165,12 @@ export const PackListTemplate_define = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListTemplate_define", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListTemplateDefine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListTemplate_define", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListTemplate_define", args.idempotencyKey), "PackListTemplate_define", __result);
     }
     return __result;
   },
@@ -33190,7 +33191,7 @@ export const PackListTemplate_createViaDefine = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListTemplate_createViaDefine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -33237,7 +33238,7 @@ export const PackListTemplate_createViaDefine = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "define", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListTemplate_createViaDefine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListTemplate_createViaDefine", args.idempotencyKey), "PackListTemplate_createViaDefine", __result);
     }
     return __result;
   },
@@ -33293,12 +33294,12 @@ export const PackListTemplate_reactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListTemplate_reactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListTemplateReactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListTemplate_reactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListTemplate_reactivate", args.idempotencyKey), "PackListTemplate_reactivate", __result);
     }
     return __result;
   },
@@ -33358,12 +33359,12 @@ export const PackListTemplate_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListTemplate_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPackListTemplateRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListTemplate_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PackListTemplate_revise", args.idempotencyKey), "PackListTemplate_revise", __result);
     }
     return __result;
   },
@@ -33418,12 +33419,12 @@ export const Payment_beginProcessing = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_beginProcessing", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentBeginProcessing(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_beginProcessing", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_beginProcessing", args.idempotencyKey), "Payment_beginProcessing", __result);
     }
     return __result;
   },
@@ -33468,12 +33469,12 @@ export const Payment_disputeReconciliation = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_disputeReconciliation", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentDisputeReconciliation(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_disputeReconciliation", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_disputeReconciliation", args.idempotencyKey), "Payment_disputeReconciliation", __result);
     }
     return __result;
   },
@@ -33532,12 +33533,12 @@ export const Payment_fail = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_fail", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentFail(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_fail", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_fail", args.idempotencyKey), "Payment_fail", __result);
     }
     return __result;
   },
@@ -33588,12 +33589,12 @@ export const Payment_markMatched = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_markMatched", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentMarkMatched(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_markMatched", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_markMatched", args.idempotencyKey), "Payment_markMatched", __result);
     }
     return __result;
   },
@@ -33648,12 +33649,12 @@ export const Payment_reassignClient = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_reassignClient", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentReassignClient(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_reassignClient", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_reassignClient", args.idempotencyKey), "Payment_reassignClient", __result);
     }
     return __result;
   },
@@ -33719,12 +33720,12 @@ export const Payment_record = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_record", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_record", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_record", args.idempotencyKey), "Payment_record", __result);
     }
     return __result;
   },
@@ -33744,7 +33745,7 @@ export const Payment_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_createViaRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -33796,7 +33797,7 @@ export const Payment_createViaRecord = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_createViaRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_createViaRecord", args.idempotencyKey), "Payment_createViaRecord", __result);
     }
     return __result;
   },
@@ -33854,12 +33855,12 @@ export const Payment_refund = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_refund", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentRefund(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_refund", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_refund", args.idempotencyKey), "Payment_refund", __result);
     }
     return __result;
   },
@@ -33918,12 +33919,12 @@ export const Payment_settle = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_settle", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentSettle(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_settle", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_settle", args.idempotencyKey), "Payment_settle", __result);
     }
     return __result;
   },
@@ -33972,12 +33973,12 @@ export const Payment_stageClientMerge = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_stageClientMerge", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentStageClientMerge(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_stageClientMerge", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_stageClientMerge", args.idempotencyKey), "Payment_stageClientMerge", __result);
     }
     return __result;
   },
@@ -34020,12 +34021,12 @@ export const Payment_updateProviderTransactionIds = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_updateProviderTransactionIds", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentUpdateProviderTransactionIds(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_updateProviderTransactionIds", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_updateProviderTransactionIds", args.idempotencyKey), "Payment_updateProviderTransactionIds", __result);
     }
     return __result;
   },
@@ -34072,12 +34073,12 @@ export const Payment_verifyReconciliation = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_verifyReconciliation", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentVerifyReconciliation(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_verifyReconciliation", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Payment_verifyReconciliation", args.idempotencyKey), "Payment_verifyReconciliation", __result);
     }
     return __result;
   },
@@ -34120,12 +34121,12 @@ export const PaymentMethod_clearDefault = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_clearDefault", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentMethodClearDefault(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_clearDefault", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_clearDefault", args.idempotencyKey), "PaymentMethod_clearDefault", __result);
     }
     return __result;
   },
@@ -34180,12 +34181,12 @@ export const PaymentMethod_expire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_expire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentMethodExpire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_expire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_expire", args.idempotencyKey), "PaymentMethod_expire", __result);
     }
     return __result;
   },
@@ -34243,12 +34244,12 @@ export const PaymentMethod_invalidate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_invalidate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentMethodInvalidate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_invalidate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_invalidate", args.idempotencyKey), "PaymentMethod_invalidate", __result);
     }
     return __result;
   },
@@ -34291,12 +34292,12 @@ export const PaymentMethod_makeDefault = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_makeDefault", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentMethodMakeDefault(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_makeDefault", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_makeDefault", args.idempotencyKey), "PaymentMethod_makeDefault", __result);
     }
     return __result;
   },
@@ -34351,12 +34352,12 @@ export const PaymentMethod_reactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_reactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentMethodReactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_reactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_reactivate", args.idempotencyKey), "PaymentMethod_reactivate", __result);
     }
     return __result;
   },
@@ -34411,12 +34412,12 @@ export const PaymentMethod_reassignClient = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_reassignClient", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentMethodReassignClient(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_reassignClient", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_reassignClient", args.idempotencyKey), "PaymentMethod_reassignClient", __result);
     }
     return __result;
   },
@@ -34476,12 +34477,12 @@ export const PaymentMethod_register = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_register", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentMethodRegister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_register", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_register", args.idempotencyKey), "PaymentMethod_register", __result);
     }
     return __result;
   },
@@ -34500,7 +34501,7 @@ export const PaymentMethod_createViaRegister = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_createViaRegister", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -34546,7 +34547,7 @@ export const PaymentMethod_createViaRegister = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "register", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_createViaRegister", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_createViaRegister", args.idempotencyKey), "PaymentMethod_createViaRegister", __result);
     }
     return __result;
   },
@@ -34602,12 +34603,12 @@ export const PaymentMethod_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentMethodRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_remove", args.idempotencyKey), "PaymentMethod_remove", __result);
     }
     return __result;
   },
@@ -34656,12 +34657,12 @@ export const PaymentMethod_stageClientMerge = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_stageClientMerge", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPaymentMethodStageClientMerge(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_stageClientMerge", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PaymentMethod_stageClientMerge", args.idempotencyKey), "PaymentMethod_stageClientMerge", __result);
     }
     return __result;
   },
@@ -34721,12 +34722,12 @@ export const PayrollInput_finalize = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PayrollInput_finalize", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPayrollInputFinalize(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PayrollInput_finalize", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PayrollInput_finalize", args.idempotencyKey), "PayrollInput_finalize", __result);
     }
     return __result;
   },
@@ -34788,12 +34789,12 @@ export const PayrollInput_markVoided = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PayrollInput_markVoided", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPayrollInputMarkVoided(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PayrollInput_markVoided", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PayrollInput_markVoided", args.idempotencyKey), "PayrollInput_markVoided", __result);
     }
     return __result;
   },
@@ -34887,12 +34888,12 @@ export const PayrollInput_prepare = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PayrollInput_prepare", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPayrollInputPrepare(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PayrollInput_prepare", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PayrollInput_prepare", args.idempotencyKey), "PayrollInput_prepare", __result);
     }
     return __result;
   },
@@ -34917,7 +34918,7 @@ export const PayrollInput_createViaPrepare = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PayrollInput_createViaPrepare", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -34982,7 +34983,7 @@ export const PayrollInput_createViaPrepare = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "prepare", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PayrollInput_createViaPrepare", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PayrollInput_createViaPrepare", args.idempotencyKey), "PayrollInput_createViaPrepare", __result);
     }
     return __result;
   },
@@ -35050,12 +35051,12 @@ export const PerformanceReview_record = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PerformanceReview_record", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPerformanceReviewRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PerformanceReview_record", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PerformanceReview_record", args.idempotencyKey), "PerformanceReview_record", __result);
     }
     return __result;
   },
@@ -35076,7 +35077,7 @@ export const PerformanceReview_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PerformanceReview_createViaRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -35128,7 +35129,7 @@ export const PerformanceReview_createViaRecord = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PerformanceReview_createViaRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PerformanceReview_createViaRecord", args.idempotencyKey), "PerformanceReview_createViaRecord", __result);
     }
     return __result;
   },
@@ -35176,12 +35177,12 @@ export const Person_assignRole = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_assignRole", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPersonAssignRole(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_assignRole", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_assignRole", args.idempotencyKey), "Person_assignRole", __result);
     }
     return __result;
   },
@@ -35236,12 +35237,12 @@ export const Person_changeAddress = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_changeAddress", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPersonChangeAddress(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_changeAddress", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_changeAddress", args.idempotencyKey), "Person_changeAddress", __result);
     }
     return __result;
   },
@@ -35289,12 +35290,12 @@ export const Person_correctEmail = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_correctEmail", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPersonCorrectEmail(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_correctEmail", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_correctEmail", args.idempotencyKey), "Person_correctEmail", __result);
     }
     return __result;
   },
@@ -35347,12 +35348,12 @@ export const Person_correctIdentity = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_correctIdentity", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPersonCorrectIdentity(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_correctIdentity", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_correctIdentity", args.idempotencyKey), "Person_correctIdentity", __result);
     }
     return __result;
   },
@@ -35410,12 +35411,12 @@ export const Person_deactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_deactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPersonDeactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_deactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_deactivate", args.idempotencyKey), "Person_deactivate", __result);
     }
     return __result;
   },
@@ -35480,12 +35481,12 @@ export const Person_hire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_hire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPersonHire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_hire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_hire", args.idempotencyKey), "Person_hire", __result);
     }
     return __result;
   },
@@ -35506,7 +35507,7 @@ export const Person_createViaHire = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_createViaHire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -35555,7 +35556,7 @@ export const Person_createViaHire = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "hire", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_createViaHire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_createViaHire", args.idempotencyKey), "Person_createViaHire", __result);
     }
     return __result;
   },
@@ -35605,12 +35606,12 @@ export const Person_linkAccount = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_linkAccount", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPersonLinkAccount(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_linkAccount", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_linkAccount", args.idempotencyKey), "Person_linkAccount", __result);
     }
     return __result;
   },
@@ -35668,12 +35669,12 @@ export const Person_reactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_reactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPersonReactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_reactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_reactivate", args.idempotencyKey), "Person_reactivate", __result);
     }
     return __result;
   },
@@ -35720,12 +35721,12 @@ export const Person_setEmployeeNumber = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_setEmployeeNumber", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPersonSetEmployeeNumber(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_setEmployeeNumber", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_setEmployeeNumber", args.idempotencyKey), "Person_setEmployeeNumber", __result);
     }
     return __result;
   },
@@ -35772,12 +35773,12 @@ export const Person_setPayRate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_setPayRate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPersonSetPayRate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_setPayRate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_setPayRate", args.idempotencyKey), "Person_setPayRate", __result);
     }
     return __result;
   },
@@ -35823,12 +35824,12 @@ export const Person_setSmsAlerts = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_setSmsAlerts", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPersonSetSmsAlerts(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_setSmsAlerts", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_setSmsAlerts", args.idempotencyKey), "Person_setSmsAlerts", __result);
     }
     return __result;
   },
@@ -35889,12 +35890,12 @@ export const Person_terminate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_terminate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPersonTerminate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_terminate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_terminate", args.idempotencyKey), "Person_terminate", __result);
     }
     return __result;
   },
@@ -35941,12 +35942,12 @@ export const Person_unlinkAccount = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_unlinkAccount", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPersonUnlinkAccount(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_unlinkAccount", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Person_unlinkAccount", args.idempotencyKey), "Person_unlinkAccount", __result);
     }
     return __result;
   },
@@ -36009,12 +36010,12 @@ export const PrepTask_assign = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_assign", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskAssign(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_assign", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_assign", args.idempotencyKey), "PrepTask_assign", __result);
     }
     return __result;
   },
@@ -36074,12 +36075,12 @@ export const PrepTask_cancel = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_cancel", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskCancel(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_cancel", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_cancel", args.idempotencyKey), "PrepTask_cancel", __result);
     }
     return __result;
   },
@@ -36139,12 +36140,12 @@ export const PrepTask_claim = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_claim", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskClaim(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_claim", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_claim", args.idempotencyKey), "PrepTask_claim", __result);
     }
     return __result;
   },
@@ -36211,12 +36212,12 @@ export const PrepTask_complete = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_complete", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskComplete(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_complete", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_complete", args.idempotencyKey), "PrepTask_complete", __result);
     }
     return __result;
   },
@@ -36263,12 +36264,12 @@ export const PrepTask_linkRecipe = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_linkRecipe", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskLinkRecipe(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_linkRecipe", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_linkRecipe", args.idempotencyKey), "PrepTask_linkRecipe", __result);
     }
     return __result;
   },
@@ -36328,12 +36329,12 @@ export const PrepTask_markBlocked = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_markBlocked", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskMarkBlocked(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_markBlocked", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_markBlocked", args.idempotencyKey), "PrepTask_markBlocked", __result);
     }
     return __result;
   },
@@ -36385,12 +36386,12 @@ export const PrepTask_markOverride = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_markOverride", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskMarkOverride(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_markOverride", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_markOverride", args.idempotencyKey), "PrepTask_markOverride", __result);
     }
     return __result;
   },
@@ -36484,12 +36485,12 @@ export const PrepTask_open = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_open", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskOpen(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_open", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_open", args.idempotencyKey), "PrepTask_open", __result);
     }
     return __result;
   },
@@ -36521,7 +36522,7 @@ export const PrepTask_createViaOpen = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_createViaOpen", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -36601,7 +36602,7 @@ export const PrepTask_createViaOpen = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "open", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_createViaOpen", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_createViaOpen", args.idempotencyKey), "PrepTask_createViaOpen", __result);
     }
     return __result;
   },
@@ -36678,12 +36679,12 @@ export const PrepTask_reconcileRemainingWork = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_reconcileRemainingWork", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskReconcileRemainingWork(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_reconcileRemainingWork", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_reconcileRemainingWork", args.idempotencyKey), "PrepTask_reconcileRemainingWork", __result);
     }
     return __result;
   },
@@ -36732,12 +36733,12 @@ export const PrepTask_refreshGenerated = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_refreshGenerated", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskRefreshGenerated(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_refreshGenerated", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_refreshGenerated", args.idempotencyKey), "PrepTask_refreshGenerated", __result);
     }
     return __result;
   },
@@ -36795,12 +36796,12 @@ export const PrepTask_refreshRecipeTemplate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_refreshRecipeTemplate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskRefreshRecipeTemplate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_refreshRecipeTemplate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_refreshRecipeTemplate", args.idempotencyKey), "PrepTask_refreshRecipeTemplate", __result);
     }
     return __result;
   },
@@ -36860,12 +36861,12 @@ export const PrepTask_release = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_release", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskRelease(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_release", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_release", args.idempotencyKey), "PrepTask_release", __result);
     }
     return __result;
   },
@@ -36905,12 +36906,12 @@ export const PrepTask_replaceRecipeComponent = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_replaceRecipeComponent", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskReplaceRecipeComponent(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_replaceRecipeComponent", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_replaceRecipeComponent", args.idempotencyKey), "PrepTask_replaceRecipeComponent", __result);
     }
     return __result;
   },
@@ -36956,12 +36957,12 @@ export const PrepTask_resolveChoice = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_resolveChoice", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskResolveChoice(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_resolveChoice", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_resolveChoice", args.idempotencyKey), "PrepTask_resolveChoice", __result);
     }
     return __result;
   },
@@ -37021,12 +37022,12 @@ export const PrepTask_retireWithTemplate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_retireWithTemplate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskRetireWithTemplate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_retireWithTemplate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_retireWithTemplate", args.idempotencyKey), "PrepTask_retireWithTemplate", __result);
     }
     return __result;
   },
@@ -37086,12 +37087,12 @@ export const PrepTask_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_revise", args.idempotencyKey), "PrepTask_revise", __result);
     }
     return __result;
   },
@@ -37131,12 +37132,12 @@ export const PrepTask_setChoice = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_setChoice", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskSetChoice(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_setChoice", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_setChoice", args.idempotencyKey), "PrepTask_setChoice", __result);
     }
     return __result;
   },
@@ -37196,12 +37197,12 @@ export const PrepTask_standDown = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_standDown", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskStandDown(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_standDown", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_standDown", args.idempotencyKey), "PrepTask_standDown", __result);
     }
     return __result;
   },
@@ -37263,12 +37264,12 @@ export const PrepTask_start = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_start", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskStart(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_start", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_start", args.idempotencyKey), "PrepTask_start", __result);
     }
     return __result;
   },
@@ -37329,12 +37330,12 @@ export const PrepTask_unblock = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_unblock", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskUnblock(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_unblock", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTask_unblock", args.idempotencyKey), "PrepTask_unblock", __result);
     }
     return __result;
   },
@@ -37379,12 +37380,12 @@ export const PrepTaskComment_edit = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskComment_edit", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskCommentEdit(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTaskComment_edit", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskComment_edit", args.idempotencyKey), "PrepTaskComment_edit", __result);
     }
     return __result;
   },
@@ -37447,12 +37448,12 @@ export const PrepTaskComment_post = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskComment_post", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskCommentPost(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTaskComment_post", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskComment_post", args.idempotencyKey), "PrepTaskComment_post", __result);
     }
     return __result;
   },
@@ -37472,7 +37473,7 @@ export const PrepTaskComment_createViaPost = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskComment_createViaPost", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -37521,7 +37522,7 @@ export const PrepTaskComment_createViaPost = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "post", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTaskComment_createViaPost", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskComment_createViaPost", args.idempotencyKey), "PrepTaskComment_createViaPost", __result);
     }
     return __result;
   },
@@ -37570,12 +37571,12 @@ export const PrepTaskDependency_declare = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskDependency_declare", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskDependencyDeclare(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTaskDependency_declare", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskDependency_declare", args.idempotencyKey), "PrepTaskDependency_declare", __result);
     }
     return __result;
   },
@@ -37590,7 +37591,7 @@ export const PrepTaskDependency_createViaDeclare = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskDependency_createViaDeclare", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -37626,7 +37627,7 @@ export const PrepTaskDependency_createViaDeclare = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "declare", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTaskDependency_createViaDeclare", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskDependency_createViaDeclare", args.idempotencyKey), "PrepTaskDependency_createViaDeclare", __result);
     }
     return __result;
   },
@@ -37662,12 +37663,12 @@ export const PrepTaskDependency_releaseRetiredRequirement = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskDependency_releaseRetiredRequirement", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskDependencyReleaseRetiredRequirement(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTaskDependency_releaseRetiredRequirement", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskDependency_releaseRetiredRequirement", args.idempotencyKey), "PrepTaskDependency_releaseRetiredRequirement", __result);
     }
     return __result;
   },
@@ -37707,12 +37708,12 @@ export const PrepTaskDependency_satisfy = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskDependency_satisfy", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskDependencySatisfy(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTaskDependency_satisfy", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskDependency_satisfy", args.idempotencyKey), "PrepTaskDependency_satisfy", __result);
     }
     return __result;
   },
@@ -37769,12 +37770,12 @@ export const PrepTaskMaterial_link = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskMaterial_link", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskMaterialLink(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTaskMaterial_link", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskMaterial_link", args.idempotencyKey), "PrepTaskMaterial_link", __result);
     }
     return __result;
   },
@@ -37794,7 +37795,7 @@ export const PrepTaskMaterial_createViaLink = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskMaterial_createViaLink", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -37837,7 +37838,7 @@ export const PrepTaskMaterial_createViaLink = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "link", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTaskMaterial_createViaLink", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskMaterial_createViaLink", args.idempotencyKey), "PrepTaskMaterial_createViaLink", __result);
     }
     return __result;
   },
@@ -37881,12 +37882,12 @@ export const PrepTaskMaterial_unlink = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskMaterial_unlink", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPrepTaskMaterialUnlink(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTaskMaterial_unlink", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PrepTaskMaterial_unlink", args.idempotencyKey), "PrepTaskMaterial_unlink", __result);
     }
     return __result;
   },
@@ -37946,12 +37947,12 @@ export const ProductionBatch_cancel = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatch_cancel", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProductionBatchCancel(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProductionBatch_cancel", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatch_cancel", args.idempotencyKey), "ProductionBatch_cancel", __result);
     }
     return __result;
   },
@@ -38017,12 +38018,12 @@ export const ProductionBatch_complete = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatch_complete", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProductionBatchComplete(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProductionBatch_complete", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatch_complete", args.idempotencyKey), "ProductionBatch_complete", __result);
     }
     return __result;
   },
@@ -38081,12 +38082,12 @@ export const ProductionBatch_plan = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatch_plan", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProductionBatchPlan(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProductionBatch_plan", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatch_plan", args.idempotencyKey), "ProductionBatch_plan", __result);
     }
     return __result;
   },
@@ -38104,7 +38105,7 @@ export const ProductionBatch_createViaPlan = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatch_createViaPlan", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -38149,7 +38150,7 @@ export const ProductionBatch_createViaPlan = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "plan", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProductionBatch_createViaPlan", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatch_createViaPlan", args.idempotencyKey), "ProductionBatch_createViaPlan", __result);
     }
     return __result;
   },
@@ -38205,12 +38206,12 @@ export const ProductionBatch_reconcilePlan = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatch_reconcilePlan", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProductionBatchReconcilePlan(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProductionBatch_reconcilePlan", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatch_reconcilePlan", args.idempotencyKey), "ProductionBatch_reconcilePlan", __result);
     }
     return __result;
   },
@@ -38267,12 +38268,12 @@ export const ProductionBatch_start = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatch_start", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProductionBatchStart(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProductionBatch_start", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatch_start", args.idempotencyKey), "ProductionBatch_start", __result);
     }
     return __result;
   },
@@ -38331,12 +38332,12 @@ export const ProductionBatchAllocation_allocate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatchAllocation_allocate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProductionBatchAllocationAllocate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProductionBatchAllocation_allocate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatchAllocation_allocate", args.idempotencyKey), "ProductionBatchAllocation_allocate", __result);
     }
     return __result;
   },
@@ -38356,7 +38357,7 @@ export const ProductionBatchAllocation_createViaAllocate = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatchAllocation_createViaAllocate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -38402,7 +38403,7 @@ export const ProductionBatchAllocation_createViaAllocate = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "allocate", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProductionBatchAllocation_createViaAllocate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatchAllocation_createViaAllocate", args.idempotencyKey), "ProductionBatchAllocation_createViaAllocate", __result);
     }
     return __result;
   },
@@ -38452,12 +38453,12 @@ export const ProductionBatchAllocation_markPortioned = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatchAllocation_markPortioned", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProductionBatchAllocationMarkPortioned(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProductionBatchAllocation_markPortioned", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatchAllocation_markPortioned", args.idempotencyKey), "ProductionBatchAllocation_markPortioned", __result);
     }
     return __result;
   },
@@ -38507,12 +38508,12 @@ export const ProductionBatchAllocation_markProduced = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatchAllocation_markProduced", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProductionBatchAllocationMarkProduced(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProductionBatchAllocation_markProduced", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatchAllocation_markProduced", args.idempotencyKey), "ProductionBatchAllocation_markProduced", __result);
     }
     return __result;
   },
@@ -38565,12 +38566,12 @@ export const ProductionBatchAllocation_release = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatchAllocation_release", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProductionBatchAllocationRelease(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProductionBatchAllocation_release", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProductionBatchAllocation_release", args.idempotencyKey), "ProductionBatchAllocation_release", __result);
     }
     return __result;
   },
@@ -38656,12 +38657,12 @@ export const Proposal_accept = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_accept", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalAccept(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_accept", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_accept", args.idempotencyKey), "Proposal_accept", __result);
     }
     return __result;
   },
@@ -38705,12 +38706,12 @@ export const Proposal_confirmChangeSource = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_confirmChangeSource", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalConfirmChangeSource(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_confirmChangeSource", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_confirmChangeSource", args.idempotencyKey), "Proposal_confirmChangeSource", __result);
     }
     return __result;
   },
@@ -38765,12 +38766,12 @@ export const Proposal_decline = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_decline", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalDecline(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_decline", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_decline", args.idempotencyKey), "Proposal_decline", __result);
     }
     return __result;
   },
@@ -38859,12 +38860,12 @@ export const Proposal_draft = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_draft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalDraft(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_draft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_draft", args.idempotencyKey), "Proposal_draft", __result);
     }
     return __result;
   },
@@ -38896,7 +38897,7 @@ export const Proposal_createViaDraft = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_createViaDraft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -38971,7 +38972,7 @@ export const Proposal_createViaDraft = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "draft", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_createViaDraft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_createViaDraft", args.idempotencyKey), "Proposal_createViaDraft", __result);
     }
     return __result;
   },
@@ -39026,12 +39027,12 @@ export const Proposal_expire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_expire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalExpire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_expire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_expire", args.idempotencyKey), "Proposal_expire", __result);
     }
     return __result;
   },
@@ -39085,12 +39086,12 @@ export const Proposal_followEventHeadcount = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_followEventHeadcount", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalFollowEventHeadcount(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_followEventHeadcount", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_followEventHeadcount", args.idempotencyKey), "Proposal_followEventHeadcount", __result);
     }
     return __result;
   },
@@ -39168,12 +39169,12 @@ export const Proposal_linkEvent = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_linkEvent", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalLinkEvent(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_linkEvent", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_linkEvent", args.idempotencyKey), "Proposal_linkEvent", __result);
     }
     return __result;
   },
@@ -39228,12 +39229,12 @@ export const Proposal_markViewed = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_markViewed", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalMarkViewed(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_markViewed", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_markViewed", args.idempotencyKey), "Proposal_markViewed", __result);
     }
     return __result;
   },
@@ -39288,12 +39289,12 @@ export const Proposal_reassignClient = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_reassignClient", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalReassignClient(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_reassignClient", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_reassignClient", args.idempotencyKey), "Proposal_reassignClient", __result);
     }
     return __result;
   },
@@ -39353,12 +39354,12 @@ export const Proposal_send = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_send", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalSend(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_send", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_send", args.idempotencyKey), "Proposal_send", __result);
     }
     return __result;
   },
@@ -39407,12 +39408,12 @@ export const Proposal_stageClientMerge = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_stageClientMerge", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalStageClientMerge(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_stageClientMerge", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_stageClientMerge", args.idempotencyKey), "Proposal_stageClientMerge", __result);
     }
     return __result;
   },
@@ -39456,12 +39457,12 @@ export const Proposal_stageEventLink = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_stageEventLink", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalStageEventLink(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_stageEventLink", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_stageEventLink", args.idempotencyKey), "Proposal_stageEventLink", __result);
     }
     return __result;
   },
@@ -39521,12 +39522,12 @@ export const Proposal_supersede = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_supersede", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalSupersede(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_supersede", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Proposal_supersede", args.idempotencyKey), "Proposal_supersede", __result);
     }
     return __result;
   },
@@ -39574,12 +39575,12 @@ export const ProposalDishSelection_adjustServings = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalDishSelection_adjustServings", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalDishSelectionAdjustServings(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalDishSelection_adjustServings", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalDishSelection_adjustServings", args.idempotencyKey), "ProposalDishSelection_adjustServings", __result);
     }
     return __result;
   },
@@ -39625,12 +39626,12 @@ export const ProposalDishSelection_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalDishSelection_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalDishSelectionRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalDishSelection_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalDishSelection_remove", args.idempotencyKey), "ProposalDishSelection_remove", __result);
     }
     return __result;
   },
@@ -39697,12 +39698,12 @@ export const ProposalDishSelection_select = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalDishSelection_select", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalDishSelectionSelect(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalDishSelection_select", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalDishSelection_select", args.idempotencyKey), "ProposalDishSelection_select", __result);
     }
     return __result;
   },
@@ -39722,7 +39723,7 @@ export const ProposalDishSelection_createViaSelect = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalDishSelection_createViaSelect", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -39772,7 +39773,7 @@ export const ProposalDishSelection_createViaSelect = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "select", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalDishSelection_createViaSelect", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalDishSelection_createViaSelect", args.idempotencyKey), "ProposalDishSelection_createViaSelect", __result);
     }
     return __result;
   },
@@ -39830,12 +39831,12 @@ export const ProposalEnhancement_offer = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalEnhancement_offer", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalEnhancementOffer(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalEnhancement_offer", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalEnhancement_offer", args.idempotencyKey), "ProposalEnhancement_offer", __result);
     }
     return __result;
   },
@@ -39853,7 +39854,7 @@ export const ProposalEnhancement_createViaOffer = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalEnhancement_createViaOffer", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -39896,7 +39897,7 @@ export const ProposalEnhancement_createViaOffer = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "offer", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalEnhancement_createViaOffer", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalEnhancement_createViaOffer", args.idempotencyKey), "ProposalEnhancement_createViaOffer", __result);
     }
     return __result;
   },
@@ -39951,12 +39952,12 @@ export const ProposalEnhancement_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalEnhancement_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalEnhancementRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalEnhancement_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalEnhancement_revise", args.idempotencyKey), "ProposalEnhancement_revise", __result);
     }
     return __result;
   },
@@ -40003,12 +40004,12 @@ export const ProposalEnhancement_withdraw = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalEnhancement_withdraw", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalEnhancementWithdraw(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalEnhancement_withdraw", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalEnhancement_withdraw", args.idempotencyKey), "ProposalEnhancement_withdraw", __result);
     }
     return __result;
   },
@@ -40079,12 +40080,12 @@ export const ProposalLineItem_addLine = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalLineItem_addLine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalLineItemAddLine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalLineItem_addLine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalLineItem_addLine", args.idempotencyKey), "ProposalLineItem_addLine", __result);
     }
     return __result;
   },
@@ -40108,7 +40109,7 @@ export const ProposalLineItem_createViaAddLine = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalLineItem_createViaAddLine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -40164,7 +40165,7 @@ export const ProposalLineItem_createViaAddLine = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "addLine", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalLineItem_createViaAddLine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalLineItem_createViaAddLine", args.idempotencyKey), "ProposalLineItem_createViaAddLine", __result);
     }
     return __result;
   },
@@ -40210,12 +40211,12 @@ export const ProposalLineItem_removeLine = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalLineItem_removeLine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalLineItemRemoveLine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalLineItem_removeLine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalLineItem_removeLine", args.idempotencyKey), "ProposalLineItem_removeLine", __result);
     }
     return __result;
   },
@@ -40282,12 +40283,12 @@ export const ProposalLineItem_reviseLine = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalLineItem_reviseLine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalLineItemReviseLine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalLineItem_reviseLine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalLineItem_reviseLine", args.idempotencyKey), "ProposalLineItem_reviseLine", __result);
     }
     return __result;
   },
@@ -40341,12 +40342,12 @@ export const ProposalRevision_capture = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalRevision_capture", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalRevisionCapture(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalRevision_capture", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalRevision_capture", args.idempotencyKey), "ProposalRevision_capture", __result);
     }
     return __result;
   },
@@ -40363,7 +40364,7 @@ export const ProposalRevision_createViaCapture = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalRevision_createViaCapture", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -40403,7 +40404,7 @@ export const ProposalRevision_createViaCapture = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "capture", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalRevision_createViaCapture", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalRevision_createViaCapture", args.idempotencyKey), "ProposalRevision_createViaCapture", __result);
     }
     return __result;
   },
@@ -40464,12 +40465,12 @@ export const ProposalTemplate_archive = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalTemplate_archive", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalTemplateArchive(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalTemplate_archive", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalTemplate_archive", args.idempotencyKey), "ProposalTemplate_archive", __result);
     }
     return __result;
   },
@@ -40533,12 +40534,12 @@ export const ProposalTemplate_define = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalTemplate_define", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalTemplateDefine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalTemplate_define", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalTemplate_define", args.idempotencyKey), "ProposalTemplate_define", __result);
     }
     return __result;
   },
@@ -40559,7 +40560,7 @@ export const ProposalTemplate_createViaDefine = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalTemplate_createViaDefine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -40610,7 +40611,7 @@ export const ProposalTemplate_createViaDefine = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "define", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalTemplate_createViaDefine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalTemplate_createViaDefine", args.idempotencyKey), "ProposalTemplate_createViaDefine", __result);
     }
     return __result;
   },
@@ -40669,12 +40670,12 @@ export const ProposalTemplate_reactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalTemplate_reactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalTemplateReactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalTemplate_reactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalTemplate_reactivate", args.idempotencyKey), "ProposalTemplate_reactivate", __result);
     }
     return __result;
   },
@@ -40739,12 +40740,12 @@ export const ProposalTemplate_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalTemplate_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runProposalTemplateRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProposalTemplate_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ProposalTemplate_revise", args.idempotencyKey), "ProposalTemplate_revise", __result);
     }
     return __result;
   },
@@ -40794,12 +40795,12 @@ export const PurchaseNeed_assignToDraft = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_assignToDraft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPurchaseNeedAssignToDraft(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PurchaseNeed_assignToDraft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_assignToDraft", args.idempotencyKey), "PurchaseNeed_assignToDraft", __result);
     }
     return __result;
   },
@@ -40859,12 +40860,12 @@ export const PurchaseNeed_cancel = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_cancel", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPurchaseNeedCancel(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PurchaseNeed_cancel", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_cancel", args.idempotencyKey), "PurchaseNeed_cancel", __result);
     }
     return __result;
   },
@@ -40935,12 +40936,12 @@ export const PurchaseNeed_create = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_create", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPurchaseNeedCreate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PurchaseNeed_create", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_create", args.idempotencyKey), "PurchaseNeed_create", __result);
     }
     return __result;
   },
@@ -41002,12 +41003,12 @@ export const PurchaseNeed_markDraftOrdered = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_markDraftOrdered", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPurchaseNeedMarkDraftOrdered(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PurchaseNeed_markDraftOrdered", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_markDraftOrdered", args.idempotencyKey), "PurchaseNeed_markDraftOrdered", __result);
     }
     return __result;
   },
@@ -41064,12 +41065,12 @@ export const PurchaseNeed_markFulfilled = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_markFulfilled", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPurchaseNeedMarkFulfilled(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PurchaseNeed_markFulfilled", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_markFulfilled", args.idempotencyKey), "PurchaseNeed_markFulfilled", __result);
     }
     return __result;
   },
@@ -41131,12 +41132,12 @@ export const PurchaseNeed_markOrdered = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_markOrdered", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPurchaseNeedMarkOrdered(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PurchaseNeed_markOrdered", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_markOrdered", args.idempotencyKey), "PurchaseNeed_markOrdered", __result);
     }
     return __result;
   },
@@ -41191,12 +41192,12 @@ export const PurchaseNeed_moveToWeek = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_moveToWeek", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPurchaseNeedMoveToWeek(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PurchaseNeed_moveToWeek", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_moveToWeek", args.idempotencyKey), "PurchaseNeed_moveToWeek", __result);
     }
     return __result;
   },
@@ -41244,12 +41245,12 @@ export const PurchaseNeed_releaseCancelledDraft = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_releaseCancelledDraft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPurchaseNeedReleaseCancelledDraft(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PurchaseNeed_releaseCancelledDraft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_releaseCancelledDraft", args.idempotencyKey), "PurchaseNeed_releaseCancelledDraft", __result);
     }
     return __result;
   },
@@ -41310,12 +41311,12 @@ export const PurchaseNeed_reviseRequired = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_reviseRequired", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPurchaseNeedReviseRequired(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PurchaseNeed_reviseRequired", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_reviseRequired", args.idempotencyKey), "PurchaseNeed_reviseRequired", __result);
     }
     return __result;
   },
@@ -41376,12 +41377,12 @@ export const PurchaseNeed_standDownWithEvent = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_standDownWithEvent", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPurchaseNeedStandDownWithEvent(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PurchaseNeed_standDownWithEvent", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PurchaseNeed_standDownWithEvent", args.idempotencyKey), "PurchaseNeed_standDownWithEvent", __result);
     }
     return __result;
   },
@@ -41435,12 +41436,12 @@ export const PushSubscription_register = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PushSubscription_register", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPushSubscriptionRegister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PushSubscription_register", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PushSubscription_register", args.idempotencyKey), "PushSubscription_register", __result);
     }
     return __result;
   },
@@ -41457,7 +41458,7 @@ export const PushSubscription_createViaRegister = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PushSubscription_createViaRegister", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -41497,7 +41498,7 @@ export const PushSubscription_createViaRegister = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "register", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PushSubscription_createViaRegister", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PushSubscription_createViaRegister", args.idempotencyKey), "PushSubscription_createViaRegister", __result);
     }
     return __result;
   },
@@ -41539,12 +41540,12 @@ export const PushSubscription_unregister = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PushSubscription_unregister", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runPushSubscriptionUnregister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "PushSubscription_unregister", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "PushSubscription_unregister", args.idempotencyKey), "PushSubscription_unregister", __result);
     }
     return __result;
   },
@@ -41605,12 +41606,12 @@ export const Qualification_expire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Qualification_expire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runQualificationExpire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Qualification_expire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Qualification_expire", args.idempotencyKey), "Qualification_expire", __result);
     }
     return __result;
   },
@@ -41680,12 +41681,12 @@ export const Qualification_grant = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Qualification_grant", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runQualificationGrant(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Qualification_grant", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Qualification_grant", args.idempotencyKey), "Qualification_grant", __result);
     }
     return __result;
   },
@@ -41706,7 +41707,7 @@ export const Qualification_createViaGrant = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Qualification_createViaGrant", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -41761,7 +41762,7 @@ export const Qualification_createViaGrant = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "grant", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Qualification_createViaGrant", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Qualification_createViaGrant", args.idempotencyKey), "Qualification_createViaGrant", __result);
     }
     return __result;
   },
@@ -41823,12 +41824,12 @@ export const Qualification_revoke = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Qualification_revoke", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runQualificationRevoke(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Qualification_revoke", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Qualification_revoke", args.idempotencyKey), "Qualification_revoke", __result);
     }
     return __result;
   },
@@ -41893,12 +41894,12 @@ export const QualityCheck_fail = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QualityCheck_fail", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runQualityCheckFail(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "QualityCheck_fail", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QualityCheck_fail", args.idempotencyKey), "QualityCheck_fail", __result);
     }
     return __result;
   },
@@ -41950,12 +41951,12 @@ export const QualityCheck_open = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QualityCheck_open", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runQualityCheckOpen(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "QualityCheck_open", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QualityCheck_open", args.idempotencyKey), "QualityCheck_open", __result);
     }
     return __result;
   },
@@ -41971,7 +41972,7 @@ export const QualityCheck_createViaOpen = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QualityCheck_createViaOpen", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -42010,7 +42011,7 @@ export const QualityCheck_createViaOpen = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "open", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "QualityCheck_createViaOpen", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QualityCheck_createViaOpen", args.idempotencyKey), "QualityCheck_createViaOpen", __result);
     }
     return __result;
   },
@@ -42072,12 +42073,12 @@ export const QualityCheck_pass = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QualityCheck_pass", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runQualityCheckPass(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "QualityCheck_pass", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QualityCheck_pass", args.idempotencyKey), "QualityCheck_pass", __result);
     }
     return __result;
   },
@@ -42137,12 +42138,12 @@ export const QualityCheck_reinspect = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QualityCheck_reinspect", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runQualityCheckReinspect(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "QualityCheck_reinspect", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QualityCheck_reinspect", args.idempotencyKey), "QualityCheck_reinspect", __result);
     }
     return __result;
   },
@@ -42193,12 +42194,12 @@ export const QuoteSubmission_complete = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QuoteSubmission_complete", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runQuoteSubmissionComplete(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "QuoteSubmission_complete", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QuoteSubmission_complete", args.idempotencyKey), "QuoteSubmission_complete", __result);
     }
     return __result;
   },
@@ -42284,12 +42285,12 @@ export const QuoteSubmission_create = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QuoteSubmission_create", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runQuoteSubmissionCreate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "QuoteSubmission_create", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QuoteSubmission_create", args.idempotencyKey), "QuoteSubmission_create", __result);
     }
     return __result;
   },
@@ -42330,12 +42331,12 @@ export const QuoteSubmission_dismiss = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QuoteSubmission_dismiss", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runQuoteSubmissionDismiss(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "QuoteSubmission_dismiss", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QuoteSubmission_dismiss", args.idempotencyKey), "QuoteSubmission_dismiss", __result);
     }
     return __result;
   },
@@ -42382,12 +42383,12 @@ export const QuoteSubmission_fail = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QuoteSubmission_fail", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runQuoteSubmissionFail(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "QuoteSubmission_fail", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QuoteSubmission_fail", args.idempotencyKey), "QuoteSubmission_fail", __result);
     }
     return __result;
   },
@@ -42427,12 +42428,12 @@ export const QuoteSubmission_retry = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QuoteSubmission_retry", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runQuoteSubmissionRetry(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "QuoteSubmission_retry", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QuoteSubmission_retry", args.idempotencyKey), "QuoteSubmission_retry", __result);
     }
     return __result;
   },
@@ -42470,12 +42471,12 @@ export const QuoteSubmission_startProcessing = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QuoteSubmission_startProcessing", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runQuoteSubmissionStartProcessing(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "QuoteSubmission_startProcessing", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "QuoteSubmission_startProcessing", args.idempotencyKey), "QuoteSubmission_startProcessing", __result);
     }
     return __result;
   },
@@ -42549,12 +42550,12 @@ export const ReceiptCorrection_record = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReceiptCorrection_record", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runReceiptCorrectionRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ReceiptCorrection_record", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReceiptCorrection_record", args.idempotencyKey), "ReceiptCorrection_record", __result);
     }
     return __result;
   },
@@ -42579,7 +42580,7 @@ export const ReceiptCorrection_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReceiptCorrection_createViaRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -42639,7 +42640,7 @@ export const ReceiptCorrection_createViaRecord = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ReceiptCorrection_createViaRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReceiptCorrection_createViaRecord", args.idempotencyKey), "ReceiptCorrection_createViaRecord", __result);
     }
     return __result;
   },
@@ -42699,12 +42700,12 @@ export const RecurringAvailability_declare = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RecurringAvailability_declare", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runRecurringAvailabilityDeclare(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "RecurringAvailability_declare", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RecurringAvailability_declare", args.idempotencyKey), "RecurringAvailability_declare", __result);
     }
     return __result;
   },
@@ -42722,7 +42723,7 @@ export const RecurringAvailability_createViaDeclare = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RecurringAvailability_createViaDeclare", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -42768,7 +42769,7 @@ export const RecurringAvailability_createViaDeclare = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "declare", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "RecurringAvailability_createViaDeclare", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RecurringAvailability_createViaDeclare", args.idempotencyKey), "RecurringAvailability_createViaDeclare", __result);
     }
     return __result;
   },
@@ -42829,12 +42830,12 @@ export const RecurringAvailability_withdraw = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RecurringAvailability_withdraw", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runRecurringAvailabilityWithdraw(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "RecurringAvailability_withdraw", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RecurringAvailability_withdraw", args.idempotencyKey), "RecurringAvailability_withdraw", __result);
     }
     return __result;
   },
@@ -42891,12 +42892,12 @@ export const ReferralSource_activate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReferralSource_activate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runReferralSourceActivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ReferralSource_activate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReferralSource_activate", args.idempotencyKey), "ReferralSource_activate", __result);
     }
     return __result;
   },
@@ -42955,12 +42956,12 @@ export const ReferralSource_deactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReferralSource_deactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runReferralSourceDeactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ReferralSource_deactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReferralSource_deactivate", args.idempotencyKey), "ReferralSource_deactivate", __result);
     }
     return __result;
   },
@@ -43026,12 +43027,12 @@ export const ReferralSource_register = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReferralSource_register", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runReferralSourceRegister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ReferralSource_register", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReferralSource_register", args.idempotencyKey), "ReferralSource_register", __result);
     }
     return __result;
   },
@@ -43048,7 +43049,7 @@ export const ReferralSource_createViaRegister = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReferralSource_createViaRegister", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -43089,7 +43090,7 @@ export const ReferralSource_createViaRegister = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "register", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ReferralSource_createViaRegister", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReferralSource_createViaRegister", args.idempotencyKey), "ReferralSource_createViaRegister", __result);
     }
     return __result;
   },
@@ -43139,12 +43140,12 @@ export const ReferralSource_reviseDetails = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReferralSource_reviseDetails", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runReferralSourceReviseDetails(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ReferralSource_reviseDetails", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReferralSource_reviseDetails", args.idempotencyKey), "ReferralSource_reviseDetails", __result);
     }
     return __result;
   },
@@ -43198,12 +43199,12 @@ export const RevenueAttribution_apply = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RevenueAttribution_apply", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runRevenueAttributionApply(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "RevenueAttribution_apply", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RevenueAttribution_apply", args.idempotencyKey), "RevenueAttribution_apply", __result);
     }
     return __result;
   },
@@ -43257,12 +43258,12 @@ export const RevenueAttribution_approve = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RevenueAttribution_approve", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runRevenueAttributionApprove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "RevenueAttribution_approve", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RevenueAttribution_approve", args.idempotencyKey), "RevenueAttribution_approve", __result);
     }
     return __result;
   },
@@ -43335,12 +43336,12 @@ export const RevenueAttribution_create = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RevenueAttribution_create", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runRevenueAttributionCreate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "RevenueAttribution_create", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RevenueAttribution_create", args.idempotencyKey), "RevenueAttribution_create", __result);
     }
     return __result;
   },
@@ -43393,12 +43394,12 @@ export const RevenueAttribution_reject = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RevenueAttribution_reject", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runRevenueAttributionReject(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "RevenueAttribution_reject", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RevenueAttribution_reject", args.idempotencyKey), "RevenueAttribution_reject", __result);
     }
     return __result;
   },
@@ -43447,12 +43448,12 @@ export const RevenueAttribution_requestApproval = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RevenueAttribution_requestApproval", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runRevenueAttributionRequestApproval(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "RevenueAttribution_requestApproval", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RevenueAttribution_requestApproval", args.idempotencyKey), "RevenueAttribution_requestApproval", __result);
     }
     return __result;
   },
@@ -43502,12 +43503,12 @@ export const RevenueAttribution_update = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RevenueAttribution_update", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runRevenueAttributionUpdate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "RevenueAttribution_update", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RevenueAttribution_update", args.idempotencyKey), "RevenueAttribution_update", __result);
     }
     return __result;
   },
@@ -43566,12 +43567,12 @@ export const ReviewFlag_dismiss = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReviewFlag_dismiss", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runReviewFlagDismiss(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ReviewFlag_dismiss", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReviewFlag_dismiss", args.idempotencyKey), "ReviewFlag_dismiss", __result);
     }
     return __result;
   },
@@ -43631,12 +43632,12 @@ export const ReviewFlag_markResolved = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReviewFlag_markResolved", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runReviewFlagMarkResolved(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ReviewFlag_markResolved", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReviewFlag_markResolved", args.idempotencyKey), "ReviewFlag_markResolved", __result);
     }
     return __result;
   },
@@ -43708,12 +43709,12 @@ export const ReviewFlag_raise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReviewFlag_raise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runReviewFlagRaise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ReviewFlag_raise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReviewFlag_raise", args.idempotencyKey), "ReviewFlag_raise", __result);
     }
     return __result;
   },
@@ -43731,7 +43732,7 @@ export const ReviewFlag_createViaRaise = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReviewFlag_createViaRaise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -43777,7 +43778,7 @@ export const ReviewFlag_createViaRaise = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "raise", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ReviewFlag_createViaRaise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReviewFlag_createViaRaise", args.idempotencyKey), "ReviewFlag_createViaRaise", __result);
     }
     return __result;
   },
@@ -43833,12 +43834,12 @@ export const ReviewFlag_reopen = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReviewFlag_reopen", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runReviewFlagReopen(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ReviewFlag_reopen", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReviewFlag_reopen", args.idempotencyKey), "ReviewFlag_reopen", __result);
     }
     return __result;
   },
@@ -43876,12 +43877,12 @@ export const ReviewFlag_reviseQuestion = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReviewFlag_reviseQuestion", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runReviewFlagReviseQuestion(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ReviewFlag_reviseQuestion", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ReviewFlag_reviseQuestion", args.idempotencyKey), "ReviewFlag_reviseQuestion", __result);
     }
     return __result;
   },
@@ -43942,12 +43943,12 @@ export const RoleScorecard_archive = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RoleScorecard_archive", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runRoleScorecardArchive(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "RoleScorecard_archive", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RoleScorecard_archive", args.idempotencyKey), "RoleScorecard_archive", __result);
     }
     return __result;
   },
@@ -43999,12 +44000,12 @@ export const RoleScorecard_define = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RoleScorecard_define", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runRoleScorecardDefine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "RoleScorecard_define", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RoleScorecard_define", args.idempotencyKey), "RoleScorecard_define", __result);
     }
     return __result;
   },
@@ -44021,7 +44022,7 @@ export const RoleScorecard_createViaDefine = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RoleScorecard_createViaDefine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -44060,7 +44061,7 @@ export const RoleScorecard_createViaDefine = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "define", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "RoleScorecard_createViaDefine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RoleScorecard_createViaDefine", args.idempotencyKey), "RoleScorecard_createViaDefine", __result);
     }
     return __result;
   },
@@ -44118,12 +44119,12 @@ export const RoleScorecard_reactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RoleScorecard_reactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runRoleScorecardReactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "RoleScorecard_reactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "RoleScorecard_reactivate", args.idempotencyKey), "RoleScorecard_reactivate", __result);
     }
     return __result;
   },
@@ -44182,12 +44183,12 @@ export const SavedReportDefinition_archive = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SavedReportDefinition_archive", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runSavedReportDefinitionArchive(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SavedReportDefinition_archive", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SavedReportDefinition_archive", args.idempotencyKey), "SavedReportDefinition_archive", __result);
     }
     return __result;
   },
@@ -44233,12 +44234,12 @@ export const SavedReportDefinition_changeSharing = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SavedReportDefinition_changeSharing", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runSavedReportDefinitionChangeSharing(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SavedReportDefinition_changeSharing", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SavedReportDefinition_changeSharing", args.idempotencyKey), "SavedReportDefinition_changeSharing", __result);
     }
     return __result;
   },
@@ -44295,12 +44296,12 @@ export const SavedReportDefinition_createDefinition = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SavedReportDefinition_createDefinition", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runSavedReportDefinitionCreateDefinition(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SavedReportDefinition_createDefinition", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SavedReportDefinition_createDefinition", args.idempotencyKey), "SavedReportDefinition_createDefinition", __result);
     }
     return __result;
   },
@@ -44318,7 +44319,7 @@ export const SavedReportDefinition_createViaCreateDefinition = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SavedReportDefinition_createViaCreateDefinition", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -44362,7 +44363,7 @@ export const SavedReportDefinition_createViaCreateDefinition = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "createDefinition", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SavedReportDefinition_createViaCreateDefinition", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SavedReportDefinition_createViaCreateDefinition", args.idempotencyKey), "SavedReportDefinition_createViaCreateDefinition", __result);
     }
     return __result;
   },
@@ -44409,12 +44410,12 @@ export const SavedReportDefinition_rename = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SavedReportDefinition_rename", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runSavedReportDefinitionRename(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SavedReportDefinition_rename", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SavedReportDefinition_rename", args.idempotencyKey), "SavedReportDefinition_rename", __result);
     }
     return __result;
   },
@@ -44473,12 +44474,12 @@ export const SavedReportDefinition_restore = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SavedReportDefinition_restore", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runSavedReportDefinitionRestore(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SavedReportDefinition_restore", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SavedReportDefinition_restore", args.idempotencyKey), "SavedReportDefinition_restore", __result);
     }
     return __result;
   },
@@ -44529,12 +44530,12 @@ export const SavedReportDefinition_updateDefinition = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SavedReportDefinition_updateDefinition", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runSavedReportDefinitionUpdateDefinition(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SavedReportDefinition_updateDefinition", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SavedReportDefinition_updateDefinition", args.idempotencyKey), "SavedReportDefinition_updateDefinition", __result);
     }
     return __result;
   },
@@ -44591,12 +44592,12 @@ export const ServiceStyle_activate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyle_activate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runServiceStyleActivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ServiceStyle_activate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyle_activate", args.idempotencyKey), "ServiceStyle_activate", __result);
     }
     return __result;
   },
@@ -44655,12 +44656,12 @@ export const ServiceStyle_deactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyle_deactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runServiceStyleDeactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ServiceStyle_deactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyle_deactivate", args.idempotencyKey), "ServiceStyle_deactivate", __result);
     }
     return __result;
   },
@@ -44726,12 +44727,12 @@ export const ServiceStyle_register = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyle_register", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runServiceStyleRegister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ServiceStyle_register", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyle_register", args.idempotencyKey), "ServiceStyle_register", __result);
     }
     return __result;
   },
@@ -44748,7 +44749,7 @@ export const ServiceStyle_createViaRegister = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyle_createViaRegister", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -44789,7 +44790,7 @@ export const ServiceStyle_createViaRegister = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "register", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ServiceStyle_createViaRegister", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyle_createViaRegister", args.idempotencyKey), "ServiceStyle_createViaRegister", __result);
     }
     return __result;
   },
@@ -44839,12 +44840,12 @@ export const ServiceStyle_reviseDetails = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyle_reviseDetails", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runServiceStyleReviseDetails(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ServiceStyle_reviseDetails", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyle_reviseDetails", args.idempotencyKey), "ServiceStyle_reviseDetails", __result);
     }
     return __result;
   },
@@ -44906,12 +44907,12 @@ export const ServiceStyleKitItem_add = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyleKitItem_add", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runServiceStyleKitItemAdd(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ServiceStyleKitItem_add", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyleKitItem_add", args.idempotencyKey), "ServiceStyleKitItem_add", __result);
     }
     return __result;
   },
@@ -44931,7 +44932,7 @@ export const ServiceStyleKitItem_createViaAdd = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyleKitItem_createViaAdd", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -44979,7 +44980,7 @@ export const ServiceStyleKitItem_createViaAdd = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "add", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ServiceStyleKitItem_createViaAdd", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyleKitItem_createViaAdd", args.idempotencyKey), "ServiceStyleKitItem_createViaAdd", __result);
     }
     return __result;
   },
@@ -45036,12 +45037,12 @@ export const ServiceStyleKitItem_reinstate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyleKitItem_reinstate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runServiceStyleKitItemReinstate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ServiceStyleKitItem_reinstate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyleKitItem_reinstate", args.idempotencyKey), "ServiceStyleKitItem_reinstate", __result);
     }
     return __result;
   },
@@ -45098,12 +45099,12 @@ export const ServiceStyleKitItem_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyleKitItem_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runServiceStyleKitItemRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ServiceStyleKitItem_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyleKitItem_retire", args.idempotencyKey), "ServiceStyleKitItem_retire", __result);
     }
     return __result;
   },
@@ -45157,12 +45158,12 @@ export const ServiceStyleKitItem_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyleKitItem_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runServiceStyleKitItemRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ServiceStyleKitItem_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ServiceStyleKitItem_revise", args.idempotencyKey), "ServiceStyleKitItem_revise", __result);
     }
     return __result;
   },
@@ -45217,12 +45218,12 @@ export const ShareLink_create = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShareLink_create", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShareLinkCreate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ShareLink_create", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShareLink_create", args.idempotencyKey), "ShareLink_create", __result);
     }
     return __result;
   },
@@ -45267,12 +45268,12 @@ export const ShareLink_revoke = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShareLink_revoke", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShareLinkRevoke(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ShareLink_revoke", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShareLink_revoke", args.idempotencyKey), "ShareLink_revoke", __result);
     }
     return __result;
   },
@@ -45345,12 +45346,12 @@ export const Shift_applyApprovedSwap = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_applyApprovedSwap", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftApplyApprovedSwap(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_applyApprovedSwap", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_applyApprovedSwap", args.idempotencyKey), "Shift_applyApprovedSwap", __result);
     }
     return __result;
   },
@@ -45412,12 +45413,12 @@ export const Shift_cancel = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_cancel", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftCancel(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_cancel", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_cancel", args.idempotencyKey), "Shift_cancel", __result);
     }
     return __result;
   },
@@ -45478,12 +45479,12 @@ export const Shift_complete = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_complete", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftComplete(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_complete", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_complete", args.idempotencyKey), "Shift_complete", __result);
     }
     return __result;
   },
@@ -45542,12 +45543,12 @@ export const Shift_markNoShow = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_markNoShow", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftMarkNoShow(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_markNoShow", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_markNoShow", args.idempotencyKey), "Shift_markNoShow", __result);
     }
     return __result;
   },
@@ -45602,12 +45603,12 @@ export const Shift_planEventTiming = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_planEventTiming", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftPlanEventTiming(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_planEventTiming", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_planEventTiming", args.idempotencyKey), "Shift_planEventTiming", __result);
     }
     return __result;
   },
@@ -45674,12 +45675,12 @@ export const Shift_removeStaffNeedCoverage = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_removeStaffNeedCoverage", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftRemoveStaffNeedCoverage(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_removeStaffNeedCoverage", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_removeStaffNeedCoverage", args.idempotencyKey), "Shift_removeStaffNeedCoverage", __result);
     }
     return __result;
   },
@@ -45730,12 +45731,12 @@ export const Shift_reschedule = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_reschedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftReschedule(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_reschedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_reschedule", args.idempotencyKey), "Shift_reschedule", __result);
     }
     return __result;
   },
@@ -45797,12 +45798,12 @@ export const Shift_retireEventTiming = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_retireEventTiming", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftRetireEventTiming(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_retireEventTiming", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_retireEventTiming", args.idempotencyKey), "Shift_retireEventTiming", __result);
     }
     return __result;
   },
@@ -45892,12 +45893,12 @@ export const Shift_schedule = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_schedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftSchedule(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_schedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_schedule", args.idempotencyKey), "Shift_schedule", __result);
     }
     return __result;
   },
@@ -45920,7 +45921,7 @@ export const Shift_createViaSchedule = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_createViaSchedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -45991,7 +45992,7 @@ export const Shift_createViaSchedule = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "schedule", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_createViaSchedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_createViaSchedule", args.idempotencyKey), "Shift_createViaSchedule", __result);
     }
     return __result;
   },
@@ -46051,12 +46052,12 @@ export const Shift_stageApprovedSwap = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_stageApprovedSwap", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftStageApprovedSwap(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_stageApprovedSwap", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_stageApprovedSwap", args.idempotencyKey), "Shift_stageApprovedSwap", __result);
     }
     return __result;
   },
@@ -46117,12 +46118,12 @@ export const Shift_start = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_start", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftStart(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_start", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Shift_start", args.idempotencyKey), "Shift_start", __result);
     }
     return __result;
   },
@@ -46190,12 +46191,12 @@ export const ShiftSwapRequest_accept = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftSwapRequest_accept", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftSwapRequestAccept(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ShiftSwapRequest_accept", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftSwapRequest_accept", args.idempotencyKey), "ShiftSwapRequest_accept", __result);
     }
     return __result;
   },
@@ -46294,12 +46295,12 @@ export const ShiftSwapRequest_approve = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftSwapRequest_approve", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftSwapRequestApprove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ShiftSwapRequest_approve", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftSwapRequest_approve", args.idempotencyKey), "ShiftSwapRequest_approve", __result);
     }
     return __result;
   },
@@ -46364,12 +46365,12 @@ export const ShiftSwapRequest_decline = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftSwapRequest_decline", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftSwapRequestDecline(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ShiftSwapRequest_decline", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftSwapRequest_decline", args.idempotencyKey), "ShiftSwapRequest_decline", __result);
     }
     return __result;
   },
@@ -46469,12 +46470,12 @@ export const ShiftSwapRequest_propose = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftSwapRequest_propose", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftSwapRequestPropose(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ShiftSwapRequest_propose", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftSwapRequest_propose", args.idempotencyKey), "ShiftSwapRequest_propose", __result);
     }
     return __result;
   },
@@ -46495,7 +46496,7 @@ export const ShiftSwapRequest_createViaPropose = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftSwapRequest_createViaPropose", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -46574,7 +46575,7 @@ export const ShiftSwapRequest_createViaPropose = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "propose", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ShiftSwapRequest_createViaPropose", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftSwapRequest_createViaPropose", args.idempotencyKey), "ShiftSwapRequest_createViaPropose", __result);
     }
     return __result;
   },
@@ -46636,12 +46637,12 @@ export const ShiftSwapRequest_reject = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftSwapRequest_reject", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftSwapRequestReject(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ShiftSwapRequest_reject", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftSwapRequest_reject", args.idempotencyKey), "ShiftSwapRequest_reject", __result);
     }
     return __result;
   },
@@ -46704,12 +46705,12 @@ export const ShiftSwapRequest_withdraw = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftSwapRequest_withdraw", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftSwapRequestWithdraw(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ShiftSwapRequest_withdraw", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftSwapRequest_withdraw", args.idempotencyKey), "ShiftSwapRequest_withdraw", __result);
     }
     return __result;
   },
@@ -46775,12 +46776,12 @@ export const ShiftType_define = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftType_define", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftTypeDefine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ShiftType_define", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftType_define", args.idempotencyKey), "ShiftType_define", __result);
     }
     return __result;
   },
@@ -46796,7 +46797,7 @@ export const ShiftType_createViaDefine = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftType_createViaDefine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -46836,7 +46837,7 @@ export const ShiftType_createViaDefine = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "define", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ShiftType_createViaDefine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftType_createViaDefine", args.idempotencyKey), "ShiftType_createViaDefine", __result);
     }
     return __result;
   },
@@ -46892,12 +46893,12 @@ export const ShiftType_reactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftType_reactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftTypeReactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ShiftType_reactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftType_reactivate", args.idempotencyKey), "ShiftType_reactivate", __result);
     }
     return __result;
   },
@@ -46954,12 +46955,12 @@ export const ShiftType_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftType_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runShiftTypeRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ShiftType_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "ShiftType_retire", args.idempotencyKey), "ShiftType_retire", __result);
     }
     return __result;
   },
@@ -47027,12 +47028,12 @@ export const SignatureRequest_complete = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SignatureRequest_complete", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runSignatureRequestComplete(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SignatureRequest_complete", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SignatureRequest_complete", args.idempotencyKey), "SignatureRequest_complete", __result);
     }
     return __result;
   },
@@ -47089,12 +47090,12 @@ export const SignatureRequest_expire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SignatureRequest_expire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runSignatureRequestExpire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SignatureRequest_expire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SignatureRequest_expire", args.idempotencyKey), "SignatureRequest_expire", __result);
     }
     return __result;
   },
@@ -47171,12 +47172,12 @@ export const SignatureRequest_requestSignature = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SignatureRequest_requestSignature", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runSignatureRequestRequestSignature(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SignatureRequest_requestSignature", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SignatureRequest_requestSignature", args.idempotencyKey), "SignatureRequest_requestSignature", __result);
     }
     return __result;
   },
@@ -47197,7 +47198,7 @@ export const SignatureRequest_createViaRequestSignature = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SignatureRequest_createViaRequestSignature", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -47248,7 +47249,7 @@ export const SignatureRequest_createViaRequestSignature = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "requestSignature", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SignatureRequest_createViaRequestSignature", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SignatureRequest_createViaRequestSignature", args.idempotencyKey), "SignatureRequest_createViaRequestSignature", __result);
     }
     return __result;
   },
@@ -47307,12 +47308,12 @@ export const SignatureRequest_revoke = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SignatureRequest_revoke", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runSignatureRequestRevoke(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SignatureRequest_revoke", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SignatureRequest_revoke", args.idempotencyKey), "SignatureRequest_revoke", __result);
     }
     return __result;
   },
@@ -47360,12 +47361,12 @@ export const StaffChatReadCursor_open = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StaffChatReadCursor_open", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStaffChatReadCursorOpen(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StaffChatReadCursor_open", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StaffChatReadCursor_open", args.idempotencyKey), "StaffChatReadCursor_open", __result);
     }
     return __result;
   },
@@ -47380,7 +47381,7 @@ export const StaffChatReadCursor_createViaOpen = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StaffChatReadCursor_createViaOpen", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -47413,7 +47414,7 @@ export const StaffChatReadCursor_createViaOpen = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "open", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StaffChatReadCursor_createViaOpen", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StaffChatReadCursor_createViaOpen", args.idempotencyKey), "StaffChatReadCursor_createViaOpen", __result);
     }
     return __result;
   },
@@ -47457,12 +47458,12 @@ export const StaffChatReadCursor_touch = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StaffChatReadCursor_touch", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStaffChatReadCursorTouch(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StaffChatReadCursor_touch", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StaffChatReadCursor_touch", args.idempotencyKey), "StaffChatReadCursor_touch", __result);
     }
     return __result;
   },
@@ -47512,12 +47513,12 @@ export const StaffMessage_edit = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StaffMessage_edit", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStaffMessageEdit(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StaffMessage_edit", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StaffMessage_edit", args.idempotencyKey), "StaffMessage_edit", __result);
     }
     return __result;
   },
@@ -47564,12 +47565,12 @@ export const StaffMessage_markRead = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StaffMessage_markRead", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStaffMessageMarkRead(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StaffMessage_markRead", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StaffMessage_markRead", args.idempotencyKey), "StaffMessage_markRead", __result);
     }
     return __result;
   },
@@ -47614,12 +47615,12 @@ export const StaffMessage_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StaffMessage_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStaffMessageRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StaffMessage_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StaffMessage_remove", args.idempotencyKey), "StaffMessage_remove", __result);
     }
     return __result;
   },
@@ -47684,12 +47685,12 @@ export const StaffMessage_send = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StaffMessage_send", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStaffMessageSend(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StaffMessage_send", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StaffMessage_send", args.idempotencyKey), "StaffMessage_send", __result);
     }
     return __result;
   },
@@ -47706,7 +47707,7 @@ export const StaffMessage_createViaSend = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StaffMessage_createViaSend", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -47755,7 +47756,7 @@ export const StaffMessage_createViaSend = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "send", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StaffMessage_createViaSend", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StaffMessage_createViaSend", args.idempotencyKey), "StaffMessage_createViaSend", __result);
     }
     return __result;
   },
@@ -47804,12 +47805,12 @@ export const Station_define = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Station_define", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStationDefine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Station_define", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Station_define", args.idempotencyKey), "Station_define", __result);
     }
     return __result;
   },
@@ -47825,7 +47826,7 @@ export const Station_createViaDefine = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Station_createViaDefine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -47861,7 +47862,7 @@ export const Station_createViaDefine = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "define", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Station_createViaDefine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Station_createViaDefine", args.idempotencyKey), "Station_createViaDefine", __result);
     }
     return __result;
   },
@@ -47911,12 +47912,12 @@ export const Station_reinstate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Station_reinstate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStationReinstate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Station_reinstate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Station_reinstate", args.idempotencyKey), "Station_reinstate", __result);
     }
     return __result;
   },
@@ -47964,12 +47965,12 @@ export const Station_rename = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Station_rename", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStationRename(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Station_rename", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Station_rename", args.idempotencyKey), "Station_rename", __result);
     }
     return __result;
   },
@@ -48021,12 +48022,12 @@ export const Station_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Station_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStationRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Station_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Station_retire", args.idempotencyKey), "Station_retire", __result);
     }
     return __result;
   },
@@ -48091,12 +48092,12 @@ export const StockCountLine_confirmLedgerMatch = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountLine_confirmLedgerMatch", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStockCountLineConfirmLedgerMatch(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StockCountLine_confirmLedgerMatch", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountLine_confirmLedgerMatch", args.idempotencyKey), "StockCountLine_confirmLedgerMatch", __result);
     }
     return __result;
   },
@@ -48166,12 +48167,12 @@ export const StockCountLine_freeze = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountLine_freeze", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStockCountLineFreeze(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StockCountLine_freeze", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountLine_freeze", args.idempotencyKey), "StockCountLine_freeze", __result);
     }
     return __result;
   },
@@ -48189,7 +48190,7 @@ export const StockCountLine_createViaFreeze = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountLine_createViaFreeze", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -48243,7 +48244,7 @@ export const StockCountLine_createViaFreeze = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "freeze", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StockCountLine_createViaFreeze", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountLine_createViaFreeze", args.idempotencyKey), "StockCountLine_createViaFreeze", __result);
     }
     return __result;
   },
@@ -48315,12 +48316,12 @@ export const StockCountLine_reconcileVariance = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountLine_reconcileVariance", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStockCountLineReconcileVariance(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StockCountLine_reconcileVariance", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountLine_reconcileVariance", args.idempotencyKey), "StockCountLine_reconcileVariance", __result);
     }
     return __result;
   },
@@ -48387,12 +48388,12 @@ export const StockCountLine_recordCount = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountLine_recordCount", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStockCountLineRecordCount(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StockCountLine_recordCount", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountLine_recordCount", args.idempotencyKey), "StockCountLine_recordCount", __result);
     }
     return __result;
   },
@@ -48445,12 +48446,12 @@ export const StockCountLine_reviseCount = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountLine_reviseCount", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStockCountLineReviseCount(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StockCountLine_reviseCount", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountLine_reviseCount", args.idempotencyKey), "StockCountLine_reviseCount", __result);
     }
     return __result;
   },
@@ -48511,12 +48512,12 @@ export const StockCountSession_close = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountSession_close", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStockCountSessionClose(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StockCountSession_close", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountSession_close", args.idempotencyKey), "StockCountSession_close", __result);
     }
     return __result;
   },
@@ -48572,12 +48573,12 @@ export const StockCountSession_start = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountSession_start", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStockCountSessionStart(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StockCountSession_start", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountSession_start", args.idempotencyKey), "StockCountSession_start", __result);
     }
     return __result;
   },
@@ -48594,7 +48595,7 @@ export const StockCountSession_createViaStart = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountSession_createViaStart", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -48637,7 +48638,7 @@ export const StockCountSession_createViaStart = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "start", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StockCountSession_createViaStart", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockCountSession_createViaStart", args.idempotencyKey), "StockCountSession_createViaStart", __result);
     }
     return __result;
   },
@@ -48717,12 +48718,12 @@ export const StockTransfer_record = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockTransfer_record", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStockTransferRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StockTransfer_record", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockTransfer_record", args.idempotencyKey), "StockTransfer_record", __result);
     }
     return __result;
   },
@@ -48743,7 +48744,7 @@ export const StockTransfer_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockTransfer_createViaRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -48807,7 +48808,7 @@ export const StockTransfer_createViaRecord = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StockTransfer_createViaRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StockTransfer_createViaRecord", args.idempotencyKey), "StockTransfer_createViaRecord", __result);
     }
     return __result;
   },
@@ -48864,12 +48865,12 @@ export const StorageLocation_activate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StorageLocation_activate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStorageLocationActivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StorageLocation_activate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StorageLocation_activate", args.idempotencyKey), "StorageLocation_activate", __result);
     }
     return __result;
   },
@@ -48929,12 +48930,12 @@ export const StorageLocation_deactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StorageLocation_deactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStorageLocationDeactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StorageLocation_deactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StorageLocation_deactivate", args.idempotencyKey), "StorageLocation_deactivate", __result);
     }
     return __result;
   },
@@ -48989,12 +48990,12 @@ export const StorageLocation_register = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StorageLocation_register", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStorageLocationRegister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StorageLocation_register", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StorageLocation_register", args.idempotencyKey), "StorageLocation_register", __result);
     }
     return __result;
   },
@@ -49013,7 +49014,7 @@ export const StorageLocation_createViaRegister = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StorageLocation_createViaRegister", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -49055,7 +49056,7 @@ export const StorageLocation_createViaRegister = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "register", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StorageLocation_createViaRegister", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StorageLocation_createViaRegister", args.idempotencyKey), "StorageLocation_createViaRegister", __result);
     }
     return __result;
   },
@@ -49110,12 +49111,12 @@ export const StorageLocation_reviseDetails = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StorageLocation_reviseDetails", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runStorageLocationReviseDetails(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "StorageLocation_reviseDetails", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "StorageLocation_reviseDetails", args.idempotencyKey), "StorageLocation_reviseDetails", __result);
     }
     return __result;
   },
@@ -49157,12 +49158,12 @@ export const SyncError_markResolved = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SyncError_markResolved", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runSyncErrorMarkResolved(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SyncError_markResolved", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SyncError_markResolved", args.idempotencyKey), "SyncError_markResolved", __result);
     }
     return __result;
   },
@@ -49217,12 +49218,12 @@ export const SyncError_record = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SyncError_record", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runSyncErrorRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SyncError_record", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SyncError_record", args.idempotencyKey), "SyncError_record", __result);
     }
     return __result;
   },
@@ -49241,7 +49242,7 @@ export const SyncError_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SyncError_createViaRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -49284,7 +49285,7 @@ export const SyncError_createViaRecord = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SyncError_createViaRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SyncError_createViaRecord", args.idempotencyKey), "SyncError_createViaRecord", __result);
     }
     return __result;
   },
@@ -49334,12 +49335,12 @@ export const SyncError_reopen = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SyncError_reopen", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runSyncErrorReopen(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SyncError_reopen", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "SyncError_reopen", args.idempotencyKey), "SyncError_reopen", __result);
     }
     return __result;
   },
@@ -49395,12 +49396,12 @@ export const TaxRate_define = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TaxRate_define", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTaxRateDefine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TaxRate_define", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TaxRate_define", args.idempotencyKey), "TaxRate_define", __result);
     }
     return __result;
   },
@@ -49418,7 +49419,7 @@ export const TaxRate_createViaDefine = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TaxRate_createViaDefine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -49460,7 +49461,7 @@ export const TaxRate_createViaDefine = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "define", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TaxRate_createViaDefine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TaxRate_createViaDefine", args.idempotencyKey), "TaxRate_createViaDefine", __result);
     }
     return __result;
   },
@@ -49514,12 +49515,12 @@ export const TaxRate_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TaxRate_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTaxRateRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TaxRate_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TaxRate_revise", args.idempotencyKey), "TaxRate_revise", __result);
     }
     return __result;
   },
@@ -49562,12 +49563,12 @@ export const TaxRate_setActive = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TaxRate_setActive", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTaxRateSetActive(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TaxRate_setActive", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TaxRate_setActive", args.idempotencyKey), "TaxRate_setActive", __result);
     }
     return __result;
   },
@@ -49630,12 +49631,12 @@ export const TimeOffRequest_approve = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TimeOffRequest_approve", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTimeOffRequestApprove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TimeOffRequest_approve", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TimeOffRequest_approve", args.idempotencyKey), "TimeOffRequest_approve", __result);
     }
     return __result;
   },
@@ -49698,12 +49699,12 @@ export const TimeOffRequest_decline = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TimeOffRequest_decline", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTimeOffRequestDecline(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TimeOffRequest_decline", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TimeOffRequest_decline", args.idempotencyKey), "TimeOffRequest_decline", __result);
     }
     return __result;
   },
@@ -49765,12 +49766,12 @@ export const TimeOffRequest_submit = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TimeOffRequest_submit", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTimeOffRequestSubmit(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TimeOffRequest_submit", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TimeOffRequest_submit", args.idempotencyKey), "TimeOffRequest_submit", __result);
     }
     return __result;
   },
@@ -49787,7 +49788,7 @@ export const TimeOffRequest_createViaSubmit = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TimeOffRequest_createViaSubmit", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -49834,7 +49835,7 @@ export const TimeOffRequest_createViaSubmit = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "submit", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TimeOffRequest_createViaSubmit", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TimeOffRequest_createViaSubmit", args.idempotencyKey), "TimeOffRequest_createViaSubmit", __result);
     }
     return __result;
   },
@@ -49895,12 +49896,12 @@ export const TimeRecord_clockIn = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TimeRecord_clockIn", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTimeRecordClockIn(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TimeRecord_clockIn", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TimeRecord_clockIn", args.idempotencyKey), "TimeRecord_clockIn", __result);
     }
     return __result;
   },
@@ -49917,7 +49918,7 @@ export const TimeRecord_createViaClockIn = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TimeRecord_createViaClockIn", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -49964,7 +49965,7 @@ export const TimeRecord_createViaClockIn = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "clockIn", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TimeRecord_createViaClockIn", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TimeRecord_createViaClockIn", args.idempotencyKey), "TimeRecord_createViaClockIn", __result);
     }
     return __result;
   },
@@ -50030,12 +50031,12 @@ export const TimeRecord_clockOut = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TimeRecord_clockOut", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTimeRecordClockOut(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TimeRecord_clockOut", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TimeRecord_clockOut", args.idempotencyKey), "TimeRecord_clockOut", __result);
     }
     return __result;
   },
@@ -50108,12 +50109,12 @@ export const TimeRecord_correct = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TimeRecord_correct", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTimeRecordCorrect(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TimeRecord_correct", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TimeRecord_correct", args.idempotencyKey), "TimeRecord_correct", __result);
     }
     return __result;
   },
@@ -50184,12 +50185,12 @@ export const Trailer_register = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Trailer_register", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTrailerRegister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Trailer_register", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Trailer_register", args.idempotencyKey), "Trailer_register", __result);
     }
     return __result;
   },
@@ -50208,7 +50209,7 @@ export const Trailer_createViaRegister = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Trailer_createViaRegister", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -50253,7 +50254,7 @@ export const Trailer_createViaRegister = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "register", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Trailer_createViaRegister", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Trailer_createViaRegister", args.idempotencyKey), "Trailer_createViaRegister", __result);
     }
     return __result;
   },
@@ -50306,12 +50307,12 @@ export const Trailer_reviseDetails = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Trailer_reviseDetails", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTrailerReviseDetails(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Trailer_reviseDetails", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Trailer_reviseDetails", args.idempotencyKey), "Trailer_reviseDetails", __result);
     }
     return __result;
   },
@@ -50361,12 +50362,12 @@ export const Trailer_updateInsurance = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Trailer_updateInsurance", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTrailerUpdateInsurance(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Trailer_updateInsurance", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Trailer_updateInsurance", args.idempotencyKey), "Trailer_updateInsurance", __result);
     }
     return __result;
   },
@@ -50425,12 +50426,12 @@ export const Trailer_updateOperationalStatus = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Trailer_updateOperationalStatus", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTrailerUpdateOperationalStatus(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Trailer_updateOperationalStatus", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Trailer_updateOperationalStatus", args.idempotencyKey), "Trailer_updateOperationalStatus", __result);
     }
     return __result;
   },
@@ -50477,12 +50478,12 @@ export const Trailer_updateRegistration = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Trailer_updateRegistration", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTrailerUpdateRegistration(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Trailer_updateRegistration", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Trailer_updateRegistration", args.idempotencyKey), "Trailer_updateRegistration", __result);
     }
     return __result;
   },
@@ -50547,12 +50548,12 @@ export const TrainingCompletion_record = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TrainingCompletion_record", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTrainingCompletionRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TrainingCompletion_record", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TrainingCompletion_record", args.idempotencyKey), "TrainingCompletion_record", __result);
     }
     return __result;
   },
@@ -50570,7 +50571,7 @@ export const TrainingCompletion_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TrainingCompletion_createViaRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -50618,7 +50619,7 @@ export const TrainingCompletion_createViaRecord = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TrainingCompletion_createViaRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TrainingCompletion_createViaRecord", args.idempotencyKey), "TrainingCompletion_createViaRecord", __result);
     }
     return __result;
   },
@@ -50684,12 +50685,12 @@ export const TrainingModule_define = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TrainingModule_define", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTrainingModuleDefine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TrainingModule_define", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TrainingModule_define", args.idempotencyKey), "TrainingModule_define", __result);
     }
     return __result;
   },
@@ -50706,7 +50707,7 @@ export const TrainingModule_createViaDefine = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TrainingModule_createViaDefine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -50747,7 +50748,7 @@ export const TrainingModule_createViaDefine = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "define", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TrainingModule_createViaDefine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TrainingModule_createViaDefine", args.idempotencyKey), "TrainingModule_createViaDefine", __result);
     }
     return __result;
   },
@@ -50803,12 +50804,12 @@ export const TrainingModule_reactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TrainingModule_reactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTrainingModuleReactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TrainingModule_reactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TrainingModule_reactivate", args.idempotencyKey), "TrainingModule_reactivate", __result);
     }
     return __result;
   },
@@ -50865,12 +50866,12 @@ export const TrainingModule_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TrainingModule_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runTrainingModuleRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "TrainingModule_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "TrainingModule_retire", args.idempotencyKey), "TrainingModule_retire", __result);
     }
     return __result;
   },
@@ -50943,12 +50944,12 @@ export const Vehicle_register = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vehicle_register", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVehicleRegister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vehicle_register", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vehicle_register", args.idempotencyKey), "Vehicle_register", __result);
     }
     return __result;
   },
@@ -50968,7 +50969,7 @@ export const Vehicle_createViaRegister = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vehicle_createViaRegister", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -51015,7 +51016,7 @@ export const Vehicle_createViaRegister = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "register", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vehicle_createViaRegister", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vehicle_createViaRegister", args.idempotencyKey), "Vehicle_createViaRegister", __result);
     }
     return __result;
   },
@@ -51070,12 +51071,12 @@ export const Vehicle_reviseDetails = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vehicle_reviseDetails", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVehicleReviseDetails(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vehicle_reviseDetails", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vehicle_reviseDetails", args.idempotencyKey), "Vehicle_reviseDetails", __result);
     }
     return __result;
   },
@@ -51125,12 +51126,12 @@ export const Vehicle_updateInsurance = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vehicle_updateInsurance", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVehicleUpdateInsurance(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vehicle_updateInsurance", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vehicle_updateInsurance", args.idempotencyKey), "Vehicle_updateInsurance", __result);
     }
     return __result;
   },
@@ -51189,12 +51190,12 @@ export const Vehicle_updateOperationalStatus = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vehicle_updateOperationalStatus", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVehicleUpdateOperationalStatus(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vehicle_updateOperationalStatus", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vehicle_updateOperationalStatus", args.idempotencyKey), "Vehicle_updateOperationalStatus", __result);
     }
     return __result;
   },
@@ -51241,12 +51242,12 @@ export const Vehicle_updateRegistration = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vehicle_updateRegistration", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVehicleUpdateRegistration(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vehicle_updateRegistration", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vehicle_updateRegistration", args.idempotencyKey), "Vehicle_updateRegistration", __result);
     }
     return __result;
   },
@@ -51304,12 +51305,12 @@ export const VehicleFuelLog_record = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VehicleFuelLog_record", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVehicleFuelLogRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VehicleFuelLog_record", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VehicleFuelLog_record", args.idempotencyKey), "VehicleFuelLog_record", __result);
     }
     return __result;
   },
@@ -51327,7 +51328,7 @@ export const VehicleFuelLog_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VehicleFuelLog_createViaRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -51370,7 +51371,7 @@ export const VehicleFuelLog_createViaRecord = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VehicleFuelLog_createViaRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VehicleFuelLog_createViaRecord", args.idempotencyKey), "VehicleFuelLog_createViaRecord", __result);
     }
     return __result;
   },
@@ -51420,12 +51421,12 @@ export const VehicleMaintenanceSchedule_applyService = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VehicleMaintenanceSchedule_applyService", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVehicleMaintenanceScheduleApplyService(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VehicleMaintenanceSchedule_applyService", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VehicleMaintenanceSchedule_applyService", args.idempotencyKey), "VehicleMaintenanceSchedule_applyService", __result);
     }
     return __result;
   },
@@ -51488,12 +51489,12 @@ export const VehicleMaintenanceSchedule_schedule = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VehicleMaintenanceSchedule_schedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVehicleMaintenanceScheduleSchedule(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VehicleMaintenanceSchedule_schedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VehicleMaintenanceSchedule_schedule", args.idempotencyKey), "VehicleMaintenanceSchedule_schedule", __result);
     }
     return __result;
   },
@@ -51514,7 +51515,7 @@ export const VehicleMaintenanceSchedule_createViaSchedule = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VehicleMaintenanceSchedule_createViaSchedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -51562,7 +51563,7 @@ export const VehicleMaintenanceSchedule_createViaSchedule = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "schedule", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VehicleMaintenanceSchedule_createViaSchedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VehicleMaintenanceSchedule_createViaSchedule", args.idempotencyKey), "VehicleMaintenanceSchedule_createViaSchedule", __result);
     }
     return __result;
   },
@@ -51635,12 +51636,12 @@ export const VehicleServiceEntry_record = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VehicleServiceEntry_record", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVehicleServiceEntryRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VehicleServiceEntry_record", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VehicleServiceEntry_record", args.idempotencyKey), "VehicleServiceEntry_record", __result);
     }
     return __result;
   },
@@ -51662,7 +51663,7 @@ export const VehicleServiceEntry_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VehicleServiceEntry_createViaRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -51719,7 +51720,7 @@ export const VehicleServiceEntry_createViaRecord = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VehicleServiceEntry_createViaRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VehicleServiceEntry_createViaRecord", args.idempotencyKey), "VehicleServiceEntry_createViaRecord", __result);
     }
     return __result;
   },
@@ -51786,12 +51787,12 @@ export const Vendor_onboard = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vendor_onboard", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOnboard(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vendor_onboard", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vendor_onboard", args.idempotencyKey), "Vendor_onboard", __result);
     }
     return __result;
   },
@@ -51814,7 +51815,7 @@ export const Vendor_createViaOnboard = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vendor_createViaOnboard", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -51867,7 +51868,7 @@ export const Vendor_createViaOnboard = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "onboard", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vendor_createViaOnboard", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vendor_createViaOnboard", args.idempotencyKey), "Vendor_createViaOnboard", __result);
     }
     return __result;
   },
@@ -51927,12 +51928,12 @@ export const Vendor_reinstate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vendor_reinstate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorReinstate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vendor_reinstate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vendor_reinstate", args.idempotencyKey), "Vendor_reinstate", __result);
     }
     return __result;
   },
@@ -51994,12 +51995,12 @@ export const Vendor_suspend = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vendor_suspend", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorSuspend(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vendor_suspend", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vendor_suspend", args.idempotencyKey), "Vendor_suspend", __result);
     }
     return __result;
   },
@@ -52062,12 +52063,12 @@ export const Vendor_terminate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vendor_terminate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorTerminate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vendor_terminate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vendor_terminate", args.idempotencyKey), "Vendor_terminate", __result);
     }
     return __result;
   },
@@ -52134,12 +52135,12 @@ export const Vendor_updateDetails = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vendor_updateDetails", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorUpdateDetails(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vendor_updateDetails", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Vendor_updateDetails", args.idempotencyKey), "Vendor_updateDetails", __result);
     }
     return __result;
   },
@@ -52200,12 +52201,12 @@ export const VendorContact_add = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContact_add", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorContactAdd(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorContact_add", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContact_add", args.idempotencyKey), "VendorContact_add", __result);
     }
     return __result;
   },
@@ -52224,7 +52225,7 @@ export const VendorContact_createViaAdd = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContact_createViaAdd", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -52269,7 +52270,7 @@ export const VendorContact_createViaAdd = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "add", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorContact_createViaAdd", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContact_createViaAdd", args.idempotencyKey), "VendorContact_createViaAdd", __result);
     }
     return __result;
   },
@@ -52313,12 +52314,12 @@ export const VendorContact_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContact_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorContactRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorContact_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContact_remove", args.idempotencyKey), "VendorContact_remove", __result);
     }
     return __result;
   },
@@ -52372,12 +52373,12 @@ export const VendorContact_update = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContact_update", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorContactUpdate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorContact_update", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContact_update", args.idempotencyKey), "VendorContact_update", __result);
     }
     return __result;
   },
@@ -52435,12 +52436,12 @@ export const VendorContract_activate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContract_activate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorContractActivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorContract_activate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContract_activate", args.idempotencyKey), "VendorContract_activate", __result);
     }
     return __result;
   },
@@ -52508,12 +52509,12 @@ export const VendorContract_draft = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContract_draft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorContractDraft(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorContract_draft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContract_draft", args.idempotencyKey), "VendorContract_draft", __result);
     }
     return __result;
   },
@@ -52535,7 +52536,7 @@ export const VendorContract_createViaDraft = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContract_createViaDraft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -52589,7 +52590,7 @@ export const VendorContract_createViaDraft = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "draft", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorContract_createViaDraft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContract_createViaDraft", args.idempotencyKey), "VendorContract_createViaDraft", __result);
     }
     return __result;
   },
@@ -52645,12 +52646,12 @@ export const VendorContract_markExpired = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContract_markExpired", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorContractMarkExpired(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorContract_markExpired", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContract_markExpired", args.idempotencyKey), "VendorContract_markExpired", __result);
     }
     return __result;
   },
@@ -52708,12 +52709,12 @@ export const VendorContract_terminate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContract_terminate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorContractTerminate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorContract_terminate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContract_terminate", args.idempotencyKey), "VendorContract_terminate", __result);
     }
     return __result;
   },
@@ -52775,12 +52776,12 @@ export const VendorContract_updateTerms = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContract_updateTerms", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorContractUpdateTerms(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorContract_updateTerms", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContract_updateTerms", args.idempotencyKey), "VendorContract_updateTerms", __result);
     }
     return __result;
   },
@@ -52842,12 +52843,12 @@ export const VendorContractPriceTier_add = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContractPriceTier_add", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorContractPriceTierAdd(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorContractPriceTier_add", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContractPriceTier_add", args.idempotencyKey), "VendorContractPriceTier_add", __result);
     }
     return __result;
   },
@@ -52866,7 +52867,7 @@ export const VendorContractPriceTier_createViaAdd = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContractPriceTier_createViaAdd", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -52913,7 +52914,7 @@ export const VendorContractPriceTier_createViaAdd = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "add", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorContractPriceTier_createViaAdd", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContractPriceTier_createViaAdd", args.idempotencyKey), "VendorContractPriceTier_createViaAdd", __result);
     }
     return __result;
   },
@@ -52958,12 +52959,12 @@ export const VendorContractPriceTier_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContractPriceTier_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorContractPriceTierRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorContractPriceTier_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContractPriceTier_remove", args.idempotencyKey), "VendorContractPriceTier_remove", __result);
     }
     return __result;
   },
@@ -53020,12 +53021,12 @@ export const VendorContractPriceTier_update = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContractPriceTier_update", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorContractPriceTierUpdate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorContractPriceTier_update", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorContractPriceTier_update", args.idempotencyKey), "VendorContractPriceTier_update", __result);
     }
     return __result;
   },
@@ -53098,12 +53099,12 @@ export const VendorOrder_approve = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_approve", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderApprove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_approve", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_approve", args.idempotencyKey), "VendorOrder_approve", __result);
     }
     return __result;
   },
@@ -53169,12 +53170,12 @@ export const VendorOrder_cancel = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_cancel", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderCancel(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_cancel", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_cancel", args.idempotencyKey), "VendorOrder_cancel", __result);
     }
     return __result;
   },
@@ -53231,12 +53232,12 @@ export const VendorOrder_confirm = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_confirm", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderConfirm(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_confirm", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_confirm", args.idempotencyKey), "VendorOrder_confirm", __result);
     }
     return __result;
   },
@@ -53338,12 +53339,12 @@ export const VendorOrder_ensureWeeklyDraft = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_ensureWeeklyDraft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderEnsureWeeklyDraft(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_ensureWeeklyDraft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_ensureWeeklyDraft", args.idempotencyKey), "VendorOrder_ensureWeeklyDraft", __result);
     }
     return __result;
   },
@@ -53399,12 +53400,12 @@ export const VendorOrder_markPartiallyReceived = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_markPartiallyReceived", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderMarkPartiallyReceived(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_markPartiallyReceived", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_markPartiallyReceived", args.idempotencyKey), "VendorOrder_markPartiallyReceived", __result);
     }
     return __result;
   },
@@ -53461,12 +53462,12 @@ export const VendorOrder_markReceived = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_markReceived", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderMarkReceived(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_markReceived", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_markReceived", args.idempotencyKey), "VendorOrder_markReceived", __result);
     }
     return __result;
   },
@@ -53518,12 +53519,12 @@ export const VendorOrder_noteReceiptCorrection = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_noteReceiptCorrection", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderNoteReceiptCorrection(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_noteReceiptCorrection", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_noteReceiptCorrection", args.idempotencyKey), "VendorOrder_noteReceiptCorrection", __result);
     }
     return __result;
   },
@@ -53585,12 +53586,12 @@ export const VendorOrder_open = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_open", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderOpen(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_open", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_open", args.idempotencyKey), "VendorOrder_open", __result);
     }
     return __result;
   },
@@ -53609,7 +53610,7 @@ export const VendorOrder_createViaOpen = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_createViaOpen", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -53661,7 +53662,7 @@ export const VendorOrder_createViaOpen = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "open", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_createViaOpen", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_createViaOpen", args.idempotencyKey), "VendorOrder_createViaOpen", __result);
     }
     return __result;
   },
@@ -53726,12 +53727,12 @@ export const VendorOrder_requestChanges = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_requestChanges", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderRequestChanges(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_requestChanges", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_requestChanges", args.idempotencyKey), "VendorOrder_requestChanges", __result);
     }
     return __result;
   },
@@ -53796,12 +53797,12 @@ export const VendorOrder_retireEmptyDraft = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_retireEmptyDraft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderRetireEmptyDraft(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_retireEmptyDraft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_retireEmptyDraft", args.idempotencyKey), "VendorOrder_retireEmptyDraft", __result);
     }
     return __result;
   },
@@ -53873,12 +53874,12 @@ export const VendorOrder_submit = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_submit", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderSubmit(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_submit", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_submit", args.idempotencyKey), "VendorOrder_submit", __result);
     }
     return __result;
   },
@@ -53941,12 +53942,12 @@ export const VendorOrder_submitForApproval = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_submitForApproval", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderSubmitForApproval(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_submitForApproval", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_submitForApproval", args.idempotencyKey), "VendorOrder_submitForApproval", __result);
     }
     return __result;
   },
@@ -53993,12 +53994,12 @@ export const VendorOrder_syncLineTotals = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_syncLineTotals", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderSyncLineTotals(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_syncLineTotals", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_syncLineTotals", args.idempotencyKey), "VendorOrder_syncLineTotals", __result);
     }
     return __result;
   },
@@ -54050,12 +54051,12 @@ export const VendorOrder_updateTotals = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_updateTotals", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderUpdateTotals(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_updateTotals", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrder_updateTotals", args.idempotencyKey), "VendorOrder_updateTotals", __result);
     }
     return __result;
   },
@@ -54149,12 +54150,12 @@ export const VendorOrderLine_addLine = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_addLine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderLineAddLine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLine_addLine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_addLine", args.idempotencyKey), "VendorOrderLine_addLine", __result);
     }
     return __result;
   },
@@ -54174,7 +54175,7 @@ export const VendorOrderLine_createViaAddLine = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_createViaAddLine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -54241,7 +54242,7 @@ export const VendorOrderLine_createViaAddLine = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "addLine", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLine_createViaAddLine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_createViaAddLine", args.idempotencyKey), "VendorOrderLine_createViaAddLine", __result);
     }
     return __result;
   },
@@ -54305,12 +54306,12 @@ export const VendorOrderLine_cancelLine = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_cancelLine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderLineCancelLine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLine_cancelLine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_cancelLine", args.idempotencyKey), "VendorOrderLine_cancelLine", __result);
     }
     return __result;
   },
@@ -54351,12 +54352,12 @@ export const VendorOrderLine_commitSupply = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_commitSupply", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderLineCommitSupply(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLine_commitSupply", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_commitSupply", args.idempotencyKey), "VendorOrderLine_commitSupply", __result);
     }
     return __result;
   },
@@ -54460,12 +54461,12 @@ export const VendorOrderLine_correctReceipt = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_correctReceipt", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderLineCorrectReceipt(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLine_correctReceipt", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_correctReceipt", args.idempotencyKey), "VendorOrderLine_correctReceipt", __result);
     }
     return __result;
   },
@@ -54586,12 +54587,12 @@ export const VendorOrderLine_ensureWeeklyLine = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_ensureWeeklyLine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderLineEnsureWeeklyLine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLine_ensureWeeklyLine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_ensureWeeklyLine", args.idempotencyKey), "VendorOrderLine_ensureWeeklyLine", __result);
     }
     return __result;
   },
@@ -54656,12 +54657,12 @@ export const VendorOrderLine_reconcileDraftRequirement = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_reconcileDraftRequirement", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderLineReconcileDraftRequirement(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLine_reconcileDraftRequirement", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_reconcileDraftRequirement", args.idempotencyKey), "VendorOrderLine_reconcileDraftRequirement", __result);
     }
     return __result;
   },
@@ -54790,12 +54791,12 @@ export const VendorOrderLine_recordReceipt = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_recordReceipt", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderLineRecordReceipt(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLine_recordReceipt", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_recordReceipt", args.idempotencyKey), "VendorOrderLine_recordReceipt", __result);
     }
     return __result;
   },
@@ -54832,12 +54833,12 @@ export const VendorOrderLine_releaseSupply = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_releaseSupply", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderLineReleaseSupply(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLine_releaseSupply", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_releaseSupply", args.idempotencyKey), "VendorOrderLine_releaseSupply", __result);
     }
     return __result;
   },
@@ -54907,12 +54908,12 @@ export const VendorOrderLine_retireEmptyDraft = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_retireEmptyDraft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderLineRetireEmptyDraft(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLine_retireEmptyDraft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_retireEmptyDraft", args.idempotencyKey), "VendorOrderLine_retireEmptyDraft", __result);
     }
     return __result;
   },
@@ -54973,12 +54974,12 @@ export const VendorOrderLine_reviseQuantity = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_reviseQuantity", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderLineReviseQuantity(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLine_reviseQuantity", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLine_reviseQuantity", args.idempotencyKey), "VendorOrderLine_reviseQuantity", __result);
     }
     return __result;
   },
@@ -55044,12 +55045,12 @@ export const VendorOrderLineDemand_link = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLineDemand_link", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderLineDemandLink(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLineDemand_link", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLineDemand_link", args.idempotencyKey), "VendorOrderLineDemand_link", __result);
     }
     return __result;
   },
@@ -55067,7 +55068,7 @@ export const VendorOrderLineDemand_createViaLink = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLineDemand_createViaLink", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -55116,7 +55117,7 @@ export const VendorOrderLineDemand_createViaLink = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "link", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLineDemand_createViaLink", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLineDemand_createViaLink", args.idempotencyKey), "VendorOrderLineDemand_createViaLink", __result);
     }
     return __result;
   },
@@ -55164,12 +55165,12 @@ export const VendorOrderLineDemand_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLineDemand_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderLineDemandRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLineDemand_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLineDemand_retire", args.idempotencyKey), "VendorOrderLineDemand_retire", __result);
     }
     return __result;
   },
@@ -55216,12 +55217,12 @@ export const VendorOrderLineDemand_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLineDemand_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVendorOrderLineDemandRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLineDemand_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VendorOrderLineDemand_revise", args.idempotencyKey), "VendorOrderLineDemand_revise", __result);
     }
     return __result;
   },
@@ -55280,12 +55281,12 @@ export const Venue_activate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Venue_activate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueActivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Venue_activate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Venue_activate", args.idempotencyKey), "Venue_activate", __result);
     }
     return __result;
   },
@@ -55332,12 +55333,12 @@ export const Venue_changeCapacity = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Venue_changeCapacity", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueChangeCapacity(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Venue_changeCapacity", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Venue_changeCapacity", args.idempotencyKey), "Venue_changeCapacity", __result);
     }
     return __result;
   },
@@ -55398,12 +55399,12 @@ export const Venue_deactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Venue_deactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueDeactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Venue_deactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Venue_deactivate", args.idempotencyKey), "Venue_deactivate", __result);
     }
     return __result;
   },
@@ -55508,12 +55509,12 @@ export const Venue_register = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Venue_register", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueRegister(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Venue_register", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Venue_register", args.idempotencyKey), "Venue_register", __result);
     }
     return __result;
   },
@@ -55555,7 +55556,7 @@ export const Venue_createViaRegister = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Venue_createViaRegister", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -55646,7 +55647,7 @@ export const Venue_createViaRegister = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "register", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Venue_createViaRegister", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Venue_createViaRegister", args.idempotencyKey), "Venue_createViaRegister", __result);
     }
     return __result;
   },
@@ -55746,12 +55747,12 @@ export const Venue_updateDetails = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Venue_updateDetails", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueUpdateDetails(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Venue_updateDetails", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Venue_updateDetails", args.idempotencyKey), "Venue_updateDetails", __result);
     }
     return __result;
   },
@@ -55798,12 +55799,12 @@ export const VenueCommissionTerm_define = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueCommissionTerm_define", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueCommissionTermDefine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueCommissionTerm_define", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueCommissionTerm_define", args.idempotencyKey), "VenueCommissionTerm_define", __result);
     }
     return __result;
   },
@@ -55821,7 +55822,7 @@ export const VenueCommissionTerm_createViaDefine = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueCommissionTerm_createViaDefine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -55856,7 +55857,7 @@ export const VenueCommissionTerm_createViaDefine = mutation({
     const docId = await ctx.db.insert("venueCommissionTerms", doc as any);
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueCommissionTerm_createViaDefine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueCommissionTerm_createViaDefine", args.idempotencyKey), "VenueCommissionTerm_createViaDefine", __result);
     }
     return __result;
   },
@@ -55896,12 +55897,12 @@ export const VenueCommissionTerm_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueCommissionTerm_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueCommissionTermRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueCommissionTerm_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueCommissionTerm_retire", args.idempotencyKey), "VenueCommissionTerm_retire", __result);
     }
     return __result;
   },
@@ -55945,12 +55946,12 @@ export const VenueCommissionTerm_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueCommissionTerm_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueCommissionTermRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueCommissionTerm_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueCommissionTerm_revise", args.idempotencyKey), "VenueCommissionTerm_revise", __result);
     }
     return __result;
   },
@@ -56008,12 +56009,12 @@ export const VenueLayoutTemplate_archive = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueLayoutTemplate_archive", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueLayoutTemplateArchive(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueLayoutTemplate_archive", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueLayoutTemplate_archive", args.idempotencyKey), "VenueLayoutTemplate_archive", __result);
     }
     return __result;
   },
@@ -56064,12 +56065,12 @@ export const VenueLayoutTemplate_define = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueLayoutTemplate_define", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueLayoutTemplateDefine(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueLayoutTemplate_define", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueLayoutTemplate_define", args.idempotencyKey), "VenueLayoutTemplate_define", __result);
     }
     return __result;
   },
@@ -56086,7 +56087,7 @@ export const VenueLayoutTemplate_createViaDefine = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueLayoutTemplate_createViaDefine", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -56124,7 +56125,7 @@ export const VenueLayoutTemplate_createViaDefine = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "define", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueLayoutTemplate_createViaDefine", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueLayoutTemplate_createViaDefine", args.idempotencyKey), "VenueLayoutTemplate_createViaDefine", __result);
     }
     return __result;
   },
@@ -56180,12 +56181,12 @@ export const VenueLayoutTemplate_reactivate = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueLayoutTemplate_reactivate", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueLayoutTemplateReactivate(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueLayoutTemplate_reactivate", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueLayoutTemplate_reactivate", args.idempotencyKey), "VenueLayoutTemplate_reactivate", __result);
     }
     return __result;
   },
@@ -56234,12 +56235,12 @@ export const VenueLayoutTemplate_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueLayoutTemplate_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueLayoutTemplateRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueLayoutTemplate_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueLayoutTemplate_revise", args.idempotencyKey), "VenueLayoutTemplate_revise", __result);
     }
     return __result;
   },
@@ -56282,12 +56283,12 @@ export const VenueNote_pin = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueNote_pin", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueNotePin(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueNote_pin", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueNote_pin", args.idempotencyKey), "VenueNote_pin", __result);
     }
     return __result;
   },
@@ -56347,12 +56348,12 @@ export const VenueNote_post = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueNote_post", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueNotePost(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueNote_post", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueNote_post", args.idempotencyKey), "VenueNote_post", __result);
     }
     return __result;
   },
@@ -56371,7 +56372,7 @@ export const VenueNote_createViaPost = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueNote_createViaPost", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -56417,7 +56418,7 @@ export const VenueNote_createViaPost = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "post", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueNote_createViaPost", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueNote_createViaPost", args.idempotencyKey), "VenueNote_createViaPost", __result);
     }
     return __result;
   },
@@ -56459,12 +56460,12 @@ export const VenueNote_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueNote_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueNoteRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueNote_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueNote_remove", args.idempotencyKey), "VenueNote_remove", __result);
     }
     return __result;
   },
@@ -56513,12 +56514,12 @@ export const VenueNote_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueNote_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueNoteRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueNote_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueNote_revise", args.idempotencyKey), "VenueNote_revise", __result);
     }
     return __result;
   },
@@ -56561,12 +56562,12 @@ export const VenueNote_unpin = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueNote_unpin", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueNoteUnpin(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueNote_unpin", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueNote_unpin", args.idempotencyKey), "VenueNote_unpin", __result);
     }
     return __result;
   },
@@ -56623,12 +56624,12 @@ export const VenueRoom_add = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueRoom_add", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueRoomAdd(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueRoom_add", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueRoom_add", args.idempotencyKey), "VenueRoom_add", __result);
     }
     return __result;
   },
@@ -56647,7 +56648,7 @@ export const VenueRoom_createViaAdd = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueRoom_createViaAdd", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -56690,7 +56691,7 @@ export const VenueRoom_createViaAdd = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "add", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueRoom_createViaAdd", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueRoom_createViaAdd", args.idempotencyKey), "VenueRoom_createViaAdd", __result);
     }
     return __result;
   },
@@ -56732,12 +56733,12 @@ export const VenueRoom_remove = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueRoom_remove", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueRoomRemove(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueRoom_remove", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueRoom_remove", args.idempotencyKey), "VenueRoom_remove", __result);
     }
     return __result;
   },
@@ -56791,12 +56792,12 @@ export const VenueRoom_revise = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueRoom_revise", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueRoomRevise(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueRoom_revise", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueRoom_revise", args.idempotencyKey), "VenueRoom_revise", __result);
     }
     return __result;
   },
@@ -56880,12 +56881,12 @@ export const VenueVendorRelationship_establish = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueVendorRelationship_establish", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueVendorRelationshipEstablish(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueVendorRelationship_establish", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueVendorRelationship_establish", args.idempotencyKey), "VenueVendorRelationship_establish", __result);
     }
     return __result;
   },
@@ -56912,7 +56913,7 @@ export const VenueVendorRelationship_createViaEstablish = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueVendorRelationship_createViaEstablish", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -56970,7 +56971,7 @@ export const VenueVendorRelationship_createViaEstablish = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "establish", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueVendorRelationship_createViaEstablish", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueVendorRelationship_createViaEstablish", args.idempotencyKey), "VenueVendorRelationship_createViaEstablish", __result);
     }
     return __result;
   },
@@ -57016,12 +57017,12 @@ export const VenueVendorRelationship_retire = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueVendorRelationship_retire", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueVendorRelationshipRetire(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueVendorRelationship_retire", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueVendorRelationship_retire", args.idempotencyKey), "VenueVendorRelationship_retire", __result);
     }
     return __result;
   },
@@ -57088,12 +57089,12 @@ export const VenueVendorRelationship_reviseDetails = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueVendorRelationship_reviseDetails", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueVendorRelationshipReviseDetails(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueVendorRelationship_reviseDetails", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueVendorRelationship_reviseDetails", args.idempotencyKey), "VenueVendorRelationship_reviseDetails", __result);
     }
     return __result;
   },
@@ -57150,12 +57151,12 @@ export const VenueVendorRelationship_reviseStatus = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueVendorRelationship_reviseStatus", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runVenueVendorRelationshipReviseStatus(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "VenueVendorRelationship_reviseStatus", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "VenueVendorRelationship_reviseStatus", args.idempotencyKey), "VenueVendorRelationship_reviseStatus", __result);
     }
     return __result;
   },
@@ -57243,12 +57244,12 @@ export const WasteRecord_record = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WasteRecord_record", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runWasteRecordRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "WasteRecord_record", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WasteRecord_record", args.idempotencyKey), "WasteRecord_record", __result);
     }
     return __result;
   },
@@ -57270,7 +57271,7 @@ export const WasteRecord_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WasteRecord_createViaRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -57331,7 +57332,7 @@ export const WasteRecord_createViaRecord = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "WasteRecord_createViaRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WasteRecord_createViaRecord", args.idempotencyKey), "WasteRecord_createViaRecord", __result);
     }
     return __result;
   },
@@ -57394,12 +57395,12 @@ export const WasteRecord_voidRecord = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WasteRecord_voidRecord", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runWasteRecordVoidRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "WasteRecord_voidRecord", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WasteRecord_voidRecord", args.idempotencyKey), "WasteRecord_voidRecord", __result);
     }
     return __result;
   },
@@ -57440,12 +57441,12 @@ export const WeeklyPurchasingConfig_configure = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WeeklyPurchasingConfig_configure", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runWeeklyPurchasingConfigConfigure(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "WeeklyPurchasingConfig_configure", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WeeklyPurchasingConfig_configure", args.idempotencyKey), "WeeklyPurchasingConfig_configure", __result);
     }
     return __result;
   },
@@ -57459,7 +57460,7 @@ export const WeeklyPurchasingConfig_createViaConfigure = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WeeklyPurchasingConfig_createViaConfigure", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -57486,7 +57487,7 @@ export const WeeklyPurchasingConfig_createViaConfigure = mutation({
     const docId = await ctx.db.insert("weeklyPurchasingConfigs", doc as any);
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "WeeklyPurchasingConfig_createViaConfigure", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WeeklyPurchasingConfig_createViaConfigure", args.idempotencyKey), "WeeklyPurchasingConfig_createViaConfigure", __result);
     }
     return __result;
   },
@@ -57563,12 +57564,12 @@ export const WeeklyPurchasingConfig_routeNeed = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WeeklyPurchasingConfig_routeNeed", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runWeeklyPurchasingConfigRouteNeed(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "WeeklyPurchasingConfig_routeNeed", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WeeklyPurchasingConfig_routeNeed", args.idempotencyKey), "WeeklyPurchasingConfig_routeNeed", __result);
     }
     return __result;
   },
@@ -57607,12 +57608,12 @@ export const WeeklyPurchasingConfig_setOrderApprovalThreshold = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WeeklyPurchasingConfig_setOrderApprovalThreshold", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runWeeklyPurchasingConfigSetOrderApprovalThreshold(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "WeeklyPurchasingConfig_setOrderApprovalThreshold", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WeeklyPurchasingConfig_setOrderApprovalThreshold", args.idempotencyKey), "WeeklyPurchasingConfig_setOrderApprovalThreshold", __result);
     }
     return __result;
   },
@@ -57657,12 +57658,12 @@ export const WeeklyScheduleNotice_acknowledge = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WeeklyScheduleNotice_acknowledge", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runWeeklyScheduleNoticeAcknowledge(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "WeeklyScheduleNotice_acknowledge", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WeeklyScheduleNotice_acknowledge", args.idempotencyKey), "WeeklyScheduleNotice_acknowledge", __result);
     }
     return __result;
   },
@@ -57725,12 +57726,12 @@ export const WeeklyScheduleNotice_publishSchedule = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WeeklyScheduleNotice_publishSchedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runWeeklyScheduleNoticePublishSchedule(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "WeeklyScheduleNotice_publishSchedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WeeklyScheduleNotice_publishSchedule", args.idempotencyKey), "WeeklyScheduleNotice_publishSchedule", __result);
     }
     return __result;
   },
@@ -57749,7 +57750,7 @@ export const WeeklyScheduleNotice_createViaPublishSchedule = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WeeklyScheduleNotice_createViaPublishSchedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -57797,7 +57798,7 @@ export const WeeklyScheduleNotice_createViaPublishSchedule = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "publishSchedule", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "WeeklyScheduleNotice_createViaPublishSchedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WeeklyScheduleNotice_createViaPublishSchedule", args.idempotencyKey), "WeeklyScheduleNotice_createViaPublishSchedule", __result);
     }
     return __result;
   },
@@ -57849,12 +57850,12 @@ export const WeeklyScheduleNotice_republishSchedule = mutation({
   handler: async (ctx, args) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WeeklyScheduleNotice_republishSchedule", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __result = await __runWeeklyScheduleNoticeRepublishSchedule(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "WeeklyScheduleNotice_republishSchedule", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "WeeklyScheduleNotice_republishSchedule", args.idempotencyKey), "WeeklyScheduleNotice_republishSchedule", __result);
     }
     return __result;
   },
@@ -57892,7 +57893,7 @@ export const Event_createViaCaptureDraft = mutation({
   handler: async (ctx, args: any) => {
     await __assertOwnWorkspaceLinks(ctx, args);
     if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      const __cached = await __getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_createViaCaptureDraft", args.idempotencyKey));
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
@@ -57980,7 +57981,7 @@ export const Event_createViaCaptureDraft = mutation({
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "captureDraft", emitIndex: 0 });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_createViaCaptureDraft", __result);
+      await __setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "Event_createViaCaptureDraft", args.idempotencyKey), "Event_createViaCaptureDraft", __result);
     }
     return __result;
   },

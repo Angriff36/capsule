@@ -19,32 +19,83 @@ const IMPORT =
 const HANDLER = /^ {2}handler: async \(ctx, args(?:: any)?\) => \{\n/gm;
 const CALL = "    await __assertOwnWorkspaceLinks(ctx, args);\n";
 
+/**
+ * The generated idempotency cache is keyed by the caller's key alone, so a
+ * caller of another workspace sending a known key got the saved answer. Every
+ * lookup and store goes through convex/lib/commandIdempotency.ts, which scopes
+ * the key to the caller's workspace and the step.
+ */
+const SCOPE_IMPORT =
+  'import { scopedCommandKey as __scopedCommandKey } from "./lib/commandIdempotency";\n';
+const MUTATION_START = /^export const (\w+) = mutation\(\{$/gm;
+const GET_CALL = "__getCommandIdempotency(ctx, args.idempotencyKey)";
+const SET_CALL =
+  /__setCommandIdempotency\(ctx, args\.idempotencyKey, "(\w+)", /g;
+
 export function applyOwnWorkspaceLinks(root: string = ROOT): string[] {
   const abs = join(root, TARGET);
   if (!existsSync(abs)) {
     throw new Error(`apply-own-workspace-links: missing ${TARGET}`);
   }
   const source = readFileSync(abs, "utf8");
-  if (source.includes(IMPORT)) {
-    refreshOwnershipDigest(root, abs);
-    return [];
-  }
   if (!source.includes(IMPORT_ANCHOR)) {
     throw new Error("apply-own-workspace-links: auth import anchor not found");
   }
-  const mutations = source.match(/= mutation\(\{/g)?.length ?? 0;
-  const handlers = source.match(HANDLER)?.length ?? 0;
-  if (handlers !== mutations) {
-    throw new Error(
-      `apply-own-workspace-links: ${String(handlers)} handlers for ${String(mutations)} mutations`,
-    );
+  let updated = source;
+  if (!updated.includes(IMPORT)) {
+    const mutations = updated.match(/= mutation\(\{/g)?.length ?? 0;
+    const handlers = updated.match(HANDLER)?.length ?? 0;
+    if (handlers !== mutations) {
+      throw new Error(
+        `apply-own-workspace-links: ${String(handlers)} handlers for ${String(mutations)} mutations`,
+      );
+    }
+    updated = updated
+      .replace(IMPORT_ANCHOR, `${IMPORT_ANCHOR}${IMPORT}`)
+      .replace(HANDLER, (line) => `${line}${CALL}`);
   }
-  const updated = source
-    .replace(IMPORT_ANCHOR, `${IMPORT_ANCHOR}${IMPORT}`)
-    .replace(HANDLER, (line) => `${line}${CALL}`);
+  if (!updated.includes(SCOPE_IMPORT)) {
+    updated = scopeIdempotencyKeys(updated);
+  }
+  if (updated === source) {
+    refreshOwnershipDigest(root, abs);
+    return [];
+  }
   writeFileSync(abs, updated, "utf8");
   refreshOwnershipDigest(root, abs);
   return [TARGET];
+}
+
+function scopeIdempotencyKeys(source: string): string {
+  const starts = [...source.matchAll(MUTATION_START)];
+  let out = source.slice(0, starts[0]?.index ?? source.length);
+  for (let i = 0; i < starts.length; i += 1) {
+    const name = starts[i][1];
+    const end = starts[i + 1]?.index ?? source.length;
+    let block = source.slice(starts[i].index, end);
+    if (block.includes(GET_CALL)) {
+      block = block
+        .replace(
+          GET_CALL,
+          `__getCommandIdempotency(ctx, await __scopedCommandKey(ctx, "${name}", args.idempotencyKey))`,
+        )
+        .replace(SET_CALL, (call, command: string) => {
+          if (command !== name) {
+            throw new Error(
+              `apply-own-workspace-links: ${name} saves its answer as ${command}`,
+            );
+          }
+          return `__setCommandIdempotency(ctx, await __scopedCommandKey(ctx, "${name}", args.idempotencyKey), "${name}", `;
+        });
+    }
+    out += block;
+  }
+  if (/__(get|set)CommandIdempotency\(ctx, args\.idempotencyKey/.test(out)) {
+    throw new Error(
+      "apply-own-workspace-links: an unscoped idempotency lookup is left",
+    );
+  }
+  return out.replace(IMPORT_ANCHOR, `${IMPORT_ANCHOR}${SCOPE_IMPORT}`);
 }
 
 function refreshOwnershipDigest(root: string, abs: string): void {
