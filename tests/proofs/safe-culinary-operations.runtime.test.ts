@@ -474,7 +474,6 @@ describe("runtime proof: safe culinary operations", () => {
         {
           componentId: component.docId,
           versionNumber: 1,
-          capturedByName: "Chef",
           changeSummary: name,
           snapshot: JSON.stringify({
             name,
@@ -604,7 +603,6 @@ describe("runtime proof: safe culinary operations", () => {
       {
         componentId: component.docId,
         versionNumber: 1,
-        capturedByName: "Chef",
         changeSummary: "Exact",
         snapshot: JSON.stringify(capturedShape),
       },
@@ -663,7 +661,6 @@ describe("runtime proof: safe culinary operations", () => {
       {
         componentId: component.docId,
         versionNumber: 2,
-        capturedByName: "Chef",
         changeSummary: "Different target",
         snapshot: JSON.stringify({ ...capturedShape, name: "Different" }),
       },

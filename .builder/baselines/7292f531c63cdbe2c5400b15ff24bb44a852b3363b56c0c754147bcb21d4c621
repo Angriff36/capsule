@@ -113,9 +113,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.ComponentPortionSpec_createViaDefine, { "componentId": "componentId-component-portion-spec-2", "name": "ComponentPortionSpec 2", "pieceQuantity": 2, "pieceUnit": "demo-pieceUnit-2", "piecesPerBatch": 2, "source": "demo-source-2" } as any);
   // ComponentSnapshot → api.mutations.ComponentSnapshot_createViaCapture
   rowsAttempted += 1;
-  await client.mutation(api.mutations.ComponentSnapshot_createViaCapture, { "componentId": "componentId-component-snapshot-1", "versionNumber": 1, "capturedByName": "ComponentSnapshot 1", "changeSummary": "demo-changeSummary-1", "snapshot": "demo-snapshot-1" } as any);
+  await client.mutation(api.mutations.ComponentSnapshot_createViaCapture, { "componentId": "componentId-component-snapshot-1", "versionNumber": 1, "changeSummary": "demo-changeSummary-1", "snapshot": "demo-snapshot-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.ComponentSnapshot_createViaCapture, { "componentId": "componentId-component-snapshot-2", "versionNumber": 2, "capturedByName": "ComponentSnapshot 2", "changeSummary": "demo-changeSummary-2", "snapshot": "demo-snapshot-2" } as any);
+  await client.mutation(api.mutations.ComponentSnapshot_createViaCapture, { "componentId": "componentId-component-snapshot-2", "versionNumber": 2, "changeSummary": "demo-changeSummary-2", "snapshot": "demo-snapshot-2" } as any);
   // ComponentStep has multiple initialization commands (add, remove); using the selected initialization command: add.
   // ComponentStep → api.mutations.ComponentStep_createViaAdd
   rowsAttempted += 1;
@@ -528,9 +528,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.ProposalLineItem_createViaAddLine, { "proposalId": "proposalId-proposal-line-item-2", "description": "demo-description-2", "pricingBasis": "demo-pricingBasis-2", "unitPrice": 2, "quantity": 2, "unit": "demo-unit-2", "amount": 2, "sortOrder": 2, "notes": "demo-notes-2", "menuDishId": "menuDishId-proposal-line-item-2", "overrideReason": "demo-overrideReason-2" } as any);
   // ProposalRevision → api.mutations.ProposalRevision_createViaCapture
   rowsAttempted += 1;
-  await client.mutation(api.mutations.ProposalRevision_createViaCapture, { "proposalId": "proposalId-proposal-revision-1", "revisionNumber": 1, "changeSummary": "demo-changeSummary-1", "capturedByName": "ProposalRevision 1", "snapshot": "demo-snapshot-1" } as any);
+  await client.mutation(api.mutations.ProposalRevision_createViaCapture, { "proposalId": "proposalId-proposal-revision-1", "revisionNumber": 1, "changeSummary": "demo-changeSummary-1", "snapshot": "demo-snapshot-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.ProposalRevision_createViaCapture, { "proposalId": "proposalId-proposal-revision-2", "revisionNumber": 2, "changeSummary": "demo-changeSummary-2", "capturedByName": "ProposalRevision 2", "snapshot": "demo-snapshot-2" } as any);
+  await client.mutation(api.mutations.ProposalRevision_createViaCapture, { "proposalId": "proposalId-proposal-revision-2", "revisionNumber": 2, "changeSummary": "demo-changeSummary-2", "snapshot": "demo-snapshot-2" } as any);
   // ProposalTemplate → api.mutations.ProposalTemplate_createViaDefine
   rowsAttempted += 1;
   await client.mutation(api.mutations.ProposalTemplate_createViaDefine, { "name": "ProposalTemplate 1", "description": "demo-description-1", "visibleSections": "demo-visibleSections-1", "defaultTerms": "demo-defaultTerms-1", "defaultNotes": "demo-defaultNotes-1", "defaultTaxRate": 1, "defaultServiceChargePercent": 1, "validityDays": 1 } as any);

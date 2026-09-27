@@ -147,7 +147,6 @@ async function captureLaterRevision(
     {
       proposalId,
       revisionNumber,
-      capturedByName: "Proof Owner",
       changeSummary: `Later revision ${revisionNumber}`,
       snapshot,
     },
@@ -580,7 +579,6 @@ describe("accepted revision link (AC-413 / AC-434)", () => {
       docId: revisionId,
       proposalId,
       revisionNumber: 1,
-      capturedByName: "Proof Owner",
       changeSummary: "Captured before acceptance",
       snapshot: uncapturedSnapshot,
     });

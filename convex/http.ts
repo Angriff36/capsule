@@ -391,8 +391,8 @@ const COMMAND_DISPATCH = {
   },
   "ComponentSnapshot.capture": {
     ref: api.mutations.ComponentSnapshot_createViaCapture,
-    params: ["componentId","versionNumber","capturedByName","changeSummary","snapshot","idempotencyKey"] as const,
-    paramMeta: [{"name":"componentId","type":"uuid","required":true},{"name":"versionNumber","type":"int","required":true},{"name":"capturedByName","type":"string","required":true},{"name":"changeSummary","type":"string","required":true},{"name":"snapshot","type":"string","required":true},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["componentId","versionNumber","changeSummary","snapshot","idempotencyKey"] as const,
+    paramMeta: [{"name":"componentId","type":"uuid","required":true},{"name":"versionNumber","type":"int","required":true},{"name":"changeSummary","type":"string","required":true},{"name":"snapshot","type":"string","required":true},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "ComponentStep.add": {
     ref: api.mutations.ComponentStep_createViaAdd,
@@ -2661,8 +2661,8 @@ const COMMAND_DISPATCH = {
   },
   "ProposalRevision.capture": {
     ref: api.mutations.ProposalRevision_createViaCapture,
-    params: ["proposalId","revisionNumber","capturedByName","changeSummary","snapshot","idempotencyKey"] as const,
-    paramMeta: [{"name":"proposalId","type":"uuid","required":true},{"name":"revisionNumber","type":"int","required":true},{"name":"capturedByName","type":"string","required":true},{"name":"changeSummary","type":"string","required":true},{"name":"snapshot","type":"string","required":true},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["proposalId","revisionNumber","changeSummary","snapshot","idempotencyKey"] as const,
+    paramMeta: [{"name":"proposalId","type":"uuid","required":true},{"name":"revisionNumber","type":"int","required":true},{"name":"changeSummary","type":"string","required":true},{"name":"snapshot","type":"string","required":true},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "ProposalTemplate.archive": {
     ref: api.mutations.ProposalTemplate_archive,

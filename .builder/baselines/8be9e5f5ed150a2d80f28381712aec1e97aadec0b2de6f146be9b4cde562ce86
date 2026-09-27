@@ -4735,7 +4735,6 @@ export type ComponentPortionSpecReviseParams = z.infer<typeof ComponentPortionSp
 export const ComponentSnapshotCaptureParamsSchema = z.object({
   componentId: z.string().min(1),
   versionNumber: z.number().int(),
-  capturedByName: z.string(),
   changeSummary: z.string(),
   snapshot: z.string(),
 });
@@ -8577,7 +8576,6 @@ export type ProposalLineItemReviseLineParams = z.infer<typeof ProposalLineItemRe
 export const ProposalRevisionCaptureParamsSchema = z.object({
   proposalId: z.string().min(1),
   revisionNumber: z.number().int(),
-  capturedByName: z.string(),
   changeSummary: z.string(),
   snapshot: z.string(),
 });

@@ -246,4 +246,98 @@ describe("runtime proof: records keep the signed-in author (AC-210 / AC-372)", (
     const retired = (await read()) as { revisedByPersonId?: string | null };
     expect(retired.revisedByPersonId).toBe(facility.personId);
   });
+
+  it("saved recipe versions and proposal versions take the saver's name from the sign-in", async () => {
+    const proof = harness();
+    const tenantId = "tenant-record-author-versions";
+    const saver = await hireStaff(proof, tenantId, "saver", "admin");
+    const staff = proof.asRole({
+      subject: saver.authSubjectId,
+      role: "admin",
+      tenantId,
+    });
+    const unlinked = proof.asRole({
+      subject: "record-author-unlinked-versions",
+      role: "admin",
+      tenantId,
+    });
+
+    // Recipe history ("Riley saver · <time>" on the recipe page).
+    const component = (await staff.mutation(M.Component_createViaDraft, {
+      name: "Version name proof",
+      yieldQuantity: 1,
+      yieldUnit: "batch",
+    } as never)) as { docId: string };
+    const recipeVersion = {
+      componentId: component.docId,
+      versionNumber: 1,
+      changeSummary: "Before edit",
+      snapshot: JSON.stringify({ name: "Version name proof", lines: [] }),
+    };
+    expect(
+      await refused(() =>
+        staff.mutation(M.ComponentSnapshot_createViaCapture, {
+          ...recipeVersion,
+          capturedByName: "Someone Else",
+        } as never),
+      ),
+    ).toBe(true);
+    const saved = (await staff.mutation(
+      M.ComponentSnapshot_createViaCapture,
+      recipeVersion as never,
+    )) as { docId: string };
+    const savedRow = (await staff.run(async (ctx) =>
+      ctx.db.get(saved.docId as never),
+    )) as { capturedByName: string; capturedByAuthSubjectId: string };
+    expect(savedRow.capturedByName).toBe("Riley saver");
+    expect(savedRow.capturedByAuthSubjectId).toBe(saver.authSubjectId);
+
+    // A sign-in with no staff profile saves no name rather than a made-up one.
+    const blank = (await unlinked.mutation(
+      M.ComponentSnapshot_createViaCapture,
+      { ...recipeVersion, versionNumber: 2 } as never,
+    )) as { docId: string };
+    const blankRow = (await staff.run(async (ctx) =>
+      ctx.db.get(blank.docId as never),
+    )) as { capturedByName: string };
+    expect(blankRow.capturedByName).toBe("");
+
+    // Proposal versions saved through the command.
+    const client = (await staff.mutation(M.Client_createViaRegister, {
+      clientType: "company",
+      companyName: "Version name client",
+    } as never)) as { docId: string };
+    const proposal = (await staff.mutation(M.Proposal_createViaDraft, {
+      clientId: client.docId,
+      title: "Version name proposal",
+      subtotal: 100,
+      taxAmount: 0,
+      discountAmount: 0,
+      total: 100,
+    } as never)) as { docId: string };
+    const proposalVersion = {
+      proposalId: proposal.docId,
+      revisionNumber: 1,
+      changeSummary: "First version",
+      snapshot: JSON.stringify({
+        proposal: { title: "Version name proposal" },
+      }),
+    };
+    expect(
+      await refused(() =>
+        staff.mutation(M.ProposalRevision_createViaCapture, {
+          ...proposalVersion,
+          capturedByName: "Someone Else",
+        } as never),
+      ),
+    ).toBe(true);
+    const revision = (await staff.mutation(
+      M.ProposalRevision_createViaCapture,
+      proposalVersion as never,
+    )) as { docId: string };
+    const revisionRow = (await staff.run(async (ctx) =>
+      ctx.db.get(revision.docId as never),
+    )) as { capturedByName: string };
+    expect(revisionRow.capturedByName).toBe("Riley saver");
+  });
 });

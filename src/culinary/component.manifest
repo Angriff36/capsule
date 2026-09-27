@@ -450,8 +450,9 @@ entity ComponentSnapshot mixin TenantScoped, SoftDeletable {
 
   property required componentId: uuid
   property required versionNumber: int = 1
+  // Name and auth subject are stamped from trusted auth context on capture;
+  // never accepted from the browser.
   property required capturedByName: string = ""
-  // Stamped from trusted auth context on capture; never accepted from browser.
   property capturedByAuthSubjectId: string?
   property required changeSummary: string = ""
   // JSON blob of the full component at capture time: name, category, cuisine,
@@ -468,7 +469,6 @@ entity ComponentSnapshot mixin TenantScoped, SoftDeletable {
   command capture(
     componentId: uuid,
     versionNumber: int,
-    capturedByName: string,
     changeSummary: string,
     snapshot: string
   ) {
@@ -478,7 +478,7 @@ entity ComponentSnapshot mixin TenantScoped, SoftDeletable {
     constraint captureSnapshotPayload: length(trim(snapshot)) > 0 "This recipe version has nothing to save."
     mutate componentId = componentId
     mutate versionNumber = versionNumber
-    mutate capturedByName = capturedByName
+    mutate capturedByName = user.personName != null ? user.personName : ""
     mutate capturedByAuthSubjectId = user.id
     mutate changeSummary = changeSummary
     mutate snapshot = snapshot

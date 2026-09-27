@@ -6248,7 +6248,7 @@ export const ComponentPortionSpec_revise = mutation({
   },
 });
 
-async function __runComponentSnapshotCapture(ctx: MutationCtx, { docId, componentId, versionNumber, capturedByName, changeSummary, snapshot, version }: any, __creation = false) {
+async function __runComponentSnapshotCapture(ctx: MutationCtx, { docId, componentId, versionNumber, changeSummary, snapshot, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -6267,7 +6267,7 @@ async function __runComponentSnapshotCapture(ctx: MutationCtx, { docId, componen
     const updates = {
       componentId: componentId,
       versionNumber: versionNumber,
-      capturedByName: capturedByName,
+      capturedByName: ((user.personName != null) ? user.personName : ""),
       capturedByAuthSubjectId: user.id,
       changeSummary: changeSummary,
       snapshot: snapshot,
@@ -6288,7 +6288,6 @@ export const ComponentSnapshot_capture = mutation({
     docId: v.id("componentSnapshots"),
     componentId: v.string(),
     versionNumber: v.number(),
-    capturedByName: v.string(),
     changeSummary: v.string(),
     snapshot: v.string(),
     version: v.optional(v.number()),
@@ -6311,7 +6310,6 @@ export const ComponentSnapshot_createViaCapture = mutation({
   args: {
     componentId: v.string(),
     versionNumber: v.number(),
-    capturedByName: v.string(),
     changeSummary: v.string(),
     snapshot: v.string(),
     idempotencyKey: v.optional(v.string())
@@ -6323,12 +6321,11 @@ export const ComponentSnapshot_createViaCapture = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { componentId, versionNumber, capturedByName, changeSummary, snapshot } = args;
+    const { componentId, versionNumber, changeSummary, snapshot } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      capturedByName: args.capturedByName,
       changeSummary: args.changeSummary,
       componentId: args.componentId,
       snapshot: args.snapshot,
@@ -6347,7 +6344,7 @@ export const ComponentSnapshot_createViaCapture = mutation({
     };
     doc.componentId = componentId;
     doc.versionNumber = versionNumber;
-    doc.capturedByName = capturedByName;
+    doc.capturedByName = ((user.personName != null) ? user.personName : "");
     doc.capturedByAuthSubjectId = user.id;
     doc.changeSummary = changeSummary;
     doc.snapshot = snapshot;
@@ -39664,7 +39661,7 @@ export const ProposalLineItem_reviseLine = mutation({
   },
 });
 
-async function __runProposalRevisionCapture(ctx: MutationCtx, { docId, proposalId, revisionNumber, capturedByName, changeSummary, snapshot, version }: any, __creation = false) {
+async function __runProposalRevisionCapture(ctx: MutationCtx, { docId, proposalId, revisionNumber, changeSummary, snapshot, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -39683,7 +39680,7 @@ async function __runProposalRevisionCapture(ctx: MutationCtx, { docId, proposalI
     const updates = {
       proposalId: proposalId,
       revisionNumber: revisionNumber,
-      capturedByName: capturedByName,
+      capturedByName: ((user.personName != null) ? user.personName : ""),
       capturedByAuthSubjectId: user.id,
       changeSummary: changeSummary,
       snapshot: snapshot,
@@ -39692,8 +39689,8 @@ async function __runProposalRevisionCapture(ctx: MutationCtx, { docId, proposalI
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, revisionId: docId, tenantId: __after.tenantId, proposalId: proposalId, revisionNumber: revisionNumber, changeSummary: changeSummary, capturedByName: capturedByName, capturedAt: Date.now(), _subject: { entity: "ProposalRevision", command: "capture", id: docId } };
-    const __manifestEvent0 = { type: "ProposalRevisionCaptured", entity: "ProposalRevision", entityId: docId, payload: { revisionId: docId, tenantId: __after.tenantId, proposalId: proposalId, revisionNumber: revisionNumber, changeSummary: changeSummary, capturedByName: capturedByName, capturedAt: Date.now() }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, revisionId: docId, tenantId: __after.tenantId, proposalId: proposalId, revisionNumber: revisionNumber, changeSummary: changeSummary, capturedByName: ((user.personName != null) ? user.personName : ""), capturedAt: Date.now(), _subject: { entity: "ProposalRevision", command: "capture", id: docId } };
+    const __manifestEvent0 = { type: "ProposalRevisionCaptured", entity: "ProposalRevision", entityId: docId, payload: { revisionId: docId, tenantId: __after.tenantId, proposalId: proposalId, revisionNumber: revisionNumber, changeSummary: changeSummary, capturedByName: ((user.personName != null) ? user.personName : ""), capturedAt: Date.now() }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "capture", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -39704,7 +39701,6 @@ export const ProposalRevision_capture = mutation({
     docId: v.id("proposalRevisions"),
     proposalId: v.string(),
     revisionNumber: v.number(),
-    capturedByName: v.string(),
     changeSummary: v.string(),
     snapshot: v.string(),
     version: v.optional(v.number()),
@@ -39727,7 +39723,6 @@ export const ProposalRevision_createViaCapture = mutation({
   args: {
     proposalId: v.string(),
     revisionNumber: v.number(),
-    capturedByName: v.string(),
     changeSummary: v.string(),
     snapshot: v.string(),
     idempotencyKey: v.optional(v.string())
@@ -39739,12 +39734,11 @@ export const ProposalRevision_createViaCapture = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { proposalId, revisionNumber, capturedByName, changeSummary, snapshot } = args;
+    const { proposalId, revisionNumber, changeSummary, snapshot } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      capturedByName: args.capturedByName,
       changeSummary: args.changeSummary,
       proposalId: args.proposalId,
       revisionNumber: args.revisionNumber,
@@ -39763,14 +39757,14 @@ export const ProposalRevision_createViaCapture = mutation({
     };
     doc.proposalId = proposalId;
     doc.revisionNumber = revisionNumber;
-    doc.capturedByName = capturedByName;
+    doc.capturedByName = ((user.personName != null) ? user.personName : "");
     doc.capturedByAuthSubjectId = user.id;
     doc.changeSummary = changeSummary;
     doc.snapshot = snapshot;
     doc.capturedAt = Date.now();
     const docId = await ctx.db.insert("proposalRevisions", doc as any);
-    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, revisionId: docId, tenantId: doc.tenantId, proposalId: proposalId, revisionNumber: revisionNumber, changeSummary: changeSummary, capturedByName: capturedByName, capturedAt: Date.now(), _subject: { entity: "ProposalRevision", command: "capture", id: docId } };
-    const __manifestEvent0 = { type: "ProposalRevisionCaptured", entity: "ProposalRevision", entityId: docId, payload: { revisionId: docId, tenantId: doc.tenantId, proposalId: proposalId, revisionNumber: revisionNumber, changeSummary: changeSummary, capturedByName: capturedByName, capturedAt: Date.now() }, createdAt: Date.now() };
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, revisionId: docId, tenantId: doc.tenantId, proposalId: proposalId, revisionNumber: revisionNumber, changeSummary: changeSummary, capturedByName: ((user.personName != null) ? user.personName : ""), capturedAt: Date.now(), _subject: { entity: "ProposalRevision", command: "capture", id: docId } };
+    const __manifestEvent0 = { type: "ProposalRevisionCaptured", entity: "ProposalRevision", entityId: docId, payload: { revisionId: docId, tenantId: doc.tenantId, proposalId: proposalId, revisionNumber: revisionNumber, changeSummary: changeSummary, capturedByName: ((user.personName != null) ? user.personName : ""), capturedAt: Date.now() }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "capture", emitIndex: 0 });
     const __result = { docId };

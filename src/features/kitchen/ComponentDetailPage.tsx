@@ -12,7 +12,6 @@ import {
   useListIngredient,
   useListIngredientPriceObservation,
   useListItemUnitMapping,
-  useListPerson,
   useListComponentIngredient,
   useListComponentSnapshot,
   useComponentIngredientAdjustQuantity,
@@ -27,7 +26,6 @@ import {
 import { useTrackRecent } from "../../lib/recents";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { useReconcileLiveEventsForComponent } from "../../lib/culinaryDemandClient";
-import { useAuthStatus } from "../../lib/useAuthStatus";
 import { buildComponentSnapshotData } from "./componentSnapshot";
 import { ComponentVersionHistoryPanel } from "./ComponentVersionHistoryPanel";
 import { captureBeforeChange } from "./componentSnapshotCapture";
@@ -113,8 +111,6 @@ export function ComponentDetailPage() {
   const captureSnapshot = useCreateComponentSnapshot();
   const restoreSnapshotCommand = useRestoreComponentSnapshotSafely();
   const snapshots = useListComponentSnapshot();
-  const people = useListPerson();
-  const authStatus = useAuthStatus();
   // Completed-import provenance: the original source this component came
   // from. Older native components have none — absence is not an error.
   // Culinary features use generated hooks only (integration guard), so the
@@ -209,13 +205,6 @@ export function ComponentDetailPage() {
     ingredients?.find((ingredient) => ingredient._id === ingredientId)?.name ??
     "Unknown ingredient";
 
-  const myPersonId = authStatus?.personId ?? null;
-  const me = (people ?? []).find(
-    (person) => person._id === myPersonId && person.deletedAt == null,
-  );
-  const myName =
-    [me?.givenName, me?.familyName].filter(Boolean).join(" ") || "Unknown";
-
   const currentData = buildComponentSnapshotData(
     component,
     componentLines,
@@ -231,7 +220,6 @@ export function ComponentDetailPage() {
         captureSnapshot({
           componentId: component._id,
           versionNumber: component.versionNumber,
-          capturedByName: myName,
           changeSummary,
           snapshot: JSON.stringify(currentData),
         }),
