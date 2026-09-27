@@ -1018,7 +1018,7 @@ export default defineSchema({
     eventId: v.id("events"),
     eventDishId: v.id("eventDishes"),
     dishId: v.string(),
-    componentId: v.string(),
+    componentId: v.id("components"),
     recipeSyncComponentId: v.optional(v.union(v.string(), v.null())),
     servings: v.number(),
     yieldQuantity: v.number(),

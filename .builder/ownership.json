@@ -18,19 +18,19 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "749fbb5c76522d7c9ef412dda86c51b2c333fd48b473a88187ccc7f47d1191d3"
+      "sha256": "5e0cce87e3cd12fbd6241821d8965a5aa06d9aae2f0f05f5f0251b14fa71c897"
     },
     "convex/queries.ts": {
-      "sha256": "b413d20def55fa2061341b5ec2a8aad8c642963af8af413b3fcbad84fa52bc10"
+      "sha256": "0562d61a5d7a878e876fb8ac27732c62d747afc6a35a84acfceb93c9763d1303"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
     },
     "convex/schema.ts": {
-      "sha256": "eb8b632bc0f4d9e93edb03a01a69abf2b72e91d439a1b52846fe463001d98dbf"
+      "sha256": "272dc1fb59d05757bd1763a168aac3dba5644458433346c26fd21c9ac7131a52"
     },
     "manifest-context-summary.json": {
-      "sha256": "99fb4157caa1750ba1cea3e57e05cf0ed77e82ae493b3cef8de9849f58a5650e"
+      "sha256": "c488a143d3b88fe20dee7df9ba76ccf220ad3b0cf2c7939ef8a4f3937d8fae0e"
     },
     "package.json": {
       "sha256": "45588d8e74712acf430f18aba8275548aac7ced9b70fe6c134def6f1e7fec6cc"
@@ -45,10 +45,10 @@
       "sha256": "7292f531c63cdbe2c5400b15ff24bb44a852b3363b56c0c754147bcb21d4c621"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "f68533b9439c02310a25908a2d22002c9fd412166a84b7a3a0d1470837a78f3d"
+      "sha256": "c2c14af370bedda0d8b26fd162a0e674d7fca7e3b59a9b52036d1f7ed5969c09"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "fed069ef22d39fdd1a2ec8091a1667f9bb90bd685507260b2fe2e177c3069349"
+      "sha256": "f4228641468f49460eb33fe6a3a9f8298d4d54dc3692eb58c807d6c2fa571347"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "1120fa0bf097901985b960cf9e1979e15878d3905696a327cf1a14e8f1367c9d"
@@ -57,7 +57,7 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "7eed6d541cee91992b07213237aeb5ac4a5aba46acb3395344bc2432dbbdc98d"
+      "sha256": "f13061d65e430798f19f24146e1a85d8b9f34441b03c3280b3d70cc6133ee373"
     }
   },
   "package": {

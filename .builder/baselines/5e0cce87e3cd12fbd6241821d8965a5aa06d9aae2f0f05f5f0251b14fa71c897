@@ -16661,12 +16661,20 @@ export const EventDishComponentSeed_retire = mutation({
 
 async function __runEventDishComponentSeedSeed(ctx: MutationCtx, { docId, eventId, eventDishId, dishId, componentId, servings, yieldQuantity, batchMultiplier, purchasingWeekStart, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
+    const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventDishComponentSeed not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDishComponentSeed not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((doc.seededAt == null))) throw new Error("Guard 0 failed");
-    if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
+    const __rel_eventDish = await __resolveRelation(ctx, "eventDishes", [__auth.tenantId, doc.eventDishId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_component = await __resolveRelation(ctx, "components", [__auth.tenantId, doc.componentId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    ((doc as any) as any).event = __rel_event;
+    ((doc as any) as any).eventDish = __rel_eventDish;
+    ((doc as any) as any).component = __rel_component;
+    if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Guard 0 failed");
+    if (!((((__rel_event != null) && (__rel_eventDish != null)) && (__rel_component != null)))) throw new Error("Guard 1 failed");
+    if (!((doc.seededAt == null))) throw new Error("Guard 2 failed");
+    if (!((doc.deletedAt == null))) throw new Error("Guard 3 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -16764,6 +16772,7 @@ export const EventDishComponentSeed_createViaSeed = mutation({
       if (__cached !== undefined) return __cached;
     }
     const __auth = (await getAuthContext(ctx)) as any;
+    const user = __auth;
     const { eventId, eventDishId, dishId, componentId, servings, yieldQuantity, batchMultiplier, purchasingWeekStart } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
@@ -16779,8 +16788,12 @@ export const EventDishComponentSeed_createViaSeed = mutation({
       yieldQuantity: args.yieldQuantity
     };
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((__draft.seededAt == null))) throw new Error("Guard 0 failed");
-    if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
+    const __rel_eventDish = await __resolveRelation(ctx, "eventDishes", [__auth.tenantId, __draft.eventDishId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_component = await __resolveRelation(ctx, "components", [__auth.tenantId, __draft.componentId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Guard 0 failed");
+    if (!((((__rel_event != null) && (__rel_eventDish != null)) && (__rel_component != null)))) throw new Error("Guard 1 failed");
+    if (!((__draft.seededAt == null))) throw new Error("Guard 2 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 3 failed");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,

@@ -5460,7 +5460,7 @@ export const listEventDishComponentSeedByEventDishId = query({
 });
 
 export const listEventDishComponentSeedByComponentId = query({
-  args: { componentId: v.string() },
+  args: { componentId: v.id("components") },
   handler: async (ctx, { componentId }) => {
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
