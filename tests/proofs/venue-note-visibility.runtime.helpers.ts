@@ -9,6 +9,7 @@ import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
+import { linkStaffProfile } from "./reconciliation-failure-isolation.runtime.helpers";
 
 export const S = {
   tenantId: "tenant-ac317-client-facing",
@@ -102,6 +103,12 @@ async function hireActors(proof: Proof) {
     role: "sales_manager",
     tenantId: S.tenantId,
   });
+  await linkStaffProfile(
+    proof,
+    S.tenantId,
+    `sales-${S.tenantId}`,
+    "sales_manager",
+  );
   return {
     staffHirePersonId: staffHire.personId,
     mgrHirePersonId: mgrHire.personId,

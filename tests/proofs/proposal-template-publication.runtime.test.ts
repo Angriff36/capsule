@@ -4,6 +4,7 @@ import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-
 import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { modules } from "./convex-test-modules";
+import { linkStaffProfile } from "./reconciliation-failure-isolation.runtime.helpers";
 
 beforeAll(() => {
   process.env.CONVEX_FIELD_ENCRYPTION_KEY ||=
@@ -22,6 +23,12 @@ describe("runtime proof: proposal template publication", () => {
       role: "sales_manager",
       tenantId: "tenant-proposal-template",
     });
+    await linkStaffProfile(
+      proof,
+      "tenant-proposal-template",
+      "proposal-template-sales",
+      "sales_manager",
+    );
     const client = (await proof.executeCommand(
       sales,
       api.mutations.Client_createViaRegister,

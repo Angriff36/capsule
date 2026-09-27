@@ -6,9 +6,22 @@
  * patches, and refreshes the generated surface's ownership digest.
  *
  * Which inputs are links comes from the Manifest IR (generated/ir/merged.ir.json):
- * a command parameter of type uuid or list of uuid, or one that fills a
- * declared ref / belongsTo link field of its entity. Other text inputs are
- * never checked, so codes and outside-system ids pass untouched.
+ * a declared ref / belongsTo link field of the command's entity (checked
+ * against that exact table), or another uuid / list-of-uuid parameter (bare
+ * uuid columns also hold outside-system ids, so only a value that resolves to
+ * a record is tenant-checked). Other text inputs are never checked.
+ *
+ * The saved-answer (idempotency) cache is keyed by the caller's key alone in
+ * generated output. This patch routes every lookup and store through
+ * convex/lib/commandIdempotency.ts, which scopes the key to the caller's
+ * workspace, sign-in, staff profile, role and switched-off areas, and the key
+ * is worked out ONCE before the step runs (a step that changes its caller's
+ * own access must not save under the changed access). Receipts saved by the
+ * old single-key version cannot be attributed to a caller, so a retry that
+ * hits one is refused with guidance instead of replayed or re-executed.
+ *
+ * The link check runs AFTER the replay lookup: a retry must get its saved
+ * answer back even if one of its linked records was deleted since.
  */
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -18,25 +31,30 @@ import { fileURLToPath } from "node:url";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const TARGET = "convex/mutations.ts";
 const IR = "generated/ir/merged.ir.json";
+const SCHEMA = "convex/schema.ts";
 
 const IMPORT_ANCHOR = 'import { getAuthContext } from "./lib/authContext";\n';
 const IMPORT =
   'import { assertOwnWorkspaceLinks as __assertOwnWorkspaceLinks } from "./lib/ownWorkspaceLinks";\n';
 const HANDLER = /^ {2}handler: async \(ctx, args(?:: any)?\) => \{\n/m;
+const RUN_LINE = /^    const __result = await __run\w+\(ctx, args\);\n/m;
+const LEGACY_REFUSAL =
+  "This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.";
 
 /**
  * The generated idempotency cache is keyed by the caller's key alone and is
- * read before the step's role checks. Every lookup and store goes through
- * convex/lib/commandIdempotency.ts, which scopes the key to the caller's
- * workspace, sign-in, staff profile, role and switched-off areas, and the key
- * is worked out ONCE before the step runs (a step that changes its caller's
- * own access must not save under the changed access).
+ * read before the step's role checks. The scoped key is worked out ONCE
+ * before the step runs; on a miss, a receipt saved under the raw pre-upgrade
+ * key is refused (it cannot be attributed to a caller) instead of replayed
+ * or re-executed.
  */
 const SCOPE_IMPORT =
   'import { scopedCommandKey as __scopedCommandKey } from "./lib/commandIdempotency";\n';
 const MUTATION_START = /^export const (\w+) = mutation\(\{$/gm;
 const GET_BLOCK =
-  "    if (args.idempotencyKey !== undefined) {\n      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);\n";
+  "    if (args.idempotencyKey !== undefined) {\n" +
+  "      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);\n" +
+  "      if (__cached !== undefined) return __cached;\n";
 const SET_BLOCK =
   /( {4})if \(args\.idempotencyKey !== undefined\) \{\n( {6})await __setCommandIdempotency\(ctx, args\.idempotencyKey, "(\w+)", /;
 
@@ -59,38 +77,83 @@ type IrEntity = {
   relationships?: {
     name: string;
     kind: string;
+    target?: string;
     foreignKey?: { fields: string[] };
   }[];
 };
 
-/** The entity's own link fields: its ref / belongsTo foreign keys. */
-function linkFields(entity: IrEntity | undefined): Set<string> {
-  const fields = new Set<string>();
+/** The entity's own link fields: its ref / belongsTo foreign keys -> target entity. */
+function linkFields(entity: IrEntity | undefined): Map<string, string> {
+  const fields = new Map<string, string>();
   for (const r of entity?.relationships ?? []) {
-    if (r.kind !== "belongsTo" && r.kind !== "ref") continue;
+    if ((r.kind !== "belongsTo" && r.kind !== "ref") || !r.target) continue;
     for (const field of r.foreignKey?.fields ?? [`${r.name}Id`]) {
-      if (field !== "tenantId") fields.add(field);
+      if (field !== "tenantId") fields.set(field, r.target);
     }
   }
   return fields;
 }
 
+type LinkParam = { name: string; table: string | null };
+
 /**
- * Mutation name -> names of its inputs the Manifest declares as record links:
- * typed uuid / list of uuid, or named like one of the entity's own link fields.
+ * IR entity name -> Convex schema table name, by the Builder's naming rules
+ * (camelCase plus a plural suffix). Resolved against schema.ts and REQUIRED
+ * to be unique: an entity that maps to nothing or to two tables stops the
+ * regen here instead of silently losing its link checks.
  */
-function linkParams(root: string): Map<string, string[]> {
+function entityTables(root: string, entities: string[]): Map<string, string> {
+  const source = readFileSync(join(root, SCHEMA), "utf8");
+  const tables = new Set(
+    [...source.matchAll(/(\w+): defineTable/g)].map((m) => m[1]),
+  );
+  // Irregular plurals the suffix rules cannot reach.
+  const IRREGULAR: Record<string, string> = { Person: "people" };
+  const out = new Map<string, string>();
+  for (const entity of entities) {
+    const camel = entity.charAt(0).toLowerCase() + entity.slice(1);
+    const candidates = [camel, `${camel}s`, `${camel}es`];
+    if (camel.endsWith("y")) candidates.push(`${camel.slice(0, -1)}ies`);
+    if (IRREGULAR[entity]) candidates.push(IRREGULAR[entity]!);
+    const hits = candidates.filter((c) => tables.has(c));
+    if (hits.length !== 1) {
+      throw new Error(
+        `apply-own-workspace-links: entity ${entity} maps to ${hits.length} schema tables (${candidates.join(", ")}); add the naming rule`,
+      );
+    }
+    out.set(entity, hits[0]!);
+  }
+  return out;
+}
+
+/**
+ * Mutation name -> the inputs the Manifest declares as record links, each
+ * with its expected table (null = bare uuid, outside ids allowed).
+ */
+function linkParams(root: string): Map<string, LinkParam[]> {
   const ir = JSON.parse(readFileSync(join(root, IR), "utf8")) as {
     commands: IrCommand[];
     entities: IrEntity[];
   };
   const entities = new Map(ir.entities.map((e) => [e.name, e]));
-  const out = new Map<string, string[]>();
+  const needed = new Set<string>();
+  for (const entity of ir.entities) {
+    for (const target of linkFields(entity).values()) needed.add(target);
+  }
+  const tables = entityTables(root, [...needed]);
+  const out = new Map<string, LinkParam[]>();
   for (const command of ir.commands) {
     const fields = linkFields(entities.get(command.entity));
-    const links = command.parameters
-      .filter((p) => isLink(p.type) || fields.has(p.name))
-      .map((p) => p.name);
+    const links: LinkParam[] = [];
+    const seen = new Set<string>();
+    for (const [field, target] of fields) {
+      seen.add(field);
+      links.push({ name: field, table: tables.get(target) ?? null });
+    }
+    for (const p of command.parameters) {
+      if (!isLink(p.type) || seen.has(p.name)) continue;
+      links.push({ name: p.name, table: null });
+    }
     const cap = command.name.charAt(0).toUpperCase() + command.name.slice(1);
     out.set(`${command.entity}_${command.name}`, links);
     out.set(`${command.entity}_createVia${cap}`, links);
@@ -115,7 +178,10 @@ export function applyOwnWorkspaceLinks(root: string = ROOT): string[] {
   return updated === source ? [] : [TARGET];
 }
 
-function patchMutations(source: string, links: Map<string, string[]>): string {
+function patchMutations(
+  source: string,
+  links: Map<string, LinkParam[]>,
+): string {
   const starts = [...source.matchAll(MUTATION_START)];
   let out = source.slice(0, starts[0]?.index ?? source.length);
   for (let i = 0; i < starts.length; i += 1) {
@@ -131,18 +197,11 @@ function patchMutations(source: string, links: Map<string, string[]>): string {
     if (!HANDLER.test(block)) {
       throw new Error(`apply-own-workspace-links: no handler in ${name}`);
     }
-    if (names.length > 0) {
-      block = block.replace(
-        HANDLER,
-        (line) =>
-          `${line}    await __assertOwnWorkspaceLinks(ctx, args, ${JSON.stringify(names)});\n`,
-      );
-    }
     if (block.includes(GET_BLOCK)) {
       block = block
         .replace(
           GET_BLOCK,
-          `    const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "${name}", args.idempotencyKey);\n    if (__idemKey !== null) {\n      const __cached = await __getCommandIdempotency(ctx, __idemKey);\n`,
+          `    const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "${name}", args.idempotencyKey);\n    if (__idemKey !== null) {\n      const __cached = await __getCommandIdempotency(ctx, __idemKey);\n      if (__cached !== undefined) return __cached;\n      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);\n      if (__legacy !== undefined) throw new Error(${JSON.stringify(LEGACY_REFUSAL)});\n`,
         )
         .replace(SET_BLOCK, (_call, a: string, b: string, command: string) => {
           if (command !== name) {
@@ -152,14 +211,35 @@ function patchMutations(source: string, links: Map<string, string[]>): string {
           }
           return `${a}if (__idemKey !== null) {\n${b}await __setCommandIdempotency(ctx, __idemKey, "${name}", `;
         });
+    } else if (
+      /args\.idempotencyKey !== undefined/.test(block) ||
+      /CommandIdempotency\(ctx, args\.idempotencyKey/.test(block)
+    ) {
+      throw new Error(
+        `apply-own-workspace-links: unrecognised idempotency block in ${name}`,
+      );
+    }
+    if (names.length > 0) {
+      // Replay first, links second: a retry gets its saved answer even when a
+      // linked record was deleted since.
+      const assertLine = `    await __assertOwnWorkspaceLinks(ctx, args, ${JSON.stringify(names)});\n`;
+      if (RUN_LINE.test(block)) {
+        block = block.replace(RUN_LINE, (line) => `${assertLine}${line}`);
+      } else if (
+        block.includes(`throw new Error(${JSON.stringify(LEGACY_REFUSAL)})`)
+      ) {
+        // createVia steps inline their body: anchor right after the replay
+        // prologue's closing brace instead of a delegated run call.
+        const LEGACY_BLOCK =
+          /^      if \(__legacy !== undefined\) throw new Error\([^\n]*\);\n    \}\n/m;
+        block = block.replace(LEGACY_BLOCK, (m) => `${m}${assertLine}`);
+      } else {
+        block = block.replace(HANDLER, (line) => `${line}${assertLine}`);
+      }
     }
     out += block;
   }
-  if (
-    /args\.idempotencyKey !== undefined\) \{|CommandIdempotency\(ctx, args\.idempotencyKey/.test(
-      out,
-    )
-  ) {
+  if (/if \(args\.idempotencyKey !== undefined\) \{/.test(out)) {
     throw new Error(
       "apply-own-workspace-links: an unscoped idempotency lookup is left",
     );

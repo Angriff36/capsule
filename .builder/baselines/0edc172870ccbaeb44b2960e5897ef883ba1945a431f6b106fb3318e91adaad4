@@ -667,6 +667,8 @@ export const Announcement_post = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runAnnouncementPost(ctx, args);
     if (__idemKey !== null) {
@@ -689,6 +691,8 @@ export const Announcement_createViaPost = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -769,6 +773,8 @@ export const Announcement_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runAnnouncementRemove(ctx, args);
     if (__idemKey !== null) {
@@ -814,12 +820,14 @@ export const AnnouncementDismissal_dismiss = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["announcementId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "AnnouncementDismissal_dismiss", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"announcementId","table":"announcements"}]);
     const __result = await __runAnnouncementDismissalDismiss(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "AnnouncementDismissal_dismiss", __result);
@@ -834,12 +842,14 @@ export const AnnouncementDismissal_createViaDismiss = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["announcementId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "AnnouncementDismissal_createViaDismiss", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"announcementId","table":"announcements"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { announcementId } = args;
@@ -916,6 +926,8 @@ export const AssistantLlmConfig_configure = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runAssistantLlmConfigConfigure(ctx, args);
     if (__idemKey !== null) {
@@ -937,6 +949,8 @@ export const AssistantLlmConfig_createViaConfigure = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -1030,6 +1044,8 @@ export const Attachment_attach = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runAttachmentAttach(ctx, args);
     if (__idemKey !== null) {
@@ -1055,6 +1071,8 @@ export const Attachment_createViaAttach = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -1143,6 +1161,8 @@ export const Attachment_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runAttachmentRemove(ctx, args);
     if (__idemKey !== null) {
@@ -1185,6 +1205,8 @@ export const Attachment_setSurveySelection = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runAttachmentSetSurveySelection(ctx, args);
     if (__idemKey !== null) {
@@ -1245,12 +1267,14 @@ export const AvailabilityWindow_declare = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "AvailabilityWindow_declare", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __result = await __runAvailabilityWindowDeclare(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "AvailabilityWindow_declare", __result);
@@ -1269,12 +1293,14 @@ export const AvailabilityWindow_createViaDeclare = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "AvailabilityWindow_createViaDeclare", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { personId, startsAt, endsAt, kind, notes } = args;
@@ -1380,7 +1406,10 @@ export const AvailabilityWindow_withdraw = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __result = await __runAvailabilityWindowWithdraw(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "AvailabilityWindow_withdraw", __result);
@@ -1432,7 +1461,10 @@ export const Candidate_advance = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"hiredPersonId","table":"people"}]);
     const __result = await __runCandidateAdvance(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Candidate_advance", __result);
@@ -1496,7 +1528,10 @@ export const Candidate_apply = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"hiredPersonId","table":"people"}]);
     const __result = await __runCandidateApply(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Candidate_apply", __result);
@@ -1521,7 +1556,10 @@ export const Candidate_createViaApply = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"hiredPersonId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { fullName, email, phone, roleAppliedFor, sourceSystem, externalCandidateId, rawSourceData } = args;
@@ -1610,12 +1648,14 @@ export const Candidate_hire = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["hiredPersonId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Candidate_hire", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"hiredPersonId","table":"people"}]);
     const __result = await __runCandidateHire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Candidate_hire", __result);
@@ -1667,7 +1707,10 @@ export const Candidate_reject = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"hiredPersonId","table":"people"}]);
     const __result = await __runCandidateReject(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Candidate_reject", __result);
@@ -1721,7 +1764,10 @@ export const Candidate_revokeHire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"hiredPersonId","table":"people"}]);
     const __result = await __runCandidateRevokeHire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Candidate_revokeHire", __result);
@@ -1788,7 +1834,10 @@ export const Client_archive = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"assignedToId","table":"people"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergedIntoClientId","table":"clients"}]);
     const __result = await __runClientArchive(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Client_archive", __result);
@@ -1836,12 +1885,14 @@ export const Client_assignOwner = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["assignedToId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Client_assignOwner", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"assignedToId","table":"people"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergedIntoClientId","table":"clients"}]);
     const __result = await __runClientAssignOwner(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Client_assignOwner", __result);
@@ -1899,7 +1950,10 @@ export const Client_changeBillingProfile = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"assignedToId","table":"people"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergedIntoClientId","table":"clients"}]);
     const __result = await __runClientChangeBillingProfile(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Client_changeBillingProfile", __result);
@@ -1968,7 +2022,10 @@ export const Client_changeContact = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"assignedToId","table":"people"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergedIntoClientId","table":"clients"}]);
     const __result = await __runClientChangeContact(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Client_changeContact", __result);
@@ -2044,12 +2101,14 @@ export const Client_markMerged = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Client_markMerged", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"assignedToId","table":"people"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergedIntoClientId","table":"clients"},{"name":"clientId","table":null}]);
     const __result = await __runClientMarkMerged(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Client_markMerged", __result);
@@ -2114,7 +2173,10 @@ export const Client_reactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"assignedToId","table":"people"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergedIntoClientId","table":"clients"}]);
     const __result = await __runClientReactivate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Client_reactivate", __result);
@@ -2200,12 +2262,14 @@ export const Client_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["assignedToId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Client_register", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"assignedToId","table":"people"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergedIntoClientId","table":"clients"}]);
     const __result = await __runClientRegister(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Client_register", __result);
@@ -2237,12 +2301,14 @@ export const Client_createViaRegister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["assignedToId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Client_createViaRegister", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"assignedToId","table":"people"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergedIntoClientId","table":"clients"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { clientType, companyName, givenName, familyName, email, phone, website, addressLine1, addressLine2, city, region, postalCode, countryCode, taxId, taxExempt, paymentTermsDays, notes, assignedToId } = args;
@@ -2359,7 +2425,10 @@ export const Client_setBirthday = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"assignedToId","table":"people"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergedIntoClientId","table":"clients"}]);
     const __result = await __runClientSetBirthday(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Client_setBirthday", __result);
@@ -2413,12 +2482,14 @@ export const Client_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientMergeId","primaryClientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Client_stageClientMerge", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"assignedToId","table":"people"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergedIntoClientId","table":"clients"},{"name":"clientMergeId","table":null},{"name":"primaryClientId","table":null}]);
     const __result = await __runClientStageClientMerge(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Client_stageClientMerge", __result);
@@ -2481,12 +2552,14 @@ export const ClientCommunication_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientContactId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ClientCommunication_record", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientContactId","table":"clientContacts"},{"name":"eventId","table":"events"}]);
     const __result = await __runClientCommunicationRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ClientCommunication_record", __result);
@@ -2505,12 +2578,14 @@ export const ClientCommunication_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientContactId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ClientCommunication_createViaRecord", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientContactId","table":"clientContacts"},{"name":"eventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { clientContactId, eventId, occurredAt, medium, summary } = args;
@@ -2622,12 +2697,14 @@ export const ClientContact_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ClientContact_add", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runClientContactAdd(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ClientContact_add", __result);
@@ -2651,12 +2728,14 @@ export const ClientContact_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ClientContact_createViaAdd", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { clientId, givenName, familyName, title, email, phone, mobile, isPrimary, isBillingContact, notes } = args;
@@ -2768,7 +2847,10 @@ export const ClientContact_reassignClient = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runClientContactReassignClient(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ClientContact_reassignClient", __result);
@@ -2831,7 +2913,10 @@ export const ClientContact_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runClientContactRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ClientContact_remove", __result);
@@ -2881,7 +2966,10 @@ export const ClientContact_setPrimary = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runClientContactSetPrimary(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ClientContact_setPrimary", __result);
@@ -2933,12 +3021,14 @@ export const ClientContact_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientMergeId","clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ClientContact_stageClientMerge", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"clientMergeId","table":null}]);
     const __result = await __runClientContactStageClientMerge(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ClientContact_stageClientMerge", __result);
@@ -3004,7 +3094,10 @@ export const ClientContact_updateDetails = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runClientContactUpdateDetails(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ClientContact_updateDetails", __result);
@@ -3113,12 +3206,14 @@ export const ClientMerge_merge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["primaryClientId","duplicateClientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ClientMerge_merge", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"primaryClientId","table":"clients"},{"name":"duplicateClientId","table":"clients"}]);
     const __result = await __runClientMergeMerge(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ClientMerge_merge", __result);
@@ -3134,12 +3229,14 @@ export const ClientMerge_createViaMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["primaryClientId","duplicateClientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ClientMerge_createViaMerge", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"primaryClientId","table":"clients"},{"name":"duplicateClientId","table":"clients"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { primaryClientId, duplicateClientId } = args;
@@ -3287,7 +3384,10 @@ export const ClientOutreachTask_complete = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"}]);
     const __result = await __runClientOutreachTaskComplete(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ClientOutreachTask_complete", __result);
@@ -3348,7 +3448,10 @@ export const ClientOutreachTask_dismiss = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"}]);
     const __result = await __runClientOutreachTaskDismiss(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ClientOutreachTask_dismiss", __result);
@@ -3409,12 +3512,14 @@ export const ClientOutreachTask_open = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ClientOutreachTask_open", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"}]);
     const __result = await __runClientOutreachTaskOpen(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ClientOutreachTask_open", __result);
@@ -3430,12 +3535,14 @@ export const ClientOutreachTask_createViaOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ClientOutreachTask_createViaOpen", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { clientId, reason } = args;
@@ -3509,12 +3616,14 @@ export const ClientPortalLink_create = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ClientPortalLink_create", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runClientPortalLinkCreate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ClientPortalLink_create", __result);
@@ -3557,7 +3666,10 @@ export const ClientPortalLink_revoke = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runClientPortalLinkRevoke(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ClientPortalLink_revoke", __result);
@@ -3631,6 +3743,8 @@ export const Component_draft = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runComponentDraft(ctx, args);
     if (__idemKey !== null) {
@@ -3660,6 +3774,8 @@ export const Component_createViaDraft = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -3771,6 +3887,8 @@ export const Component_publishVersion = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runComponentPublishVersion(ctx, args);
     if (__idemKey !== null) {
@@ -3833,6 +3951,8 @@ export const Component_purge = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runComponentPurge(ctx, args);
     if (__idemKey !== null) {
@@ -3897,6 +4017,8 @@ export const Component_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runComponentRetire(ctx, args);
     if (__idemKey !== null) {
@@ -3960,6 +4082,8 @@ export const Component_retract = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runComponentRetract(ctx, args);
     if (__idemKey !== null) {
@@ -4028,6 +4152,8 @@ export const Component_reviseDraft = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runComponentReviseDraft(ctx, args);
     if (__idemKey !== null) {
@@ -4076,6 +4202,8 @@ export const Component_setServesPerYield = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runComponentSetServesPerYield(ctx, args);
     if (__idemKey !== null) {
@@ -4126,6 +4254,8 @@ export const Component_setStorageWindow = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runComponentSetStorageWindow(ctx, args);
     if (__idemKey !== null) {
@@ -4188,12 +4318,14 @@ export const ComponentComponent_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["componentId","childComponentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ComponentComponent_add", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"},{"name":"childComponentId","table":"components"}]);
     const __result = await __runComponentComponentAdd(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentComponent_add", __result);
@@ -4215,12 +4347,14 @@ export const ComponentComponent_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["componentId","childComponentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ComponentComponent_createViaAdd", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"},{"name":"childComponentId","table":"components"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { componentId, childComponentId, quantity, unit, sortOrder, wasteFactor, quantityBasis, prepNotes } = args;
@@ -4314,7 +4448,10 @@ export const ComponentComponent_adjustQuantity = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"},{"name":"childComponentId","table":"components"}]);
     const __result = await __runComponentComponentAdjustQuantity(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentComponent_adjustQuantity", __result);
@@ -4363,7 +4500,10 @@ export const ComponentComponent_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"},{"name":"childComponentId","table":"components"}]);
     const __result = await __runComponentComponentRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentComponent_remove", __result);
@@ -4426,7 +4566,10 @@ export const ComponentImport_approveReview = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"resultingComponentId","table":"components"}]);
     const __result = await __runComponentImportApproveReview(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImport_approveReview", __result);
@@ -4489,7 +4632,10 @@ export const ComponentImport_beginFinalization = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"resultingComponentId","table":"components"}]);
     const __result = await __runComponentImportBeginFinalization(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImport_beginFinalization", __result);
@@ -4550,7 +4696,10 @@ export const ComponentImport_beginReview = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"resultingComponentId","table":"components"}]);
     const __result = await __runComponentImportBeginReview(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImport_beginReview", __result);
@@ -4613,7 +4762,10 @@ export const ComponentImport_cancel = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"resultingComponentId","table":"components"}]);
     const __result = await __runComponentImportCancel(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImport_cancel", __result);
@@ -4688,7 +4840,10 @@ export const ComponentImport_complete = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"resultingComponentId","table":"components"}]);
     const __result = await __runComponentImportComplete(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImport_complete", __result);
@@ -4755,7 +4910,10 @@ export const ComponentImport_markFailed = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"resultingComponentId","table":"components"}]);
     const __result = await __runComponentImportMarkFailed(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImport_markFailed", __result);
@@ -4800,12 +4958,14 @@ export const ComponentImport_recordComponent = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["resultingComponentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ComponentImport_recordComponent", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"resultingComponentId","table":"components"}]);
     const __result = await __runComponentImportRecordComponent(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImport_recordComponent", __result);
@@ -4889,7 +5049,10 @@ export const ComponentImport_recordParse = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"resultingComponentId","table":"components"}]);
     const __result = await __runComponentImportRecordParse(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImport_recordParse", __result);
@@ -4940,7 +5103,10 @@ export const ComponentImport_recordResolutionProgress = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"resultingComponentId","table":"components"}]);
     const __result = await __runComponentImportRecordResolutionProgress(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImport_recordResolutionProgress", __result);
@@ -5003,7 +5169,10 @@ export const ComponentImport_resumeReview = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"resultingComponentId","table":"components"}]);
     const __result = await __runComponentImportResumeReview(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImport_resumeReview", __result);
@@ -5072,7 +5241,10 @@ export const ComponentImport_reviseReview = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"resultingComponentId","table":"components"}]);
     const __result = await __runComponentImportReviseReview(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImport_reviseReview", __result);
@@ -5149,7 +5321,10 @@ export const ComponentImport_upload = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"resultingComponentId","table":"components"}]);
     const __result = await __runComponentImportUpload(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImport_upload", __result);
@@ -5174,7 +5349,10 @@ export const ComponentImport_createViaUpload = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"resultingComponentId","table":"components"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { sourceKind, rawSourceText, sourceByteCount, sourceFingerprint, sourceFilename, csvSheetText, csvLinesText } = args;
@@ -5264,12 +5442,14 @@ export const ComponentImportLine_attachCreatedIngredient = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["matchedIngredientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ComponentImportLine_attachCreatedIngredient", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"importId","table":"componentImports"},{"name":"matchedIngredientId","table":"ingredients"}]);
     const __result = await __runComponentImportLineAttachCreatedIngredient(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImportLine_attachCreatedIngredient", __result);
@@ -5319,12 +5499,14 @@ export const ComponentImportLine_confirmExisting = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["matchedIngredientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ComponentImportLine_confirmExisting", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"importId","table":"componentImports"},{"name":"matchedIngredientId","table":"ingredients"}]);
     const __result = await __runComponentImportLineConfirmExisting(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImportLine_confirmExisting", __result);
@@ -5373,7 +5555,10 @@ export const ComponentImportLine_confirmNew = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"importId","table":"componentImports"},{"name":"matchedIngredientId","table":"ingredients"}]);
     const __result = await __runComponentImportLineConfirmNew(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImportLine_confirmNew", __result);
@@ -5421,7 +5606,10 @@ export const ComponentImportLine_discard = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"importId","table":"componentImports"},{"name":"matchedIngredientId","table":"ingredients"}]);
     const __result = await __runComponentImportLineDiscard(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImportLine_discard", __result);
@@ -5470,7 +5658,10 @@ export const ComponentImportLine_markNew = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"importId","table":"componentImports"},{"name":"matchedIngredientId","table":"ingredients"}]);
     const __result = await __runComponentImportLineMarkNew(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImportLine_markNew", __result);
@@ -5519,7 +5710,10 @@ export const ComponentImportLine_resetResolution = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"importId","table":"componentImports"},{"name":"matchedIngredientId","table":"ingredients"}]);
     const __result = await __runComponentImportLineResetResolution(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImportLine_resetResolution", __result);
@@ -5579,7 +5773,10 @@ export const ComponentImportLine_reviseMeasurements = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"importId","table":"componentImports"},{"name":"matchedIngredientId","table":"ingredients"}]);
     const __result = await __runComponentImportLineReviseMeasurements(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImportLine_reviseMeasurements", __result);
@@ -5642,12 +5839,14 @@ export const ComponentImportLine_stage = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["importId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ComponentImportLine_stage", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"importId","table":"componentImports"},{"name":"matchedIngredientId","table":"ingredients"}]);
     const __result = await __runComponentImportLineStage(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImportLine_stage", __result);
@@ -5668,12 +5867,14 @@ export const ComponentImportLine_createViaStage = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["importId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ComponentImportLine_createViaStage", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"importId","table":"componentImports"},{"name":"matchedIngredientId","table":"ingredients"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { importId, sourceOrder, sourceLine, parsedQuantity, parsedUnit, parsedIngredientName, preparationNote } = args;
@@ -5762,12 +5963,14 @@ export const ComponentImportLine_suggestExactMatch = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["matchedIngredientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ComponentImportLine_suggestExactMatch", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"importId","table":"componentImports"},{"name":"matchedIngredientId","table":"ingredients"}]);
     const __result = await __runComponentImportLineSuggestExactMatch(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImportLine_suggestExactMatch", __result);
@@ -5817,7 +6020,10 @@ export const ComponentImportLine_suggestPossibleMatches = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"importId","table":"componentImports"},{"name":"matchedIngredientId","table":"ingredients"}]);
     const __result = await __runComponentImportLineSuggestPossibleMatches(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentImportLine_suggestPossibleMatches", __result);
@@ -5882,12 +6088,14 @@ export const ComponentIngredient_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["componentId","ingredientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ComponentIngredient_add", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runComponentIngredientAdd(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentIngredient_add", __result);
@@ -5908,12 +6116,14 @@ export const ComponentIngredient_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["componentId","ingredientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ComponentIngredient_createViaAdd", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"},{"name":"ingredientId","table":"ingredients"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { componentId, ingredientId, quantity, unit, sortOrder, wasteFactor, prepNotes } = args;
@@ -6025,7 +6235,10 @@ export const ComponentIngredient_adjustQuantity = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runComponentIngredientAdjustQuantity(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentIngredient_adjustQuantity", __result);
@@ -6083,7 +6296,10 @@ export const ComponentIngredient_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runComponentIngredientRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentIngredient_remove", __result);
@@ -6132,7 +6348,10 @@ export const ComponentIngredient_setWasteFactor = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runComponentIngredientSetWasteFactor(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentIngredient_setWasteFactor", __result);
@@ -6190,12 +6409,14 @@ export const ComponentPortionSpec_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ComponentPortionSpec_define", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"}]);
     const __result = await __runComponentPortionSpecDefine(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentPortionSpec_define", __result);
@@ -6215,12 +6436,14 @@ export const ComponentPortionSpec_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ComponentPortionSpec_createViaDefine", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { componentId, name, pieceQuantity, pieceUnit, piecesPerBatch, source } = args;
@@ -6307,7 +6530,10 @@ export const ComponentPortionSpec_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"}]);
     const __result = await __runComponentPortionSpecRetire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentPortionSpec_retire", __result);
@@ -6365,7 +6591,10 @@ export const ComponentPortionSpec_revise = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"}]);
     const __result = await __runComponentPortionSpecRevise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentPortionSpec_revise", __result);
@@ -6420,12 +6649,14 @@ export const ComponentSnapshot_capture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ComponentSnapshot_capture", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"}]);
     const __result = await __runComponentSnapshotCapture(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentSnapshot_capture", __result);
@@ -6443,12 +6674,14 @@ export const ComponentSnapshot_createViaCapture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ComponentSnapshot_createViaCapture", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { componentId, versionNumber, changeSummary, snapshot } = args;
@@ -6536,12 +6769,14 @@ export const ComponentStep_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ComponentStep_add", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"}]);
     const __result = await __runComponentStepAdd(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentStep_add", __result);
@@ -6559,12 +6794,14 @@ export const ComponentStep_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ComponentStep_createViaAdd", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { componentId, instruction, sortOrder, durationMinutes } = args;
@@ -6646,7 +6883,10 @@ export const ComponentStep_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"}]);
     const __result = await __runComponentStepRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentStep_remove", __result);
@@ -6700,7 +6940,10 @@ export const ComponentStep_revise = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"}]);
     const __result = await __runComponentStepRevise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ComponentStep_revise", __result);
@@ -6767,12 +7010,14 @@ export const Contract_draft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Contract_draft", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runContractDraft(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Contract_draft", __result);
@@ -6793,12 +7038,14 @@ export const Contract_createViaDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Contract_createViaDraft", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, clientId, title, contractNumber, documentUrl, expiresAt, notes } = args;
@@ -6903,7 +7150,10 @@ export const Contract_expire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runContractExpire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Contract_expire", __result);
@@ -6963,7 +7213,10 @@ export const Contract_markViewed = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runContractMarkViewed(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Contract_markViewed", __result);
@@ -7026,7 +7279,10 @@ export const Contract_markVoided = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runContractMarkVoided(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Contract_markVoided", __result);
@@ -7086,7 +7342,10 @@ export const Contract_reassignClient = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runContractReassignClient(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Contract_reassignClient", __result);
@@ -7148,7 +7407,10 @@ export const Contract_send = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runContractSend(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Contract_send", __result);
@@ -7212,7 +7474,10 @@ export const Contract_sign = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runContractSign(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Contract_sign", __result);
@@ -7262,12 +7527,14 @@ export const Contract_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientMergeId","clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Contract_stageClientMerge", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"clientMergeId","table":null}]);
     const __result = await __runContractStageClientMerge(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Contract_stageClientMerge", __result);
@@ -7336,7 +7603,10 @@ export const CorrectiveAction_close = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"incidentId","table":"incidents"},{"name":"eventId","table":"events"}]);
     const __result = await __runCorrectiveActionClose(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "CorrectiveAction_close", __result);
@@ -7391,12 +7661,14 @@ export const CorrectiveAction_open = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["incidentId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "CorrectiveAction_open", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"incidentId","table":"incidents"},{"name":"eventId","table":"events"}]);
     const __result = await __runCorrectiveActionOpen(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "CorrectiveAction_open", __result);
@@ -7413,12 +7685,14 @@ export const CorrectiveAction_createViaOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["incidentId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "CorrectiveAction_createViaOpen", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"incidentId","table":"incidents"},{"name":"eventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { incidentId, eventId, description } = args;
@@ -7562,12 +7836,14 @@ export const CreditMemo_issue = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["sourceInvoiceId","clientId","targetInvoiceId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "CreditMemo_issue", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceInvoiceId","table":"invoices"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"targetInvoiceId","table":"invoices"},{"name":"eventId","table":"events"}]);
     const __result = await __runCreditMemoIssue(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "CreditMemo_issue", __result);
@@ -7589,12 +7865,14 @@ export const CreditMemo_createViaIssue = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["sourceInvoiceId","clientId","targetInvoiceId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "CreditMemo_createViaIssue", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceInvoiceId","table":"invoices"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"targetInvoiceId","table":"invoices"},{"name":"eventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { sourceInvoiceId, clientId, creditMemoNumber, amount, reason, disposition, targetInvoiceId, eventId } = args;
@@ -7728,7 +8006,10 @@ export const CreditMemo_reassignClient = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceInvoiceId","table":"invoices"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"targetInvoiceId","table":"invoices"},{"name":"eventId","table":"events"}]);
     const __result = await __runCreditMemoReassignClient(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "CreditMemo_reassignClient", __result);
@@ -7778,12 +8059,14 @@ export const CreditMemo_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientMergeId","clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "CreditMemo_stageClientMerge", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceInvoiceId","table":"invoices"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"targetInvoiceId","table":"invoices"},{"name":"eventId","table":"events"},{"name":"clientMergeId","table":null}]);
     const __result = await __runCreditMemoStageClientMerge(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "CreditMemo_stageClientMerge", __result);
@@ -7828,6 +8111,8 @@ export const CutoverDecision_create = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runCutoverDecisionCreate(ctx, args);
     if (__idemKey !== null) {
@@ -7869,6 +8154,8 @@ export const CutoverDecision_execute = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runCutoverDecisionExecute(ctx, args);
     if (__idemKey !== null) {
@@ -7910,6 +8197,8 @@ export const CutoverDecision_recordApprovals = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runCutoverDecisionRecordApprovals(ctx, args);
     if (__idemKey !== null) {
@@ -7951,6 +8240,8 @@ export const CutoverDecision_rollback = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runCutoverDecisionRollback(ctx, args);
     if (__idemKey !== null) {
@@ -7989,6 +8280,8 @@ export const CutoverDecision_setTppReadOnly = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runCutoverDecisionSetTppReadOnly(ctx, args);
     if (__idemKey !== null) {
@@ -8056,7 +8349,10 @@ export const Delivery_cancel = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"eventId","table":"events"},{"name":"driverId","table":"people"},{"name":"vehicleId","table":"vehicles"}]);
     const __result = await __runDeliveryCancel(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Delivery_cancel", __result);
@@ -8122,7 +8418,10 @@ export const Delivery_confirmDelivery = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"eventId","table":"events"},{"name":"driverId","table":"people"},{"name":"vehicleId","table":"vehicles"}]);
     const __result = await __runDeliveryConfirmDelivery(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Delivery_confirmDelivery", __result);
@@ -8190,7 +8489,10 @@ export const Delivery_markFailed = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"eventId","table":"events"},{"name":"driverId","table":"people"},{"name":"vehicleId","table":"vehicles"}]);
     const __result = await __runDeliveryMarkFailed(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Delivery_markFailed", __result);
@@ -8261,12 +8563,14 @@ export const Delivery_schedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["packListId","eventId","driverId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Delivery_schedule", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"eventId","table":"events"},{"name":"driverId","table":"people"},{"name":"vehicleId","table":"vehicles"}]);
     const __result = await __runDeliverySchedule(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Delivery_schedule", __result);
@@ -8287,12 +8591,14 @@ export const Delivery_createViaSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["packListId","eventId","driverId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Delivery_createViaSchedule", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"eventId","table":"events"},{"name":"driverId","table":"people"},{"name":"vehicleId","table":"vehicles"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { packListId, eventId, destination, windowStartsAt, windowEndsAt, driverId, notes } = args;
@@ -8409,7 +8715,10 @@ export const Delivery_standDownWithEvent = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"eventId","table":"events"},{"name":"driverId","table":"people"},{"name":"vehicleId","table":"vehicles"}]);
     const __result = await __runDeliveryStandDownWithEvent(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Delivery_standDownWithEvent", __result);
@@ -8476,7 +8785,10 @@ export const Delivery_startTransit = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"eventId","table":"events"},{"name":"driverId","table":"people"},{"name":"vehicleId","table":"vehicles"}]);
     const __result = await __runDeliveryStartTransit(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Delivery_startTransit", __result);
@@ -8524,7 +8836,10 @@ export const Dish_classifyAllergens = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalDishId","table":"dishes"},{"name":"mergedIntoDishId","table":"dishes"}]);
     const __result = await __runDishClassifyAllergens(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Dish_classifyAllergens", __result);
@@ -8571,7 +8886,10 @@ export const Dish_classifyKind = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalDishId","table":"dishes"},{"name":"mergedIntoDishId","table":"dishes"}]);
     const __result = await __runDishClassifyKind(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Dish_classifyKind", __result);
@@ -8619,7 +8937,10 @@ export const Dish_clearPrimaryImage = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalDishId","table":"dishes"},{"name":"mergedIntoDishId","table":"dishes"}]);
     const __result = await __runDishClearPrimaryImage(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Dish_clearPrimaryImage", __result);
@@ -8686,7 +9007,10 @@ export const Dish_introduce = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalDishId","table":"dishes"},{"name":"mergedIntoDishId","table":"dishes"}]);
     const __result = await __runDishIntroduce(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Dish_introduce", __result);
@@ -8713,7 +9037,10 @@ export const Dish_createViaIntroduce = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalDishId","table":"dishes"},{"name":"mergedIntoDishId","table":"dishes"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { name, portionSize, portionUnit, description, category, course, serviceStyle, dietaryTags, allergenSummary } = args;
@@ -8807,12 +9134,14 @@ export const Dish_linkAsEdition = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["sourceDishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Dish_linkAsEdition", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalDishId","table":"dishes"},{"name":"mergedIntoDishId","table":"dishes"},{"name":"sourceDishId","table":null}]);
     const __result = await __runDishLinkAsEdition(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Dish_linkAsEdition", __result);
@@ -8876,12 +9205,14 @@ export const Dish_mergeInto = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["targetDishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Dish_mergeInto", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalDishId","table":"dishes"},{"name":"mergedIntoDishId","table":"dishes"},{"name":"targetDishId","table":null}]);
     const __result = await __runDishMergeInto(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Dish_mergeInto", __result);
@@ -8943,7 +9274,10 @@ export const Dish_purge = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalDishId","table":"dishes"},{"name":"mergedIntoDishId","table":"dishes"}]);
     const __result = await __runDishPurge(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Dish_purge", __result);
@@ -9005,7 +9339,10 @@ export const Dish_reinstate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalDishId","table":"dishes"},{"name":"mergedIntoDishId","table":"dishes"}]);
     const __result = await __runDishReinstate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Dish_reinstate", __result);
@@ -9069,7 +9406,10 @@ export const Dish_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalDishId","table":"dishes"},{"name":"mergedIntoDishId","table":"dishes"}]);
     const __result = await __runDishRetire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Dish_retire", __result);
@@ -9128,7 +9468,10 @@ export const Dish_reviseDetails = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalDishId","table":"dishes"},{"name":"mergedIntoDishId","table":"dishes"}]);
     const __result = await __runDishReviseDetails(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Dish_reviseDetails", __result);
@@ -9182,7 +9525,10 @@ export const Dish_saveRecipe = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalDishId","table":"dishes"},{"name":"mergedIntoDishId","table":"dishes"}]);
     const __result = await __runDishSaveRecipe(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Dish_saveRecipe", __result);
@@ -9233,7 +9579,10 @@ export const Dish_saveServiceInstructions = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalDishId","table":"dishes"},{"name":"mergedIntoDishId","table":"dishes"}]);
     const __result = await __runDishSaveServiceInstructions(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Dish_saveServiceInstructions", __result);
@@ -9284,7 +9633,10 @@ export const Dish_setPrimaryImage = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalDishId","table":"dishes"},{"name":"mergedIntoDishId","table":"dishes"}]);
     const __result = await __runDishSetPrimaryImage(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Dish_setPrimaryImage", __result);
@@ -9337,7 +9689,10 @@ export const Dish_updatePortioning = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalDishId","table":"dishes"},{"name":"mergedIntoDishId","table":"dishes"}]);
     const __result = await __runDishUpdatePortioning(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Dish_updatePortioning", __result);
@@ -9425,12 +9780,14 @@ export const DishComponent_attach = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["dishId","componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "DishComponent_attach", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"},{"name":"componentId","table":"components"},{"name":"portionSpecId","table":"componentPortionSpecs"}]);
     const __result = await __runDishComponentAttach(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishComponent_attach", __result);
@@ -9450,12 +9807,14 @@ export const DishComponent_createViaAttach = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["dishId","componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "DishComponent_createViaAttach", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"},{"name":"componentId","table":"components"},{"name":"portionSpecId","table":"componentPortionSpecs"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { dishId, componentId, yieldQuantity, batchMultiplier, sortOrder, role } = args;
@@ -9589,7 +9948,10 @@ export const DishComponent_detach = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"},{"name":"componentId","table":"components"},{"name":"portionSpecId","table":"componentPortionSpecs"}]);
     const __result = await __runDishComponentDetach(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishComponent_detach", __result);
@@ -9638,12 +10000,14 @@ export const DishComponent_setPortionSpec = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["portionSpecId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "DishComponent_setPortionSpec", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"},{"name":"componentId","table":"components"},{"name":"portionSpecId","table":"componentPortionSpecs"}]);
     const __result = await __runDishComponentSetPortionSpec(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishComponent_setPortionSpec", __result);
@@ -9713,12 +10077,14 @@ export const DishContainer_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "DishContainer_define", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"}]);
     const __result = await __runDishContainerDefine(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishContainer_define", __result);
@@ -9741,12 +10107,14 @@ export const DishContainer_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "DishContainer_createViaDefine", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { dishId, name, serviceMethod, servingsPerContainer, baseQuantity, unit, equipmentNotes, handlingNotes, sortOrder } = args;
@@ -9837,7 +10205,10 @@ export const DishContainer_refreshActiveKey = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"}]);
     const __result = await __runDishContainerRefreshActiveKey(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishContainer_refreshActiveKey", __result);
@@ -9909,7 +10280,10 @@ export const DishContainer_reinstate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"}]);
     const __result = await __runDishContainerReinstate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishContainer_reinstate", __result);
@@ -9977,7 +10351,10 @@ export const DishContainer_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"}]);
     const __result = await __runDishContainerRetire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishContainer_retire", __result);
@@ -10052,7 +10429,10 @@ export const DishContainer_revise = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"}]);
     const __result = await __runDishContainerRevise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishContainer_revise", __result);
@@ -10138,12 +10518,14 @@ export const DishIngredient_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["dishId","ingredientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "DishIngredient_add", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runDishIngredientAdd(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishIngredient_add", __result);
@@ -10164,12 +10546,14 @@ export const DishIngredient_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["dishId","ingredientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "DishIngredient_createViaAdd", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { dishId, ingredientId, quantity, unit, sortOrder, wasteFactor, prepNotes } = args;
@@ -10314,7 +10698,10 @@ export const DishIngredient_adjustQuantity = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runDishIngredientAdjustQuantity(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishIngredient_adjustQuantity", __result);
@@ -10372,7 +10759,10 @@ export const DishIngredient_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runDishIngredientRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishIngredient_remove", __result);
@@ -10447,12 +10837,14 @@ export const DishTask_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["dishId","componentId","ingredientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "DishTask_add", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"},{"name":"componentId","table":"components"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runDishTaskAdd(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishTask_add", __result);
@@ -10478,12 +10870,14 @@ export const DishTask_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["dishId","componentId","ingredientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "DishTask_createViaAdd", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"},{"name":"componentId","table":"components"},{"name":"ingredientId","table":"ingredients"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { dishId, name, category, taskType, defaultQuantity, defaultUnit, station, sortOrder, componentId, ingredientId, instructions, synchronizePrep } = args;
@@ -10577,7 +10971,10 @@ export const DishTask_backfillActiveKey = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"},{"name":"componentId","table":"components"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runDishTaskBackfillActiveKey(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishTask_backfillActiveKey", __result);
@@ -10641,7 +11038,10 @@ export const DishTask_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"},{"name":"componentId","table":"components"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runDishTaskRetire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishTask_retire", __result);
@@ -10711,12 +11111,14 @@ export const DishTask_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["componentId","ingredientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "DishTask_revise", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"},{"name":"componentId","table":"components"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runDishTaskRevise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishTask_revise", __result);
@@ -10774,12 +11176,14 @@ export const DishTask_specifyWork = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["sequenceAfterDishTaskId","stationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "DishTask_specifyWork", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishId","table":"dishes"},{"name":"componentId","table":"components"},{"name":"ingredientId","table":"ingredients"},{"name":"sequenceAfterDishTaskId","table":null},{"name":"stationId","table":null}]);
     const __result = await __runDishTaskSpecifyWork(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishTask_specifyWork", __result);
@@ -10836,12 +11240,14 @@ export const DishTaskMaterial_link = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["dishTaskId","dishIngredientId","dishComponentId","dishContainerId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "DishTaskMaterial_link", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishTaskId","table":"dishTasks"},{"name":"dishIngredientId","table":"dishIngredients"},{"name":"dishComponentId","table":"dishComponents"},{"name":"dishContainerId","table":"dishContainers"}]);
     const __result = await __runDishTaskMaterialLink(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishTaskMaterial_link", __result);
@@ -10861,12 +11267,14 @@ export const DishTaskMaterial_createViaLink = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["dishTaskId","dishIngredientId","dishComponentId","dishContainerId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "DishTaskMaterial_createViaLink", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishTaskId","table":"dishTasks"},{"name":"dishIngredientId","table":"dishIngredients"},{"name":"dishComponentId","table":"dishComponents"},{"name":"dishContainerId","table":"dishContainers"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { dishTaskId, dishIngredientId, dishComponentId, dishContainerId, workQuantity, workUnit } = args;
@@ -10952,7 +11360,10 @@ export const DishTaskMaterial_unlink = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dishTaskId","table":"dishTasks"},{"name":"dishIngredientId","table":"dishIngredients"},{"name":"dishComponentId","table":"dishComponents"},{"name":"dishContainerId","table":"dishContainers"}]);
     const __result = await __runDishTaskMaterialUnlink(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "DishTaskMaterial_unlink", __result);
@@ -11009,6 +11420,8 @@ export const EmailNotificationSubscription_configure = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runEmailNotificationSubscriptionConfigure(ctx, args);
     if (__idemKey !== null) {
@@ -11031,6 +11444,8 @@ export const EmailNotificationSubscription_createViaConfigure = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -11119,6 +11534,8 @@ export const EmailNotificationSubscription_updateSubscriptions = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runEmailNotificationSubscriptionUpdateSubscriptions(ctx, args);
     if (__idemKey !== null) {
@@ -11181,6 +11598,8 @@ export const Equipment_reactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runEquipmentReactivate(ctx, args);
     if (__idemKey !== null) {
@@ -11231,6 +11650,8 @@ export const Equipment_recount = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runEquipmentRecount(ctx, args);
     if (__idemKey !== null) {
@@ -11297,6 +11718,8 @@ export const Equipment_register = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runEquipmentRegister(ctx, args);
     if (__idemKey !== null) {
@@ -11322,6 +11745,8 @@ export const Equipment_createViaRegister = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -11430,6 +11855,8 @@ export const Equipment_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runEquipmentRetire(ctx, args);
     if (__idemKey !== null) {
@@ -11492,6 +11919,8 @@ export const Equipment_reviseDetails = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runEquipmentReviseDetails(ctx, args);
     if (__idemKey !== null) {
@@ -11543,6 +11972,8 @@ export const Equipment_updateCondition = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runEquipmentUpdateCondition(ctx, args);
     if (__idemKey !== null) {
@@ -11595,7 +12026,10 @@ export const EquipmentMaintenanceTask_applyService = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"equipmentId","table":"equipments"}]);
     const __result = await __runEquipmentMaintenanceTaskApplyService(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EquipmentMaintenanceTask_applyService", __result);
@@ -11653,12 +12087,14 @@ export const EquipmentMaintenanceTask_schedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["equipmentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EquipmentMaintenanceTask_schedule", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"equipmentId","table":"equipments"}]);
     const __result = await __runEquipmentMaintenanceTaskSchedule(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EquipmentMaintenanceTask_schedule", __result);
@@ -11677,12 +12113,14 @@ export const EquipmentMaintenanceTask_createViaSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["equipmentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EquipmentMaintenanceTask_createViaSchedule", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"equipmentId","table":"equipments"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { equipmentId, taskName, intervalDays, nextDueAt, instructions } = args;
@@ -11781,7 +12219,10 @@ export const EquipmentReservation_cancel = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"equipmentId","table":"equipments"},{"name":"eventId","table":"events"}]);
     const __result = await __runEquipmentReservationCancel(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EquipmentReservation_cancel", __result);
@@ -11848,7 +12289,10 @@ export const EquipmentReservation_checkOut = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"equipmentId","table":"equipments"},{"name":"eventId","table":"events"}]);
     const __result = await __runEquipmentReservationCheckOut(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EquipmentReservation_checkOut", __result);
@@ -11920,7 +12364,10 @@ export const EquipmentReservation_markReturned = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"equipmentId","table":"equipments"},{"name":"eventId","table":"events"}]);
     const __result = await __runEquipmentReservationMarkReturned(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EquipmentReservation_markReturned", __result);
@@ -11990,12 +12437,14 @@ export const EquipmentServiceEntry_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["maintenanceTaskId","equipmentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EquipmentServiceEntry_record", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"maintenanceTaskId","table":"equipmentMaintenanceTasks"},{"name":"equipmentId","table":"equipments"}]);
     const __result = await __runEquipmentServiceEntryRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EquipmentServiceEntry_record", __result);
@@ -12016,12 +12465,14 @@ export const EquipmentServiceEntry_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["maintenanceTaskId","equipmentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EquipmentServiceEntry_createViaRecord", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"maintenanceTaskId","table":"equipmentMaintenanceTasks"},{"name":"equipmentId","table":"equipments"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { maintenanceTaskId, equipmentId, technician, cost, completedAt, nextDueAt, notes } = args;
@@ -12218,7 +12669,10 @@ export const Event_approve = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventApprove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_approve", __result);
@@ -12272,7 +12726,10 @@ export const Event_archive = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventArchive(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_archive", __result);
@@ -12321,12 +12778,14 @@ export const Event_assignOwner = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["assignedToId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Event_assignOwner", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventAssignOwner(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_assignOwner", __result);
@@ -12390,7 +12849,10 @@ export const Event_beginExecution = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventBeginExecution(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_beginExecution", __result);
@@ -12478,7 +12940,10 @@ export const Event_cancel = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventCancel(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_cancel", __result);
@@ -12580,12 +13045,14 @@ export const Event_captureDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId","serviceStyleId","occasionId","venueId","assignedToId","referralSourceId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Event_captureDraft", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventCaptureDraft(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_captureDraft", __result);
@@ -12644,7 +13111,10 @@ export const Event_changeHeadcount = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventChangeHeadcount(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_changeHeadcount", __result);
@@ -12699,7 +13169,10 @@ export const Event_changePricing = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventChangePricing(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_changePricing", __result);
@@ -12755,7 +13228,10 @@ export const Event_changePrimaryContact = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventChangePrimaryContact(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_changePrimaryContact", __result);
@@ -12810,7 +13286,10 @@ export const Event_changeRequirements = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventChangeRequirements(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_changeRequirements", __result);
@@ -12877,12 +13356,14 @@ export const Event_changeServiceStyle = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["serviceStyleId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Event_changeServiceStyle", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventChangeServiceStyle(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_changeServiceStyle", __result);
@@ -12936,12 +13417,14 @@ export const Event_changeVenue = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["venueId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Event_changeVenue", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventChangeVenue(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_changeVenue", __result);
@@ -12991,7 +13474,10 @@ export const Event_clearBinderBuilt = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventClearBinderBuilt(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_clearBinderBuilt", __result);
@@ -13089,7 +13575,10 @@ export const Event_closeOut = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventCloseOut(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_closeOut", __result);
@@ -13169,7 +13658,10 @@ export const Event_complete = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventComplete(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_complete", __result);
@@ -13243,7 +13735,10 @@ export const Event_configureRecurrence = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventConfigureRecurrence(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_configureRecurrence", __result);
@@ -13314,7 +13809,10 @@ export const Event_configureTiming = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventConfigureTiming(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_configureTiming", __result);
@@ -13378,7 +13876,10 @@ export const Event_confirmSalesLock = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventConfirmSalesLock(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_confirmSalesLock", __result);
@@ -13435,7 +13936,10 @@ export const Event_correctCommercial = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventCorrectCommercial(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_correctCommercial", __result);
@@ -13499,7 +14003,10 @@ export const Event_finalizeEvent = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventFinalizeEvent(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_finalizeEvent", __result);
@@ -13568,7 +14075,10 @@ export const Event_lockForSales = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventLockForSales(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_lockForSales", __result);
@@ -13617,7 +14127,10 @@ export const Event_markBinderBuilt = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventMarkBinderBuilt(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_markBinderBuilt", __result);
@@ -13670,7 +14183,10 @@ export const Event_normalizePurchasingWeek = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventNormalizePurchasingWeek(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_normalizePurchasingWeek", __result);
@@ -13790,12 +14306,14 @@ export const Event_planEngagement = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId","serviceStyleId","occasionId","venueId","assignedToId","referralSourceId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Event_planEngagement", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventPlanEngagement(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_planEngagement", __result);
@@ -13835,12 +14353,14 @@ export const Event_createViaPlanEngagement = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId","serviceStyleId","occasionId","venueId","assignedToId","referralSourceId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Event_createViaPlanEngagement", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const context = (ctx as any);
@@ -13981,7 +14501,10 @@ export const Event_reactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventReactivate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_reactivate", __result);
@@ -14044,7 +14567,10 @@ export const Event_reassignClient = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventReassignClient(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_reassignClient", __result);
@@ -14106,7 +14632,10 @@ export const Event_reschedule = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventReschedule(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_reschedule", __result);
@@ -14172,7 +14701,10 @@ export const Event_returnToPlanning = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventReturnToPlanning(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_returnToPlanning", __result);
@@ -14222,7 +14754,10 @@ export const Event_setEventNumber = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventSetEventNumber(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_setEventNumber", __result);
@@ -14275,12 +14810,14 @@ export const Event_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientMergeId","clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Event_stageClientMerge", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"},{"name":"clientMergeId","table":null}]);
     const __result = await __runEventStageClientMerge(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_stageClientMerge", __result);
@@ -14332,7 +14869,10 @@ export const Event_stopRecurrence = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventStopRecurrence(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_stopRecurrence", __result);
@@ -14395,7 +14935,10 @@ export const Event_submitForApproval = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventSubmitForApproval(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_submitForApproval", __result);
@@ -14475,7 +15018,10 @@ export const Event_updateDaySheet = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventUpdateDaySheet(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_updateDaySheet", __result);
@@ -14572,12 +15118,14 @@ export const Event_updateImportDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId","serviceStyleId","occasionId","venueId","assignedToId","referralSourceId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Event_updateImportDraft", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventUpdateImportDraft(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_updateImportDraft", __result);
@@ -14637,7 +15185,10 @@ export const Event_updateSetupNotes = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventUpdateSetupNotes(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_updateSetupNotes", __result);
@@ -14703,7 +15254,10 @@ export const Event_updateTaskBreakdown = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __result = await __runEventUpdateTaskBreakdown(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Event_updateTaskBreakdown", __result);
@@ -14782,12 +15336,14 @@ export const EventAllergenCheck_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","eventDishId","dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventAllergenCheck_record", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"dishId","table":"dishes"},{"name":"checkedById","table":"people"}]);
     const __result = await __runEventAllergenCheckRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventAllergenCheck_record", __result);
@@ -14807,12 +15363,14 @@ export const EventAllergenCheck_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","eventDishId","dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventAllergenCheck_createViaRecord", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"dishId","table":"dishes"},{"name":"checkedById","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, result, eventDishId, dishId, flaggedAllergens, notes } = args;
@@ -14925,12 +15483,14 @@ export const EventAssignment_applyApprovedShiftSwap = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId","shiftSwapRequestId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventAssignment_applyApprovedShiftSwap", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"personId","table":"people"},{"name":"shiftSwapRequestId","table":null}]);
     const __result = await __runEventAssignmentApplyApprovedShiftSwap(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventAssignment_applyApprovedShiftSwap", __result);
@@ -15000,12 +15560,14 @@ export const EventAssignment_assign = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","personId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventAssignment_assign", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"personId","table":"people"}]);
     const __result = await __runEventAssignmentAssign(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventAssignment_assign", __result);
@@ -15025,12 +15587,14 @@ export const EventAssignment_createViaAssign = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","personId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventAssignment_createViaAssign", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"personId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, personId, role, startsAt, endsAt, notes } = args;
@@ -15144,7 +15708,10 @@ export const EventAssignment_checkIn = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"personId","table":"people"}]);
     const __result = await __runEventAssignmentCheckIn(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventAssignment_checkIn", __result);
@@ -15210,7 +15777,10 @@ export const EventAssignment_checkOut = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"personId","table":"people"}]);
     const __result = await __runEventAssignmentCheckOut(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventAssignment_checkOut", __result);
@@ -15276,7 +15846,10 @@ export const EventAssignment_confirm = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"personId","table":"people"}]);
     const __result = await __runEventAssignmentConfirm(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventAssignment_confirm", __result);
@@ -15341,7 +15914,10 @@ export const EventAssignment_markNoShow = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"personId","table":"people"}]);
     const __result = await __runEventAssignmentMarkNoShow(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventAssignment_markNoShow", __result);
@@ -15398,7 +15974,10 @@ export const EventAssignment_planTiming = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"personId","table":"people"}]);
     const __result = await __runEventAssignmentPlanTiming(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventAssignment_planTiming", __result);
@@ -15463,7 +16042,10 @@ export const EventAssignment_unassign = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"personId","table":"people"}]);
     const __result = await __runEventAssignmentUnassign(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventAssignment_unassign", __result);
@@ -15551,12 +16133,14 @@ export const EventCloseout_capture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventCloseout_capture", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventCloseoutCapture(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventCloseout_capture", __result);
@@ -15587,12 +16171,14 @@ export const EventCloseout_createViaCapture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventCloseout_createViaCapture", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, actualRevenue, budgetedRevenue, revenueVariance, actualIngredientCost, actualWasteCost, actualLaborCost, actualVendorCost, budgetedCost, totalActualCost, costVariance, grossProfit, expectedHeadcount, actualHeadcount, unresolvedIssues, performanceNotes, notes } = args;
@@ -15722,7 +16308,10 @@ export const EventCloseout_finalize = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventCloseoutFinalize(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventCloseout_finalize", __result);
@@ -15778,7 +16367,10 @@ export const EventCloseout_followEventCommercial = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventCloseoutFollowEventCommercial(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventCloseout_followEventCommercial", __result);
@@ -15941,12 +16533,14 @@ export const EventDish_addToEvent = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventDish_addToEvent", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runEventDishAddToEvent(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDish_addToEvent", __result);
@@ -15968,12 +16562,14 @@ export const EventDish_createViaAddToEvent = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventDish_createViaAddToEvent", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"dishId","table":"dishes"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, dishId, quantityServings, dishName, headcountOverride, course, serviceStyle, specialInstructions } = args;
@@ -16181,7 +16777,10 @@ export const EventDish_adjustServings = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runEventDishAdjustServings(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDish_adjustServings", __result);
@@ -16235,7 +16834,10 @@ export const EventDish_changeCourse = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runEventDishChangeCourse(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDish_changeCourse", __result);
@@ -16355,12 +16957,14 @@ export const EventDish_confirmFromProposal = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventDish_confirmFromProposal", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runEventDishConfirmFromProposal(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDish_confirmFromProposal", __result);
@@ -16401,7 +17005,10 @@ export const EventDish_refreshRecipeSync = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runEventDishRefreshRecipeSync(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDish_refreshRecipeSync", __result);
@@ -16467,7 +17074,10 @@ export const EventDish_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runEventDishRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDish_remove", __result);
@@ -16515,7 +17125,10 @@ export const EventDish_reorder = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runEventDishReorder(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDish_reorder", __result);
@@ -16570,7 +17183,10 @@ export const EventDish_requestCatalogPacking = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runEventDishRequestCatalogPacking(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDish_requestCatalogPacking", __result);
@@ -16647,12 +17263,14 @@ export const EventDish_requestContainerPack = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["packListId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventDish_requestContainerPack", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"dishId","table":"dishes"},{"name":"packListId","table":null}]);
     const __result = await __runEventDishRequestContainerPack(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDish_requestContainerPack", __result);
@@ -16722,7 +17340,10 @@ export const EventDish_setHeadcountOverride = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runEventDishSetHeadcountOverride(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDish_setHeadcountOverride", __result);
@@ -16789,7 +17410,10 @@ export const EventDish_syncHeadcount = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runEventDishSyncHeadcount(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDish_syncHeadcount", __result);
@@ -16841,7 +17465,10 @@ export const EventDish_updateInstructions = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runEventDishUpdateInstructions(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDish_updateInstructions", __result);
@@ -16913,7 +17540,10 @@ export const EventDishComponentSeed_refresh = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"componentId","table":"components"}]);
     const __result = await __runEventDishComponentSeedRefresh(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDishComponentSeed_refresh", __result);
@@ -16950,7 +17580,10 @@ export const EventDishComponentSeed_refreshRecipeSync = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"componentId","table":"components"}]);
     const __result = await __runEventDishComponentSeedRefreshRecipeSync(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDishComponentSeed_refreshRecipeSync", __result);
@@ -16987,7 +17620,10 @@ export const EventDishComponentSeed_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"componentId","table":"components"}]);
     const __result = await __runEventDishComponentSeedRetire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDishComponentSeed_retire", __result);
@@ -17080,12 +17716,14 @@ export const EventDishComponentSeed_seed = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","eventDishId","dishId","componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventDishComponentSeed_seed", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"componentId","table":"components"},{"name":"dishId","table":null}]);
     const __result = await __runEventDishComponentSeedSeed(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDishComponentSeed_seed", __result);
@@ -17107,12 +17745,14 @@ export const EventDishComponentSeed_createViaSeed = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","eventDishId","dishId","componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventDishComponentSeed_createViaSeed", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"componentId","table":"components"},{"name":"dishId","table":null}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, eventDishId, dishId, componentId, servings, yieldQuantity, batchMultiplier, purchasingWeekStart } = args;
@@ -17256,12 +17896,14 @@ export const EventDishLineOverride_apply = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventDishId","eventId","targetDishIngredientId","targetDishComponentId","targetDishContainerId","targetDishTaskId","ingredientId","componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventDishLineOverride_apply", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"targetDishIngredientId","table":null},{"name":"targetDishComponentId","table":null},{"name":"targetDishContainerId","table":null},{"name":"targetDishTaskId","table":null},{"name":"ingredientId","table":null},{"name":"componentId","table":null}]);
     const __result = await __runEventDishLineOverrideApply(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDishLineOverride_apply", __result);
@@ -17288,12 +17930,14 @@ export const EventDishLineOverride_createViaApply = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventDishId","eventId","targetDishIngredientId","targetDishComponentId","targetDishContainerId","targetDishTaskId","ingredientId","componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventDishLineOverride_createViaApply", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"targetDishIngredientId","table":null},{"name":"targetDishComponentId","table":null},{"name":"targetDishContainerId","table":null},{"name":"targetDishTaskId","table":null},{"name":"ingredientId","table":null},{"name":"componentId","table":null}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventDishId, eventId, kind, portionsAffected, reason, targetDishIngredientId, targetDishComponentId, targetDishContainerId, targetDishTaskId, ingredientId, componentId, quantity, unit } = args;
@@ -17397,7 +18041,10 @@ export const EventDishLineOverride_revoke = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"}]);
     const __result = await __runEventDishLineOverrideRevoke(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventDishLineOverride_revoke", __result);
@@ -17448,7 +18095,10 @@ export const EventGuest_assignTable = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventGuestAssignTable(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventGuest_assignTable", __result);
@@ -17499,7 +18149,10 @@ export const EventGuest_checkIn = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventGuestCheckIn(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventGuest_checkIn", __result);
@@ -17574,12 +18227,14 @@ export const EventGuest_invite = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventGuest_invite", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventGuestInvite(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventGuest_invite", __result);
@@ -17601,12 +18256,14 @@ export const EventGuest_createViaInvite = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventGuest_createViaInvite", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, name, email, phone, dietaryRestrictions, allergenRestrictions, accessibilityNeeds, specialMealRequired } = args;
@@ -17712,7 +18369,10 @@ export const EventGuest_rsvpConfirm = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventGuestRsvpConfirm(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventGuest_rsvpConfirm", __result);
@@ -17776,7 +18436,10 @@ export const EventGuest_rsvpDecline = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventGuestRsvpDecline(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventGuest_rsvpDecline", __result);
@@ -17826,7 +18489,10 @@ export const EventGuest_withdraw = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventGuestWithdraw(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventGuest_withdraw", __result);
@@ -17981,12 +18647,14 @@ export const EventIngredientContribution_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","eventDishId","dishId","ingredientId","componentId","sourceDishIngredientId","sourceDishComponentId","productionBatchId","productionBatchAllocationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventIngredientContribution_record", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"ingredientId","table":"ingredients"},{"name":"dishId","table":null},{"name":"componentId","table":null},{"name":"sourceDishIngredientId","table":null},{"name":"sourceDishComponentId","table":null},{"name":"productionBatchId","table":null},{"name":"productionBatchAllocationId","table":null}]);
     const __result = await __runEventIngredientContributionRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventIngredientContribution_record", __result);
@@ -18021,12 +18689,14 @@ export const EventIngredientContribution_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","eventDishId","dishId","ingredientId","componentId","sourceDishIngredientId","sourceDishComponentId","productionBatchId","productionBatchAllocationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventIngredientContribution_createViaRecord", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"ingredientId","table":"ingredients"},{"name":"dishId","table":null},{"name":"componentId","table":null},{"name":"sourceDishIngredientId","table":null},{"name":"sourceDishComponentId","table":null},{"name":"productionBatchId","table":null},{"name":"productionBatchAllocationId","table":null}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, eventDishId, dishId, ingredientId, quantity, unit, servings, quantityPerServing, componentId, purchasingWeekStart, sourceKey, exactQuantity, roundedQuantity, quantityBasis, unitStatus, ownership, sourceDishIngredientId, sourceDishComponentId, componentPath, productionBatchId, productionBatchAllocationId } = args;
@@ -18203,7 +18873,10 @@ export const EventIngredientContribution_refreshRecipeSync = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runEventIngredientContributionRefreshRecipeSync(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventIngredientContribution_refreshRecipeSync", __result);
@@ -18318,7 +18991,10 @@ export const EventIngredientContribution_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runEventIngredientContributionRetire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventIngredientContribution_retire", __result);
@@ -18432,7 +19108,10 @@ export const EventIngredientContribution_retirePreviousUnit = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runEventIngredientContributionRetirePreviousUnit(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventIngredientContribution_retirePreviousUnit", __result);
@@ -18550,7 +19229,10 @@ export const EventIngredientContribution_revise = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runEventIngredientContributionRevise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventIngredientContribution_revise", __result);
@@ -18668,7 +19350,10 @@ export const EventIngredientContribution_supersede = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runEventIngredientContributionSupersede(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventIngredientContribution_supersede", __result);
@@ -18721,12 +19406,14 @@ export const EventLayoutSection_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventLayoutSection_add", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventLayoutSectionAdd(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventLayoutSection_add", __result);
@@ -18744,12 +19431,14 @@ export const EventLayoutSection_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventLayoutSection_createViaAdd", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, type, instructions, sortOrder } = args;
@@ -18828,7 +19517,10 @@ export const EventLayoutSection_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventLayoutSectionRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventLayoutSection_remove", __result);
@@ -18882,7 +19574,10 @@ export const EventLayoutSection_update = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventLayoutSectionUpdate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventLayoutSection_update", __result);
@@ -18934,12 +19629,14 @@ export const EventStaffNeed_applyApprovedShiftSwap = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId","shiftSwapRequestId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventStaffNeed_applyApprovedShiftSwap", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"claimedByPersonId","table":"people"},{"name":"filledByPersonId","table":"people"},{"name":"previousStaffNeedId","table":"eventStaffNeeds"},{"name":"coverageReplacementPersonId","table":"people"},{"name":"personId","table":null},{"name":"shiftSwapRequestId","table":null}]);
     const __result = await __runEventStaffNeedApplyApprovedShiftSwap(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventStaffNeed_applyApprovedShiftSwap", __result);
@@ -19003,7 +19700,10 @@ export const EventStaffNeed_cancel = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"claimedByPersonId","table":"people"},{"name":"filledByPersonId","table":"people"},{"name":"previousStaffNeedId","table":"eventStaffNeeds"},{"name":"coverageReplacementPersonId","table":"people"}]);
     const __result = await __runEventStaffNeedCancel(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventStaffNeed_cancel", __result);
@@ -19071,12 +19771,14 @@ export const EventStaffNeed_changeCoverage = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventStaffNeed_changeCoverage", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"claimedByPersonId","table":"people"},{"name":"filledByPersonId","table":"people"},{"name":"previousStaffNeedId","table":"eventStaffNeeds"},{"name":"coverageReplacementPersonId","table":"people"},{"name":"personId","table":null}]);
     const __result = await __runEventStaffNeedChangeCoverage(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventStaffNeed_changeCoverage", __result);
@@ -19136,12 +19838,14 @@ export const EventStaffNeed_claim = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventStaffNeed_claim", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"claimedByPersonId","table":"people"},{"name":"filledByPersonId","table":"people"},{"name":"previousStaffNeedId","table":"eventStaffNeeds"},{"name":"coverageReplacementPersonId","table":"people"},{"name":"personId","table":null}]);
     const __result = await __runEventStaffNeedClaim(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventStaffNeed_claim", __result);
@@ -19202,12 +19906,14 @@ export const EventStaffNeed_fill = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventStaffNeed_fill", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"claimedByPersonId","table":"people"},{"name":"filledByPersonId","table":"people"},{"name":"previousStaffNeedId","table":"eventStaffNeeds"},{"name":"coverageReplacementPersonId","table":"people"},{"name":"personId","table":null}]);
     const __result = await __runEventStaffNeedFill(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventStaffNeed_fill", __result);
@@ -19262,7 +19968,10 @@ export const EventStaffNeed_planTiming = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"claimedByPersonId","table":"people"},{"name":"filledByPersonId","table":"people"},{"name":"previousStaffNeedId","table":"eventStaffNeeds"},{"name":"coverageReplacementPersonId","table":"people"}]);
     const __result = await __runEventStaffNeedPlanTiming(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventStaffNeed_planTiming", __result);
@@ -19339,12 +20048,14 @@ export const EventStaffNeed_postOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","previousStaffNeedId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventStaffNeed_postOpen", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"claimedByPersonId","table":"people"},{"name":"filledByPersonId","table":"people"},{"name":"previousStaffNeedId","table":"eventStaffNeeds"},{"name":"coverageReplacementPersonId","table":"people"}]);
     const __result = await __runEventStaffNeedPostOpen(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventStaffNeed_postOpen", __result);
@@ -19367,12 +20078,14 @@ export const EventStaffNeed_createViaPostOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","previousStaffNeedId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventStaffNeed_createViaPostOpen", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"claimedByPersonId","table":"people"},{"name":"filledByPersonId","table":"people"},{"name":"previousStaffNeedId","table":"eventStaffNeeds"},{"name":"coverageReplacementPersonId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, role, description, startsAt, endsAt, notes, previousStaffNeedId, continuationSlot, followsEventTiming } = args;
@@ -19467,7 +20180,10 @@ export const EventStaffNeed_prepareCoverageContinuation = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"claimedByPersonId","table":"people"},{"name":"filledByPersonId","table":"people"},{"name":"previousStaffNeedId","table":"eventStaffNeeds"},{"name":"coverageReplacementPersonId","table":"people"}]);
     const __result = await __runEventStaffNeedPrepareCoverageContinuation(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventStaffNeed_prepareCoverageContinuation", __result);
@@ -19529,7 +20245,10 @@ export const EventStaffNeed_releaseClaim = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"claimedByPersonId","table":"people"},{"name":"filledByPersonId","table":"people"},{"name":"previousStaffNeedId","table":"eventStaffNeeds"},{"name":"coverageReplacementPersonId","table":"people"}]);
     const __result = await __runEventStaffNeedReleaseClaim(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventStaffNeed_releaseClaim", __result);
@@ -19593,6 +20312,8 @@ export const EventTemplate_archive = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runEventTemplateArchive(ctx, args);
     if (__idemKey !== null) {
@@ -19657,12 +20378,14 @@ export const EventTemplate_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["menuId","sourceEventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventTemplate_define", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"menuId","table":null},{"name":"sourceEventId","table":null}]);
     const __result = await __runEventTemplateDefine(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventTemplate_define", __result);
@@ -19685,12 +20408,14 @@ export const EventTemplate_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["menuId","sourceEventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventTemplate_createViaDefine", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"menuId","table":null},{"name":"sourceEventId","table":null}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { name, clientType, eventType, defaultHeadcount, menuId, defaultStaffRoles, typicalEquipment, notes, sourceEventId } = args;
@@ -19796,6 +20521,8 @@ export const EventTemplate_reactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runEventTemplateReactivate(ctx, args);
     if (__idemKey !== null) {
@@ -19858,12 +20585,14 @@ export const EventTemplate_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["menuId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventTemplate_revise", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"menuId","table":null}]);
     const __result = await __runEventTemplateRevise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventTemplate_revise", __result);
@@ -19939,7 +20668,10 @@ export const EventTimelineActivity_adjust = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventTimelineActivityAdjust(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventTimelineActivity_adjust", __result);
@@ -19988,7 +20720,10 @@ export const EventTimelineActivity_complete = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventTimelineActivityComplete(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventTimelineActivity_complete", __result);
@@ -20048,7 +20783,10 @@ export const EventTimelineActivity_planTiming = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventTimelineActivityPlanTiming(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventTimelineActivity_planTiming", __result);
@@ -20095,7 +20833,10 @@ export const EventTimelineActivity_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventTimelineActivityRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventTimelineActivity_remove", __result);
@@ -20142,7 +20883,10 @@ export const EventTimelineActivity_reopen = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventTimelineActivityReopen(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventTimelineActivity_reopen", __result);
@@ -20211,12 +20955,14 @@ export const EventTimelineActivity_schedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventTimelineActivity_schedule", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventTimelineActivitySchedule(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventTimelineActivity_schedule", __result);
@@ -20241,12 +20987,14 @@ export const EventTimelineActivity_createViaSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventTimelineActivity_createViaSchedule", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, name, startsAt, endsAt, responsibleParty, notes, category, siteNotes, sortOrder, assigneeTeams, assigneePersonIds } = args;
@@ -20347,7 +21095,10 @@ export const EventTimelineActivity_useCalculatedTiming = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runEventTimelineActivityUseCalculatedTiming(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventTimelineActivity_useCalculatedTiming", __result);
@@ -20402,12 +21153,14 @@ export const EventTimelineComment_post = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventTimelineComment_post", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"authorPersonId","table":"people"}]);
     const __result = await __runEventTimelineCommentPost(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventTimelineComment_post", __result);
@@ -20424,12 +21177,14 @@ export const EventTimelineComment_createViaPost = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventTimelineComment_createViaPost", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"authorPersonId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, body, activityId } = args;
@@ -20511,7 +21266,10 @@ export const EventTimelineComment_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"authorPersonId","table":"people"}]);
     const __result = await __runEventTimelineCommentRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventTimelineComment_remove", __result);
@@ -20580,12 +21338,14 @@ export const EventVehicleAssignment_assign = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","vehicleId","trailerId","driverId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventVehicleAssignment_assign", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"vehicleId","table":"vehicles"},{"name":"trailerId","table":"trailers"},{"name":"driverId","table":"people"}]);
     const __result = await __runEventVehicleAssignmentAssign(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventVehicleAssignment_assign", __result);
@@ -20605,12 +21365,14 @@ export const EventVehicleAssignment_createViaAssign = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","vehicleId","trailerId","driverId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "EventVehicleAssignment_createViaAssign", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"vehicleId","table":"vehicles"},{"name":"trailerId","table":"trailers"},{"name":"driverId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, vehicleId, trailerId, driverId, notes, preloaded } = args;
@@ -20701,7 +21463,10 @@ export const EventVehicleAssignment_clearPreloaded = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"vehicleId","table":"vehicles"},{"name":"trailerId","table":"trailers"},{"name":"driverId","table":"people"}]);
     const __result = await __runEventVehicleAssignmentClearPreloaded(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventVehicleAssignment_clearPreloaded", __result);
@@ -20749,7 +21514,10 @@ export const EventVehicleAssignment_markPreloaded = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"vehicleId","table":"vehicles"},{"name":"trailerId","table":"trailers"},{"name":"driverId","table":"people"}]);
     const __result = await __runEventVehicleAssignmentMarkPreloaded(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventVehicleAssignment_markPreloaded", __result);
@@ -20798,7 +21566,10 @@ export const EventVehicleAssignment_release = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"vehicleId","table":"vehicles"},{"name":"trailerId","table":"trailers"},{"name":"driverId","table":"people"}]);
     const __result = await __runEventVehicleAssignmentRelease(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "EventVehicleAssignment_release", __result);
@@ -20848,7 +21619,10 @@ export const ExternalRecordLink_decide = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceImportRunId","table":"importRuns"}]);
     const __result = await __runExternalRecordLinkDecide(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ExternalRecordLink_decide", __result);
@@ -20897,7 +21671,10 @@ export const ExternalRecordLink_discard = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceImportRunId","table":"importRuns"}]);
     const __result = await __runExternalRecordLinkDiscard(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ExternalRecordLink_discard", __result);
@@ -20983,12 +21760,14 @@ export const ExternalRecordLink_link = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["sourceImportRunId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ExternalRecordLink_link", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceImportRunId","table":"importRuns"}]);
     const __result = await __runExternalRecordLinkLink(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ExternalRecordLink_link", __result);
@@ -21020,12 +21799,14 @@ export const ExternalRecordLink_createViaLink = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["sourceImportRunId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ExternalRecordLink_createViaLink", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceImportRunId","table":"importRuns"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { sourceSystem, recordType, externalId, capsuleEntity, capsuleId, verified, sourceImportRunId, effectiveStartDate, effectiveEndDate, rawSourceData, metadata, sourceAccount, role, ordinal, linkKey, decision, suggestedBy, sourceVersion } = args;
@@ -21139,7 +21920,10 @@ export const ExternalRecordLink_observe = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceImportRunId","table":"importRuns"}]);
     const __result = await __runExternalRecordLinkObserve(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ExternalRecordLink_observe", __result);
@@ -21187,7 +21971,10 @@ export const ExternalRecordLink_recordApplied = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceImportRunId","table":"importRuns"}]);
     const __result = await __runExternalRecordLinkRecordApplied(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ExternalRecordLink_recordApplied", __result);
@@ -21239,7 +22026,10 @@ export const ExternalRecordLink_resolveConflict = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceImportRunId","table":"importRuns"}]);
     const __result = await __runExternalRecordLinkResolveConflict(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ExternalRecordLink_resolveConflict", __result);
@@ -21290,7 +22080,10 @@ export const ExternalRecordLink_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceImportRunId","table":"importRuns"}]);
     const __result = await __runExternalRecordLinkRetire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ExternalRecordLink_retire", __result);
@@ -21340,7 +22133,10 @@ export const ExternalRecordLink_unlinkExternalRecord = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceImportRunId","table":"importRuns"}]);
     const __result = await __runExternalRecordLinkUnlinkExternalRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ExternalRecordLink_unlinkExternalRecord", __result);
@@ -21392,7 +22188,10 @@ export const ExternalRecordLink_updateCapsuleId = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceImportRunId","table":"importRuns"}]);
     const __result = await __runExternalRecordLinkUpdateCapsuleId(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ExternalRecordLink_updateCapsuleId", __result);
@@ -21446,7 +22245,10 @@ export const ExternalRecordLink_verifyLink = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceImportRunId","table":"importRuns"}]);
     const __result = await __runExternalRecordLinkVerifyLink(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ExternalRecordLink_verifyLink", __result);
@@ -21502,7 +22304,10 @@ export const ImportArtifact_classify = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"importRunId","table":"importRuns"}]);
     const __result = await __runImportArtifactClassify(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ImportArtifact_classify", __result);
@@ -21554,7 +22359,10 @@ export const ImportArtifact_recordParse = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"importRunId","table":"importRuns"}]);
     const __result = await __runImportArtifactRecordParse(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ImportArtifact_recordParse", __result);
@@ -21619,12 +22427,14 @@ export const ImportArtifact_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["importRunId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ImportArtifact_register", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"importRunId","table":"importRuns"}]);
     const __result = await __runImportArtifactRegister(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ImportArtifact_register", __result);
@@ -21693,12 +22503,14 @@ export const ImportConflict_raise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["externalRecordLinkId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ImportConflict_raise", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"externalRecordLinkId","table":"externalRecordLinks"}]);
     const __result = await __runImportConflictRaise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ImportConflict_raise", __result);
@@ -21718,12 +22530,14 @@ export const ImportConflict_createViaRaise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["externalRecordLinkId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ImportConflict_createViaRaise", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"externalRecordLinkId","table":"externalRecordLinks"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { externalRecordLinkId, field, appliedValue, capsuleValue, sourceValue, sourceVersion } = args;
@@ -21826,7 +22640,10 @@ export const ImportConflict_settle = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"externalRecordLinkId","table":"externalRecordLinks"}]);
     const __result = await __runImportConflictSettle(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ImportConflict_settle", __result);
@@ -21886,7 +22703,10 @@ export const ImportConflict_updateSource = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"externalRecordLinkId","table":"externalRecordLinks"}]);
     const __result = await __runImportConflictUpdateSource(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ImportConflict_updateSource", __result);
@@ -21932,6 +22752,8 @@ export const ImportDataset_activate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportDatasetActivate(ctx, args);
     if (__idemKey !== null) {
@@ -21978,6 +22800,8 @@ export const ImportDataset_deactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportDatasetDeactivate(ctx, args);
     if (__idemKey !== null) {
@@ -22026,6 +22850,8 @@ export const ImportDataset_recordLastImport = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportDatasetRecordLastImport(ctx, args);
     if (__idemKey !== null) {
@@ -22093,6 +22919,8 @@ export const ImportDataset_register = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportDatasetRegister(ctx, args);
     if (__idemKey !== null) {
@@ -22147,6 +22975,8 @@ export const ImportDataset_updateConfig = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportDatasetUpdateConfig(ctx, args);
     if (__idemKey !== null) {
@@ -22212,6 +23042,8 @@ export const ImportRun_approveReview = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportRunApproveReview(ctx, args);
     if (__idemKey !== null) {
@@ -22274,6 +23106,8 @@ export const ImportRun_beginReview = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportRunBeginReview(ctx, args);
     if (__idemKey !== null) {
@@ -22341,6 +23175,8 @@ export const ImportRun_commit = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportRunCommit(ctx, args);
     if (__idemKey !== null) {
@@ -22392,6 +23228,8 @@ export const ImportRun_explainArchiveDiscrepancy = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportRunExplainArchiveDiscrepancy(ctx, args);
     if (__idemKey !== null) {
@@ -22458,6 +23296,8 @@ export const ImportRun_markFailed = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportRunMarkFailed(ctx, args);
     if (__idemKey !== null) {
@@ -22520,6 +23360,8 @@ export const ImportRun_recordArchiveInventory = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportRunRecordArchiveInventory(ctx, args);
     if (__idemKey !== null) {
@@ -22571,6 +23413,8 @@ export const ImportRun_recordCommitCheckpoint = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportRunRecordCommitCheckpoint(ctx, args);
     if (__idemKey !== null) {
@@ -22625,6 +23469,8 @@ export const ImportRun_recordDispositionSummary = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportRunRecordDispositionSummary(ctx, args);
     if (__idemKey !== null) {
@@ -22689,6 +23535,8 @@ export const ImportRun_recordParse = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportRunRecordParse(ctx, args);
     if (__idemKey !== null) {
@@ -22752,6 +23600,8 @@ export const ImportRun_revert = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportRunRevert(ctx, args);
     if (__idemKey !== null) {
@@ -22819,6 +23669,8 @@ export const ImportRun_start = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportRunStart(ctx, args);
     if (__idemKey !== null) {
@@ -22881,6 +23733,8 @@ export const ImportRun_validate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runImportRunValidate(ctx, args);
     if (__idemKey !== null) {
@@ -22943,7 +23797,10 @@ export const Incident_beginInvestigation = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"prepTaskId","table":"prepTasks"},{"name":"deliveryId","table":"deliveries"},{"name":"shiftId","table":"shifts"}]);
     const __result = await __runIncidentBeginInvestigation(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Incident_beginInvestigation", __result);
@@ -22989,7 +23846,10 @@ export const Incident_clearCorrectiveActionLock = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"prepTaskId","table":"prepTasks"},{"name":"deliveryId","table":"deliveries"},{"name":"shiftId","table":"shifts"}]);
     const __result = await __runIncidentClearCorrectiveActionLock(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Incident_clearCorrectiveActionLock", __result);
@@ -23056,7 +23916,10 @@ export const Incident_dismiss = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"prepTaskId","table":"prepTasks"},{"name":"deliveryId","table":"deliveries"},{"name":"shiftId","table":"shifts"}]);
     const __result = await __runIncidentDismiss(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Incident_dismiss", __result);
@@ -23122,7 +23985,10 @@ export const Incident_markResolved = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"prepTaskId","table":"prepTasks"},{"name":"deliveryId","table":"deliveries"},{"name":"shiftId","table":"shifts"}]);
     const __result = await __runIncidentMarkResolved(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Incident_markResolved", __result);
@@ -23191,12 +24057,14 @@ export const Incident_report = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","prepTaskId","deliveryId","shiftId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Incident_report", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"prepTaskId","table":"prepTasks"},{"name":"deliveryId","table":"deliveries"},{"name":"shiftId","table":"shifts"}]);
     const __result = await __runIncidentReport(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Incident_report", __result);
@@ -23217,12 +24085,14 @@ export const Incident_createViaReport = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","prepTaskId","deliveryId","shiftId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Incident_createViaReport", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"prepTaskId","table":"prepTasks"},{"name":"deliveryId","table":"deliveries"},{"name":"shiftId","table":"shifts"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, severity, category, description, prepTaskId, deliveryId, shiftId } = args;
@@ -23321,7 +24191,10 @@ export const Ingredient_classifyAllergens = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"}]);
     const __result = await __runIngredientClassifyAllergens(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Ingredient_classifyAllergens", __result);
@@ -23369,7 +24242,10 @@ export const Ingredient_clearPrimaryImage = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"}]);
     const __result = await __runIngredientClearPrimaryImage(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Ingredient_clearPrimaryImage", __result);
@@ -23408,12 +24284,14 @@ export const Ingredient_configureSubstitutes = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["substituteIngredientIds"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Ingredient_configureSubstitutes", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"},{"name":"substituteIngredientIds","table":null}]);
     const __result = await __runIngredientConfigureSubstitutes(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Ingredient_configureSubstitutes", __result);
@@ -23477,7 +24355,10 @@ export const Ingredient_discontinue = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"}]);
     const __result = await __runIngredientDiscontinue(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Ingredient_discontinue", __result);
@@ -23536,12 +24417,14 @@ export const Ingredient_introduce = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["preferredVendorId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Ingredient_introduce", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"},{"name":"preferredVendorId","table":null}]);
     const __result = await __runIngredientIntroduce(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Ingredient_introduce", __result);
@@ -23562,12 +24445,14 @@ export const Ingredient_createViaIntroduce = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["preferredVendorId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Ingredient_createViaIntroduce", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"},{"name":"preferredVendorId","table":null}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { name, unit, costPerUnit, allergens, category, preferredVendorId, isGlutenFree } = args;
@@ -23659,12 +24544,14 @@ export const Ingredient_linkAsEdition = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["sourceIngredientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Ingredient_linkAsEdition", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"},{"name":"sourceIngredientId","table":null}]);
     const __result = await __runIngredientLinkAsEdition(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Ingredient_linkAsEdition", __result);
@@ -23728,12 +24615,14 @@ export const Ingredient_mergeInto = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["targetIngredientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Ingredient_mergeInto", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"},{"name":"targetIngredientId","table":null}]);
     const __result = await __runIngredientMergeInto(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Ingredient_mergeInto", __result);
@@ -23795,7 +24684,10 @@ export const Ingredient_purge = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"}]);
     const __result = await __runIngredientPurge(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Ingredient_purge", __result);
@@ -23857,7 +24749,10 @@ export const Ingredient_reinstate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"}]);
     const __result = await __runIngredientReinstate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Ingredient_reinstate", __result);
@@ -23930,7 +24825,10 @@ export const Ingredient_setNutrition = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"}]);
     const __result = await __runIngredientSetNutrition(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Ingredient_setNutrition", __result);
@@ -23969,12 +24867,14 @@ export const Ingredient_setPreferredVendor = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["preferredVendorId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Ingredient_setPreferredVendor", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"},{"name":"preferredVendorId","table":null}]);
     const __result = await __runIngredientSetPreferredVendor(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Ingredient_setPreferredVendor", __result);
@@ -24015,12 +24915,14 @@ export const Ingredient_setPreferredVendors = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["preferredVendorIds","preferredVendorId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Ingredient_setPreferredVendors", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"},{"name":"preferredVendorIds","table":null},{"name":"preferredVendorId","table":null}]);
     const __result = await __runIngredientSetPreferredVendors(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Ingredient_setPreferredVendors", __result);
@@ -24071,7 +24973,10 @@ export const Ingredient_setPrimaryImage = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"}]);
     const __result = await __runIngredientSetPrimaryImage(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Ingredient_setPrimaryImage", __result);
@@ -24122,7 +25027,10 @@ export const Ingredient_updateCosting = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"}]);
     const __result = await __runIngredientUpdateCosting(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Ingredient_updateCosting", __result);
@@ -24175,7 +25083,10 @@ export const Ingredient_updateDetails = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"}]);
     const __result = await __runIngredientUpdateDetails(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Ingredient_updateDetails", __result);
@@ -24221,7 +25132,10 @@ export const IngredientDemand_alignPurchasingWeek = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientId","table":"ingredients"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runIngredientDemandAlignPurchasingWeek(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "IngredientDemand_alignPurchasingWeek", __result);
@@ -24317,12 +25231,14 @@ export const IngredientDemand_calculate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","ingredientId","dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "IngredientDemand_calculate", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientId","table":"ingredients"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runIngredientDemandCalculate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "IngredientDemand_calculate", __result);
@@ -24345,12 +25261,14 @@ export const IngredientDemand_createViaCalculate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","ingredientId","dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "IngredientDemand_createViaCalculate", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientId","table":"ingredients"},{"name":"dishId","table":"dishes"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, ingredientId, requiredQuantity, unit, servings, dishId, sourceComponentLineQuantity, sourceBatchMultiplier, sourceYieldQuantity } = args;
@@ -24481,7 +25399,10 @@ export const IngredientDemand_confirm = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientId","table":"ingredients"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runIngredientDemandConfirm(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "IngredientDemand_confirm", __result);
@@ -24526,7 +25447,10 @@ export const IngredientDemand_ensurePurchaseEligible = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientId","table":"ingredients"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runIngredientDemandEnsurePurchaseEligible(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "IngredientDemand_ensurePurchaseEligible", __result);
@@ -24588,7 +25512,10 @@ export const IngredientDemand_fulfill = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientId","table":"ingredients"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runIngredientDemandFulfill(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "IngredientDemand_fulfill", __result);
@@ -24652,7 +25579,10 @@ export const IngredientDemand_markReleased = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientId","table":"ingredients"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runIngredientDemandMarkReleased(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "IngredientDemand_markReleased", __result);
@@ -24706,7 +25636,10 @@ export const IngredientDemand_recalculate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientId","table":"ingredients"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runIngredientDemandRecalculate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "IngredientDemand_recalculate", __result);
@@ -24773,7 +25706,10 @@ export const IngredientDemand_supersede = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientId","table":"ingredients"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runIngredientDemandSupersede(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "IngredientDemand_supersede", __result);
@@ -24872,12 +25808,14 @@ export const IngredientDemand_syncFromContributions = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","ingredientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "IngredientDemand_syncFromContributions", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientId","table":"ingredients"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runIngredientDemandSyncFromContributions(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "IngredientDemand_syncFromContributions", __result);
@@ -24934,12 +25872,14 @@ export const IngredientPriceObservation_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["ingredientId","vendorId","vendorOrderId","vendorOrderLineId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "IngredientPriceObservation_record", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"vendorId","table":"vendors"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"vendorOrderLineId","table":"vendorOrderLines"}]);
     const __result = await __runIngredientPriceObservationRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "IngredientPriceObservation_record", __result);
@@ -24961,12 +25901,14 @@ export const IngredientPriceObservation_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["ingredientId","vendorId","vendorOrderId","vendorOrderLineId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "IngredientPriceObservation_createViaRecord", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"vendorId","table":"vendors"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"vendorOrderLineId","table":"vendorOrderLines"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { ingredientId, vendorId, vendorOrderId, vendorOrderLineId, receiptQuantity, cumulativeReceivedQuantity, unit, unitPrice } = args;
@@ -25075,6 +26017,8 @@ export const IntegrationConnection_authorize = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runIntegrationConnectionAuthorize(ctx, args);
     if (__idemKey !== null) {
@@ -25098,6 +26042,8 @@ export const IntegrationConnection_createViaAuthorize = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -25199,6 +26145,8 @@ export const IntegrationConnection_disconnect = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runIntegrationConnectionDisconnect(ctx, args);
     if (__idemKey !== null) {
@@ -25271,6 +26219,8 @@ export const IntegrationConnection_markConnected = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runIntegrationConnectionMarkConnected(ctx, args);
     if (__idemKey !== null) {
@@ -25333,6 +26283,8 @@ export const IntegrationConnection_reauthorize = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runIntegrationConnectionReauthorize(ctx, args);
     if (__idemKey !== null) {
@@ -25396,6 +26348,8 @@ export const IntegrationConnection_recordFailure = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runIntegrationConnectionRecordFailure(ctx, args);
     if (__idemKey !== null) {
@@ -25458,6 +26412,8 @@ export const IntegrationConnection_recordSyncSuccess = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runIntegrationConnectionRecordSyncSuccess(ctx, args);
     if (__idemKey !== null) {
@@ -25511,7 +26467,10 @@ export const Interview_recordOutcome = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"candidateId","table":"candidates"},{"name":"interviewerPersonId","table":"people"}]);
     const __result = await __runInterviewRecordOutcome(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Interview_recordOutcome", __result);
@@ -25570,12 +26529,14 @@ export const Interview_schedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["candidateId","interviewerPersonId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Interview_schedule", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"candidateId","table":"candidates"},{"name":"interviewerPersonId","table":"people"}]);
     const __result = await __runInterviewSchedule(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Interview_schedule", __result);
@@ -25595,12 +26556,14 @@ export const Interview_createViaSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["candidateId","interviewerPersonId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Interview_createViaSchedule", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"candidateId","table":"candidates"},{"name":"interviewerPersonId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { candidateId, scheduledFor, interviewerPersonId, sourceSystem, externalInterviewId, rawSourceData } = args;
@@ -25692,7 +26655,10 @@ export const InventoryItem_adjustQuantity = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runInventoryItemAdjustQuantity(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "InventoryItem_adjustQuantity", __result);
@@ -25753,12 +26719,14 @@ export const InventoryItem_applyReceiptCorrection = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["ingredientId","locationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "InventoryItem_applyReceiptCorrection", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runInventoryItemApplyReceiptCorrection(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "InventoryItem_applyReceiptCorrection", __result);
@@ -25825,12 +26793,14 @@ export const InventoryItem_open = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["ingredientId","locationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "InventoryItem_open", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runInventoryItemOpen(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "InventoryItem_open", __result);
@@ -25851,12 +26821,14 @@ export const InventoryItem_createViaOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["ingredientId","locationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "InventoryItem_createViaOpen", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { ingredientId, locationId, unit, quantityOnHand, parLevel, reorderThreshold, unitCost } = args;
@@ -25966,12 +26938,14 @@ export const InventoryItem_receiveDelivery = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["ingredientId","locationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "InventoryItem_receiveDelivery", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runInventoryItemReceiveDelivery(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "InventoryItem_receiveDelivery", __result);
@@ -26025,7 +26999,10 @@ export const InventoryItem_receiveStock = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runInventoryItemReceiveStock(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "InventoryItem_receiveStock", __result);
@@ -26075,7 +27052,10 @@ export const InventoryItem_recount = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runInventoryItemRecount(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "InventoryItem_recount", __result);
@@ -26130,7 +27110,10 @@ export const InventoryItem_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runInventoryItemRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "InventoryItem_remove", __result);
@@ -26181,7 +27164,10 @@ export const InventoryItem_setExpiry = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runInventoryItemSetExpiry(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "InventoryItem_setExpiry", __result);
@@ -26229,12 +27215,14 @@ export const InventoryItem_transferIn = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["sourceLocationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "InventoryItem_transferIn", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"},{"name":"sourceLocationId","table":null}]);
     const __result = await __runInventoryItemTransferIn(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "InventoryItem_transferIn", __result);
@@ -26283,12 +27271,14 @@ export const InventoryItem_transferOut = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["destinationLocationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "InventoryItem_transferOut", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"},{"name":"destinationLocationId","table":null}]);
     const __result = await __runInventoryItemTransferOut(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "InventoryItem_transferOut", __result);
@@ -26344,7 +27334,10 @@ export const InventoryItem_updateLevels = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runInventoryItemUpdateLevels(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "InventoryItem_updateLevels", __result);
@@ -26441,12 +27434,14 @@ export const InventoryLot_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorOrderLineId","vendorOrderId","vendorId","ingredientId","ingredientDemandId","eventId","locationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "InventoryLot_record", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderLineId","table":"vendorOrderLines"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"vendorId","table":"vendors"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"eventId","table":"events"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runInventoryLotRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "InventoryLot_record", __result);
@@ -26472,12 +27467,14 @@ export const InventoryLot_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorOrderLineId","vendorOrderId","vendorId","ingredientId","ingredientDemandId","eventId","locationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "InventoryLot_createViaRecord", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderLineId","table":"vendorOrderLines"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"vendorId","table":"vendors"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"eventId","table":"events"},{"name":"locationId","table":"storageLocations"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { supplierLotNumber, vendorOrderLineId, vendorOrderId, vendorId, ingredientId, ingredientDemandId, eventId, locationId, receiptQuantity, cumulativeReceivedQuantity, unit, unitCost } = args;
@@ -26622,7 +27619,10 @@ export const InventoryReservation_consume = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"inventoryItemId","table":"inventoryItems"},{"name":"inventoryLotId","table":"inventoryLots"},{"name":"eventId","table":"events"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runInventoryReservationConsume(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "InventoryReservation_consume", __result);
@@ -26687,7 +27687,10 @@ export const InventoryReservation_release = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"inventoryItemId","table":"inventoryItems"},{"name":"inventoryLotId","table":"inventoryLots"},{"name":"eventId","table":"events"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runInventoryReservationRelease(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "InventoryReservation_release", __result);
@@ -26774,12 +27777,14 @@ export const InventoryReservation_reserve = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["inventoryItemId","eventId","ingredientId","inventoryLotId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "InventoryReservation_reserve", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"inventoryItemId","table":"inventoryItems"},{"name":"inventoryLotId","table":"inventoryLots"},{"name":"eventId","table":"events"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runInventoryReservationReserve(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "InventoryReservation_reserve", __result);
@@ -26798,12 +27803,14 @@ export const InventoryReservation_createViaReserve = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["inventoryItemId","eventId","ingredientId","inventoryLotId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "InventoryReservation_createViaReserve", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"inventoryItemId","table":"inventoryItems"},{"name":"inventoryLotId","table":"inventoryLots"},{"name":"eventId","table":"events"},{"name":"ingredientId","table":"ingredients"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { inventoryItemId, eventId, ingredientId, quantity, inventoryLotId } = args;
@@ -26904,6 +27911,8 @@ export const InventorySettings_register = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runInventorySettingsRegister(ctx, args);
     if (__idemKey !== null) {
@@ -26923,6 +27932,8 @@ export const InventorySettings_createViaRegister = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -26987,6 +27998,8 @@ export const InventorySettings_setStockTracking = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runInventorySettingsSetStockTracking(ctx, args);
     if (__idemKey !== null) {
@@ -27057,7 +28070,10 @@ export const Invoice_applyCredit = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __result = await __runInvoiceApplyCredit(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_applyCredit", __result);
@@ -27125,7 +28141,10 @@ export const Invoice_applyPayment = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __result = await __runInvoiceApplyPayment(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_applyPayment", __result);
@@ -27175,7 +28194,10 @@ export const Invoice_assignNumber = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __result = await __runInvoiceAssignNumber(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_assignNumber", __result);
@@ -27231,7 +28253,10 @@ export const Invoice_followEventPrice = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __result = await __runInvoiceFollowEventPrice(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_followEventPrice", __result);
@@ -27322,12 +28347,14 @@ export const Invoice_issue = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Invoice_issue", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __result = await __runInvoiceIssue(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_issue", __result);
@@ -27356,12 +28383,14 @@ export const Invoice_createViaIssue = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Invoice_createViaIssue", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { clientId, invoiceNumber, invoiceSequence, subtotal, taxAmount, discountAmount, total, eventId, paymentTermsDays, dueDate, notes, lineItems, taxBreakdown, currencyCode, exchangeRate } = args;
@@ -27499,7 +28528,10 @@ export const Invoice_markDepositPaid = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __result = await __runInvoiceMarkDepositPaid(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_markDepositPaid", __result);
@@ -27560,7 +28592,10 @@ export const Invoice_markOverdue = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __result = await __runInvoiceMarkOverdue(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_markOverdue", __result);
@@ -27620,7 +28655,10 @@ export const Invoice_markViewed = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __result = await __runInvoiceMarkViewed(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_markViewed", __result);
@@ -27684,7 +28722,10 @@ export const Invoice_markVoided = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __result = await __runInvoiceMarkVoided(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_markVoided", __result);
@@ -27744,7 +28785,10 @@ export const Invoice_reassignClient = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __result = await __runInvoiceReassignClient(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_reassignClient", __result);
@@ -27798,7 +28842,10 @@ export const Invoice_recordCreditMemo = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __result = await __runInvoiceRecordCreditMemo(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_recordCreditMemo", __result);
@@ -27867,7 +28914,10 @@ export const Invoice_recordRefund = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __result = await __runInvoiceRecordRefund(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_recordRefund", __result);
@@ -27929,7 +28979,10 @@ export const Invoice_send = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __result = await __runInvoiceSend(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_send", __result);
@@ -27977,7 +29030,10 @@ export const Invoice_sendBalanceReminder = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __result = await __runInvoiceSendBalanceReminder(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_sendBalanceReminder", __result);
@@ -28030,7 +29086,10 @@ export const Invoice_setDeposit = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __result = await __runInvoiceSetDeposit(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_setDeposit", __result);
@@ -28080,12 +29139,14 @@ export const Invoice_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientMergeId","clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Invoice_stageClientMerge", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"clientMergeId","table":null}]);
     const __result = await __runInvoiceStageClientMerge(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_stageClientMerge", __result);
@@ -28152,7 +29213,10 @@ export const Invoice_writeOff = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
     const __result = await __runInvoiceWriteOff(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Invoice_writeOff", __result);
@@ -28216,12 +29280,14 @@ export const ItemUnitMapping_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["ingredientId","componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ItemUnitMapping_record", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"componentId","table":null}]);
     const __result = await __runItemUnitMappingRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ItemUnitMapping_record", __result);
@@ -28244,12 +29310,14 @@ export const ItemUnitMapping_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["ingredientId","componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ItemUnitMapping_createViaRecord", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"componentId","table":null}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { kind, unit, equalsQuantity, equalsUnit, ingredientId, componentId, fromBasis, toBasis, source } = args;
@@ -28342,7 +29410,10 @@ export const ItemUnitMapping_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runItemUnitMappingRetire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ItemUnitMapping_retire", __result);
@@ -28414,12 +29485,14 @@ export const Lead_capture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["referralSourceId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Lead_capture", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientContactId","table":"clientContacts"},{"name":"proposalId","table":"proposals"},{"name":"referralSourceId","table":"referralSources"}]);
     const __result = await __runLeadCapture(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Lead_capture", __result);
@@ -28444,12 +29517,14 @@ export const Lead_createViaCapture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["referralSourceId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Lead_createViaCapture", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientContactId","table":"clientContacts"},{"name":"proposalId","table":"proposals"},{"name":"referralSourceId","table":"referralSources"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { leadType, source, referralSourceId, estimatedValue, companyName, givenName, familyName, email, phone, probability, notes } = args;
@@ -28555,7 +29630,10 @@ export const Lead_confirmConversion = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientContactId","table":"clientContacts"},{"name":"proposalId","table":"proposals"},{"name":"referralSourceId","table":"referralSources"}]);
     const __result = await __runLeadConfirmConversion(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Lead_confirmConversion", __result);
@@ -28611,7 +29689,10 @@ export const Lead_confirmProposalSent = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientContactId","table":"clientContacts"},{"name":"proposalId","table":"proposals"},{"name":"referralSourceId","table":"referralSources"}]);
     const __result = await __runLeadConfirmProposalSent(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Lead_confirmProposalSent", __result);
@@ -28675,12 +29756,14 @@ export const Lead_reviseDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["referralSourceId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Lead_reviseDetails", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientContactId","table":"clientContacts"},{"name":"proposalId","table":"proposals"},{"name":"referralSourceId","table":"referralSources"}]);
     const __result = await __runLeadReviseDetails(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Lead_reviseDetails", __result);
@@ -28723,12 +29806,14 @@ export const Lead_stageConversion = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId","clientContactId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Lead_stageConversion", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientContactId","table":"clientContacts"},{"name":"proposalId","table":"proposals"},{"name":"referralSourceId","table":"referralSources"}]);
     const __result = await __runLeadStageConversion(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Lead_stageConversion", __result);
@@ -28770,12 +29855,14 @@ export const Lead_stageProposal = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["proposalId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Lead_stageProposal", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientContactId","table":"clientContacts"},{"name":"proposalId","table":"proposals"},{"name":"referralSourceId","table":"referralSources"}]);
     const __result = await __runLeadStageProposal(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Lead_stageProposal", __result);
@@ -28832,7 +29919,10 @@ export const Lead_updatePipeline = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientContactId","table":"clientContacts"},{"name":"proposalId","table":"proposals"},{"name":"referralSourceId","table":"referralSources"}]);
     const __result = await __runLeadUpdatePipeline(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Lead_updatePipeline", __result);
@@ -28896,6 +29986,8 @@ export const Menu_archive = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runMenuArchive(ctx, args);
     if (__idemKey !== null) {
@@ -28962,6 +30054,8 @@ export const Menu_draft = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runMenuDraft(ctx, args);
     if (__idemKey !== null) {
@@ -28988,6 +30082,8 @@ export const Menu_createViaDraft = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -29093,6 +30189,8 @@ export const Menu_markPublished = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runMenuMarkPublished(ctx, args);
     if (__idemKey !== null) {
@@ -29156,6 +30254,8 @@ export const Menu_restore = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runMenuRestore(ctx, args);
     if (__idemKey !== null) {
@@ -29211,6 +30311,8 @@ export const Menu_reviseDetails = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runMenuReviseDetails(ctx, args);
     if (__idemKey !== null) {
@@ -29274,6 +30376,8 @@ export const Menu_unpublish = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runMenuUnpublish(ctx, args);
     if (__idemKey !== null) {
@@ -29331,6 +30435,8 @@ export const Menu_updatePricing = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runMenuUpdatePricing(ctx, args);
     if (__idemKey !== null) {
@@ -29393,12 +30499,14 @@ export const MenuDish_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["menuId","dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "MenuDish_add", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"menuId","table":"menus"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runMenuDishAdd(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "MenuDish_add", __result);
@@ -29419,12 +30527,14 @@ export const MenuDish_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["menuId","dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "MenuDish_createViaAdd", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"menuId","table":"menus"},{"name":"dishId","table":"dishes"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { menuId, dishId, sortOrder, sellingPrice, course, serviceStyle, specialInstructions } = args;
@@ -29518,7 +30628,10 @@ export const MenuDish_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"menuId","table":"menus"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runMenuDishRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "MenuDish_remove", __result);
@@ -29575,7 +30688,10 @@ export const MenuDish_updateDetails = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"menuId","table":"menus"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runMenuDishUpdateDetails(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "MenuDish_updateDetails", __result);
@@ -29629,7 +30745,10 @@ export const MenuDish_updateSellingPrice = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"menuId","table":"menus"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runMenuDishUpdateSellingPrice(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "MenuDish_updateSellingPrice", __result);
@@ -29689,12 +30808,14 @@ export const Message_post = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["threadId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Message_post", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"threadId","table":"messageThreads"}]);
     const __result = await __runMessagePost(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Message_post", __result);
@@ -29716,12 +30837,14 @@ export const Message_createViaPost = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["threadId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Message_createViaPost", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"threadId","table":"messageThreads"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { threadId, direction, status, bodyText, providerMessageId, senderIdentity, sentAt, rawPayload } = args;
@@ -29809,7 +30932,10 @@ export const Message_setDelivery = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"threadId","table":"messageThreads"}]);
     const __result = await __runMessageSetDelivery(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Message_setDelivery", __result);
@@ -29865,12 +30991,14 @@ export const MessageThread_create = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["contactId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "MessageThread_create", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"contactId","table":"clientContacts"},{"name":"leadId","table":"leads"}]);
     const __result = await __runMessageThreadCreate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "MessageThread_create", __result);
@@ -29914,12 +31042,14 @@ export const MessageThread_linkContact = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["contactId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "MessageThread_linkContact", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"contactId","table":"clientContacts"},{"name":"leadId","table":"leads"}]);
     const __result = await __runMessageThreadLinkContact(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "MessageThread_linkContact", __result);
@@ -29963,12 +31093,14 @@ export const MessageThread_linkLead = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["leadId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "MessageThread_linkLead", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"contactId","table":"clientContacts"},{"name":"leadId","table":"leads"}]);
     const __result = await __runMessageThreadLinkLead(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "MessageThread_linkLead", __result);
@@ -30016,7 +31148,10 @@ export const MessageThread_setStatus = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"contactId","table":"clientContacts"},{"name":"leadId","table":"leads"}]);
     const __result = await __runMessageThreadSetStatus(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "MessageThread_setStatus", __result);
@@ -30078,6 +31213,8 @@ export const Occasion_activate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runOccasionActivate(ctx, args);
     if (__idemKey !== null) {
@@ -30142,6 +31279,8 @@ export const Occasion_deactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runOccasionDeactivate(ctx, args);
     if (__idemKey !== null) {
@@ -30213,6 +31352,8 @@ export const Occasion_register = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runOccasionRegister(ctx, args);
     if (__idemKey !== null) {
@@ -30235,6 +31376,8 @@ export const Occasion_createViaRegister = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -30326,6 +31469,8 @@ export const Occasion_reviseDetails = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runOccasionReviseDetails(ctx, args);
     if (__idemKey !== null) {
@@ -30386,12 +31531,14 @@ export const OneOnOne_hold = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["leadPersonId","staffMemberId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "OneOnOne_hold", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"leadPersonId","table":"people"},{"name":"staffMemberId","table":"people"}]);
     const __result = await __runOneOnOneHold(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "OneOnOne_hold", __result);
@@ -30413,12 +31560,14 @@ export const OneOnOne_createViaHold = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["leadPersonId","staffMemberId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "OneOnOne_createViaHold", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"leadPersonId","table":"people"},{"name":"staffMemberId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { leadPersonId, staffMemberId, meetingDate, agenda, goals, wins, opportunities, decisions } = args;
@@ -30514,12 +31663,14 @@ export const OneOnOneAction_capture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["oneOnOneId","ownerPersonId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "OneOnOneAction_capture", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"oneOnOneId","table":"oneOnOnes"},{"name":"ownerPersonId","table":"people"}]);
     const __result = await __runOneOnOneActionCapture(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "OneOnOneAction_capture", __result);
@@ -30537,12 +31688,14 @@ export const OneOnOneAction_createViaCapture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["oneOnOneId","ownerPersonId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "OneOnOneAction_createViaCapture", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"oneOnOneId","table":"oneOnOnes"},{"name":"ownerPersonId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { oneOnOneId, ownerPersonId, description, dueDate } = args;
@@ -30640,7 +31793,10 @@ export const OneOnOneAction_close = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"oneOnOneId","table":"oneOnOnes"},{"name":"ownerPersonId","table":"people"}]);
     const __result = await __runOneOnOneActionClose(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "OneOnOneAction_close", __result);
@@ -30693,6 +31849,8 @@ export const Organization_configureBranding = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runOrganizationConfigureBranding(ctx, args);
     if (__idemKey !== null) {
@@ -30752,6 +31910,8 @@ export const Organization_deactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runOrganizationDeactivate(ctx, args);
     if (__idemKey !== null) {
@@ -30811,6 +31971,8 @@ export const Organization_reactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runOrganizationReactivate(ctx, args);
     if (__idemKey !== null) {
@@ -30868,6 +32030,8 @@ export const Organization_register = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runOrganizationRegister(ctx, args);
     if (__idemKey !== null) {
@@ -30891,6 +32055,8 @@ export const Organization_createViaRegister = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -30975,6 +32141,8 @@ export const Organization_rename = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runOrganizationRename(ctx, args);
     if (__idemKey !== null) {
@@ -31023,6 +32191,8 @@ export const Organization_setBrandLogo = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runOrganizationSetBrandLogo(ctx, args);
     if (__idemKey !== null) {
@@ -31072,6 +32242,8 @@ export const Organization_setDefaultCurrency = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runOrganizationSetDefaultCurrency(ctx, args);
     if (__idemKey !== null) {
@@ -31132,6 +32304,8 @@ export const Organization_suspend = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runOrganizationSuspend(ctx, args);
     if (__idemKey !== null) {
@@ -31180,6 +32354,8 @@ export const OrganizationCapabilitySetting_register = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runOrganizationCapabilitySettingRegister(ctx, args);
     if (__idemKey !== null) {
@@ -31200,6 +32376,8 @@ export const OrganizationCapabilitySetting_createViaRegister = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -31269,6 +32447,8 @@ export const OrganizationCapabilitySetting_setEnabled = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runOrganizationCapabilitySettingSetEnabled(ctx, args);
     if (__idemKey !== null) {
@@ -31324,7 +32504,10 @@ export const PackList_acknowledgePackingRequirement = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runPackListAcknowledgePackingRequirement(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackList_acknowledgePackingRequirement", __result);
@@ -31398,12 +32581,14 @@ export const PackList_applyServiceStyleKit = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["serviceStyleId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PackList_applyServiceStyleKit", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"serviceStyleId","table":null}]);
     const __result = await __runPackListApplyServiceStyleKit(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackList_applyServiceStyleKit", __result);
@@ -31471,7 +32656,10 @@ export const PackList_cancel = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runPackListCancel(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackList_cancel", __result);
@@ -31536,7 +32724,10 @@ export const PackList_dispatch = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runPackListDispatch(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackList_dispatch", __result);
@@ -31600,7 +32791,10 @@ export const PackList_markLoaded = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runPackListMarkLoaded(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackList_markLoaded", __result);
@@ -31687,7 +32881,10 @@ export const PackList_markPacked = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runPackListMarkPacked(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackList_markPacked", __result);
@@ -31787,12 +32984,14 @@ export const PackList_open = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PackList_open", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runPackListOpen(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackList_open", __result);
@@ -31810,12 +33009,14 @@ export const PackList_createViaOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PackList_createViaOpen", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, name, purpose, notes } = args;
@@ -31943,7 +33144,10 @@ export const PackList_requestAssistance = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runPackListRequestAssistance(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackList_requestAssistance", __result);
@@ -32023,12 +33227,14 @@ export const PackList_requestDishContainers = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventDishId","dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PackList_requestDishContainers", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"eventDishId","table":null},{"name":"dishId","table":null}]);
     const __result = await __runPackListRequestDishContainers(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackList_requestDishContainers", __result);
@@ -32078,7 +33284,10 @@ export const PackList_resolveAssistance = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runPackListResolveAssistance(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackList_resolveAssistance", __result);
@@ -32147,7 +33356,10 @@ export const PackList_standDownWithEvent = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runPackListStandDownWithEvent(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackList_standDownWithEvent", __result);
@@ -32211,7 +33423,10 @@ export const PackList_startPacking = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runPackListStartPacking(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackList_startPacking", __result);
@@ -32289,12 +33504,14 @@ export const PackListItem_addItem = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["packListId","dishId","productionBatchId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PackListItem_addItem", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"dishId","table":"dishes"},{"name":"dishContainerId","table":"dishContainers"},{"name":"eventDishId","table":"eventDishes"},{"name":"productionBatchId","table":"productionBatches"}]);
     const __result = await __runPackListItemAddItem(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackListItem_addItem", __result);
@@ -32314,12 +33531,14 @@ export const PackListItem_createViaAddItem = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["packListId","dishId","productionBatchId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PackListItem_createViaAddItem", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"dishId","table":"dishes"},{"name":"dishContainerId","table":"dishContainers"},{"name":"eventDishId","table":"eventDishes"},{"name":"productionBatchId","table":"productionBatches"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { packListId, description, requiredQuantity, unit, dishId, productionBatchId } = args;
@@ -32421,7 +33640,10 @@ export const PackListItem_adjustQuantity = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"dishId","table":"dishes"},{"name":"dishContainerId","table":"dishContainers"},{"name":"eventDishId","table":"eventDishes"},{"name":"productionBatchId","table":"productionBatches"}]);
     const __result = await __runPackListItemAdjustQuantity(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackListItem_adjustQuantity", __result);
@@ -32496,12 +33718,14 @@ export const PackListItem_adoptContainerLink = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventDishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PackListItem_adoptContainerLink", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"dishId","table":"dishes"},{"name":"dishContainerId","table":"dishContainers"},{"name":"eventDishId","table":"eventDishes"},{"name":"productionBatchId","table":"productionBatches"}]);
     const __result = await __runPackListItemAdoptContainerLink(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackListItem_adoptContainerLink", __result);
@@ -32548,7 +33772,10 @@ export const PackListItem_annotate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"dishId","table":"dishes"},{"name":"dishContainerId","table":"dishContainers"},{"name":"eventDishId","table":"eventDishes"},{"name":"productionBatchId","table":"productionBatches"}]);
     const __result = await __runPackListItemAnnotate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackListItem_annotate", __result);
@@ -32611,7 +33838,10 @@ export const PackListItem_correctImportedFluidOunces = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"dishId","table":"dishes"},{"name":"dishContainerId","table":"dishContainers"},{"name":"eventDishId","table":"eventDishes"},{"name":"productionBatchId","table":"productionBatches"}]);
     const __result = await __runPackListItemCorrectImportedFluidOunces(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackListItem_correctImportedFluidOunces", __result);
@@ -32692,12 +33922,14 @@ export const PackListItem_ensureContainer = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["packListId","dishContainerId","eventDishId","dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PackListItem_ensureContainer", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"dishId","table":"dishes"},{"name":"dishContainerId","table":"dishContainers"},{"name":"eventDishId","table":"eventDishes"},{"name":"productionBatchId","table":"productionBatches"}]);
     const __result = await __runPackListItemEnsureContainer(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackListItem_ensureContainer", __result);
@@ -32773,12 +34005,14 @@ export const PackListItem_ensureKitItem = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["packListId","serviceStyleKitItemId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PackListItem_ensureKitItem", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"dishId","table":"dishes"},{"name":"dishContainerId","table":"dishContainers"},{"name":"eventDishId","table":"eventDishes"},{"name":"productionBatchId","table":"productionBatches"},{"name":"serviceStyleKitItemId","table":null}]);
     const __result = await __runPackListItemEnsureKitItem(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackListItem_ensureKitItem", __result);
@@ -32843,7 +34077,10 @@ export const PackListItem_markMissing = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"dishId","table":"dishes"},{"name":"dishContainerId","table":"dishContainers"},{"name":"eventDishId","table":"eventDishes"},{"name":"productionBatchId","table":"productionBatches"}]);
     const __result = await __runPackListItemMarkMissing(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackListItem_markMissing", __result);
@@ -32915,7 +34152,10 @@ export const PackListItem_markPacked = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"dishId","table":"dishes"},{"name":"dishContainerId","table":"dishContainers"},{"name":"eventDishId","table":"eventDishes"},{"name":"productionBatchId","table":"productionBatches"}]);
     const __result = await __runPackListItemMarkPacked(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackListItem_markPacked", __result);
@@ -32971,7 +34211,10 @@ export const PackListItem_recordPackedCount = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"dishId","table":"dishes"},{"name":"dishContainerId","table":"dishContainers"},{"name":"eventDishId","table":"eventDishes"},{"name":"productionBatchId","table":"productionBatches"}]);
     const __result = await __runPackListItemRecordPackedCount(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackListItem_recordPackedCount", __result);
@@ -33018,7 +34261,10 @@ export const PackListItem_recordSentInstead = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"dishId","table":"dishes"},{"name":"dishContainerId","table":"dishContainers"},{"name":"eventDishId","table":"eventDishes"},{"name":"productionBatchId","table":"productionBatches"}]);
     const __result = await __runPackListItemRecordSentInstead(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackListItem_recordSentInstead", __result);
@@ -33067,7 +34313,10 @@ export const PackListItem_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"dishId","table":"dishes"},{"name":"dishContainerId","table":"dishContainers"},{"name":"eventDishId","table":"eventDishes"},{"name":"productionBatchId","table":"productionBatches"}]);
     const __result = await __runPackListItemRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackListItem_remove", __result);
@@ -33137,12 +34386,14 @@ export const PackListItem_restoreImportedAssociation = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["dishId","eventDishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PackListItem_restoreImportedAssociation", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"dishId","table":"dishes"},{"name":"dishContainerId","table":"dishContainers"},{"name":"eventDishId","table":"eventDishes"},{"name":"productionBatchId","table":"productionBatches"}]);
     const __result = await __runPackListItemRestoreImportedAssociation(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackListItem_restoreImportedAssociation", __result);
@@ -33210,7 +34461,10 @@ export const PackListItem_syncContainerServings = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"packListId","table":"packLists"},{"name":"dishId","table":"dishes"},{"name":"dishContainerId","table":"dishContainers"},{"name":"eventDishId","table":"eventDishes"},{"name":"productionBatchId","table":"productionBatches"}]);
     const __result = await __runPackListItemSyncContainerServings(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackListItem_syncContainerServings", __result);
@@ -33273,6 +34527,8 @@ export const PackListTemplate_archive = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runPackListTemplateArchive(ctx, args);
     if (__idemKey !== null) {
@@ -33334,12 +34590,14 @@ export const PackListTemplate_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["serviceStyleId","occasionId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PackListTemplate_define", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"serviceStyleId","table":null},{"name":"occasionId","table":null}]);
     const __result = await __runPackListTemplateDefine(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackListTemplate_define", __result);
@@ -33361,12 +34619,14 @@ export const PackListTemplate_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["serviceStyleId","occasionId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PackListTemplate_createViaDefine", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"serviceStyleId","table":null},{"name":"occasionId","table":null}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { name, description, items, serviceStyleId, occasionId, guestCountMin, guestCountMax, venueRequirement } = args;
@@ -33469,6 +34729,8 @@ export const PackListTemplate_reactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runPackListTemplateReactivate(ctx, args);
     if (__idemKey !== null) {
@@ -33530,12 +34792,14 @@ export const PackListTemplate_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["serviceStyleId","occasionId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PackListTemplate_revise", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"serviceStyleId","table":null},{"name":"occasionId","table":null}]);
     const __result = await __runPackListTemplateRevise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PackListTemplate_revise", __result);
@@ -33595,7 +34859,10 @@ export const Payment_beginProcessing = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"invoiceId","table":"invoices"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"paymentMethodId","table":"paymentMethods"}]);
     const __result = await __runPaymentBeginProcessing(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Payment_beginProcessing", __result);
@@ -33645,7 +34912,10 @@ export const Payment_disputeReconciliation = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"invoiceId","table":"invoices"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"paymentMethodId","table":"paymentMethods"}]);
     const __result = await __runPaymentDisputeReconciliation(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Payment_disputeReconciliation", __result);
@@ -33709,7 +34979,10 @@ export const Payment_fail = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"invoiceId","table":"invoices"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"paymentMethodId","table":"paymentMethods"}]);
     const __result = await __runPaymentFail(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Payment_fail", __result);
@@ -33765,7 +35038,10 @@ export const Payment_markMatched = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"invoiceId","table":"invoices"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"paymentMethodId","table":"paymentMethods"}]);
     const __result = await __runPaymentMarkMatched(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Payment_markMatched", __result);
@@ -33825,7 +35101,10 @@ export const Payment_reassignClient = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"invoiceId","table":"invoices"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"paymentMethodId","table":"paymentMethods"}]);
     const __result = await __runPaymentReassignClient(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Payment_reassignClient", __result);
@@ -33892,12 +35171,14 @@ export const Payment_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["invoiceId","clientId","eventId","paymentMethodId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Payment_record", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"invoiceId","table":"invoices"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"paymentMethodId","table":"paymentMethods"}]);
     const __result = await __runPaymentRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Payment_record", __result);
@@ -33918,12 +35199,14 @@ export const Payment_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["invoiceId","clientId","eventId","paymentMethodId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Payment_createViaRecord", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"invoiceId","table":"invoices"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"paymentMethodId","table":"paymentMethods"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { invoiceId, clientId, amount, method, eventId, paymentMethodId, notes } = args;
@@ -34033,7 +35316,10 @@ export const Payment_refund = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"invoiceId","table":"invoices"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"paymentMethodId","table":"paymentMethods"}]);
     const __result = await __runPaymentRefund(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Payment_refund", __result);
@@ -34097,7 +35383,10 @@ export const Payment_settle = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"invoiceId","table":"invoices"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"paymentMethodId","table":"paymentMethods"}]);
     const __result = await __runPaymentSettle(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Payment_settle", __result);
@@ -34147,12 +35436,14 @@ export const Payment_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientMergeId","clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Payment_stageClientMerge", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"invoiceId","table":"invoices"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"paymentMethodId","table":"paymentMethods"},{"name":"clientMergeId","table":null}]);
     const __result = await __runPaymentStageClientMerge(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Payment_stageClientMerge", __result);
@@ -34200,7 +35491,10 @@ export const Payment_updateProviderTransactionIds = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"invoiceId","table":"invoices"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"paymentMethodId","table":"paymentMethods"}]);
     const __result = await __runPaymentUpdateProviderTransactionIds(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Payment_updateProviderTransactionIds", __result);
@@ -34252,7 +35546,10 @@ export const Payment_verifyReconciliation = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"invoiceId","table":"invoices"},{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"paymentMethodId","table":"paymentMethods"}]);
     const __result = await __runPaymentVerifyReconciliation(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Payment_verifyReconciliation", __result);
@@ -34300,7 +35597,10 @@ export const PaymentMethod_clearDefault = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runPaymentMethodClearDefault(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PaymentMethod_clearDefault", __result);
@@ -34360,7 +35660,10 @@ export const PaymentMethod_expire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runPaymentMethodExpire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PaymentMethod_expire", __result);
@@ -34423,7 +35726,10 @@ export const PaymentMethod_invalidate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runPaymentMethodInvalidate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PaymentMethod_invalidate", __result);
@@ -34471,7 +35777,10 @@ export const PaymentMethod_makeDefault = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runPaymentMethodMakeDefault(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PaymentMethod_makeDefault", __result);
@@ -34531,7 +35840,10 @@ export const PaymentMethod_reactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runPaymentMethodReactivate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PaymentMethod_reactivate", __result);
@@ -34591,7 +35903,10 @@ export const PaymentMethod_reassignClient = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runPaymentMethodReassignClient(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PaymentMethod_reassignClient", __result);
@@ -34652,12 +35967,14 @@ export const PaymentMethod_register = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PaymentMethod_register", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runPaymentMethodRegister(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PaymentMethod_register", __result);
@@ -34677,12 +35994,14 @@ export const PaymentMethod_createViaRegister = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PaymentMethod_createViaRegister", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { clientId, methodType, provider, lastFour, isDefault, notes } = args;
@@ -34784,7 +36103,10 @@ export const PaymentMethod_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"}]);
     const __result = await __runPaymentMethodRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PaymentMethod_remove", __result);
@@ -34834,12 +36156,14 @@ export const PaymentMethod_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientMergeId","clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PaymentMethod_stageClientMerge", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"clientMergeId","table":null}]);
     const __result = await __runPaymentMethodStageClientMerge(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PaymentMethod_stageClientMerge", __result);
@@ -34904,7 +36228,10 @@ export const PayrollInput_finalize = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"eventId","table":"events"},{"name":"shiftId","table":"shifts"}]);
     const __result = await __runPayrollInputFinalize(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PayrollInput_finalize", __result);
@@ -34971,7 +36298,10 @@ export const PayrollInput_markVoided = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"eventId","table":"events"},{"name":"shiftId","table":"shifts"}]);
     const __result = await __runPayrollInputMarkVoided(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PayrollInput_markVoided", __result);
@@ -35066,12 +36396,14 @@ export const PayrollInput_prepare = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId","eventId","shiftId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PayrollInput_prepare", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"eventId","table":"events"},{"name":"shiftId","table":"shifts"}]);
     const __result = await __runPayrollInputPrepare(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PayrollInput_prepare", __result);
@@ -35097,12 +36429,14 @@ export const PayrollInput_createViaPrepare = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId","eventId","shiftId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PayrollInput_createViaPrepare", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"eventId","table":"events"},{"name":"shiftId","table":"shifts"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { personId, periodStart, periodEnd, regularMinutes, overtimeMinutes, totalMinutes, eventId, shiftId, hourlyRate, overtimeRate, grossAmount, notes } = args;
@@ -35231,12 +36565,14 @@ export const PerformanceReview_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId","reviewerId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PerformanceReview_record", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"reviewerId","table":"people"},{"name":"eventId","table":"events"}]);
     const __result = await __runPerformanceReviewRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PerformanceReview_record", __result);
@@ -35258,12 +36594,14 @@ export const PerformanceReview_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId","reviewerId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PerformanceReview_createViaRecord", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"reviewerId","table":"people"},{"name":"eventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { personId, reviewerId, eventId, reviewDate, reliabilityRating, qualityRating, teamworkRating, notes } = args;
@@ -35363,6 +36701,8 @@ export const Person_assignRole = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runPersonAssignRole(ctx, args);
     if (__idemKey !== null) {
@@ -35423,6 +36763,8 @@ export const Person_changeAddress = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runPersonChangeAddress(ctx, args);
     if (__idemKey !== null) {
@@ -35476,6 +36818,8 @@ export const Person_correctEmail = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runPersonCorrectEmail(ctx, args);
     if (__idemKey !== null) {
@@ -35534,6 +36878,8 @@ export const Person_correctIdentity = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runPersonCorrectIdentity(ctx, args);
     if (__idemKey !== null) {
@@ -35597,6 +36943,8 @@ export const Person_deactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runPersonDeactivate(ctx, args);
     if (__idemKey !== null) {
@@ -35667,6 +37015,8 @@ export const Person_hire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runPersonHire(ctx, args);
     if (__idemKey !== null) {
@@ -35693,6 +37043,8 @@ export const Person_createViaHire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -35792,6 +37144,8 @@ export const Person_linkAccount = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runPersonLinkAccount(ctx, args);
     if (__idemKey !== null) {
@@ -35855,6 +37209,8 @@ export const Person_reactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runPersonReactivate(ctx, args);
     if (__idemKey !== null) {
@@ -35907,6 +37263,8 @@ export const Person_setEmployeeNumber = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runPersonSetEmployeeNumber(ctx, args);
     if (__idemKey !== null) {
@@ -35959,6 +37317,8 @@ export const Person_setPayRate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runPersonSetPayRate(ctx, args);
     if (__idemKey !== null) {
@@ -36010,6 +37370,8 @@ export const Person_setSmsAlerts = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runPersonSetSmsAlerts(ctx, args);
     if (__idemKey !== null) {
@@ -36076,6 +37438,8 @@ export const Person_terminate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runPersonTerminate(ctx, args);
     if (__idemKey !== null) {
@@ -36128,6 +37492,8 @@ export const Person_unlinkAccount = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runPersonUnlinkAccount(ctx, args);
     if (__idemKey !== null) {
@@ -36192,12 +37558,14 @@ export const PrepTask_assign = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PrepTask_assign", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"},{"name":"personId","table":null}]);
     const __result = await __runPrepTaskAssign(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_assign", __result);
@@ -36262,7 +37630,10 @@ export const PrepTask_cancel = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskCancel(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_cancel", __result);
@@ -36327,7 +37698,10 @@ export const PrepTask_claim = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskClaim(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_claim", __result);
@@ -36399,7 +37773,10 @@ export const PrepTask_complete = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskComplete(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_complete", __result);
@@ -36447,12 +37824,14 @@ export const PrepTask_linkRecipe = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["dishTaskId","dishId","componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PrepTask_linkRecipe", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskLinkRecipe(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_linkRecipe", __result);
@@ -36517,7 +37896,10 @@ export const PrepTask_markBlocked = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskMarkBlocked(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_markBlocked", __result);
@@ -36570,12 +37952,14 @@ export const PrepTask_markOverride = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["overrideOfDishTaskId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PrepTask_markOverride", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"},{"name":"overrideOfDishTaskId","table":null}]);
     const __result = await __runPrepTaskMarkOverride(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_markOverride", __result);
@@ -36670,12 +38054,14 @@ export const PrepTask_open = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventDishId","eventId","ingredientId","ingredientDemandId","componentId","dishTaskId","dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PrepTask_open", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskOpen(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_open", __result);
@@ -36708,12 +38094,14 @@ export const PrepTask_createViaOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventDishId","eventId","ingredientId","ingredientDemandId","componentId","dishTaskId","dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PrepTask_createViaOpen", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventDishId, eventId, name, quantity, unit, ingredientId, ingredientDemandId, componentId, dishTaskId, dishId, category, taskType, specialInstructions, isGenerated, station, dueAt, notes, resolution, choiceOptions } = args;
@@ -36870,7 +38258,10 @@ export const PrepTask_reconcileRemainingWork = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskReconcileRemainingWork(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_reconcileRemainingWork", __result);
@@ -36924,7 +38315,10 @@ export const PrepTask_refreshGenerated = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskRefreshGenerated(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_refreshGenerated", __result);
@@ -36987,7 +38381,10 @@ export const PrepTask_refreshRecipeTemplate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskRefreshRecipeTemplate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_refreshRecipeTemplate", __result);
@@ -37052,7 +38449,10 @@ export const PrepTask_release = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskRelease(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_release", __result);
@@ -37093,12 +38493,14 @@ export const PrepTask_replaceRecipeComponent = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["previousComponentId","componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PrepTask_replaceRecipeComponent", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"},{"name":"previousComponentId","table":null}]);
     const __result = await __runPrepTaskReplaceRecipeComponent(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_replaceRecipeComponent", __result);
@@ -37149,7 +38551,10 @@ export const PrepTask_resolveChoice = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskResolveChoice(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_resolveChoice", __result);
@@ -37214,7 +38619,10 @@ export const PrepTask_retireWithTemplate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskRetireWithTemplate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_retireWithTemplate", __result);
@@ -37275,12 +38683,14 @@ export const PrepTask_revise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["ingredientId","componentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PrepTask_revise", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskRevise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_revise", __result);
@@ -37325,7 +38735,10 @@ export const PrepTask_setChoice = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskSetChoice(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_setChoice", __result);
@@ -37390,7 +38803,10 @@ export const PrepTask_standDown = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskStandDown(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_standDown", __result);
@@ -37457,7 +38873,10 @@ export const PrepTask_start = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskStart(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_start", __result);
@@ -37523,7 +38942,10 @@ export const PrepTask_unblock = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventDishId","table":"eventDishes"},{"name":"eventId","table":"events"},{"name":"dishTaskId","table":"dishTasks"},{"name":"dishId","table":"dishes"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"componentId","table":"components"},{"name":"assignedToId","table":"people"}]);
     const __result = await __runPrepTaskUnblock(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTask_unblock", __result);
@@ -37573,7 +38995,10 @@ export const PrepTaskComment_edit = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"prepTaskId","table":"prepTasks"},{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"authorPersonId","table":"people"},{"name":"taskOwnerAssignedToId","table":"people"}]);
     const __result = await __runPrepTaskCommentEdit(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTaskComment_edit", __result);
@@ -37637,12 +39062,14 @@ export const PrepTaskComment_post = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["prepTaskId","eventId","eventDishId","taskOwnerAssignedToId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PrepTaskComment_post", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"prepTaskId","table":"prepTasks"},{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"authorPersonId","table":"people"},{"name":"taskOwnerAssignedToId","table":"people"}]);
     const __result = await __runPrepTaskCommentPost(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTaskComment_post", __result);
@@ -37663,12 +39090,14 @@ export const PrepTaskComment_createViaPost = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["prepTaskId","eventId","eventDishId","taskOwnerAssignedToId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PrepTaskComment_createViaPost", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"prepTaskId","table":"prepTasks"},{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"},{"name":"authorPersonId","table":"people"},{"name":"taskOwnerAssignedToId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { prepTaskId, eventId, body, eventDishId, category, taskOwnerAssignedToId, taskOwnerAuthSubjectId } = args;
@@ -37762,12 +39191,14 @@ export const PrepTaskDependency_declare = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["dependentTaskId","predecessorTaskId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PrepTaskDependency_declare", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dependentTaskId","table":"prepTasks"},{"name":"predecessorTaskId","table":"prepTasks"}]);
     const __result = await __runPrepTaskDependencyDeclare(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTaskDependency_declare", __result);
@@ -37783,12 +39214,14 @@ export const PrepTaskDependency_createViaDeclare = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["dependentTaskId","predecessorTaskId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PrepTaskDependency_createViaDeclare", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dependentTaskId","table":"prepTasks"},{"name":"predecessorTaskId","table":"prepTasks"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { dependentTaskId, predecessorTaskId } = args;
@@ -37860,7 +39293,10 @@ export const PrepTaskDependency_releaseRetiredRequirement = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dependentTaskId","table":"prepTasks"},{"name":"predecessorTaskId","table":"prepTasks"}]);
     const __result = await __runPrepTaskDependencyReleaseRetiredRequirement(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTaskDependency_releaseRetiredRequirement", __result);
@@ -37905,7 +39341,10 @@ export const PrepTaskDependency_satisfy = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"dependentTaskId","table":"prepTasks"},{"name":"predecessorTaskId","table":"prepTasks"}]);
     const __result = await __runPrepTaskDependencySatisfy(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTaskDependency_satisfy", __result);
@@ -37963,12 +39402,14 @@ export const PrepTaskMaterial_link = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["prepTaskId","eventIngredientContributionId","productionBatchAllocationId","dishIngredientId","dishComponentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PrepTaskMaterial_link", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"prepTaskId","table":"prepTasks"},{"name":"eventIngredientContributionId","table":null},{"name":"productionBatchAllocationId","table":null},{"name":"dishIngredientId","table":null},{"name":"dishComponentId","table":null}]);
     const __result = await __runPrepTaskMaterialLink(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTaskMaterial_link", __result);
@@ -37989,12 +39430,14 @@ export const PrepTaskMaterial_createViaLink = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["prepTaskId","eventIngredientContributionId","productionBatchAllocationId","dishIngredientId","dishComponentId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PrepTaskMaterial_createViaLink", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"prepTaskId","table":"prepTasks"},{"name":"eventIngredientContributionId","table":null},{"name":"productionBatchAllocationId","table":null},{"name":"dishIngredientId","table":null},{"name":"dishComponentId","table":null}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { prepTaskId, eventIngredientContributionId, productionBatchAllocationId, dishIngredientId, dishComponentId, workQuantity, workUnit } = args;
@@ -38081,7 +39524,10 @@ export const PrepTaskMaterial_unlink = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"prepTaskId","table":"prepTasks"}]);
     const __result = await __runPrepTaskMaterialUnlink(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PrepTaskMaterial_unlink", __result);
@@ -38146,7 +39592,10 @@ export const ProductionBatch_cancel = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"},{"name":"eventId","table":"events"}]);
     const __result = await __runProductionBatchCancel(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProductionBatch_cancel", __result);
@@ -38217,7 +39666,10 @@ export const ProductionBatch_complete = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"},{"name":"eventId","table":"events"}]);
     const __result = await __runProductionBatchComplete(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProductionBatch_complete", __result);
@@ -38277,12 +39729,14 @@ export const ProductionBatch_plan = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["componentId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ProductionBatch_plan", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"},{"name":"eventId","table":"events"}]);
     const __result = await __runProductionBatchPlan(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProductionBatch_plan", __result);
@@ -38301,12 +39755,14 @@ export const ProductionBatch_createViaPlan = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["componentId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ProductionBatch_createViaPlan", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"},{"name":"eventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { componentId, plannedYield, yieldUnit, eventId, notes } = args;
@@ -38403,12 +39859,14 @@ export const ProductionBatch_reconcilePlan = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["portionSpecId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ProductionBatch_reconcilePlan", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"},{"name":"eventId","table":"events"},{"name":"portionSpecId","table":null}]);
     const __result = await __runProductionBatchReconcilePlan(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProductionBatch_reconcilePlan", __result);
@@ -38470,7 +39928,10 @@ export const ProductionBatch_start = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"componentId","table":"components"},{"name":"eventId","table":"events"}]);
     const __result = await __runProductionBatchStart(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProductionBatch_start", __result);
@@ -38530,12 +39991,14 @@ export const ProductionBatchAllocation_allocate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["productionBatchId","eventId","eventDishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ProductionBatchAllocation_allocate", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"productionBatchId","table":"productionBatches"},{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"}]);
     const __result = await __runProductionBatchAllocationAllocate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProductionBatchAllocation_allocate", __result);
@@ -38556,12 +40019,14 @@ export const ProductionBatchAllocation_createViaAllocate = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["productionBatchId","eventId","eventDishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ProductionBatchAllocation_createViaAllocate", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"productionBatchId","table":"productionBatches"},{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { productionBatchId, allocatedQuantity, unit, formulaShare, eventId, eventDishId, isSurplus } = args;
@@ -38657,7 +40122,10 @@ export const ProductionBatchAllocation_markPortioned = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"productionBatchId","table":"productionBatches"},{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"}]);
     const __result = await __runProductionBatchAllocationMarkPortioned(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProductionBatchAllocation_markPortioned", __result);
@@ -38712,7 +40180,10 @@ export const ProductionBatchAllocation_markProduced = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"productionBatchId","table":"productionBatches"},{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"}]);
     const __result = await __runProductionBatchAllocationMarkProduced(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProductionBatchAllocation_markProduced", __result);
@@ -38770,7 +40241,10 @@ export const ProductionBatchAllocation_release = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"productionBatchId","table":"productionBatches"},{"name":"eventId","table":"events"},{"name":"eventDishId","table":"eventDishes"}]);
     const __result = await __runProductionBatchAllocationRelease(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProductionBatchAllocation_release", __result);
@@ -38857,12 +40331,14 @@ export const Proposal_accept = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","acceptedRevisionId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Proposal_accept", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"pendingEventId","table":"events"},{"name":"acceptedRevisionId","table":"proposalRevisions"},{"name":"supersededById","table":"proposals"},{"name":"replacesProposalId","table":"proposals"}]);
     const __result = await __runProposalAccept(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Proposal_accept", __result);
@@ -38911,7 +40387,10 @@ export const Proposal_confirmChangeSource = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"pendingEventId","table":"events"},{"name":"acceptedRevisionId","table":"proposalRevisions"},{"name":"supersededById","table":"proposals"},{"name":"replacesProposalId","table":"proposals"}]);
     const __result = await __runProposalConfirmChangeSource(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Proposal_confirmChangeSource", __result);
@@ -38971,7 +40450,10 @@ export const Proposal_decline = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"pendingEventId","table":"events"},{"name":"acceptedRevisionId","table":"proposalRevisions"},{"name":"supersededById","table":"proposals"},{"name":"replacesProposalId","table":"proposals"}]);
     const __result = await __runProposalDecline(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Proposal_decline", __result);
@@ -39061,12 +40543,14 @@ export const Proposal_draft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId","eventId","replacesProposalId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Proposal_draft", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"pendingEventId","table":"events"},{"name":"acceptedRevisionId","table":"proposalRevisions"},{"name":"supersededById","table":"proposals"},{"name":"replacesProposalId","table":"proposals"}]);
     const __result = await __runProposalDraft(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Proposal_draft", __result);
@@ -39099,12 +40583,14 @@ export const Proposal_createViaDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId","eventId","replacesProposalId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Proposal_createViaDraft", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"pendingEventId","table":"events"},{"name":"acceptedRevisionId","table":"proposalRevisions"},{"name":"supersededById","table":"proposals"},{"name":"replacesProposalId","table":"proposals"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { clientId, title, subtotal, taxAmount, discountAmount, total, proposalNumber, eventDate, eventEndDate, eventType, guestCount, venueName, venueAddress, expiresAt, notes, terms, visibleSections, eventId, replacesProposalId } = args;
@@ -39234,7 +40720,10 @@ export const Proposal_expire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"pendingEventId","table":"events"},{"name":"acceptedRevisionId","table":"proposalRevisions"},{"name":"supersededById","table":"proposals"},{"name":"replacesProposalId","table":"proposals"}]);
     const __result = await __runProposalExpire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Proposal_expire", __result);
@@ -39293,7 +40782,10 @@ export const Proposal_followEventHeadcount = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"pendingEventId","table":"events"},{"name":"acceptedRevisionId","table":"proposalRevisions"},{"name":"supersededById","table":"proposals"},{"name":"replacesProposalId","table":"proposals"}]);
     const __result = await __runProposalFollowEventHeadcount(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Proposal_followEventHeadcount", __result);
@@ -39376,7 +40868,10 @@ export const Proposal_linkEvent = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"pendingEventId","table":"events"},{"name":"acceptedRevisionId","table":"proposalRevisions"},{"name":"supersededById","table":"proposals"},{"name":"replacesProposalId","table":"proposals"}]);
     const __result = await __runProposalLinkEvent(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Proposal_linkEvent", __result);
@@ -39436,7 +40931,10 @@ export const Proposal_markViewed = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"pendingEventId","table":"events"},{"name":"acceptedRevisionId","table":"proposalRevisions"},{"name":"supersededById","table":"proposals"},{"name":"replacesProposalId","table":"proposals"}]);
     const __result = await __runProposalMarkViewed(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Proposal_markViewed", __result);
@@ -39496,7 +40994,10 @@ export const Proposal_reassignClient = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"pendingEventId","table":"events"},{"name":"acceptedRevisionId","table":"proposalRevisions"},{"name":"supersededById","table":"proposals"},{"name":"replacesProposalId","table":"proposals"}]);
     const __result = await __runProposalReassignClient(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Proposal_reassignClient", __result);
@@ -39561,7 +41062,10 @@ export const Proposal_send = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"pendingEventId","table":"events"},{"name":"acceptedRevisionId","table":"proposalRevisions"},{"name":"supersededById","table":"proposals"},{"name":"replacesProposalId","table":"proposals"}]);
     const __result = await __runProposalSend(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Proposal_send", __result);
@@ -39611,12 +41115,14 @@ export const Proposal_stageClientMerge = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientMergeId","clientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Proposal_stageClientMerge", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"pendingEventId","table":"events"},{"name":"acceptedRevisionId","table":"proposalRevisions"},{"name":"supersededById","table":"proposals"},{"name":"replacesProposalId","table":"proposals"},{"name":"clientMergeId","table":null}]);
     const __result = await __runProposalStageClientMerge(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Proposal_stageClientMerge", __result);
@@ -39661,12 +41167,14 @@ export const Proposal_stageEventLink = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Proposal_stageEventLink", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"pendingEventId","table":"events"},{"name":"acceptedRevisionId","table":"proposalRevisions"},{"name":"supersededById","table":"proposals"},{"name":"replacesProposalId","table":"proposals"}]);
     const __result = await __runProposalStageEventLink(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Proposal_stageEventLink", __result);
@@ -39727,12 +41235,14 @@ export const Proposal_supersede = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["revisedById"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Proposal_supersede", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"pendingEventId","table":"events"},{"name":"acceptedRevisionId","table":"proposalRevisions"},{"name":"supersededById","table":"proposals"},{"name":"replacesProposalId","table":"proposals"},{"name":"revisedById","table":null}]);
     const __result = await __runProposalSupersede(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Proposal_supersede", __result);
@@ -39785,7 +41295,10 @@ export const ProposalDishSelection_adjustServings = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"},{"name":"menuId","table":"menus"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runProposalDishSelectionAdjustServings(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProposalDishSelection_adjustServings", __result);
@@ -39836,7 +41349,10 @@ export const ProposalDishSelection_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"},{"name":"menuId","table":"menus"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runProposalDishSelectionRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProposalDishSelection_remove", __result);
@@ -39904,12 +41420,14 @@ export const ProposalDishSelection_select = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["proposalId","menuId","dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ProposalDishSelection_select", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"},{"name":"menuId","table":"menus"},{"name":"dishId","table":"dishes"}]);
     const __result = await __runProposalDishSelectionSelect(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProposalDishSelection_select", __result);
@@ -39930,12 +41448,14 @@ export const ProposalDishSelection_createViaSelect = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["proposalId","menuId","dishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ProposalDishSelection_createViaSelect", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"},{"name":"menuId","table":"menus"},{"name":"dishId","table":"dishes"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { proposalId, menuId, dishId, quantityServings, course, serviceStyle, specialInstructions } = args;
@@ -40039,12 +41559,14 @@ export const ProposalEnhancement_offer = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["proposalId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ProposalEnhancement_offer", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"}]);
     const __result = await __runProposalEnhancementOffer(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProposalEnhancement_offer", __result);
@@ -40063,12 +41585,14 @@ export const ProposalEnhancement_createViaOffer = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["proposalId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ProposalEnhancement_createViaOffer", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { proposalId, name, price, description, sortOrder } = args;
@@ -40166,7 +41690,10 @@ export const ProposalEnhancement_revise = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"}]);
     const __result = await __runProposalEnhancementRevise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProposalEnhancement_revise", __result);
@@ -40218,7 +41745,10 @@ export const ProposalEnhancement_withdraw = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"}]);
     const __result = await __runProposalEnhancementWithdraw(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProposalEnhancement_withdraw", __result);
@@ -40290,12 +41820,14 @@ export const ProposalLineItem_addLine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["proposalId","menuDishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ProposalLineItem_addLine", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"},{"name":"menuDishId","table":null}]);
     const __result = await __runProposalLineItemAddLine(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProposalLineItem_addLine", __result);
@@ -40320,12 +41852,14 @@ export const ProposalLineItem_createViaAddLine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["proposalId","menuDishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ProposalLineItem_createViaAddLine", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"},{"name":"menuDishId","table":null}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { proposalId, description, pricingBasis, unitPrice, amount, quantity, unit, sortOrder, notes, menuDishId, overrideReason } = args;
@@ -40427,7 +41961,10 @@ export const ProposalLineItem_removeLine = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"}]);
     const __result = await __runProposalLineItemRemoveLine(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProposalLineItem_removeLine", __result);
@@ -40495,12 +42032,14 @@ export const ProposalLineItem_reviseLine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["menuDishId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ProposalLineItem_reviseLine", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"},{"name":"menuDishId","table":null}]);
     const __result = await __runProposalLineItemReviseLine(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProposalLineItem_reviseLine", __result);
@@ -40555,12 +42094,14 @@ export const ProposalRevision_capture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["proposalId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ProposalRevision_capture", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"}]);
     const __result = await __runProposalRevisionCapture(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ProposalRevision_capture", __result);
@@ -40578,12 +42119,14 @@ export const ProposalRevision_createViaCapture = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["proposalId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ProposalRevision_createViaCapture", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { proposalId, revisionNumber, changeSummary, snapshot } = args;
@@ -40684,6 +42227,8 @@ export const ProposalTemplate_archive = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runProposalTemplateArchive(ctx, args);
     if (__idemKey !== null) {
@@ -40753,6 +42298,8 @@ export const ProposalTemplate_define = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runProposalTemplateDefine(ctx, args);
     if (__idemKey !== null) {
@@ -40779,6 +42326,8 @@ export const ProposalTemplate_createViaDefine = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -40889,6 +42438,8 @@ export const ProposalTemplate_reactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runProposalTemplateReactivate(ctx, args);
     if (__idemKey !== null) {
@@ -40959,6 +42510,8 @@ export const ProposalTemplate_revise = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runProposalTemplateRevise(ctx, args);
     if (__idemKey !== null) {
@@ -41010,12 +42563,14 @@ export const PurchaseNeed_assignToDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorOrderId","vendorOrderLineId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PurchaseNeed_assignToDraft", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"ingredientId","table":"ingredients"},{"name":"preferredVendorId","table":"vendors"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"vendorOrderLineId","table":"vendorOrderLines"}]);
     const __result = await __runPurchaseNeedAssignToDraft(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PurchaseNeed_assignToDraft", __result);
@@ -41080,7 +42635,10 @@ export const PurchaseNeed_cancel = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"ingredientId","table":"ingredients"},{"name":"preferredVendorId","table":"vendors"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"vendorOrderLineId","table":"vendorOrderLines"}]);
     const __result = await __runPurchaseNeedCancel(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PurchaseNeed_cancel", __result);
@@ -41152,12 +42710,14 @@ export const PurchaseNeed_create = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","ingredientDemandId","ingredientId","preferredVendorId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PurchaseNeed_create", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"ingredientId","table":"ingredients"},{"name":"preferredVendorId","table":"vendors"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"vendorOrderLineId","table":"vendorOrderLines"}]);
     const __result = await __runPurchaseNeedCreate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PurchaseNeed_create", __result);
@@ -41224,7 +42784,10 @@ export const PurchaseNeed_markDraftOrdered = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"ingredientId","table":"ingredients"},{"name":"preferredVendorId","table":"vendors"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"vendorOrderLineId","table":"vendorOrderLines"}]);
     const __result = await __runPurchaseNeedMarkDraftOrdered(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PurchaseNeed_markDraftOrdered", __result);
@@ -41286,7 +42849,10 @@ export const PurchaseNeed_markFulfilled = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"ingredientId","table":"ingredients"},{"name":"preferredVendorId","table":"vendors"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"vendorOrderLineId","table":"vendorOrderLines"}]);
     const __result = await __runPurchaseNeedMarkFulfilled(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PurchaseNeed_markFulfilled", __result);
@@ -41349,12 +42915,14 @@ export const PurchaseNeed_markOrdered = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorOrderId","vendorOrderLineId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "PurchaseNeed_markOrdered", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"ingredientId","table":"ingredients"},{"name":"preferredVendorId","table":"vendors"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"vendorOrderLineId","table":"vendorOrderLines"}]);
     const __result = await __runPurchaseNeedMarkOrdered(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PurchaseNeed_markOrdered", __result);
@@ -41414,7 +42982,10 @@ export const PurchaseNeed_moveToWeek = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"ingredientId","table":"ingredients"},{"name":"preferredVendorId","table":"vendors"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"vendorOrderLineId","table":"vendorOrderLines"}]);
     const __result = await __runPurchaseNeedMoveToWeek(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PurchaseNeed_moveToWeek", __result);
@@ -41467,7 +43038,10 @@ export const PurchaseNeed_releaseCancelledDraft = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"ingredientId","table":"ingredients"},{"name":"preferredVendorId","table":"vendors"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"vendorOrderLineId","table":"vendorOrderLines"}]);
     const __result = await __runPurchaseNeedReleaseCancelledDraft(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PurchaseNeed_releaseCancelledDraft", __result);
@@ -41533,7 +43107,10 @@ export const PurchaseNeed_reviseRequired = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"ingredientId","table":"ingredients"},{"name":"preferredVendorId","table":"vendors"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"vendorOrderLineId","table":"vendorOrderLines"}]);
     const __result = await __runPurchaseNeedReviseRequired(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PurchaseNeed_reviseRequired", __result);
@@ -41599,7 +43176,10 @@ export const PurchaseNeed_standDownWithEvent = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"ingredientId","table":"ingredients"},{"name":"preferredVendorId","table":"vendors"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"vendorOrderLineId","table":"vendorOrderLines"}]);
     const __result = await __runPurchaseNeedStandDownWithEvent(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PurchaseNeed_standDownWithEvent", __result);
@@ -41658,7 +43238,10 @@ export const PushSubscription_register = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __result = await __runPushSubscriptionRegister(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PushSubscription_register", __result);
@@ -41680,7 +43263,10 @@ export const PushSubscription_createViaRegister = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { endpoint, p256dh, auth, userAgent } = args;
@@ -41762,7 +43348,10 @@ export const PushSubscription_unregister = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __result = await __runPushSubscriptionUnregister(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "PushSubscription_unregister", __result);
@@ -41828,7 +43417,10 @@ export const Qualification_expire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __result = await __runQualificationExpire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Qualification_expire", __result);
@@ -41899,12 +43491,14 @@ export const Qualification_grant = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Qualification_grant", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __result = await __runQualificationGrant(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Qualification_grant", __result);
@@ -41926,12 +43520,14 @@ export const Qualification_createViaGrant = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Qualification_createViaGrant", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { personId, name, issuedAt, certificationType, issuingBody, expiresAt, documentRef, notes } = args;
@@ -42048,7 +43644,10 @@ export const Qualification_revoke = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __result = await __runQualificationRevoke(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Qualification_revoke", __result);
@@ -42118,7 +43717,10 @@ export const QualityCheck_fail = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"prepTaskId","table":"prepTasks"},{"name":"productionBatchId","table":"productionBatches"},{"name":"checkedById","table":"people"}]);
     const __result = await __runQualityCheckFail(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "QualityCheck_fail", __result);
@@ -42171,12 +43773,14 @@ export const QualityCheck_open = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["prepTaskId","productionBatchId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "QualityCheck_open", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"prepTaskId","table":"prepTasks"},{"name":"productionBatchId","table":"productionBatches"},{"name":"checkedById","table":"people"}]);
     const __result = await __runQualityCheckOpen(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "QualityCheck_open", __result);
@@ -42193,12 +43797,14 @@ export const QualityCheck_createViaOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["prepTaskId","productionBatchId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "QualityCheck_createViaOpen", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"prepTaskId","table":"prepTasks"},{"name":"productionBatchId","table":"productionBatches"},{"name":"checkedById","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { prepTaskId, productionBatchId, notes } = args;
@@ -42299,7 +43905,10 @@ export const QualityCheck_pass = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"prepTaskId","table":"prepTasks"},{"name":"productionBatchId","table":"productionBatches"},{"name":"checkedById","table":"people"}]);
     const __result = await __runQualityCheckPass(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "QualityCheck_pass", __result);
@@ -42364,7 +43973,10 @@ export const QualityCheck_reinspect = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"prepTaskId","table":"prepTasks"},{"name":"productionBatchId","table":"productionBatches"},{"name":"checkedById","table":"people"}]);
     const __result = await __runQualityCheckReinspect(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "QualityCheck_reinspect", __result);
@@ -42416,12 +44028,14 @@ export const QuoteSubmission_complete = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId","leadId","eventId","proposalId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "QuoteSubmission_complete", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"}]);
     const __result = await __runQuoteSubmissionComplete(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "QuoteSubmission_complete", __result);
@@ -42508,12 +44122,14 @@ export const QuoteSubmission_create = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["serviceStyleId","occasionId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "QuoteSubmission_create", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"}]);
     const __result = await __runQuoteSubmissionCreate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "QuoteSubmission_create", __result);
@@ -42559,7 +44175,10 @@ export const QuoteSubmission_dismiss = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"}]);
     const __result = await __runQuoteSubmissionDismiss(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "QuoteSubmission_dismiss", __result);
@@ -42611,7 +44230,10 @@ export const QuoteSubmission_fail = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"}]);
     const __result = await __runQuoteSubmissionFail(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "QuoteSubmission_fail", __result);
@@ -42656,7 +44278,10 @@ export const QuoteSubmission_retry = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"}]);
     const __result = await __runQuoteSubmissionRetry(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "QuoteSubmission_retry", __result);
@@ -42699,7 +44324,10 @@ export const QuoteSubmission_startProcessing = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"}]);
     const __result = await __runQuoteSubmissionStartProcessing(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "QuoteSubmission_startProcessing", __result);
@@ -42774,12 +44402,14 @@ export const ReceiptCorrection_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorOrderLineId","vendorOrderId","vendorId","ingredientId","locationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ReceiptCorrection_record", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderLineId","table":"vendorOrderLines"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"},{"name":"vendorId","table":null}]);
     const __result = await __runReceiptCorrectionRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ReceiptCorrection_record", __result);
@@ -42805,12 +44435,14 @@ export const ReceiptCorrection_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorOrderLineId","vendorOrderId","vendorId","ingredientId","locationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ReceiptCorrection_createViaRecord", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderLineId","table":"vendorOrderLines"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"},{"name":"vendorId","table":null}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { vendorOrderLineId, vendorOrderId, vendorId, ingredientId, locationId, supplierLotNumber, priorReceivedQuantity, correctedReceivedQuantity, delta, unit, reason, correctionSequence } = args;
@@ -42926,12 +44558,14 @@ export const RecurringAvailability_declare = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "RecurringAvailability_declare", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __result = await __runRecurringAvailabilityDeclare(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "RecurringAvailability_declare", __result);
@@ -42950,12 +44584,14 @@ export const RecurringAvailability_createViaDeclare = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "RecurringAvailability_createViaDeclare", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { personId, dayOfWeek, startMinute, endMinute, notes } = args;
@@ -43062,7 +44698,10 @@ export const RecurringAvailability_withdraw = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __result = await __runRecurringAvailabilityWithdraw(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "RecurringAvailability_withdraw", __result);
@@ -43124,6 +44763,8 @@ export const ReferralSource_activate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runReferralSourceActivate(ctx, args);
     if (__idemKey !== null) {
@@ -43188,6 +44829,8 @@ export const ReferralSource_deactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runReferralSourceDeactivate(ctx, args);
     if (__idemKey !== null) {
@@ -43259,6 +44902,8 @@ export const ReferralSource_register = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runReferralSourceRegister(ctx, args);
     if (__idemKey !== null) {
@@ -43281,6 +44926,8 @@ export const ReferralSource_createViaRegister = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -43372,6 +45019,8 @@ export const ReferralSource_reviseDetails = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runReferralSourceReviseDetails(ctx, args);
     if (__idemKey !== null) {
@@ -43431,7 +45080,10 @@ export const RevenueAttribution_apply = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"venueId","table":"venues"},{"name":"salespersonId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"partnerPersonId","table":"people"},{"name":"partnerClientId","table":"clients"},{"name":"requestedById","table":"people"},{"name":"approvedById","table":"people"}]);
     const __result = await __runRevenueAttributionApply(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "RevenueAttribution_apply", __result);
@@ -43490,7 +45142,10 @@ export const RevenueAttribution_approve = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"venueId","table":"venues"},{"name":"salespersonId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"partnerPersonId","table":"people"},{"name":"partnerClientId","table":"clients"},{"name":"requestedById","table":"people"},{"name":"approvedById","table":"people"}]);
     const __result = await __runRevenueAttributionApprove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "RevenueAttribution_approve", __result);
@@ -43564,12 +45219,14 @@ export const RevenueAttribution_create = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId","venueId","salespersonId","referralSourceId","partnerPersonId","partnerClientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "RevenueAttribution_create", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"venueId","table":"venues"},{"name":"salespersonId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"partnerPersonId","table":"people"},{"name":"partnerClientId","table":"clients"},{"name":"requestedById","table":"people"},{"name":"approvedById","table":"people"}]);
     const __result = await __runRevenueAttributionCreate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "RevenueAttribution_create", __result);
@@ -43627,7 +45284,10 @@ export const RevenueAttribution_reject = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"venueId","table":"venues"},{"name":"salespersonId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"partnerPersonId","table":"people"},{"name":"partnerClientId","table":"clients"},{"name":"requestedById","table":"people"},{"name":"approvedById","table":"people"}]);
     const __result = await __runRevenueAttributionReject(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "RevenueAttribution_reject", __result);
@@ -43681,7 +45341,10 @@ export const RevenueAttribution_requestApproval = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"venueId","table":"venues"},{"name":"salespersonId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"partnerPersonId","table":"people"},{"name":"partnerClientId","table":"clients"},{"name":"requestedById","table":"people"},{"name":"approvedById","table":"people"}]);
     const __result = await __runRevenueAttributionRequestApproval(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "RevenueAttribution_requestApproval", __result);
@@ -43736,7 +45399,10 @@ export const RevenueAttribution_update = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"venueId","table":"venues"},{"name":"salespersonId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"partnerPersonId","table":"people"},{"name":"partnerClientId","table":"clients"},{"name":"requestedById","table":"people"},{"name":"approvedById","table":"people"}]);
     const __result = await __runRevenueAttributionUpdate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "RevenueAttribution_update", __result);
@@ -43800,7 +45466,10 @@ export const ReviewFlag_dismiss = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runReviewFlagDismiss(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ReviewFlag_dismiss", __result);
@@ -43865,7 +45534,10 @@ export const ReviewFlag_markResolved = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runReviewFlagMarkResolved(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ReviewFlag_markResolved", __result);
@@ -43938,12 +45610,14 @@ export const ReviewFlag_raise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ReviewFlag_raise", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runReviewFlagRaise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ReviewFlag_raise", __result);
@@ -43962,12 +45636,14 @@ export const ReviewFlag_createViaRaise = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ReviewFlag_createViaRaise", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, targetKind, question, targetId, targetLabel } = args;
@@ -44069,7 +45745,10 @@ export const ReviewFlag_reopen = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runReviewFlagReopen(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ReviewFlag_reopen", __result);
@@ -44112,7 +45791,10 @@ export const ReviewFlag_reviseQuestion = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __result = await __runReviewFlagReviseQuestion(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ReviewFlag_reviseQuestion", __result);
@@ -44178,6 +45860,8 @@ export const RoleScorecard_archive = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runRoleScorecardArchive(ctx, args);
     if (__idemKey !== null) {
@@ -44235,6 +45919,8 @@ export const RoleScorecard_define = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runRoleScorecardDefine(ctx, args);
     if (__idemKey !== null) {
@@ -44257,6 +45943,8 @@ export const RoleScorecard_createViaDefine = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -44354,6 +46042,8 @@ export const RoleScorecard_reactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runRoleScorecardReactivate(ctx, args);
     if (__idemKey !== null) {
@@ -44418,7 +46108,10 @@ export const SavedReportDefinition_archive = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ownerId","table":"people"}]);
     const __result = await __runSavedReportDefinitionArchive(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "SavedReportDefinition_archive", __result);
@@ -44469,7 +46162,10 @@ export const SavedReportDefinition_changeSharing = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ownerId","table":"people"}]);
     const __result = await __runSavedReportDefinitionChangeSharing(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "SavedReportDefinition_changeSharing", __result);
@@ -44531,7 +46227,10 @@ export const SavedReportDefinition_createDefinition = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ownerId","table":"people"}]);
     const __result = await __runSavedReportDefinitionCreateDefinition(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "SavedReportDefinition_createDefinition", __result);
@@ -44554,7 +46253,10 @@ export const SavedReportDefinition_createViaCreateDefinition = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ownerId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { name, subjectArea, chartType, definition, sharingScope } = args;
@@ -44645,7 +46347,10 @@ export const SavedReportDefinition_rename = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ownerId","table":"people"}]);
     const __result = await __runSavedReportDefinitionRename(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "SavedReportDefinition_rename", __result);
@@ -44709,7 +46414,10 @@ export const SavedReportDefinition_restore = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ownerId","table":"people"}]);
     const __result = await __runSavedReportDefinitionRestore(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "SavedReportDefinition_restore", __result);
@@ -44765,7 +46473,10 @@ export const SavedReportDefinition_updateDefinition = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ownerId","table":"people"}]);
     const __result = await __runSavedReportDefinitionUpdateDefinition(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "SavedReportDefinition_updateDefinition", __result);
@@ -44827,6 +46538,8 @@ export const ServiceStyle_activate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runServiceStyleActivate(ctx, args);
     if (__idemKey !== null) {
@@ -44891,6 +46604,8 @@ export const ServiceStyle_deactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runServiceStyleDeactivate(ctx, args);
     if (__idemKey !== null) {
@@ -44962,6 +46677,8 @@ export const ServiceStyle_register = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runServiceStyleRegister(ctx, args);
     if (__idemKey !== null) {
@@ -44984,6 +46701,8 @@ export const ServiceStyle_createViaRegister = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -45075,6 +46794,8 @@ export const ServiceStyle_reviseDetails = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runServiceStyleReviseDetails(ctx, args);
     if (__idemKey !== null) {
@@ -45138,12 +46859,14 @@ export const ServiceStyleKitItem_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["serviceStyleId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ServiceStyleKitItem_add", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"serviceStyleId","table":"serviceStyles"}]);
     const __result = await __runServiceStyleKitItemAdd(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ServiceStyleKitItem_add", __result);
@@ -45164,12 +46887,14 @@ export const ServiceStyleKitItem_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["serviceStyleId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ServiceStyleKitItem_createViaAdd", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"serviceStyleId","table":"serviceStyles"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { serviceStyleId, description, baseQuantity, guestsPerUnit, unit, note, sortOrder } = args;
@@ -45274,7 +46999,10 @@ export const ServiceStyleKitItem_reinstate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"serviceStyleId","table":"serviceStyles"}]);
     const __result = await __runServiceStyleKitItemReinstate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ServiceStyleKitItem_reinstate", __result);
@@ -45336,7 +47064,10 @@ export const ServiceStyleKitItem_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"serviceStyleId","table":"serviceStyles"}]);
     const __result = await __runServiceStyleKitItemRetire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ServiceStyleKitItem_retire", __result);
@@ -45395,7 +47126,10 @@ export const ServiceStyleKitItem_revise = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"serviceStyleId","table":"serviceStyles"}]);
     const __result = await __runServiceStyleKitItemRevise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ServiceStyleKitItem_revise", __result);
@@ -45416,7 +47150,7 @@ async function __runShareLinkCreate(ctx: MutationCtx, args: any) {
       proposalRevisionId: args.proposalRevisionId,
       status: "active",
       expiresAt: args.expiresAt,
-      createdByPersonId: user.id,
+      createdByPersonId: user.personId,
       revokedAt: null,
       revokedByPersonId: null,
       viewCount: 0,
@@ -45431,9 +47165,10 @@ async function __runShareLinkCreate(ctx: MutationCtx, args: any) {
     if (!((args.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((user.id != null))) throw new Error("Guard 1 failed");
     if (!(((args.expiresAt == null) || (args.expiresAt > Date.now())))) throw new Error("Share link expiry must be in the future");
+    if (!((user.personId != null))) throw new Error("Link your account to a staff profile before you create a share link.");
     const _id = await ctx.db.insert("shareLinks", doc as any);
-    const payload: Record<string, any> = { _id, id: _id, ...doc, result: { _id, id: _id, ...doc }, shareLinkId: _id, tenantId: doc.tenantId, proposalId: doc.proposalId, proposalRevisionId: doc.proposalRevisionId, createdByPersonId: ((user.id != null) ? user.id : ""), expiresAt: doc.expiresAt, _subject: { entity: "ShareLink", command: "create", id: _id } };
-    const __manifestEvent0 = { type: "ShareLinkCreated", entity: "ShareLink", entityId: _id, payload: { shareLinkId: _id, tenantId: doc.tenantId, proposalId: doc.proposalId, proposalRevisionId: doc.proposalRevisionId, createdByPersonId: ((user.id != null) ? user.id : ""), expiresAt: doc.expiresAt }, createdAt: Date.now() };
+    const payload: Record<string, any> = { _id, id: _id, ...doc, result: { _id, id: _id, ...doc }, shareLinkId: _id, tenantId: doc.tenantId, proposalId: doc.proposalId, proposalRevisionId: doc.proposalRevisionId, createdByPersonId: ((user.personId != null) ? user.personId : ""), expiresAt: doc.expiresAt, _subject: { entity: "ShareLink", command: "create", id: _id } };
+    const __manifestEvent0 = { type: "ShareLinkCreated", entity: "ShareLink", entityId: _id, payload: { shareLinkId: _id, tenantId: doc.tenantId, proposalId: doc.proposalId, proposalRevisionId: doc.proposalRevisionId, createdByPersonId: ((user.personId != null) ? user.personId : ""), expiresAt: doc.expiresAt }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "create", emitIndex: 0 });
     return { _id, ...doc };
@@ -45451,12 +47186,14 @@ export const ShareLink_create = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["proposalId","proposalRevisionId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ShareLink_create", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"},{"name":"proposalRevisionId","table":"proposalRevisions"}]);
     const __result = await __runShareLinkCreate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ShareLink_create", __result);
@@ -45477,19 +47214,20 @@ async function __runShareLinkRevoke(ctx: MutationCtx, { docId, version }: any, _
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Guard 2 failed");
+    if (!((user.personId != null))) throw new Error("Link your account to a staff profile before you revoke a share link.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
       status: "revoked",
       revokedAt: Date.now(),
-      revokedByPersonId: user.id,
+      revokedByPersonId: user.personId,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, shareLinkId: docId, tenantId: __after.tenantId, proposalId: __after.proposalId, revokedByPersonId: ((user.id != null) ? user.id : ""), revokedAt: Date.now(), _subject: { entity: "ShareLink", command: "revoke", id: docId } };
-    const __manifestEvent0 = { type: "ShareLinkRevoked", entity: "ShareLink", entityId: docId, payload: { shareLinkId: docId, tenantId: __after.tenantId, proposalId: __after.proposalId, revokedByPersonId: ((user.id != null) ? user.id : ""), revokedAt: Date.now() }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, shareLinkId: docId, tenantId: __after.tenantId, proposalId: __after.proposalId, revokedByPersonId: ((user.personId != null) ? user.personId : ""), revokedAt: Date.now(), _subject: { entity: "ShareLink", command: "revoke", id: docId } };
+    const __manifestEvent0 = { type: "ShareLinkRevoked", entity: "ShareLink", entityId: docId, payload: { shareLinkId: docId, tenantId: __after.tenantId, proposalId: __after.proposalId, revokedByPersonId: ((user.personId != null) ? user.personId : ""), revokedAt: Date.now() }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "revoke", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -45506,7 +47244,10 @@ export const ShareLink_revoke = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"},{"name":"proposalRevisionId","table":"proposalRevisions"}]);
     const __result = await __runShareLinkRevoke(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ShareLink_revoke", __result);
@@ -45584,7 +47325,10 @@ export const Shift_applyApprovedSwap = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"eventId","table":"events"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"requiredQualificationId","table":"qualifications"},{"name":"requiredTrainingCompletionId","table":"trainingCompletions"},{"name":"swapAuthorizationId","table":"shiftSwapRequests"},{"name":"swapTargetPersonId","table":"people"},{"name":"swapTargetQualificationId","table":"qualifications"},{"name":"swapTargetTrainingCompletionId","table":"trainingCompletions"}]);
     const __result = await __runShiftApplyApprovedSwap(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Shift_applyApprovedSwap", __result);
@@ -45651,7 +47395,10 @@ export const Shift_cancel = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"eventId","table":"events"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"requiredQualificationId","table":"qualifications"},{"name":"requiredTrainingCompletionId","table":"trainingCompletions"},{"name":"swapAuthorizationId","table":"shiftSwapRequests"},{"name":"swapTargetPersonId","table":"people"},{"name":"swapTargetQualificationId","table":"qualifications"},{"name":"swapTargetTrainingCompletionId","table":"trainingCompletions"}]);
     const __result = await __runShiftCancel(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Shift_cancel", __result);
@@ -45717,7 +47464,10 @@ export const Shift_complete = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"eventId","table":"events"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"requiredQualificationId","table":"qualifications"},{"name":"requiredTrainingCompletionId","table":"trainingCompletions"},{"name":"swapAuthorizationId","table":"shiftSwapRequests"},{"name":"swapTargetPersonId","table":"people"},{"name":"swapTargetQualificationId","table":"qualifications"},{"name":"swapTargetTrainingCompletionId","table":"trainingCompletions"}]);
     const __result = await __runShiftComplete(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Shift_complete", __result);
@@ -45781,7 +47531,10 @@ export const Shift_markNoShow = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"eventId","table":"events"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"requiredQualificationId","table":"qualifications"},{"name":"requiredTrainingCompletionId","table":"trainingCompletions"},{"name":"swapAuthorizationId","table":"shiftSwapRequests"},{"name":"swapTargetPersonId","table":"people"},{"name":"swapTargetQualificationId","table":"qualifications"},{"name":"swapTargetTrainingCompletionId","table":"trainingCompletions"}]);
     const __result = await __runShiftMarkNoShow(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Shift_markNoShow", __result);
@@ -45841,7 +47594,10 @@ export const Shift_planEventTiming = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"eventId","table":"events"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"requiredQualificationId","table":"qualifications"},{"name":"requiredTrainingCompletionId","table":"trainingCompletions"},{"name":"swapAuthorizationId","table":"shiftSwapRequests"},{"name":"swapTargetPersonId","table":"people"},{"name":"swapTargetQualificationId","table":"qualifications"},{"name":"swapTargetTrainingCompletionId","table":"trainingCompletions"}]);
     const __result = await __runShiftPlanEventTiming(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Shift_planEventTiming", __result);
@@ -45909,12 +47665,14 @@ export const Shift_removeStaffNeedCoverage = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["staffNeedId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Shift_removeStaffNeedCoverage", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"eventId","table":"events"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"requiredQualificationId","table":"qualifications"},{"name":"requiredTrainingCompletionId","table":"trainingCompletions"},{"name":"swapAuthorizationId","table":"shiftSwapRequests"},{"name":"swapTargetPersonId","table":"people"},{"name":"swapTargetQualificationId","table":"qualifications"},{"name":"swapTargetTrainingCompletionId","table":"trainingCompletions"},{"name":"staffNeedId","table":null}]);
     const __result = await __runShiftRemoveStaffNeedCoverage(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Shift_removeStaffNeedCoverage", __result);
@@ -45970,7 +47728,10 @@ export const Shift_reschedule = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"eventId","table":"events"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"requiredQualificationId","table":"qualifications"},{"name":"requiredTrainingCompletionId","table":"trainingCompletions"},{"name":"swapAuthorizationId","table":"shiftSwapRequests"},{"name":"swapTargetPersonId","table":"people"},{"name":"swapTargetQualificationId","table":"qualifications"},{"name":"swapTargetTrainingCompletionId","table":"trainingCompletions"}]);
     const __result = await __runShiftReschedule(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Shift_reschedule", __result);
@@ -46037,7 +47798,10 @@ export const Shift_retireEventTiming = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"eventId","table":"events"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"requiredQualificationId","table":"qualifications"},{"name":"requiredTrainingCompletionId","table":"trainingCompletions"},{"name":"swapAuthorizationId","table":"shiftSwapRequests"},{"name":"swapTargetPersonId","table":"people"},{"name":"swapTargetQualificationId","table":"qualifications"},{"name":"swapTargetTrainingCompletionId","table":"trainingCompletions"}]);
     const __result = await __runShiftRetireEventTiming(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Shift_retireEventTiming", __result);
@@ -46128,12 +47892,14 @@ export const Shift_schedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId","eventId","shiftTypeId","requiredQualificationId","requiredTrainingCompletionId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Shift_schedule", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"eventId","table":"events"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"requiredQualificationId","table":"qualifications"},{"name":"requiredTrainingCompletionId","table":"trainingCompletions"},{"name":"swapAuthorizationId","table":"shiftSwapRequests"},{"name":"swapTargetPersonId","table":"people"},{"name":"swapTargetQualificationId","table":"qualifications"},{"name":"swapTargetTrainingCompletionId","table":"trainingCompletions"}]);
     const __result = await __runShiftSchedule(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Shift_schedule", __result);
@@ -46157,12 +47923,14 @@ export const Shift_createViaSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId","eventId","shiftTypeId","requiredQualificationId","requiredTrainingCompletionId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Shift_createViaSchedule", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"eventId","table":"events"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"requiredQualificationId","table":"qualifications"},{"name":"requiredTrainingCompletionId","table":"trainingCompletions"},{"name":"swapAuthorizationId","table":"shiftSwapRequests"},{"name":"swapTargetPersonId","table":"people"},{"name":"swapTargetQualificationId","table":"qualifications"},{"name":"swapTargetTrainingCompletionId","table":"trainingCompletions"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { personId, startsAt, endsAt, eventId, role, shiftTypeId, requiredQualificationId, requiredTrainingCompletionId, notes, eventStaffingSourceIds } = args;
@@ -46289,12 +48057,14 @@ export const Shift_stageApprovedSwap = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["shiftSwapRequestId","requesterPersonId","recipientPersonId","targetQualificationId","targetTrainingCompletionId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Shift_stageApprovedSwap", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"eventId","table":"events"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"requiredQualificationId","table":"qualifications"},{"name":"requiredTrainingCompletionId","table":"trainingCompletions"},{"name":"swapAuthorizationId","table":"shiftSwapRequests"},{"name":"swapTargetPersonId","table":"people"},{"name":"swapTargetQualificationId","table":"qualifications"},{"name":"swapTargetTrainingCompletionId","table":"trainingCompletions"},{"name":"shiftSwapRequestId","table":null},{"name":"requesterPersonId","table":null},{"name":"recipientPersonId","table":null},{"name":"targetQualificationId","table":null},{"name":"targetTrainingCompletionId","table":null}]);
     const __result = await __runShiftStageApprovedSwap(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Shift_stageApprovedSwap", __result);
@@ -46360,7 +48130,10 @@ export const Shift_start = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"eventId","table":"events"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"requiredQualificationId","table":"qualifications"},{"name":"requiredTrainingCompletionId","table":"trainingCompletions"},{"name":"swapAuthorizationId","table":"shiftSwapRequests"},{"name":"swapTargetPersonId","table":"people"},{"name":"swapTargetQualificationId","table":"qualifications"},{"name":"swapTargetTrainingCompletionId","table":"trainingCompletions"}]);
     const __result = await __runShiftStart(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "Shift_start", __result);
@@ -46433,7 +48206,10 @@ export const ShiftSwapRequest_accept = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"shiftId","table":"shifts"},{"name":"requesterPersonId","table":"people"},{"name":"recipientPersonId","table":"people"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"sourceQualificationId","table":"qualifications"},{"name":"targetQualificationId","table":"qualifications"},{"name":"targetTrainingCompletionId","table":"trainingCompletions"}]);
     const __result = await __runShiftSwapRequestAccept(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ShiftSwapRequest_accept", __result);
@@ -46537,7 +48313,10 @@ export const ShiftSwapRequest_approve = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"shiftId","table":"shifts"},{"name":"requesterPersonId","table":"people"},{"name":"recipientPersonId","table":"people"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"sourceQualificationId","table":"qualifications"},{"name":"targetQualificationId","table":"qualifications"},{"name":"targetTrainingCompletionId","table":"trainingCompletions"}]);
     const __result = await __runShiftSwapRequestApprove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ShiftSwapRequest_approve", __result);
@@ -46607,7 +48386,10 @@ export const ShiftSwapRequest_decline = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"shiftId","table":"shifts"},{"name":"requesterPersonId","table":"people"},{"name":"recipientPersonId","table":"people"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"sourceQualificationId","table":"qualifications"},{"name":"targetQualificationId","table":"qualifications"},{"name":"targetTrainingCompletionId","table":"trainingCompletions"}]);
     const __result = await __runShiftSwapRequestDecline(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ShiftSwapRequest_decline", __result);
@@ -46708,12 +48490,14 @@ export const ShiftSwapRequest_propose = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["shiftId","requesterPersonId","recipientPersonId","shiftTypeId","sourceQualificationId","targetQualificationId","targetTrainingCompletionId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ShiftSwapRequest_propose", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"shiftId","table":"shifts"},{"name":"requesterPersonId","table":"people"},{"name":"recipientPersonId","table":"people"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"sourceQualificationId","table":"qualifications"},{"name":"targetQualificationId","table":"qualifications"},{"name":"targetTrainingCompletionId","table":"trainingCompletions"}]);
     const __result = await __runShiftSwapRequestPropose(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ShiftSwapRequest_propose", __result);
@@ -46735,12 +48519,14 @@ export const ShiftSwapRequest_createViaPropose = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["shiftId","requesterPersonId","recipientPersonId","shiftTypeId","sourceQualificationId","targetQualificationId","targetTrainingCompletionId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ShiftSwapRequest_createViaPropose", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"shiftId","table":"shifts"},{"name":"requesterPersonId","table":"people"},{"name":"recipientPersonId","table":"people"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"sourceQualificationId","table":"qualifications"},{"name":"targetQualificationId","table":"qualifications"},{"name":"targetTrainingCompletionId","table":"trainingCompletions"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { shiftId, requesterPersonId, recipientPersonId, shiftTypeId, sourceQualificationId, targetQualificationId, targetTrainingCompletionId, reason } = args;
@@ -46881,7 +48667,10 @@ export const ShiftSwapRequest_reject = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"shiftId","table":"shifts"},{"name":"requesterPersonId","table":"people"},{"name":"recipientPersonId","table":"people"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"sourceQualificationId","table":"qualifications"},{"name":"targetQualificationId","table":"qualifications"},{"name":"targetTrainingCompletionId","table":"trainingCompletions"}]);
     const __result = await __runShiftSwapRequestReject(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ShiftSwapRequest_reject", __result);
@@ -46949,7 +48738,10 @@ export const ShiftSwapRequest_withdraw = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"shiftId","table":"shifts"},{"name":"requesterPersonId","table":"people"},{"name":"recipientPersonId","table":"people"},{"name":"shiftTypeId","table":"shiftTypes"},{"name":"sourceQualificationId","table":"qualifications"},{"name":"targetQualificationId","table":"qualifications"},{"name":"targetTrainingCompletionId","table":"trainingCompletions"}]);
     const __result = await __runShiftSwapRequestWithdraw(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ShiftSwapRequest_withdraw", __result);
@@ -47016,12 +48808,14 @@ export const ShiftType_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["requiredTrainingModuleId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ShiftType_define", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"requiredTrainingModuleId","table":"trainingModules"}]);
     const __result = await __runShiftTypeDefine(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ShiftType_define", __result);
@@ -47038,12 +48832,14 @@ export const ShiftType_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["requiredTrainingModuleId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "ShiftType_createViaDefine", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"requiredTrainingModuleId","table":"trainingModules"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { name, description, requiredTrainingModuleId } = args;
@@ -47139,7 +48935,10 @@ export const ShiftType_reactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"requiredTrainingModuleId","table":"trainingModules"}]);
     const __result = await __runShiftTypeReactivate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ShiftType_reactivate", __result);
@@ -47201,7 +49000,10 @@ export const ShiftType_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"requiredTrainingModuleId","table":"trainingModules"}]);
     const __result = await __runShiftTypeRetire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "ShiftType_retire", __result);
@@ -47274,7 +49076,10 @@ export const SignatureRequest_complete = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalRevisionId","table":"proposalRevisions"},{"name":"recipientPersonId","table":"people"},{"name":"requestedByPersonId","table":"people"}]);
     const __result = await __runSignatureRequestComplete(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "SignatureRequest_complete", __result);
@@ -47336,7 +49141,10 @@ export const SignatureRequest_expire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalRevisionId","table":"proposalRevisions"},{"name":"recipientPersonId","table":"people"},{"name":"requestedByPersonId","table":"people"}]);
     const __result = await __runSignatureRequestExpire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "SignatureRequest_expire", __result);
@@ -47414,12 +49222,14 @@ export const SignatureRequest_requestSignature = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["proposalRevisionId","recipientPersonId","recipientContactId","proposalId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "SignatureRequest_requestSignature", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalRevisionId","table":"proposalRevisions"},{"name":"recipientPersonId","table":"people"},{"name":"requestedByPersonId","table":"people"},{"name":"recipientContactId","table":null},{"name":"proposalId","table":null}]);
     const __result = await __runSignatureRequestRequestSignature(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "SignatureRequest_requestSignature", __result);
@@ -47441,12 +49251,14 @@ export const SignatureRequest_createViaRequestSignature = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["proposalRevisionId","recipientPersonId","recipientContactId","proposalId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "SignatureRequest_createViaRequestSignature", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalRevisionId","table":"proposalRevisions"},{"name":"recipientPersonId","table":"people"},{"name":"requestedByPersonId","table":"people"},{"name":"recipientContactId","table":null},{"name":"proposalId","table":null}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { proposalRevisionId, recipientEmail, recipientName, recipientPersonId, recipientContactId, provider, expiresAt, proposalId } = args;
@@ -47556,7 +49368,10 @@ export const SignatureRequest_revoke = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalRevisionId","table":"proposalRevisions"},{"name":"recipientPersonId","table":"people"},{"name":"requestedByPersonId","table":"people"}]);
     const __result = await __runSignatureRequestRevoke(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "SignatureRequest_revoke", __result);
@@ -47609,6 +49424,8 @@ export const StaffChatReadCursor_open = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runStaffChatReadCursorOpen(ctx, args);
     if (__idemKey !== null) {
@@ -47629,6 +49446,8 @@ export const StaffChatReadCursor_createViaOpen = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -47706,6 +49525,8 @@ export const StaffChatReadCursor_touch = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runStaffChatReadCursorTouch(ctx, args);
     if (__idemKey !== null) {
@@ -47761,7 +49582,10 @@ export const StaffMessage_edit = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"senderPersonId","table":"people"},{"name":"recipientPersonId","table":"people"},{"name":"eventId","table":"events"}]);
     const __result = await __runStaffMessageEdit(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "StaffMessage_edit", __result);
@@ -47813,7 +49637,10 @@ export const StaffMessage_markRead = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"senderPersonId","table":"people"},{"name":"recipientPersonId","table":"people"},{"name":"eventId","table":"events"}]);
     const __result = await __runStaffMessageMarkRead(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "StaffMessage_markRead", __result);
@@ -47863,7 +49690,10 @@ export const StaffMessage_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"senderPersonId","table":"people"},{"name":"recipientPersonId","table":"people"},{"name":"eventId","table":"events"}]);
     const __result = await __runStaffMessageRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "StaffMessage_remove", __result);
@@ -47929,12 +49759,14 @@ export const StaffMessage_send = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["recipientPersonId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "StaffMessage_send", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"senderPersonId","table":"people"},{"name":"recipientPersonId","table":"people"},{"name":"eventId","table":"events"}]);
     const __result = await __runStaffMessageSend(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "StaffMessage_send", __result);
@@ -47952,12 +49784,14 @@ export const StaffMessage_createViaSend = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["recipientPersonId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "StaffMessage_createViaSend", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"senderPersonId","table":"people"},{"name":"recipientPersonId","table":"people"},{"name":"eventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { recipientPersonId, eventId, body, mentionedPersonIds } = args;
@@ -48055,6 +49889,8 @@ export const Station_define = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runStationDefine(ctx, args);
     if (__idemKey !== null) {
@@ -48076,6 +49912,8 @@ export const Station_createViaDefine = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -48162,6 +50000,8 @@ export const Station_reinstate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runStationReinstate(ctx, args);
     if (__idemKey !== null) {
@@ -48215,6 +50055,8 @@ export const Station_rename = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runStationRename(ctx, args);
     if (__idemKey !== null) {
@@ -48272,6 +50114,8 @@ export const Station_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runStationRetire(ctx, args);
     if (__idemKey !== null) {
@@ -48342,7 +50186,10 @@ export const StockCountLine_confirmLedgerMatch = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"stockCountSessionId","table":"stockCountSessions"},{"name":"inventoryItemId","table":"inventoryItems"},{"name":"locationId","table":"storageLocations"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runStockCountLineConfirmLedgerMatch(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "StockCountLine_confirmLedgerMatch", __result);
@@ -48413,12 +50260,14 @@ export const StockCountLine_freeze = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["stockCountSessionId","inventoryItemId","locationId","ingredientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "StockCountLine_freeze", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"stockCountSessionId","table":"stockCountSessions"},{"name":"inventoryItemId","table":"inventoryItems"},{"name":"locationId","table":"storageLocations"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runStockCountLineFreeze(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "StockCountLine_freeze", __result);
@@ -48437,12 +50286,14 @@ export const StockCountLine_createViaFreeze = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["stockCountSessionId","inventoryItemId","locationId","ingredientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "StockCountLine_createViaFreeze", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"stockCountSessionId","table":"stockCountSessions"},{"name":"inventoryItemId","table":"inventoryItems"},{"name":"locationId","table":"storageLocations"},{"name":"ingredientId","table":"ingredients"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { stockCountSessionId, inventoryItemId, locationId, ingredientId, unit } = args;
@@ -48568,7 +50419,10 @@ export const StockCountLine_reconcileVariance = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"stockCountSessionId","table":"stockCountSessions"},{"name":"inventoryItemId","table":"inventoryItems"},{"name":"locationId","table":"storageLocations"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runStockCountLineReconcileVariance(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "StockCountLine_reconcileVariance", __result);
@@ -48640,7 +50494,10 @@ export const StockCountLine_recordCount = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"stockCountSessionId","table":"stockCountSessions"},{"name":"inventoryItemId","table":"inventoryItems"},{"name":"locationId","table":"storageLocations"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runStockCountLineRecordCount(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "StockCountLine_recordCount", __result);
@@ -48698,7 +50555,10 @@ export const StockCountLine_reviseCount = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"stockCountSessionId","table":"stockCountSessions"},{"name":"inventoryItemId","table":"inventoryItems"},{"name":"locationId","table":"storageLocations"},{"name":"ingredientId","table":"ingredients"}]);
     const __result = await __runStockCountLineReviseCount(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "StockCountLine_reviseCount", __result);
@@ -48764,6 +50624,8 @@ export const StockCountSession_close = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runStockCountSessionClose(ctx, args);
     if (__idemKey !== null) {
@@ -48825,6 +50687,8 @@ export const StockCountSession_start = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runStockCountSessionStart(ctx, args);
     if (__idemKey !== null) {
@@ -48847,6 +50711,8 @@ export const StockCountSession_createViaStart = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -48966,12 +50832,14 @@ export const StockTransfer_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["sourceInventoryItemId","destinationInventoryItemId","ingredientId","sourceLocationId","destinationLocationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "StockTransfer_record", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceInventoryItemId","table":"inventoryItems"},{"name":"destinationInventoryItemId","table":"inventoryItems"},{"name":"ingredientId","table":"ingredients"},{"name":"sourceLocationId","table":"storageLocations"},{"name":"destinationLocationId","table":"storageLocations"}]);
     const __result = await __runStockTransferRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "StockTransfer_record", __result);
@@ -48993,12 +50861,14 @@ export const StockTransfer_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["sourceInventoryItemId","destinationInventoryItemId","ingredientId","sourceLocationId","destinationLocationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "StockTransfer_createViaRecord", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"sourceInventoryItemId","table":"inventoryItems"},{"name":"destinationInventoryItemId","table":"inventoryItems"},{"name":"ingredientId","table":"ingredients"},{"name":"sourceLocationId","table":"storageLocations"},{"name":"destinationLocationId","table":"storageLocations"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { sourceInventoryItemId, destinationInventoryItemId, ingredientId, sourceLocationId, destinationLocationId, quantity, unit, notes } = args;
@@ -49119,6 +50989,8 @@ export const StorageLocation_activate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runStorageLocationActivate(ctx, args);
     if (__idemKey !== null) {
@@ -49184,6 +51056,8 @@ export const StorageLocation_deactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runStorageLocationDeactivate(ctx, args);
     if (__idemKey !== null) {
@@ -49244,6 +51118,8 @@ export const StorageLocation_register = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runStorageLocationRegister(ctx, args);
     if (__idemKey !== null) {
@@ -49268,6 +51144,8 @@ export const StorageLocation_createViaRegister = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -49365,6 +51243,8 @@ export const StorageLocation_reviseDetails = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runStorageLocationReviseDetails(ctx, args);
     if (__idemKey !== null) {
@@ -49412,6 +51292,8 @@ export const SyncError_markResolved = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runSyncErrorMarkResolved(ctx, args);
     if (__idemKey !== null) {
@@ -49472,6 +51354,8 @@ export const SyncError_record = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runSyncErrorRecord(ctx, args);
     if (__idemKey !== null) {
@@ -49496,6 +51380,8 @@ export const SyncError_createViaRecord = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -49589,6 +51475,8 @@ export const SyncError_reopen = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runSyncErrorReopen(ctx, args);
     if (__idemKey !== null) {
@@ -49650,6 +51538,8 @@ export const TaxRate_define = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runTaxRateDefine(ctx, args);
     if (__idemKey !== null) {
@@ -49673,6 +51563,8 @@ export const TaxRate_createViaDefine = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -49769,6 +51661,8 @@ export const TaxRate_revise = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runTaxRateRevise(ctx, args);
     if (__idemKey !== null) {
@@ -49817,6 +51711,8 @@ export const TaxRate_setActive = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runTaxRateSetActive(ctx, args);
     if (__idemKey !== null) {
@@ -49885,7 +51781,10 @@ export const TimeOffRequest_approve = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __result = await __runTimeOffRequestApprove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "TimeOffRequest_approve", __result);
@@ -49953,7 +51852,10 @@ export const TimeOffRequest_decline = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __result = await __runTimeOffRequestDecline(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "TimeOffRequest_decline", __result);
@@ -50016,12 +51918,14 @@ export const TimeOffRequest_submit = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "TimeOffRequest_submit", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __result = await __runTimeOffRequestSubmit(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "TimeOffRequest_submit", __result);
@@ -50039,12 +51943,14 @@ export const TimeOffRequest_createViaSubmit = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "TimeOffRequest_createViaSubmit", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { personId, startsAt, endsAt, reason } = args;
@@ -50148,12 +52054,14 @@ export const TimeRecord_clockIn = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId","shiftId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "TimeRecord_clockIn", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"shiftId","table":"shifts"},{"name":"eventId","table":"events"}]);
     const __result = await __runTimeRecordClockIn(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "TimeRecord_clockIn", __result);
@@ -50171,12 +52079,14 @@ export const TimeRecord_createViaClockIn = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId","shiftId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "TimeRecord_createViaClockIn", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"shiftId","table":"shifts"},{"name":"eventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { personId, shiftId, eventId, notes } = args;
@@ -50289,7 +52199,10 @@ export const TimeRecord_clockOut = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"shiftId","table":"shifts"},{"name":"eventId","table":"events"}]);
     const __result = await __runTimeRecordClockOut(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "TimeRecord_clockOut", __result);
@@ -50367,7 +52280,10 @@ export const TimeRecord_correct = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"shiftId","table":"shifts"},{"name":"eventId","table":"events"}]);
     const __result = await __runTimeRecordCorrect(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "TimeRecord_correct", __result);
@@ -50443,6 +52359,8 @@ export const Trailer_register = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runTrailerRegister(ctx, args);
     if (__idemKey !== null) {
@@ -50467,6 +52385,8 @@ export const Trailer_createViaRegister = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -50565,6 +52485,8 @@ export const Trailer_reviseDetails = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runTrailerReviseDetails(ctx, args);
     if (__idemKey !== null) {
@@ -50620,6 +52542,8 @@ export const Trailer_updateInsurance = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runTrailerUpdateInsurance(ctx, args);
     if (__idemKey !== null) {
@@ -50684,6 +52608,8 @@ export const Trailer_updateOperationalStatus = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runTrailerUpdateOperationalStatus(ctx, args);
     if (__idemKey !== null) {
@@ -50736,6 +52662,8 @@ export const Trailer_updateRegistration = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runTrailerUpdateRegistration(ctx, args);
     if (__idemKey !== null) {
@@ -50802,12 +52730,14 @@ export const TrainingCompletion_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId","trainingModuleId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "TrainingCompletion_record", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"trainingModuleId","table":"trainingModules"}]);
     const __result = await __runTrainingCompletionRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "TrainingCompletion_record", __result);
@@ -50826,12 +52756,14 @@ export const TrainingCompletion_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId","trainingModuleId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "TrainingCompletion_createViaRecord", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"trainingModuleId","table":"trainingModules"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { personId, trainingModuleId, completedAt, assessmentScore, notes } = args;
@@ -50945,6 +52877,8 @@ export const TrainingModule_define = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runTrainingModuleDefine(ctx, args);
     if (__idemKey !== null) {
@@ -50967,6 +52901,8 @@ export const TrainingModule_createViaDefine = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -51064,6 +53000,8 @@ export const TrainingModule_reactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runTrainingModuleReactivate(ctx, args);
     if (__idemKey !== null) {
@@ -51126,6 +53064,8 @@ export const TrainingModule_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runTrainingModuleRetire(ctx, args);
     if (__idemKey !== null) {
@@ -51204,6 +53144,8 @@ export const Vehicle_register = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runVehicleRegister(ctx, args);
     if (__idemKey !== null) {
@@ -51229,6 +53171,8 @@ export const Vehicle_createViaRegister = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -51331,6 +53275,8 @@ export const Vehicle_reviseDetails = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runVehicleReviseDetails(ctx, args);
     if (__idemKey !== null) {
@@ -51386,6 +53332,8 @@ export const Vehicle_updateInsurance = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runVehicleUpdateInsurance(ctx, args);
     if (__idemKey !== null) {
@@ -51450,6 +53398,8 @@ export const Vehicle_updateOperationalStatus = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runVehicleUpdateOperationalStatus(ctx, args);
     if (__idemKey !== null) {
@@ -51502,6 +53452,8 @@ export const Vehicle_updateRegistration = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runVehicleUpdateRegistration(ctx, args);
     if (__idemKey !== null) {
@@ -51561,12 +53513,14 @@ export const VehicleFuelLog_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vehicleId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VehicleFuelLog_record", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vehicleId","table":"vehicles"}]);
     const __result = await __runVehicleFuelLogRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VehicleFuelLog_record", __result);
@@ -51585,12 +53539,14 @@ export const VehicleFuelLog_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vehicleId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VehicleFuelLog_createViaRecord", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vehicleId","table":"vehicles"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { vehicleId, odometer, fuelCost, filledAt, notes } = args;
@@ -51683,7 +53639,10 @@ export const VehicleMaintenanceSchedule_applyService = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vehicleId","table":"vehicles"}]);
     const __result = await __runVehicleMaintenanceScheduleApplyService(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VehicleMaintenanceSchedule_applyService", __result);
@@ -51747,12 +53706,14 @@ export const VehicleMaintenanceSchedule_schedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vehicleId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VehicleMaintenanceSchedule_schedule", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vehicleId","table":"vehicles"}]);
     const __result = await __runVehicleMaintenanceScheduleSchedule(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VehicleMaintenanceSchedule_schedule", __result);
@@ -51774,12 +53735,14 @@ export const VehicleMaintenanceSchedule_createViaSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vehicleId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VehicleMaintenanceSchedule_createViaSchedule", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vehicleId","table":"vehicles"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { vehicleId, taskName, intervalType, intervalDays, intervalMiles, nextDueAt, nextDueMileage, instructions } = args;
@@ -51896,12 +53859,14 @@ export const VehicleServiceEntry_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["maintenanceScheduleId","vehicleId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VehicleServiceEntry_record", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"maintenanceScheduleId","table":"vehicleMaintenanceSchedules"},{"name":"vehicleId","table":"vehicles"}]);
     const __result = await __runVehicleServiceEntryRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VehicleServiceEntry_record", __result);
@@ -51924,12 +53889,14 @@ export const VehicleServiceEntry_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["maintenanceScheduleId","vehicleId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VehicleServiceEntry_createViaRecord", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"maintenanceScheduleId","table":"vehicleMaintenanceSchedules"},{"name":"vehicleId","table":"vehicles"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { maintenanceScheduleId, vehicleId, vendor, cost, odometer, completedAt, nextDueAt, nextDueMileage, notes } = args;
@@ -52053,6 +54020,8 @@ export const Vendor_onboard = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runVendorOnboard(ctx, args);
     if (__idemKey !== null) {
@@ -52081,6 +54050,8 @@ export const Vendor_createViaOnboard = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -52194,6 +54165,8 @@ export const Vendor_reinstate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runVendorReinstate(ctx, args);
     if (__idemKey !== null) {
@@ -52261,6 +54234,8 @@ export const Vendor_suspend = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runVendorSuspend(ctx, args);
     if (__idemKey !== null) {
@@ -52329,6 +54304,8 @@ export const Vendor_terminate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runVendorTerminate(ctx, args);
     if (__idemKey !== null) {
@@ -52401,6 +54378,8 @@ export const Vendor_updateDetails = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runVendorUpdateDetails(ctx, args);
     if (__idemKey !== null) {
@@ -52463,12 +54442,14 @@ export const VendorContact_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VendorContact_add", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"}]);
     const __result = await __runVendorContactAdd(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorContact_add", __result);
@@ -52488,12 +54469,14 @@ export const VendorContact_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VendorContact_createViaAdd", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { vendorId, name, role, email, phone, notes } = args;
@@ -52582,7 +54565,10 @@ export const VendorContact_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"}]);
     const __result = await __runVendorContactRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorContact_remove", __result);
@@ -52641,7 +54627,10 @@ export const VendorContact_update = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"}]);
     const __result = await __runVendorContactUpdate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorContact_update", __result);
@@ -52704,7 +54693,10 @@ export const VendorContract_activate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"}]);
     const __result = await __runVendorContractActivate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorContract_activate", __result);
@@ -52773,12 +54765,14 @@ export const VendorContract_draft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VendorContract_draft", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"}]);
     const __result = await __runVendorContractDraft(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorContract_draft", __result);
@@ -52801,12 +54795,14 @@ export const VendorContract_createViaDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VendorContract_createViaDraft", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { vendorId, title, startsAt, endsAt, contractNumber, paymentTermsDays, deliveryLeadTimeDays, documentUrl, notes } = args;
@@ -52916,7 +54912,10 @@ export const VendorContract_markExpired = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"}]);
     const __result = await __runVendorContractMarkExpired(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorContract_markExpired", __result);
@@ -52979,7 +54978,10 @@ export const VendorContract_terminate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"}]);
     const __result = await __runVendorContractTerminate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorContract_terminate", __result);
@@ -53046,7 +55048,10 @@ export const VendorContract_updateTerms = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"}]);
     const __result = await __runVendorContractUpdateTerms(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorContract_updateTerms", __result);
@@ -53109,12 +55114,14 @@ export const VendorContractPriceTier_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["contractId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VendorContractPriceTier_add", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"contractId","table":"vendorContracts"}]);
     const __result = await __runVendorContractPriceTierAdd(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorContractPriceTier_add", __result);
@@ -53134,12 +55141,14 @@ export const VendorContractPriceTier_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["contractId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VendorContractPriceTier_createViaAdd", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"contractId","table":"vendorContracts"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { contractId, itemName, unitPrice, unit, minQuantity, notes } = args;
@@ -53231,7 +55240,10 @@ export const VendorContractPriceTier_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"contractId","table":"vendorContracts"}]);
     const __result = await __runVendorContractPriceTierRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorContractPriceTier_remove", __result);
@@ -53293,7 +55305,10 @@ export const VendorContractPriceTier_update = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"contractId","table":"vendorContracts"}]);
     const __result = await __runVendorContractPriceTierUpdate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorContractPriceTier_update", __result);
@@ -53371,7 +55386,10 @@ export const VendorOrder_approve = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"},{"name":"eventId","table":"events"}]);
     const __result = await __runVendorOrderApprove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrder_approve", __result);
@@ -53442,7 +55460,10 @@ export const VendorOrder_cancel = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"},{"name":"eventId","table":"events"}]);
     const __result = await __runVendorOrderCancel(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrder_cancel", __result);
@@ -53504,7 +55525,10 @@ export const VendorOrder_confirm = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"},{"name":"eventId","table":"events"}]);
     const __result = await __runVendorOrderConfirm(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrder_confirm", __result);
@@ -53607,12 +55631,14 @@ export const VendorOrder_ensureWeeklyDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorId","purchaseNeedId","ingredientDemandId","ingredientId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VendorOrder_ensureWeeklyDraft", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"},{"name":"eventId","table":"events"},{"name":"purchaseNeedId","table":null},{"name":"ingredientDemandId","table":null},{"name":"ingredientId","table":null}]);
     const __result = await __runVendorOrderEnsureWeeklyDraft(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrder_ensureWeeklyDraft", __result);
@@ -53673,7 +55699,10 @@ export const VendorOrder_markPartiallyReceived = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"},{"name":"eventId","table":"events"}]);
     const __result = await __runVendorOrderMarkPartiallyReceived(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrder_markPartiallyReceived", __result);
@@ -53735,7 +55764,10 @@ export const VendorOrder_markReceived = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"},{"name":"eventId","table":"events"}]);
     const __result = await __runVendorOrderMarkReceived(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrder_markReceived", __result);
@@ -53792,7 +55824,10 @@ export const VendorOrder_noteReceiptCorrection = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"},{"name":"eventId","table":"events"}]);
     const __result = await __runVendorOrderNoteReceiptCorrection(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrder_noteReceiptCorrection", __result);
@@ -53855,12 +55890,14 @@ export const VendorOrder_open = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VendorOrder_open", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"},{"name":"eventId","table":"events"}]);
     const __result = await __runVendorOrderOpen(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrder_open", __result);
@@ -53880,12 +55917,14 @@ export const VendorOrder_createViaOpen = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VendorOrder_createViaOpen", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"},{"name":"eventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { vendorId, eventId, sourceRangeStart, sourceRangeEnd, orderNumber, notes } = args;
@@ -54002,7 +56041,10 @@ export const VendorOrder_requestChanges = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"},{"name":"eventId","table":"events"}]);
     const __result = await __runVendorOrderRequestChanges(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrder_requestChanges", __result);
@@ -54072,7 +56114,10 @@ export const VendorOrder_retireEmptyDraft = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"},{"name":"eventId","table":"events"}]);
     const __result = await __runVendorOrderRetireEmptyDraft(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrder_retireEmptyDraft", __result);
@@ -54149,7 +56194,10 @@ export const VendorOrder_submit = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"},{"name":"eventId","table":"events"}]);
     const __result = await __runVendorOrderSubmit(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrder_submit", __result);
@@ -54217,7 +56265,10 @@ export const VendorOrder_submitForApproval = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"},{"name":"eventId","table":"events"}]);
     const __result = await __runVendorOrderSubmitForApproval(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrder_submitForApproval", __result);
@@ -54269,7 +56320,10 @@ export const VendorOrder_syncLineTotals = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"},{"name":"eventId","table":"events"}]);
     const __result = await __runVendorOrderSyncLineTotals(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrder_syncLineTotals", __result);
@@ -54326,7 +56380,10 @@ export const VendorOrder_updateTotals = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorId","table":"vendors"},{"name":"eventId","table":"events"}]);
     const __result = await __runVendorOrderUpdateTotals(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrder_updateTotals", __result);
@@ -54421,12 +56478,14 @@ export const VendorOrderLine_addLine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorOrderId","ingredientId","ingredientDemandId","locationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VendorOrderLine_addLine", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderId","table":"vendorOrders"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runVendorOrderLineAddLine(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrderLine_addLine", __result);
@@ -54447,12 +56506,14 @@ export const VendorOrderLine_createViaAddLine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorOrderId","ingredientId","ingredientDemandId","locationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VendorOrderLine_createViaAddLine", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderId","table":"vendorOrders"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"locationId","table":"storageLocations"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { vendorOrderId, ingredientId, orderedQuantity, unit, unitCost, ingredientDemandId, locationId } = args;
@@ -54583,7 +56644,10 @@ export const VendorOrderLine_cancelLine = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderId","table":"vendorOrders"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runVendorOrderLineCancelLine(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrderLine_cancelLine", __result);
@@ -54629,7 +56693,10 @@ export const VendorOrderLine_commitSupply = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderId","table":"vendorOrders"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runVendorOrderLineCommitSupply(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrderLine_commitSupply", __result);
@@ -54738,7 +56805,10 @@ export const VendorOrderLine_correctReceipt = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderId","table":"vendorOrders"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runVendorOrderLineCorrectReceipt(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrderLine_correctReceipt", __result);
@@ -54860,12 +56930,14 @@ export const VendorOrderLine_ensureWeeklyLine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorOrderId","ingredientId","purchaseNeedId","ingredientDemandId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VendorOrderLine_ensureWeeklyLine", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderId","table":"vendorOrders"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"locationId","table":"storageLocations"},{"name":"purchaseNeedId","table":null}]);
     const __result = await __runVendorOrderLineEnsureWeeklyLine(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrderLine_ensureWeeklyLine", __result);
@@ -54931,12 +57003,14 @@ export const VendorOrderLine_reconcileDraftRequirement = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["ingredientDemandId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VendorOrderLine_reconcileDraftRequirement", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderId","table":"vendorOrders"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runVendorOrderLineReconcileDraftRequirement(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrderLine_reconcileDraftRequirement", __result);
@@ -55066,12 +57140,14 @@ export const VendorOrderLine_recordReceipt = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["locationId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VendorOrderLine_recordReceipt", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderId","table":"vendorOrders"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runVendorOrderLineRecordReceipt(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrderLine_recordReceipt", __result);
@@ -55113,7 +57189,10 @@ export const VendorOrderLine_releaseSupply = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderId","table":"vendorOrders"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runVendorOrderLineReleaseSupply(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrderLine_releaseSupply", __result);
@@ -55188,7 +57267,10 @@ export const VendorOrderLine_retireEmptyDraft = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderId","table":"vendorOrders"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runVendorOrderLineRetireEmptyDraft(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrderLine_retireEmptyDraft", __result);
@@ -55254,7 +57336,10 @@ export const VendorOrderLine_reviseQuantity = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderId","table":"vendorOrders"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"locationId","table":"storageLocations"}]);
     const __result = await __runVendorOrderLineReviseQuantity(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrderLine_reviseQuantity", __result);
@@ -55321,12 +57406,14 @@ export const VendorOrderLineDemand_link = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorOrderLineId","ingredientDemandId","vendorOrderId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VendorOrderLineDemand_link", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderLineId","table":"vendorOrderLines"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"vendorOrderId","table":"vendorOrders"}]);
     const __result = await __runVendorOrderLineDemandLink(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrderLineDemand_link", __result);
@@ -55345,12 +57432,14 @@ export const VendorOrderLineDemand_createViaLink = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["vendorOrderLineId","ingredientDemandId","vendorOrderId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VendorOrderLineDemand_createViaLink", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderLineId","table":"vendorOrderLines"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"vendorOrderId","table":"vendorOrders"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { vendorOrderLineId, ingredientDemandId, vendorOrderId, contributionQuantity, unit } = args;
@@ -55447,7 +57536,10 @@ export const VendorOrderLineDemand_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderLineId","table":"vendorOrderLines"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"vendorOrderId","table":"vendorOrders"}]);
     const __result = await __runVendorOrderLineDemandRetire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrderLineDemand_retire", __result);
@@ -55499,7 +57591,10 @@ export const VendorOrderLineDemand_revise = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderLineId","table":"vendorOrderLines"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"vendorOrderId","table":"vendorOrders"}]);
     const __result = await __runVendorOrderLineDemandRevise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VendorOrderLineDemand_revise", __result);
@@ -55563,6 +57658,8 @@ export const Venue_activate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runVenueActivate(ctx, args);
     if (__idemKey !== null) {
@@ -55615,6 +57712,8 @@ export const Venue_changeCapacity = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runVenueChangeCapacity(ctx, args);
     if (__idemKey !== null) {
@@ -55681,6 +57780,8 @@ export const Venue_deactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runVenueDeactivate(ctx, args);
     if (__idemKey !== null) {
@@ -55791,6 +57892,8 @@ export const Venue_register = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runVenueRegister(ctx, args);
     if (__idemKey !== null) {
@@ -55838,6 +57941,8 @@ export const Venue_createViaRegister = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -56029,6 +58134,8 @@ export const Venue_updateDetails = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
     const __result = await __runVenueUpdateDetails(ctx, args);
     if (__idemKey !== null) {
@@ -56077,12 +58184,14 @@ export const VenueCommissionTerm_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["venueId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VenueCommissionTerm_define", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __result = await __runVenueCommissionTermDefine(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueCommissionTerm_define", __result);
@@ -56101,12 +58210,14 @@ export const VenueCommissionTerm_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["venueId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VenueCommissionTerm_createViaDefine", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { venueId, commissionPercent, effectiveStartDate, effectiveEndDate, notes } = args;
@@ -56181,7 +58292,10 @@ export const VenueCommissionTerm_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __result = await __runVenueCommissionTermRetire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueCommissionTerm_retire", __result);
@@ -56230,7 +58344,10 @@ export const VenueCommissionTerm_revise = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __result = await __runVenueCommissionTermRevise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueCommissionTerm_revise", __result);
@@ -56293,7 +58410,10 @@ export const VenueLayoutTemplate_archive = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __result = await __runVenueLayoutTemplateArchive(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueLayoutTemplate_archive", __result);
@@ -56345,12 +58465,14 @@ export const VenueLayoutTemplate_define = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["venueId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VenueLayoutTemplate_define", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __result = await __runVenueLayoutTemplateDefine(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueLayoutTemplate_define", __result);
@@ -56368,12 +58490,14 @@ export const VenueLayoutTemplate_createViaDefine = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["venueId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VenueLayoutTemplate_createViaDefine", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { venueId, name, description, sections } = args;
@@ -56467,7 +58591,10 @@ export const VenueLayoutTemplate_reactivate = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __result = await __runVenueLayoutTemplateReactivate(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueLayoutTemplate_reactivate", __result);
@@ -56521,7 +58648,10 @@ export const VenueLayoutTemplate_revise = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __result = await __runVenueLayoutTemplateRevise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueLayoutTemplate_revise", __result);
@@ -56569,7 +58699,10 @@ export const VenueNote_pin = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"},{"name":"eventId","table":"events"},{"name":"authorPersonId","table":"people"}]);
     const __result = await __runVenueNotePin(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueNote_pin", __result);
@@ -56630,12 +58763,14 @@ export const VenueNote_post = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["venueId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VenueNote_post", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"},{"name":"eventId","table":"events"},{"name":"authorPersonId","table":"people"}]);
     const __result = await __runVenueNotePost(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueNote_post", __result);
@@ -56655,12 +58790,14 @@ export const VenueNote_createViaPost = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["venueId","eventId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VenueNote_createViaPost", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"},{"name":"eventId","table":"events"},{"name":"authorPersonId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { venueId, eventId, category, content, visibility, isPinned } = args;
@@ -56748,7 +58885,10 @@ export const VenueNote_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"},{"name":"eventId","table":"events"},{"name":"authorPersonId","table":"people"}]);
     const __result = await __runVenueNoteRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueNote_remove", __result);
@@ -56802,7 +58942,10 @@ export const VenueNote_revise = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"},{"name":"eventId","table":"events"},{"name":"authorPersonId","table":"people"}]);
     const __result = await __runVenueNoteRevise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueNote_revise", __result);
@@ -56850,7 +58993,10 @@ export const VenueNote_unpin = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"},{"name":"eventId","table":"events"},{"name":"authorPersonId","table":"people"}]);
     const __result = await __runVenueNoteUnpin(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueNote_unpin", __result);
@@ -56908,12 +59054,14 @@ export const VenueRoom_add = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["venueId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VenueRoom_add", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __result = await __runVenueRoomAdd(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueRoom_add", __result);
@@ -56933,12 +59081,14 @@ export const VenueRoom_createViaAdd = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["venueId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VenueRoom_createViaAdd", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { venueId, name, roomType, capacity, squareFootage, description } = args;
@@ -57023,7 +59173,10 @@ export const VenueRoom_remove = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __result = await __runVenueRoomRemove(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueRoom_remove", __result);
@@ -57082,7 +59235,10 @@ export const VenueRoom_revise = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __result = await __runVenueRoomRevise(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueRoom_revise", __result);
@@ -57167,12 +59323,14 @@ export const VenueVendorRelationship_establish = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["venueId","vendorId","primaryContactId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VenueVendorRelationship_establish", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"},{"name":"vendorId","table":"vendors"},{"name":"primaryContactId","table":"vendorContacts"},{"name":"establishedByPersonId","table":"people"},{"name":"revisedByPersonId","table":"people"}]);
     const __result = await __runVenueVendorRelationshipEstablish(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueVendorRelationship_establish", __result);
@@ -57200,12 +59358,14 @@ export const VenueVendorRelationship_createViaEstablish = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["venueId","vendorId","primaryContactId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VenueVendorRelationship_createViaEstablish", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"},{"name":"vendorId","table":"vendors"},{"name":"primaryContactId","table":"vendorContacts"},{"name":"establishedByPersonId","table":"people"},{"name":"revisedByPersonId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { venueId, vendorId, category, status, effectiveFrom, effectiveUntil, primaryContactId, insuranceCertificate, insuranceExpiry, complianceNotes, discountPercent, paymentTerms, minimumOrder, notes } = args;
@@ -57309,7 +59469,10 @@ export const VenueVendorRelationship_retire = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"},{"name":"vendorId","table":"vendors"},{"name":"primaryContactId","table":"vendorContacts"},{"name":"establishedByPersonId","table":"people"},{"name":"revisedByPersonId","table":"people"}]);
     const __result = await __runVenueVendorRelationshipRetire(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueVendorRelationship_retire", __result);
@@ -57377,12 +59540,14 @@ export const VenueVendorRelationship_reviseDetails = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["primaryContactId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "VenueVendorRelationship_reviseDetails", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"},{"name":"vendorId","table":"vendors"},{"name":"primaryContactId","table":"vendorContacts"},{"name":"establishedByPersonId","table":"people"},{"name":"revisedByPersonId","table":"people"}]);
     const __result = await __runVenueVendorRelationshipReviseDetails(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueVendorRelationship_reviseDetails", __result);
@@ -57444,7 +59609,10 @@ export const VenueVendorRelationship_reviseStatus = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"},{"name":"vendorId","table":"vendors"},{"name":"primaryContactId","table":"vendorContacts"},{"name":"establishedByPersonId","table":"people"},{"name":"revisedByPersonId","table":"people"}]);
     const __result = await __runVenueVendorRelationshipReviseStatus(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "VenueVendorRelationship_reviseStatus", __result);
@@ -57533,12 +59701,14 @@ export const WasteRecord_record = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["ingredientId","locationId","eventId","inventoryItemId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "WasteRecord_record", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"},{"name":"eventId","table":"events"},{"name":"inventoryItemId","table":"inventoryItems"}]);
     const __result = await __runWasteRecordRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "WasteRecord_record", __result);
@@ -57561,12 +59731,14 @@ export const WasteRecord_createViaRecord = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["ingredientId","locationId","eventId","inventoryItemId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "WasteRecord_createViaRecord", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"},{"name":"eventId","table":"events"},{"name":"inventoryItemId","table":"inventoryItems"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { ingredientId, locationId, quantity, unit, reason, eventId, inventoryItemId, unitCost, notes } = args;
@@ -57690,7 +59862,10 @@ export const WasteRecord_voidRecord = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"ingredientId","table":"ingredients"},{"name":"locationId","table":"storageLocations"},{"name":"eventId","table":"events"},{"name":"inventoryItemId","table":"inventoryItems"}]);
     const __result = await __runWasteRecordVoidRecord(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "WasteRecord_voidRecord", __result);
@@ -57732,12 +59907,14 @@ export const WeeklyPurchasingConfig_configure = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["defaultVendorId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "WeeklyPurchasingConfig_configure", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"defaultVendorId","table":"vendors"}]);
     const __result = await __runWeeklyPurchasingConfigConfigure(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "WeeklyPurchasingConfig_configure", __result);
@@ -57752,12 +59929,14 @@ export const WeeklyPurchasingConfig_createViaConfigure = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["defaultVendorId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "WeeklyPurchasingConfig_createViaConfigure", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"defaultVendorId","table":"vendors"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { defaultVendorId } = args;
@@ -57857,12 +60036,14 @@ export const WeeklyPurchasingConfig_routeNeed = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["purchaseNeedId","eventId","ingredientDemandId","ingredientId","preferredVendorId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "WeeklyPurchasingConfig_routeNeed", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"defaultVendorId","table":"vendors"},{"name":"purchaseNeedId","table":null},{"name":"eventId","table":null},{"name":"ingredientDemandId","table":null},{"name":"ingredientId","table":null},{"name":"preferredVendorId","table":null}]);
     const __result = await __runWeeklyPurchasingConfigRouteNeed(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "WeeklyPurchasingConfig_routeNeed", __result);
@@ -57906,7 +60087,10 @@ export const WeeklyPurchasingConfig_setOrderApprovalThreshold = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"defaultVendorId","table":"vendors"}]);
     const __result = await __runWeeklyPurchasingConfigSetOrderApprovalThreshold(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "WeeklyPurchasingConfig_setOrderApprovalThreshold", __result);
@@ -57956,7 +60140,10 @@ export const WeeklyScheduleNotice_acknowledge = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __result = await __runWeeklyScheduleNoticeAcknowledge(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "WeeklyScheduleNotice_acknowledge", __result);
@@ -58020,12 +60207,14 @@ export const WeeklyScheduleNotice_publishSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "WeeklyScheduleNotice_publishSchedule", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __result = await __runWeeklyScheduleNoticePublishSchedule(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "WeeklyScheduleNotice_publishSchedule", __result);
@@ -58045,12 +60234,14 @@ export const WeeklyScheduleNotice_createViaPublishSchedule = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["personId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "WeeklyScheduleNotice_createViaPublishSchedule", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { personId, recipientAuthSubjectId, weekStartsAt, weekEndsAt, shiftCount, shiftSummary } = args;
@@ -58150,7 +60341,10 @@ export const WeeklyScheduleNotice_republishSchedule = mutation({
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"}]);
     const __result = await __runWeeklyScheduleNoticeRepublishSchedule(ctx, args);
     if (__idemKey !== null) {
       await __setCommandIdempotency(ctx, __idemKey, "WeeklyScheduleNotice_republishSchedule", __result);
@@ -58189,12 +60383,14 @@ export const Event_createViaCaptureDraft = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
-    await __assertOwnWorkspaceLinks(ctx, args, ["clientId","serviceStyleId","occasionId","venueId","assignedToId","referralSourceId"]);
     const __idemKey = args.idempotencyKey === undefined ? null : await __scopedCommandKey(ctx, "Event_createViaCaptureDraft", args.idempotencyKey);
     if (__idemKey !== null) {
       const __cached = await __getCommandIdempotency(ctx, __idemKey);
       if (__cached !== undefined) return __cached;
+      const __legacy = await __getCommandIdempotency(ctx, args.idempotencyKey as string);
+      if (__legacy !== undefined) throw new Error("This retry key was used by an earlier version of the app, so its saved answer can no longer be replayed safely. Send the request again with a new key.");
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"venueId","table":"venues"},{"name":"assignedToId","table":"people"},{"name":"referralSourceId","table":"referralSources"},{"name":"recurrenceTemplateEventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const context = (ctx as any);

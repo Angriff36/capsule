@@ -130,4 +130,75 @@ describe("assistant settings follow only active staff profiles", () => {
       vi.unstubAllEnvs();
     }
   });
+
+  it("follows the workspace the sign-in claims, not just any live profile", async () => {
+    const t = convexTest(schema, modules);
+    await t.run(async (ctx) => {
+      // The same sign-in is linked to one profile per workspace: removed
+      // (inactive) from A, still live in B.
+      await ctx.db.insert("assistantLlmConfigs", {
+        tenantId: "tenant-claim-a",
+        baseUrl: "https://a.example.test",
+        apiKey: "key-a",
+        model: "model-a",
+        version: 1,
+      } as never);
+      await ctx.db.insert("assistantLlmConfigs", {
+        tenantId: "tenant-claim-b",
+        baseUrl: "https://b.example.test",
+        apiKey: "key-b",
+        model: "model-b",
+        version: 1,
+      } as never);
+      for (const [tenantId, status] of [
+        ["tenant-claim-a", "inactive"],
+        ["tenant-claim-b", "active"],
+      ] as const) {
+        await ctx.db.insert("people", {
+          tenantId,
+          givenName: "Dual",
+          familyName: tenantId,
+          email: `dual-${tenantId}@example.test`,
+          role: "owner",
+          employmentType: "full_time",
+          status,
+          authSubjectId: "dual-workspace",
+          version: 1,
+        } as never);
+      }
+    });
+    // Presenting workspace A's claims (as the sign-in still does after the
+    // removal): A's settings and key are out of reach.
+    const asA = t.withIdentity({
+      subject: "dual-workspace",
+      tokenIdentifier: "proof|dual",
+      tenantId: "tenant-claim-a",
+    });
+    expect(await asA.query(api.assistantConfig.forCaller, {})).toEqual({
+      configured: false,
+    });
+    expect(
+      await t.query(internal.assistantConfig.readForSubject, {
+        subject: "dual-workspace",
+        tenantId: "tenant-claim-a",
+      }),
+    ).toEqual({ staff: false });
+
+    // The same sign-in in its live workspace B still works and gets B's key.
+    const asB = t.withIdentity({
+      subject: "dual-workspace",
+      tokenIdentifier: "proof|dual",
+      tenantId: "tenant-claim-b",
+    });
+    expect(await asB.query(api.assistantConfig.forCaller, {})).toMatchObject({
+      configured: true,
+      model: "model-b",
+    });
+    expect(
+      await t.query(internal.assistantConfig.readForSubject, {
+        subject: "dual-workspace",
+        tenantId: "tenant-claim-b",
+      }),
+    ).toMatchObject({ staff: true, settings: { apiKey: "key-b" } });
+  });
 });

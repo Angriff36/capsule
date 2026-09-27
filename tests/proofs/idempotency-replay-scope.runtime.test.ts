@@ -243,4 +243,115 @@ describe("saved step answers replay only in their own workspace (PL-AUTH)", () =
       }),
     ).rejects.toThrow("A linked record was not found");
   });
+
+  it("refuses a pre-upgrade receipt instead of replaying or re-running it", async () => {
+    const t = convexTest(schema, modules);
+    const owner = t.withIdentity({
+      subject: "replay-legacy-owner",
+      tokenIdentifier: "replay|legacy-owner",
+      role: "org:owner",
+      tenantId: "tenant-replay-legacy",
+    });
+    const saffron = (await owner.mutation(
+      api.mutations.Ingredient_createViaIntroduce,
+      { name: "Legacy saffron", unit: "kilogram", costPerUnit: 3 },
+    )) as { docId: Id<"ingredients"> };
+    // A receipt saved by the version that keyed the cache on the raw caller
+    // key alone: nobody can prove whose it is, so it must not come back and
+    // the step must not run again under it.
+    await t.run((ctx) =>
+      ctx.db.insert("commandIdempotencyKeys", {
+        key: "pre-upgrade-key",
+        command: "Ingredient_discontinue",
+        result: { forged: true },
+        createdAt: Date.now(),
+      } as never),
+    );
+    await expect(
+      owner.mutation(api.mutations.Ingredient_discontinue, {
+        docId: saffron.docId,
+        reason: "Out of season",
+        idempotencyKey: "pre-upgrade-key",
+      }),
+    ).rejects.toThrow(/earlier version of the app/);
+    // Nothing re-ran: the ingredient is still on the books.
+    const row = (await t.run((ctx) => ctx.db.get(saffron.docId))) as {
+      status?: string;
+    } | null;
+    expect(row?.status).toBe("active");
+    // A caller of another workspace with the same pre-upgrade key is refused
+    // the same way, never handed the saved answer.
+    const other = t.withIdentity(kitchen("tenant-replay-legacy-b"));
+    const bSaffron = (await other.mutation(
+      api.mutations.Ingredient_createViaIntroduce,
+      { name: "Legacy saffron B", unit: "kilogram", costPerUnit: 3 },
+    )) as { docId: Id<"ingredients"> };
+    await expect(
+      other.mutation(api.mutations.Ingredient_discontinue, {
+        docId: bSaffron.docId,
+        reason: "Out of season",
+        idempotencyKey: "pre-upgrade-key",
+      }),
+    ).rejects.toThrow(/earlier version of the app/);
+  });
+
+  it("replays a saved answer before the link check, and rejects malformed and wrong-table links alike", async () => {
+    const t = convexTest(schema, modules);
+    const tenantId = "tenant-replay-links";
+    const owner = t.withIdentity({
+      subject: "replay-links-owner",
+      tokenIdentifier: "replay|links-owner",
+      role: "org:owner",
+      tenantId,
+    });
+    const ids = await t.run(async (ctx) => {
+      const announcementId = await ctx.db.insert("announcements", {
+        tenantId,
+        title: "Menu changes",
+        body: "The spring menu starts Monday.",
+        category: "general",
+        expiresAt: Date.now() + 86_400_000,
+        version: 1,
+      } as never);
+      const dismissalId = await ctx.db.insert("announcementDismissals", {
+        tenantId,
+        announcementId,
+        authSubjectId: "replay-links-owner",
+        version: 1,
+      } as never);
+      return { announcementId, dismissalId };
+    });
+    const dismiss = (idempotencyKey: string, announcementId?: string) =>
+      owner.mutation(api.mutations.AnnouncementDismissal_dismiss, {
+        docId: ids.dismissalId as unknown as Id<"announcementDismissals">,
+        announcementId: announcementId ?? (ids.announcementId as string),
+        idempotencyKey,
+      });
+    const first = (await dismiss("dismiss-key")) as {
+      authSubjectId?: string;
+    };
+    expect(first.authSubjectId).toBe("replay-links-owner");
+
+    // The linked announcement is deleted; the retry still gets the saved
+    // answer back - the link check belongs to fresh runs only.
+    await t.run((ctx) => ctx.db.delete(ids.announcementId as never));
+    expect(await dismiss("dismiss-key")).toEqual(first);
+
+    // Fresh runs: a malformed link, a link of the wrong table and a missing
+    // link all get the same refusal.
+    await expect(dismiss("malformed-key", "not-a-record-id")).rejects.toThrow(
+      "A linked record was not found",
+    );
+    const ingredient = (await owner.mutation(
+      api.mutations.Ingredient_createViaIntroduce,
+      { name: "Wrong-table saffron", unit: "kilogram", costPerUnit: 3 },
+    )) as { docId: string };
+    await expect(dismiss("wrong-table-key", ingredient.docId)).rejects.toThrow(
+      "A linked record was not found",
+    );
+    await t.run((ctx) => ctx.db.delete(ingredient.docId as never));
+    await expect(dismiss("missing-link-key")).rejects.toThrow(
+      "A linked record was not found",
+    );
+  });
 });

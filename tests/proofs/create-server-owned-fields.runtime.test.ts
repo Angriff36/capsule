@@ -183,6 +183,103 @@ describe("create steps keep approval, totals and results server-owned (AC-372)",
     ).rejects.toThrow(/staff profile/);
   });
 
+  it("a share link records the signed-in staff profile as creator and revoker", async () => {
+    const t = convexTest(schema, modules);
+    const tenantId = "tenant-sharelink";
+    await t.run((ctx) =>
+      ctx.db.insert("people", {
+        tenantId,
+        givenName: "Sam",
+        familyName: "Sales",
+        email: "sam@example.test",
+        role: "sales_manager",
+        employmentType: "full_time",
+        status: "active",
+        authSubjectId: "sharelink-sales",
+        version: 1,
+      } as never),
+    );
+    const sales = t.withIdentity({
+      subject: "sharelink-sales",
+      tokenIdentifier: "proof|sharelink-sales",
+      role: "sales_manager",
+      tenantId,
+    });
+    const ids = await t.run(async (ctx) => {
+      const clientId = await ctx.db.insert("clients", {
+        tenantId,
+        clientType: "company",
+        companyName: "Proof client",
+        taxExempt: false,
+        paymentTermsDays: 30,
+        status: "active",
+        version: 1,
+      } as never);
+      const proposalId = await ctx.db.insert("proposals", {
+        tenantId,
+        clientId,
+        title: "Proof wedding",
+        guestCount: 80,
+        subtotal: 0,
+        taxAmount: 0,
+        discountAmount: 0,
+        total: 0,
+        status: "sent",
+        version: 1,
+      } as never);
+      const proposalRevisionId = await ctx.db.insert("proposalRevisions", {
+        tenantId,
+        proposalId,
+        revisionNumber: 1,
+        changeSummary: "First capture",
+        capturedByName: "Sam Sales",
+        snapshot: "{}",
+        version: 1,
+      } as never);
+      return { proposalId, proposalRevisionId };
+    });
+    const created = (await sales.mutation(api.mutations.ShareLink_create, {
+      proposalId: ids.proposalId as string,
+      proposalRevisionId: ids.proposalRevisionId as string,
+    })) as { _id: string; createdByPersonId?: string | null };
+    const salesPersonId = await t.run(async (ctx) => {
+      const rows = await ctx.db
+        .query("people")
+        .withIndex("by_authSubjectId", (q) =>
+          q.eq("authSubjectId", "sharelink-sales"),
+        )
+        .collect();
+      return String(rows[0]!._id);
+    });
+    // The stored audit reference is the staff profile row, not the sign-in.
+    expect(created.createdByPersonId).toBe(salesPersonId);
+
+    await sales.mutation(api.mutations.ShareLink_revoke, {
+      docId: created._id,
+    } as never);
+    const row = (await t.run((ctx) => ctx.db.get(created._id as never))) as {
+      status: string;
+      revokedByPersonId?: string | null;
+    };
+    expect(row.status).toBe("revoked");
+    expect(row.revokedByPersonId).toBe(salesPersonId);
+
+    // A sign-in with no staff profile cannot create a share link at all.
+    await expect(
+      t
+        .withIdentity({
+          subject: "sharelink-unlinked",
+          tokenIdentifier: "proof|sharelink-unlinked",
+          role: "sales_manager",
+          tenantId,
+        })
+        .mutation(api.mutations.ShareLink_create, {
+          proposalId: ids.proposalId as string,
+          proposalRevisionId: ids.proposalRevisionId as string,
+        }),
+    ).rejects.toThrow(/staff profile/);
+  });
+
   it("a repeated purchase-need create leaves an ordered, received or cancelled need exactly as it was", async () => {
     const tenantId = "tenant-replay";
     const proof = harness();

@@ -873,14 +873,15 @@ describe("accepted proposal → create event (issue #141)", () => {
       docId: proposal.docId,
     });
 
-    // A malformed id cannot even be staged — the schema validator rejects it
-    // before any write (pendingEventId is a real v.id("events") column).
+    // A malformed id cannot even be staged — the own-workspace link check
+    // rejects it before any write (pendingEventId is a real v.id("events")
+    // column).
     await expect(
       proof.executeCommand(owner, api.mutations.Proposal_stageEventLink, {
         docId: proposal.docId,
         eventId: "evt_does_not_exist",
       }),
-    ).rejects.toThrow(/Validator/);
+    ).rejects.toThrow("A linked record was not found");
 
     // A well-formed id that does not exist in THIS tenant (another tenant's
     // event) is refused when staged. One staged before that check (older
