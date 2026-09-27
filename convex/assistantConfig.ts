@@ -19,6 +19,7 @@ import {
 } from "./_generated/server";
 import { storageReferencedByTenant } from "./fileStorage";
 import { blobReferenced } from "./lib/blobs";
+import { pickLivePerson } from "./lib/personAuthPick";
 
 async function personTenantId(
   ctx: QueryCtx,
@@ -28,7 +29,8 @@ async function personTenantId(
     .query("people")
     .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", subject))
     .collect();
-  const person = people.find((p) => p.deletedAt == null);
+  // Same live-person rule as sign-in: a removed (inactive) profile has no access.
+  const person = pickLivePerson(people, { subject });
   return person?.tenantId ?? null;
 }
 
