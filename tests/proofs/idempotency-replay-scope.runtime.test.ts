@@ -85,4 +85,129 @@ describe("saved step answers replay only in their own workspace (PL-AUTH)", () =
     };
     expect(bAnswer.name).toBe("Plain salt B");
   });
+
+  it("refuses a known key from a same-workspace caller without the role, and from a removed person", async () => {
+    const t = convexTest(schema, modules);
+    const tenantId = "tenant-replay-role";
+    const cook = t.withIdentity(kitchen(tenantId));
+    const sales = t.withIdentity({
+      subject: "replay-sales",
+      tokenIdentifier: "replay|sales",
+      role: "sales_staff",
+      tenantId,
+    });
+    const saffron = (await cook.mutation(
+      api.mutations.Ingredient_createViaIntroduce,
+      { name: "Secret saffron", unit: "kilogram", costPerUnit: 3 },
+    )) as { docId: Id<"ingredients"> };
+    const discontinue = (as: typeof cook) =>
+      as.mutation(api.mutations.Ingredient_discontinue, {
+        docId: saffron.docId,
+        reason: "Out of season",
+        idempotencyKey: "kitchen-key",
+      });
+    const first = (await discontinue(cook)) as { name?: string };
+    expect(first.name).toBe("Secret saffron");
+    expect(await discontinue(cook)).toEqual(first);
+    // Sales may not see ingredients: the kitchen's saved answer is not theirs.
+    await expect(discontinue(sales)).rejects.toThrow(
+      "Kitchen, inventory and managers may see ingredients",
+    );
+
+    // A staff profile linked to a sign-in with no workspace claim; after it is
+    // removed, the same sign-in with the same key gets no saved answer.
+    const [ownerId, keeperId] = await t.run(async (ctx) => {
+      const person = {
+        tenantId,
+        givenName: "Pat",
+        familyName: "Owner",
+        email: "pat@example.test",
+        role: "owner",
+        status: "active",
+        employmentType: "full_time",
+        version: 1,
+      };
+      return [
+        await ctx.db.insert("people", {
+          ...person,
+          authSubjectId: "replay-owner",
+        } as never),
+        await ctx.db.insert("people", {
+          ...person,
+          givenName: "Kim",
+          authSubjectId: "replay-keeper",
+        } as never),
+      ];
+    });
+    const owner = t.withIdentity({
+      subject: "replay-owner",
+      tokenIdentifier: "replay|owner",
+    });
+    const vanilla = (await cook.mutation(
+      api.mutations.Ingredient_createViaIntroduce,
+      { name: "Secret vanilla", unit: "kilogram", costPerUnit: 9 },
+    )) as { docId: Id<"ingredients"> };
+    const retire = (as: typeof owner) =>
+      as.mutation(api.mutations.Ingredient_discontinue, {
+        docId: vanilla.docId,
+        idempotencyKey: "owner-key",
+      });
+    expect(((await retire(owner)) as { name?: string }).name).toBe(
+      "Secret vanilla",
+    );
+    await t.run((ctx) =>
+      ctx.db.patch(ownerId as Id<"people">, { status: "inactive" } as never),
+    );
+    await expect(retire(owner)).rejects.toThrow();
+    await expect(retire(t as never)).rejects.toThrow();
+
+    // A person who removes their own profile: the answer (their own record) is
+    // saved under the access they had when they asked, so neither their
+    // now-removed sign-in nor a signed-out caller replays it.
+    const keeper = t.withIdentity({
+      subject: "replay-keeper",
+      tokenIdentifier: "replay|keeper",
+    });
+    const selfRemove = (as: typeof keeper) =>
+      as.mutation(api.mutations.Person_deactivate, {
+        docId: keeperId as Id<"people">,
+        idempotencyKey: "self-key",
+      });
+    expect(((await selfRemove(keeper)) as { email?: string }).email).toBe(
+      "pat@example.test",
+    );
+    await expect(selfRemove(keeper)).rejects.toThrow();
+    await expect(selfRemove(t as never)).rejects.toThrow();
+  });
+
+  it("checks only the inputs the Manifest declares as links", async () => {
+    const t = convexTest(schema, modules);
+    const a = t.withIdentity(kitchen("tenant-links-a"));
+    const b = t.withIdentity(kitchen("tenant-links-b"));
+    const aOwn = (await a.mutation(
+      api.mutations.Ingredient_createViaIntroduce,
+      { name: "Saffron A", unit: "kilogram", costPerUnit: 3 },
+    )) as { docId: string };
+    // A text input that happens to hold another workspace's record id is
+    // ordinary text: accepted.
+    const named = (await b.mutation(
+      api.mutations.Ingredient_createViaIntroduce,
+      {
+        name: aOwn.docId,
+        category: aOwn.docId,
+        unit: "kilogram",
+        costPerUnit: 1,
+      },
+    )) as { docId: string };
+    expect(named.docId).toBeTruthy();
+    // The same id in a declared link input is refused.
+    await expect(
+      b.mutation(api.mutations.Ingredient_createViaIntroduce, {
+        name: "Salt B",
+        unit: "kilogram",
+        costPerUnit: 1,
+        preferredVendorId: aOwn.docId,
+      }),
+    ).rejects.toThrow("A linked record was not found");
+  });
 });

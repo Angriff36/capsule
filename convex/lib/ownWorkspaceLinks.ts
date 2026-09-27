@@ -6,10 +6,13 @@
  * signed-in caller could save its own record pointing at another workspace's
  * record, and reactions keyed by that id then read the other workspace's
  * data into it. scripts/apply-own-workspace-links.ts calls this at the start
- * of every public generated mutation. Every text value in the arguments that
- * is a record id must name a live-or-soft-deleted record of the caller's
- * workspace; another workspace's record and a missing record get the same
- * answer, so the refusal does not tell what exists elsewhere.
+ * of every public generated mutation with the names of the step's inputs the
+ * Manifest declares as record links (type uuid or list of uuid, or a field of
+ * a declared ref / belongsTo link). Only those
+ * inputs are checked; text, codes and outside-system ids are never looked at.
+ * A linked value that is a record id must name a live-or-soft-deleted record
+ * of the caller's workspace; another workspace's record and a missing record
+ * get the same answer, so the refusal does not tell what exists elsewhere.
  */
 import type { MutationCtx } from "../_generated/server";
 import schema from "../schema";
@@ -17,27 +20,18 @@ import { getAuthContext } from "./authContext";
 
 const TABLES = Object.keys(schema.tables);
 
-/** docId is checked by each step itself, with its own "not found" answer. */
-const SKIP = new Set(["docId", "version", "idempotencyKey"]);
-
-function texts(value: unknown, out: string[]): void {
-  if (typeof value === "string") {
-    if (value.length > 0 && value.length <= 64 && !/\s/.test(value))
-      out.push(value);
-  } else if (Array.isArray(value)) {
-    for (const item of value) texts(item, out);
-  } else if (value !== null && typeof value === "object") {
-    for (const item of Object.values(value)) texts(item, out);
-  }
-}
-
 export async function assertOwnWorkspaceLinks(
   ctx: MutationCtx,
   args: Record<string, unknown>,
+  links: readonly string[],
 ): Promise<void> {
   const candidates: string[] = [];
-  for (const [key, value] of Object.entries(args)) {
-    if (!SKIP.has(key)) texts(value, candidates);
+  for (const name of links) {
+    const value = args[name];
+    if (typeof value === "string") candidates.push(value);
+    else if (Array.isArray(value)) {
+      for (const item of value) if (typeof item === "string") candidates.push(item);
+    }
   }
   if (candidates.length === 0) return;
   let tenantId: string | null | undefined;

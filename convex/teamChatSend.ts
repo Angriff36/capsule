@@ -106,6 +106,7 @@ export const sendWithFiles = mutation({
       messageKey,
     );
     const replay =
+      savedKey !== null &&
       (await ctx.db
         .query("commandIdempotencyKeys")
         .withIndex("by_key", (q) => q.eq("key", savedKey))
