@@ -143,6 +143,9 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     // made every establish fail. deletedAt is null on create, so its guard
     // still passes.
     guard self.deletedAt == null
+    // Only a sign-in linked to a staff profile can set one up, so the record
+    // always names who did it.
+    guard user.personId != null
     constraint establishVenue: venueId != null and length(trim(venueId)) > 0 "Pick a venue."
     constraint establishVendor: vendorId != null and length(trim(vendorId)) > 0 "Pick a vendor."
     mutate venueId = venueId
@@ -176,7 +179,10 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     status: VenueVendorStatus
   ) {
     guard self.deletedAt == null
+    guard user.personId != null
     mutate status = status
+    mutate revisedByPersonId = user.personId
+    mutate revisedAt = now()
     emit VenueVendorRelationshipStatusChanged {
       relationshipId: self.id
       tenantId: self.tenantId
@@ -201,6 +207,7 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     optional notes: string
   ) {
     guard self.deletedAt == null
+    guard user.personId != null
     constraint reviseEffectiveDates: (effectiveFrom == null or effectiveUntil == null or effectiveFrom <= effectiveUntil) "Effective from must be before effective until"
     constraint reviseDiscount: discountPercent == null or (discountPercent >= 0 and discountPercent <= 100) "Discount percent must be between 0 and 100"
     mutate category = category != null ? category : self.category
@@ -216,14 +223,14 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     mutate notes = notes != null ? notes : self.notes
     // Who changed it is the signed-in person's staff profile, never a
     // caller-sent id.
-    mutate revisedByPersonId = user.personId != null ? user.personId : self.revisedByPersonId
+    mutate revisedByPersonId = user.personId
     mutate revisedAt = now()
     emit VenueVendorRelationshipRevised {
       relationshipId: self.id
       tenantId: self.tenantId
       venueId: self.venueId
       vendorId: self.vendorId
-      revisedBy: user.personId != null ? user.personId : self.revisedByPersonId
+      revisedBy: user.personId
     }
   }
 
@@ -231,8 +238,11 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     reason: string
   ) {
     guard self.deletedAt == null
+    guard user.personId != null
     constraint retireReason: length(trim(reason)) > 0 "Say why you're retiring this."
     mutate deletedAt = now()
+    mutate revisedByPersonId = user.personId
+    mutate revisedAt = now()
     emit VenueVendorRelationshipRetired {
       relationshipId: self.id
       tenantId: self.tenantId

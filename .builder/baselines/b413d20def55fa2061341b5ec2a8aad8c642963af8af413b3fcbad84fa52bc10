@@ -14370,7 +14370,7 @@ export const listVendor = query({
   handler: async (ctx) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("vendorRead", "Vendor", () => checkRole(user, "procurementAccess"))) return [];
+    if (!__allowsRead("vendorRead", "Vendor", () => (checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("vendors").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
@@ -14384,7 +14384,7 @@ export const getVendor = query({
   handler: async (ctx, { id }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("vendorRead", "Vendor", () => checkRole(user, "procurementAccess"))) return null;
+    if (!__allowsRead("vendorRead", "Vendor", () => (checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (doc && (doc as any).tenantId !== __tenant) return null;
@@ -14401,7 +14401,7 @@ export const listVendorByTenantId = query({
   handler: async (ctx, { tenantId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("vendorRead", "Vendor", () => checkRole(user, "procurementAccess"))) return [];
+    if (!__allowsRead("vendorRead", "Vendor", () => (checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("vendors").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
@@ -14416,7 +14416,7 @@ export const listVendorContact = query({
   handler: async (ctx) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("vendorContactRead", "VendorContact", () => checkRole(user, "procurementAccess"))) return [];
+    if (!__allowsRead("vendorContactRead", "VendorContact", () => (checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("vendorContacts").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
@@ -14430,7 +14430,7 @@ export const getVendorContact = query({
   handler: async (ctx, { id }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("vendorContactRead", "VendorContact", () => checkRole(user, "procurementAccess"))) return null;
+    if (!__allowsRead("vendorContactRead", "VendorContact", () => (checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (doc && (doc as any).tenantId !== __tenant) return null;
@@ -14447,7 +14447,7 @@ export const listVendorContactByTenantId = query({
   handler: async (ctx, { tenantId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("vendorContactRead", "VendorContact", () => checkRole(user, "procurementAccess"))) return [];
+    if (!__allowsRead("vendorContactRead", "VendorContact", () => (checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("vendorContacts").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
@@ -14462,7 +14462,7 @@ export const listVendorContactByVendorId = query({
   handler: async (ctx, { vendorId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("vendorContactRead", "VendorContact", () => checkRole(user, "procurementAccess"))) return [];
+    if (!__allowsRead("vendorContactRead", "VendorContact", () => (checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("vendorContacts").withIndex("by_vendorId", (q) => q.eq("vendorId", vendorId)).collect();

@@ -2399,8 +2399,9 @@ async function __runClientCommunicationRecord(ctx: MutationCtx, { docId, clientC
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may add client notes");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change client notes");
     if (!((doc.recordedAt == null))) throw new Error("Guard 0 failed");
-    if (!(((doc.clientContactId == null) || (__rel_clientContact != null)))) throw new Error("Guard 1 failed");
-    if (!(((doc.eventId == null) || (__rel_event != null)))) throw new Error("Guard 2 failed");
+    if (!((user.personId != null))) throw new Error("Guard 1 failed");
+    if (!(((doc.clientContactId == null) || (__rel_clientContact != null)))) throw new Error("Guard 2 failed");
+    if (!(((doc.eventId == null) || (__rel_event != null)))) throw new Error("Guard 3 failed");
     if (!((((clientContactId != null) && (eventId == null)) || ((clientContactId == null) && (eventId != null))))) throw new Error("Choose one contact or event");
     if (!((((summary).trim()).length > 0))) throw new Error("Give this note a summary");
     if (version !== undefined && (doc as any).version !== version) {
@@ -2413,7 +2414,7 @@ async function __runClientCommunicationRecord(ctx: MutationCtx, { docId, clientC
       medium: medium,
       summary: summary,
       authorId: user.id,
-      authorName: (((user.personName != null) && (((user.personName).trim()).length > 0)) ? user.personName : "Staff member"),
+      authorName: ((user.personName != null) ? user.personName : ""),
       recordedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -2483,8 +2484,9 @@ export const ClientCommunication_createViaRecord = mutation({
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may add client notes");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change client notes");
     if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
-    if (!(((__draft.clientContactId == null) || (__rel_clientContact != null)))) throw new Error("Guard 1 failed");
-    if (!(((__draft.eventId == null) || (__rel_event != null)))) throw new Error("Guard 2 failed");
+    if (!((user.personId != null))) throw new Error("Guard 1 failed");
+    if (!(((__draft.clientContactId == null) || (__rel_clientContact != null)))) throw new Error("Guard 2 failed");
+    if (!(((__draft.eventId == null) || (__rel_event != null)))) throw new Error("Guard 3 failed");
     if (!((((clientContactId != null) && (eventId == null)) || ((clientContactId == null) && (eventId != null))))) throw new Error("Choose one contact or event");
     if (!((((summary).trim()).length > 0))) throw new Error("Give this note a summary");
     const doc: Record<string, any> = {
@@ -2497,7 +2499,7 @@ export const ClientCommunication_createViaRecord = mutation({
     doc.medium = medium;
     doc.summary = summary;
     doc.authorId = user.id;
-    doc.authorName = (((user.personName != null) && (((user.personName).trim()).length > 0)) ? user.personName : "Staff member");
+    doc.authorName = ((user.personName != null) ? user.personName : "");
     doc.recordedAt = Date.now();
     const docId = await ctx.db.insert("clientCommunications", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, clientCommunicationId: docId, tenantId: doc.tenantId, clientContactId: clientContactId, eventId: eventId, occurredAt: occurredAt, medium: medium, authorId: user.id, _subject: { entity: "ClientCommunication", command: "record", id: docId } };
@@ -50950,7 +50952,7 @@ async function __runVendorOnboard(ctx: MutationCtx, { docId, name, email, phone,
     if (!__storedDoc) throw new Error("Vendor not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Vendor not found");
     const doc = await __decryptDoc(ctx, "Vendor", ["email","phone","addressLine1","city","region","postalCode","countryCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may see vendors");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Procurement staff and event managers may see vendors");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendors");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendors");
     if (!((doc.onboardedAt == null))) throw new Error("Guard 0 failed");
@@ -51052,7 +51054,7 @@ export const Vendor_createViaOnboard = mutation({
       postalCode: args.postalCode,
       region: args.region
     };
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may see vendors");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Procurement staff and event managers may see vendors");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendors");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendors");
     if (!((__draft.onboardedAt == null))) throw new Error("Guard 0 failed");
@@ -51096,7 +51098,7 @@ async function __runVendorReinstate(ctx: MutationCtx, { docId, version }: any, _
     if (!__storedDoc) throw new Error("Vendor not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Vendor not found");
     const doc = await __decryptDoc(ctx, "Vendor", ["email","phone","addressLine1","city","region","postalCode","countryCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may see vendors");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Procurement staff and event managers may see vendors");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendors");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendors");
     if (!((doc.onboardedAt != null))) throw new Error("Guard 0 failed");
@@ -51160,7 +51162,7 @@ async function __runVendorSuspend(ctx: MutationCtx, { docId, reason, version }: 
     if (!__storedDoc) throw new Error("Vendor not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Vendor not found");
     const doc = await __decryptDoc(ctx, "Vendor", ["email","phone","addressLine1","city","region","postalCode","countryCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may see vendors");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Procurement staff and event managers may see vendors");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendors");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendors");
     if (!((doc.onboardedAt != null))) throw new Error("Guard 0 failed");
@@ -51226,7 +51228,7 @@ async function __runVendorTerminate(ctx: MutationCtx, { docId, reason, version }
     if (!__storedDoc) throw new Error("Vendor not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Vendor not found");
     const doc = await __decryptDoc(ctx, "Vendor", ["email","phone","addressLine1","city","region","postalCode","countryCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may see vendors");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Procurement staff and event managers may see vendors");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendors");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendors");
     if (!((doc.onboardedAt != null))) throw new Error("Guard 0 failed");
@@ -51293,7 +51295,7 @@ async function __runVendorUpdateDetails(ctx: MutationCtx, { docId, name, email, 
     if (!__storedDoc) throw new Error("Vendor not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Vendor not found");
     const doc = await __decryptDoc(ctx, "Vendor", ["email","phone","addressLine1","city","region","postalCode","countryCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may see vendors");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Procurement staff and event managers may see vendors");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendors");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendors");
     if (!((doc.onboardedAt != null))) throw new Error("Guard 0 failed");
@@ -51366,7 +51368,7 @@ async function __runVendorContactAdd(ctx: MutationCtx, { docId, vendorId, name, 
     const doc = await __decryptDoc(ctx, "VendorContact", ["email","phone"], __storedDoc) as Record<string, any>;
     const __rel_vendor = await __resolveRelation(ctx, "vendors", [__auth.tenantId, doc.vendorId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendor = __rel_vendor;
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may see vendor contacts");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Procurement staff and event managers may see vendor contacts");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendor contacts");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendor contacts");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
@@ -51452,7 +51454,7 @@ export const VendorContact_createViaAdd = mutation({
       vendorId: args.vendorId
     };
     const __rel_vendor = await __resolveRelation(ctx, "vendors", [__auth.tenantId, __draft.vendorId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may see vendor contacts");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Procurement staff and event managers may see vendor contacts");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendor contacts");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendor contacts");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
@@ -51492,7 +51494,7 @@ async function __runVendorContactRemove(ctx: MutationCtx, { docId, version }: an
     if (!__storedDoc) throw new Error("VendorContact not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("VendorContact not found");
     const doc = await __decryptDoc(ctx, "VendorContact", ["email","phone"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may see vendor contacts");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Procurement staff and event managers may see vendor contacts");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendor contacts");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendor contacts");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -51540,7 +51542,7 @@ async function __runVendorContactUpdate(ctx: MutationCtx, { docId, name, role, e
     if (!__storedDoc) throw new Error("VendorContact not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("VendorContact not found");
     const doc = await __decryptDoc(ctx, "VendorContact", ["email","phone"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may see vendor contacts");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Procurement staff and event managers may see vendor contacts");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendor contacts");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendor contacts");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -55955,6 +55957,7 @@ async function __runVenueVendorRelationshipEstablish(ctx: MutationCtx, { docId, 
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update venue suppliers");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change venue suppliers");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
+    if (!((user.personId != null))) throw new Error("Guard 1 failed");
     if (!(((venueId != null) && (((venueId).trim()).length > 0)))) throw new Error("Pick a venue.");
     if (!(((vendorId != null) && (((vendorId).trim()).length > 0)))) throw new Error("Pick a vendor.");
     {
@@ -56081,6 +56084,7 @@ export const VenueVendorRelationship_createViaEstablish = mutation({
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update venue suppliers");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change venue suppliers");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
+    if (!((user.personId != null))) throw new Error("Guard 1 failed");
     if (!(((venueId != null) && (((venueId).trim()).length > 0)))) throw new Error("Pick a venue.");
     if (!(((vendorId != null) && (((vendorId).trim()).length > 0)))) throw new Error("Pick a vendor.");
     const doc: Record<string, any> = {
@@ -56125,12 +56129,15 @@ async function __runVenueVendorRelationshipRetire(ctx: MutationCtx, { docId, rea
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update venue suppliers");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change venue suppliers");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
+    if (!((user.personId != null))) throw new Error("Guard 1 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Say why you're retiring this.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
       deletedAt: Date.now(),
+      revisedByPersonId: user.personId,
+      revisedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -56172,6 +56179,7 @@ async function __runVenueVendorRelationshipReviseDetails(ctx: MutationCtx, { doc
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update venue suppliers");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change venue suppliers");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
+    if (!((user.personId != null))) throw new Error("Guard 1 failed");
     if (!((((effectiveFrom == null) || (effectiveUntil == null)) || (effectiveFrom <= effectiveUntil)))) throw new Error("Effective from must be before effective until");
     if (!(((discountPercent == null) || ((discountPercent >= 0) && (discountPercent <= 100))))) throw new Error("Discount percent must be between 0 and 100");
     if (version !== undefined && (doc as any).version !== version) {
@@ -56189,14 +56197,14 @@ async function __runVenueVendorRelationshipReviseDetails(ctx: MutationCtx, { doc
       paymentTerms: ((paymentTerms != null) ? paymentTerms : doc.paymentTerms),
       minimumOrder: ((minimumOrder != null) ? minimumOrder : doc.minimumOrder),
       notes: ((notes != null) ? notes : doc.notes),
-      revisedByPersonId: ((user.personId != null) ? user.personId : doc.revisedByPersonId),
+      revisedByPersonId: user.personId,
       revisedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, relationshipId: docId, tenantId: __after.tenantId, venueId: __after.venueId, vendorId: __after.vendorId, revisedBy: ((user.personId != null) ? user.personId : __after.revisedByPersonId), _subject: { entity: "VenueVendorRelationship", command: "reviseDetails", id: docId } };
-    const __manifestEvent0 = { type: "VenueVendorRelationshipRevised", entity: "VenueVendorRelationship", entityId: docId, payload: { relationshipId: docId, tenantId: __after.tenantId, venueId: __after.venueId, vendorId: __after.vendorId, revisedBy: ((user.personId != null) ? user.personId : __after.revisedByPersonId) }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, relationshipId: docId, tenantId: __after.tenantId, venueId: __after.venueId, vendorId: __after.vendorId, revisedBy: user.personId, _subject: { entity: "VenueVendorRelationship", command: "reviseDetails", id: docId } };
+    const __manifestEvent0 = { type: "VenueVendorRelationshipRevised", entity: "VenueVendorRelationship", entityId: docId, payload: { relationshipId: docId, tenantId: __after.tenantId, venueId: __after.venueId, vendorId: __after.vendorId, revisedBy: user.personId }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "reviseDetails", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -56242,6 +56250,7 @@ async function __runVenueVendorRelationshipReviseStatus(ctx: MutationCtx, { docI
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update venue suppliers");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change venue suppliers");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
+    if (!((user.personId != null))) throw new Error("Guard 1 failed");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -56259,6 +56268,8 @@ async function __runVenueVendorRelationshipReviseStatus(ctx: MutationCtx, { docI
     }
     const updates = {
       status: status,
+      revisedByPersonId: user.personId,
+      revisedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
