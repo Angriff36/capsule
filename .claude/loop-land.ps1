@@ -4,7 +4,9 @@
 #   1. brings the worktree up to date with origin/dev (collision = retry later, no strike)
 #   2. runs typecheck ITSELF (never trusts the maker's claim)
 #   3. asks a reviewer from a DIFFERENT PROVIDER (Codex gpt-5.6-sol; fallback grok via Cursor CLI)
-#   4. APPROVE -> pushes the fix onto dev. Anything else -> records why and deletes the attempt.
+#   4. APPROVE -> pushes the fix onto dev. Anything else -> records why and KEEPS the worktree, so the
+#      maker answers the findings in the same campaign (Ryan 2026-09-27: "If rejected, fix every review
+#      finding in the same campaign and resubmit"). Only landed or empty attempts are deleted.
 # The pre-push hook refuses pushes from a loop worktree unless LOOP_LANDER=1, which only this script sets.
 param([switch]$IgnorePause)   # supervised manual run while the loops are paused
 $ErrorActionPreference = 'Continue'
@@ -20,6 +22,12 @@ function Record($h, $verdict, $reason) {
   $ledger | ConvertTo-Json -Depth 8 | Set-Content $ledgerPath -Encoding utf8NoBOM
   (@{ source = 'loop-land'; runId = $h.runId; item = $h.item; verdict = $verdict; reason = $reason; timestamp = (Get-Date).ToUniversalTime().ToString('o') } | ConvertTo-Json -Compress) | Add-Content (Join-Path $root 'loop-run-log.md')
   Say "$($h.runId): $verdict - $reason"
+}
+
+function Keep($file) {
+  # Unlanded work is never thrown away: the worktree and branch stay, only the hand-off goes.
+  # The maker's next run finds the worktree in its STATE.md checklist and continues there.
+  Remove-Item $file -Force
 }
 
 function Discard($h, $file) {
@@ -41,7 +49,7 @@ function Discard($h, $file) {
 function Review($wt, $target) {
   $prompt = @"
 You are the independent reviewer for an automated fix. In this directory run ``git diff origin/dev HEAD --stat`` and then ``git diff origin/dev HEAD`` (skip the bodies of .builder/, convex/_generated/, src/generated/ and schemas/ - only confirm those were regenerated, not hand-edited). Fix target: $target
-Find reasons to REJECT: wrong scope, unrelated edits, secrets, hand-edited generated files, disabled tests, symptom-fixes, partial implementation. Also REJECT tedium: any new guard, policy, approval, or validation that blocks a reasonable user action without a proportionate real-world reason - this is a catering app, not a bank.
+Find reasons to REJECT: wrong scope, unrelated edits, secrets, hand-edited generated files, disabled tests, symptom-fixes, partial implementation of what the target says this change delivers. The change may be one checkpoint of a larger capability: work the target names as still open is not a reason to reject; anything the target claims as done must be complete and proven. Also REJECT tedium: any new guard, policy, approval, or validation that blocks a reasonable user action without a proportionate real-world reason - this is a catering app, not a bank.
 On REJECT give numbered reasons with file and line, and say concretely what a passing fix must do - the maker's next attempt is built from your text.
 End your answer with exactly one line: VERDICT: APPROVE   or   VERDICT: REJECT - <main reason>
 "@
@@ -79,13 +87,13 @@ foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
     Record $h 'FAIL' "hand-off names '$wt' on '$($h.branch)' (checked out: '$checkedOut'); this run owns $expectedWt on $expectedBranch - nothing touched"
     Remove-Item $file.FullName -Force; continue
   }
-  if (git -C $wt status --porcelain) { Record $h 'FAIL' 'maker left uncommitted changes in the worktree'; Discard $h $file.FullName; continue }
+  if (git -C $wt status --porcelain) { Record $h 'FAIL' "maker left uncommitted changes in the worktree - worktree kept: $wt"; Keep $file.FullName; continue }
 
   git -C $wt fetch origin dev --quiet
   if ((git -C $wt rev-list --count origin/dev..HEAD) -eq '0') { Record $h 'FAIL' 'no commits to land'; Discard $h $file.FullName; continue }
   if ((git -C $wt rev-list --count HEAD..origin/dev) -ne '0') {
     git -C $wt merge --no-edit origin/dev *> $null
-    if ($LASTEXITCODE -ne 0) { git -C $wt merge --abort; Record $h 'COLLISION' 'newer dev work touches the same places - retry from a fresh worktree (not a strike)'; Discard $h $file.FullName; continue }
+    if ($LASTEXITCODE -ne 0) { git -C $wt merge --abort; Record $h 'COLLISION' "newer dev work touches the same places - merge origin/dev in the kept worktree and resolve (not a strike): $wt"; Keep $file.FullName; continue }
   }
 
   Push-Location $wt
@@ -93,7 +101,7 @@ foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
   bun run typecheck *> (Join-Path $wt '.loop-typecheck.log')
   $typecheckOk = $LASTEXITCODE -eq 0
   Pop-Location
-  if (-not $typecheckOk) { Record $h 'FAIL' "typecheck failed when the lander ran it: $((Get-Content (Join-Path $wt '.loop-typecheck.log') -Tail 3) -join ' | ')"; Discard $h $file.FullName; continue }
+  if (-not $typecheckOk) { Record $h 'FAIL' "typecheck failed when the lander ran it: $((Get-Content (Join-Path $wt '.loop-typecheck.log') -Tail 3) -join ' | ') - worktree kept: $wt"; Remove-Item (Join-Path $wt '.loop-typecheck.log') -Force; Keep $file.FullName; continue }
   Remove-Item (Join-Path $wt '.loop-typecheck.log') -Force
 
   $r = Review $wt "$($h.item) - $($h.target)"
@@ -105,14 +113,14 @@ foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
     continue
   }
   if ($r.verdict -ne 'APPROVE') {
-    # Keep the WHOLE review and the rejected patch: the attempt is deleted, and the next maker run starts from this file.
+    # Keep the WHOLE review and the rejected patch; the worktree is kept too, and the next maker run answers this file in it.
     $fbDir = Join-Path $root '.loop-worktrees\_feedback'
     New-Item -ItemType Directory -Force $fbDir | Out-Null
     $fb = Join-Path $fbDir "$($h.runId).md"
     $patch = (git -C $wt diff origin/dev HEAD -- . ':(exclude).builder' ':(exclude)convex/_generated' ':(exclude)src/generated' ':(exclude)schemas') -join "`n"
     "# Rejected attempt $($h.runId)`n`nItem: $($h.item)`n`nTarget: $($h.target)`n`nReviewer: $($r.reviewer) - $($r.verdict)`n`n## Full review`n`n$($r.full)`n`n## The rejected patch (generated trees left out)`n`n``````diff`n$patch`n``````" | Set-Content $fb -Encoding utf8NoBOM
-    Record $h 'FAIL' "review by $($r.reviewer): $($r.verdict) $($r.reason) | full review + rejected patch: .loop-worktrees/_feedback/$($h.runId).md"
-    Discard $h $file.FullName; continue
+    Record $h 'FAIL' "review by $($r.reviewer): $($r.verdict) $($r.reason) | full review + rejected patch: .loop-worktrees/_feedback/$($h.runId).md | worktree kept: $wt"
+    Keep $file.FullName; continue
   }
 
   git -C $wt commit --amend --no-edit --quiet --trailer "Reviewed-by: $($r.reviewer) APPROVE" --trailer 'Landed-by: loop-land.ps1'
@@ -120,7 +128,7 @@ foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
   git -C $wt push --quiet origin HEAD:dev *>> $log
   $pushed = $LASTEXITCODE -eq 0
   $env:LOOP_LANDER = $null
-  if (-not $pushed) { Record $h 'COLLISION' 'push to dev refused (dev moved again or the regen check blocked it) - see loop-land.log; retry from a fresh worktree'; Discard $h $file.FullName; continue }
+  if (-not $pushed) { Record $h 'COLLISION' "push to dev refused (dev moved again or the regen check blocked it) - see loop-land.log; worktree kept, merge origin/dev and hand off again: $wt"; Keep $file.FullName; continue }
 
   $sha = git -C $wt rev-parse --short HEAD
   Record $h 'LANDED' "on dev as $sha, reviewed by $($r.reviewer)"
