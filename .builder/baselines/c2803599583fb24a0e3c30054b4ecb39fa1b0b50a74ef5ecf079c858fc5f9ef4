@@ -30519,7 +30519,7 @@ export const Organization_suspend = mutation({
   },
 });
 
-async function __runOrganizationCapabilitySettingRegister(ctx: MutationCtx, { docId, capability, enabled, updatedBy, version }: any, __creation = false) {
+async function __runOrganizationCapabilitySettingRegister(ctx: MutationCtx, { docId, capability, enabled, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -30537,7 +30537,7 @@ async function __runOrganizationCapabilitySettingRegister(ctx: MutationCtx, { do
     const updates = {
       capability: capability,
       enabled: enabled,
-      updatedBy: updatedBy,
+      updatedBy: user.id,
       registeredAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -30550,7 +30550,6 @@ export const OrganizationCapabilitySetting_register = mutation({
     docId: v.id("organizationCapabilitySettings"),
     capability: v.any(),
     enabled: v.boolean(),
-    updatedBy: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -30571,7 +30570,6 @@ export const OrganizationCapabilitySetting_createViaRegister = mutation({
   args: {
     capability: v.any(),
     enabled: v.boolean(),
-    updatedBy: v.optional(v.string()),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -30581,14 +30579,13 @@ export const OrganizationCapabilitySetting_createViaRegister = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { capability, enabled, updatedBy } = args;
+    const { capability, enabled } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
       capability: args.capability,
-      enabled: args.enabled,
-      updatedBy: args.updatedBy
+      enabled: args.enabled
     };
     if (!((user.id != null))) throw new Error("Signed-in staff may see capability settings");
     if (!((user.id != null))) throw new Error("Signed-in staff may update capability settings");
@@ -30602,7 +30599,7 @@ export const OrganizationCapabilitySetting_createViaRegister = mutation({
     };
     doc.capability = capability;
     doc.enabled = enabled;
-    doc.updatedBy = updatedBy;
+    doc.updatedBy = user.id;
     doc.registeredAt = Date.now();
     const docId = await ctx.db.insert("organizationCapabilitySettings", doc as any);
     const __result = { docId };
@@ -30613,7 +30610,7 @@ export const OrganizationCapabilitySetting_createViaRegister = mutation({
   },
 });
 
-async function __runOrganizationCapabilitySettingSetEnabled(ctx: MutationCtx, { docId, enabled, updatedBy, version }: any, __creation = false) {
+async function __runOrganizationCapabilitySettingSetEnabled(ctx: MutationCtx, { docId, enabled, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -30629,7 +30626,7 @@ async function __runOrganizationCapabilitySettingSetEnabled(ctx: MutationCtx, { 
     }
     const updates = {
       enabled: enabled,
-      updatedBy: updatedBy,
+      updatedBy: user.id,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -30640,7 +30637,6 @@ export const OrganizationCapabilitySetting_setEnabled = mutation({
   args: {
     docId: v.id("organizationCapabilitySettings"),
     enabled: v.boolean(),
-    updatedBy: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },

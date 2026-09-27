@@ -7566,7 +7566,6 @@ export type OrganizationSuspendParams = z.infer<typeof OrganizationSuspendParams
 export const OrganizationCapabilitySettingRegisterParamsSchema = z.object({
   capability: z.enum(["kitchen", "inventory", "procurement", "events", "sales", "logistics", "workforce", "finance", "reports", "administration"]),
   enabled: z.boolean(),
-  updatedBy: z.string().optional(),
 });
 
 export type OrganizationCapabilitySettingRegisterParams = z.infer<typeof OrganizationCapabilitySettingRegisterParamsSchema>;
@@ -7574,7 +7573,6 @@ export type OrganizationCapabilitySettingRegisterParams = z.infer<typeof Organiz
 // Command: setEnabled on OrganizationCapabilitySetting
 export const OrganizationCapabilitySettingSetEnabledParamsSchema = z.object({
   enabled: z.boolean(),
-  updatedBy: z.string().optional(),
 });
 
 export type OrganizationCapabilitySettingSetEnabledParams = z.infer<typeof OrganizationCapabilitySettingSetEnabledParamsSchema>;

@@ -2026,13 +2026,13 @@ const COMMAND_DISPATCH = {
   },
   "OrganizationCapabilitySetting.register": {
     ref: api.mutations.OrganizationCapabilitySetting_createViaRegister,
-    params: ["capability","enabled","updatedBy","idempotencyKey"] as const,
-    paramMeta: [{"name":"capability","type":"OrganizationCapability","required":true},{"name":"enabled","type":"boolean","required":true},{"name":"updatedBy","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["capability","enabled","idempotencyKey"] as const,
+    paramMeta: [{"name":"capability","type":"OrganizationCapability","required":true},{"name":"enabled","type":"boolean","required":true},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "OrganizationCapabilitySetting.setEnabled": {
     ref: api.mutations.OrganizationCapabilitySetting_setEnabled,
-    params: ["docId","enabled","updatedBy","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"enabled","type":"boolean","required":true},{"name":"updatedBy","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","enabled","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"enabled","type":"boolean","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "PackList.acknowledgePackingRequirement": {
     ref: api.mutations.PackList_acknowledgePackingRequirement,

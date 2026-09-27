@@ -425,9 +425,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.Organization_createViaRegister, { "name": "Organization 2", "brandDisplayName": "Organization 2", "brandAddress": "demo-brandAddress-2", "brandPrimaryColor": "demo-brandPrimaryColor-2", "brandAccentColor": "demo-brandAccentColor-2" } as any);
   // OrganizationCapabilitySetting → api.mutations.OrganizationCapabilitySetting_createViaRegister
   rowsAttempted += 1;
-  await client.mutation(api.mutations.OrganizationCapabilitySetting_createViaRegister, { "capability": "demo-capability-1", "enabled": false, "updatedBy": "demo-updatedBy-1" } as any);
+  await client.mutation(api.mutations.OrganizationCapabilitySetting_createViaRegister, { "capability": "demo-capability-1", "enabled": false } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.OrganizationCapabilitySetting_createViaRegister, { "capability": "demo-capability-2", "enabled": false, "updatedBy": "demo-updatedBy-2" } as any);
+  await client.mutation(api.mutations.OrganizationCapabilitySetting_createViaRegister, { "capability": "demo-capability-2", "enabled": false } as any);
   // PackList → api.mutations.PackList_createViaOpen
   rowsAttempted += 1;
   await client.mutation(api.mutations.PackList_createViaOpen, { "eventId": "eventId-pack-list-1", "name": "PackList 1", "purpose": "demo-purpose-1", "notes": "demo-notes-1" } as any);
