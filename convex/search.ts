@@ -32,6 +32,7 @@ const ALL_READS = [
   "eventAccess",
   "eventManageAccess",
   "financeAccess",
+  "financeManageAccess",
   "importAccess",
   "inventoryAccess",
   "kitchenAccess",
@@ -73,6 +74,7 @@ const ROLE_READS: Record<string, readonly string[]> = {
   event_staff: ["eventAccess", "staffAccess", "workforceSelfAccess"],
   finance_manager: [
     "financeAccess",
+    "financeManageAccess",
     "importAccess",
     "manageAccess",
     "staffAccess",
