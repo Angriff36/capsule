@@ -2476,8 +2476,8 @@ const COMMAND_DISPATCH = {
   },
   "PrepTaskComment.post": {
     ref: api.mutations.PrepTaskComment_createViaPost,
-    params: ["prepTaskId","eventId","body","eventDishId","category","authorPersonId","authorName","taskOwnerAssignedToId","taskOwnerAuthSubjectId","idempotencyKey"] as const,
-    paramMeta: [{"name":"prepTaskId","type":"uuid","required":true},{"name":"eventId","type":"uuid","required":true},{"name":"body","type":"string","required":true},{"name":"eventDishId","type":"uuid","required":false},{"name":"category","type":"PrepTaskCommentCategory","required":false},{"name":"authorPersonId","type":"uuid","required":false},{"name":"authorName","type":"string","required":false},{"name":"taskOwnerAssignedToId","type":"uuid","required":false},{"name":"taskOwnerAuthSubjectId","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["prepTaskId","eventId","body","eventDishId","category","authorName","taskOwnerAssignedToId","taskOwnerAuthSubjectId","idempotencyKey"] as const,
+    paramMeta: [{"name":"prepTaskId","type":"uuid","required":true},{"name":"eventId","type":"uuid","required":true},{"name":"body","type":"string","required":true},{"name":"eventDishId","type":"uuid","required":false},{"name":"category","type":"PrepTaskCommentCategory","required":false},{"name":"authorName","type":"string","required":false},{"name":"taskOwnerAssignedToId","type":"uuid","required":false},{"name":"taskOwnerAuthSubjectId","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "PrepTaskDependency.declare": {
     ref: api.mutations.PrepTaskDependency_createViaDeclare,

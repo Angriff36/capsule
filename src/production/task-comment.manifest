@@ -47,13 +47,13 @@ entity PrepTaskComment mixin TenantScoped, SoftDeletable {
   default policy prepTaskCommentWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and event managers may update prep task comments"
   default policy prepTaskCommentExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and event managers may change prep task comments"
 
+  // The author is the signed-in person's staff profile, never a caller-sent id.
   command post(
     prepTaskId: uuid,
     eventId: uuid,
     body: string,
     optional eventDishId: uuid,
     optional category: PrepTaskCommentCategory,
-    optional authorPersonId: uuid,
     optional authorName: string,
     optional taskOwnerAssignedToId: uuid,
     optional taskOwnerAuthSubjectId: string
@@ -61,6 +61,7 @@ entity PrepTaskComment mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.postedAt == null
     guard user.id != null
+    guard user.personId != null
     constraint postBodyPresent: length(trim(body)) > 0 "Write something before you post this comment."
     constraint postAuthorName: authorName == null or length(trim(authorName)) > 0 "Give this comment an author name."
     constraint postNotSelf: taskOwnerAuthSubjectId == null or taskOwnerAuthSubjectId != user.id "A task owner can't post a comment that notifies themselves."
@@ -69,7 +70,7 @@ entity PrepTaskComment mixin TenantScoped, SoftDeletable {
     mutate eventDishId = eventDishId != null ? eventDishId : self.eventDishId
     mutate taskOwnerAssignedToId = taskOwnerAssignedToId
     mutate taskOwnerAuthSubjectId = taskOwnerAuthSubjectId
-    mutate authorPersonId = authorPersonId != null ? authorPersonId : self.authorPersonId
+    mutate authorPersonId = user.personId
     mutate authorAuthSubjectId = user.id
     mutate authorName = authorName != null ? authorName : self.authorName
     mutate category = category != null ? category : "note"
@@ -82,7 +83,7 @@ entity PrepTaskComment mixin TenantScoped, SoftDeletable {
       eventId: eventId
       eventDishId: eventDishId != null ? eventDishId : self.eventDishId
       taskOwnerAuthSubjectId: taskOwnerAuthSubjectId
-      authorPersonId: authorPersonId != null ? authorPersonId : self.authorPersonId
+      authorPersonId: user.personId
       authorName: authorName != null ? authorName : self.authorName
       category: category != null ? category : "note"
       body: body
