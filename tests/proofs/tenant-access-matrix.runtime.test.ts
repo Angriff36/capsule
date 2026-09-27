@@ -631,7 +631,17 @@ async function makeWorld(withA: boolean) {
         for (const row of (await ctx.db
           .query(table as never)
           .collect()) as Doc[]) {
-          if (row.tenantId === TENANT_A) await ctx.db.delete(row._id as never);
+          if (row.tenantId !== TENANT_A) continue;
+          // The removed caller's own staff profile is part of the caller, not
+          // workspace A data: both copies must see the same caller, or the
+          // copy without A would answer as a claims-only sign-in instead.
+          if (
+            table === "people" &&
+            (row as Doc).authSubjectId === "matrix-removed-a"
+          ) {
+            continue;
+          }
+          await ctx.db.delete(row._id as never);
         }
       }
     });
@@ -662,9 +672,13 @@ const OUTSIDERS: Caller[] = [
   { label: "signed out", identity: null },
   {
     label: "removed person of workspace A",
+    // Still carries workspace A's owner claims, as a removed Clerk
+    // organization member does: the removal must win over the claims.
     identity: {
       subject: "matrix-removed-a",
       tokenIdentifier: "matrix|removed-a",
+      role: "org:owner",
+      tenantId: TENANT_A,
     },
   },
 ];

@@ -114,8 +114,10 @@ describe("saved step answers replay only in their own workspace (PL-AUTH)", () =
       "Kitchen, inventory and managers may see ingredients",
     );
 
-    // A staff profile linked to a sign-in with no workspace claim; after it is
-    // removed, the same sign-in with the same key gets no saved answer.
+    // A staff profile linked to a sign-in that still carries the company's
+    // workspace and owner role claims (as a Clerk organization member does);
+    // after it is removed, the same sign-in gets no saved answer and cannot
+    // run the step fresh either: the claims do not outlive the removal.
     const [ownerId, keeperId] = await t.run(async (ctx) => {
       const person = {
         tenantId,
@@ -142,15 +144,17 @@ describe("saved step answers replay only in their own workspace (PL-AUTH)", () =
     const owner = t.withIdentity({
       subject: "replay-owner",
       tokenIdentifier: "replay|owner",
+      role: "org:owner",
+      tenantId,
     });
     const vanilla = (await cook.mutation(
       api.mutations.Ingredient_createViaIntroduce,
       { name: "Secret vanilla", unit: "kilogram", costPerUnit: 9 },
     )) as { docId: Id<"ingredients"> };
-    const retire = (as: typeof owner) =>
+    const retire = (as: typeof owner, idempotencyKey = "owner-key") =>
       as.mutation(api.mutations.Ingredient_discontinue, {
         docId: vanilla.docId,
-        idempotencyKey: "owner-key",
+        idempotencyKey,
       });
     expect(((await retire(owner)) as { name?: string }).name).toBe(
       "Secret vanilla",
@@ -159,7 +163,34 @@ describe("saved step answers replay only in their own workspace (PL-AUTH)", () =
       ctx.db.patch(ownerId as Id<"people">, { status: "inactive" } as never),
     );
     await expect(retire(owner)).rejects.toThrow();
+    await expect(retire(owner, "fresh-owner-key")).rejects.toThrow();
     await expect(retire(t as never)).rejects.toThrow();
+    // A deleted profile is removed the same way.
+    await t.run((ctx) =>
+      ctx.db.patch(
+        ownerId as Id<"people">,
+        { status: "active", deletedAt: Date.now() } as never,
+      ),
+    );
+    await expect(retire(owner, "deleted-owner-key")).rejects.toThrow();
+
+    // A sign-in never linked to a staff profile still starts from its claims,
+    // so a new company owner can set up before their profile exists.
+    const newcomer = t.withIdentity({
+      subject: "replay-newcomer",
+      tokenIdentifier: "replay|newcomer",
+      role: "org:owner",
+      tenantId,
+    });
+    const cardamom = (await cook.mutation(
+      api.mutations.Ingredient_createViaIntroduce,
+      { name: "Green cardamom", unit: "kilogram", costPerUnit: 7 },
+    )) as { docId: Id<"ingredients"> };
+    const newcomerAnswer = (await newcomer.mutation(
+      api.mutations.Ingredient_discontinue,
+      { docId: cardamom.docId, idempotencyKey: "newcomer-key" },
+    )) as { name?: string };
+    expect(newcomerAnswer.name).toBe("Green cardamom");
 
     // A person who removes their own profile: the answer (their own record) is
     // saved under the access they had when they asked, so neither their
@@ -167,6 +198,8 @@ describe("saved step answers replay only in their own workspace (PL-AUTH)", () =
     const keeper = t.withIdentity({
       subject: "replay-keeper",
       tokenIdentifier: "replay|keeper",
+      role: "org:owner",
+      tenantId,
     });
     const selfRemove = (as: typeof keeper) =>
       as.mutation(api.mutations.Person_deactivate, {

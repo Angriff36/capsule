@@ -21,6 +21,7 @@ import {
   type OrgCapabilityId,
 } from "./orgCapabilityGate";
 import {
+  isLivePerson,
   pickLivePerson,
   tenantIdFromIdentityClaims,
 } from "./personAuthPick";
@@ -90,6 +91,15 @@ export async function getAuthContext(ctx: {
   const linked = ctx.db
     ? await loadPersonBySubject(ctx.db, identity.subject, tenantClaim)
     : null;
+  if (linked === REMOVED) {
+    return {
+      id: identity.subject,
+      role: ANONYMOUS.role,
+      tenantId: "",
+      roleSource: "anonymous",
+      disabledCapabilities: [],
+    };
+  }
   if (linked) {
     return {
       id: identity.subject,
@@ -134,18 +144,31 @@ export async function getAuthContext(ctx: {
   };
 }
 
+/**
+ * A sign-in still linked to a removed (inactive, terminated or deleted) Person
+ * in the workspace its IdP claims name (any workspace when there is no claim)
+ * was taken off that team. It must not fall back to the IdP tenant/role
+ * claims, which outlive the removal. Only sign-ins never linked there
+ * bootstrap from claims.
+ */
+const REMOVED = "removed" as const;
+
 /** The active Person linked to this sign-in, in whichever tenant hired them. */
 async function loadPersonBySubject(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   db: { query: (table: "people") => any },
   authSubjectId: string,
   tenantId?: string,
-): Promise<{
-  role: string;
-  personId: string;
-  personName: string;
-  tenantId: string;
-} | null> {
+): Promise<
+  | {
+      role: string;
+      personId: string;
+      personName: string;
+      tenantId: string;
+    }
+  | typeof REMOVED
+  | null
+> {
   const rows = (await db
     .query("people")
     .withIndex(
@@ -153,17 +176,14 @@ async function loadPersonBySubject(
       (q: { eq: (f: string, v: string) => unknown }) =>
         q.eq("authSubjectId", authSubjectId),
     )
-    .filter(
-      (q: {
-        eq: (left: unknown, right: unknown) => unknown;
-        field: (name: string) => unknown;
-      }) => q.eq(q.field("status"), "active"),
-    )
     .collect()) as PersonRow[];
-  const person = pickLivePerson(rows, { subject: authSubjectId, tenantId });
-  if (!person) return null;
   const hint = tenantId?.trim() ?? "";
-  if (hint && person.tenantId !== hint) return null;
+  const removedHere = rows.some(
+    (row) => !isLivePerson(row) && (!hint || row.tenantId === hint),
+  );
+  const person = pickLivePerson(rows, { subject: authSubjectId, tenantId });
+  if (!person) return removedHere ? REMOVED : null;
+  if (hint && person.tenantId !== hint) return removedHere ? REMOVED : null;
   if (typeof person.role !== "string" || person.role.length === 0) return null;
   if (typeof person.tenantId !== "string" || person.tenantId.length === 0) {
     return null;
