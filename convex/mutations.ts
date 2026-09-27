@@ -21724,7 +21724,7 @@ export const ImportDataset_updateConfig = mutation({
   },
 });
 
-async function __runImportRunApproveReview(ctx: MutationCtx, { docId, finalRecordCounts, actorId, version }: any, __creation = false) {
+async function __runImportRunApproveReview(ctx: MutationCtx, { docId, finalRecordCounts, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -21737,7 +21737,6 @@ async function __runImportRunApproveReview(ctx: MutationCtx, { docId, finalRecor
     if (!((doc.reviewStartedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((finalRecordCounts != null))) throw new Error("This import needs its final item counts.");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -21755,15 +21754,15 @@ async function __runImportRunApproveReview(ctx: MutationCtx, { docId, finalRecor
     }
     const updates = {
       recordCounts: finalRecordCounts,
-      actorId: ((actorId != null) ? actorId : doc.actorId),
+      actorId: user.id,
       reviewApprovedAt: Date.now(),
       status: "committing",
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, finalRecordCounts: finalRecordCounts, actorId: ((actorId != null) ? actorId : __after.actorId), _subject: { entity: "ImportRun", command: "approveReview", id: docId } };
-    const __manifestEvent0 = { type: "ImportRunReviewApproved", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, finalRecordCounts: finalRecordCounts, actorId: ((actorId != null) ? actorId : __after.actorId) }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, finalRecordCounts: finalRecordCounts, actorId: user.id, _subject: { entity: "ImportRun", command: "approveReview", id: docId } };
+    const __manifestEvent0 = { type: "ImportRunReviewApproved", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, finalRecordCounts: finalRecordCounts, actorId: user.id }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "approveReview", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -21773,7 +21772,6 @@ export const ImportRun_approveReview = mutation({
   args: {
     docId: v.id("importRuns"),
     finalRecordCounts: v.string(),
-    actorId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -21790,7 +21788,7 @@ export const ImportRun_approveReview = mutation({
   },
 });
 
-async function __runImportRunBeginReview(ctx: MutationCtx, { docId, actorId, version }: any, __creation = false) {
+async function __runImportRunBeginReview(ctx: MutationCtx, { docId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -21802,7 +21800,6 @@ async function __runImportRunBeginReview(ctx: MutationCtx, { docId, actorId, ver
     if (!((doc.status === "validating"))) throw new Error("Guard 0 failed");
     if (!((doc.validatedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -21819,15 +21816,15 @@ async function __runImportRunBeginReview(ctx: MutationCtx, { docId, actorId, ver
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
-      actorId: ((actorId != null) ? actorId : doc.actorId),
+      actorId: user.id,
       reviewStartedAt: Date.now(),
       status: "reviewing",
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, actorId: ((actorId != null) ? actorId : __after.actorId), _subject: { entity: "ImportRun", command: "beginReview", id: docId } };
-    const __manifestEvent0 = { type: "ImportRunReviewStarted", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, actorId: ((actorId != null) ? actorId : __after.actorId) }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, actorId: user.id, _subject: { entity: "ImportRun", command: "beginReview", id: docId } };
+    const __manifestEvent0 = { type: "ImportRunReviewStarted", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, actorId: user.id }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "beginReview", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -21836,7 +21833,6 @@ async function __runImportRunBeginReview(ctx: MutationCtx, { docId, actorId, ver
 export const ImportRun_beginReview = mutation({
   args: {
     docId: v.id("importRuns"),
-    actorId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -21853,7 +21849,7 @@ export const ImportRun_beginReview = mutation({
   },
 });
 
-async function __runImportRunCommit(ctx: MutationCtx, { docId, actorId, version }: any, __creation = false) {
+async function __runImportRunCommit(ctx: MutationCtx, { docId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -21868,7 +21864,6 @@ async function __runImportRunCommit(ctx: MutationCtx, { docId, actorId, version 
     if (!(((doc.indexNameMismatch !== true) || (doc.discrepancyExplained === true)))) throw new Error("Guard 3 failed");
     if (!((((doc.unaccountedRecordCount != null) ? doc.unaccountedRecordCount : 0) === 0))) throw new Error("Guard 4 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 5 failed");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -21885,7 +21880,7 @@ async function __runImportRunCommit(ctx: MutationCtx, { docId, actorId, version 
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
-      actorId: ((actorId != null) ? actorId : doc.actorId),
+      actorId: user.id,
       commitStartedAt: Date.now(),
       completionTime: Date.now(),
       endTime: Date.now(),
@@ -21894,8 +21889,8 @@ async function __runImportRunCommit(ctx: MutationCtx, { docId, actorId, version 
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, recordCounts: __after.recordCounts, actorId: ((actorId != null) ? actorId : __after.actorId), _subject: { entity: "ImportRun", command: "commit", id: docId } };
-    const __manifestEvent0 = { type: "ImportRunCommitted", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, recordCounts: __after.recordCounts, actorId: ((actorId != null) ? actorId : __after.actorId) }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, recordCounts: __after.recordCounts, actorId: user.id, _subject: { entity: "ImportRun", command: "commit", id: docId } };
+    const __manifestEvent0 = { type: "ImportRunCommitted", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, recordCounts: __after.recordCounts, actorId: user.id }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "commit", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -21904,7 +21899,6 @@ async function __runImportRunCommit(ctx: MutationCtx, { docId, actorId, version 
 export const ImportRun_commit = mutation({
   args: {
     docId: v.id("importRuns"),
-    actorId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -21921,7 +21915,7 @@ export const ImportRun_commit = mutation({
   },
 });
 
-async function __runImportRunExplainArchiveDiscrepancy(ctx: MutationCtx, { docId, note, actorId, version }: any, __creation = false) {
+async function __runImportRunExplainArchiveDiscrepancy(ctx: MutationCtx, { docId, note, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -21933,20 +21927,19 @@ async function __runImportRunExplainArchiveDiscrepancy(ctx: MutationCtx, { docId
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
     if (!((((note).trim()).length > 0))) throw new Error("Say why the file counts don't match.");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
-      actorId: ((actorId != null) ? actorId : doc.actorId),
+      actorId: user.id,
       discrepancyExplained: true,
       discrepancyNote: note,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, note: note, actorId: ((actorId != null) ? actorId : __after.actorId), _subject: { entity: "ImportRun", command: "explainArchiveDiscrepancy", id: docId } };
-    const __manifestEvent0 = { type: "ImportRunArchiveDiscrepancyExplained", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, note: note, actorId: ((actorId != null) ? actorId : __after.actorId) }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, note: note, actorId: user.id, _subject: { entity: "ImportRun", command: "explainArchiveDiscrepancy", id: docId } };
+    const __manifestEvent0 = { type: "ImportRunArchiveDiscrepancyExplained", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, note: note, actorId: user.id }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "explainArchiveDiscrepancy", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -21956,7 +21949,6 @@ export const ImportRun_explainArchiveDiscrepancy = mutation({
   args: {
     docId: v.id("importRuns"),
     note: v.string(),
-    actorId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -21973,7 +21965,7 @@ export const ImportRun_explainArchiveDiscrepancy = mutation({
   },
 });
 
-async function __runImportRunMarkFailed(ctx: MutationCtx, { docId, failureDetails, actorId, version }: any, __creation = false) {
+async function __runImportRunMarkFailed(ctx: MutationCtx, { docId, failureDetails, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -21986,7 +21978,6 @@ async function __runImportRunMarkFailed(ctx: MutationCtx, { docId, failureDetail
     if (!((doc.status !== "reverted"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((((failureDetails).trim()).length > 0))) throw new Error("Say what went wrong.");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -22005,15 +21996,15 @@ async function __runImportRunMarkFailed(ctx: MutationCtx, { docId, failureDetail
     }
     const updates = {
       failureDetails: failureDetails,
-      actorId: ((actorId != null) ? actorId : doc.actorId),
+      actorId: user.id,
       endTime: Date.now(),
       status: "failed",
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, previousStatus: previousStatus, failureDetails: failureDetails, actorId: ((actorId != null) ? actorId : __after.actorId), _subject: { entity: "ImportRun", command: "markFailed", id: docId } };
-    const __manifestEvent0 = { type: "ImportRunFailed", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, previousStatus: previousStatus, failureDetails: failureDetails, actorId: ((actorId != null) ? actorId : __after.actorId) }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, previousStatus: previousStatus, failureDetails: failureDetails, actorId: user.id, _subject: { entity: "ImportRun", command: "markFailed", id: docId } };
+    const __manifestEvent0 = { type: "ImportRunFailed", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, previousStatus: previousStatus, failureDetails: failureDetails, actorId: user.id }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "markFailed", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -22023,7 +22014,6 @@ export const ImportRun_markFailed = mutation({
   args: {
     docId: v.id("importRuns"),
     failureDetails: v.string(),
-    actorId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -22101,7 +22091,7 @@ export const ImportRun_recordArchiveInventory = mutation({
   },
 });
 
-async function __runImportRunRecordCommitCheckpoint(ctx: MutationCtx, { docId, commitCheckpoint, actorId, version }: any, __creation = false) {
+async function __runImportRunRecordCommitCheckpoint(ctx: MutationCtx, { docId, commitCheckpoint, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -22114,19 +22104,18 @@ async function __runImportRunRecordCommitCheckpoint(ctx: MutationCtx, { docId, c
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.status === "committing"))) throw new Error("Guard 2 failed");
     if (!((((commitCheckpoint).trim()).length > 0))) throw new Error("This import needs to say how far its committing has gotten.");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
       commitCheckpoint: commitCheckpoint,
-      actorId: ((actorId != null) ? actorId : doc.actorId),
+      actorId: user.id,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, commitCheckpoint: commitCheckpoint, actorId: ((actorId != null) ? actorId : __after.actorId), _subject: { entity: "ImportRun", command: "recordCommitCheckpoint", id: docId } };
-    const __manifestEvent0 = { type: "ImportRunCommitCheckpointRecorded", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, commitCheckpoint: commitCheckpoint, actorId: ((actorId != null) ? actorId : __after.actorId) }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, commitCheckpoint: commitCheckpoint, actorId: user.id, _subject: { entity: "ImportRun", command: "recordCommitCheckpoint", id: docId } };
+    const __manifestEvent0 = { type: "ImportRunCommitCheckpointRecorded", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, commitCheckpoint: commitCheckpoint, actorId: user.id }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "recordCommitCheckpoint", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -22136,7 +22125,6 @@ export const ImportRun_recordCommitCheckpoint = mutation({
   args: {
     docId: v.id("importRuns"),
     commitCheckpoint: v.string(),
-    actorId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -22153,7 +22141,7 @@ export const ImportRun_recordCommitCheckpoint = mutation({
   },
 });
 
-async function __runImportRunRecordDispositionSummary(ctx: MutationCtx, { docId, dispositionCounts, unaccountedRecordCount, actorId, version }: any, __creation = false) {
+async function __runImportRunRecordDispositionSummary(ctx: MutationCtx, { docId, dispositionCounts, unaccountedRecordCount, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -22167,20 +22155,19 @@ async function __runImportRunRecordDispositionSummary(ctx: MutationCtx, { docId,
     if (!((((((doc.status === "started") || (doc.status === "parsing")) || (doc.status === "validating")) || (doc.status === "reviewing")) || (doc.status === "committing")))) throw new Error("Guard 2 failed");
     if (!((((dispositionCounts).trim()).length > 0))) throw new Error("This import needs its file outcome counts.");
     if (!((unaccountedRecordCount >= 0))) throw new Error("This import's count of files not yet accounted for can't be negative. Use zero or more.");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
       dispositionCounts: dispositionCounts,
       unaccountedRecordCount: unaccountedRecordCount,
-      actorId: ((actorId != null) ? actorId : doc.actorId),
+      actorId: user.id,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, dispositionCounts: dispositionCounts, unaccountedRecordCount: unaccountedRecordCount, actorId: ((actorId != null) ? actorId : __after.actorId), _subject: { entity: "ImportRun", command: "recordDispositionSummary", id: docId } };
-    const __manifestEvent0 = { type: "ImportRunDispositionSummaryRecorded", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, dispositionCounts: dispositionCounts, unaccountedRecordCount: unaccountedRecordCount, actorId: ((actorId != null) ? actorId : __after.actorId) }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, dispositionCounts: dispositionCounts, unaccountedRecordCount: unaccountedRecordCount, actorId: user.id, _subject: { entity: "ImportRun", command: "recordDispositionSummary", id: docId } };
+    const __manifestEvent0 = { type: "ImportRunDispositionSummaryRecorded", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, dispositionCounts: dispositionCounts, unaccountedRecordCount: unaccountedRecordCount, actorId: user.id }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "recordDispositionSummary", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -22191,7 +22178,6 @@ export const ImportRun_recordDispositionSummary = mutation({
     docId: v.id("importRuns"),
     dispositionCounts: v.string(),
     unaccountedRecordCount: v.number(),
-    actorId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -22208,7 +22194,7 @@ export const ImportRun_recordDispositionSummary = mutation({
   },
 });
 
-async function __runImportRunRecordParse(ctx: MutationCtx, { docId, recordCounts, actorId, version }: any, __creation = false) {
+async function __runImportRunRecordParse(ctx: MutationCtx, { docId, recordCounts, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -22220,7 +22206,6 @@ async function __runImportRunRecordParse(ctx: MutationCtx, { docId, recordCounts
     if (!((doc.status === "started"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((recordCounts != null))) throw new Error("This import needs its item counts.");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -22238,15 +22223,15 @@ async function __runImportRunRecordParse(ctx: MutationCtx, { docId, recordCounts
     }
     const updates = {
       recordCounts: recordCounts,
-      actorId: ((actorId != null) ? actorId : doc.actorId),
+      actorId: user.id,
       parsedAt: Date.now(),
       status: "parsing",
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, recordCounts: recordCounts, actorId: ((actorId != null) ? actorId : __after.actorId), _subject: { entity: "ImportRun", command: "recordParse", id: docId } };
-    const __manifestEvent0 = { type: "ImportRunParsed", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, recordCounts: recordCounts, actorId: ((actorId != null) ? actorId : __after.actorId) }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, recordCounts: recordCounts, actorId: user.id, _subject: { entity: "ImportRun", command: "recordParse", id: docId } };
+    const __manifestEvent0 = { type: "ImportRunParsed", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, recordCounts: recordCounts, actorId: user.id }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "recordParse", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -22256,7 +22241,6 @@ export const ImportRun_recordParse = mutation({
   args: {
     docId: v.id("importRuns"),
     recordCounts: v.string(),
-    actorId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -22273,7 +22257,7 @@ export const ImportRun_recordParse = mutation({
   },
 });
 
-async function __runImportRunRevert(ctx: MutationCtx, { docId, actorId, version }: any, __creation = false) {
+async function __runImportRunRevert(ctx: MutationCtx, { docId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -22285,7 +22269,6 @@ async function __runImportRunRevert(ctx: MutationCtx, { docId, actorId, version 
     if (!((doc.status === "completed"))) throw new Error("Guard 0 failed");
     if (!((doc.completionTime != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -22302,7 +22285,7 @@ async function __runImportRunRevert(ctx: MutationCtx, { docId, actorId, version 
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
-      actorId: ((actorId != null) ? actorId : doc.actorId),
+      actorId: user.id,
       revertedAt: Date.now(),
       endTime: Date.now(),
       status: "reverted",
@@ -22310,8 +22293,8 @@ async function __runImportRunRevert(ctx: MutationCtx, { docId, actorId, version 
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, actorId: ((actorId != null) ? actorId : __after.actorId), _subject: { entity: "ImportRun", command: "revert", id: docId } };
-    const __manifestEvent0 = { type: "ImportRunReverted", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, actorId: ((actorId != null) ? actorId : __after.actorId) }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, actorId: user.id, _subject: { entity: "ImportRun", command: "revert", id: docId } };
+    const __manifestEvent0 = { type: "ImportRunReverted", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, actorId: user.id }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "revert", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -22320,7 +22303,6 @@ async function __runImportRunRevert(ctx: MutationCtx, { docId, actorId, version 
 export const ImportRun_revert = mutation({
   args: {
     docId: v.id("importRuns"),
-    actorId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -22337,7 +22319,7 @@ export const ImportRun_revert = mutation({
   },
 });
 
-async function __runImportRunStart(ctx: MutationCtx, { docId, sourceSystem, datasetType, actorId, checksum, version }: any, __creation = false) {
+async function __runImportRunStart(ctx: MutationCtx, { docId, sourceSystem, datasetType, checksum, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -22348,7 +22330,6 @@ async function __runImportRunStart(ctx: MutationCtx, { docId, sourceSystem, data
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imports");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "started"))) throw new Error("Guard 1 failed");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -22367,7 +22348,7 @@ async function __runImportRunStart(ctx: MutationCtx, { docId, sourceSystem, data
     const updates = {
       sourceSystem: sourceSystem,
       datasetType: datasetType,
-      actorId: ((actorId != null) ? actorId : ""),
+      actorId: user.id,
       checksum: checksum,
       startTime: Date.now(),
       status: "started",
@@ -22375,8 +22356,8 @@ async function __runImportRunStart(ctx: MutationCtx, { docId, sourceSystem, data
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, sourceSystem: sourceSystem, datasetType: datasetType, actorId: ((actorId != null) ? actorId : ""), _subject: { entity: "ImportRun", command: "start", id: docId } };
-    const __manifestEvent0 = { type: "ImportRunStarted", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, sourceSystem: sourceSystem, datasetType: datasetType, actorId: ((actorId != null) ? actorId : "") }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, sourceSystem: sourceSystem, datasetType: datasetType, actorId: user.id, _subject: { entity: "ImportRun", command: "start", id: docId } };
+    const __manifestEvent0 = { type: "ImportRunStarted", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, sourceSystem: sourceSystem, datasetType: datasetType, actorId: user.id }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "start", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -22387,7 +22368,6 @@ export const ImportRun_start = mutation({
     docId: v.id("importRuns"),
     sourceSystem: v.any(),
     datasetType: v.any(),
-    actorId: v.optional(v.string()),
     checksum: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
@@ -22405,7 +22385,7 @@ export const ImportRun_start = mutation({
   },
 });
 
-async function __runImportRunValidate(ctx: MutationCtx, { docId, actorId, version }: any, __creation = false) {
+async function __runImportRunValidate(ctx: MutationCtx, { docId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -22417,7 +22397,6 @@ async function __runImportRunValidate(ctx: MutationCtx, { docId, actorId, versio
     if (!((doc.status === "parsing"))) throw new Error("Guard 0 failed");
     if (!((doc.parsedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((actorId == null) || (((actorId).trim()).length > 0)))) throw new Error("If you name who's doing this, that name can't be blank.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -22434,15 +22413,15 @@ async function __runImportRunValidate(ctx: MutationCtx, { docId, actorId, versio
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
-      actorId: ((actorId != null) ? actorId : doc.actorId),
+      actorId: user.id,
       validatedAt: Date.now(),
       status: "validating",
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, actorId: ((actorId != null) ? actorId : __after.actorId), _subject: { entity: "ImportRun", command: "validate", id: docId } };
-    const __manifestEvent0 = { type: "ImportRunValidated", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, actorId: ((actorId != null) ? actorId : __after.actorId) }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, importRunId: docId, tenantId: __after.tenantId, actorId: user.id, _subject: { entity: "ImportRun", command: "validate", id: docId } };
+    const __manifestEvent0 = { type: "ImportRunValidated", entity: "ImportRun", entityId: docId, payload: { importRunId: docId, tenantId: __after.tenantId, actorId: user.id }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "validate", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -22451,7 +22430,6 @@ async function __runImportRunValidate(ctx: MutationCtx, { docId, actorId, versio
 export const ImportRun_validate = mutation({
   args: {
     docId: v.id("importRuns"),
-    actorId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },

@@ -6530,29 +6530,23 @@ export type ImportDatasetUpdateConfigParams = z.infer<typeof ImportDatasetUpdate
 // Command: approveReview on ImportRun
 export const ImportRunApproveReviewParamsSchema = z.object({
   finalRecordCounts: z.string(),
-  actorId: z.string().optional(),
 });
 
 export type ImportRunApproveReviewParams = z.infer<typeof ImportRunApproveReviewParamsSchema>;
 
 // Command: beginReview on ImportRun
-export const ImportRunBeginReviewParamsSchema = z.object({
-  actorId: z.string().optional(),
-});
+export const ImportRunBeginReviewParamsSchema = z.object({});
 
 export type ImportRunBeginReviewParams = z.infer<typeof ImportRunBeginReviewParamsSchema>;
 
 // Command: commit on ImportRun
-export const ImportRunCommitParamsSchema = z.object({
-  actorId: z.string().optional(),
-});
+export const ImportRunCommitParamsSchema = z.object({});
 
 export type ImportRunCommitParams = z.infer<typeof ImportRunCommitParamsSchema>;
 
 // Command: explainArchiveDiscrepancy on ImportRun
 export const ImportRunExplainArchiveDiscrepancyParamsSchema = z.object({
   note: z.string(),
-  actorId: z.string().optional(),
 });
 
 export type ImportRunExplainArchiveDiscrepancyParams = z.infer<typeof ImportRunExplainArchiveDiscrepancyParamsSchema>;
@@ -6560,7 +6554,6 @@ export type ImportRunExplainArchiveDiscrepancyParams = z.infer<typeof ImportRunE
 // Command: markFailed on ImportRun
 export const ImportRunMarkFailedParamsSchema = z.object({
   failureDetails: z.string(),
-  actorId: z.string().optional(),
 });
 
 export type ImportRunMarkFailedParams = z.infer<typeof ImportRunMarkFailedParamsSchema>;
@@ -6579,7 +6572,6 @@ export type ImportRunRecordArchiveInventoryParams = z.infer<typeof ImportRunReco
 // Command: recordCommitCheckpoint on ImportRun
 export const ImportRunRecordCommitCheckpointParamsSchema = z.object({
   commitCheckpoint: z.string(),
-  actorId: z.string().optional(),
 });
 
 export type ImportRunRecordCommitCheckpointParams = z.infer<typeof ImportRunRecordCommitCheckpointParamsSchema>;
@@ -6588,7 +6580,6 @@ export type ImportRunRecordCommitCheckpointParams = z.infer<typeof ImportRunReco
 export const ImportRunRecordDispositionSummaryParamsSchema = z.object({
   dispositionCounts: z.string(),
   unaccountedRecordCount: z.number().int(),
-  actorId: z.string().optional(),
 });
 
 export type ImportRunRecordDispositionSummaryParams = z.infer<typeof ImportRunRecordDispositionSummaryParamsSchema>;
@@ -6596,15 +6587,12 @@ export type ImportRunRecordDispositionSummaryParams = z.infer<typeof ImportRunRe
 // Command: recordParse on ImportRun
 export const ImportRunRecordParseParamsSchema = z.object({
   recordCounts: z.string(),
-  actorId: z.string().optional(),
 });
 
 export type ImportRunRecordParseParams = z.infer<typeof ImportRunRecordParseParamsSchema>;
 
 // Command: revert on ImportRun
-export const ImportRunRevertParamsSchema = z.object({
-  actorId: z.string().optional(),
-});
+export const ImportRunRevertParamsSchema = z.object({});
 
 export type ImportRunRevertParams = z.infer<typeof ImportRunRevertParamsSchema>;
 
@@ -6612,16 +6600,13 @@ export type ImportRunRevertParams = z.infer<typeof ImportRunRevertParamsSchema>;
 export const ImportRunStartParamsSchema = z.object({
   sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync"]),
   datasetType: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "pack_list"]),
-  actorId: z.string().optional(),
   checksum: z.string().optional(),
 });
 
 export type ImportRunStartParams = z.infer<typeof ImportRunStartParamsSchema>;
 
 // Command: validate on ImportRun
-export const ImportRunValidateParamsSchema = z.object({
-  actorId: z.string().optional(),
-});
+export const ImportRunValidateParamsSchema = z.object({});
 
 export type ImportRunValidateParams = z.infer<typeof ImportRunValidateParamsSchema>;
 

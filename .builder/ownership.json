@@ -18,7 +18,7 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "cfa329d365988e992a5e8aeadb5251b1fc7802592b60ed5a3f5f90c21f1bd2af"
+      "sha256": "6fae5ce8c92ff0186db0f350e8a9e331856b0beaa94082a3df64535be89127c6"
     },
     "convex/queries.ts": {
       "sha256": "b7f453c49212e1ab48dfc88033a0e742cd365d092e2d1c4877f4d4161fff575a"
@@ -30,7 +30,7 @@
       "sha256": "eb8b632bc0f4d9e93edb03a01a69abf2b72e91d439a1b52846fe463001d98dbf"
     },
     "manifest-context-summary.json": {
-      "sha256": "4e818242b6e8163f6e3a281648445d02844eca0026e4d79f033a0c742f31fcf3"
+      "sha256": "2496e4bb4e9a248b6f7fe7f761f104ca795b3432c682f035a216c2b634c81c46"
     },
     "package.json": {
       "sha256": "45588d8e74712acf430f18aba8275548aac7ced9b70fe6c134def6f1e7fec6cc"
@@ -39,16 +39,16 @@
       "sha256": "0a182867580c09e3a3a52fb6d1e8e8a831d67e6c9d2634d5bcaeeb3443ad59d8"
     },
     "schemas/manifest-schemas.ts": {
-      "sha256": "d434b8cdf8224c48e5920b58dd8d01aa8c22b9105387f551a063a378fe912611"
+      "sha256": "dd1b49494bf475a598a0ebc82fd4402beee3cadbea5b133007aae790633331ef"
     },
     "scripts/seed-convex.ts": {
       "sha256": "7b0a06a6400cb045c7adccc26bc0a37fab8d0b2d752b9ed6a7f93dd3d5b6761e"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "767cbd4aaf10de86084e0b464d6752faa2491a671f3b8ed73ad60913e7d01c9f"
+      "sha256": "9ee7463f001c2e91c3455c886d6db433cf65df93eeab8a749925d8ffbcb268cf"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "a596a08478dd0ab8e80586429539d4b906b0ccb281f1b32499496f95d20dfbef"
+      "sha256": "7addf071265808043fcf989e23a16cfc33893f6f4f49e32dbb8a96932524aa94"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "1120fa0bf097901985b960cf9e1979e15878d3905696a327cf1a14e8f1367c9d"
@@ -57,7 +57,7 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "c472d8d05de9f133cde84d13b5f0177b7b50e2be42cbf85633425404782c262e"
+      "sha256": "cf86ace8049cb379028a4635be76c8daab81b291db6c38c9eca486afc72e0e75"
     }
   },
   "package": {
