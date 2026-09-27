@@ -123,13 +123,14 @@ function reconciliationFlagText(flag: EventReconciliationFlag): FlagText | null 
         return flagText(
           "commercial",
           billReason + " Part of it is paid, so correct it with a credit.",
-          "Invoice.applyCredit",
+          // A credit reaches the bill only through a credit memo (AC-372).
+          "CreditMemo.issue",
         );
       if (status === "paid")
         return flagText(
           "commercial",
           billReason + " It is paid, so correct it with a credit memo.",
-          "Invoice.recordCreditMemo",
+          "CreditMemo.issue",
         );
       return null;
     case "proposal_review":

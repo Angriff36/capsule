@@ -28,6 +28,12 @@
  *
  * The link check runs AFTER the replay lookup: a retry must get its saved
  * answer back even if one of its linked records was deleted since.
+ *
+ * A Manifest `private command` (IR visibility "private") is a step only the
+ * server runs; its public wrapper refuses every caller except the tenant
+ * system identity (convex/lib/serverOnlyStep.ts) before anything else, so no
+ * person can send it totals of their own. Reactions call the run function
+ * in-process and are not affected.
  */
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -57,7 +63,9 @@ const SCOPE_IMPORT =
   "  commandIdempotencyScope as __commandIdempotencyScope,\n" +
   "  lookupCommandIdempotency as __lookupCommandIdempotency,\n" +
   "  saveCommandIdempotency as __saveCommandIdempotency,\n" +
-  '} from "./lib/commandIdempotency";\n';
+  '} from "./lib/commandIdempotency";\n' +
+  'import { assertServerOnlyStep as __assertServerOnlyStep } from "./lib/serverOnlyStep";\n';
+const SERVER_ONLY_LINE = "    await __assertServerOnlyStep(ctx);\n";
 const REFUSE_LINE =
   '      if (__hit.kind === "refuse") throw new Error(__hit.reason);\n';
 const MUTATION_START = /^export const (\w+) = mutation\(\{$/gm;
@@ -73,6 +81,7 @@ type IrCommand = {
   name: string;
   entity: string;
   parameters: { name: string; type: IrType }[];
+  visibility?: string;
 };
 
 function isLink(type: IrType): boolean {
@@ -140,11 +149,27 @@ function entityTables(root: string, entities: string[]): Map<string, string> {
  * Mutation name -> the inputs the Manifest declares as record links, each
  * with its expected table (null = bare uuid, outside ids allowed).
  */
+function readIr(root: string): {
+  commands: IrCommand[];
+  entities: IrEntity[];
+} {
+  return JSON.parse(readFileSync(join(root, IR), "utf8"));
+}
+
+/** Mutation names of every Manifest `private command` (both wrapper names). */
+function serverOnlySteps(root: string): Set<string> {
+  const out = new Set<string>();
+  for (const command of readIr(root).commands) {
+    if (command.visibility !== "private") continue;
+    const cap = command.name.charAt(0).toUpperCase() + command.name.slice(1);
+    out.add(`${command.entity}_${command.name}`);
+    out.add(`${command.entity}_createVia${cap}`);
+  }
+  return out;
+}
+
 function linkParams(root: string): Map<string, LinkParam[]> {
-  const ir = JSON.parse(readFileSync(join(root, IR), "utf8")) as {
-    commands: IrCommand[];
-    entities: IrEntity[];
-  };
+  const ir = readIr(root);
   const entities = new Map(ir.entities.map((e) => [e.name, e]));
   const needed = new Set<string>();
   for (const entity of ir.entities) {
@@ -182,7 +207,7 @@ export function applyOwnWorkspaceLinks(root: string = ROOT): string[] {
   }
   const updated = source.includes(IMPORT)
     ? source
-    : patchMutations(source, linkParams(root));
+    : patchMutations(source, linkParams(root), serverOnlySteps(root));
   if (updated !== source) writeFileSync(abs, updated, "utf8");
   refreshOwnershipDigest(root, abs);
   return updated === source ? [] : [TARGET];
@@ -191,6 +216,7 @@ export function applyOwnWorkspaceLinks(root: string = ROOT): string[] {
 function patchMutations(
   source: string,
   links: Map<string, LinkParam[]>,
+  serverOnly: Set<string>,
 ): string {
   const starts = [...source.matchAll(MUTATION_START)];
   let out = source.slice(0, starts[0]?.index ?? source.length);
@@ -244,6 +270,11 @@ function patchMutations(
       } else {
         block = block.replace(HANDLER, (line) => `${line}${assertLine}`);
       }
+    }
+    if (serverOnly.has(name)) {
+      // First line of the handler: no saved answer, link check or step runs
+      // for a person calling a server-only step.
+      block = block.replace(HANDLER, (line) => `${line}${SERVER_ONLY_LINE}`);
     }
     out += block;
   }

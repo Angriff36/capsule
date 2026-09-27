@@ -166,6 +166,7 @@ entity Invoice mixin TenantScoped, SoftDeletable {
       eventId: eventId != null ? eventId : self.eventId
       invoiceNumber: alreadyIssued ? self.invoiceNumber : resolvedInvoiceNumber
       autoNumbered: alreadyIssued ? false : (invoiceNumber == null)
+      newlyIssued: alreadyIssued ? false : true
       total: alreadyIssued ? self.total : total
       amountDue: alreadyIssued ? self.amountDue : total
       currencyCode: normalizedCurrencyCode
@@ -227,7 +228,9 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command applyPayment(paymentAmount: money(12, 2), optional paymentId: string) {
+  // Server-only (private): run by the PaymentSettled reaction; no person may
+  // lower a balance without a settled payment behind it (AC-372).
+  private command applyPayment(paymentAmount: money(12, 2), optional paymentId: string) {
     guard self.status == "sent" or self.status == "viewed" or self.status == "overdue" or self.status == "partial"
     guard self.deletedAt == null
     constraint applyPositive: paymentAmount > 0 "This payment's amount has to be more than zero. Enter how much was paid."
@@ -336,7 +339,8 @@ entity Invoice mixin TenantScoped, SoftDeletable {
 
   // Records total credit memos issued against this paid source invoice without
   // rewriting its payment history or reopening its settled balance.
-  command recordCreditMemo(creditAmount: money(12, 2), creditMemoId: string) {
+  // Server-only (private): run by the CreditMemoIssued reaction (AC-372).
+  private command recordCreditMemo(creditAmount: money(12, 2), creditMemoId: string) {
     guard self.status == "paid"
     guard self.deletedAt == null
     constraint creditMemoPositive: creditAmount > 0 "This credit memo's amount has to be more than zero. Enter how much to credit."
@@ -358,7 +362,8 @@ entity Invoice mixin TenantScoped, SoftDeletable {
 
   // Applies a credit memo to an open target invoice. Payment totals remain
   // untouched so finance can distinguish cash received from account credit.
-  command applyCredit(creditAmount: money(12, 2), creditMemoId: string) {
+  // Server-only (private): run by the CreditMemoIssued fan-out (AC-372).
+  private command applyCredit(creditAmount: money(12, 2), creditMemoId: string) {
     guard self.status == "sent" or self.status == "viewed" or self.status == "overdue" or self.status == "partial"
     guard self.deletedAt == null
     constraint creditPositive: creditAmount > 0 "The credit applied has to be more than zero"
@@ -420,13 +425,17 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   // (convex/lib/invoicePricingReconciliation.ts) only calls this for a draft
   // still in its auto-made shape; a draft finance changed (tax, discount,
   // deposit, payment, credit) is left as it is and flagged on the receipt.
-  command followEventPrice(total: money(12, 2)) {
+  // The new amount is the event's own quoted price, never a caller's number
+  // (AC-372); finance may also run it from the readiness list.
+  command followEventPrice() {
     guard self.status == "draft"
     guard self.deletedAt == null
     guard self.sentAt == null
     guard self.amountPaid == 0
     guard self.taxAmount == 0 and self.discountAmount == 0
     guard self.amountCredited == null or self.amountCredited == 0
+    constraint followEventPriceEvent: self.event != null and self.event.quotedPrice != null "This bill has no event price to follow."
+    compute total = self.event.quotedPrice
     constraint followEventPriceNonnegative: total >= 0 "This invoice's money amounts can't be negative. Use zero or more."
     compute previousTotal = self.total
     mutate subtotal = total
@@ -518,6 +527,9 @@ event InvoiceIssued: "invoice.issued" {
   invoiceNumber: string
   // True when the number came from invoiceSequence rather than the caller.
   autoNumbered: boolean
+  // True only on the first issue; the invoice line check runs then
+  // (convex/lib/invoiceIssueTotals.ts), never on an idempotent re-issue.
+  newlyIssued: boolean?
   total: money(12, 2)
   amountDue: money(12, 2)
   currencyCode: string?

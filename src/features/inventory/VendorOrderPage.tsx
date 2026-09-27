@@ -302,15 +302,9 @@ export function VendorOrderPage() {
     void (async () => {
       const values = await prompt.askFields({
         title: "Revise order totals",
-        description: "Update subtotal, tax, and shipping for this order.",
+        description:
+          "Update tax and shipping for this order. The subtotal is the sum of the order lines.",
         fields: [
-          {
-            name: "subtotal",
-            label: "Subtotal",
-            defaultValue: String(order.subtotal),
-            inputType: "number",
-            required: true,
-          },
           {
             name: "taxAmount",
             label: "Tax",
@@ -329,11 +323,10 @@ export function VendorOrderPage() {
         confirmLabel: "Save totals",
       });
       if (!values) return;
-      const subtotal = Number(values.subtotal);
       const taxAmount = Number(values.taxAmount);
       const shippingAmount = Number(values.shippingAmount);
       if (
-        ![subtotal, taxAmount, shippingAmount].every(
+        ![taxAmount, shippingAmount].every(
           (value) => Number.isFinite(value) && value >= 0,
         )
       )
@@ -342,7 +335,6 @@ export function VendorOrderPage() {
         await updateTotals({
           docId: order._id,
           version: order.version,
-          subtotal,
           taxAmount,
           shippingAmount,
         });

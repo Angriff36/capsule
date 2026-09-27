@@ -144,7 +144,8 @@ entity EventCloseout mixin TenantScoped, SoftDeletable {
   // after closeOut. A draft still in the zero-actual shape the EventClosedOut
   // reaction seeded follows the corrected budget; a draft finance already
   // captured, and a finalized closeout, are never rewritten here.
-  command followEventCommercial(budgetedRevenue: money(12, 2), budgetedCost: money(12, 2)) {
+  // Server-only (private): the seam runs it as the tenant system (AC-372).
+  private command followEventCommercial(budgetedRevenue: money(12, 2), budgetedCost: money(12, 2)) {
     guard self.status == "draft"
     guard self.deletedAt == null
     guard self.actualRevenue == 0 and self.totalActualCost == 0 and self.actualHeadcount == 0

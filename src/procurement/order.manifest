@@ -165,18 +165,20 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Tax and shipping are what the buyer types from the vendor's bill. The
+  // subtotal is never typed: it stays the sum of the order lines that the
+  // line reactions keep (syncLineTotals), so a typed subtotal cannot slip an
+  // order under the spend-approval limit (AC-372).
   command updateTotals(
-    subtotal: money(12, 2),
     taxAmount: money(12, 2),
     shippingAmount: money(12, 2)
   ) {
     guard self.openedAt != null
     guard self.status == "draft" or self.status == "submitted"
     guard self.deletedAt == null
-    constraint totalsNonnegative: subtotal >= 0 and taxAmount >= 0 and shippingAmount >= 0 "Order money amounts can't be negative. Use zero or more."
+    constraint totalsNonnegative: taxAmount >= 0 and shippingAmount >= 0 "Order money amounts can't be negative. Use zero or more."
     compute previousTotal = self.totalAmount
-    compute nextTotal = subtotal + taxAmount + shippingAmount
-    mutate subtotal = subtotal
+    compute nextTotal = self.subtotal + taxAmount + shippingAmount
     mutate taxAmount = taxAmount
     mutate shippingAmount = shippingAmount
     mutate totalAmount = nextTotal
@@ -186,7 +188,7 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
       vendorId: self.vendorId
       eventId: self.eventId
       previousTotalAmount: previousTotal
-      subtotal: subtotal
+      subtotal: self.subtotal
       taxAmount: taxAmount
       shippingAmount: shippingAmount
       totalAmount: nextTotal
@@ -203,8 +205,9 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   // (Re-deriving the sum from self.lines inside this command — no param at
   // all — is blocked at Manifest 3.6.45: the Convex projection only preloads
   // hasMany for count_of, and sum(self.lines, …) in a command body
-  // fail-closes with a denying throw.)
-  command syncLineTotals(lineSubtotal: money(12, 2)) {
+  // fail-closes with a denying throw.) Server-only (private): only the line
+  // reactions below run it, so no person can send a lineSubtotal (AC-372).
+  private command syncLineTotals(lineSubtotal: money(12, 2)) {
     guard self.deletedAt == null
     guard self.status == "draft" or self.status == "submitted"
     constraint syncLineSubtotalNonnegative: lineSubtotal >= 0 "Order money amounts can't be negative. Use zero or more."

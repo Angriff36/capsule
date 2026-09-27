@@ -1751,8 +1751,8 @@ const COMMAND_DISPATCH = {
   },
   "Invoice.followEventPrice": {
     ref: api.mutations.Invoice_followEventPrice,
-    params: ["docId","total","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"total","type":"money","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "Invoice.issue": {
     ref: api.mutations.Invoice_createViaIssue,
@@ -3521,8 +3521,8 @@ const COMMAND_DISPATCH = {
   },
   "VendorOrder.updateTotals": {
     ref: api.mutations.VendorOrder_updateTotals,
-    params: ["docId","subtotal","taxAmount","shippingAmount","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"subtotal","type":"money","required":true},{"name":"taxAmount","type":"money","required":true},{"name":"shippingAmount","type":"money","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","taxAmount","shippingAmount","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"taxAmount","type":"money","required":true},{"name":"shippingAmount","type":"money","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "VendorOrderLine.addLine": {
     ref: api.mutations.VendorOrderLine_createViaAddLine,

@@ -183,10 +183,10 @@ describe("runtime proof: AC-388 readiness shows records a change did not reach",
     const [kept] = await listedInvoiceFacts(finance, eventId);
     expect(kept!.status).toBe("draft");
     expect(kept!.total).toBe(QUOTED_PRICE);
+    // The bill takes the event's own price; no amount is sent (AC-372).
     await runner(proof, finance)(api.mutations.Invoice_followEventPrice, {
       docId: kept!._id,
       version: kept!.version,
-      total: NEW_PRICE,
     });
     const [saved] = await listedInvoiceFacts(finance, eventId);
     expect(saved!.total).toBe(NEW_PRICE);

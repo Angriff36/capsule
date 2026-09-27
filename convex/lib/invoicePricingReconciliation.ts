@@ -16,8 +16,7 @@
 import { api } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
-import { eventReconciliationReceipt } from "./reconciliationReceipt";
-import type { ReconciliationReceiptOutput, TimingWindow } from "./reconciliationReceipt";
+import { eventReconciliationReceipt } from "./reconciliationReceipt";import type { ReconciliationReceiptOutput, TimingWindow } from "./reconciliationReceipt";
 
 /** Which ledger command triggered this reconcile — recorded on the receipt. */
 export type PricingReconcileTrigger = {
@@ -94,10 +93,10 @@ export class EventInvoicePricingReconciliation {
     const unresolved: ReconciliationReceiptOutput["unresolved"] = [];
     for (const invoice of differing) {
       if (followsEventPrice(invoice)) {
+        // The command reads the event's price itself (AC-372).
         await ctx.runMutation(api.mutations.Invoice_followEventPrice, {
           docId: invoice._id,
           version: invoice.version,
-          total: quotedPrice,
         });
         updatedCount += 1;
         continue;

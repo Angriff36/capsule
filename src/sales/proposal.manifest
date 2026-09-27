@@ -177,11 +177,15 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   // unsent draft still sized for the event's old guest count follows the new
   // count. convex/lib/proposalReconciliation.ts prices it with the central
   // calc (src/lib/pricing.ts); tax and discount stay as the person set them.
+  // The count must be the event's count, and the money is checked on the
+  // server against the proposal's priced lines (convex/lib/
+  // proposalFollowTotals.ts) - a caller cannot set a price of its own (AC-372).
   command followEventHeadcount(guestCount: number, subtotal: money(12, 2), total: money(12, 2)) {
     guard self.status == "draft"
     guard self.draftedAt != null
     guard self.deletedAt == null
     guard self.eventId != null
+    constraint followEventCount: self.event != null and guestCount == self.event.expectedHeadcount "Use the event's guest count."
     constraint followGuestCount: guestCount >= 0 "The guest count can't be negative. Use zero or more."
     constraint followMoneyNonnegative: subtotal >= 0 and total >= 0 "This proposal's money amounts can't be negative. Use zero or more."
     constraint followTotalMatch: total == subtotal + self.taxAmount - self.discountAmount "Proposal total must equal subtotal plus tax minus discount"

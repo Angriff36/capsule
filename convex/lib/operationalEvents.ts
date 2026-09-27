@@ -37,6 +37,8 @@ import {
 import { moveEventPurchasingWeek } from "./purchasingReschedule";
 import { lineOverridePurchasingFollowThrough } from "./lineOverridePurchasing";
 import { ensureUniqueInvoiceNumber } from "./invoiceNumbering";
+import { assertInvoiceIssueTotals } from "./invoiceIssueTotals";
+import { assertProposalFollowTotals } from "./proposalFollowTotals";
 import { ensureEventNumber } from "./eventNumbering";
 import { recordAcceptedProposalRevision } from "./proposalAcceptanceRevision";
 import { deleteBlobIfOrphan } from "./blobs";
@@ -295,6 +297,13 @@ export async function handleManifestEvent(
     await ensureEventNumber(ctx, event.entityId as Id<"events">);
     return;
   }
+  if (event.entity === "Proposal" && event.type === "ProposalEventHeadcountFollowed") {
+    // A person may run this from the readiness list; its money is checked
+    // against the priced lines (AC-372).
+    await assertProposalFollowTotals(ctx, event.entityId as Id<"proposals">,
+      event.payload.previousTotal);
+    return;
+  }
   if (event.entity === "Proposal" && event.type === "ProposalAccepted") {
     // The acceptance transaction records WHICH revision was accepted
     // (AC-413/AC-434); a validation failure here rolls the acceptance — and
@@ -304,6 +313,9 @@ export async function handleManifestEvent(
   }
   if (event.entity === "Invoice" &&
     (event.type === "InvoiceIssued" || event.type === "InvoiceNumberAssigned")) {
+    // Line money is worked out on the server, first issue only (AC-372).
+    if (event.type === "InvoiceIssued" && event.payload.newlyIssued === true)
+      await assertInvoiceIssueTotals(ctx, event.entityId as Id<"invoices">);
     // A manually assigned number is validated exactly like an explicit one at issue.
     await ensureUniqueInvoiceNumber(
       ctx,

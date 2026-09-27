@@ -7092,9 +7092,7 @@ export const InvoiceAssignNumberParamsSchema = z.object({
 export type InvoiceAssignNumberParams = z.infer<typeof InvoiceAssignNumberParamsSchema>;
 
 // Command: followEventPrice on Invoice
-export const InvoiceFollowEventPriceParamsSchema = z.object({
-  total: z.number(),
-});
+export const InvoiceFollowEventPriceParamsSchema = z.object({});
 
 export type InvoiceFollowEventPriceParams = z.infer<typeof InvoiceFollowEventPriceParamsSchema>;
 
@@ -10017,7 +10015,6 @@ export type VendorOrderSyncLineTotalsParams = z.infer<typeof VendorOrderSyncLine
 
 // Command: updateTotals on VendorOrder
 export const VendorOrderUpdateTotalsParamsSchema = z.object({
-  subtotal: z.number(),
   taxAmount: z.number(),
   shippingAmount: z.number(),
 });

@@ -12,6 +12,7 @@ import {
   lookupCommandIdempotency as __lookupCommandIdempotency,
   saveCommandIdempotency as __saveCommandIdempotency,
 } from "./lib/commandIdempotency";
+import { assertServerOnlyStep as __assertServerOnlyStep } from "./lib/serverOnlyStep";
 import { encrypt, decrypt } from "./lib/encryption";
 
 async function __encryptDoc(ctx: any, entity: string, fields: readonly string[], doc: Record<string, any>): Promise<Record<string, any>> {
@@ -16133,6 +16134,7 @@ export const EventCloseout_followEventCommercial = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertServerOnlyStep(ctx);
     const __idem = args.idempotencyKey === undefined ? null : await __commandIdempotencyScope(ctx, "EventCloseout_followEventCommercial", args.idempotencyKey as string);
     if (__idem !== null) {
       const __hit = await __lookupCommandIdempotency(ctx, __idem, args.idempotencyKey as string);
@@ -24770,6 +24772,7 @@ export const IngredientDemand_alignPurchasingWeek = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertServerOnlyStep(ctx);
     const __idem = args.idempotencyKey === undefined ? null : await __commandIdempotencyScope(ctx, "IngredientDemand_alignPurchasingWeek", args.idempotencyKey as string);
     if (__idem !== null) {
       const __hit = await __lookupCommandIdempotency(ctx, __idem, args.idempotencyKey as string);
@@ -25441,6 +25444,7 @@ export const IngredientDemand_syncFromContributions = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertServerOnlyStep(ctx);
     const __idem = args.idempotencyKey === undefined ? null : await __commandIdempotencyScope(ctx, "IngredientDemand_syncFromContributions", args.idempotencyKey as string);
     if (__idem !== null) {
       const __hit = await __lookupCommandIdempotency(ctx, __idem, args.idempotencyKey as string);
@@ -27665,6 +27669,7 @@ export const Invoice_applyCredit = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertServerOnlyStep(ctx);
     const __idem = args.idempotencyKey === undefined ? null : await __commandIdempotencyScope(ctx, "Invoice_applyCredit", args.idempotencyKey as string);
     if (__idem !== null) {
       const __hit = await __lookupCommandIdempotency(ctx, __idem, args.idempotencyKey as string);
@@ -27735,6 +27740,7 @@ export const Invoice_applyPayment = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertServerOnlyStep(ctx);
     const __idem = args.idempotencyKey === undefined ? null : await __commandIdempotencyScope(ctx, "Invoice_applyPayment", args.idempotencyKey as string);
     if (__idem !== null) {
       const __hit = await __lookupCommandIdempotency(ctx, __idem, args.idempotencyKey as string);
@@ -27802,12 +27808,14 @@ export const Invoice_assignNumber = mutation({
   },
 });
 
-async function __runInvoiceFollowEventPrice(ctx: MutationCtx, { docId, total, version }: any, __creation = false) {
+async function __runInvoiceFollowEventPrice(ctx: MutationCtx, { docId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    ((doc as any) as any).event = __rel_event;
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
@@ -27817,7 +27825,9 @@ async function __runInvoiceFollowEventPrice(ctx: MutationCtx, { docId, total, ve
     if (!((doc.amountPaid === 0))) throw new Error("Guard 3 failed");
     if (!(((doc.taxAmount === 0) && (doc.discountAmount === 0)))) throw new Error("Guard 4 failed");
     if (!(((doc.amountCredited == null) || (doc.amountCredited === 0)))) throw new Error("Guard 5 failed");
-    if (!((total >= 0))) throw new Error("This invoice's money amounts can't be negative. Use zero or more.");
+    if (!(((__rel_event != null) && (__rel_event.quotedPrice != null)))) throw new Error("This bill has no event price to follow.");
+    if (!((doc.total >= 0))) throw new Error("This invoice's money amounts can't be negative. Use zero or more.");
+    const total = __rel_event.quotedPrice;
     const previousTotal = doc.total;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -27840,7 +27850,6 @@ async function __runInvoiceFollowEventPrice(ctx: MutationCtx, { docId, total, ve
 export const Invoice_followEventPrice = mutation({
   args: {
     docId: v.id("invoices"),
-    total: v.number(),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -27913,8 +27922,8 @@ async function __runInvoiceIssue(ctx: MutationCtx, { docId, clientId, invoiceNum
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, invoiceId: docId, tenantId: __after.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : __after.eventId), invoiceNumber: (alreadyIssued ? __after.invoiceNumber : resolvedInvoiceNumber), autoNumbered: (alreadyIssued ? false : (invoiceNumber == null)), total: (alreadyIssued ? __after.total : total), amountDue: (alreadyIssued ? __after.amountDue : total), currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate, _subject: { entity: "Invoice", command: "issue", id: docId } };
-    const __manifestEvent0 = { type: "InvoiceIssued", entity: "Invoice", entityId: docId, payload: { invoiceId: docId, tenantId: __after.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : __after.eventId), invoiceNumber: (alreadyIssued ? __after.invoiceNumber : resolvedInvoiceNumber), autoNumbered: (alreadyIssued ? false : (invoiceNumber == null)), total: (alreadyIssued ? __after.total : total), amountDue: (alreadyIssued ? __after.amountDue : total), currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, invoiceId: docId, tenantId: __after.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : __after.eventId), invoiceNumber: (alreadyIssued ? __after.invoiceNumber : resolvedInvoiceNumber), autoNumbered: (alreadyIssued ? false : (invoiceNumber == null)), newlyIssued: (alreadyIssued ? false : true), total: (alreadyIssued ? __after.total : total), amountDue: (alreadyIssued ? __after.amountDue : total), currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate, _subject: { entity: "Invoice", command: "issue", id: docId } };
+    const __manifestEvent0 = { type: "InvoiceIssued", entity: "Invoice", entityId: docId, payload: { invoiceId: docId, tenantId: __after.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : __after.eventId), invoiceNumber: (alreadyIssued ? __after.invoiceNumber : resolvedInvoiceNumber), autoNumbered: (alreadyIssued ? false : (invoiceNumber == null)), newlyIssued: (alreadyIssued ? false : true), total: (alreadyIssued ? __after.total : total), amountDue: (alreadyIssued ? __after.amountDue : total), currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "issue", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -28050,8 +28059,8 @@ export const Invoice_createViaIssue = mutation({
     doc.exchangeRate = (alreadyIssued ? doc.exchangeRate : resolvedExchangeRate);
     doc.issuedAt = (alreadyIssued ? doc.issuedAt : Date.now());
     const docId = await ctx.db.insert("invoices", doc as any);
-    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, invoiceId: docId, tenantId: doc.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : doc.eventId), invoiceNumber: (alreadyIssued ? doc.invoiceNumber : resolvedInvoiceNumber), autoNumbered: (alreadyIssued ? false : (invoiceNumber == null)), total: (alreadyIssued ? doc.total : total), amountDue: (alreadyIssued ? doc.amountDue : total), currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate, _subject: { entity: "Invoice", command: "issue", id: docId } };
-    const __manifestEvent0 = { type: "InvoiceIssued", entity: "Invoice", entityId: docId, payload: { invoiceId: docId, tenantId: doc.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : doc.eventId), invoiceNumber: (alreadyIssued ? doc.invoiceNumber : resolvedInvoiceNumber), autoNumbered: (alreadyIssued ? false : (invoiceNumber == null)), total: (alreadyIssued ? doc.total : total), amountDue: (alreadyIssued ? doc.amountDue : total), currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate }, createdAt: Date.now() };
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, invoiceId: docId, tenantId: doc.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : doc.eventId), invoiceNumber: (alreadyIssued ? doc.invoiceNumber : resolvedInvoiceNumber), autoNumbered: (alreadyIssued ? false : (invoiceNumber == null)), newlyIssued: (alreadyIssued ? false : true), total: (alreadyIssued ? doc.total : total), amountDue: (alreadyIssued ? doc.amountDue : total), currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate, _subject: { entity: "Invoice", command: "issue", id: docId } };
+    const __manifestEvent0 = { type: "InvoiceIssued", entity: "Invoice", entityId: docId, payload: { invoiceId: docId, tenantId: doc.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : doc.eventId), invoiceNumber: (alreadyIssued ? doc.invoiceNumber : resolvedInvoiceNumber), autoNumbered: (alreadyIssued ? false : (invoiceNumber == null)), newlyIssued: (alreadyIssued ? false : true), total: (alreadyIssued ? doc.total : total), amountDue: (alreadyIssued ? doc.amountDue : total), currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "issue", emitIndex: 0 });
     const __result = { docId };
@@ -28426,6 +28435,7 @@ export const Invoice_recordCreditMemo = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertServerOnlyStep(ctx);
     const __idem = args.idempotencyKey === undefined ? null : await __commandIdempotencyScope(ctx, "Invoice_recordCreditMemo", args.idempotencyKey as string);
     if (__idem !== null) {
       const __hit = await __lookupCommandIdempotency(ctx, __idem, args.idempotencyKey as string);
@@ -40143,6 +40153,8 @@ async function __runProposalFollowEventHeadcount(ctx: MutationCtx, { docId, gues
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Proposal not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Proposal not found");
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    ((doc as any) as any).event = __rel_event;
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposals");
@@ -40150,6 +40162,7 @@ async function __runProposalFollowEventHeadcount(ctx: MutationCtx, { docId, gues
     if (!((doc.draftedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((doc.eventId != null))) throw new Error("Guard 3 failed");
+    if (!(((__rel_event != null) && (guestCount === __rel_event.expectedHeadcount)))) throw new Error("Use the event's guest count.");
     if (!((guestCount >= 0))) throw new Error("The guest count can't be negative. Use zero or more.");
     if (!(((subtotal >= 0) && (total >= 0)))) throw new Error("This proposal's money amounts can't be negative. Use zero or more.");
     if (!((total === ((subtotal + doc.taxAmount) - doc.discountAmount)))) throw new Error("Proposal total must equal subtotal plus tax minus discount");
@@ -55490,6 +55503,7 @@ export const VendorOrder_syncLineTotals = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertServerOnlyStep(ctx);
     const __idem = args.idempotencyKey === undefined ? null : await __commandIdempotencyScope(ctx, "VendorOrder_syncLineTotals", args.idempotencyKey as string);
     if (__idem !== null) {
       const __hit = await __lookupCommandIdempotency(ctx, __idem, args.idempotencyKey as string);
@@ -55505,7 +55519,7 @@ export const VendorOrder_syncLineTotals = mutation({
   },
 });
 
-async function __runVendorOrderUpdateTotals(ctx: MutationCtx, { docId, subtotal, taxAmount, shippingAmount, version }: any, __creation = false) {
+async function __runVendorOrderUpdateTotals(ctx: MutationCtx, { docId, taxAmount, shippingAmount, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -55517,14 +55531,13 @@ async function __runVendorOrderUpdateTotals(ctx: MutationCtx, { docId, subtotal,
     if (!((doc.openedAt != null))) throw new Error("Guard 0 failed");
     if (!(((doc.status === "draft") || (doc.status === "submitted")))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((subtotal >= 0) && (taxAmount >= 0)) && (shippingAmount >= 0)))) throw new Error("Order money amounts can't be negative. Use zero or more.");
+    if (!(((taxAmount >= 0) && (shippingAmount >= 0)))) throw new Error("Order money amounts can't be negative. Use zero or more.");
     const previousTotal = doc.totalAmount;
-    const nextTotal = ((subtotal + taxAmount) + shippingAmount);
+    const nextTotal = ((doc.subtotal + taxAmount) + shippingAmount);
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
-      subtotal: subtotal,
       taxAmount: taxAmount,
       shippingAmount: shippingAmount,
       totalAmount: nextTotal,
@@ -55532,8 +55545,8 @@ async function __runVendorOrderUpdateTotals(ctx: MutationCtx, { docId, subtotal,
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorOrderId: docId, tenantId: __after.tenantId, vendorId: __after.vendorId, eventId: __after.eventId, previousTotalAmount: previousTotal, subtotal: subtotal, taxAmount: taxAmount, shippingAmount: shippingAmount, totalAmount: nextTotal, _subject: { entity: "VendorOrder", command: "updateTotals", id: docId } };
-    const __manifestEvent0 = { type: "VendorOrderTotalsUpdated", entity: "VendorOrder", entityId: docId, payload: { vendorOrderId: docId, tenantId: __after.tenantId, vendorId: __after.vendorId, eventId: __after.eventId, previousTotalAmount: previousTotal, subtotal: subtotal, taxAmount: taxAmount, shippingAmount: shippingAmount, totalAmount: nextTotal }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorOrderId: docId, tenantId: __after.tenantId, vendorId: __after.vendorId, eventId: __after.eventId, previousTotalAmount: previousTotal, subtotal: __after.subtotal, taxAmount: taxAmount, shippingAmount: shippingAmount, totalAmount: nextTotal, _subject: { entity: "VendorOrder", command: "updateTotals", id: docId } };
+    const __manifestEvent0 = { type: "VendorOrderTotalsUpdated", entity: "VendorOrder", entityId: docId, payload: { vendorOrderId: docId, tenantId: __after.tenantId, vendorId: __after.vendorId, eventId: __after.eventId, previousTotalAmount: previousTotal, subtotal: __after.subtotal, taxAmount: taxAmount, shippingAmount: shippingAmount, totalAmount: nextTotal }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "updateTotals", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -55542,7 +55555,6 @@ async function __runVendorOrderUpdateTotals(ctx: MutationCtx, { docId, subtotal,
 export const VendorOrder_updateTotals = mutation({
   args: {
     docId: v.id("vendorOrders"),
-    subtotal: v.number(),
     taxAmount: v.number(),
     shippingAmount: v.number(),
     version: v.optional(v.number()),
