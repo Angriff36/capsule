@@ -40242,14 +40242,14 @@ async function __runPurchaseNeedCreate(ctx: MutationCtx, args: any) {
       purchasingWeekStart: ((args.openedAt != null) ? args.purchasingWeekStart : args.purchasingWeekStart),
       preferredVendorId: ((args.openedAt != null) ? args.preferredVendorId : args.preferredVendorId),
       openedAt: ((args.openedAt != null) ? args.openedAt : Date.now()),
-      status: "open",
-      orderedQuantity: null,
-      vendorOrderId: null,
-      vendorOrderLineId: null,
-      orderedAt: null,
-      fulfilledAt: null,
-      cancelledAt: null,
-      cancellationReason: null,
+      status: ((args.openedAt != null) ? args.status : "open"),
+      orderedQuantity: ((args.openedAt != null) ? args.orderedQuantity : null),
+      vendorOrderId: ((args.openedAt != null) ? args.vendorOrderId : null),
+      vendorOrderLineId: ((args.openedAt != null) ? args.vendorOrderLineId : null),
+      orderedAt: ((args.openedAt != null) ? args.orderedAt : null),
+      fulfilledAt: ((args.openedAt != null) ? args.fulfilledAt : null),
+      cancelledAt: ((args.openedAt != null) ? args.cancelledAt : null),
+      cancellationReason: ((args.openedAt != null) ? args.cancellationReason : null),
       version: 1
     };
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may see purchase needs");

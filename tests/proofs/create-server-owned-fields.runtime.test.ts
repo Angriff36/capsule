@@ -15,6 +15,12 @@ import { api } from "../../convex/_generated/api";
 import * as mutations from "../../convex/mutations";
 import schema from "../../convex/schema";
 import { modules } from "./convex-test-modules";
+import {
+  createPlannedEvent,
+  harness,
+  openPurchaseNeed,
+  rolesFor,
+} from "./reconciliation-failure-isolation.runtime.helpers";
 
 beforeAll(() => {
   if (!process.env.CONVEX_FIELD_ENCRYPTION_KEY) {
@@ -163,5 +169,88 @@ describe("create steps keep approval, totals and results server-owned (AC-372)",
         base as never,
       ),
     ).rejects.toThrow(/staff profile/);
+  });
+
+  it("a repeated purchase-need create leaves an ordered, received or cancelled need exactly as it was", async () => {
+    const tenantId = "tenant-replay";
+    const proof = harness();
+    const { eventId } = await createPlannedEvent(
+      proof,
+      tenantId,
+      "Replay dinner",
+    );
+    const { inventory } = rolesFor(proof, tenantId);
+    const manager = proof.asRole({
+      subject: `inventory-manager-${tenantId}`,
+      role: "inventory_manager",
+      tenantId,
+    });
+    const idOf = (row: unknown) => {
+      const r = row as { _id?: string; docId?: string };
+      return (r.docId ?? r._id)!;
+    };
+    const { ingredientId } = await openPurchaseNeed(proof, tenantId, eventId);
+    const demand = idOf(
+      await proof.executeCommand(
+        inventory,
+        api.mutations.IngredientDemand_createViaCalculate,
+        {
+          eventId,
+          ingredientId,
+          requiredQuantity: 2,
+          unit: "kilogram",
+          servings: 40,
+        },
+      ),
+    );
+    const createArgs = {
+      eventId,
+      ingredientDemandId: demand,
+      ingredientId,
+      requiredQuantity: 2,
+      unit: "kilogram",
+    };
+    const create = async () =>
+      idOf(
+        await proof.executeCommand(
+          inventory,
+          api.mutations.PurchaseNeed_create,
+          createArgs,
+        ),
+      );
+    const receivedId = await create();
+    const orderedOnly = { docId: await create() };
+    const cancelledNeed = { docId: await create() };
+
+    // Ordered and received history (how it got there does not matter here).
+    await inventory.run(async (ctx) => {
+      const ordered = { status: "ordered", orderedAt: 1, orderedQuantity: 2 };
+      await ctx.db.patch(orderedOnly.docId as never, ordered as never);
+      await ctx.db.patch(
+        receivedId as never,
+        { ...ordered, status: "fulfilled", fulfilledAt: 2 } as never,
+      );
+    });
+    await proof.executeCommand(manager, api.mutations.PurchaseNeed_cancel, {
+      docId: cancelledNeed.docId,
+      reason: "Menu changed",
+    });
+
+    const ids = [receivedId, orderedOnly.docId, cancelledNeed.docId];
+    const read = () =>
+      inventory.run(async (ctx) =>
+        Promise.all(ids.map((id) => ctx.db.get(id as never))),
+      );
+    const before = await read();
+    expect(before.map((row) => (row as { status: string }).status)).toEqual([
+      "fulfilled",
+      "ordered",
+      "cancelled",
+    ]);
+
+    // Replay the create for the same demand (as a repeated approval would).
+    const replayId = await create();
+    expect(ids).not.toContain(replayId);
+    expect(await read()).toEqual(before);
   });
 });

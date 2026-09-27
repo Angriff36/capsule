@@ -75,7 +75,8 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     optional purchasingWeekStart: datetime,
     optional preferredVendorId: uuid
   ) {
-    // Idempotent create: EventApproved may re-run; unique demand key still binds.
+    // EventApproved may re-run. The generated create always inserts a new need
+    // and never rewrites an existing one (proof: create-server-owned-fields).
     guard self.openedAt == null or (self.eventId == eventId and self.ingredientDemandId == ingredientDemandId)
     guard self.deletedAt == null
     constraint createNeedQuantityPositive: requiredQuantity > 0 "The amount needed has to be more than zero."
@@ -85,14 +86,15 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     mutate preferredVendorId = self.openedAt != null ? self.preferredVendorId : preferredVendorId
     mutate openedAt = self.openedAt != null ? self.openedAt : now()
     // A new need is open; ordering, receiving and cancelling are their own steps.
-    mutate status = "open"
-    mutate orderedQuantity = null
-    mutate vendorOrderId = null
-    mutate vendorOrderLineId = null
-    mutate orderedAt = null
-    mutate fulfilledAt = null
-    mutate cancelledAt = null
-    mutate cancellationReason = null
+    // A repeated create keeps an existing need and its history exactly as it is.
+    mutate status = self.openedAt != null ? self.status : "open"
+    mutate orderedQuantity = self.openedAt != null ? self.orderedQuantity : null
+    mutate vendorOrderId = self.openedAt != null ? self.vendorOrderId : null
+    mutate vendorOrderLineId = self.openedAt != null ? self.vendorOrderLineId : null
+    mutate orderedAt = self.openedAt != null ? self.orderedAt : null
+    mutate fulfilledAt = self.openedAt != null ? self.fulfilledAt : null
+    mutate cancelledAt = self.openedAt != null ? self.cancelledAt : null
+    mutate cancellationReason = self.openedAt != null ? self.cancellationReason : null
     emit PurchaseNeedOpened {
       purchaseNeedId: self.id
       tenantId: self.tenantId
