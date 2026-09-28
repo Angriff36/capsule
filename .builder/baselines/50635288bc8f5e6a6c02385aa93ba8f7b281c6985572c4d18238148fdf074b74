@@ -8550,6 +8550,13 @@ export const PrepTaskDependencyDeclareParamsSchema = z.object({
 
 export type PrepTaskDependencyDeclareParams = z.infer<typeof PrepTaskDependencyDeclareParamsSchema>;
 
+// Command: dropLink on PrepTaskDependency
+export const PrepTaskDependencyDropLinkParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type PrepTaskDependencyDropLinkParams = z.infer<typeof PrepTaskDependencyDropLinkParamsSchema>;
+
 // Command: releaseRetiredRequirement on PrepTaskDependency
 export const PrepTaskDependencyReleaseRetiredRequirementParamsSchema = z.object({});
 

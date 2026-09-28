@@ -15,6 +15,7 @@ import {
   usePrepTaskCancel,
   usePrepTaskClaim,
   usePrepTaskComplete,
+  usePrepTaskDependencyDropLink,
   usePrepTaskMarkBlocked,
   usePrepTaskRelease,
   usePrepTaskStart,
@@ -43,10 +44,12 @@ import { ProductionLifecyclePolicy } from "./ProductionLifecyclePolicy";
 import { ProductionWorkspaceNav } from "./ProductionWorkspaceNav";
 import {
   prepTaskDependencyLabel,
+  prepTaskDependencyLoopLinks,
   prepTaskDependencySummary,
 } from "./PrepTaskDependencies";
 import "./PrepTaskDependencies.css";
 import { useActionNotice } from "../../ui/action-result";
+import { useActionPrompt } from "../../ui/action-prompt";
 
 const UNITS = [
   "each",
@@ -97,6 +100,7 @@ export function PrepBoardPage() {
   const markBlocked = usePrepTaskMarkBlocked();
   const unblock = usePrepTaskUnblock();
   const cancel = usePrepTaskCancel();
+  const dropLink = usePrepTaskDependencyDropLink();
   const createCheck = useCreateQualityCheck();
   const passCheck = useQualityCheckPass();
   const failCheck = useQualityCheckFail();
@@ -111,6 +115,7 @@ export function PrepBoardPage() {
   );
   const [threadTaskId, setThreadTaskId] = useState<string | null>(null);
   const optimistic = useOptimisticStatus();
+  const { prompt, host: promptHost } = useActionPrompt(busy != null);
 
   const activeTasks = (tasks ?? []).filter((task) => task.deletedAt == null);
   const activeDependencies = dependencies ?? [];
@@ -222,6 +227,33 @@ export function PrepBoardPage() {
       setBusy(null);
       if (optimisticTarget) optimistic.end(optimisticTarget.id);
     }
+  };
+
+  const dropLoopLink = (
+    task: { name?: string; ingredientId?: string | null },
+    link: { _id: string; predecessorTaskId: string },
+  ) => {
+    const before = activeTasks.find(
+      (row) => row._id === link.predecessorTaskId,
+    );
+    const beforeName = before ? taskLabel(before) : "the other task";
+    void (async () => {
+      const reason = (
+        await prompt.askReason({
+          title: "Drop this link",
+          description: `${taskLabel(task)} will no longer wait for ${beforeName}. The link stays in the history.`,
+          label: "Why drop it",
+          confirmLabel: "Drop link",
+          cancelLabel: "Keep link",
+        })
+      )?.trim();
+      if (!reason) return;
+      await run(
+        `${link._id}:drop-link`,
+        () => dropLink({ docId: link._id, reason }),
+        `${taskLabel(task)} no longer waits for ${beforeName}.`,
+      );
+    })();
   };
 
   const runBulkPrep = (action: (typeof BULK_PREP)[number]) => {
@@ -424,6 +456,7 @@ export function PrepBoardPage() {
           task, and a lead must have permission to complete the quality action.
         </span>
       </aside>
+      {promptHost}
       <div aria-live="polite" aria-atomic="true">
         {notice ? (
           <div className="card border-ok/40 px-4 py-3" role="status">
@@ -724,6 +757,28 @@ export function PrepBoardPage() {
                             {prepTaskDependencyLabel(dependency)}
                           </small>
                         ) : null}
+                        {dependency.loopNames.length
+                          ? prepTaskDependencyLoopLinks(
+                              task._id,
+                              activeDependencies,
+                            ).map((link) => (
+                              <button
+                                key={link._id}
+                                type="button"
+                                className="text-link"
+                                disabled={busy != null}
+                                aria-busy={busy === `${link._id}:drop-link`}
+                                onClick={() => dropLoopLink(task, link)}
+                              >
+                                Stop waiting for{" "}
+                                {taskLabel(
+                                  activeTasks.find(
+                                    (row) => row._id === link.predecessorTaskId,
+                                  ) ?? {},
+                                )}
+                              </button>
+                            ))
+                          : null}
                       </td>
                       <td>
                         <div

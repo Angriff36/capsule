@@ -501,6 +501,7 @@ import {
   PrepTaskCommentPostParamsSchema,
   PrepTaskCompleteParamsSchema,
   PrepTaskDependencyDeclareParamsSchema,
+  PrepTaskDependencyDropLinkParamsSchema,
   PrepTaskDependencyReleaseRetiredRequirementParamsSchema,
   PrepTaskDependencySatisfyParamsSchema,
   PrepTaskLinkRecipeParamsSchema,
@@ -7835,6 +7836,16 @@ export function usePrepTaskDependencyDeclare() {
   };
 }
 
+/** Mutation hook for PrepTaskDependency.dropLink. */
+export function usePrepTaskDependencyDropLink() {
+  const mutate = useMutation(api.mutations.PrepTaskDependency_dropLink);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PrepTaskDependencyDropLinkParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for PrepTaskDependency.releaseRetiredRequirement. */
 export function usePrepTaskDependencyReleaseRetiredRequirement() {
   const mutate = useMutation(api.mutations.PrepTaskDependency_releaseRetiredRequirement);
@@ -11674,4 +11685,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1238 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1239 as const;

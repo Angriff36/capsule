@@ -666,6 +666,17 @@ entity PrepTaskDependency mixin TenantScoped {
     mutate requirementReleaseReason = "Prerequisite retired from recipe"
   }
 
+  // A person drops a "must follow" link that should not hold the work: two
+  // tasks that each wait on the other, or a wrong link. The edge and the
+  // reason stay as history; the waiting task can start.
+  command dropLink(reason: string) {
+    guard self.isSatisfied == false
+    constraint dropLinkReason: length(trim(reason)) > 0 "Say why you're dropping this link."
+    mutate isSatisfied = true
+    mutate requirementReleasedAt = now()
+    mutate requirementReleaseReason = reason
+  }
+
   command satisfy() {
     guard self.isSatisfied == false
     guard self.predecessorTask != null

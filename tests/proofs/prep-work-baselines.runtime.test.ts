@@ -299,6 +299,79 @@ describe("runtime proof: prep baselines, overrides and partial work (PL-PREP)", 
     expect(stepRows(await prep(w, line), dish.make)).toHaveLength(2);
   });
 
+  it("AC-488: a person can drop one link of a waiting loop; the link and the reason stay as history", async () => {
+    const w = await world("tenant-prep-loop");
+    const dish = await dishWithSteps(w, "Duck");
+    const line = await addDish(w, dish.dishId, 20);
+    await reconcilePrep(w, line);
+    const rows = await prep(w, line);
+    const make = stepRows(rows, dish.make)[0];
+    const plate = stepRows(rows, dish.plate)[0];
+    const kitchen = w.run(w.kitchen);
+    await kitchen(M.PrepTaskDependency_createViaDeclare, {
+      dependentTaskId: plate._id,
+      predecessorTaskId: make._id,
+    });
+    const back = await kitchen(M.PrepTaskDependency_createViaDeclare, {
+      dependentTaskId: make._id,
+      predecessorTaskId: plate._id,
+    });
+
+    await expect(
+      kitchen(M.PrepTaskDependency_dropLink, {
+        docId: back.docId,
+        reason: " ",
+      }),
+    ).rejects.toThrow(/why you're dropping/i);
+    await kitchen(M.PrepTaskDependency_dropLink, {
+      docId: back.docId,
+      reason: "Sauce does not wait for plating",
+    });
+    const dropped = await readRow<{
+      isSatisfied: boolean;
+      requirementReleasedAt?: number | null;
+      requirementReleaseReason?: string | null;
+      dependentTaskId: string;
+      predecessorTaskId: string;
+    }>(w.kitchen, back.docId);
+    expect(dropped).toMatchObject({
+      isSatisfied: true,
+      requirementReleaseReason: "Sauce does not wait for plating",
+      dependentTaskId: make._id,
+      predecessorTaskId: plate._id,
+    });
+    expect(dropped.requirementReleasedAt).toEqual(expect.any(Number));
+    // A dropped link cannot be dropped twice.
+    await expect(
+      kitchen(M.PrepTaskDependency_dropLink, {
+        docId: back.docId,
+        reason: "again",
+      }),
+    ).rejects.toThrow();
+
+    // New work for the same step after a servings change never gets the
+    // dropped link back.
+    await finish(w, make._id, 20);
+    await w.run(w.manager)(M.EventDish_adjustServings, {
+      docId: line,
+      quantityServings: 30,
+    });
+    await reconcilePrep(w, line);
+    const extra = stepRows(await prep(w, line), dish.make).find(
+      (t) => t._id !== make._id,
+    )!;
+    expect(extra.quantity).toBe(10);
+    const links = (await w.kitchen.run(async (ctx) =>
+      ctx.db.query("prepTaskDependencies").collect(),
+    )) as unknown as { dependentTaskId: string; predecessorTaskId: string }[];
+    expect(
+      links.filter(
+        (l) =>
+          l.dependentTaskId === extra._id && l.predecessorTaskId === plate._id,
+      ),
+    ).toEqual([]);
+  });
+
   it("AC-337: a recipe change after the work is finished is listed for review and the finished task is never edited", async () => {
     const w = await world("tenant-prep-review");
     const dish = await dishWithSteps(w, "Salmon");
