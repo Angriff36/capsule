@@ -85,6 +85,11 @@ projections:
         # contribution passed Convex's 16 MB read limit on a 15-dish BEO
         # import (2026-09-24). Manifest reads each sum through the declared
         # index covering the most equality predicates, i.e. this one.
+        # Public quote dedup: one point read per submit instead of scanning the
+        # tenant's submissions (convex/quoteBuilder.ts ingressQuoteSubmission).
+        QuoteSubmission:
+          - fields: [tenantId, dedupKey]
+            name: by_tenantId_and_dedupKey
         EventIngredientContribution:
           - fields: [eventId, ingredientId]
             name: by_eventId_and_ingredientId

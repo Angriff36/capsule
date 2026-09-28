@@ -18,19 +18,19 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "54048d37212e7b75478cde7078cfcff473a8e70806ef235758337ddc6b66bfff"
+      "sha256": "e00f873e9033e4117f1b782d71c0863315e9568685e1611c120790db1849ae09"
     },
     "convex/queries.ts": {
-      "sha256": "e52ca7f6f026ac8e27e7f98e5241f30e630ddd3c8769017d7a3704e4ef223d22"
+      "sha256": "7f542180e7bfff600cdf6c7d5e930cc76c90bf06f679f24cdbd503e95876c2cc"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
     },
     "convex/schema.ts": {
-      "sha256": "33cdd0e3f77a05dd7c39642bcb4d652630cc6015d0b3b744f9fb0cee9b89bca4"
+      "sha256": "e7c289018dfc8e3e37506671039080306912e975cb47cde9cab6987dd9ccc03d"
     },
     "manifest-context-summary.json": {
-      "sha256": "843b191b9c8f9786c80a5eacd713e9f1a62f43f9e96775f63c521a7ee548ed39"
+      "sha256": "86568ff9ca8c0ef4c45bd9e03625a836f01cf875d22eb3460c936d3f8a620985"
     },
     "package.json": {
       "sha256": "39b5393b44d082e7efdb04a947247668e98b6d36c6a944ef91c710cd64ee0737"
@@ -45,10 +45,10 @@
       "sha256": "7b0a06a6400cb045c7adccc26bc0a37fab8d0b2d752b9ed6a7f93dd3d5b6761e"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "761add7e1718257aba05ad72d6ca90a3ad518490fd7575a6f4c092e50f631af5"
+      "sha256": "7e419b0d78d94737901570585f93378235db71c23ac89372cd0d401a83acbcc9"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "faac1fdbfc63a49b375cc43089d88ab571716e5047388281ee3d008e74ce9202"
+      "sha256": "25053264828f98e8662ed8a605230041d6ae7aa8da8fada74e1f926ed68ab854"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "dfebaff58d6535dc97d527266d138f9ac9bc44e695dca64d8f5460b178f0b987"
@@ -57,7 +57,7 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "a48da839c5a48663a6b98c596a5243fb4e3acfd984276f9ad561030f88e249d6"
+      "sha256": "90f6cf97b7447d065a44afb22fdf34274274d442161e0b4a75310e7f7a65df11"
     }
   },
   "package": {

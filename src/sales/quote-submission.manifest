@@ -107,14 +107,15 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     optional dietaryRestrictions: string?,
     optional notes: string?
   ) {
-    // Abuse cap for the public web form, not throttling: a caterer's real
-    // inquiry volume is a handful a day. Global scope because the caller is
-    // anonymous (no user to key on). Repeat submits of the same request are
-    // deduped before this command runs, so they never spend the budget.
+    // Abuse cap per submitter, not throttling: the ingress seam runs this as
+    // a system actor keyed on the SHA-256 of the submitter's normalized email,
+    // so one address flooding the form cannot use up anyone else's budget (a
+    // shared global bucket could). Repeat submits of the same request are
+    // deduped before this command runs and never spend the budget.
     rateLimit {
-      maxRequests: 60
-      windowMs: 60000
-      scope: global
+      maxRequests: 5
+      windowMs: 3600000
+      scope: user
     }
 
     guard self.submittedAt == null "Quote submission already exists"

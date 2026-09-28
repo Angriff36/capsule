@@ -2659,6 +2659,7 @@ export default defineSchema({
     .index("by_proposalId", ["proposalId"])
     .index("by_serviceStyleId", ["serviceStyleId"])
     .index("by_occasionId", ["occasionId"])
+    .index("by_tenantId_and_dedupKey", ["tenantId", "dedupKey"])
     .searchIndex("search_venueName", { searchField: "venueName", filterFields: ["tenantId"] })
     .searchIndex("search_venueAddress", { searchField: "venueAddress", filterFields: ["tenantId"] }),
   receiptCorrections: defineTable({

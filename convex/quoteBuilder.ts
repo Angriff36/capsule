@@ -186,6 +186,18 @@ function bounded(value: string | undefined, max = MAX_SHORT): string {
 }
 
 /**
+ * Rate-limit actor for a public submitter: SHA-256 of the normalized email,
+ * so the bucket table never stores the address itself.
+ */
+export async function quoteSubmitterKey(email: string): Promise<string> {
+  const bytes = new TextEncoder().encode(email.trim().toLowerCase());
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+  let hex = "";
+  for (const byte of digest) hex += byte.toString(16).padStart(2, "0");
+  return `quote:${hex}`;
+}
+
+/**
  * Public-ingress seam.
  *
  * The public /quote form runs ANONYMOUSLY (it lives outside AuthGate), so the
@@ -270,10 +282,13 @@ export const ingressQuoteSubmission = internalMutation({
     // repeat submit is a no-op (submit-once). Dismissed rows still count — the
     // raw capture is retained, and a repeat submit of a dismissed key must not
     // mint a second row. Failed rows retain their IDs for staff to retry.
+    // Point read on (tenantId, dedupKey): cost does not grow with the
+    // tenant's submission history, so rejected floods stay cheap too.
     const candidates = await ctx.db
       .query("quoteSubmissions")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .filter((q) => q.eq(q.field("dedupKey"), dedupKey))
+      .withIndex("by_tenantId_and_dedupKey", (q) =>
+        q.eq("tenantId", tenantId).eq("dedupKey", dedupKey),
+      )
       .collect();
     const existing = candidates.find(
       (sub) =>
@@ -294,7 +309,11 @@ export const ingressQuoteSubmission = internalMutation({
 
     // Blank optional answers are stored as null, not as empty strings.
     const text = (value: string) => value.trim() || null;
-    const system = TenantSystemCommandRunner.forTenant(ctx, tenantId).context;
+    // The command's per-user rateLimit keys on this actor: one bucket per
+    // submitter, so a flood from one address never blocks other inquiries.
+    const system = TenantSystemCommandRunner.forTenant(ctx, tenantId, {
+      actorKey: await quoteSubmitterKey(email),
+    }).context;
     const created = (await system.runMutation(
       api.mutations.QuoteSubmission_create,
       {

@@ -41498,8 +41498,10 @@ async function __runQuoteSubmissionCreate(ctx: MutationCtx, args: any) {
       status: "pending",
       version: 1
     };
-    const __rlScopeKey = "QuoteSubmission_create" + ":global";
-    await __consumeCommandRateLimit(ctx, __rlScopeKey, 60, 60000, 0);
+    const __rlUserId = __auth?.id ?? __auth?.user?.id;
+    if (typeof __rlUserId !== "string" || !__rlUserId) throw new Error("Rate limit denied: unresolved user scope");
+    const __rlScopeKey = "QuoteSubmission_create" + ":user:" + __rlUserId;
+    await __consumeCommandRateLimit(ctx, __rlScopeKey, 5, 3600000, 0);
     if (!(true)) throw new Error("Anyone may check a quote request");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Only sales staff may update quote submissions");
     if (!(true)) throw new Error("Anyone may send a quote request");
