@@ -45,6 +45,8 @@ export interface PaymentLinkView {
   url: string;
   createdAt: number;
   amount: number;
+  /** Paid by card beyond what was owed on this invoice; refund it in Stripe. */
+  overpaidAmount?: number;
 }
 
 export interface StripeSyncResult {
@@ -283,7 +285,7 @@ export const getPaymentLink = action({
       { invoiceId: args.invoiceId, tenantId: invoice.tenantId },
     );
     const latest = view.sessions[0];
-    return latest ?? null;
+    return latest ? { ...latest, overpaidAmount: view.overpaidAmount } : null;
   },
 });
 

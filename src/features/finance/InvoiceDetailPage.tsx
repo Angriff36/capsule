@@ -481,8 +481,12 @@ export function InvoiceDetailPage() {
         setFailure(new Error(result.failures.join(" · ")));
       }
       if (result.recorded > 0) {
+        const extra =
+          result.overpaidAmount > 0
+            ? ` The client paid ${usd(result.overpaidAmount)} more than was owed; refund it in Stripe.`
+            : "";
         setNotice(
-          `Added ${result.recorded} Stripe payment${result.recorded === 1 ? "" : "s"} (${usd(result.recordedAmount)}) — invoice balance updated.`,
+          `Added ${result.recorded} Stripe payment${result.recorded === 1 ? "" : "s"} (${usd(result.recordedAmount)}) — invoice balance updated.${extra}`,
         );
         return;
       }
@@ -1230,6 +1234,13 @@ export function InvoiceDetailPage() {
         {!paymentLinkAvailable && !paymentLink ? (
           <p className="mt-3 text-base text-ink-2" role="status">
             Send the invoice with a balance due to generate a payment link.
+          </p>
+        ) : null}
+        {(paymentLink?.overpaidAmount ?? 0) > 0 ? (
+          <p className="mt-3 text-base text-ink-2" role="status">
+            The client paid {usd(paymentLink?.overpaidAmount ?? 0)} more than
+            was owed by card. Only what was owed went on the invoice. Refund the
+            extra in Stripe.
           </p>
         ) : null}
       </section>
