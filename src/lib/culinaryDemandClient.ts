@@ -6,10 +6,27 @@ import { useMutation, useQuery } from "convex/react";
 import { api, type Id } from "./api";
 import { formatMoney } from "./format";
 
-export const useEventDemandReview = (eventId: string) =>
-  useQuery(api.culinaryDemand.eventDemandReview, {
-    eventId: eventId as Id<"events">,
-  });
+export const useEventDemandReview = (eventId: string, enabled = true) =>
+  useQuery(
+    api.culinaryDemand.eventDemandReview,
+    enabled ? { eventId: eventId as Id<"events"> } : "skip",
+  );
+
+/** Same roles the server lets read demand reports (culinaryDemand.ts). */
+export function canReadCulinaryDemand(role: string | null | undefined) {
+  if (!role) return false;
+  return (
+    role === "kitchen_staff" ||
+    role === "kitchen_lead" ||
+    role === "inventory_staff" ||
+    role === "procurement_staff" ||
+    role === "manager" ||
+    role.endsWith("_manager") ||
+    role === "admin" ||
+    role === "owner" ||
+    role === "system"
+  );
+}
 
 export const useComponentContentReport = (componentId: string) =>
   useQuery(api.culinaryDemand.componentContentReport, {

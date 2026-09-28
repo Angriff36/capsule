@@ -533,6 +533,12 @@ async function reviewEvent(
       demand.contributions = demand.contributions.filter(
         (c) => !(c.componentPath.length && satisfied.has(c.componentPath[0])),
       );
+    demand.recipeNeeds = demand.recipeNeeds.map((need) => ({
+      ...need,
+      editionVersion:
+        catalog.lookups.components.get(need.componentId)?.editionVersion ??
+        null,
+    }));
     return {
       ...demand,
       dishName: catalog.lookups.dishes.get(ed.dishId)?.name ?? ed.dishId,

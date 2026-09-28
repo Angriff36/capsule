@@ -148,6 +148,8 @@ export interface RecipeNeed {
   batchesExact: number | null;
   contentStatus: ContentStatus;
   unitStatus: UnitStatus;
+  /** Recipe edition the need was worked out from (set by the event review). */
+  editionVersion?: number | null;
 }
 
 export type UnresolvedKind =
