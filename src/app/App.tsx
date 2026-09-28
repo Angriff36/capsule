@@ -190,6 +190,11 @@ const RoleScorecardsPage = lazy(() =>
     default: module.RoleScorecardsPage,
   })),
 );
+const StaffingTemplatesPage = lazy(() =>
+  import("../features/workforce/StaffingTemplatesPage").then((module) => ({
+    default: module.StaffingTemplatesPage,
+  })),
+);
 const OneOnOnesPage = lazy(() =>
   import("../features/workforce/OneOnOnesPage").then((module) => ({
     default: module.OneOnOnesPage,
@@ -961,6 +966,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <RoleScorecardsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/staff/crew-templates"
+              element={
+                <SupplyRoute>
+                  <StaffingTemplatesPage />
                 </SupplyRoute>
               }
             />

@@ -480,6 +480,16 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: ["Define the measurables per role; reviews use them."],
   },
   {
+    prefix: "/staff/crew-templates",
+    title: "Crew templates",
+    purpose:
+      "The crew each kind of event needs, posted as open shifts when the event is approved.",
+    steps: [
+      "Make a template for a service style and guest range; list each role and how many.",
+      "Approve an event: its open shifts appear on the event's Staff tab.",
+    ],
+  },
+  {
     prefix: "/staff/one-on-ones",
     title: "One-on-ones",
     purpose:

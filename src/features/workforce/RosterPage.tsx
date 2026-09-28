@@ -45,6 +45,7 @@ import {
 } from "./weeklySchedule";
 import { ShiftRescheduleAction } from "./ShiftRescheduleAction";
 import { SmsAlertOptInSection } from "./SmsAlertOptInSection";
+import { StaffSchedulingSection } from "./StaffSchedulingSection";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
@@ -509,6 +510,7 @@ export function RosterPage() {
       <AvailabilityGridSection people={activePeople} />
 
       <SmsAlertOptInSection people={activePeople} />
+      <StaffSchedulingSection people={activePeople} />
 
       <section className="working-ledger">
         <div className="ledger-heading">
