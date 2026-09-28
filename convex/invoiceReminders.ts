@@ -10,10 +10,12 @@ import {
   type QueryCtx,
 } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
+import { requireConnectedAccountId } from "./invoicePayments";
 import {
   connectedAccountHeaders,
-  requireConnectedAccountId,
-} from "./invoicePayments";
+  invoiceCheckoutCurrency,
+  toStripeAmount,
+} from "./lib/stripeCheckout";
 import { decrypt } from "./lib/encryption";
 import {
   buildInvoiceReminderPdf,
@@ -557,7 +559,11 @@ async function createStripeSession(
   const invoiceNumber = String(
     context.invoice.invoiceNumber || context.invoice._id,
   );
-  const amountCents = Math.round(Number(context.invoice.amountDue) * 100);
+  const currency = invoiceCheckoutCurrency(context.invoice);
+  const amountCents = toStripeAmount(
+    Number(context.invoice.amountDue),
+    currency,
+  );
   if (amountCents <= 0) throw new Error("Invoice has no payable balance.");
 
   const returnUrl = new URL(environment.appOrigin);
@@ -570,7 +576,7 @@ async function createStripeSession(
     cancel_url: cancelUrl.toString(),
     customer_email: context.recipient.email,
     client_reference_id: String(context.invoice._id),
-    "line_items[0][price_data][currency]": "usd",
+    "line_items[0][price_data][currency]": currency,
     "line_items[0][price_data][unit_amount]": String(amountCents),
     "line_items[0][price_data][product_data][name]": `Invoice ${invoiceNumber} balance`,
     "line_items[0][quantity]": "1",

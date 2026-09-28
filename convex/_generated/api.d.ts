@@ -24,6 +24,7 @@ import type * as candidateToTeam from "../candidateToTeam.js";
 import type * as catalogReclassification from "../catalogReclassification.js";
 import type * as chatNotifyPreference from "../chatNotifyPreference.js";
 import type * as clientPortal from "../clientPortal.js";
+import type * as clientPortalPayments from "../clientPortalPayments.js";
 import type * as computed from "../computed.js";
 import type * as crons from "../crons.js";
 import type * as culinaryDemand from "../culinaryDemand.js";
@@ -108,6 +109,7 @@ import type * as lib_invoiceNumberSequence from "../lib/invoiceNumberSequence.js
 import type * as lib_invoiceNumbering from "../lib/invoiceNumbering.js";
 import type * as lib_invoicePricingReconciliation from "../lib/invoicePricingReconciliation.js";
 import type * as lib_invoiceReminderPdf from "../lib/invoiceReminderPdf.js";
+import type * as lib_invoiceStripeReconcile from "../lib/invoiceStripeReconcile.js";
 import type * as lib_kitchenAccessGate from "../lib/kitchenAccessGate.js";
 import type * as lib_lineOverridePurchasing from "../lib/lineOverridePurchasing.js";
 import type * as lib_lookupCostBarcodeDiscovery from "../lib/lookupCostBarcodeDiscovery.js";
@@ -160,6 +162,7 @@ import type * as lib_staffSignInMailer from "../lib/staffSignInMailer.js";
 import type * as lib_staffSignInPassword from "../lib/staffSignInPassword.js";
 import type * as lib_staffingReconciliation from "../lib/staffingReconciliation.js";
 import type * as lib_standInPurchaseNeed from "../lib/standInPurchaseNeed.js";
+import type * as lib_stripeCheckout from "../lib/stripeCheckout.js";
 import type * as lib_styleReconciliation from "../lib/styleReconciliation.js";
 import type * as lib_teamChatRead from "../lib/teamChatRead.js";
 import type * as lib_teamChatScan from "../lib/teamChatScan.js";
@@ -234,6 +237,7 @@ declare const fullApi: ApiFromModules<{
   catalogReclassification: typeof catalogReclassification;
   chatNotifyPreference: typeof chatNotifyPreference;
   clientPortal: typeof clientPortal;
+  clientPortalPayments: typeof clientPortalPayments;
   computed: typeof computed;
   crons: typeof crons;
   culinaryDemand: typeof culinaryDemand;
@@ -318,6 +322,7 @@ declare const fullApi: ApiFromModules<{
   "lib/invoiceNumbering": typeof lib_invoiceNumbering;
   "lib/invoicePricingReconciliation": typeof lib_invoicePricingReconciliation;
   "lib/invoiceReminderPdf": typeof lib_invoiceReminderPdf;
+  "lib/invoiceStripeReconcile": typeof lib_invoiceStripeReconcile;
   "lib/kitchenAccessGate": typeof lib_kitchenAccessGate;
   "lib/lineOverridePurchasing": typeof lib_lineOverridePurchasing;
   "lib/lookupCostBarcodeDiscovery": typeof lib_lookupCostBarcodeDiscovery;
@@ -370,6 +375,7 @@ declare const fullApi: ApiFromModules<{
   "lib/staffSignInPassword": typeof lib_staffSignInPassword;
   "lib/staffingReconciliation": typeof lib_staffingReconciliation;
   "lib/standInPurchaseNeed": typeof lib_standInPurchaseNeed;
+  "lib/stripeCheckout": typeof lib_stripeCheckout;
   "lib/styleReconciliation": typeof lib_styleReconciliation;
   "lib/teamChatRead": typeof lib_teamChatRead;
   "lib/teamChatScan": typeof lib_teamChatScan;
