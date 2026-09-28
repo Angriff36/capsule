@@ -14,15 +14,21 @@
  *     "acknowledgedAt": "<ISO date>", "reason": "<why>" }
  * to `acknowledged`; the gate prints the path and category it needs.
  */
-import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { runManifestCli } from "./manifest-cli";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const ACKS = path.join(ROOT, "scripts", "manifest-breaking-acks.json");
-const MANIFEST_BIN = path.join(ROOT, "node_modules", ".bin", "manifest");
 const IR_REL = path.join("generated", "ir", "merged.ir.json");
 
 function git(args: string[]): string {
@@ -51,10 +57,7 @@ export function lastReleaseCommit(): string {
 }
 
 function compile(cwd: string): string {
-  const result = spawnSync(MANIFEST_BIN, ["compile", "--all"], {
-    cwd,
-    encoding: "utf8",
-  });
+  const result = runManifestCli(["compile", "--all"], { cwd });
   const out = path.join(cwd, IR_REL);
   if (result.status !== 0 || !existsSync(out)) {
     console.error(result.stdout);
@@ -66,15 +69,47 @@ function compile(cwd: string): string {
   return out;
 }
 
+/**
+ * Write the release commit's src/ and manifest.config.yaml into `dir` using
+ * git plumbing and Node fs only (no mkdir/tar on PATH; works from PowerShell).
+ */
+export function materializeBaseline(sha: string, dir: string): number {
+  const listed = execFileSync(
+    "git",
+    [
+      "ls-tree",
+      "-r",
+      "-z",
+      "--name-only",
+      sha,
+      "--",
+      "src",
+      "manifest.config.yaml",
+    ],
+    { cwd: ROOT, maxBuffer: 64 * 1024 * 1024 },
+  )
+    .toString("utf8")
+    .split("\0")
+    .filter((file) => file.length > 0);
+  for (const file of listed) {
+    const target = path.join(dir, ...file.split("/"));
+    mkdirSync(path.dirname(target), { recursive: true });
+    writeFileSync(
+      target,
+      execFileSync("git", ["show", `${sha}:${file}`], {
+        cwd: ROOT,
+        maxBuffer: 64 * 1024 * 1024,
+      }),
+    );
+  }
+  return listed.length;
+}
+
 function baselineIr(sha: string, scratch: string): string {
   const dir = path.join(scratch, "baseline");
-  execFileSync("mkdir", ["-p", dir]);
-  const archive = execFileSync(
-    "git",
-    ["archive", sha, "src", "manifest.config.yaml"],
-    { cwd: ROOT, maxBuffer: 256 * 1024 * 1024 },
-  );
-  execFileSync("tar", ["-x", "-C", dir], { input: archive });
+  if (materializeBaseline(sha, dir) === 0) {
+    throw new Error(`check-manifest-breaking: ${sha} has no src/ to compare`);
+  }
   return compile(dir);
 }
 
@@ -89,10 +124,7 @@ export function checkManifestBreaking(): number {
     );
     const args = ["diff", "breaking", oldIr, newIr, "--ci"];
     if (existsSync(ACKS)) args.push("--ack", ACKS);
-    const result = spawnSync(MANIFEST_BIN, args, {
-      cwd: ROOT,
-      stdio: "inherit",
-    });
+    const result = runManifestCli(args, { cwd: ROOT, inherit: true });
     return result.status ?? 1;
   } finally {
     rmSync(scratch, { recursive: true, force: true });

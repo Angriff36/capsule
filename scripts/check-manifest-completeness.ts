@@ -8,13 +8,12 @@
  * no longer reported also fails until it is removed from the list.
  * Reaction wiring has no tracked entries — any REACTION_UNWIRED fails.
  */
-import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { runManifestCli } from "./manifest-cli";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MANIFEST_BIN = path.join(ROOT, "node_modules", ".bin", "manifest");
 const IR = path.join(ROOT, "generated", "ir", "merged.ir.json");
 const TRACKED = path.join(
   ROOT,
@@ -46,11 +45,7 @@ export function findingKey(diagnostic: Diagnostic): string {
 }
 
 function run(args: string[]): { status: number; stdout: string } {
-  const result = spawnSync(MANIFEST_BIN, args, {
-    cwd: ROOT,
-    encoding: "utf8",
-    maxBuffer: 256 * 1024 * 1024,
-  });
+  const result = runManifestCli(args, { cwd: ROOT });
   return { status: result.status ?? 1, stdout: result.stdout };
 }
 
