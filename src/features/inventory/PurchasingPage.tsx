@@ -6,7 +6,9 @@ import {
   useCreateVendorOrder,
   useListEvent,
   useListIngredient,
+  useListIngredientDemand,
   useListIngredientPriceObservation,
+  useListItemUnitMapping,
   useListInventoryItem,
   useListPurchaseNeed,
   useListVendor,
@@ -36,6 +38,8 @@ import {
   PurchasingCommandForm,
 } from "./PurchasingCommandForm";
 import { findByName } from "./inlineCatalogChoice";
+import { WeeklyDraftPanel } from "./WeeklyDraftPanel";
+import { currentWeeklyDraft, weeklyDraftLines } from "./weeklyDraftView";
 import { PurchasingQueueSplit } from "./PurchasingQueueSplit";
 import { purchasingStockContext } from "./purchasingStockContext";
 import { SeasonalDemandForecast } from "./SeasonalDemandForecast";
@@ -65,6 +69,8 @@ export function PurchasingPage() {
   const events = useListEvent();
   const vendorContacts = useListVendorContact();
   const priceObservations = useListIngredientPriceObservation();
+  const demands = useListIngredientDemand();
+  const unitMappings = useListItemUnitMapping();
   const createVendor = useCreateVendor();
   const createOrder = useCreateVendorOrder();
   const createContact = useCreateVendorContact();
@@ -117,6 +123,23 @@ export function PurchasingPage() {
       ),
     [activeOrders],
   );
+  // Purchasing opens on the week's automatic draft (BE-10.6).
+  const currentDraft = currentWeeklyDraft(weeklyDrafts, Date.now());
+  const currentDraftLines =
+    currentDraft &&
+    lines !== undefined &&
+    demandLinks !== undefined &&
+    needs !== undefined &&
+    demands !== undefined
+      ? weeklyDraftLines({
+          order: currentDraft,
+          lines,
+          links: demandLinks,
+          needs,
+          demands,
+          mappings: unitMappings ?? [],
+        })
+      : null;
   const ingredientName = (id: string) =>
     ingredients?.find((item) => item._id === id)?.name ?? "Unknown ingredient";
   const eventName = (id: string) =>
@@ -470,10 +493,20 @@ export function PurchasingPage() {
         />
       ) : null}
 
+      {currentDraft && currentDraftLines ? (
+        <WeeklyDraftPanel
+          order={currentDraft}
+          vendorName={vendorName(currentDraft.vendorId)}
+          lines={currentDraftLines}
+          ingredientName={ingredientName}
+          eventName={eventName}
+        />
+      ) : null}
+
       <section className="working-ledger mt-6">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">This week</p>
+            <p className="eyebrow">All weeks</p>
             <h2>Auto-maintained drafts</h2>
           </div>
           <span>{weeklyDrafts.length} drafts</span>
