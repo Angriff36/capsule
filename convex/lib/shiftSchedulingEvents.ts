@@ -94,6 +94,22 @@ export async function validateScheduledShift(
       "This shift overlaps approved time off. Choose another staff member or adjust the shift.",
     );
   }
+  // A hand-made shift over the same person's other work is a double booking.
+  // Event staffing across events is shown on the roster instead (CF-9.1).
+  if (shift.eventStaffingSourceIds?.length) return;
+  const others = await ctx.db.query("shifts")
+    .withIndex("by_personId", (q) => q.eq("personId", personId)).collect();
+  const clash = others.find((row) => row._id !== shift._id &&
+    row.tenantId === shift.tenantId && row.deletedAt == null &&
+    row.status !== "cancelled" && row.startsAt != null && row.endsAt != null &&
+    row.startsAt < endsAt! && row.endsAt > startsAt!);
+  if (clash) {
+    const person = await ctx.db.get(personId);
+    const name = person ? `${person.givenName} ${person.familyName}`.trim() : "This person";
+    throw new ConvexError(
+      `${name} already has a shift on ${day.format(clash.startsAt!)} that overlaps these times. Change the times or pick someone else.`,
+    );
+  }
 }
 
 /** Unknown planning dates are allowed; non-finite or reversed dates are not. */
