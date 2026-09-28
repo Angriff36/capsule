@@ -43,6 +43,8 @@ export interface ComponentLike {
   yieldUnit: UnitCode;
   instructions?: string | null;
   stepCount: number;
+  /** Recipe edition the lines come from (the published one while a draft is open). */
+  editionVersion?: number;
   ingredientLines: IngredientLineLike[];
   componentLines: NestedLineLike[];
 }

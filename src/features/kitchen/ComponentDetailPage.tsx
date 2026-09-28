@@ -17,7 +17,6 @@ import {
   useComponentIngredientAdjustQuantity,
   useComponentIngredientRemove,
   useComponentIngredientSetWasteFactor,
-  useComponentPublishVersion,
   useComponentPurge,
   useComponentRetract,
   useComponentReviseDraft,
@@ -25,7 +24,11 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useTrackRecent } from "../../lib/recents";
 import { useRouteRecord } from "../../lib/routeRecord";
-import { useReconcileLiveEventsForComponent } from "../../lib/culinaryDemandClient";
+import {
+  usePublishRecipeEdition,
+  useReconcileLiveEventsForComponent,
+} from "../../lib/culinaryDemandClient";
+import { RecipeEditionNotice } from "./RecipeEditionNotice";
 import { buildComponentSnapshotData } from "./componentSnapshot";
 import { ComponentVersionHistoryPanel } from "./ComponentVersionHistoryPanel";
 import { captureBeforeChange } from "./componentSnapshotCapture";
@@ -98,7 +101,7 @@ export function ComponentDetailPage() {
   const dishes = useListDish();
   const dishComponents = useListDishComponent();
   const revise = useComponentReviseDraft();
-  const publish = useComponentPublishVersion();
+  const publish = usePublishRecipeEdition();
   const retract = useComponentRetract();
   const purge = useComponentPurge();
   const createLine = useCreateComponentIngredient();
@@ -354,7 +357,12 @@ export function ComponentDetailPage() {
   const invokeLifecycle = (key: string) => {
     void run(key, async () => {
       const args = { docId: component._id, version: component.version };
-      if (key === "publishVersion") await publish(args);
+      if (key === "publishVersion") {
+        // Saves the published edition, then brings events not finished yet
+        // up to it; finished events keep their demand.
+        await publish(component._id, component.version);
+        await reconcileEvents(component._id);
+      }
       if (key === "retract") await retract(args);
       if (key === "purge") await purge(args);
     });
@@ -447,6 +455,12 @@ export function ComponentDetailPage() {
             <dd>{component.cuisine || "—"}</dd>
           </div>
         </dl>
+        <RecipeEditionNotice
+          componentId={component._id}
+          status={String(component.status)}
+          versionNumber={component.versionNumber}
+          saved={snapshots}
+        />
         {prepTaskId ? (
           <ComponentPrepContext
             recipe={component}

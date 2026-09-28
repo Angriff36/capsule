@@ -42,6 +42,7 @@ import {
   type RoundingScope,
   type UnresolvedItem,
 } from "./lib/culinaryModel/demand";
+import { editionInUse } from "./lib/culinaryModel/recipeEdition";
 import { withUnresolvedText } from "./lib/culinaryModel/unresolvedText";
 import {
   isUnitCode,
@@ -77,6 +78,7 @@ async function byTenant<
     | "componentComponents"
     | "componentPortionSpecs"
     | "componentSteps"
+    | "componentSnapshots"
     | "dishIngredients"
     | "dishComponents"
     | "dishTasks"
@@ -145,14 +147,58 @@ async function loadCatalog(ctx: Ctx, tenantId: string): Promise<Catalog> {
       (stepCounts.get(String(step.componentId)) ?? 0) + 1,
     );
   }
+  // A recipe taken back to draft keeps feeding events its last published
+  // edition until the draft is published (recipeEdition.ts).
+  const savedByRecipe = new Map<string, Doc<"componentSnapshots">[]>();
+  for (const row of await byTenant(ctx, "componentSnapshots", tenantId)) {
+    const list = savedByRecipe.get(String(row.componentId)) ?? [];
+    list.push(row);
+    savedByRecipe.set(String(row.componentId), list);
+  }
   const componentMap = new Map<string, ComponentLike>();
   for (const c of components) {
+    const edition = editionInUse(
+      { status: String(c.status), versionNumber: Number(c.versionNumber) },
+      (savedByRecipe.get(String(c._id)) ?? []).map((row) => ({
+        versionNumber: Number(row.versionNumber),
+        snapshot: row.snapshot,
+      })),
+    );
+    if (edition) {
+      componentMap.set(String(c._id), {
+        id: String(c._id),
+        name: c.name,
+        yieldQuantity: Number(edition.yieldQuantity),
+        yieldUnit: unitOf(edition.yieldUnit, "portion"),
+        instructions: edition.instructions || null,
+        stepCount: stepCounts.get(String(c._id)) ?? 0,
+        editionVersion: edition.versionNumber,
+        ingredientLines: edition.lines.map((l) => ({
+          id: l.id,
+          ingredientId: l.ingredientId,
+          quantity: Number(l.quantity),
+          unit: unitOf(l.unit),
+          wasteFactor: l.wasteFactor ?? 1,
+          quantityBasis: basisOf(l.quantityBasis),
+        })),
+        componentLines: edition.componentLines.map((l) => ({
+          id: l.id,
+          childComponentId: l.childComponentId,
+          quantity: Number(l.quantity),
+          unit: unitOf(l.unit),
+          wasteFactor: l.wasteFactor ?? 1,
+          quantityBasis: basisOf(l.quantityBasis),
+        })),
+      });
+      continue;
+    }
     componentMap.set(String(c._id), {
       id: String(c._id),
       name: c.name,
       yieldQuantity: Number(c.yieldQuantity ?? 0),
       yieldUnit: unitOf(c.yieldUnit, "portion"),
       instructions: c.instructions ?? null,
+      editionVersion: Number(c.versionNumber),
       stepCount: stepCounts.get(String(c._id)) ?? 0,
       ingredientLines: componentIngredients
         .filter(
@@ -404,7 +450,7 @@ function canReadCulinaryReports(role: string): boolean {
   );
 }
 
-function requireCulinaryReader(auth: AppAuthContext): string {
+export function requireCulinaryReader(auth: AppAuthContext): string {
   const tenantId = requireTenant(auth);
   if (!canReadCulinaryReports(auth.role)) {
     throw new Error(
@@ -714,7 +760,16 @@ export interface ReconcileEventDemandResult {
   unchanged: number;
   unresolvedCount: number;
   purchasingComplete: boolean;
+  /** True when the event is finished or cancelled: its demand is history and was left as it was. */
+  historyKept?: boolean;
 }
+
+/** Stages whose demand is history: later recipe edits never rewrite it. */
+export const FINISHED_EVENT_STAGES = new Set([
+  "completed",
+  "closed_out",
+  "cancelled",
+]);
 
 /** Write the authoritative demand for an event: idempotent replace by sourceKey. */
 export async function writeReconciledEventDemand(
@@ -723,6 +778,17 @@ export async function writeReconciledEventDemand(
 ): Promise<ReconcileEventDemandResult> {
   const tenantId = requireTenant(await getAuthContext(ctx));
   const event = await requireEvent(ctx, tenantId, eventId);
+  if (FINISHED_EVENT_STAGES.has(String(event.stage)))
+    return {
+      eventId: String(eventId),
+      created: 0,
+      updated: 0,
+      superseded: 0,
+      unchanged: 0,
+      unresolvedCount: 0,
+      purchasingComplete: true,
+      historyKept: true,
+    };
   const review = await reviewEvent(ctx, tenantId, eventId);
   const existingRows = (
     await byTenant(ctx, "eventIngredientContributions", tenantId)

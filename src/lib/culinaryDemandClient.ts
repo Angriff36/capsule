@@ -57,6 +57,37 @@ export function useReconcileLiveEventsForComponent() {
   };
 }
 
+/** Events a publish of this recipe reaches, and finished events that keep theirs. */
+export const useRecipeEditionImpact = (componentId: string) =>
+  useQuery(api.culinaryDemandSweep.recipeEditionImpact, {
+    componentId: componentId as Id<"components">,
+  });
+
+/** Publish a recipe and save the edition events use while it is a draft again. */
+export function usePublishRecipeEdition() {
+  const mutate = useMutation(api.culinaryDemandSweep.publishRecipeEdition);
+  return (componentId: string, version?: number) =>
+    mutate({ componentId: componentId as Id<"components">, version });
+}
+
+/** Plain words for who a publish reaches. */
+export function recipeEditionImpactText(impact: {
+  following: unknown[];
+  keeping: unknown[];
+}): string | null {
+  const events = (n: number) => (n === 1 ? "1 event" : `${n} events`);
+  const parts: string[] = [];
+  if (impact.following.length)
+    parts.push(
+      `${events(impact.following.length)} not finished yet use this recipe as published.`,
+    );
+  if (impact.keeping.length)
+    parts.push(
+      `${events(impact.keeping.length)} already finished keep what they were made with.`,
+    );
+  return parts.length ? parts.join(" ") : null;
+}
+
 /** Kitchen wording for each unresolved kind the demand engine reports. */
 export const UNRESOLVED_KIND_LABEL: Record<string, string> = {
   unit: "Amount can't be converted",
