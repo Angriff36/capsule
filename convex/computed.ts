@@ -674,13 +674,13 @@ export function computeEvent(doc: Record<string, any>, { user }: { user: any }):
   doc.timingCanRecalculate = __timingCanRecalculate;
   const __staffingCanManage = (checkRole(user.role, "workforceManageAccess") || (checkRole(user.role, "workforceSelfAccess") && checkRole(user.role, "eventManageAccess")));
   doc.staffingCanManage = __staffingCanManage;
-  const __timingSuggestedSetupMinutes = (((doc.serviceStyle != null) && (doc.serviceStyle.name === "Full Service")) ? 180 : (((doc.serviceStyle != null) && (doc.serviceStyle.name === "Limited Service")) ? 90 : null));
-  doc.timingSuggestedSetupMinutes = __timingSuggestedSetupMinutes;
   const __timingOnsiteAt = (((doc.serviceStartsAt != null) && (doc.timingSetupMinutes != null)) ? (doc.serviceStartsAt - (doc.timingSetupMinutes * 60000)) : null);
   doc.timingOnsiteAt = __timingOnsiteAt;
-  const __timingDepartShopAt = (((doc.timingOnsiteAt != null) && (doc.timingOutboundTravelMinutes != null)) ? (doc.timingOnsiteAt - (doc.timingOutboundTravelMinutes * 60000)) : null);
+  const __timingDepartShopAt = (((doc.timingOnsiteAt != null) && (doc.timingOutboundTravelMinutes != null)) ? (doc.timingOnsiteAt - ((doc.timingOutboundTravelMinutes + ((doc.timingSafetyBufferMinutes != null) ? doc.timingSafetyBufferMinutes : 0)) * 60000)) : null);
   doc.timingDepartShopAt = __timingDepartShopAt;
-  const __timingStaffOnAt = (((doc.timingDepartShopAt != null) && (doc.timingLoadMinutes != null)) ? (doc.timingDepartShopAt - (doc.timingLoadMinutes * 60000)) : null);
+  const __timingLoadStartAt = (((doc.timingDepartShopAt != null) && (doc.timingLoadMinutes != null)) ? (doc.timingDepartShopAt - (doc.timingLoadMinutes * 60000)) : null);
+  doc.timingLoadStartAt = __timingLoadStartAt;
+  const __timingStaffOnAt = ((doc.timingLoadStartAt != null) ? (doc.timingLoadStartAt - (((doc.timingBriefingMinutes != null) ? doc.timingBriefingMinutes : 0) * 60000)) : null);
   doc.timingStaffOnAt = __timingStaffOnAt;
   const __timingDepartVenueAt = (((doc.endsAt != null) && (doc.timingCleanupMinutes != null)) ? (doc.endsAt + (doc.timingCleanupMinutes * 60000)) : null);
   doc.timingDepartVenueAt = __timingDepartVenueAt;
@@ -688,8 +688,6 @@ export function computeEvent(doc: Record<string, any>, { user }: { user: any }):
   doc.timingReturnShopAt = __timingReturnShopAt;
   const __timingStaffOffAt = (((doc.timingReturnShopAt != null) && (doc.timingUnloadMinutes != null)) ? (doc.timingReturnShopAt + (doc.timingUnloadMinutes * 60000)) : null);
   doc.timingStaffOffAt = __timingStaffOffAt;
-  const __timingSuggestedLoadMinutes = 60;
-  doc.timingSuggestedLoadMinutes = __timingSuggestedLoadMinutes;
   const __timingSuggestedCleanupMinutes = 60;
   doc.timingSuggestedCleanupMinutes = __timingSuggestedCleanupMinutes;
   const __binderColor = (((doc.serviceStyle != null) && (doc.serviceStyle.name === "Full Service")) ? "red" : (((doc.serviceStyle != null) && (doc.serviceStyle.name === "Limited Service")) ? "green" : (((doc.serviceStyle != null) && (doc.serviceStyle.name === "Drop Off")) ? "blue" : null)));
@@ -721,14 +719,13 @@ export function computeEvent(doc: Record<string, any>, { user }: { user: any }):
     isArchived: __isArchived,
     timingCanRecalculate: __timingCanRecalculate,
     staffingCanManage: __staffingCanManage,
-    timingSuggestedSetupMinutes: __timingSuggestedSetupMinutes,
     timingOnsiteAt: __timingOnsiteAt,
     timingDepartShopAt: __timingDepartShopAt,
+    timingLoadStartAt: __timingLoadStartAt,
     timingStaffOnAt: __timingStaffOnAt,
     timingDepartVenueAt: __timingDepartVenueAt,
     timingReturnShopAt: __timingReturnShopAt,
     timingStaffOffAt: __timingStaffOffAt,
-    timingSuggestedLoadMinutes: __timingSuggestedLoadMinutes,
     timingSuggestedCleanupMinutes: __timingSuggestedCleanupMinutes,
     binderColor: __binderColor,
     isEditable: __isEditable,

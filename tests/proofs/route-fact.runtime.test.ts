@@ -88,9 +88,10 @@ describe("route fact (AC-426)", () => {
       true,
     );
 
-    // 40 minutes of road, plus the 15-minute company buffer on the way out.
+    // 40 minutes of road; the 15-minute company buffer is kept apart.
     const saved = await t.run((ctx) => ctx.db.get(event));
-    expect(saved!.timingOutboundTravelMinutes).toBe(55);
+    expect(saved!.timingOutboundTravelMinutes).toBe(40);
+    expect(saved!.timingSafetyBufferMinutes).toBe(15);
     expect(saved!.timingReturnTravelMinutes).toBe(40);
 
     const status = await owner.query(api.eventRoutes.getEventRoute, {
@@ -201,7 +202,7 @@ describe("route fact (AC-426)", () => {
     google.state.mode = "down";
     await owner.action(api.eventRoutes.refreshEventRoute, { eventId: event });
     const saved = await t.run((ctx) => ctx.db.get(event));
-    expect(saved!.timingOutboundTravelMinutes).toBe(55);
+    expect(saved!.timingOutboundTravelMinutes).toBe(40);
 
     const status = await owner.query(api.eventRoutes.getEventRoute, {
       eventId: event,

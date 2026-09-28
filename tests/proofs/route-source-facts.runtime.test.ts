@@ -57,7 +57,8 @@ describe("route source facts (AC-425)", () => {
       "7 Branch Street, Boulder, US",
     );
     const saved = await t.run((ctx) => ctx.db.get(event));
-    expect(saved!.timingOutboundTravelMinutes).toBe(15 + 15);
+    expect(saved!.timingOutboundTravelMinutes).toBe(15);
+    expect(saved!.timingSafetyBufferMinutes).toBe(15);
     status = await owner.query(api.eventRoutes.getEventRoute, {
       eventId: event,
     });
@@ -142,7 +143,8 @@ describe("route source facts (AC-425)", () => {
     expect(google.requests[0].body.routingPreference).toBe("TRAFFIC_UNAWARE");
     expect(google.requests[0].body.departureTime).toBeUndefined();
     const saved = await t.run((ctx) => ctx.db.get(event));
-    expect(saved!.timingOutboundTravelMinutes).toBe(40 + 30);
+    expect(saved!.timingOutboundTravelMinutes).toBe(40);
+    expect(saved!.timingSafetyBufferMinutes).toBe(30);
     expect(saved!.timingReturnTravelMinutes).toBe(40);
     const fact = (await storedRouteFacts(t, event))[0].payload.fact;
     expect(fact.trafficPolicy).toBe("no_traffic");

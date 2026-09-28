@@ -899,6 +899,18 @@ export const EventSchema = z.object({
   timingReturnTravelMinutes: z.number().nullable().optional(),
   timingUnloadMinutes: z.number().nullable().optional(),
   timingConfiguredAt: z.coerce.date().nullable().optional(),
+  timingSafetyBufferMinutes: z.number().nullable().optional(),
+  timingBriefingMinutes: z.number().nullable().optional(),
+  timingSetupSource: z.enum(["company_rule", "person"]).nullable().optional(),
+  timingSetupOverrideReason: z.string().nullable().optional(),
+  timingSetupOverrideByPersonId: z.string().uuid().nullable().optional(),
+  timingSetupOverrideAt: z.coerce.date().nullable().optional(),
+  timingLoadSource: z.enum(["company_rule", "person"]).nullable().optional(),
+  timingLoadOverrideReason: z.string().nullable().optional(),
+  timingLoadOverrideByPersonId: z.string().uuid().nullable().optional(),
+  timingLoadOverrideAt: z.coerce.date().nullable().optional(),
+  timingLoadRuleId: z.string().nullable().optional(),
+  timingLoadNeedsReview: z.boolean().nullable().optional(),
   purchasingWeekStart: z.coerce.date().nullable().optional(),
   venueName: z.string().nullable().optional(),
   venueAddress: z.string().nullable().optional(),
@@ -989,14 +1001,13 @@ export const EventComputedSchema = EventSchema.extend({
   isArchived: z.boolean(),
   timingCanRecalculate: z.boolean(),
   staffingCanManage: z.boolean(),
-  timingSuggestedSetupMinutes: z.number().nullable(),
   timingOnsiteAt: z.coerce.date().nullable(),
   timingDepartShopAt: z.coerce.date().nullable(),
+  timingLoadStartAt: z.coerce.date().nullable(),
   timingStaffOnAt: z.coerce.date().nullable(),
   timingDepartVenueAt: z.coerce.date().nullable(),
   timingReturnShopAt: z.coerce.date().nullable(),
   timingStaffOffAt: z.coerce.date().nullable(),
-  timingSuggestedLoadMinutes: z.number(),
   timingSuggestedCleanupMinutes: z.number(),
   binderColor: z.string().nullable(),
   isEditable: z.boolean(),
@@ -2235,6 +2246,11 @@ export const OrganizationSchema = z.object({
   routeSafetyBufferMinutes: z.number().int().nullable().optional(),
   routeTrafficPolicy: z.enum(["traffic_aware", "no_traffic"]).nullable().optional(),
   routeRefreshHours: z.number().int().nullable().optional(),
+  timingFullServiceSetupMinutes: z.number().int().nullable().optional(),
+  timingLimitedServiceSetupMinutes: z.number().int().nullable().optional(),
+  timingBriefingMinutes: z.number().int().nullable().optional(),
+  timingLoadBaselineMinutes: z.number().int().nullable().optional(),
+  timingLoadRulesJson: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -5434,9 +5450,22 @@ export type EquipmentServiceEntryRecordParams = z.infer<typeof EquipmentServiceE
 export const EventApplyRouteTravelParamsSchema = z.object({
   outboundTravelMinutes: z.number().optional(),
   returnTravelMinutes: z.number().optional(),
+  safetyBufferMinutes: z.number().optional(),
 });
 
 export type EventApplyRouteTravelParams = z.infer<typeof EventApplyRouteTravelParamsSchema>;
+
+// Command: applyTimingPolicy on Event
+export const EventApplyTimingPolicyParamsSchema = z.object({
+  setupMinutes: z.number().optional(),
+  loadMinutes: z.number().optional(),
+  loadRuleId: z.string().optional(),
+  loadNeedsReview: z.boolean(),
+  briefingMinutes: z.number(),
+  safetyBufferMinutes: z.number(),
+});
+
+export type EventApplyTimingPolicyParams = z.infer<typeof EventApplyTimingPolicyParamsSchema>;
 
 // Command: approve on Event
 export const EventApproveParamsSchema = z.object({});
@@ -5594,6 +5623,8 @@ export const EventConfigureTimingParamsSchema = z.object({
   cleanupMinutes: z.number().optional(),
   returnTravelMinutes: z.number().optional(),
   unloadMinutes: z.number().optional(),
+  setupOverrideReason: z.string().optional(),
+  loadOverrideReason: z.string().optional(),
 });
 
 export type EventConfigureTimingParams = z.infer<typeof EventConfigureTimingParamsSchema>;
@@ -5809,6 +5840,14 @@ export const EventUpdateTaskBreakdownParamsSchema = z.object({
 });
 
 export type EventUpdateTaskBreakdownParams = z.infer<typeof EventUpdateTaskBreakdownParamsSchema>;
+
+// Command: useCompanyTimingRule on Event
+export const EventUseCompanyTimingRuleParamsSchema = z.object({
+  setup: z.boolean(),
+  load: z.boolean(),
+});
+
+export type EventUseCompanyTimingRuleParams = z.infer<typeof EventUseCompanyTimingRuleParamsSchema>;
 
 // Command: record on EventAllergenCheck
 export const EventAllergenCheckRecordParamsSchema = z.object({
@@ -7663,6 +7702,17 @@ export const OrganizationConfigureRoutePolicyParamsSchema = z.object({
 });
 
 export type OrganizationConfigureRoutePolicyParams = z.infer<typeof OrganizationConfigureRoutePolicyParamsSchema>;
+
+// Command: configureTimingPolicy on Organization
+export const OrganizationConfigureTimingPolicyParamsSchema = z.object({
+  fullServiceSetupMinutes: z.number().int(),
+  limitedServiceSetupMinutes: z.number().int(),
+  briefingMinutes: z.number().int(),
+  loadBaselineMinutes: z.number().int(),
+  loadRulesJson: z.string().optional(),
+});
+
+export type OrganizationConfigureTimingPolicyParams = z.infer<typeof OrganizationConfigureTimingPolicyParamsSchema>;
 
 // Command: deactivate on Organization
 export const OrganizationDeactivateParamsSchema = z.object({});

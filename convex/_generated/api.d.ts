@@ -38,6 +38,7 @@ import type * as eventCreateCatalog from "../eventCreateCatalog.js";
 import type * as eventDayBriefing from "../eventDayBriefing.js";
 import type * as eventReadiness from "../eventReadiness.js";
 import type * as eventRoutes from "../eventRoutes.js";
+import type * as eventTimingRules from "../eventTimingRules.js";
 import type * as fileStorage from "../fileStorage.js";
 import type * as googleCalendar from "../googleCalendar.js";
 import type * as hiringPipeline from "../hiringPipeline.js";
@@ -90,6 +91,7 @@ import type * as lib_eventPacket_reconcileNative from "../lib/eventPacket/reconc
 import type * as lib_eventReadinessProjection from "../lib/eventReadinessProjection.js";
 import type * as lib_eventStaffingOperations from "../lib/eventStaffingOperations.js";
 import type * as lib_eventTimingOperations from "../lib/eventTimingOperations.js";
+import type * as lib_eventTimingPolicy from "../lib/eventTimingPolicy.js";
 import type * as lib_fdcNutrientMapper from "../lib/fdcNutrientMapper.js";
 import type * as lib_foodDatabaseClient from "../lib/foodDatabaseClient.js";
 import type * as lib_foodDatabaseImage from "../lib/foodDatabaseImage.js";
@@ -170,6 +172,7 @@ import type * as lib_styleReconciliation from "../lib/styleReconciliation.js";
 import type * as lib_teamChatRead from "../lib/teamChatRead.js";
 import type * as lib_teamChatScan from "../lib/teamChatScan.js";
 import type * as lib_tenantSystemCommandRunner from "../lib/tenantSystemCommandRunner.js";
+import type * as lib_timingFollowUp from "../lib/timingFollowUp.js";
 import type * as lib_twilio from "../lib/twilio.js";
 import type * as lib_typicalKitchenDensity from "../lib/typicalKitchenDensity.js";
 import type * as lib_usdaCountPortionGrams from "../lib/usdaCountPortionGrams.js";
@@ -254,6 +257,7 @@ declare const fullApi: ApiFromModules<{
   eventDayBriefing: typeof eventDayBriefing;
   eventReadiness: typeof eventReadiness;
   eventRoutes: typeof eventRoutes;
+  eventTimingRules: typeof eventTimingRules;
   fileStorage: typeof fileStorage;
   googleCalendar: typeof googleCalendar;
   hiringPipeline: typeof hiringPipeline;
@@ -306,6 +310,7 @@ declare const fullApi: ApiFromModules<{
   "lib/eventReadinessProjection": typeof lib_eventReadinessProjection;
   "lib/eventStaffingOperations": typeof lib_eventStaffingOperations;
   "lib/eventTimingOperations": typeof lib_eventTimingOperations;
+  "lib/eventTimingPolicy": typeof lib_eventTimingPolicy;
   "lib/fdcNutrientMapper": typeof lib_fdcNutrientMapper;
   "lib/foodDatabaseClient": typeof lib_foodDatabaseClient;
   "lib/foodDatabaseImage": typeof lib_foodDatabaseImage;
@@ -386,6 +391,7 @@ declare const fullApi: ApiFromModules<{
   "lib/teamChatRead": typeof lib_teamChatRead;
   "lib/teamChatScan": typeof lib_teamChatScan;
   "lib/tenantSystemCommandRunner": typeof lib_tenantSystemCommandRunner;
+  "lib/timingFollowUp": typeof lib_timingFollowUp;
   "lib/twilio": typeof lib_twilio;
   "lib/typicalKitchenDensity": typeof lib_typicalKitchenDensity;
   "lib/usdaCountPortionGrams": typeof lib_usdaCountPortionGrams;

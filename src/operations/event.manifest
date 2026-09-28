@@ -50,6 +50,12 @@ enum EventTimingMilestone {
   staff_off
 }
 
+// Who set an event's setup or load time (PL-TIMING).
+enum EventTimingSource {
+  company_rule
+  person
+}
+
 enum EventRecurrenceEndCondition {
   on_date
   after_occurrences
@@ -643,6 +649,26 @@ entity Event mixin TenantScoped, SoftDeletable {
   property timingReturnTravelMinutes: float?
   property timingUnloadMinutes: float?
   property timingConfiguredAt: datetime?
+  // Company timing rules copied onto the event (PL-TIMING, spec §8.4): spare
+  // minutes before the shop departure and the crew briefing before loading.
+  // Unset counts as zero.
+  property timingSafetyBufferMinutes: float?
+  property timingBriefingMinutes: float?
+  // Where setup and load came from: the company rule, or a person. A person's
+  // value stays until they hand it back to the rule; the reason and who
+  // changed it are kept.
+  property timingSetupSource: EventTimingSource?
+  property timingSetupOverrideReason: string?
+  property timingSetupOverrideByPersonId: uuid?
+  property timingSetupOverrideAt: datetime?
+  property timingLoadSource: EventTimingSource?
+  property timingLoadOverrideReason: string?
+  property timingLoadOverrideByPersonId: uuid?
+  property timingLoadOverrideAt: datetime?
+  // The company load rule used; unset with source company_rule = no rule
+  // matched, so the baseline was used and needs a look.
+  property timingLoadRuleId: string?
+  property timingLoadNeedsReview: boolean?
   // Purchasing week bucket key for weekly VendorOrder draft consolidation.
   // Normalized from startsAt on plan/reschedule to the Monday 08:00 UTC that
   // starts the event's week (Monday 00:00 US Pacific / 04:00 US Eastern —
@@ -788,19 +814,19 @@ entity Event mixin TenantScoped, SoftDeletable {
   computed timingCanRecalculate: boolean = self.deletedAt == null and self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled"
   // Same authority as the staffing commands, evaluated for the current reader.
   computed staffingCanManage: boolean = roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
-  // Mangia Ops Final Lock Training p4. Unknown durations stay unknown.
-  // Suggested setup is presented for explicit acceptance, never silently saved.
-  computed timingSuggestedSetupMinutes: float? = self.serviceStyle != null and self.serviceStyle.name == "Full Service" ? 180 : (self.serviceStyle != null and self.serviceStyle.name == "Limited Service" ? 90 : null)
+  // Spec §8.4 (PL-TIMING). Unknown durations stay unknown. Setup and load
+  // defaults come from the company timing rules (convex/lib/eventTimingPolicy.ts).
+  // onsite = serve - setup; depart = onsite - drive - safety buffer;
+  // load start = depart - load; staff on = load start - briefing.
   computed timingOnsiteAt: datetime? = self.serviceStartsAt != null and self.timingSetupMinutes != null ? self.serviceStartsAt - self.timingSetupMinutes * 60000 : null
-  computed timingDepartShopAt: datetime? = self.timingOnsiteAt != null and self.timingOutboundTravelMinutes != null ? self.timingOnsiteAt - self.timingOutboundTravelMinutes * 60000 : null
-  computed timingStaffOnAt: datetime? = self.timingDepartShopAt != null and self.timingLoadMinutes != null ? self.timingDepartShopAt - self.timingLoadMinutes * 60000 : null
+  computed timingDepartShopAt: datetime? = self.timingOnsiteAt != null and self.timingOutboundTravelMinutes != null ? self.timingOnsiteAt - (self.timingOutboundTravelMinutes + (self.timingSafetyBufferMinutes != null ? self.timingSafetyBufferMinutes : 0)) * 60000 : null
+  computed timingLoadStartAt: datetime? = self.timingDepartShopAt != null and self.timingLoadMinutes != null ? self.timingDepartShopAt - self.timingLoadMinutes * 60000 : null
+  computed timingStaffOnAt: datetime? = self.timingLoadStartAt != null ? self.timingLoadStartAt - (self.timingBriefingMinutes != null ? self.timingBriefingMinutes : 0) * 60000 : null
   computed timingDepartVenueAt: datetime? = self.endsAt != null and self.timingCleanupMinutes != null ? self.endsAt + self.timingCleanupMinutes * 60000 : null
   computed timingReturnShopAt: datetime? = self.timingDepartVenueAt != null and self.timingReturnTravelMinutes != null ? self.timingDepartVenueAt + self.timingReturnTravelMinutes * 60000 : null
   computed timingStaffOffAt: datetime? = self.timingReturnShopAt != null and self.timingUnloadMinutes != null ? self.timingReturnShopAt + self.timingUnloadMinutes * 60000 : null
-  // Mangia Ops Final Lock Training p4: back out 1 hour to load (more for a
-  // large event) and allow 1 hour after event end for cleanup and reload.
-  // Suggestions only, like timingSuggestedSetupMinutes — never silently saved.
-  computed timingSuggestedLoadMinutes: float = 60
+  // Mangia Ops Final Lock Training p4: allow 1 hour after event end for
+  // cleanup and reload. A suggestion only - never silently saved.
   computed timingSuggestedCleanupMinutes: float = 60
   // Binder color code (training part 4): red = cooked on site (full service),
   // green = limited service, blue = drop-off clipboard.
@@ -1122,10 +1148,21 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional outboundTravelMinutes: number,
     optional cleanupMinutes: number,
     optional returnTravelMinutes: number,
-    optional unloadMinutes: number
+    optional unloadMinutes: number,
+    optional setupOverrideReason: string,
+    optional loadOverrideReason: string
   ) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may plan the event timeline"
+    // A setup or load time that differs from the saved one is the person's
+    // own value (PL-TIMING); company rules no longer move it. A reason is
+    // welcome but never required.
+    compute setupChanged = setupMinutes != self.timingSetupMinutes
+    compute loadChanged = loadMinutes != self.timingLoadMinutes
+    compute setupReasonGiven = setupOverrideReason != null and length(trim(setupOverrideReason)) > 0
+    compute loadReasonGiven = loadOverrideReason != null and length(trim(loadOverrideReason)) > 0
+    compute setupByPerson = setupMinutes != null and (setupChanged or self.timingSetupSource != "company_rule" or setupReasonGiven)
+    compute loadByPerson = loadMinutes != null and (loadChanged or self.timingLoadSource != "company_rule" or loadReasonGiven)
     constraint activeEventTiming: self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled" "Finished or cancelled events keep their saved timing; correct individual blocks if needed"
     constraint timingSetupNonnegative: setupMinutes == null or setupMinutes >= 0 "Setup time can't be negative. Use zero or more."
     constraint timingLoadNonnegative: loadMinutes == null or loadMinutes >= 0 "Load time can't be negative. Use zero or more."
@@ -1141,6 +1178,65 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate timingReturnTravelMinutes = returnTravelMinutes
     mutate timingUnloadMinutes = unloadMinutes
     mutate timingConfiguredAt = now()
+    mutate timingSetupSource = setupMinutes == null ? null : (setupByPerson ? "person" : "company_rule")
+    mutate timingSetupOverrideReason = setupByPerson ? (setupReasonGiven ? setupOverrideReason : (setupChanged ? null : self.timingSetupOverrideReason)) : null
+    mutate timingSetupOverrideByPersonId = setupByPerson ? (setupChanged or setupReasonGiven ? user.personId : self.timingSetupOverrideByPersonId) : null
+    mutate timingSetupOverrideAt = setupByPerson ? (setupChanged or setupReasonGiven ? now() : self.timingSetupOverrideAt) : null
+    mutate timingLoadSource = loadMinutes == null ? null : (loadByPerson ? "person" : "company_rule")
+    mutate timingLoadOverrideReason = loadByPerson ? (loadReasonGiven ? loadOverrideReason : (loadChanged ? null : self.timingLoadOverrideReason)) : null
+    mutate timingLoadOverrideByPersonId = loadByPerson ? (loadChanged or loadReasonGiven ? user.personId : self.timingLoadOverrideByPersonId) : null
+    mutate timingLoadOverrideAt = loadByPerson ? (loadChanged or loadReasonGiven ? now() : self.timingLoadOverrideAt) : null
+    mutate timingLoadRuleId = loadByPerson ? null : self.timingLoadRuleId
+    mutate timingLoadNeedsReview = loadByPerson ? false : self.timingLoadNeedsReview
+    emit EventTimingConfigured {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Hand setup and/or load back to the company timing rule (PL-TIMING); the
+  // follow-up re-applies the rule and the timeline follows.
+  command useCompanyTimingRule(setup: boolean, load: boolean) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may plan the event timeline"
+    constraint activeRuleTiming: self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled" "Finished or cancelled events keep their saved timing; correct individual blocks if needed"
+    mutate timingSetupSource = setup ? "company_rule" : self.timingSetupSource
+    mutate timingSetupOverrideReason = setup ? null : self.timingSetupOverrideReason
+    mutate timingSetupOverrideByPersonId = setup ? null : self.timingSetupOverrideByPersonId
+    mutate timingSetupOverrideAt = setup ? null : self.timingSetupOverrideAt
+    mutate timingLoadSource = load ? "company_rule" : self.timingLoadSource
+    mutate timingLoadOverrideReason = load ? null : self.timingLoadOverrideReason
+    mutate timingLoadOverrideByPersonId = load ? null : self.timingLoadOverrideByPersonId
+    mutate timingLoadOverrideAt = load ? null : self.timingLoadOverrideAt
+    emit EventTimingRuleRestored {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Server-only (PL-TIMING, AC-428): company setup/load/briefing/buffer rules
+  // applied by convex/lib/eventTimingPolicy.ts. A person's setup or load
+  // value is never replaced; an omitted value clears only a rule value.
+  private command applyTimingPolicy(
+    optional setupMinutes: number,
+    optional loadMinutes: number,
+    optional loadRuleId: string,
+    loadNeedsReview: boolean,
+    briefingMinutes: number,
+    safetyBufferMinutes: number
+  ) {
+    guard self.deletedAt == null
+    constraint activePolicyTiming: self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled" "Finished or cancelled events keep their saved timing; correct individual blocks if needed"
+    compute setupFollowsRule = self.timingSetupSource == "company_rule" or (self.timingSetupSource == null and self.timingSetupMinutes == null)
+    compute loadFollowsRule = self.timingLoadSource == "company_rule" or (self.timingLoadSource == null and self.timingLoadMinutes == null)
+    mutate timingSetupMinutes = setupFollowsRule ? setupMinutes : self.timingSetupMinutes
+    mutate timingSetupSource = setupFollowsRule ? (setupMinutes != null ? "company_rule" : null) : self.timingSetupSource
+    mutate timingLoadMinutes = loadFollowsRule ? loadMinutes : self.timingLoadMinutes
+    mutate timingLoadSource = loadFollowsRule ? (loadMinutes != null ? "company_rule" : null) : self.timingLoadSource
+    mutate timingLoadRuleId = loadFollowsRule ? loadRuleId : self.timingLoadRuleId
+    mutate timingLoadNeedsReview = loadFollowsRule ? loadNeedsReview : self.timingLoadNeedsReview
+    mutate timingBriefingMinutes = briefingMinutes
+    mutate timingSafetyBufferMinutes = safetyBufferMinutes
     emit EventTimingConfigured {
       eventId: self.id
       tenantId: self.tenantId
@@ -1161,12 +1257,14 @@ entity Event mixin TenantScoped, SoftDeletable {
   }
 
   // Server-only (PL-ROUTES, AC-382): the drive time comes from a stored route
-  // fact, never from the browser. Travel includes the company safety buffer on
-  // the way out. An omitted leg keeps its current value. Emits the same event
-  // as configureTiming so the timeline and shifts follow.
+  // fact, never from the browser. Travel is the road time only; the company
+  // safety buffer is kept apart (timingSafetyBufferMinutes). An omitted value
+  // keeps its current value. Emits the same event as configureTiming so the
+  // timeline and shifts follow.
   private command applyRouteTravel(
     optional outboundTravelMinutes: number,
-    optional returnTravelMinutes: number
+    optional returnTravelMinutes: number,
+    optional safetyBufferMinutes: number
   ) {
     guard self.deletedAt == null
     constraint activeRouteTiming: self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled" "Finished or cancelled events keep their saved timing; correct individual blocks if needed"
@@ -1174,6 +1272,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     constraint routeReturnNonnegative: returnTravelMinutes == null or returnTravelMinutes >= 0 "Return travel time can't be negative. Use zero or more."
     mutate timingOutboundTravelMinutes = outboundTravelMinutes != null ? outboundTravelMinutes : self.timingOutboundTravelMinutes
     mutate timingReturnTravelMinutes = returnTravelMinutes != null ? returnTravelMinutes : self.timingReturnTravelMinutes
+    mutate timingSafetyBufferMinutes = safetyBufferMinutes != null ? safetyBufferMinutes : self.timingSafetyBufferMinutes
     mutate timingConfiguredAt = self.timingConfiguredAt != null ? self.timingConfiguredAt : now()
     emit EventTimingConfigured {
       eventId: self.id
@@ -2565,6 +2664,11 @@ event EventGuestWithdrawn: "event_guest.withdrawn" {
 }
 
 event EventTimingConfigured: "event.timing_configured" {
+  eventId: string
+  tenantId: string
+}
+
+event EventTimingRuleRestored: "event.timing_rule_restored" {
   eventId: string
   tenantId: string
 }

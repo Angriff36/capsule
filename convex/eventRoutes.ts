@@ -34,7 +34,6 @@ import {
   routeProviderConfigured,
 } from "./lib/routeProvider";
 import {
-  DEFAULT_ROUTE_POLICY,
   evaluateRouteLeg,
   legAnchor,
   legDepartureTime,
@@ -314,14 +313,10 @@ export const recordRouteFacts = internalMutation({
       });
     }
     if (FINISHED_STAGES.has(String(event.stage))) return { applied: false };
-    const policy: RoutePolicy = {
-      ...DEFAULT_ROUTE_POLICY,
-      safetyBufferMinutes,
-    };
     const minutes = (leg: RouteLeg) => {
       const fact = facts.find((row) => row.leg === leg && row.status === "ok");
       return fact?.durationSeconds != null
-        ? legTravelMinutes(leg, fact.durationSeconds, policy)
+        ? legTravelMinutes(fact.durationSeconds)
         : undefined;
     };
     const outboundTravelMinutes = minutes("outbound");
@@ -337,6 +332,7 @@ export const recordRouteFacts = internalMutation({
       docId: eventId,
       ...(outboundTravelMinutes !== undefined ? { outboundTravelMinutes } : {}),
       ...(returnTravelMinutes !== undefined ? { returnTravelMinutes } : {}),
+      ...(outboundTravelMinutes !== undefined ? { safetyBufferMinutes } : {}),
     });
     return { applied: true };
   },

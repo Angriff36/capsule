@@ -59,7 +59,7 @@ describe("route-backed timeline (AC-382)", () => {
       await t.finishInProgressScheduledFunctions();
       expect(google.requests).toHaveLength(2);
       let saved = await t.run((ctx) => ctx.db.get(event));
-      expect(saved!.timingOutboundTravelMinutes).toBe(55);
+      expect(saved!.timingOutboundTravelMinutes).toBe(40);
 
       // Its own travel update queues one more check, which finds it current.
       vi.advanceTimersByTime(61_000);
@@ -79,7 +79,7 @@ describe("route-backed timeline (AC-382)", () => {
         "55 Farm Road, Golden CO, US",
       );
       saved = await t.run((ctx) => ctx.db.get(event));
-      expect(saved!.timingOutboundTravelMinutes).toBe(55);
+      expect(saved!.timingOutboundTravelMinutes).toBe(40);
     } finally {
       vi.useRealTimers();
     }
@@ -96,7 +96,7 @@ describe("route-backed timeline (AC-382)", () => {
       serviceStartsAt: later,
       setupMinutes: 180,
       loadMinutes: 60,
-      outboundTravelMinutes: 55,
+      outboundTravelMinutes: 40,
       cleanupMinutes: 60,
       returnTravelMinutes: 40,
       unloadMinutes: 30,

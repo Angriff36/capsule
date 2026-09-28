@@ -43,6 +43,7 @@ import { ensureEventNumber } from "./eventNumbering";
 import { recordAcceptedProposalRevision } from "./proposalAcceptanceRevision";
 import { deleteBlobIfOrphan } from "./blobs";
 import { queueRouteRefresh } from "./routeFollowUp";
+import { queueTimingRecalculation } from "./timingFollowUp";
 
 /** Runs after declared reactions, inside the originating command transaction. */
 export async function handleManifestEvent(
@@ -50,6 +51,7 @@ export async function handleManifestEvent(
   event: ConvexCommandEvent,
 ): Promise<void> {
   await queueRouteRefresh(ctx, event);
+  await queueTimingRecalculation(ctx, event);
   if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedCoverageChangeRequested") {
     await prepareStaffNeedCoverageChange(ctx, event.entityId as Id<"eventStaffNeeds">);
     return;

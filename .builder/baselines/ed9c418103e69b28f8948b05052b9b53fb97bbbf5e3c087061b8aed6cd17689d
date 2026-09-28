@@ -154,6 +154,7 @@ import {
   EquipmentUpdateConditionParamsSchema,
   EventAllergenCheckRecordParamsSchema,
   EventApplyRouteTravelParamsSchema,
+  EventApplyTimingPolicyParamsSchema,
   EventApproveParamsSchema,
   EventArchiveParamsSchema,
   EventAssignOwnerParamsSchema,
@@ -259,6 +260,7 @@ import {
   EventUpdateImportDraftParamsSchema,
   EventUpdateSetupNotesParamsSchema,
   EventUpdateTaskBreakdownParamsSchema,
+  EventUseCompanyTimingRuleParamsSchema,
   EventVehicleAssignmentAssignParamsSchema,
   EventVehicleAssignmentClearPreloadedParamsSchema,
   EventVehicleAssignmentMarkPreloadedParamsSchema,
@@ -412,6 +414,7 @@ import {
   OrganizationCapabilitySettingSetEnabledParamsSchema,
   OrganizationConfigureBrandingParamsSchema,
   OrganizationConfigureRoutePolicyParamsSchema,
+  OrganizationConfigureTimingPolicyParamsSchema,
   OrganizationDeactivateParamsSchema,
   OrganizationReactivateParamsSchema,
   OrganizationRegisterParamsSchema,
@@ -3038,6 +3041,16 @@ export function useEventApplyRouteTravel() {
   };
 }
 
+/** Mutation hook for Event.applyTimingPolicy. */
+export function useEventApplyTimingPolicy() {
+  const mutate = useMutation(api.mutations.Event_applyTimingPolicy);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventApplyTimingPolicyParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Event.approve. */
 export function useEventApprove() {
   const mutate = useMutation(api.mutations.Event_approve);
@@ -3424,6 +3437,16 @@ export function useEventUpdateTaskBreakdown() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventUpdateTaskBreakdownParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Event.useCompanyTimingRule. */
+export function useEventUseCompanyTimingRule() {
+  const mutate = useMutation(api.mutations.Event_useCompanyTimingRule);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventUseCompanyTimingRuleParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -6501,6 +6524,16 @@ export function useOrganizationConfigureRoutePolicy() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = OrganizationConfigureRoutePolicyParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Organization.configureTimingPolicy. */
+export function useOrganizationConfigureTimingPolicy() {
+  const mutate = useMutation(api.mutations.Organization_configureTimingPolicy);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationConfigureTimingPolicyParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11586,4 +11619,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1230 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1233 as const;

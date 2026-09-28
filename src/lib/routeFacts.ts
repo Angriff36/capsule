@@ -450,13 +450,8 @@ export function evaluateRouteLeg(
   };
 }
 
-/** Minutes the event timeline uses for a leg: the road time rounded up,
- * plus the safety buffer on the way out. */
-export function legTravelMinutes(
-  leg: RouteLeg,
-  durationSeconds: number,
-  policy: RoutePolicy,
-): number {
-  const drive = Math.ceil(durationSeconds / 60);
-  return leg === "outbound" ? drive + policy.safetyBufferMinutes : drive;
+/** Minutes the event timeline uses for a leg: the road time rounded up. The
+ * safety buffer is kept apart on the event (timingSafetyBufferMinutes). */
+export function legTravelMinutes(durationSeconds: number): number {
+  return Math.ceil(durationSeconds / 60);
 }

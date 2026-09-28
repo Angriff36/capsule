@@ -1,4 +1,5 @@
 import { ConvexError, v } from "convex/values";
+import { internal } from "./_generated/api";
 import { mutation } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
 import { conflictingVehicleDeliveries } from "./lib/vehicleDeliveryAvailability";
@@ -123,6 +124,11 @@ export const assign = mutation({
       },
       createdAt: now,
     });
+    // The truck count can pick another company load rule (PL-TIMING).
+    await ctx.scheduler.runAfter(0, internal.eventTimingRules.recalculate, {
+      tenantId,
+      eventId: delivery.eventId,
+    });
 
     return { deliveryId: args.deliveryId, vehicleId: args.vehicleId };
   },
@@ -182,6 +188,11 @@ export const unassign = mutation({
         eventId: delivery.eventId,
       },
       createdAt: now,
+    });
+    // The truck count can pick another company load rule (PL-TIMING).
+    await ctx.scheduler.runAfter(0, internal.eventTimingRules.recalculate, {
+      tenantId,
+      eventId: delivery.eventId,
     });
 
     return { deliveryId: args.deliveryId, vehicleId: null };

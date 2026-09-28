@@ -9,13 +9,13 @@ export const durationFields = [
     "setupMinutes",
     "timingSetupMinutes",
     "Onsite setup",
-    "Before service; full service 180 min, limited service 90 min.",
+    "Before service; filled from your company timing rules for the service style.",
   ],
   [
     "loadMinutes",
     "timingLoadMinutes",
     "Load at shop",
-    "Start with 60 min; allow more for larger loads or more vehicles.",
+    "Filled from your company load rules; change it for a bigger or smaller load.",
   ],
   [
     "outboundTravelMinutes",
@@ -59,7 +59,6 @@ export function startDraft(plan: Plan): Draft {
   const defaults: Record<string, number | null | undefined> =
     event.timingConfiguredAt == null
       ? {
-          setupMinutes: event.timingSuggestedSetupMinutes,
           loadMinutes: 60,
           cleanupMinutes: 60,
         }
