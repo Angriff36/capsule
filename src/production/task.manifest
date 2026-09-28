@@ -587,12 +587,13 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   // work makes the whole removal fail: one cook finishing one step used to make
   // a dish impossible to pull from service, which is exactly when you need to
   // pull it. Finished work stays finished here — the task is left alone rather
-  // than rejected. eventManageAccess is granted because the fan-out runs as the
-  // acting user, and an event manager killing their own event is not a kitchen
-  // lead. `cancel` stays narrow: it is the button a human presses.
+  // than rejected. manageAccess is granted because the fan-out runs as the
+  // acting user: any manager may pull a dish (EventDish.remove), and that
+  // manager is not a kitchen lead. `cancel` stays narrow: it is the button a
+  // human presses.
   command standDown(reason: string) {
     guard self.deletedAt == null
-    guard roleAllows(user.role, "kitchenLeadAccess") or roleAllows(user.role, "eventManageAccess")
+    guard roleAllows(user.role, "kitchenLeadAccess") or roleAllows(user.role, "manageAccess")
     constraint standDownPrepReason: length(trim(reason)) > 0 "Say why you're standing this down."
     compute previousStatus = self.status
     compute alreadySettled = self.status == "completed" or self.status == "cancelled"

@@ -39475,7 +39475,7 @@ async function __runPrepTaskStandDown(ctx: MutationCtx, { docId, reason, version
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((checkRole(user, "kitchenLeadAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Guard 1 failed");
+    if (!((checkRole(user, "kitchenLeadAccess") || checkRole(user, "manageAccess")))) throw new Error("Guard 1 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Say why you're standing this down.");
     const previousStatus = doc.status;
     const alreadySettled = ((doc.status === "completed") || (doc.status === "cancelled"));
