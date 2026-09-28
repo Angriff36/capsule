@@ -48,6 +48,7 @@ import {
 } from "./offlineStore";
 import { MyDayFrame, OfflineStatusBar } from "./MyDayFrame";
 import { clerkSignedInLabel } from "./MyDayIdentityResolver";
+import { useOpenTasksDueTodayForPerson } from "./useOpenTasksDueTodayForPerson";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { resolveMyDayAccount } from "./resolveMyDayAccount";
 import { MyDayProfileLink } from "./MyDayProfileLink";
@@ -222,6 +223,20 @@ export function MyDayPage() {
       replayScope.current = null;
     };
   }, [me?._id, offlineScope]);
+
+  /**
+   * Open tasks assigned to the signed-in Person that are due today (local
+   * server day). The query returns [] until the resolver has me; while
+   * loading, the click falls through (treated as "no blocker"). The
+   * intercept modal only opens when the result is a non-empty list.
+   */
+  const openTasksDueToday = useOpenTasksDueTodayForPerson(
+    me?._id as Parameters<typeof useOpenTasksDueTodayForPerson>[0],
+  );
+  const [clockOutDialog, setClockOutDialog] = useState<{
+    docId: string;
+    version: number;
+  } | null>(null);
 
   const run = (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -597,12 +612,32 @@ export function MyDayPage() {
                     <button
                       className={BLOCK_BTN}
                       disabled={busy != null}
-                      onClick={() =>
+                      onClick={() => {
+                        // Block-then-confirm: if any open tasks are due
+                        // today, show the dialog instead of clocking out
+                        // immediately. The mutation only fires when the
+                        // user picks "Clock out anyway". A loading result
+                        // (undefined) does NOT block — better to let the
+                        // clock-out go through than to deadlock on a slow
+                        // network. Resolves to a noop when offline: queued
+                        // actions don't get intercepted by this dialog,
+                        // matching the existing offline behavior.
+                        if (
+                          online &&
+                          Array.isArray(openTasksDueToday) &&
+                          openTasksDueToday.length > 0
+                        ) {
+                          setClockOutDialog({
+                            docId: openRecord._id,
+                            version: openRecord.version,
+                          });
+                          return;
+                        }
                         perform("clock-out", "clock-out", "Clock out", {
                           docId: openRecord._id,
                           version: openRecord.version,
-                        })
-                      }
+                        });
+                      }}
                     >
                       {busy === "clock-out" ? "Clocking out…" : "Clock out"}
                     </button>
@@ -1144,6 +1179,59 @@ export function MyDayPage() {
           </div>
         </>
       )}
+
+      {clockOutDialog ? (
+        <dialog
+          open
+          aria-labelledby="clock-out-blocker-title"
+          className="my-day-blocker-dialog"
+        >
+          <div className="my-day-blocker-shell">
+            <h2 id="clock-out-blocker-title">You still have open tasks</h2>
+            <p className="text-base text-ink-2">
+              Finish these before you clock out, or clock out anyway and pick
+              them up later.
+            </p>
+            <ul className="my-day-blocker-list">
+              {(openTasksDueToday ?? []).map((task) => (
+                <li key={task._id}>
+                  <strong>{task.title}</strong>
+                  <span className="text-sm text-ink-3">
+                    Due {timeLabel(task.dueAt)} ·{" "}
+                    {task.status === "in_progress" ? "in progress" : "pending"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <div className="my-day-blocker-actions">
+              <button
+                type="button"
+                className={BLOCK_BTN}
+                onClick={() => setClockOutDialog(null)}
+              >
+                Go finish them
+              </button>
+              <button
+                type="button"
+                className={BLOCK_BTN}
+                disabled={busy != null}
+                onClick={() => {
+                  const pending = clockOutDialog;
+                  setClockOutDialog(null);
+                  if (pending) {
+                    perform("clock-out", "clock-out", "Clock out", {
+                      docId: pending.docId,
+                      version: pending.version,
+                    });
+                  }
+                }}
+              >
+                Clock out anyway
+              </button>
+            </div>
+          </div>
+        </dialog>
+      ) : null}
     </MyDayFrame>
   );
 }

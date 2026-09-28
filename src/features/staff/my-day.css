@@ -683,3 +683,64 @@
 .my-day-prep-progress progress::-moz-progress-bar {
   background: var(--color-brand);
 }
+
+/* Clock-out blocker dialog. Shows the open tasks that are due today and
+   asks the user to either go finish them or clock out anyway. No
+   native <dialog> chrome — a plain shell backed by a scrim is enough
+   for the blocker; the rest of the app uses proper <dialog> elements. */
+.my-day-blocker-dialog {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(10, 14, 12, 0.55);
+  backdrop-filter: blur(2px);
+  z-index: 60;
+  padding: 16px;
+  border: 0;
+}
+.my-day-blocker-shell {
+  background: var(--color-panel);
+  color: var(--color-ink);
+  border-radius: 18px;
+  padding: 28px 28px 24px;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.45);
+  display: grid;
+  gap: 14px;
+}
+.my-day-blocker-shell h2 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 1.1;
+  margin: 0;
+}
+.my-day-blocker-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+.my-day-blocker-list li {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  background: var(--color-inset);
+}
+.my-day-blocker-list strong {
+  font-weight: 600;
+  font-size: 15px;
+}
+.my-day-blocker-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
