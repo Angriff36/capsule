@@ -10,7 +10,9 @@
       "Edit(//c/Projects/capsule/.loop-worktrees/**)",
       "Edit(//c/Projects/capsule/STATE.md)",
       "Edit(//c/Projects/capsule/loop-run-log.md)",
-      "Edit(//c/Projects/capsule/loop-ledger.json)"
+      "Edit(//c/Projects/capsule/loop-ledger.json)",
+      "Bash(git mv *)",
+      "Bash(git rm *)"
     ],
     "deny": [
       "Bash(git push *)",

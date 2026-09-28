@@ -132,6 +132,9 @@ foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
 
   $sha = git -C $wt rev-parse --short HEAD
   Record $h 'LANDED' "on dev as $sha, reviewed by $($r.reviewer)"
+  # The day's batch passed: close the review; the next one opens 24 hours from now.
+  Remove-Item (Join-Path $root '.loop-worktrees\_review-open') -Force -ErrorAction SilentlyContinue
+  Set-Content (Join-Path $root '.loop-worktrees\_last-review') (Get-Date -Format s)
   Discard $h $file.FullName
   git -C $root pull --ff-only --quiet origin dev *> $null   # best effort; never forced
 }
