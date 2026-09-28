@@ -20,6 +20,32 @@ const FRACTIONS: Record<string, number> = {
 const QUANTITY_TOKEN =
   "(?:(?:\\d+\\s+)?\\d+\\/\\d+|\\d+(?:\\.\\d+)?|[½¼¾⅓⅔⅛⅜⅝⅞])";
 
+const SUBRECIPE_PREFIX = /^(?:sub[\s-]?recipe|recipe)\s*:\s*/i;
+const SUBRECIPE_MARK =
+  /\s*(?:\((?:see\s+)?(?:sub[\s-]?)?recipe\)|[-–—]\s*see\s+recipe|\bsee\s+recipe\b)\s*/i;
+
+/**
+ * Kitchens mark a line that is another recipe: "Sub-recipe: 2 qt alfredo",
+ * "2 qt alfredo (see recipe)", "alfredo - see recipe". Returns the line
+ * without the marker and whether one was found.
+ */
+export function stripSubrecipeMarker(line: string): {
+  text: string;
+  hint: boolean;
+} {
+  let text = line.trim();
+  let hint = false;
+  if (SUBRECIPE_PREFIX.test(text)) {
+    text = text.replace(SUBRECIPE_PREFIX, "");
+    hint = true;
+  }
+  if (SUBRECIPE_MARK.test(text)) {
+    text = text.replace(SUBRECIPE_MARK, " ").replace(/\s+/g, " ").trim();
+    hint = true;
+  }
+  return { text, hint };
+}
+
 /**
  * Deterministic plain-text component parser for the culinary import workbench.
  * Does not invent Manifest entities — only structures text for createVia review.
@@ -239,6 +265,19 @@ export class ComponentTextParser {
   }
 
   parseIngredientLine(raw: string): ParsedIngredientLine | null {
+    const line = this.parseMeasuredLine(raw);
+    if (!line) return null;
+    const marked = stripSubrecipeMarker(line.raw);
+    if (!marked.hint) return line;
+    // Re-read the line without the marker so the name stays clean; the raw
+    // text keeps the marker as the source wrote it.
+    const unmarked = this.parseMeasuredLine(marked.text);
+    return unmarked
+      ? { ...unmarked, raw: line.raw, subrecipeHint: true }
+      : { ...line, subrecipeHint: true };
+  }
+
+  private parseMeasuredLine(raw: string): ParsedIngredientLine | null {
     const cleaned = raw.replace(/^[-*•]\s*/, "").trim();
     if (!cleaned || this.isSectionHeader(cleaned)) return null;
     if (this.isMethodStepLine(cleaned)) return null;
@@ -347,7 +386,7 @@ export class ComponentTextParser {
   }
 
   private looksLikeIngredient(line: string): boolean {
-    const cleaned = line.replace(/^[-*•]\s*/, "").trim();
+    const cleaned = stripSubrecipeMarker(line.replace(/^[-*•]\s*/, "")).text;
     if (this.isMethodStepLine(cleaned)) return false;
     if (this.isInstructionSectionHeader(cleaned)) return false;
     return new RegExp(`^(?:${QUANTITY_TOKEN}|#)`, "u").test(cleaned);

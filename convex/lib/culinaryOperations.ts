@@ -324,6 +324,8 @@ export const cloneMenu = mutation({
 const importLine = v.object({
   name: v.string(),
   ingredientId: v.optional(v.id("ingredients")),
+  /** A sub-recipe line: the recipe-book recipe this line uses. */
+  componentId: v.optional(v.id("components")),
   createNew: v.optional(v.boolean()),
   quantity: v.number(),
   unit,
@@ -356,14 +358,16 @@ export const importComponent = mutation({
     );
     if (prior) return { ...prior, recovered: true };
     for (const line of args.projection.lines) {
-      if (line.ingredientId) await ownedLive(ctx, line.ingredientId, tenantId, "Ingredient");
+      if (line.componentId) await ownedLive(ctx, line.componentId, tenantId, "Recipe");
+      else if (line.ingredientId) await ownedLive(ctx, line.ingredientId, tenantId, "Ingredient");
       else if (!line.createNew) throw new Error(`${line.name} is missing a matched ingredient`);
     }
     const createdIngredientIds: string[] = [];
-    const ingredientIds: Id<"ingredients">[] = [];
+    const ingredientIds: (Id<"ingredients"> | null)[] = [];
     for (let index = 0; index < args.projection.lines.length; index++) {
       const line = args.projection.lines[index];
-      if (line.ingredientId) ingredientIds.push(line.ingredientId);
+      if (line.componentId) ingredientIds.push(null);
+      else if (line.ingredientId) ingredientIds.push(line.ingredientId);
       else {
         const created = await ctx.runMutation(api.mutations.Ingredient_createViaIntroduce, {
           name: line.name.trim(), unit: line.unit as never, costPerUnit: 0, allergens: [],
@@ -375,16 +379,7 @@ export const importComponent = mutation({
     const component = await ctx.runMutation(api.mutations.Component_createViaDraft, {
       ...args.projection, lines: undefined, yieldUnit: args.projection.yieldUnit as never,
     });
-    const lineIds: string[] = [];
-    for (let index = 0; index < args.projection.lines.length; index++) {
-      const line = args.projection.lines[index];
-      const created = await ctx.runMutation(api.mutations.ComponentIngredient_createViaAdd, {
-        componentId: component.docId, ingredientId: ingredientIds[index], quantity: line.quantity,
-        unit: line.unit as never, sortOrder: line.sortOrder, wasteFactor: line.wasteFactor,
-        prepNotes: line.prepNotes,
-      });
-      lineIds.push(String(created.docId));
-    }
+    const lineIds = await addRecipeLines(ctx, component.docId, args.projection.lines, ingredientIds);
     const output = { componentId: String(component.docId), createdIngredientIds, lineIds };
     await writeMaterializationReceipt(ctx, tenantId, "componentImport", args.operationKey, args.projection, output);
     return { ...output, recovered: false };
@@ -403,6 +398,7 @@ type ImportProjection = {
   lines: {
     name: string;
     ingredientId?: Id<"ingredients">;
+    componentId?: Id<"components">;
     createNew?: boolean;
     quantity: number;
     unit: string;
@@ -411,6 +407,38 @@ type ImportProjection = {
     prepNotes?: string;
   }[];
 };
+
+/**
+ * Writes the finished recipe's lines in source order: a sub-recipe line becomes
+ * a nested recipe line (ComponentComponent), every other line an ingredient
+ * line. The new recipe has no parents yet, so linking existing recipes under
+ * it cannot close a cycle.
+ */
+async function addRecipeLines(
+  ctx: MutationCtx,
+  componentId: Id<"components">,
+  lines: ImportProjection["lines"],
+  ingredientIds: (Id<"ingredients"> | null)[],
+): Promise<string[]> {
+  const lineIds: string[] = [];
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index];
+    const ingredientId = ingredientIds[index];
+    const created = line.componentId
+      ? await ctx.runMutation(api.mutations.ComponentComponent_createViaAdd, {
+          componentId, childComponentId: line.componentId, quantity: line.quantity,
+          unit: line.unit as never, sortOrder: line.sortOrder, wasteFactor: line.wasteFactor,
+          prepNotes: line.prepNotes,
+        })
+      : await ctx.runMutation(api.mutations.ComponentIngredient_createViaAdd, {
+          componentId, ingredientId: ingredientId as Id<"ingredients">, quantity: line.quantity,
+          unit: line.unit as never, sortOrder: line.sortOrder, wasteFactor: line.wasteFactor,
+          prepNotes: line.prepNotes,
+        });
+    lineIds.push(String(created.docId));
+  }
+  return lineIds;
+}
 
 type ReviewedImportResult = { componentId: string; createdIngredientIds: string[]; lineIds: string[]; request: unknown };
 
@@ -479,7 +507,14 @@ async function finalizeReviewedImport(
     if (stored.parsedUnit !== requested.unit) {
       throw new Error(`line ${index + 1} unit does not match the saved review`);
     }
-    if (stored.matchStatus === "exact" || stored.matchStatus === "confirmed_existing") {
+    if (stored.matchStatus === "subrecipe") {
+      if (stored.matchedComponentId == null || requested.componentId !== stored.matchedComponentId) {
+        throw new Error(`line ${index + 1} must keep its linked sub-recipe`);
+      }
+      await ownedLive(ctx, stored.matchedComponentId, tenantId, "Recipe");
+    } else if (requested.componentId != null) {
+      throw new Error(`line ${index + 1} is not a sub-recipe in the saved review`);
+    } else if (stored.matchStatus === "exact" || stored.matchStatus === "confirmed_existing") {
       if (stored.matchedIngredientId == null || requested.ingredientId !== stored.matchedIngredientId) {
         throw new Error(`line ${index + 1} must keep its confirmed ingredient`);
       }
@@ -496,11 +531,13 @@ async function finalizeReviewedImport(
     }
   }
   const createdIngredientIds: string[] = [];
-  const ingredientIds: Id<"ingredients">[] = [];
+  const ingredientIds: (Id<"ingredients"> | null)[] = [];
   for (let index = 0; index < lines.length; index++) {
     const stored = lines[index];
     const requested = projection.lines[index];
-    if (stored.matchStatus === "confirmed_new") {
+    if (stored.matchStatus === "subrecipe") {
+      ingredientIds.push(null);
+    } else if (stored.matchStatus === "confirmed_new") {
       const created = await ctx.runMutation(api.mutations.Ingredient_createViaIntroduce, {
         name: requested.name.trim(), unit: requested.unit as never, costPerUnit: 0, allergens: [],
       });
@@ -516,16 +553,7 @@ async function finalizeReviewedImport(
   const component = await ctx.runMutation(api.mutations.Component_createViaDraft, {
     ...projection, lines: undefined, yieldUnit: projection.yieldUnit as never,
   });
-  const lineIds: string[] = [];
-  for (let index = 0; index < projection.lines.length; index++) {
-    const requested = projection.lines[index];
-    const created = await ctx.runMutation(api.mutations.ComponentIngredient_createViaAdd, {
-      componentId: component.docId, ingredientId: ingredientIds[index], quantity: requested.quantity,
-      unit: requested.unit as never, sortOrder: requested.sortOrder, wasteFactor: requested.wasteFactor,
-      prepNotes: requested.prepNotes,
-    });
-    lineIds.push(String(created.docId));
-  }
+  const lineIds = await addRecipeLines(ctx, component.docId, projection.lines, ingredientIds);
   await ctx.runMutation(api.mutations.ComponentImport_recordComponent, {
     docId: review.importId, resultingComponentId: component.docId,
   });
@@ -549,16 +577,18 @@ const reviewSourceInput = v.object({
 const lineMatchInput = v.object({
   matchStatus: v.string(),
   matchedIngredientId: v.optional(v.id("ingredients")),
+  matchedComponentId: v.optional(v.id("components")),
   possibleMatchIngredientIds: v.optional(v.array(v.string())),
 });
 
-type LineMatchTarget = { matchStatus: string; matchedIngredientId?: Id<"ingredients">; possibleMatchIngredientIds?: string[] };
-type StoredLineMatch = { matchStatus: string; matchedIngredientId?: Id<"ingredients"> | null; possibleMatchIngredientIds?: string[]; resolvedAt?: number | null };
+type LineMatchTarget = { matchStatus: string; matchedIngredientId?: Id<"ingredients">; matchedComponentId?: Id<"components">; possibleMatchIngredientIds?: string[] };
+type StoredLineMatch = { matchStatus: string; matchedIngredientId?: Id<"ingredients"> | null; matchedComponentId?: Id<"components"> | null; possibleMatchIngredientIds?: string[]; resolvedAt?: number | null };
 
 function sameLineMatch(stored: StoredLineMatch, target: LineMatchTarget): boolean {
   const storedId = stored.matchedIngredientId ?? null;
   const targetId = target.matchedIngredientId ?? null;
   if (stored.matchStatus !== target.matchStatus || storedId !== targetId) return false;
+  if ((stored.matchedComponentId ?? null) !== (target.matchedComponentId ?? null)) return false;
   const storedPossible = JSON.stringify(stored.possibleMatchIngredientIds ?? []);
   const targetPossible = JSON.stringify(target.possibleMatchIngredientIds ?? []);
   return storedPossible === targetPossible;
@@ -575,13 +605,14 @@ function sameLineMatch(stored: StoredLineMatch, target: LineMatchTarget): boolea
  */
 async function applyLineMatch(
   ctx: MutationCtx,
+  tenantId: string,
   lineId: Id<"componentImportLines">,
   stored: StoredLineMatch,
   target: LineMatchTarget,
 ) {
   if (sameLineMatch(stored, target)) return;
   if (target.matchStatus === "unresolved") {
-    if (stored.matchStatus !== "unresolved" || stored.matchedIngredientId != null || (stored.possibleMatchIngredientIds ?? []).length > 0) {
+    if (stored.matchStatus !== "unresolved" || stored.matchedIngredientId != null || stored.matchedComponentId != null || (stored.possibleMatchIngredientIds ?? []).length > 0) {
       await ctx.runMutation(api.mutations.ComponentImportLine_resetResolution, { docId: lineId });
     }
     return;
@@ -589,7 +620,15 @@ async function applyLineMatch(
   if (stored.resolvedAt != null) {
     await ctx.runMutation(api.mutations.ComponentImportLine_resetResolution, { docId: lineId });
   }
-  if (target.matchStatus === "exact" || target.matchStatus === "confirmed_existing") {
+  if (target.matchStatus === "subrecipe") {
+    if (target.matchedComponentId == null) throw new Error("A sub-recipe line needs a recipe from the recipe book");
+    await ownedLive(ctx, target.matchedComponentId, tenantId, "Recipe");
+    await ctx.runMutation(api.mutations.ComponentImportLine_linkSubrecipe, {
+      docId: lineId, matchedComponentId: target.matchedComponentId,
+    });
+    return;
+  }
+  if (target.matchStatus === "exact"|| target.matchStatus === "confirmed_existing") {
     if (target.matchedIngredientId == null) {
       throw new Error(`Line match ${target.matchStatus} requires an ingredient`);
     }
@@ -678,7 +717,7 @@ export const createComponentImportReview = mutation({
     approveWhenReady: v.optional(v.boolean()),
   },
   handler: async (ctx, args): Promise<{ importId: string; reviewRevision: number; lineIds: string[] }> => {
-    await authorize(ctx);
+    const tenantId = await authorize(ctx);
     if (args.parsed.lineCount !== args.lines.length) {
       throw new Error(`parsed line count ${args.parsed.lineCount} does not match ${args.lines.length} staged lines`);
     }
@@ -719,7 +758,7 @@ export const createComponentImportReview = mutation({
       // The workbench match already knows exact/possible/new confidence; store
       // it with the staged line so a saved review reopens with its decisions.
       if (line.match) {
-        await applyLineMatch(ctx, staged.docId, {
+        await applyLineMatch(ctx, tenantId, staged.docId, {
           matchStatus: "unresolved",
           matchedIngredientId: null,
           possibleMatchIngredientIds: [],
@@ -823,7 +862,7 @@ export const saveComponentImportReview = mutation({
     for (const line of args.lines) {
       if (!line.match) continue;
       const stored = storedLines.get(String(line.lineId))!;
-      await applyLineMatch(ctx, line.lineId, stored, line.match);
+      await applyLineMatch(ctx, tenantId, line.lineId, stored, line.match);
     }
     for (const discard of args.discardedLines ?? []) {
       await ctx.runMutation(api.mutations.ComponentImportLine_discard, {

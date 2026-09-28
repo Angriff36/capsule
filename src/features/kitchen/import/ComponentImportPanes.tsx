@@ -2,8 +2,14 @@ import { formatCountNoun } from "../../../lib/format";
 import type { ImportSourceMode } from "./ImportSourceReadiness";
 import {
   reviewMeasurementIssues,
+  type CatalogRecipe,
   type ComponentImportReviewState,
 } from "./ComponentImportTypes";
+import {
+  ComponentImportLineKindActions,
+  SubrecipePicker,
+  isSubrecipeLine,
+} from "./ComponentImportLineKind";
 import type { UnitOfMeasure } from "./UnitOfMeasureMapper";
 
 const UNIT_CHOICES = [
@@ -217,6 +223,7 @@ export function ComponentImportReviewPane({
   review,
   coordinator,
   catalog,
+  recipes = [],
   busy,
   unresolvedCount,
   saveState,
@@ -231,6 +238,8 @@ export function ComponentImportReviewPane({
   review: ComponentImportReviewState | null;
   coordinator: import("./ComponentImportCoordinator").ComponentImportCoordinator;
   catalog: { id: string; name: string }[];
+  /** The recipe book, for sub-recipe lines. */
+  recipes?: readonly CatalogRecipe[];
   busy: boolean;
   unresolvedCount: number;
   saveState: ComponentImportSaveState;
@@ -266,6 +275,7 @@ export function ComponentImportReviewPane({
     (line) =>
       line.matchStatus === "new" || line.matchStatus === "confirmed_new",
   ).length;
+  const subrecipeCount = review.lines.filter(isSubrecipeLine).length;
   const measurementIssues = reviewMeasurementIssues(review);
 
   return (
@@ -276,7 +286,8 @@ export function ComponentImportReviewPane({
       <div className="component-import-pane-head">
         <h2>Capsule draft</h2>
         <span className="component-import-badge">
-          {newIngredientCount} new · {unresolvedCount} unresolved
+          {newIngredientCount} new · {subrecipeCount} sub-recipe
+          {subrecipeCount === 1 ? "" : "s"} · {unresolvedCount} unresolved
         </span>
       </div>
 
@@ -297,7 +308,7 @@ export function ComponentImportReviewPane({
 
       {unresolvedCount > 0 ? (
         <div className="component-import-unresolved">
-          <p>{unresolvedCount} ingredient lines still need review.</p>
+          <p>{unresolvedCount} recipe lines still need review.</p>
           <button
             type="button"
             className="btn btn-ghost"
@@ -383,7 +394,7 @@ export function ComponentImportReviewPane({
       </div>
 
       <div className="component-import-lines-head">
-        <h3>Ingredients</h3>
+        <h3>Ingredients and sub-recipes</h3>
         <span className="font-mono text-xs text-ink-3">
           {formatCountNoun(review.lines.length, "line")}
         </span>
@@ -432,6 +443,12 @@ export function ComponentImportReviewPane({
                   Confirm create
                 </button>
               ) : null}
+              <ComponentImportLineKindActions
+                review={review}
+                index={index}
+                coordinator={coordinator}
+                onReviewChange={onReviewChange}
+              />
               <button
                 type="button"
                 className="btn btn-ghost"
@@ -444,51 +461,65 @@ export function ComponentImportReviewPane({
             </div>
             <div className="component-import-line-grid">
               <label className="field-label">
-                Ingredient
+                {isSubrecipeLine(line) ? "Sub-recipe" : "Ingredient"}
                 <input
                   value={line.name}
                   onChange={(event) =>
                     onReviewChange(
-                      coordinator.updateLine(review, index, {
-                        name: event.target.value,
-                        matchStatus: "new",
-                        matchedIngredientId: undefined,
-                        matchedIngredientName: undefined,
-                        possibleMatchIds: [],
-                        possibleMatchNames: [],
-                        createNew: true,
-                      }),
+                      isSubrecipeLine(line)
+                        ? coordinator.updateLine(review, index, {
+                            name: event.target.value,
+                          })
+                        : coordinator.updateLine(review, index, {
+                            name: event.target.value,
+                            matchStatus: "new",
+                            matchedIngredientId: undefined,
+                            matchedIngredientName: undefined,
+                            possibleMatchIds: [],
+                            possibleMatchNames: [],
+                            createNew: true,
+                          }),
                     )
                   }
                 />
               </label>
-              <label className="field-label">
-                Match catalog
-                <input
-                  list={`catalog-${index}`}
-                  placeholder="Search existing ingredients"
-                  defaultValue={line.matchedIngredientName ?? ""}
-                  onChange={(event) => {
-                    const item =
-                      catalog.find(
-                        (entry) =>
-                          entry.name.toLowerCase() ===
-                          event.target.value.trim().toLowerCase(),
-                      ) ?? null;
-                    onReviewChange(
-                      coordinator.bindCatalogIngredient(review, index, item),
-                    );
-                  }}
+              {isSubrecipeLine(line) ? (
+                <SubrecipePicker
+                  review={review}
+                  index={index}
+                  coordinator={coordinator}
+                  recipes={recipes}
+                  onReviewChange={onReviewChange}
                 />
-                <datalist id={`catalog-${index}`}>
-                  {catalog.map((item) => (
-                    <option key={item.id} value={item.name} />
-                  ))}
-                  {(line.possibleMatchNames ?? []).map((name) => (
-                    <option key={name} value={name} />
-                  ))}
-                </datalist>
-              </label>
+              ) : (
+                <label className="field-label">
+                  Match catalog
+                  <input
+                    list={`catalog-${index}`}
+                    placeholder="Search existing ingredients"
+                    defaultValue={line.matchedIngredientName ?? ""}
+                    onChange={(event) => {
+                      const item =
+                        catalog.find(
+                          (entry) =>
+                            entry.name.toLowerCase() ===
+                            event.target.value.trim().toLowerCase(),
+                        ) ?? null;
+                      onReviewChange(
+                        coordinator.bindCatalogIngredient(review, index, item),
+                      );
+                    }}
+                  />
+                  <datalist id={`catalog-${index}`}>
+                    {catalog.map((item) => (
+                      <option key={item.id} value={item.name} />
+                    ))}
+                    {(line.possibleMatchNames ?? []).map((name) => (
+                      <option key={name} value={name} />
+                    ))}
+                  </datalist>
+                </label>
+              )}
               <label className="field-label">
                 Qty
                 <input
