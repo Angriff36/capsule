@@ -29,6 +29,19 @@ enum ComponentImportMatchStatus {
   subrecipe
 }
 
+// What finalize did when the formula matched a recipe already in the book.
+enum ComponentImportDuplicateOutcome {
+  // Same source text, same formula: linked, nothing copied.
+  identical_source
+  // Same formula at a different batch size: linked, the book keeps its
+  // original serving amounts.
+  scaled_copy
+  // Same formula finished under a different name: both kept.
+  same_formula_other_name
+  // Same name, different formula: both kept so a person can compare.
+  same_name_other_formula
+}
+
 entity ComponentImport mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -56,6 +69,10 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
   property parsingFailureDetail: string?
   property finalizationFailureDetail: string?
   property resultingComponentId: uuid?
+  // Set when finalize matched an existing recipe (AC-067): the book recipe
+  // this import linked to or sits beside, and which match it was.
+  property duplicateOfComponentId: uuid?
+  property duplicateOutcome: ComponentImportDuplicateOutcome?
   property uploadedAt: datetime?
   property parsedAt: datetime?
   property reviewStartedAt: datetime?
@@ -67,6 +84,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
 
   hasMany lines: ComponentImportLine
   belongsTo resultingComponent: Component fields [tenantId, resultingComponentId] references [tenantId, id]
+  belongsTo duplicateOfComponent: Component fields [tenantId, duplicateOfComponentId] references [tenantId, id]
 
   constraint importSourcePresent: self.uploadedAt == null or length(trim(self.rawSourceText)) > 0 "Paste recipe text before parsing."
   constraint importYieldPositive: self.parsedYieldQuantity == null or self.parsedYieldQuantity > 0 "When you enter a yield, it must be more than zero."
@@ -261,6 +279,24 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     guard self.finalizationStartedAt != null
     guard self.deletedAt == null
     mutate resultingComponentId = resultingComponentId
+    emit ComponentImportComponentRecorded {
+      componentImportId: self.id
+      tenantId: self.tenantId
+      resultingComponentId: resultingComponentId
+    }
+  }
+
+  // The finished formula matched a recipe already in the book. Identical and
+  // scaled matches finish as a link to that recipe — no second recipe row and
+  // no second set of lines. The matched recipe is validated at complete()
+  // through the same tenant-scoped relation as recordComponent's link.
+  command recordDuplicateComponent(resultingComponentId: uuid, matchedComponentId: uuid, outcome: ComponentImportDuplicateOutcome) {
+    guard self.status == "finalizing"
+    guard self.finalizationStartedAt != null
+    guard self.deletedAt == null
+    mutate resultingComponentId = resultingComponentId
+    mutate duplicateOfComponentId = matchedComponentId
+    mutate duplicateOutcome = outcome
     emit ComponentImportComponentRecorded {
       componentImportId: self.id
       tenantId: self.tenantId

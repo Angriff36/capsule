@@ -259,6 +259,7 @@ export default defineSchema({
     instructions: v.optional(v.union(v.string(), v.null())),
     recipeSourceFingerprint: v.optional(v.union(v.string(), v.null())),
     recipeSourceText: v.optional(v.union(v.string(), v.null())),
+    recipeIdentityFingerprint: v.optional(v.union(v.string(), v.null())),
     versionNumber: v.number(),
     yieldQuantity: v.number(),
     yieldUnit: v.union(v.literal("each"), v.literal("gram"), v.literal("kilogram"), v.literal("ounce"), v.literal("pound"), v.literal("milliliter"), v.literal("liter"), v.literal("teaspoon"), v.literal("tablespoon"), v.literal("cup"), v.literal("pint"), v.literal("quart"), v.literal("gallon"), v.literal("portion"), v.literal("serving"), v.literal("batch"), v.literal("melon"), v.literal("bottle"), v.literal("fluid_ounce"), v.literal("piece"), v.literal("slice"), v.literal("pizza"), v.literal("package"), v.literal("case"), v.literal("can"), v.literal("tub")),
@@ -276,6 +277,7 @@ export default defineSchema({
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
+    .index("by_recipeIdentityFingerprint", ["recipeIdentityFingerprint"])
     .searchIndex("search_name", { searchField: "name", filterFields: ["tenantId"] }),
   componentComponents: defineTable({
     tenantId: v.string(),
@@ -321,6 +323,8 @@ export default defineSchema({
     parsingFailureDetail: v.optional(v.union(v.string(), v.null())),
     finalizationFailureDetail: v.optional(v.union(v.string(), v.null())),
     resultingComponentId: v.optional(v.union(v.id("components"), v.null())),
+    duplicateOfComponentId: v.optional(v.union(v.id("components"), v.null())),
+    duplicateOutcome: v.optional(v.union(v.literal("identical_source"), v.literal("scaled_copy"), v.literal("same_formula_other_name"), v.literal("same_name_other_formula"), v.null())),
     uploadedAt: v.optional(v.union(v.number(), v.null())),
     parsedAt: v.optional(v.union(v.number(), v.null())),
     reviewStartedAt: v.optional(v.union(v.number(), v.null())),
@@ -334,7 +338,8 @@ export default defineSchema({
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
-    .index("by_resultingComponentId", ["resultingComponentId"]),
+    .index("by_resultingComponentId", ["resultingComponentId"])
+    .index("by_duplicateOfComponentId", ["duplicateOfComponentId"]),
   componentImportLines: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

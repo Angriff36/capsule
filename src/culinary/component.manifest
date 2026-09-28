@@ -21,6 +21,10 @@ entity Component mixin TenantScoped, SoftDeletable {
   property instructions: string?
   property recipeSourceFingerprint: string?
   property recipeSourceText: string?
+  // Normalized formula identity (src/lib/recipeIdentity.ts): per-yield amounts
+  // of each line. Two imports of the same formula — even scaled — share it, so
+  // a repeated export links to this recipe instead of making a copy.
+  property indexed recipeIdentityFingerprint: string?
   property required versionNumber: int = 1
   property required yieldQuantity: decimal(10, 2) = 1
   property required yieldUnit: UnitOfMeasure = "portion"
@@ -76,7 +80,8 @@ entity Component mixin TenantScoped, SoftDeletable {
     optional description: string,
     optional instructions: string,
     optional sourceFingerprint: string,
-    optional sourceText: string
+    optional sourceText: string,
+    optional recipeIdentityFingerprint: string
   ) {
     guard self.draftedAt == null
     guard self.deletedAt == null
@@ -95,6 +100,7 @@ entity Component mixin TenantScoped, SoftDeletable {
     mutate instructions = instructions
     mutate recipeSourceFingerprint = sourceFingerprint
     mutate recipeSourceText = sourceText
+    mutate recipeIdentityFingerprint = recipeIdentityFingerprint
     mutate versionNumber = 1
     mutate draftedAt = now()
     emit ComponentDrafted {

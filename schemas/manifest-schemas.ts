@@ -280,6 +280,7 @@ export const ComponentSchema = z.object({
   instructions: z.string().nullable().optional(),
   recipeSourceFingerprint: z.string().nullable().optional(),
   recipeSourceText: z.string().nullable().optional(),
+  recipeIdentityFingerprint: z.string().nullable().optional(),
   versionNumber: z.number().int().default(1),
   yieldQuantity: z.number().min(1).default(1),
   yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("portion"),
@@ -354,6 +355,8 @@ export const ComponentImportSchema = z.object({
   parsingFailureDetail: z.string().nullable().optional(),
   finalizationFailureDetail: z.string().nullable().optional(),
   resultingComponentId: z.string().uuid().nullable().optional(),
+  duplicateOfComponentId: z.string().uuid().nullable().optional(),
+  duplicateOutcome: z.enum(["identical_source", "scaled_copy", "same_formula_other_name", "same_name_other_formula"]).nullable().optional(),
   uploadedAt: z.coerce.date().nullable().optional(),
   parsedAt: z.coerce.date().nullable().optional(),
   reviewStartedAt: z.coerce.date().nullable().optional(),
@@ -4498,6 +4501,7 @@ export const ComponentDraftParamsSchema = z.object({
   instructions: z.string().optional(),
   sourceFingerprint: z.string().optional(),
   sourceText: z.string().optional(),
+  recipeIdentityFingerprint: z.string().optional(),
 });
 
 export type ComponentDraftParams = z.infer<typeof ComponentDraftParamsSchema>;
@@ -4626,6 +4630,15 @@ export const ComponentImportRecordComponentParamsSchema = z.object({
 });
 
 export type ComponentImportRecordComponentParams = z.infer<typeof ComponentImportRecordComponentParamsSchema>;
+
+// Command: recordDuplicateComponent on ComponentImport
+export const ComponentImportRecordDuplicateComponentParamsSchema = z.object({
+  resultingComponentId: z.string().min(1),
+  matchedComponentId: z.string().min(1),
+  outcome: z.enum(["identical_source", "scaled_copy", "same_formula_other_name", "same_name_other_formula"]),
+});
+
+export type ComponentImportRecordDuplicateComponentParams = z.infer<typeof ComponentImportRecordDuplicateComponentParamsSchema>;
 
 // Command: recordParse on ComponentImport
 export const ComponentImportRecordParseParamsSchema = z.object({

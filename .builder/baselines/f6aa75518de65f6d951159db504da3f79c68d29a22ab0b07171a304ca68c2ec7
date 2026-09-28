@@ -79,9 +79,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // Component has multiple initialization commands (draft, purge, retire); using the selected initialization command: draft.
   // Component → api.mutations.Component_createViaDraft
   rowsAttempted += 1;
-  await client.mutation(api.mutations.Component_createViaDraft, { "name": "Component 1", "category": "demo-category-1", "cuisine": "demo-cuisine-1", "description": "demo-description-1", "instructions": "demo-instructions-1", "yieldQuantity": 1, "yieldUnit": "demo-yieldUnit-1", "servesPerYield": 1, "batchMultiplier": 1 } as any);
+  await client.mutation(api.mutations.Component_createViaDraft, { "name": "Component 1", "category": "demo-category-1", "cuisine": "demo-cuisine-1", "description": "demo-description-1", "instructions": "demo-instructions-1", "recipeIdentityFingerprint": "demo-recipeIdentityFingerprint-1", "yieldQuantity": 1, "yieldUnit": "demo-yieldUnit-1", "servesPerYield": 1, "batchMultiplier": 1 } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.Component_createViaDraft, { "name": "Component 2", "category": "demo-category-2", "cuisine": "demo-cuisine-2", "description": "demo-description-2", "instructions": "demo-instructions-2", "yieldQuantity": 2, "yieldUnit": "demo-yieldUnit-2", "servesPerYield": 2, "batchMultiplier": 2 } as any);
+  await client.mutation(api.mutations.Component_createViaDraft, { "name": "Component 2", "category": "demo-category-2", "cuisine": "demo-cuisine-2", "description": "demo-description-2", "instructions": "demo-instructions-2", "recipeIdentityFingerprint": "demo-recipeIdentityFingerprint-2", "yieldQuantity": 2, "yieldUnit": "demo-yieldUnit-2", "servesPerYield": 2, "batchMultiplier": 2 } as any);
   // ComponentComponent has multiple initialization commands (add, remove); using the selected initialization command: add.
   // ComponentComponent → api.mutations.ComponentComponent_createViaAdd
   rowsAttempted += 1;

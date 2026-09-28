@@ -60,6 +60,7 @@ import {
   ComponentImportLineSuggestPossibleMatchesParamsSchema,
   ComponentImportMarkFailedParamsSchema,
   ComponentImportRecordComponentParamsSchema,
+  ComponentImportRecordDuplicateComponentParamsSchema,
   ComponentImportRecordParseParamsSchema,
   ComponentImportRecordResolutionProgressParamsSchema,
   ComponentImportResumeReviewParamsSchema,
@@ -1631,6 +1632,16 @@ export function useComponentImportRecordComponent() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ComponentImportRecordComponentParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ComponentImport.recordDuplicateComponent. */
+export function useComponentImportRecordDuplicateComponent() {
+  const mutate = useMutation(api.mutations.ComponentImport_recordDuplicateComponent);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ComponentImportRecordDuplicateComponentParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11663,4 +11674,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1237 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1238 as const;

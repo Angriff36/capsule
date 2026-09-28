@@ -10,6 +10,7 @@ import {
   readMaterializationReceipt,
   writeMaterializationReceipt,
 } from "./materializationReceipt";
+import { recipeIdentityFingerprint } from "../../src/lib/recipeIdentity";
 
 export const reconcileImportedEventRecipeSync = mutation({
   args: { eventId: v.id("events"), expectedEventVersion: v.number() },
@@ -443,6 +444,71 @@ async function addRecipeLines(
 type ReviewedImportResult = { componentId: string; createdIngredientIds: string[]; lineIds: string[]; request: unknown };
 
 /**
+ * What finalize should do with a finished formula that may already be in the
+ * book (AC-067). Precedence:
+ *  1. Same source text — the same exported row. Formula finished the same way
+ *     → link (identical_source); finished differently → conflict, because the
+ *     two readings of one source must be settled by a person, not duplicated.
+ *  2. Same normalized formula (a scaled copy) under the same name → link
+ *     (scaled_copy); the book recipe keeps its original serving amounts.
+ *  3. Same formula under a different name, or the same name with a different
+ *     formula → create, and record the pairing so both stay distinguishable.
+ * Only live, non-deleted recipes in the tenant take part.
+ */
+type RecipeDuplicateDecision =
+  | { action: "link"; recipe: Doc<"components">; outcome: "identical_source" | "scaled_copy"; identity: string }
+  | { action: "conflict"; recipe: Doc<"components">; identity: string }
+  | {
+      action: "create";
+      identity: string;
+      note?: { recipeId: Id<"components">; outcome: "same_formula_other_name" | "same_name_other_formula" };
+    };
+
+async function decideRecipeDuplicate(
+  ctx: MutationCtx,
+  tenantId: string,
+  candidate: { identity: string; sourceFingerprint: string; name: string },
+): Promise<RecipeDuplicateDecision> {
+  const live = (
+    await ctx.db
+      .query("components")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .collect()
+  ).filter((row) => row.deletedAt == null && row.status != "retired");
+  const normalizedName = candidate.name.trim().toLowerCase();
+  const nameEquals = (row: Doc<"components">) => row.name.trim().toLowerCase() === normalizedName;
+  const sameSource = live.find(
+    (row) => row.recipeSourceFingerprint != null && row.recipeSourceFingerprint === candidate.sourceFingerprint,
+  );
+  if (sameSource) {
+    if (sameSource.recipeIdentityFingerprint === candidate.identity) {
+      return { action: "link", recipe: sameSource, outcome: "identical_source", identity: candidate.identity };
+    }
+    return { action: "conflict", recipe: sameSource, identity: candidate.identity };
+  }
+  const sameIdentity = live.find((row) => row.recipeIdentityFingerprint === candidate.identity);
+  if (sameIdentity) {
+    if (nameEquals(sameIdentity)) {
+      return { action: "link", recipe: sameIdentity, outcome: "scaled_copy", identity: candidate.identity };
+    }
+    return {
+      action: "create",
+      identity: candidate.identity,
+      note: { recipeId: sameIdentity._id, outcome: "same_formula_other_name" },
+    };
+  }
+  const sameName = live.find(nameEquals);
+  if (sameName) {
+    return {
+      action: "create",
+      identity: candidate.identity,
+      note: { recipeId: sameName._id, outcome: "same_name_other_formula" },
+    };
+  }
+  return { action: "create", identity: candidate.identity };
+}
+
+/**
  * Atomic finalize for a durable ComponentImport review (PR03-01 + PR13 recovery).
  * One transaction validates the stored review, creates the business graph,
  * links created ingredients, records the component, completes the import and
@@ -530,6 +596,54 @@ async function finalizeReviewedImport(
       throw new Error(`line ${index + 1} still needs review`);
     }
   }
+  // AC-067: reconcile the finished formula against the recipe book BEFORE any
+  // row is created. Identity is the normalized per-yield formula
+  // (src/lib/recipeIdentity.ts), so a repeated category export and an
+  // identical scaled copy both match, while a corrected quantity no longer
+  // does. Distinct same-name formulas are never merged — both stay in the
+  // book and the import records the pairing for a person to resolve.
+  const decision = await decideRecipeDuplicate(ctx, tenantId, {
+    identity: recipeIdentityFingerprint({
+      yieldQuantity: row.parsedYieldQuantity,
+      yieldUnit: row.parsedYieldUnit,
+      lines: lines.map((stored, index) =>
+        stored.matchStatus === "subrecipe"
+          ? {
+              kind: "subrecipe" as const,
+              refId: String(stored.matchedComponentId),
+              quantity: stored.parsedQuantity as number,
+              unit: stored.parsedUnit as string,
+              wasteFactor: projection.lines[index].wasteFactor,
+            }
+          : {
+              kind: "ingredient" as const,
+              refId: projection.lines[index].name,
+              quantity: stored.parsedQuantity as number,
+              unit: stored.parsedUnit as string,
+              wasteFactor: projection.lines[index].wasteFactor,
+            },
+      ),
+    }),
+    sourceFingerprint: row.sourceFingerprint,
+    name: projection.name,
+  });
+  if (decision.action === "conflict") {
+    throw new Error(
+      `This exact recipe text is already in the recipe book as "${decision.recipe.name}", and this review finished it differently. Compare the two in the recipe book, then fix the lines here or rename this recipe.`,
+    );
+  }
+  if (decision.action === "link") {
+    await ctx.runMutation(api.mutations.ComponentImport_recordDuplicateComponent, {
+      docId: review.importId,
+      resultingComponentId: decision.recipe._id,
+      matchedComponentId: decision.recipe._id,
+      outcome: decision.outcome,
+    });
+    await ctx.runMutation(api.mutations.ComponentImport_complete, { docId: review.importId });
+    const output = { componentId: String(decision.recipe._id), createdIngredientIds: [] as string[], lineIds: [] as string[], request };
+    await writeMaterializationReceipt(ctx, tenantId, "componentImportReview", operationKey, request, output);
+    return { componentId: output.componentId, createdIngredientIds: [], lineIds: [], recovered: false };
+  }
   const createdIngredientIds: string[] = [];
   const ingredientIds: (Id<"ingredients"> | null)[] = [];
   for (let index = 0; index < lines.length; index++) {
@@ -552,11 +666,28 @@ async function finalizeReviewedImport(
   }
   const component = await ctx.runMutation(api.mutations.Component_createViaDraft, {
     ...projection, lines: undefined, yieldUnit: projection.yieldUnit as never,
+    recipeIdentityFingerprint: decision.identity,
+    // Provenance the duplicate check reads back: which export this recipe
+    // came from and the normalized formula identity computed above.
+    sourceFingerprint: row.sourceFingerprint,
+    sourceText: row.rawSourceText,
   });
   const lineIds = await addRecipeLines(ctx, component.docId, projection.lines, ingredientIds);
-  await ctx.runMutation(api.mutations.ComponentImport_recordComponent, {
-    docId: review.importId, resultingComponentId: component.docId,
-  });
+  if (decision.note) {
+    // Same formula under a new name, or the same name with a different
+    // formula: the new recipe stands on its own and the pairing is stored so
+    // the book can show both versions to a person.
+    await ctx.runMutation(api.mutations.ComponentImport_recordDuplicateComponent, {
+      docId: review.importId,
+      resultingComponentId: component.docId,
+      matchedComponentId: decision.note.recipeId,
+      outcome: decision.note.outcome,
+    });
+  } else {
+    await ctx.runMutation(api.mutations.ComponentImport_recordComponent, {
+      docId: review.importId, resultingComponentId: component.docId,
+    });
+  }
   await ctx.runMutation(api.mutations.ComponentImport_complete, { docId: review.importId });
   const output = { componentId: String(component.docId), createdIngredientIds, lineIds, request };
   await writeMaterializationReceipt(ctx, tenantId, "componentImportReview", operationKey, request, output);
