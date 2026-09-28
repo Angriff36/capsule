@@ -27,7 +27,11 @@ export const openAndDueTodayForPerson = query({
   args: { personId: v.id("people") },
   handler: async (ctx, { personId }) => {
     const auth = await getAuthContext(ctx);
-    if (!auth.tenantId || auth.role === "anonymous" || !auth.personId) {
+    // The viewer is one of: leadership (any manager+), the assignee
+    // themselves, or the creator. Leadership is caught by the tenant check
+    // below; the assignee/creator paths are enforced by the per-row
+    // filter on `tenantId`. Anonymous viewers see nothing.
+    if (!auth.tenantId || auth.role === "anonymous") {
       return [];
     }
 
@@ -49,7 +53,9 @@ export const openAndDueTodayForPerson = query({
     return rows
       .filter((row) => row.tenantId === auth.tenantId)
       .filter((row) => row.deletedAt == null)
-      .filter((row) => (STATUS_OPEN as readonly string[]).includes(row.status as OpenStatus))
+      .filter((row) =>
+        (STATUS_OPEN as readonly string[]).includes(row.status as OpenStatus),
+      )
       .filter((row) => row.dueAt >= windowStart && row.dueAt < windowEnd)
       .map((row) => ({
         _id: row._id,
