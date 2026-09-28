@@ -39,6 +39,13 @@ export function runBuilder(args: string[]): number {
 export function regenerate(passthrough: string[] = []): number {
   const status = runBuilder(["generate", "convex", "--apply", ...passthrough]);
   if (status !== 0) return status;
+  // The patches below read generated/ir/merged.ir.json, which is gitignored:
+  // rebuild it so a new command from another checkout is never "missing".
+  const compiled = spawnSync(process.execPath, ["run", "manifest:compile"], {
+    stdio: "inherit",
+    cwd: CAPSULE_ROOT,
+  });
+  if (compiled.status !== 0) return compiled.status ?? 1;
   // Builder emits checkRole(user.role). Re-apply org capability enforcement
   // and the service-style reference guard, and point aggregate sums at their
   // composite indexes, refreshing ownership digests.

@@ -4,7 +4,8 @@ REM PRODUCT BUILDER - ONE ROUND per call. The MAKER builds all day in one batch 
 REM with no review in between. Once a day loop-review-due.ps1 opens the review; from then on
 REM each round the maker answers the review and hands off, and loop-land.ps1 (plain code +
 REM a reviewer from a different provider) checks the whole batch at once, round after round,
-REM until it approves and lands it on dev (Ryan 2026-09-28). The maker never checks or lands
+REM until it approves; APPROVE releases dev to production. loop-publish.ps1 puts each
+REM round on dev at once, before review (Ryan 2026-09-28). The maker never checks or lands
 REM its own work. Exit 10 = a round finished and more work may wait; loop-tick-hidden.vbs
 REM then starts the next round at once, with NO round limit (Ryan 2026-09-27). Exit 0 = stop:
 REM the maker wrote _nothing-left (nothing open, or all that is left is blocked), every maker
@@ -42,5 +43,7 @@ if errorlevel 1 (
 )
 if exist ".loop-worktrees\_nothing-left" exit /b 0
 if "%MAKEROK%"=="0" exit /b 0
+REM Every round goes to dev at once so Ryan can test it (Ryan 2026-09-28).
+pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-publish.ps1" >> ".claude\loop-tick.log" 2>&1
 if exist ".loop-worktrees\_handoff\*.json" pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-land.ps1" >> ".claude\loop-tick.log" 2>&1
 exit /b 10
