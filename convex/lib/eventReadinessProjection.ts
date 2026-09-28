@@ -63,6 +63,14 @@ export type EventReadinessFacts = {
    * summarized without answer values (readiness is readable by any staff
    * member, so nothing here may carry a price). */
   finalLock?: FinalLockReadinessSummary | null;
+  /** Kitchen-to-venue drive time (PL-ROUTES); null when the event has no
+   * venue yet or is finished. */
+  route?: {
+    required: boolean;
+    stale: boolean;
+    /** The first leg's problem or out-of-date reason, plain words. */
+    reason: string | null;
+  } | null;
   closeoutId: string | null;
   closeoutStatus: "draft" | "finalized" | null;
   /** Open change flags from the invoice, proposal and closeout
@@ -286,6 +294,29 @@ export function projectEventReadiness(
       "warning",
       "This event has no expected headcount yet.",
       "Event.changeHeadcount",
+    );
+  }
+
+  // Drive time (spec §8.4): ROUTE_REQUIRED when a leg has no drive time from
+  // the route service; out of date when a kept one no longer matches.
+  const route = facts.route;
+  if (route?.required) {
+    add(
+      "planning",
+      "planning.route_required",
+      [facts.eventId],
+      "warning",
+      `No drive time yet. ${route.reason ?? ""}`.trim(),
+      "refreshEventRoute",
+    );
+  } else if (route?.stale) {
+    add(
+      "planning",
+      "planning.route_stale",
+      [facts.eventId],
+      "warning",
+      `The drive time is out of date. ${route.reason ?? ""}`.trim(),
+      "refreshEventRoute",
     );
   }
 
