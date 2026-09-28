@@ -1,7 +1,17 @@
 {
-  "attribution": { "commit": "", "pr": "" },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
-    "allow": ["Bash(git fetch *)", "Bash(bash scripts/loop-worktree-sweep.sh)"],
+    "allow": [
+      "Bash(git fetch *)",
+      "Bash(bash scripts/loop-worktree-sweep.sh)",
+      "Edit(//c/Projects/capsule/.loop-worktrees/**)",
+      "Edit(//c/Projects/capsule/STATE.md)",
+      "Edit(//c/Projects/capsule/loop-run-log.md)",
+      "Edit(//c/Projects/capsule/loop-ledger.json)"
+    ],
     "deny": [
       "Bash(git push *)",
       "Bash(git -C * push *)",
@@ -18,7 +28,12 @@
       "Edit(.githooks/**)",
       "Edit(.loop-worktrees/**/.githooks/**)",
       "Edit(.loop-worktrees/**/.claude/**)",
-      "Edit(loop-constraints.md)"
+      "Edit(loop-constraints.md)",
+      "Edit(//c/Projects/capsule/.claude/**)",
+      "Edit(//c/Projects/capsule/.githooks/**)",
+      "Edit(//c/Projects/capsule/.loop-worktrees/**/.githooks/**)",
+      "Edit(//c/Projects/capsule/.loop-worktrees/**/.claude/**)",
+      "Edit(//c/Projects/capsule/loop-constraints.md)"
     ]
   }
 }
