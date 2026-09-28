@@ -242,6 +242,24 @@ describe("structured quote picks reach the sales record (AC-095/AC-243/AC-244/AC
       "Campaign: instagram / social / fall-weddings.",
     );
     expect(lead.notes).toContain("Offers and news: yes");
+
+    // AC-246: staff send the draft as is — no retyping, no price override —
+    // and the frozen revision carries the company's name and the picks.
+    await owner.mutation(
+      (api.lib as any).proposalRevision.sendProposalWithRevisionCapture,
+      { docId: proposalId, version: proposal.version },
+    );
+    const [revision] = (await owner.query(
+      api.queries.listProposalRevisionByProposalId,
+      { proposalId },
+    )) as any[];
+    const frozen = JSON.parse(revision.snapshot);
+    expect(frozen.tenant.name).toBe("Structured quote kitchen");
+    expect(frozen.lineItems).toHaveLength(2);
+    for (const line of frozen.lineItems) {
+      expect(line.catalogPrice).toBe(line.unitPrice);
+    }
+    expect(frozen.dishSelections).toHaveLength(2);
   });
 
   it("a retried conversion adds no second set of lines, dish choices or extras", async () => {
