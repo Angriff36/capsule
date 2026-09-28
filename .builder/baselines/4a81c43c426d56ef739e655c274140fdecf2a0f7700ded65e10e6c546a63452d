@@ -1901,6 +1901,9 @@ export const InventoryReservationSchema = z.object({
   releasedAt: z.coerce.date().nullable().optional(),
   consumedAt: z.coerce.date().nullable().optional(),
   releaseReason: z.string().nullable().optional(),
+  returnedQuantity: z.number().nullable().optional(),
+  returnedAt: z.coerce.date().nullable().optional(),
+  returnReason: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -7315,6 +7318,14 @@ export const InventoryReservationReserveParamsSchema = z.object({
 });
 
 export type InventoryReservationReserveParams = z.infer<typeof InventoryReservationReserveParamsSchema>;
+
+// Command: returnUnused on InventoryReservation
+export const InventoryReservationReturnUnusedParamsSchema = z.object({
+  quantity: z.number(),
+  reason: z.string(),
+});
+
+export type InventoryReservationReturnUnusedParams = z.infer<typeof InventoryReservationReturnUnusedParamsSchema>;
 
 // Command: register on InventorySettings
 export const InventorySettingsRegisterParamsSchema = z.object({

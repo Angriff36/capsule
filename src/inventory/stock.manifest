@@ -76,7 +76,9 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     constraint openStockParNonnegative: parLevel == null or parLevel >= 0 "This item's par level can't be negative. Use zero or more."
     constraint openStockReorderNonnegative: reorderThreshold == null or reorderThreshold >= 0 "This item's reorder threshold can't be negative. Use zero or more."
     constraint openStockCostNonnegative: unitCost == null or unitCost >= 0 "This item's cost per unit can't be negative. Use zero or more."
-    compute previousQuantity = self.quantityOnHand
+    // A line that was never opened holds nothing yet. On create, self already
+    // carries the opening amount, so reading it would log the opening as +0.
+    compute previousQuantity = 0
     mutate ingredientId = ingredientId
     mutate locationId = locationId
     mutate unit = unit
@@ -385,6 +387,10 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
   property releasedAt: datetime?
   property consumedAt: datetime?
   property releaseReason: string?
+  // Unused stock that came back from the event after it was issued.
+  property returnedQuantity: decimal(12, 4)?
+  property returnedAt: datetime?
+  property returnReason: string?
 
   belongsTo inventoryItem: InventoryItem fields [tenantId, inventoryItemId] references [tenantId, id]
   belongsTo inventoryLot: InventoryLot fields [tenantId, inventoryLotId] references [tenantId, id]
@@ -492,6 +498,32 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
       ingredientId: self.ingredientId
       previousQuantity: previousQuantity
       quantity: self.quantity
+    }
+  }
+
+  // Unused issued stock goes back on the shelf. The total sent back can
+  // never pass what the event used, so a repeated send adds nothing extra.
+  command returnUnused(quantity: decimal(12, 4), reason: string) {
+    guard self.status == "consumed"
+    guard self.deletedAt == null
+    constraint returnQuantityPositive: quantity > 0 "Enter how much came back. It has to be more than zero."
+    constraint returnWithinUsed: (self.returnedQuantity != null ? self.returnedQuantity : 0) + quantity <= self.quantity "That is more than this event used. Enter the amount that actually came back."
+    constraint returnReasonRequired: length(trim(reason)) > 0 "Say why this stock came back."
+    compute previousReturned = self.returnedQuantity != null ? self.returnedQuantity : 0
+    mutate returnedQuantity = previousReturned + quantity
+    mutate returnedAt = now()
+    mutate returnReason = reason
+    emit InventoryReservationReturned {
+      inventoryReservationId: self.id
+      tenantId: self.tenantId
+      actorId: user.id
+      inventoryItemId: self.inventoryItemId
+      inventoryLotId: self.inventoryLotId
+      eventId: self.eventId
+      ingredientId: self.ingredientId
+      quantity: quantity
+      returnedQuantity: previousReturned + quantity
+      reason: reason
     }
   }
 
@@ -638,6 +670,19 @@ event InventoryReservationConsumed: "inventory_reservation.consumed" {
   quantity: decimal(12, 4)
 }
 
+event InventoryReservationReturned: "inventory_reservation.returned" {
+  inventoryReservationId: string
+  tenantId: string
+  actorId: string
+  inventoryItemId: string
+  inventoryLotId: string?
+  eventId: string
+  ingredientId: string
+  quantity: decimal(12, 4)
+  returnedQuantity: decimal(12, 4)
+  reason: string
+}
+
 // Event cancellation/completion releases only active holds through the
 // transactional operational callback. Already released/consumed reservations
 // are historical facts; invoking release on them would reject the parent event.
@@ -648,4 +693,12 @@ on InventoryReservationConsumed run InventoryItem.adjustQuantity
   params {
     delta: 0 - payload.quantity,
     reason: "Reservation consumed"
+  }
+
+// Sending unused stock back puts it on hand again (one ledger entry).
+on InventoryReservationReturned run InventoryItem.adjustQuantity
+  resolve payload.inventoryItemId
+  params {
+    delta: payload.quantity,
+    reason: "Returned from event"
   }

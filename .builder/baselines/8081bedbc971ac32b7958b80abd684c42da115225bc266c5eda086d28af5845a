@@ -357,6 +357,7 @@ import {
   InventoryReservationConsumeParamsSchema,
   InventoryReservationReleaseParamsSchema,
   InventoryReservationReserveParamsSchema,
+  InventoryReservationReturnUnusedParamsSchema,
   InventorySettingsRegisterParamsSchema,
   InventorySettingsSetStockTrackingParamsSchema,
   InvoiceApplyCreditParamsSchema,
@@ -5705,6 +5706,16 @@ export function useInventoryReservationReserve() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = InventoryReservationReserveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for InventoryReservation.returnUnused. */
+export function useInventoryReservationReturnUnused() {
+  const mutate = useMutation(api.mutations.InventoryReservation_returnUnused);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InventoryReservationReturnUnusedParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11783,4 +11794,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1249 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1250 as const;
