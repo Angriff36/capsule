@@ -200,8 +200,8 @@ entity Shift mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // Linked staff act through user.personId. Preserve the existing bootstrap
-  // identity convention only when no linked Person overrides that identity.
+  // Linked staff act through user.personId only; an unlinked sign-in has no
+  // own-work path and needs the manager role.
   command start() {
     guard self.status == "scheduled"
     guard self.scheduledAt != null

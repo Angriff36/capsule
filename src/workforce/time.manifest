@@ -53,8 +53,8 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
   default policy timeRecordWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may update time entries"
   default policy timeRecordExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may change time entries"
 
-  // The linked Person is authoritative for self-service; the old direct-ID
-  // identity path remains available only to unlinked bootstrap identities.
+  // The linked Person is the only self-service path; an unlinked sign-in
+  // has no own-work path and needs the workforce role.
   command clockIn(
     personId: uuid,
     optional shiftId: uuid,

@@ -136,7 +136,8 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
   }
 
   // A linked Clerk subject and a Person ID are different identifiers.
-  // Only unlinked legacy identities retain the old Person-ID subject path.
+  // Self-service follows user.personId only; an unlinked sign-in has no
+  // own-work path and needs the manager role.
   command confirm() {
     guard self.status == "assigned"
     guard self.assignedAt != null
