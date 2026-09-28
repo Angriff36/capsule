@@ -19,6 +19,7 @@ import {
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { FailureBanner } from "../FailureBanner";
 import { eventDetailPath, type EventDetailTab } from "../eventRoutes";
+import { OutsideChannelForm } from "./OutsideChannelForm";
 
 const OUTCOME: Record<FinalLockOutcome, string> = {
   clear: "ALL ANSWERED",
@@ -108,12 +109,23 @@ export function FinalLockPanel({ eventId }: { eventId: Id<"events"> }) {
         Loading Final Lock answers…
       </p>
     );
+  const chat = report.answers.find(
+    (a) => a.questionKey === "communication.channel",
+  );
+  const suggested =
+    chat?.value.type === "record" ? chat.value.fields.outsideChannelName : null;
   return (
-    <FinalLockQuestionList
-      eventId={eventId}
-      report={report}
-      onOverride={override}
-    />
+    <>
+      <FinalLockQuestionList
+        eventId={eventId}
+        report={report}
+        onOverride={override}
+      />
+      <OutsideChannelForm
+        eventId={eventId}
+        suggestedName={typeof suggested === "string" ? suggested : null}
+      />
+    </>
   );
 }
 

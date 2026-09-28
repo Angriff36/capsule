@@ -130,6 +130,8 @@ export interface FinalLockInput {
     };
     salesLockedAt: number | null;
     operationalRequirements: string | null;
+    /** The event's channel in an outside team chat, when it has one. */
+    externalChannel: { name: string; id: string; url: string | null } | null;
     /** Day sheet, setup notes and task breakdown text, keyed by field name. */
     text: Record<string, string | null>;
   };

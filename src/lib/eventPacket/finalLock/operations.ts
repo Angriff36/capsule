@@ -6,6 +6,7 @@ import {
   unresolved,
   type Draft,
 } from "./answer";
+import { externalChannelName } from "./channelName";
 import { QUESTIONS, type Question } from "./policy";
 import { dayTimes } from "./timelineSetup";
 import type { FinalLockInput } from "./types";
@@ -77,24 +78,57 @@ export function operationsAnswers(
       );
 
   const chat = input.channel;
-  const chatSources = chat.lastMessageId
-    ? [{ table: "staffMessages", id: chat.lastMessageId, version: null }]
-    : [];
-  // Every event has its own chat; an empty one is not a problem to fix.
-  out["communication.channel"] = answered(
-    {
-      type: "record",
-      fields: {
-        messages: chat.messageCount,
-        attachments: chat.attachmentCount,
-      },
-    },
-    chat.messageCount
-      ? `The event chat has ${chat.messageCount} message${chat.messageCount === 1 ? "" : "s"} and ${chat.attachmentCount} file${chat.attachmentCount === 1 ? "" : "s"}.`
-      : "The event chat is ready; no messages yet.",
-    "communication.channel.one-event-chat",
-    chatSources,
+  const outside = input.event.externalChannel;
+  const expected = externalChannelName(
+    input.event.eventNumber,
+    input.event.title,
   );
+  const chatSources = [
+    ...(chat.lastMessageId
+      ? [{ table: "staffMessages", id: chat.lastMessageId, version: null }]
+      : []),
+    // Pinned by value: the channel name follows the number and the title.
+    ...source("events", input.event, "externalChannel"),
+    ...source("events", input.event, "eventNumber"),
+    ...source("events", input.event, "title"),
+  ];
+  const chatWords = chat.messageCount
+    ? `The event chat has ${chat.messageCount} message${chat.messageCount === 1 ? "" : "s"} and ${chat.attachmentCount} file${chat.attachmentCount === 1 ? "" : "s"}.`
+    : "The event chat is ready; no messages yet.";
+  // Every event has its own chat; an empty one is not a problem to fix. An
+  // outside channel is optional, but when there is one its name must match.
+  out["communication.channel"] =
+    outside && outside.name !== expected
+      ? unresolved(
+          [
+            expected
+              ? `The outside chat channel is named "${outside.name}"; it should be "${expected}".`
+              : `The event has an outside chat channel "${outside.name}" but no event number to name it by.`,
+          ],
+          expected
+            ? `Rename the outside channel to "${expected}" and record the new name on the event.`
+            : "Give the event its number, then rename the outside channel.",
+          "communication.channel.one-event-chat",
+          chatSources,
+        )
+      : answered(
+          {
+            type: "record",
+            fields: {
+              messages: chat.messageCount,
+              attachments: chat.attachmentCount,
+              outsideChannel: outside?.name ?? null,
+              outsideChannelName: expected,
+            },
+          },
+          outside
+            ? `${chatWords} Mirrored to the outside channel "${outside.name}".`
+            : expected
+              ? `${chatWords} An outside channel, if the team makes one, is named "${expected}".`
+              : chatWords,
+          "communication.channel.one-event-chat",
+          chatSources,
+        );
   return out;
 }
 

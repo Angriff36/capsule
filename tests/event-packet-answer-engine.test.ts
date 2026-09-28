@@ -13,6 +13,7 @@ import type {
   FinalLockAnswer,
   FinalLockInput,
 } from "../src/lib/eventPacket/finalLock/types";
+import { externalChannelName } from "../src/lib/eventPacket/finalLock/channelName";
 
 const T = Date.parse("2026-10-10T18:00:00Z");
 const MIN = 60_000;
@@ -38,6 +39,7 @@ function input(): FinalLockInput {
       contactPhone: "555-0100",
       contactEmail: null,
       assignedToId: "person-owner",
+      externalChannel: null,
       ownerName: "Dana",
       quotedPrice: 5000,
       startsAt: T,
@@ -820,6 +822,51 @@ describe("Final Lock answer engine", () => {
     expect(get(run(none).answers, "vehicles.assigned").action).toBe(
       "Assign a truck on the event.",
     );
+  });
+
+  it("names the outside chat channel event-number-event-name and checks a recorded one still matches", () => {
+    expect(externalChannelName("6014", "Ashley's Wedding")).toBe(
+      "6014-ashley-s-wedding",
+    );
+    expect(externalChannelName("6014", "José’s Café & Bar")).toBe(
+      "6014-jose-s-cafe-bar",
+    );
+    expect(externalChannelName(null, "Ashley's Wedding")).toBeNull();
+
+    const none = get(run(input()).answers, "communication.channel");
+    expect(none.result).toBe("answered");
+    expect(none.value).toMatchObject({
+      fields: {
+        outsideChannel: null,
+        outsideChannelName: "6014-ashley-s-wedding",
+      },
+    });
+
+    const linked = input();
+    linked.event.externalChannel = {
+      name: "6014-ashley-s-wedding",
+      id: "C0123",
+      url: "https://mangia.slack.com/archives/C0123",
+    };
+    const ok = get(run(linked).answers, "communication.channel");
+    expect(ok.result).toBe("answered");
+    expect(ok.explanation).toContain(
+      'Mirrored to the outside channel "6014-ashley-s-wedding".',
+    );
+    expect(ok.sources).toContainEqual({
+      table: "events",
+      id: "event-1",
+      version: 7,
+      field: "externalChannel",
+    });
+
+    // The event was renamed after the channel was made: the name must follow.
+    linked.event.title = "Ashley and Sam's Wedding";
+    const renamed = get(run(linked).answers, "communication.channel");
+    expect(renamed.result).toBe("unresolved");
+    expect(renamed.missing).toEqual([
+      'The outside chat channel is named "6014-ashley-s-wedding"; it should be "6014-ashley-and-sam-s-wedding".',
+    ]);
   });
 
   it("shows truck availability and load grouping, and names what is missing", () => {

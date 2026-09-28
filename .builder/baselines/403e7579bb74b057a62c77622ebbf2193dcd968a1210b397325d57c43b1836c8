@@ -217,6 +217,7 @@ import {
   EventLayoutSectionAddParamsSchema,
   EventLayoutSectionRemoveParamsSchema,
   EventLayoutSectionUpdateParamsSchema,
+  EventLinkExternalChannelParamsSchema,
   EventLockForSalesParamsSchema,
   EventMarkBinderBuiltParamsSchema,
   EventNormalizePurchasingWeekParamsSchema,
@@ -251,6 +252,7 @@ import {
   EventTimelineActivityUseCalculatedTimingParamsSchema,
   EventTimelineCommentPostParamsSchema,
   EventTimelineCommentRemoveParamsSchema,
+  EventUnlinkExternalChannelParamsSchema,
   EventUpdateDaySheetParamsSchema,
   EventUpdateImportDraftParamsSchema,
   EventUpdateSetupNotesParamsSchema,
@@ -3214,6 +3216,16 @@ export function useEventFinalizeEvent() {
   };
 }
 
+/** Mutation hook for Event.linkExternalChannel. */
+export function useEventLinkExternalChannel() {
+  const mutate = useMutation(api.mutations.Event_linkExternalChannel);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventLinkExternalChannelParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Event.lockForSales. */
 export function useEventLockForSales() {
   const mutate = useMutation(api.mutations.Event_lockForSales);
@@ -3330,6 +3342,16 @@ export function useEventSubmitForApproval() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventSubmitForApprovalParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Event.unlinkExternalChannel. */
+export function useEventUnlinkExternalChannel() {
+  const mutate = useMutation(api.mutations.Event_unlinkExternalChannel);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventUnlinkExternalChannelParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11411,4 +11433,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1213 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1215 as const;

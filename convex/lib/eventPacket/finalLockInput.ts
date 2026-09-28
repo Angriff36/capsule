@@ -445,6 +445,13 @@ export async function readFinalLockInput(
       },
       salesLockedAt: num(event.salesLockedAt),
       operationalRequirements: str(event.operationalRequirements),
+      externalChannel: str(event.externalChannelId)
+        ? {
+            name: str(event.externalChannelName) ?? "",
+            id: str(event.externalChannelId)!,
+            url: str(event.externalChannelUrl),
+          }
+        : null,
       text: Object.fromEntries(TEXT_FIELDS.map((f) => [f, str(event[f])])),
     },
     serviceStyle: style

@@ -732,6 +732,12 @@ entity Event mixin TenantScoped, SoftDeletable {
   // The event binder is built (Ops Final Lock, Part 4). Built or not built:
   // "fully packed" and "ready" describe the load, which the pack list holds.
   property binderBuiltAt: datetime?
+  // The event's channel in an outside team chat (Slack), when the team mirrors
+  // the event chat there. Named event-number-event-name; Final Lock checks
+  // the name still matches the event.
+  property externalChannelName: string?
+  property externalChannelId: string?
+  property externalChannelUrl: string?
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
@@ -1428,6 +1434,33 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate binderBuiltAt = null
     emit EventBinderBuiltCleared {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Records the event's channel in an outside team chat. Staff who can change
+  // the event can record, correct or clear it at any time.
+  command linkExternalChannel(channelName: string, channelId: string, optional channelUrl: string) {
+    guard self.deletedAt == null
+    constraint externalChannelNamed: length(trim(channelName)) > 0 and length(trim(channelId)) > 0 "Give the channel's name and its id"
+    mutate externalChannelName = trim(channelName)
+    mutate externalChannelId = trim(channelId)
+    mutate externalChannelUrl = channelUrl != null ? trim(channelUrl) : null
+    emit EventExternalChannelLinked {
+      eventId: self.id
+      tenantId: self.tenantId
+      channelName: channelName
+      channelId: channelId
+    }
+  }
+
+  command unlinkExternalChannel() {
+    guard self.deletedAt == null
+    mutate externalChannelName = null
+    mutate externalChannelId = null
+    mutate externalChannelUrl = null
+    emit EventExternalChannelUnlinked {
       eventId: self.id
       tenantId: self.tenantId
     }
@@ -2549,6 +2582,18 @@ event EventBinderBuilt: "event_binder.built" {
 }
 
 event EventBinderBuiltCleared: "event_binder.built_cleared" {
+  eventId: string
+  tenantId: string
+}
+
+event EventExternalChannelLinked: "event_external_channel.linked" {
+  eventId: string
+  tenantId: string
+  channelName: string
+  channelId: string
+}
+
+event EventExternalChannelUnlinked: "event_external_channel.unlinked" {
   eventId: string
   tenantId: string
 }

@@ -975,6 +975,9 @@ export const EventSchema = z.object({
   beverageDispensers: z.string().nullable().optional(),
   buffetService: z.string().nullable().optional(),
   binderBuiltAt: z.coerce.date().nullable().optional(),
+  externalChannelName: z.string().nullable().optional(),
+  externalChannelId: z.string().nullable().optional(),
+  externalChannelUrl: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -5544,6 +5547,15 @@ export const EventFinalizeEventParamsSchema = z.object({});
 
 export type EventFinalizeEventParams = z.infer<typeof EventFinalizeEventParamsSchema>;
 
+// Command: linkExternalChannel on Event
+export const EventLinkExternalChannelParamsSchema = z.object({
+  channelName: z.string(),
+  channelId: z.string(),
+  channelUrl: z.string().optional(),
+});
+
+export type EventLinkExternalChannelParams = z.infer<typeof EventLinkExternalChannelParamsSchema>;
+
 // Command: lockForSales on Event
 export const EventLockForSalesParamsSchema = z.object({});
 
@@ -5640,6 +5652,11 @@ export type EventStopRecurrenceParams = z.infer<typeof EventStopRecurrenceParams
 export const EventSubmitForApprovalParamsSchema = z.object({});
 
 export type EventSubmitForApprovalParams = z.infer<typeof EventSubmitForApprovalParamsSchema>;
+
+// Command: unlinkExternalChannel on Event
+export const EventUnlinkExternalChannelParamsSchema = z.object({});
+
+export type EventUnlinkExternalChannelParams = z.infer<typeof EventUnlinkExternalChannelParamsSchema>;
 
 // Command: updateDaySheet on Event
 export const EventUpdateDaySheetParamsSchema = z.object({
