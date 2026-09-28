@@ -84,7 +84,10 @@ async function quoteWithMenu(owner: Actor, menuId: string, email: string) {
     { submissionId: submitted.submissionId },
   );
   expect(converted.errors).toEqual([]);
-  return converted.proposalId as string;
+  return {
+    proposalId: converted.proposalId as string,
+    submissionId: submitted.submissionId as string,
+  };
 }
 
 async function liveLines(owner: Actor, proposalId: string) {
@@ -116,7 +119,11 @@ describe("quote menu choice uses the public menu's prices (AC-241)", () => {
       {},
     )) as any[];
     const pricedDishes = shown.dishes.filter((d: any) => d.price != null);
-    const proposalId = await quoteWithMenu(owner, menuId, "robin@example.com");
+    const { proposalId } = await quoteWithMenu(
+      owner,
+      menuId,
+      "robin@example.com",
+    );
 
     const lines = await liveLines(owner, proposalId);
     expect(
@@ -175,7 +182,11 @@ describe("quote menu choice uses the public menu's prices (AC-241)", () => {
       { basePrice: 400, pricePerPerson: 38 },
       [{ name: "Carved beef", price: 22 }],
     );
-    const proposalId = await quoteWithMenu(owner, menuId, "wed@example.com");
+    const { proposalId, submissionId } = await quoteWithMenu(
+      owner,
+      menuId,
+      "wed@example.com",
+    );
     const lines = await liveLines(owner, proposalId);
     expect(
       lines.map((l) => [l.description, l.pricingBasis, l.unitPrice]),
@@ -190,10 +201,10 @@ describe("quote menu choice uses the public menu's prices (AC-241)", () => {
 
     // The chosen-menu lines are only added to a proposal with none.
     const again = (await owner.query(
-      internal.lib.quoteMenuLines.chosenMenuLines as never,
-      { proposalId, menuId } as never,
-    )) as unknown[];
-    expect(again).toEqual([]);
+      internal.lib.quoteSelections.quoteConversionPlan as never,
+      { proposalId, submissionId } as never,
+    )) as { lines: unknown[] };
+    expect(again.lines).toEqual([]);
   });
 
   it("refuses a menu that is not published", async () => {

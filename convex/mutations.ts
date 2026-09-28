@@ -43815,7 +43815,7 @@ export const QuoteSubmission_complete = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"referralSourceId","table":"referralSources"}]);
     const __result = await __runQuoteSubmissionComplete(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -43831,6 +43831,18 @@ async function __runQuoteSubmissionCreate(ctx: MutationCtx, args: any) {
       tenantId: __auth.tenantId,
       deletedAt: args.deletedAt,
       menuId: args.menuId,
+      selectionsJson: args.selectionsJson,
+      estimateJson: args.estimateJson,
+      submissionKey: args.submissionKey,
+      referralSourceId: args.referralSourceId,
+      howHeardText: args.howHeardText,
+      utmSource: args.utmSource,
+      utmMedium: args.utmMedium,
+      utmCampaign: args.utmCampaign,
+      referrer: args.referrer,
+      landingPage: args.landingPage,
+      consentNotice: args.consentNotice,
+      marketingConsent: args.marketingConsent ?? false,
       createdAt: args.createdAt,
       updatedAt: args.updatedAt,
       dedupKey: args.dedupKey,
@@ -43883,6 +43895,18 @@ export const QuoteSubmission_create = mutation({
   args: {
     deletedAt: v.optional(v.union(v.number(), v.null())),
     menuId: v.optional(v.union(v.string(), v.null())),
+    selectionsJson: v.optional(v.union(v.string(), v.null())),
+    estimateJson: v.optional(v.union(v.string(), v.null())),
+    submissionKey: v.optional(v.union(v.string(), v.null())),
+    referralSourceId: v.optional(v.union(v.id("referralSources"), v.null())),
+    howHeardText: v.optional(v.union(v.string(), v.null())),
+    utmSource: v.optional(v.union(v.string(), v.null())),
+    utmMedium: v.optional(v.union(v.string(), v.null())),
+    utmCampaign: v.optional(v.union(v.string(), v.null())),
+    referrer: v.optional(v.union(v.string(), v.null())),
+    landingPage: v.optional(v.union(v.string(), v.null())),
+    consentNotice: v.optional(v.union(v.string(), v.null())),
+    marketingConsent: v.optional(v.boolean()),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     dedupKey: v.string(),
@@ -43910,7 +43934,7 @@ export const QuoteSubmission_create = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"referralSourceId","table":"referralSources"}]);
     const __result = await __runQuoteSubmissionCreate(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -43958,7 +43982,7 @@ export const QuoteSubmission_dismiss = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"referralSourceId","table":"referralSources"}]);
     const __result = await __runQuoteSubmissionDismiss(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -44012,7 +44036,7 @@ export const QuoteSubmission_fail = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"referralSourceId","table":"referralSources"}]);
     const __result = await __runQuoteSubmissionFail(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -44059,7 +44083,7 @@ export const QuoteSubmission_retry = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"referralSourceId","table":"referralSources"}]);
     const __result = await __runQuoteSubmissionRetry(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -44104,7 +44128,7 @@ export const QuoteSubmission_startProcessing = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"leadId","table":"leads"},{"name":"eventId","table":"events"},{"name":"proposalId","table":"proposals"},{"name":"serviceStyleId","table":"serviceStyles"},{"name":"occasionId","table":"occasions"},{"name":"referralSourceId","table":"referralSources"}]);
     const __result = await __runQuoteSubmissionStartProcessing(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);

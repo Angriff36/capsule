@@ -51,10 +51,35 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
   // The published menu the visitor picked from the public menu. Conversion
   // prices the draft proposal from it through the catalog price rule.
   property menuId: uuid?
+  // Structured picks (spec CF-4-3): dishes from the chosen menu with their
+  // quantities, and extras from other published menus, resolved at the
+  // catalog price in force when submitted (convex/lib/quoteSelections.ts).
+  property selectionsJson: string?
+  // The estimate the visitor was shown, with its assumptions. Always labelled
+  // an estimate; the formal price is the proposal staff publishes.
+  property estimateJson: string?
+
+  // Stable id the form makes once per visit: a repeat of the same request
+  // (double tap, lost response) returns the first submission.
+  property submissionKey: string?
+
+  // Attribution: how the visitor heard of us (a referral source row, or
+  // text when none fits) and the campaign/page that brought them.
+  property referralSourceId: uuid?
+  property howHeardText: string?
+  property utmSource: string?
+  property utmMedium: string?
+  property utmCampaign: string?
+  property referrer: string?
+  property landingPage: string?
 
   // Additional notes and consent
   property notes: string?
   property consentGrantedAt: datetime = now()
+  // The privacy words the visitor agreed to, and whether they also asked
+  // for offers and news.
+  property consentNotice: string?
+  property marketingConsent: boolean = false
 
   // Links to created entities (populated during processing)
   property clientId: uuid?
@@ -74,6 +99,7 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
   ref proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
   ref serviceStyle: ServiceStyle fields [tenantId, serviceStyleId] references [tenantId, id]
   ref occasion: Occasion fields [tenantId, occasionId] references [tenantId, id]
+  ref referralSource: ReferralSource fields [tenantId, referralSourceId] references [tenantId, id]
 
   // Constraints
   constraint dedupKeyPresent: length(trim(self.dedupKey)) > 0 "This quote request is missing the ID used to catch duplicates"

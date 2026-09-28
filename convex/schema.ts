@@ -2658,8 +2658,20 @@ export default defineSchema({
     menuPreferences: v.optional(v.union(v.string(), v.null())),
     dietaryRestrictions: v.optional(v.union(v.string(), v.null())),
     menuId: v.optional(v.union(v.string(), v.null())),
+    selectionsJson: v.optional(v.union(v.string(), v.null())),
+    estimateJson: v.optional(v.union(v.string(), v.null())),
+    submissionKey: v.optional(v.union(v.string(), v.null())),
+    referralSourceId: v.optional(v.union(v.id("referralSources"), v.null())),
+    howHeardText: v.optional(v.union(v.string(), v.null())),
+    utmSource: v.optional(v.union(v.string(), v.null())),
+    utmMedium: v.optional(v.union(v.string(), v.null())),
+    utmCampaign: v.optional(v.union(v.string(), v.null())),
+    referrer: v.optional(v.union(v.string(), v.null())),
+    landingPage: v.optional(v.union(v.string(), v.null())),
     notes: v.optional(v.union(v.string(), v.null())),
     consentGrantedAt: v.optional(v.number()),
+    consentNotice: v.optional(v.union(v.string(), v.null())),
+    marketingConsent: v.optional(v.boolean()),
     clientId: v.optional(v.union(v.id("clients"), v.null())),
     leadId: v.optional(v.union(v.id("leads"), v.null())),
     eventId: v.optional(v.union(v.id("events"), v.null())),
@@ -2678,6 +2690,7 @@ export default defineSchema({
     .index("by_proposalId", ["proposalId"])
     .index("by_serviceStyleId", ["serviceStyleId"])
     .index("by_occasionId", ["occasionId"])
+    .index("by_referralSourceId", ["referralSourceId"])
     .searchIndex("search_venueName", { searchField: "venueName", filterFields: ["tenantId"] })
     .searchIndex("search_venueAddress", { searchField: "venueAddress", filterFields: ["tenantId"] }),
   receiptCorrections: defineTable({
