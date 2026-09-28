@@ -153,6 +153,7 @@ import type * as lib_reconciliationFlags from "../lib/reconciliationFlags.js";
 import type * as lib_reconciliationIsolation from "../lib/reconciliationIsolation.js";
 import type * as lib_reconciliationReceipt from "../lib/reconciliationReceipt.js";
 import type * as lib_rentalReconciliation from "../lib/rentalReconciliation.js";
+import type * as lib_routeFollowUp from "../lib/routeFollowUp.js";
 import type * as lib_routeProvider from "../lib/routeProvider.js";
 import type * as lib_runOfShowAlertLoop from "../lib/runOfShowAlertLoop.js";
 import type * as lib_safeMaterialization from "../lib/safeMaterialization.js";
@@ -368,6 +369,7 @@ declare const fullApi: ApiFromModules<{
   "lib/reconciliationIsolation": typeof lib_reconciliationIsolation;
   "lib/reconciliationReceipt": typeof lib_reconciliationReceipt;
   "lib/rentalReconciliation": typeof lib_rentalReconciliation;
+  "lib/routeFollowUp": typeof lib_routeFollowUp;
   "lib/routeProvider": typeof lib_routeProvider;
   "lib/runOfShowAlertLoop": typeof lib_runOfShowAlertLoop;
   "lib/safeMaterialization": typeof lib_safeMaterialization;

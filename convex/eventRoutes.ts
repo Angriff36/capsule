@@ -17,6 +17,7 @@ import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import {
   action,
+  internalAction,
   internalMutation,
   internalQuery,
   query,
@@ -346,8 +347,10 @@ export type RefreshRouteResult = {
   applied: boolean;
 };
 
+const WEEK_MS = 7 * 24 * 3_600_000;
+
 /** Fetch both drive times now (the "Get drive time" button, and the
- * scheduled refresh through refreshEventRouteForTenant). */
+ * automatic check refreshIfDue). */
 async function refreshRoute(
   ctx: ActionCtx,
   tenantId: string,
@@ -461,6 +464,21 @@ async function refreshRoute(
       facts,
     },
   );
+  // Check again when the answer goes out of date; an event more than a week
+  // away waits until a week before (spec §8.4 route-refresh policy).
+  const nextAnchor = Math.max(
+    ...ROUTE_LEGS.map((leg) => status.anchors[leg] ?? 0),
+  );
+  if (facts.some((fact) => fact.status === "ok") && nextAnchor > now) {
+    const delay = Math.max(
+      status.policy.refreshHours * 3_600_000,
+      nextAnchor - WEEK_MS - now,
+    );
+    await ctx.scheduler.runAfter(delay, internal.eventRoutes.refreshIfDue, {
+      tenantId,
+      eventId,
+    });
+  }
   return {
     legs: facts.map((fact) => ({
       leg: fact.leg,
@@ -491,6 +509,32 @@ export const refreshEventRoute = action({
     });
     if (!id) throw new ConvexError("Event not found");
     return refreshRoute(ctx, auth.tenantId, id);
+  },
+});
+
+/**
+ * The automatic check (after an event change, and when a drive time goes
+ * out of date): fetches only when a leg is out of date or missing, both
+ * addresses resolve, the route service is set up and the event is still
+ * ahead. Otherwise it records nothing.
+ */
+export const refreshIfDue = internalAction({
+  args: { tenantId: v.string(), eventId: v.id("events") },
+  handler: async (ctx, { tenantId, eventId }): Promise<void> => {
+    const now = Date.now();
+    const status = await ctx.runQuery(internal.eventRoutes.loadRouteStatus, {
+      tenantId,
+      eventId,
+      at: now,
+    });
+    if (!status || status.finished || !status.providerConfigured) return;
+    if (!status.origin.ok || !status.destination.ok) return;
+    if (status.legs.every((leg) => leg.state === "current")) return;
+    const anchors = ROUTE_LEGS.map((leg) => status.anchors[leg]).filter(
+      (value): value is number => value != null,
+    );
+    if (anchors.length > 0 && anchors.every((value) => value < now)) return;
+    await refreshRoute(ctx, tenantId, eventId);
   },
 });
 

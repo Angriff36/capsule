@@ -1,6 +1,7 @@
 import { getFunctionName, type FunctionReference } from "convex/server";
 import type { MutationCtx } from "../_generated/server";
 import * as generatedMutations from "../mutations";
+import * as generatedQueries from "../queries";
 
 /**
  * Runs generated commands inside the CURRENT transaction as the tenant's
@@ -63,8 +64,26 @@ export class TenantSystemCommandRunner {
       },
       runMutation: ((reference, ...args) =>
         this.runElevated(elevated, reference, args[0])) as MutationCtx["runMutation"],
+      // Generated reads a command's follow-up makes (the timeline reconcile
+      // reads getEvent) answer as the same system identity. Without this a
+      // run with no signed-in person behind it - a scheduled check - reads
+      // the event as nobody and finds nothing.
+      runQuery: ((reference, ...args) =>
+        this.runElevatedQuery(elevated, reference, args[0])) as MutationCtx["runQuery"],
     };
     return elevated;
+  }
+
+  private async runElevatedQuery(
+    elevated: MutationCtx,
+    reference: FunctionReference<"query", "public" | "internal">,
+    args: unknown,
+  ): Promise<unknown> {
+    const handler = generatedQueryHandler(reference);
+    if (handler === null) {
+      return this.callerContext.runQuery(reference, ...([args] as unknown as []));
+    }
+    return handler(elevated, args ?? {});
   }
 
   private systemIdentity() {
@@ -102,6 +121,20 @@ function generatedCommandHandler(
   const [module, exportName] = getFunctionName(reference).split(":");
   if (module !== "mutations" || exportName === undefined) return null;
   const registered = (generatedMutations as Record<string, unknown>)[
+    exportName
+  ] as { _handler?: unknown } | undefined;
+  return typeof registered?._handler === "function"
+    ? (registered._handler as CommandHandler)
+    : null;
+}
+
+/** The generated read's handler for a `queries:*` reference, if reachable. */
+function generatedQueryHandler(
+  reference: FunctionReference<"query", "public" | "internal">,
+): CommandHandler | null {
+  const [module, exportName] = getFunctionName(reference).split(":");
+  if (module !== "queries" || exportName === undefined) return null;
+  const registered = (generatedQueries as Record<string, unknown>)[
     exportName
   ] as { _handler?: unknown } | undefined;
   return typeof registered?._handler === "function"

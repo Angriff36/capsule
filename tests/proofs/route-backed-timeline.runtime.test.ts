@@ -49,6 +49,42 @@ describe("route-backed timeline (AC-382)", () => {
     expect(at("staff_off")).toBe(departVenue + 45 * MIN + 30 * MIN);
   });
 
+  it("an event change queues a drive-time check that fetches once and then stops", async () => {
+    vi.useFakeTimers();
+    try {
+      const google = fakeRoutes(() => 2400);
+      const { t, owner, event } = await routeWorld();
+      // Planning the timing queued a check a minute later.
+      vi.advanceTimersByTime(61_000);
+      await t.finishInProgressScheduledFunctions();
+      expect(google.requests).toHaveLength(2);
+      let saved = await t.run((ctx) => ctx.db.get(event));
+      expect(saved!.timingOutboundTravelMinutes).toBe(55);
+
+      // Its own travel update queues one more check, which finds it current.
+      vi.advanceTimersByTime(61_000);
+      await t.finishInProgressScheduledFunctions();
+      expect(google.requests).toHaveLength(2);
+
+      // Moving the event to a typed address fetches the new route.
+      await owner.mutation(api.mutations.Event_changeVenue, {
+        docId: event,
+        venueName: "Garden Barn",
+        venueAddress: "55 Farm Road, Golden CO, US",
+      });
+      vi.advanceTimersByTime(61_000);
+      await t.finishInProgressScheduledFunctions();
+      expect(google.requests).toHaveLength(4);
+      expect(google.requests[2].body.destination.address).toBe(
+        "55 Farm Road, Golden CO, US",
+      );
+      saved = await t.run((ctx) => ctx.db.get(event));
+      expect(saved!.timingOutboundTravelMinutes).toBe(55);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("a new serve time makes the drive time out of date until fetched again", async () => {
     const google = fakeRoutes(() => 2400);
     const { t, owner, event } = await routeWorld();
