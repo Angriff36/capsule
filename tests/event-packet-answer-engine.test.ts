@@ -556,6 +556,63 @@ describe("Final Lock answer engine", () => {
     expect(get(run(left).answers, "rentals.return").value).toMatchObject({
       fields: { owner: "Rental company" },
     });
+
+    // Every rented equipment line gets the one owner and its own window.
+    const rentedLine = (id: string, name: string, endsAt: number | null) => ({
+      id,
+      version: 2,
+      name,
+      category: null,
+      rented: true,
+      quantity: 4,
+      status: "reserved",
+      shortBy: 0,
+      endsAt,
+      item: { id: `item-${id}`, version: 5 },
+    });
+    const lines = input();
+    lines.equipment.push(
+      rentedLine("res-tent", "Tent", T + 300 * MIN),
+      rentedLine("res-heater", "Heater", null),
+    );
+    const perLine = get(run(lines).answers, "rentals.return");
+    expect(perLine.result).toBe("answered");
+    expect(perLine.value).toEqual({
+      type: "record",
+      fields: {
+        handling: "Mangia takes them away",
+        owner: "Mangia",
+        windowStartsAt: T + 180 * MIN,
+        "Tent x4": T + 300 * MIN,
+        "Heater x4": T + 180 * MIN,
+      },
+    });
+    expect(perLine.explanation).toContain("Rented: Tent x4, Heater x4.");
+    expect(perLine.sources).toEqual(
+      expect.arrayContaining([
+        { table: "equipmentReservations", id: "res-tent", version: 2 },
+        { table: "equipments", id: "item-res-tent", version: 5 },
+      ]),
+    );
+
+    // A rented line with no return time at all is named.
+    const noWindow = input();
+    noWindow.event.endsAt = null;
+    noWindow.equipment.push(rentedLine("res-heater", "Heater", null));
+    const open = get(run(noWindow).answers, "rentals.return");
+    expect(open.result).toBe("unresolved");
+    expect(open.missing).toContain('Rental "Heater" has no return time.');
+
+    // Rented equipment against a "no rentals" day sheet is a clash, not N/A.
+    const clash = input();
+    clash.event.text.eventRentals = "No";
+    clash.event.text.takeRentalsWithUs = "";
+    clash.equipment.push(rentedLine("res-tent", "Tent", T + 300 * MIN));
+    const clashed = get(run(clash).answers, "rentals.return");
+    expect(clashed.result).toBe("unresolved");
+    expect(clashed.missing).toContain(
+      'Rental "Tent" is reserved, but the day sheet says no rentals.',
+    );
   });
 
   it("answers who sets each part of the room", () => {
@@ -692,6 +749,7 @@ describe("Final Lock answer engine", () => {
       quantity: 10,
       status: "reserved",
       shortBy: 2,
+      endsAt: null,
       item: { id: "equipment-chafers", version: 1 },
     });
     expect(get(run(i).answers, "vehicles.assigned").missing).toEqual([
@@ -855,6 +913,7 @@ describe("Final Lock answer engine", () => {
       quantity: 100,
       status: "reserved",
       shortBy: 0,
+      endsAt: null,
       item: { id: "equipment-china", version: 5 },
     });
     const agreed = get(run(i).answers, "servingware.source");
@@ -1026,6 +1085,7 @@ describe("Final Lock answer engine", () => {
         quantity: 1,
         status: "reserved",
         shortBy: 0,
+        endsAt: null,
         item: { id: "equipment-urn", version: 1 },
       });
       i.dishes.push({

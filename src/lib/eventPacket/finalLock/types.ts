@@ -174,6 +174,8 @@ export interface FinalLockInput {
     quantity: number;
     status: string;
     shortBy: number;
+    /** When the reservation ends: a rented line's return window. */
+    endsAt: number | null;
     /** The equipment record its name, category and ownership come from. */
     item: NativeRow | null;
   })[];

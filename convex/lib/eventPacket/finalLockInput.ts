@@ -187,6 +187,7 @@ export async function readFinalLockInput(
       quantity: row.quantity,
       status: row.status,
       shortBy,
+      endsAt: row.endsAt ?? null,
       item: item ? { id: String(item._id), version: version(item) } : null,
     });
   }
