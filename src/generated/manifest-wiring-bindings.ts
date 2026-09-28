@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:0fa9c629f23816c9e51aa47d766814b4adc281ed73c0a26bad33ba65ec930114:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:16428e8f81027619a7727910e2d6ed3a452d4b82d7b55621c534594c54c658b0:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1ac59da709d8a3b74ccd932e0d295541f188978a9237df6771e866371088a8d1:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e112ef70ab2634ddc76e69be97bf2cf6213bc0662e21efdb998b5fe1fecbfa5:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2c42c97da3b397baa523b8f7ae11ed10f988cb9ea37f6b158ecb4404f5bcab62:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:44730f01893c2c387121f8aa1d1465975c3d70ad9d2ba6bcafc51190118cfc30:461b35052a22a3f3494612a688d5024cf608ca3f5f42e7392e2e39d0b4ae3059:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4f96accd204d5e6e9c1ee144e0310bc741843542d014ce2bfa4303801a5260a4:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:571c1fbbd06e6f847dc0789bb6699eef2dad5b3438eb906c97bd99975eee1572:5865118d3c2cc0441916631fed5be684f876ea34c8cc603b23d1cc192c29b379:5d74cdb72f413816d23511933efc3b0968c049582a1b5f5c7f5ea3b90783f931:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:673eea009a24475e68b862081672cfe7f5ac7d9c5fb1cae8cd3cb4e17912765f:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7a8de9cb59f93d64dd599f21ded09010d4de32c74d4c83100dcea9b6877fe6b0:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85925fa05b7ac7c2984ccbe3b0da809b7f3cec09b05aeb3daf07730342f4887a:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:946747485e83cf5d41c4c5a046fc32486ecd0f7e059812185e3b5886d06852a0:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a87caa099b219e0f859edc5be5c50d0cb367def3e8348a5e9bb406bbc8502c65:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b7a8e29fcf51b07830d4c56102194730fa51e426a43be671d6ffb18c38698087:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bb600371fea1eff4f3657b6b04cda8f5c95f4e121333689aa33d26c7d49f7d85:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c4f4847c56f2947ed5512b4e3254c848c5063e0e6d9d5f2a79578b289d098114:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d3cddf57125b7deddf7588e0061261b2b99ae4bf1a5ffd8ce15faa8c733f1e56:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:e69aaee600e0695a11cd87fca6c72ff383f0b8c2333fd92e4ab031225acb6fef:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:f7a4e5f8e94ed6c20dd10eb865c5d62a080b7e9547387be50830d7a0511564ae:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:fe12ec68acbd90d70ee5bf2ff2e02da31a4ce58c43c8a4e73702f79c3f17957c:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1:ff4b516c73ca788ccfa3285c374f68123f1ffbfcc3cd8036654a8bc728175d7d";
+export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:0fa9c629f23816c9e51aa47d766814b4adc281ed73c0a26bad33ba65ec930114:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:16428e8f81027619a7727910e2d6ed3a452d4b82d7b55621c534594c54c658b0:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1ac59da709d8a3b74ccd932e0d295541f188978a9237df6771e866371088a8d1:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e112ef70ab2634ddc76e69be97bf2cf6213bc0662e21efdb998b5fe1fecbfa5:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2c42c97da3b397baa523b8f7ae11ed10f988cb9ea37f6b158ecb4404f5bcab62:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:425786468a2c925e4a22baf51be9695b6f09848be70c0a67ee021678166c63c5:44730f01893c2c387121f8aa1d1465975c3d70ad9d2ba6bcafc51190118cfc30:461b35052a22a3f3494612a688d5024cf608ca3f5f42e7392e2e39d0b4ae3059:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4f96accd204d5e6e9c1ee144e0310bc741843542d014ce2bfa4303801a5260a4:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:571c1fbbd06e6f847dc0789bb6699eef2dad5b3438eb906c97bd99975eee1572:5865118d3c2cc0441916631fed5be684f876ea34c8cc603b23d1cc192c29b379:5d74cdb72f413816d23511933efc3b0968c049582a1b5f5c7f5ea3b90783f931:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:673eea009a24475e68b862081672cfe7f5ac7d9c5fb1cae8cd3cb4e17912765f:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:77e0d3181b4febaaa663ecdb3476b943a5aa588f20396e8243a196d12cae1e7c:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7a8de9cb59f93d64dd599f21ded09010d4de32c74d4c83100dcea9b6877fe6b0:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:946747485e83cf5d41c4c5a046fc32486ecd0f7e059812185e3b5886d06852a0:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a87caa099b219e0f859edc5be5c50d0cb367def3e8348a5e9bb406bbc8502c65:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b7a8e29fcf51b07830d4c56102194730fa51e426a43be671d6ffb18c38698087:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bb600371fea1eff4f3657b6b04cda8f5c95f4e121333689aa33d26c7d49f7d85:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c4f4847c56f2947ed5512b4e3254c848c5063e0e6d9d5f2a79578b289d098114:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:e69aaee600e0695a11cd87fca6c72ff383f0b8c2333fd92e4ab031225acb6fef:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:f7a4e5f8e94ed6c20dd10eb865c5d62a080b7e9547387be50830d7a0511564ae:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:fe12ec68acbd90d70ee5bf2ff2e02da31a4ce58c43c8a4e73702f79c3f17957c:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1:ff4b516c73ca788ccfa3285c374f68123f1ffbfcc3cd8036654a8bc728175d7d";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -74625,14 +74625,14 @@ export const ImportRunApproveReviewCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\" | \"stock\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["finalRecordCounts"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see imports"},{"kind":"policy_denial","message":"Staff may update imports"},{"kind":"policy_denial","message":"Staff may change imports"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This import needs its final item counts."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ImportRun not found"}],
   emits: ["ImportRunReviewApproved"],
 } as const;
 
-export type ImportRunApproveReviewResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
+export type ImportRunApproveReviewResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ImportRun.approveReview.
@@ -74733,14 +74733,14 @@ export const ImportRunBeginReviewCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\" | \"stock\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see imports"},{"kind":"policy_denial","message":"Staff may update imports"},{"kind":"policy_denial","message":"Staff may change imports"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ImportRun not found"}],
   emits: ["ImportRunReviewStarted"],
 } as const;
 
-export type ImportRunBeginReviewResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
+export type ImportRunBeginReviewResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ImportRun.beginReview.
@@ -74835,14 +74835,14 @@ export const ImportRunCommitCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\" | \"stock\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see imports"},{"kind":"policy_denial","message":"Staff may update imports"},{"kind":"policy_denial","message":"Staff may change imports"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ImportRun not found"}],
   emits: ["ImportRunCommitted"],
 } as const;
 
-export type ImportRunCommitResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
+export type ImportRunCommitResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ImportRun.commit.
@@ -74939,14 +74939,14 @@ export const ImportRunExplainArchiveDiscrepancyCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\" | \"stock\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["note"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see imports"},{"kind":"policy_denial","message":"Staff may update imports"},{"kind":"policy_denial","message":"Staff may change imports"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Say why the file counts don't match."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ImportRun not found"}],
   emits: ["ImportRunArchiveDiscrepancyExplained"],
 } as const;
 
-export type ImportRunExplainArchiveDiscrepancyResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
+export type ImportRunExplainArchiveDiscrepancyResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ImportRun.explainArchiveDiscrepancy.
@@ -75033,14 +75033,14 @@ export const ImportRunMarkFailedCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\" | \"stock\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["failureDetails"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see imports"},{"kind":"policy_denial","message":"Staff may update imports"},{"kind":"policy_denial","message":"Staff may change imports"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Say what went wrong."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ImportRun not found"}],
   emits: ["ImportRunFailed"],
 } as const;
 
-export type ImportRunMarkFailedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
+export type ImportRunMarkFailedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ImportRun.markFailed.
@@ -75177,14 +75177,14 @@ export const ImportRunRecordArchiveInventoryCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\" | \"stock\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["archiveWorkbookCount","archiveStorageId","archiveChecksum","indexWorkbookCount","indexNameMismatch"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see imports"},{"kind":"policy_denial","message":"Staff may update imports"},{"kind":"policy_denial","message":"Staff may change imports"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This import's file count from the upload can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This import's expected file count can't be negative. Use zero or more."},{"kind":"constraint_block","message":"If you give a storage ID for the upload, it can't be blank."},{"kind":"constraint_block","message":"If you give a checksum for the upload, it can't be blank."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ImportRun not found"}],
   emits: ["ImportRunArchiveInventoryRecorded"],
 } as const;
 
-export type ImportRunRecordArchiveInventoryResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
+export type ImportRunRecordArchiveInventoryResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ImportRun.recordArchiveInventory.
@@ -75291,14 +75291,14 @@ export const ImportRunRecordCommitCheckpointCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\" | \"stock\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["commitCheckpoint"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see imports"},{"kind":"policy_denial","message":"Staff may update imports"},{"kind":"policy_denial","message":"Staff may change imports"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This import needs to say how far its committing has gotten."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ImportRun not found"}],
   emits: ["ImportRunCommitCheckpointRecorded"],
 } as const;
 
-export type ImportRunRecordCommitCheckpointResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
+export type ImportRunRecordCommitCheckpointResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ImportRun.recordCommitCheckpoint.
@@ -75387,14 +75387,14 @@ export const ImportRunRecordDispositionSummaryCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\" | \"stock\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["dispositionCounts","unaccountedRecordCount"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see imports"},{"kind":"policy_denial","message":"Staff may update imports"},{"kind":"policy_denial","message":"Staff may change imports"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This import needs its file outcome counts."},{"kind":"constraint_block","message":"This import's count of files not yet accounted for can't be negative. Use zero or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ImportRun not found"}],
   emits: ["ImportRunDispositionSummaryRecorded"],
 } as const;
 
-export type ImportRunRecordDispositionSummaryResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
+export type ImportRunRecordDispositionSummaryResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ImportRun.recordDispositionSummary.
@@ -75486,14 +75486,14 @@ export const ImportRunRecordParseCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\" | \"stock\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["recordCounts"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see imports"},{"kind":"policy_denial","message":"Staff may update imports"},{"kind":"policy_denial","message":"Staff may change imports"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This import needs its item counts."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ImportRun not found"}],
   emits: ["ImportRunParsed"],
 } as const;
 
-export type ImportRunRecordParseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
+export type ImportRunRecordParseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ImportRun.recordParse.
@@ -75594,14 +75594,14 @@ export const ImportRunRevertCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\" | \"stock\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see imports"},{"kind":"policy_denial","message":"Staff may update imports"},{"kind":"policy_denial","message":"Staff may change imports"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ImportRun not found"}],
   emits: ["ImportRunReverted"],
 } as const;
 
-export type ImportRunRevertResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
+export type ImportRunRevertResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ImportRun.revert.
@@ -75685,8 +75685,8 @@ export const ImportRunRevertLifecycle = [
 export interface ImportRunStartClientInput {
   /** Allowed: "tpp_legacy" | "csv_export" | "api_sync" */
   sourceSystem: "tpp_legacy" | "csv_export" | "api_sync";
-  /** Allowed: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" */
-  datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list";
+  /** Allowed: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock" */
+  datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock";
   checksum?: string;
 }
 
@@ -75702,14 +75702,14 @@ export const ImportRunStartCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\" | \"stock\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["sourceSystem","datasetType","checksum"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see imports"},{"kind":"policy_denial","message":"Staff may update imports"},{"kind":"policy_denial","message":"Staff may change imports"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ImportRun not found"}],
   emits: ["ImportRunStarted"],
 } as const;
 
-export type ImportRunStartResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
+export type ImportRunStartResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ImportRun.start.
@@ -75822,6 +75822,10 @@ export const ImportRunStartAction = {
         {
           "value": "pack_list",
           "label": "pack_list"
+        },
+        {
+          "value": "stock",
+          "label": "stock"
         }
       ]
     },
@@ -75848,14 +75852,14 @@ export const ImportRunValidateCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\" | \"stock\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see imports"},{"kind":"policy_denial","message":"Staff may update imports"},{"kind":"policy_denial","message":"Staff may change imports"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ImportRun not found"}],
   emits: ["ImportRunValidated"],
 } as const;
 
-export type ImportRunValidateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
+export type ImportRunValidateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ImportRun.validate.
@@ -76950,6 +76954,20 @@ export const IngredientClassifyAllergensInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -77309,6 +77327,20 @@ export const IngredientClearPrimaryImageInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -77617,6 +77649,20 @@ export const IngredientConfigureSubstitutesInvalidation = [
     "entity": "ItemUnitMapping",
     "queryKeyHint": "queryKeys.itemUnitMapping.detail(id)",
     "readId": "ItemUnitMapping.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
     "label": "related entity detail"
   },
   {
@@ -77935,6 +77981,20 @@ export const IngredientDiscontinueInvalidation = [
     "entity": "ItemUnitMapping",
     "queryKeyHint": "queryKeys.itemUnitMapping.detail(id)",
     "readId": "ItemUnitMapping.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
     "label": "related entity detail"
   },
   {
@@ -78277,6 +78337,20 @@ export const IngredientIntroduceInvalidation = [
     "entity": "ItemUnitMapping",
     "queryKeyHint": "queryKeys.itemUnitMapping.detail(id)",
     "readId": "ItemUnitMapping.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
     "label": "related entity detail"
   },
   {
@@ -78775,6 +78849,20 @@ export const IngredientLinkAsEditionInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -79095,6 +79183,20 @@ export const IngredientMergeIntoInvalidation = [
     "entity": "ItemUnitMapping",
     "queryKeyHint": "queryKeys.itemUnitMapping.detail(id)",
     "readId": "ItemUnitMapping.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
     "label": "related entity detail"
   },
   {
@@ -79436,6 +79538,20 @@ export const IngredientPurgeInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -79758,6 +79874,20 @@ export const IngredientReinstateInvalidation = [
     "entity": "ItemUnitMapping",
     "queryKeyHint": "queryKeys.itemUnitMapping.detail(id)",
     "readId": "ItemUnitMapping.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
     "label": "related entity detail"
   },
   {
@@ -80103,6 +80233,20 @@ export const IngredientSetNutritionInvalidation = [
     "entity": "ItemUnitMapping",
     "queryKeyHint": "queryKeys.itemUnitMapping.detail(id)",
     "readId": "ItemUnitMapping.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
     "label": "related entity detail"
   },
   {
@@ -80465,6 +80609,20 @@ export const IngredientSetPreferredVendorInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -80780,6 +80938,20 @@ export const IngredientSetPreferredVendorsInvalidation = [
     "entity": "ItemUnitMapping",
     "queryKeyHint": "queryKeys.itemUnitMapping.detail(id)",
     "readId": "ItemUnitMapping.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
     "label": "related entity detail"
   },
   {
@@ -81108,6 +81280,20 @@ export const IngredientSetPrimaryImageInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -81432,6 +81618,20 @@ export const IngredientUpdateCostingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -81749,6 +81949,20 @@ export const IngredientUpdateDetailsInvalidation = [
     "entity": "ItemUnitMapping",
     "queryKeyHint": "queryKeys.itemUnitMapping.detail(id)",
     "readId": "ItemUnitMapping.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
     "label": "related entity detail"
   },
   {
@@ -95617,6 +95831,995 @@ export const OneOnOneActionCloseLifecycle = [
     "proven": true
   }
 ] as const;
+
+// --- OpeningStockRecord.markApplied ---
+export interface OpeningStockRecordMarkAppliedClientInput {
+  inventoryItemId: string;
+}
+
+export const OpeningStockRecordMarkAppliedCapability = {
+  capabilityId: "OpeningStockRecord.markApplied",
+  entity: "OpeningStockRecord",
+  command: "markApplied",
+  route: "/api/manifest/OpeningStockRecord/commands/markApplied",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: \"ingredient\" | \"equipment\" | \"disposable\" | \"component\" | \"instruction\" | \"unsorted\"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\" | null; catalogQuantity: number | null; asOfAt: number | null; countState: \"counted\" | \"unverified\" | \"estimated\" | \"unknown\"; status: \"needs_review\" | \"ready\" | \"applied\" | \"set_aside\"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["inventoryItemId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Inventory staff and managers may see opening stock"},{"kind":"policy_denial","message":"Inventory staff and managers may update opening stock"},{"kind":"policy_denial","message":"Inventory staff and managers may change opening stock"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"OpeningStockRecord not found"}],
+  emits: ["OpeningStockApplied"],
+} as const;
+
+export type OpeningStockRecordMarkAppliedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: "ingredient" | "equipment" | "disposable" | "component" | "instruction" | "unsorted"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" | null; catalogQuantity: number | null; asOfAt: number | null; countState: "counted" | "unverified" | "estimated" | "unknown"; status: "needs_review" | "ready" | "applied" | "set_aside"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for OpeningStockRecord.markApplied.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindOpeningStockRecordMarkAppliedInput(client: OpeningStockRecordMarkAppliedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful OpeningStockRecord.markApplied. */
+export const OpeningStockRecordMarkAppliedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "readId": "Ingredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "readId": "Ingredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.lists()",
+    "readId": "StorageLocation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.detail(id)",
+    "readId": "StorageLocation.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer OpeningStockRecord.markApplied. Not a rendered control. */
+export const OpeningStockRecordMarkAppliedAction = {
+  "exposure": "human",
+  "label": "Mark applied",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "inventoryItemId",
+      "label": "Inventory item id",
+      "required": true
+    }
+  ],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "ready"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for OpeningStockRecord.markApplied. */
+export const OpeningStockRecordMarkAppliedLifecycle = [
+  {
+    "property": "status",
+    "from": "ready",
+    "to": "applied",
+    "proven": true
+  }
+] as const;
+
+// --- OpeningStockRecord.refreshIssues ---
+export interface OpeningStockRecordRefreshIssuesClientInput {
+  issues: string;
+}
+
+export const OpeningStockRecordRefreshIssuesCapability = {
+  capabilityId: "OpeningStockRecord.refreshIssues",
+  entity: "OpeningStockRecord",
+  command: "refreshIssues",
+  route: "/api/manifest/OpeningStockRecord/commands/refreshIssues",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: \"ingredient\" | \"equipment\" | \"disposable\" | \"component\" | \"instruction\" | \"unsorted\"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\" | null; catalogQuantity: number | null; asOfAt: number | null; countState: \"counted\" | \"unverified\" | \"estimated\" | \"unknown\"; status: \"needs_review\" | \"ready\" | \"applied\" | \"set_aside\"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["issues"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Inventory staff and managers may see opening stock"},{"kind":"policy_denial","message":"Inventory staff and managers may update opening stock"},{"kind":"policy_denial","message":"Inventory staff and managers may change opening stock"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Each stock row needs its list of open issues, even an empty one."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"OpeningStockRecord not found"}],
+  emits: [],
+} as const;
+
+export type OpeningStockRecordRefreshIssuesResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: "ingredient" | "equipment" | "disposable" | "component" | "instruction" | "unsorted"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" | null; catalogQuantity: number | null; asOfAt: number | null; countState: "counted" | "unverified" | "estimated" | "unknown"; status: "needs_review" | "ready" | "applied" | "set_aside"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for OpeningStockRecord.refreshIssues.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindOpeningStockRecordRefreshIssuesInput(client: OpeningStockRecordRefreshIssuesClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful OpeningStockRecord.refreshIssues. */
+export const OpeningStockRecordRefreshIssuesInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "readId": "Ingredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "readId": "Ingredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.lists()",
+    "readId": "StorageLocation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.detail(id)",
+    "readId": "StorageLocation.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer OpeningStockRecord.refreshIssues. Not a rendered control. */
+export const OpeningStockRecordRefreshIssuesAction = {
+  "exposure": "human",
+  "label": "Refresh issues",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "issues",
+      "label": "Issues",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- OpeningStockRecord.review ---
+export interface OpeningStockRecordReviewClientInput {
+  /** Allowed: "ingredient" | "equipment" | "disposable" | "component" | "instruction" | "unsorted" */
+  kind: "ingredient" | "equipment" | "disposable" | "component" | "instruction" | "unsorted";
+  ingredientId?: string;
+  componentId?: string;
+  locationId?: string;
+  locationName: string;
+  quantity?: number;
+  sourceUnit: string;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+  catalogQuantity?: number;
+  asOfAt?: string;
+  /** Allowed: "counted" | "unverified" | "estimated" | "unknown" */
+  countState: "counted" | "unverified" | "estimated" | "unknown";
+  issues: string;
+  note?: string;
+}
+
+export const OpeningStockRecordReviewCapability = {
+  capabilityId: "OpeningStockRecord.review",
+  entity: "OpeningStockRecord",
+  command: "review",
+  route: "/api/manifest/OpeningStockRecord/commands/review",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: ["asOfAt"],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: \"ingredient\" | \"equipment\" | \"disposable\" | \"component\" | \"instruction\" | \"unsorted\"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\" | null; catalogQuantity: number | null; asOfAt: number | null; countState: \"counted\" | \"unverified\" | \"estimated\" | \"unknown\"; status: \"needs_review\" | \"ready\" | \"applied\" | \"set_aside\"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["kind","ingredientId","componentId","locationId","locationName","quantity","sourceUnit","unit","catalogQuantity","asOfAt","countState","issues","note"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Inventory staff and managers may see opening stock"},{"kind":"policy_denial","message":"Inventory staff and managers may update opening stock"},{"kind":"policy_denial","message":"Inventory staff and managers may change opening stock"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Each stock row needs its list of open issues, even an empty one."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"OpeningStockRecord not found"}],
+  emits: ["OpeningStockReviewed"],
+} as const;
+
+export type OpeningStockRecordReviewResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: "ingredient" | "equipment" | "disposable" | "component" | "instruction" | "unsorted"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" | null; catalogQuantity: number | null; asOfAt: number | null; countState: "counted" | "unverified" | "estimated" | "unknown"; status: "needs_review" | "ready" | "applied" | "set_aside"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for OpeningStockRecord.review.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindOpeningStockRecordReviewInput(client: OpeningStockRecordReviewClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful OpeningStockRecord.review. */
+export const OpeningStockRecordReviewInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "readId": "Ingredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "readId": "Ingredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.lists()",
+    "readId": "StorageLocation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.detail(id)",
+    "readId": "StorageLocation.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer OpeningStockRecord.review. Not a rendered control. */
+export const OpeningStockRecordReviewAction = {
+  "exposure": "human",
+  "label": "Review",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "kind",
+      "label": "Kind",
+      "required": true,
+      "choices": [
+        {
+          "value": "ingredient",
+          "label": "ingredient"
+        },
+        {
+          "value": "equipment",
+          "label": "equipment"
+        },
+        {
+          "value": "disposable",
+          "label": "disposable"
+        },
+        {
+          "value": "component",
+          "label": "component"
+        },
+        {
+          "value": "instruction",
+          "label": "instruction"
+        },
+        {
+          "value": "unsorted",
+          "label": "unsorted"
+        }
+      ]
+    },
+    {
+      "name": "ingredientId",
+      "label": "Ingredient id",
+      "required": false
+    },
+    {
+      "name": "componentId",
+      "label": "Component id",
+      "required": false
+    },
+    {
+      "name": "locationId",
+      "label": "Location id",
+      "required": false
+    },
+    {
+      "name": "locationName",
+      "label": "Location name",
+      "required": true
+    },
+    {
+      "name": "quantity",
+      "label": "Quantity",
+      "required": false
+    },
+    {
+      "name": "sourceUnit",
+      "label": "Source unit",
+      "required": true
+    },
+    {
+      "name": "unit",
+      "label": "Unit",
+      "required": false,
+      "choices": [
+        {
+          "value": "each",
+          "label": "each"
+        },
+        {
+          "value": "gram",
+          "label": "gram"
+        },
+        {
+          "value": "kilogram",
+          "label": "kilogram"
+        },
+        {
+          "value": "ounce",
+          "label": "ounce"
+        },
+        {
+          "value": "pound",
+          "label": "pound"
+        },
+        {
+          "value": "milliliter",
+          "label": "milliliter"
+        },
+        {
+          "value": "liter",
+          "label": "liter"
+        },
+        {
+          "value": "teaspoon",
+          "label": "teaspoon"
+        },
+        {
+          "value": "tablespoon",
+          "label": "tablespoon"
+        },
+        {
+          "value": "cup",
+          "label": "cup"
+        },
+        {
+          "value": "pint",
+          "label": "pint"
+        },
+        {
+          "value": "quart",
+          "label": "quart"
+        },
+        {
+          "value": "gallon",
+          "label": "gallon"
+        },
+        {
+          "value": "portion",
+          "label": "portion"
+        },
+        {
+          "value": "serving",
+          "label": "serving"
+        },
+        {
+          "value": "batch",
+          "label": "batch"
+        },
+        {
+          "value": "melon",
+          "label": "melon"
+        },
+        {
+          "value": "bottle",
+          "label": "bottle"
+        },
+        {
+          "value": "fluid_ounce",
+          "label": "fluid_ounce"
+        },
+        {
+          "value": "piece",
+          "label": "piece"
+        },
+        {
+          "value": "slice",
+          "label": "slice"
+        },
+        {
+          "value": "pizza",
+          "label": "pizza"
+        },
+        {
+          "value": "package",
+          "label": "package"
+        },
+        {
+          "value": "case",
+          "label": "case"
+        },
+        {
+          "value": "can",
+          "label": "can"
+        },
+        {
+          "value": "tub",
+          "label": "tub"
+        }
+      ]
+    },
+    {
+      "name": "catalogQuantity",
+      "label": "Catalog quantity",
+      "required": false
+    },
+    {
+      "name": "asOfAt",
+      "label": "As of at",
+      "required": false
+    },
+    {
+      "name": "countState",
+      "label": "Count state",
+      "required": true,
+      "choices": [
+        {
+          "value": "counted",
+          "label": "counted"
+        },
+        {
+          "value": "unverified",
+          "label": "unverified"
+        },
+        {
+          "value": "estimated",
+          "label": "estimated"
+        },
+        {
+          "value": "unknown",
+          "label": "unknown"
+        }
+      ]
+    },
+    {
+      "name": "issues",
+      "label": "Issues",
+      "required": true
+    },
+    {
+      "name": "note",
+      "label": "Note",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- OpeningStockRecord.setAside ---
+export interface OpeningStockRecordSetAsideClientInput {
+  reason: string;
+}
+
+export const OpeningStockRecordSetAsideCapability = {
+  capabilityId: "OpeningStockRecord.setAside",
+  entity: "OpeningStockRecord",
+  command: "setAside",
+  route: "/api/manifest/OpeningStockRecord/commands/setAside",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: \"ingredient\" | \"equipment\" | \"disposable\" | \"component\" | \"instruction\" | \"unsorted\"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\" | null; catalogQuantity: number | null; asOfAt: number | null; countState: \"counted\" | \"unverified\" | \"estimated\" | \"unknown\"; status: \"needs_review\" | \"ready\" | \"applied\" | \"set_aside\"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Inventory staff and managers may see opening stock"},{"kind":"policy_denial","message":"Inventory staff and managers may update opening stock"},{"kind":"policy_denial","message":"Inventory staff and managers may change opening stock"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Say why this count is not used."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"OpeningStockRecord not found"}],
+  emits: ["OpeningStockSetAside"],
+} as const;
+
+export type OpeningStockRecordSetAsideResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: "ingredient" | "equipment" | "disposable" | "component" | "instruction" | "unsorted"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" | null; catalogQuantity: number | null; asOfAt: number | null; countState: "counted" | "unverified" | "estimated" | "unknown"; status: "needs_review" | "ready" | "applied" | "set_aside"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for OpeningStockRecord.setAside.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindOpeningStockRecordSetAsideInput(client: OpeningStockRecordSetAsideClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful OpeningStockRecord.setAside. */
+export const OpeningStockRecordSetAsideInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "readId": "Ingredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "readId": "Ingredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.lists()",
+    "readId": "StorageLocation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.detail(id)",
+    "readId": "StorageLocation.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer OpeningStockRecord.setAside. Not a rendered control. */
+export const OpeningStockRecordSetAsideAction = {
+  "exposure": "human",
+  "label": "Set aside",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "reason",
+      "label": "Reason",
+      "required": true
+    }
+  ],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "needs_review",
+      "ready"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for OpeningStockRecord.setAside. */
+export const OpeningStockRecordSetAsideLifecycle = [
+  {
+    "property": "status",
+    "from": "needs_review",
+    "to": "set_aside",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "ready",
+    "to": "set_aside",
+    "proven": true
+  }
+] as const;
+
+// --- OpeningStockRecord.stage ---
+export interface OpeningStockRecordStageClientInput {
+  importRunId?: string;
+  sourceSystem: string;
+  sourceFile: string;
+  sourceRow: string;
+  itemName: string;
+  /** Allowed: "ingredient" | "equipment" | "disposable" | "component" | "instruction" | "unsorted" */
+  kind: "ingredient" | "equipment" | "disposable" | "component" | "instruction" | "unsorted";
+  ingredientId?: string;
+  componentId?: string;
+  locationId?: string;
+  locationName: string;
+  quantity?: number;
+  sourceUnit: string;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+  catalogQuantity?: number;
+  asOfAt?: string;
+  /** Allowed: "counted" | "unverified" | "estimated" | "unknown" */
+  countState: "counted" | "unverified" | "estimated" | "unknown";
+  issues: string;
+  note?: string;
+}
+
+export const OpeningStockRecordStageCapability = {
+  capabilityId: "OpeningStockRecord.stage",
+  entity: "OpeningStockRecord",
+  command: "stage",
+  route: "/api/manifest/OpeningStockRecord/commands/stage",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: ["asOfAt"],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["importRunId","sourceSystem","sourceFile","sourceRow","itemName","kind","ingredientId","componentId","locationId","locationName","quantity","sourceUnit","unit","catalogQuantity","asOfAt","countState","issues","note"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Inventory staff and managers may see opening stock"},{"kind":"policy_denial","message":"Inventory staff and managers may update opening stock"},{"kind":"policy_denial","message":"Inventory staff and managers may change opening stock"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Each stock row needs the item's name."},{"kind":"constraint_block","message":"Each stock row needs its place in the source file."},{"kind":"constraint_block","message":"Each stock row needs its list of open issues, even an empty one."}],
+  emits: ["OpeningStockStaged"],
+} as const;
+
+export type OpeningStockRecordStageResult = { docId: string };
+
+/**
+ * Build command input for OpeningStockRecord.stage.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindOpeningStockRecordStageInput(client: OpeningStockRecordStageClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful OpeningStockRecord.stage. */
+export const OpeningStockRecordStageInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "readId": "Ingredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "readId": "Ingredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.lists()",
+    "readId": "StorageLocation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.detail(id)",
+    "readId": "StorageLocation.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer OpeningStockRecord.stage. Not a rendered control. */
+export const OpeningStockRecordStageAction = {
+  "exposure": "human",
+  "label": "Stage",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "importRunId",
+      "label": "Import run id",
+      "required": false
+    },
+    {
+      "name": "sourceSystem",
+      "label": "Source system",
+      "required": true
+    },
+    {
+      "name": "sourceFile",
+      "label": "Source file",
+      "required": true
+    },
+    {
+      "name": "sourceRow",
+      "label": "Source row",
+      "required": true
+    },
+    {
+      "name": "itemName",
+      "label": "Item name",
+      "required": true
+    },
+    {
+      "name": "kind",
+      "label": "Kind",
+      "required": true,
+      "choices": [
+        {
+          "value": "ingredient",
+          "label": "ingredient"
+        },
+        {
+          "value": "equipment",
+          "label": "equipment"
+        },
+        {
+          "value": "disposable",
+          "label": "disposable"
+        },
+        {
+          "value": "component",
+          "label": "component"
+        },
+        {
+          "value": "instruction",
+          "label": "instruction"
+        },
+        {
+          "value": "unsorted",
+          "label": "unsorted"
+        }
+      ]
+    },
+    {
+      "name": "ingredientId",
+      "label": "Ingredient id",
+      "required": false
+    },
+    {
+      "name": "componentId",
+      "label": "Component id",
+      "required": false
+    },
+    {
+      "name": "locationId",
+      "label": "Location id",
+      "required": false
+    },
+    {
+      "name": "locationName",
+      "label": "Location name",
+      "required": true
+    },
+    {
+      "name": "quantity",
+      "label": "Quantity",
+      "required": false
+    },
+    {
+      "name": "sourceUnit",
+      "label": "Source unit",
+      "required": true
+    },
+    {
+      "name": "unit",
+      "label": "Unit",
+      "required": false,
+      "choices": [
+        {
+          "value": "each",
+          "label": "each"
+        },
+        {
+          "value": "gram",
+          "label": "gram"
+        },
+        {
+          "value": "kilogram",
+          "label": "kilogram"
+        },
+        {
+          "value": "ounce",
+          "label": "ounce"
+        },
+        {
+          "value": "pound",
+          "label": "pound"
+        },
+        {
+          "value": "milliliter",
+          "label": "milliliter"
+        },
+        {
+          "value": "liter",
+          "label": "liter"
+        },
+        {
+          "value": "teaspoon",
+          "label": "teaspoon"
+        },
+        {
+          "value": "tablespoon",
+          "label": "tablespoon"
+        },
+        {
+          "value": "cup",
+          "label": "cup"
+        },
+        {
+          "value": "pint",
+          "label": "pint"
+        },
+        {
+          "value": "quart",
+          "label": "quart"
+        },
+        {
+          "value": "gallon",
+          "label": "gallon"
+        },
+        {
+          "value": "portion",
+          "label": "portion"
+        },
+        {
+          "value": "serving",
+          "label": "serving"
+        },
+        {
+          "value": "batch",
+          "label": "batch"
+        },
+        {
+          "value": "melon",
+          "label": "melon"
+        },
+        {
+          "value": "bottle",
+          "label": "bottle"
+        },
+        {
+          "value": "fluid_ounce",
+          "label": "fluid_ounce"
+        },
+        {
+          "value": "piece",
+          "label": "piece"
+        },
+        {
+          "value": "slice",
+          "label": "slice"
+        },
+        {
+          "value": "pizza",
+          "label": "pizza"
+        },
+        {
+          "value": "package",
+          "label": "package"
+        },
+        {
+          "value": "case",
+          "label": "case"
+        },
+        {
+          "value": "can",
+          "label": "can"
+        },
+        {
+          "value": "tub",
+          "label": "tub"
+        }
+      ]
+    },
+    {
+      "name": "catalogQuantity",
+      "label": "Catalog quantity",
+      "required": false
+    },
+    {
+      "name": "asOfAt",
+      "label": "As of at",
+      "required": false
+    },
+    {
+      "name": "countState",
+      "label": "Count state",
+      "required": true,
+      "choices": [
+        {
+          "value": "counted",
+          "label": "counted"
+        },
+        {
+          "value": "unverified",
+          "label": "unverified"
+        },
+        {
+          "value": "estimated",
+          "label": "estimated"
+        },
+        {
+          "value": "unknown",
+          "label": "unknown"
+        }
+      ]
+    },
+    {
+      "name": "issues",
+      "label": "Issues",
+      "required": true
+    },
+    {
+      "name": "note",
+      "label": "Note",
+      "required": false
+    }
+  ]
+} as const;
 
 // --- OperatingLocation.activate ---
 export type OperatingLocationActivateClientInput = Record<string, never>;
@@ -140310,6 +141513,20 @@ export const StorageLocationActivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "ReceiptCorrection",
     "queryKeyHint": "queryKeys.receiptCorrection.lists()",
     "readId": "ReceiptCorrection.list",
@@ -140480,6 +141697,20 @@ export const StorageLocationDeactivateInvalidation = [
     "entity": "InventoryLot",
     "queryKeyHint": "queryKeys.inventoryLot.detail(id)",
     "readId": "InventoryLot.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
     "label": "related entity detail"
   },
   {
@@ -140665,6 +141896,20 @@ export const StorageLocationRegisterInvalidation = [
     "entity": "InventoryLot",
     "queryKeyHint": "queryKeys.inventoryLot.detail(id)",
     "readId": "InventoryLot.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
     "label": "related entity detail"
   },
   {
@@ -140859,6 +142104,20 @@ export const StorageLocationReviseDetailsInvalidation = [
     "entity": "InventoryLot",
     "queryKeyHint": "queryKeys.inventoryLot.detail(id)",
     "readId": "InventoryLot.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
     "label": "related entity detail"
   },
   {
@@ -158178,6 +159437,11 @@ export const ALL_CAPABILITY_IDS = [
   "OneOnOne.hold",
   "OneOnOneAction.capture",
   "OneOnOneAction.close",
+  "OpeningStockRecord.markApplied",
+  "OpeningStockRecord.refreshIssues",
+  "OpeningStockRecord.review",
+  "OpeningStockRecord.setAside",
+  "OpeningStockRecord.stage",
   "OperatingLocation.activate",
   "OperatingLocation.add",
   "OperatingLocation.deactivate",
@@ -158991,6 +160255,12 @@ export const ALL_READ_IDS = [
   "OneOnOneAction.byTenantId",
   "OneOnOneAction.get",
   "OneOnOneAction.list",
+  "OpeningStockRecord.byImportRunId",
+  "OpeningStockRecord.byIngredientId",
+  "OpeningStockRecord.byLocationId",
+  "OpeningStockRecord.byTenantId",
+  "OpeningStockRecord.get",
+  "OpeningStockRecord.list",
   "OperatingLocation.byTenantId",
   "OperatingLocation.get",
   "OperatingLocation.list",
@@ -160365,14 +161635,14 @@ export type getImportDatasetResult = { _id: string; _creationTime: number; tenan
 export const listImportDatasetRead = {"entity":"ImportDataset","readId":"ImportDataset.list","exportName":"listImportDataset","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; datasetCategory: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"invoices\" | \"proposals\"; targetEntity: \"event_record\" | \"contact\" | \"lead\" | \"menu\" | \"venue\" | \"payment\" | \"invoice\" | \"contract\" | \"proposal\" | \"client\" | \"vendor\" | \"person\" | \"task\" | \"batch\" | \"order\" | \"delivery\" | \"stock\" | \"location\" | \"pack_list\" | \"ingredient\" | \"component\" | \"component_portion_spec\" | \"component_ingredient\" | \"component_component\" | \"dish\" | \"dish_ingredient\" | \"dish_component\" | \"dish_task\" | \"dish_container\" | \"station\" | \"unit\" | \"event_dish\" | \"prep_task\" | \"service_style\"; config: string; active: boolean; importOrder: number; fieldMappingCount: number; dependsOn: string; uniqueKeyFields: string; name: string | null; description: string | null; schemaVersion: string | null; lastImportRunId: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listImportDatasetResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; datasetCategory: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "invoices" | "proposals"; targetEntity: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task" | "service_style"; config: string; active: boolean; importOrder: number; fieldMappingCount: number; dependsOn: string; uniqueKeyFields: string; name: string | null; description: string | null; schemaVersion: string | null; lastImportRunId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listImportRunByTenantIdRead = {"entity":"ImportRun","readId":"ImportRun.byTenantId","exportName":"listImportRunByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }>"} as const;
-export type listImportRunByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }>;
+export const listImportRunByTenantIdRead = {"entity":"ImportRun","readId":"ImportRun.byTenantId","exportName":"listImportRunByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\" | \"stock\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }>"} as const;
+export type listImportRunByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }>;
 
-export const getImportRunRead = {"entity":"ImportRun","readId":"ImportRun.get","exportName":"getImportRun","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getImportRunResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number } | null;
+export const getImportRunRead = {"entity":"ImportRun","readId":"ImportRun.get","exportName":"getImportRun","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\" | \"stock\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getImportRunResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number } | null;
 
-export const listImportRunRead = {"entity":"ImportRun","readId":"ImportRun.list","exportName":"listImportRun","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }>"} as const;
-export type listImportRunResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }>;
+export const listImportRunRead = {"entity":"ImportRun","readId":"ImportRun.list","exportName":"listImportRun","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\" | \"stock\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }>"} as const;
+export type listImportRunResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list" | "stock"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }>;
 
 export const listIncidentByDeliveryIdRead = {"entity":"Incident","readId":"Incident.byDeliveryId","exportName":"listIncidentByDeliveryId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"deliveryId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; prepTaskId: string | null; deliveryId: string | null; shiftId: string | null; severity: \"low\" | \"medium\" | \"high\" | \"critical\"; category: \"food_safety\" | \"allergen\" | \"injury\" | \"equipment\" | \"service\" | \"other\"; description: string; resolution: string | null; dismissalReason: string | null; reportedById: string | null; status: \"open\" | \"investigating\" | \"resolved\" | \"dismissed\"; correctiveActionRequired: boolean | null; reportedAt: number | null; investigatingAt: number | null; resolvedAt: number | null; dismissedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listIncidentByDeliveryIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; prepTaskId: string | null; deliveryId: string | null; shiftId: string | null; severity: "low" | "medium" | "high" | "critical"; category: "food_safety" | "allergen" | "injury" | "equipment" | "service" | "other"; description: string; resolution: string | null; dismissalReason: string | null; reportedById: string | null; status: "open" | "investigating" | "resolved" | "dismissed"; correctiveActionRequired: boolean | null; reportedAt: number | null; investigatingAt: number | null; resolvedAt: number | null; dismissedAt: number | null; createdAt: number; updatedAt: number }>;
@@ -160730,6 +162000,24 @@ export type getOneOnOneActionResult = { _id: string; _creationTime: number; tena
 
 export const listOneOnOneActionRead = {"entity":"OneOnOneAction","readId":"OneOnOneAction.list","exportName":"listOneOnOneAction","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; oneOnOneId: string; ownerPersonId: string; description: string; dueDate: number | null; status: \"open\" | \"closed\"; capturedAt: number | null; closedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listOneOnOneActionResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; oneOnOneId: string; ownerPersonId: string; description: string; dueDate: number | null; status: "open" | "closed"; capturedAt: number | null; closedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listOpeningStockRecordByImportRunIdRead = {"entity":"OpeningStockRecord","readId":"OpeningStockRecord.byImportRunId","exportName":"listOpeningStockRecordByImportRunId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"importRunId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: \"ingredient\" | \"equipment\" | \"disposable\" | \"component\" | \"instruction\" | \"unsorted\"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\" | null; catalogQuantity: number | null; asOfAt: number | null; countState: \"counted\" | \"unverified\" | \"estimated\" | \"unknown\"; status: \"needs_review\" | \"ready\" | \"applied\" | \"set_aside\"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listOpeningStockRecordByImportRunIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: "ingredient" | "equipment" | "disposable" | "component" | "instruction" | "unsorted"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" | null; catalogQuantity: number | null; asOfAt: number | null; countState: "counted" | "unverified" | "estimated" | "unknown"; status: "needs_review" | "ready" | "applied" | "set_aside"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number }>;
+
+export const listOpeningStockRecordByIngredientIdRead = {"entity":"OpeningStockRecord","readId":"OpeningStockRecord.byIngredientId","exportName":"listOpeningStockRecordByIngredientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"ingredientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: \"ingredient\" | \"equipment\" | \"disposable\" | \"component\" | \"instruction\" | \"unsorted\"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\" | null; catalogQuantity: number | null; asOfAt: number | null; countState: \"counted\" | \"unverified\" | \"estimated\" | \"unknown\"; status: \"needs_review\" | \"ready\" | \"applied\" | \"set_aside\"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listOpeningStockRecordByIngredientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: "ingredient" | "equipment" | "disposable" | "component" | "instruction" | "unsorted"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" | null; catalogQuantity: number | null; asOfAt: number | null; countState: "counted" | "unverified" | "estimated" | "unknown"; status: "needs_review" | "ready" | "applied" | "set_aside"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number }>;
+
+export const listOpeningStockRecordByLocationIdRead = {"entity":"OpeningStockRecord","readId":"OpeningStockRecord.byLocationId","exportName":"listOpeningStockRecordByLocationId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"locationId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: \"ingredient\" | \"equipment\" | \"disposable\" | \"component\" | \"instruction\" | \"unsorted\"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\" | null; catalogQuantity: number | null; asOfAt: number | null; countState: \"counted\" | \"unverified\" | \"estimated\" | \"unknown\"; status: \"needs_review\" | \"ready\" | \"applied\" | \"set_aside\"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listOpeningStockRecordByLocationIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: "ingredient" | "equipment" | "disposable" | "component" | "instruction" | "unsorted"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" | null; catalogQuantity: number | null; asOfAt: number | null; countState: "counted" | "unverified" | "estimated" | "unknown"; status: "needs_review" | "ready" | "applied" | "set_aside"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number }>;
+
+export const listOpeningStockRecordByTenantIdRead = {"entity":"OpeningStockRecord","readId":"OpeningStockRecord.byTenantId","exportName":"listOpeningStockRecordByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: \"ingredient\" | \"equipment\" | \"disposable\" | \"component\" | \"instruction\" | \"unsorted\"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\" | null; catalogQuantity: number | null; asOfAt: number | null; countState: \"counted\" | \"unverified\" | \"estimated\" | \"unknown\"; status: \"needs_review\" | \"ready\" | \"applied\" | \"set_aside\"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listOpeningStockRecordByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: "ingredient" | "equipment" | "disposable" | "component" | "instruction" | "unsorted"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" | null; catalogQuantity: number | null; asOfAt: number | null; countState: "counted" | "unverified" | "estimated" | "unknown"; status: "needs_review" | "ready" | "applied" | "set_aside"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number }>;
+
+export const getOpeningStockRecordRead = {"entity":"OpeningStockRecord","readId":"OpeningStockRecord.get","exportName":"getOpeningStockRecord","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: \"ingredient\" | \"equipment\" | \"disposable\" | \"component\" | \"instruction\" | \"unsorted\"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\" | null; catalogQuantity: number | null; asOfAt: number | null; countState: \"counted\" | \"unverified\" | \"estimated\" | \"unknown\"; status: \"needs_review\" | \"ready\" | \"applied\" | \"set_aside\"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getOpeningStockRecordResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: "ingredient" | "equipment" | "disposable" | "component" | "instruction" | "unsorted"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" | null; catalogQuantity: number | null; asOfAt: number | null; countState: "counted" | "unverified" | "estimated" | "unknown"; status: "needs_review" | "ready" | "applied" | "set_aside"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number } | null;
+
+export const listOpeningStockRecordRead = {"entity":"OpeningStockRecord","readId":"OpeningStockRecord.list","exportName":"listOpeningStockRecord","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: \"ingredient\" | \"equipment\" | \"disposable\" | \"component\" | \"instruction\" | \"unsorted\"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\" | null; catalogQuantity: number | null; asOfAt: number | null; countState: \"counted\" | \"unverified\" | \"estimated\" | \"unknown\"; status: \"needs_review\" | \"ready\" | \"applied\" | \"set_aside\"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listOpeningStockRecordResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string | null; sourceSystem: string; sourceFile: string; sourceRow: string; itemName: string; kind: "ingredient" | "equipment" | "disposable" | "component" | "instruction" | "unsorted"; ingredientId: string | null; componentId: string | null; locationId: string | null; locationName: string; quantity: number | null; sourceUnit: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" | null; catalogQuantity: number | null; asOfAt: number | null; countState: "counted" | "unverified" | "estimated" | "unknown"; status: "needs_review" | "ready" | "applied" | "set_aside"; issues: string; note: string | null; stagedAt: number | null; stagedById: string | null; reviewedAt: number | null; reviewedById: string | null; setAsideAt: number | null; setAsideById: string | null; setAsideReason: string | null; appliedAt: number | null; appliedById: string | null; appliedInventoryItemId: string | null; createdAt: number; updatedAt: number }>;
 
 export const listOperatingLocationByTenantIdRead = {"entity":"OperatingLocation","readId":"OperatingLocation.byTenantId","exportName":"listOperatingLocationByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; timeZone: string | null; status: \"active\" | \"inactive\"; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listOperatingLocationByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; timeZone: string | null; status: "active" | "inactive"; addedAt: number | null; createdAt: number; updatedAt: number }>;

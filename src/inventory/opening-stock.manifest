@@ -1,0 +1,279 @@
+// Opening stock from an imported count sheet (spec PR04-01, PR04-02;
+// PL-OPENING-STOCK). One record per source row. An import never writes
+// on-hand stock: every row is sorted (food, equipment, disposables, in-house
+// items, instructions) and kept with its quantity, unit, location, count time,
+// source and how sure the count is. Missing or unconvertible units, clashing
+// counts and unchecked counts stay open on the record until a person fixes
+// them. Only a ready food record can become opening stock, and a person picks
+// which one - that is the cutover basis. The issue list is worked out by
+// convex/openingStock.ts from src/lib/openingStock.ts; the status follows it.
+
+use "./stock.manifest"
+
+enum OpeningStockKind {
+  ingredient
+  equipment
+  disposable
+  component
+  instruction
+  unsorted
+}
+
+enum OpeningStockCountState {
+  counted
+  unverified
+  estimated
+  unknown
+}
+
+enum OpeningStockStatus {
+  needs_review
+  ready
+  applied
+  set_aside
+}
+
+entity OpeningStockRecord mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed importRunId: string?
+  property required sourceSystem: string = ""
+  property required sourceFile: string = ""
+  property required sourceRow: string = ""
+  property required searchable itemName: string = ""
+  property required kind: OpeningStockKind = "unsorted"
+  property ingredientId: uuid?
+  property componentId: uuid?
+  property locationId: uuid?
+  property required locationName: string = ""
+  // Null means the source gave no amount. Never read as zero.
+  property quantity: decimal(12, 4)?
+  property required sourceUnit: string = ""
+  // Null means the unit is missing or unknown. Never read as "each".
+  property unit: UnitOfMeasure?
+  // The amount in the ingredient's catalog unit, set only by an exact
+  // conversion (same measure, or a unit mapping recorded on the item).
+  property catalogQuantity: decimal(12, 4)?
+  property asOfAt: datetime?
+  property required countState: OpeningStockCountState = "unknown"
+  property required status: OpeningStockStatus = "needs_review"
+  // JSON list of open issue codes; "[]" means nothing is open.
+  property required issues: string = "[]"
+  property note: string?
+  property stagedAt: datetime?
+  property stagedById: string?
+  property reviewedAt: datetime?
+  property reviewedById: string?
+  property setAsideAt: datetime?
+  property setAsideById: string?
+  property setAsideReason: string?
+  property appliedAt: datetime?
+  property appliedById: string?
+  property appliedInventoryItemId: uuid?
+
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+  belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
+
+  computed isOpen: boolean = self.status == "needs_review" or self.status == "ready"
+
+  transition status from "needs_review" to ["needs_review", "ready", "set_aside"]
+  transition status from "ready" to ["needs_review", "ready", "applied", "set_aside"]
+  transition status from "applied" to []
+  transition status from "set_aside" to []
+
+  default policy openingStockRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may see opening stock"
+  default policy openingStockWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may update opening stock"
+  default policy openingStockExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may change opening stock"
+
+  command stage(
+    optional importRunId: string,
+    sourceSystem: string,
+    sourceFile: string,
+    sourceRow: string,
+    itemName: string,
+    kind: OpeningStockKind,
+    optional ingredientId: uuid,
+    optional componentId: uuid,
+    optional locationId: uuid,
+    locationName: string,
+    optional quantity: decimal(12, 4),
+    sourceUnit: string,
+    optional unit: UnitOfMeasure,
+    optional catalogQuantity: decimal(12, 4),
+    optional asOfAt: datetime,
+    countState: OpeningStockCountState,
+    issues: string,
+    optional note: string
+  ) {
+    guard self.stagedAt == null
+    guard self.deletedAt == null
+    constraint stageOpeningStockName: length(trim(itemName)) > 0 "Each stock row needs the item's name."
+    constraint stageOpeningStockRow: length(trim(sourceRow)) > 0 "Each stock row needs its place in the source file."
+    constraint stageOpeningStockIssues: length(trim(issues)) >= 2 "Each stock row needs its list of open issues, even an empty one."
+    mutate importRunId = importRunId
+    mutate sourceSystem = sourceSystem
+    mutate sourceFile = sourceFile
+    mutate sourceRow = sourceRow
+    mutate itemName = itemName
+    mutate kind = kind
+    mutate ingredientId = ingredientId
+    mutate componentId = componentId
+    mutate locationId = locationId
+    mutate locationName = locationName
+    mutate quantity = quantity
+    mutate sourceUnit = sourceUnit
+    mutate unit = unit
+    mutate catalogQuantity = catalogQuantity
+    mutate asOfAt = asOfAt
+    mutate countState = countState
+    mutate issues = issues
+    mutate status = issues == "[]" ? "ready" : "needs_review"
+    mutate note = note
+    mutate stagedAt = now()
+    mutate stagedById = user.id
+    emit OpeningStockStaged {
+      openingStockRecordId: self.id
+      tenantId: self.tenantId
+      actorId: user.id
+      itemName: itemName
+      kind: kind
+      issues: issues
+    }
+  }
+
+  // A person corrects the record. The seam works out the issues again.
+  command review(
+    kind: OpeningStockKind,
+    optional ingredientId: uuid,
+    optional componentId: uuid,
+    optional locationId: uuid,
+    locationName: string,
+    optional quantity: decimal(12, 4),
+    sourceUnit: string,
+    optional unit: UnitOfMeasure,
+    optional catalogQuantity: decimal(12, 4),
+    optional asOfAt: datetime,
+    countState: OpeningStockCountState,
+    issues: string,
+    optional note: string
+  ) {
+    guard self.stagedAt != null
+    guard self.deletedAt == null
+    guard self.status == "needs_review" or self.status == "ready"
+    constraint reviewOpeningStockIssues: length(trim(issues)) >= 2 "Each stock row needs its list of open issues, even an empty one."
+    mutate kind = kind
+    mutate ingredientId = ingredientId
+    mutate componentId = componentId
+    mutate locationId = locationId
+    mutate locationName = locationName
+    mutate quantity = quantity
+    mutate sourceUnit = sourceUnit
+    mutate unit = unit
+    mutate catalogQuantity = catalogQuantity
+    mutate asOfAt = asOfAt
+    mutate countState = countState
+    mutate issues = issues
+    mutate status = issues == "[]" ? "ready" : "needs_review"
+    mutate note = note
+    mutate reviewedAt = now()
+    mutate reviewedById = user.id
+    emit OpeningStockReviewed {
+      openingStockRecordId: self.id
+      tenantId: self.tenantId
+      actorId: user.id
+      itemName: self.itemName
+      kind: kind
+      issues: issues
+    }
+  }
+
+  // Another record in the same place changed, so a clash may have opened or
+  // closed. Only the issue list moves.
+  command refreshIssues(issues: string) {
+    guard self.stagedAt != null
+    guard self.deletedAt == null
+    guard self.status == "needs_review" or self.status == "ready"
+    constraint refreshOpeningStockIssues: length(trim(issues)) >= 2 "Each stock row needs its list of open issues, even an empty one."
+    mutate issues = issues
+    mutate status = issues == "[]" ? "ready" : "needs_review"
+  }
+
+  command setAside(reason: string) {
+    guard self.stagedAt != null
+    guard self.deletedAt == null
+    guard self.status == "needs_review" or self.status == "ready"
+    constraint setAsideOpeningStockReason: length(trim(reason)) > 0 "Say why this count is not used."
+    mutate status = "set_aside"
+    mutate setAsideAt = now()
+    mutate setAsideById = user.id
+    mutate setAsideReason = reason
+    emit OpeningStockSetAside {
+      openingStockRecordId: self.id
+      tenantId: self.tenantId
+      actorId: user.id
+      itemName: self.itemName
+      reason: reason
+    }
+  }
+
+  // The seam opens or recounts the stock line first, then records it here.
+  command markApplied(inventoryItemId: uuid) {
+    guard self.stagedAt != null
+    guard self.deletedAt == null
+    guard self.status == "ready"
+    guard self.issues == "[]"
+    guard self.kind == "ingredient"
+    guard self.ingredientId != null and self.locationId != null and self.catalogQuantity != null
+    mutate status = "applied"
+    mutate appliedAt = now()
+    mutate appliedById = user.id
+    mutate appliedInventoryItemId = inventoryItemId
+    emit OpeningStockApplied {
+      openingStockRecordId: self.id
+      tenantId: self.tenantId
+      actorId: user.id
+      itemName: self.itemName
+      inventoryItemId: inventoryItemId
+      catalogQuantity: self.catalogQuantity
+    }
+  }
+
+  store OpeningStockRecord in durable
+}
+
+event OpeningStockStaged: "opening_stock.staged" {
+  openingStockRecordId: string
+  tenantId: string
+  actorId: string
+  itemName: string
+  kind: OpeningStockKind
+  issues: string
+}
+
+event OpeningStockReviewed: "opening_stock.reviewed" {
+  openingStockRecordId: string
+  tenantId: string
+  actorId: string
+  itemName: string
+  kind: OpeningStockKind
+  issues: string
+}
+
+event OpeningStockSetAside: "opening_stock.set_aside" {
+  openingStockRecordId: string
+  tenantId: string
+  actorId: string
+  itemName: string
+  reason: string
+}
+
+event OpeningStockApplied: "opening_stock.applied" {
+  openingStockRecordId: string
+  tenantId: string
+  actorId: string
+  itemName: string
+  inventoryItemId: string
+  catalogQuantity: decimal(12, 4)?
+}

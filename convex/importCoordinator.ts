@@ -67,6 +67,7 @@ const DATASET_TYPES = [
   "venues",
   "payments",
   "pack_list",
+  "stock",
 ] as const;
 type DatasetType = (typeof DATASET_TYPES)[number];
 

@@ -117,6 +117,7 @@ import {
 import type { Doc, Id } from "./_generated/dataModel";
 import { buildLinkKey } from "./lib/culinaryModel/importMapping";
 import { SERVICE_STYLE_RECORD_TYPE } from "./importServiceStyle";
+import { commitStockRows } from "./openingStock";
 
 /**
  * Canonical ExternalRecordLink key for an import-commit identity. Commit links
@@ -1613,8 +1614,37 @@ export const commitImportRun = action({
       };
     }
 
+    if (importRun.datasetType === "stock") {
+      // Opening stock count sheets (PL-OPENING-STOCK): each row is staged as
+      // an OpeningStockRecord for review; on-hand stock is never written here.
+      if (args.rawRows.length === 0) {
+        throw new ConvexError("No source rows provided — nothing to commit.");
+      }
+      const result = await commitStockRows(ctx, {
+        importRunId: args.importRunId,
+        tenantId,
+        sourceSystem: importRun.sourceSystem,
+        rawRows: args.rawRows,
+        maxRecords: args.maxRecords,
+      });
+      const invocation = {
+        committed: result.committed,
+        skipped: result.skipped,
+        pending: result.pending,
+      };
+      if (result.stoppedEarly) {
+        return await stopEarly(result.parseErrors, invocation);
+      }
+      await completeRun(invocation);
+      return {
+        ...invocation,
+        parseErrors: result.parseErrors,
+        processedCount: mergeCheckpoint(checkpoint, invocation).processedCount,
+      };
+    }
+
     // ImportDatasetType is a closed union (contacts/events/leads/payments/menus/
-    // pack_list/venues); the six branches above each return, so TS narrows
+    // pack_list/stock/venues); the seven branches above each return, so TS narrows
     // importRun.datasetType to "venues" here — this fall-through is exhaustive.
     // A future member added without a branch would fall through to venue parsing
     // and fail loudly ("No valid venue records parsed") rather than misroute.

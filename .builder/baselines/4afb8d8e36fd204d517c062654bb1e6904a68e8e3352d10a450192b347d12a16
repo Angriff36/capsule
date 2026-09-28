@@ -417,6 +417,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.OneOnOneAction_createViaCapture, { "oneOnOneId": "oneOnOneId-one-on-one-action-1", "ownerPersonId": "ownerPersonId-one-on-one-action-1", "description": "demo-description-1", "dueDate": 1767268800000 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.OneOnOneAction_createViaCapture, { "oneOnOneId": "oneOnOneId-one-on-one-action-2", "ownerPersonId": "ownerPersonId-one-on-one-action-2", "description": "demo-description-2", "dueDate": 1767355200000 } as any);
+  // OpeningStockRecord → api.mutations.OpeningStockRecord_createViaStage
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.OpeningStockRecord_createViaStage, { "importRunId": "importRunId-opening-stock-record-1", "sourceSystem": "demo-sourceSystem-1", "sourceFile": "demo-sourceFile-1", "sourceRow": "demo-sourceRow-1", "itemName": "OpeningStockRecord 1", "kind": "demo-kind-1", "ingredientId": "ingredientId-opening-stock-record-1", "componentId": "componentId-opening-stock-record-1", "locationId": "locationId-opening-stock-record-1", "locationName": "OpeningStockRecord 1", "quantity": 1, "sourceUnit": "demo-sourceUnit-1", "unit": "demo-unit-1", "catalogQuantity": 1, "asOfAt": 1767268800000, "countState": "demo-countState-1", "issues": "demo-issues-1", "note": "demo-note-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.OpeningStockRecord_createViaStage, { "importRunId": "importRunId-opening-stock-record-2", "sourceSystem": "demo-sourceSystem-2", "sourceFile": "demo-sourceFile-2", "sourceRow": "demo-sourceRow-2", "itemName": "OpeningStockRecord 2", "kind": "demo-kind-2", "ingredientId": "ingredientId-opening-stock-record-2", "componentId": "componentId-opening-stock-record-2", "locationId": "locationId-opening-stock-record-2", "locationName": "OpeningStockRecord 2", "quantity": 2, "sourceUnit": "demo-sourceUnit-2", "unit": "demo-unit-2", "catalogQuantity": 2, "asOfAt": 1767355200000, "countState": "demo-countState-2", "issues": "demo-issues-2", "note": "demo-note-2" } as any);
   // OperatingLocation → api.mutations.OperatingLocation_createViaAdd
   rowsAttempted += 1;
   await client.mutation(api.mutations.OperatingLocation_createViaAdd, { "name": "OperatingLocation 1", "addressLine1": "demo-addressLine1-1", "addressLine2": "demo-addressLine2-1", "city": "demo-city-1", "region": "demo-region-1", "postalCode": "demo-postalCode-1", "countryCode": "demo-countryCode-1", "timeZone": "demo-timeZone-1" } as any);
@@ -1258,6 +1263,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "OneOnOneAction",
       "createMutation": "OneOnOneAction_createViaCapture",
+      "rowCount": 2
+    },
+    {
+      "entity": "OpeningStockRecord",
+      "createMutation": "OpeningStockRecord_createViaStage",
       "rowCount": 2
     },
     {

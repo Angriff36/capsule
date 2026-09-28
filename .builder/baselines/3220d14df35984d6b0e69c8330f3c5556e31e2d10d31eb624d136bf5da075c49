@@ -411,6 +411,11 @@ import {
   OneOnOneActionCaptureParamsSchema,
   OneOnOneActionCloseParamsSchema,
   OneOnOneHoldParamsSchema,
+  OpeningStockRecordMarkAppliedParamsSchema,
+  OpeningStockRecordRefreshIssuesParamsSchema,
+  OpeningStockRecordReviewParamsSchema,
+  OpeningStockRecordSetAsideParamsSchema,
+  OpeningStockRecordStageParamsSchema,
   OperatingLocationActivateParamsSchema,
   OperatingLocationAddParamsSchema,
   OperatingLocationDeactivateParamsSchema,
@@ -6495,6 +6500,77 @@ export function useCreateOneOnOneAction() {
   };
 }
 
+/** Reactive list for OpeningStockRecord. */
+export function useListOpeningStockRecord() {
+  return useQuery(api.queries.listOpeningStockRecord);
+}
+
+/** Reactive get-by-id for OpeningStockRecord. Pass "skip" to suspend. */
+export function useGetOpeningStockRecord(id: string | "skip") {
+  return useQuery(api.queries.getOpeningStockRecord, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for OpeningStockRecord.markApplied. */
+export function useOpeningStockRecordMarkApplied() {
+  const mutate = useMutation(api.mutations.OpeningStockRecord_markApplied);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OpeningStockRecordMarkAppliedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for OpeningStockRecord.refreshIssues. */
+export function useOpeningStockRecordRefreshIssues() {
+  const mutate = useMutation(api.mutations.OpeningStockRecord_refreshIssues);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OpeningStockRecordRefreshIssuesParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for OpeningStockRecord.review. */
+export function useOpeningStockRecordReview() {
+  const mutate = useMutation(api.mutations.OpeningStockRecord_review);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OpeningStockRecordReviewParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for OpeningStockRecord.setAside. */
+export function useOpeningStockRecordSetAside() {
+  const mutate = useMutation(api.mutations.OpeningStockRecord_setAside);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OpeningStockRecordSetAsideParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for OpeningStockRecord.stage. */
+export function useOpeningStockRecordStage() {
+  const mutate = useMutation(api.mutations.OpeningStockRecord_stage);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OpeningStockRecordStageParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for OpeningStockRecord.stage. */
+export function useCreateOpeningStockRecord() {
+  const mutate = useMutation(api.mutations.OpeningStockRecord_createViaStage);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = OpeningStockRecordStageParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for OperatingLocation. */
 export function useListOperatingLocation() {
   return useQuery(api.queries.listOperatingLocation);
@@ -11707,4 +11783,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1241 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1249 as const;

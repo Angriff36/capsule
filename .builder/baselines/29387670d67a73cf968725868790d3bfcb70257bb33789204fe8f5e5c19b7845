@@ -1625,7 +1625,7 @@ export const ImportRunSchema = z.object({
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync"]).default("tpp_legacy"),
-  datasetType: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "pack_list"]).default("events"),
+  datasetType: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "pack_list", "stock"]).default("events"),
   status: z.enum(["started", "parsing", "validating", "reviewing", "committing", "completed", "failed", "reverted"]).default("started"),
   startTime: z.coerce.date().nullable().optional(),
   endTime: z.coerce.date().nullable().optional(),
@@ -2213,6 +2213,52 @@ export const OneOnOneActionSchema = z.object({
 });
 
 export type OneOnOneAction = z.infer<typeof OneOnOneActionSchema>;
+
+// Entity: OpeningStockRecord
+export const OpeningStockRecordSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  importRunId: z.string().nullable().optional(),
+  sourceSystem: z.string().default(""),
+  sourceFile: z.string().default(""),
+  sourceRow: z.string().default(""),
+  itemName: z.string().default(""),
+  kind: z.enum(["ingredient", "equipment", "disposable", "component", "instruction", "unsorted"]).default("unsorted"),
+  ingredientId: z.string().uuid().nullable().optional(),
+  componentId: z.string().uuid().nullable().optional(),
+  locationId: z.string().uuid().nullable().optional(),
+  locationName: z.string().default(""),
+  quantity: z.number().nullable().optional(),
+  sourceUnit: z.string().default(""),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).nullable().optional(),
+  catalogQuantity: z.number().nullable().optional(),
+  asOfAt: z.coerce.date().nullable().optional(),
+  countState: z.enum(["counted", "unverified", "estimated", "unknown"]).default("unknown"),
+  status: z.enum(["needs_review", "ready", "applied", "set_aside"]).default("needs_review"),
+  issues: z.string().default("[]"),
+  note: z.string().nullable().optional(),
+  stagedAt: z.coerce.date().nullable().optional(),
+  stagedById: z.string().nullable().optional(),
+  reviewedAt: z.coerce.date().nullable().optional(),
+  reviewedById: z.string().nullable().optional(),
+  setAsideAt: z.coerce.date().nullable().optional(),
+  setAsideById: z.string().nullable().optional(),
+  setAsideReason: z.string().nullable().optional(),
+  appliedAt: z.coerce.date().nullable().optional(),
+  appliedById: z.string().nullable().optional(),
+  appliedInventoryItemId: z.string().uuid().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+// Computed: OpeningStockRecord
+export const OpeningStockRecordComputedSchema = OpeningStockRecordSchema.extend({
+  isOpen: z.boolean(),
+});
+
+export type OpeningStockRecord = z.infer<typeof OpeningStockRecordSchema>;
+export type OpeningStockRecordWithComputed = z.infer<typeof OpeningStockRecordComputedSchema>;
 
 // Entity: OperatingLocation
 export const OperatingLocationSchema = z.object({
@@ -6800,7 +6846,7 @@ export type ImportRunRevertParams = z.infer<typeof ImportRunRevertParamsSchema>;
 // Command: start on ImportRun
 export const ImportRunStartParamsSchema = z.object({
   sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync"]),
-  datasetType: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "pack_list"]),
+  datasetType: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "pack_list", "stock"]),
   checksum: z.string().optional(),
 });
 
@@ -7722,6 +7768,70 @@ export type OneOnOneActionCaptureParams = z.infer<typeof OneOnOneActionCapturePa
 export const OneOnOneActionCloseParamsSchema = z.object({});
 
 export type OneOnOneActionCloseParams = z.infer<typeof OneOnOneActionCloseParamsSchema>;
+
+// Command: markApplied on OpeningStockRecord
+export const OpeningStockRecordMarkAppliedParamsSchema = z.object({
+  inventoryItemId: z.string().min(1),
+});
+
+export type OpeningStockRecordMarkAppliedParams = z.infer<typeof OpeningStockRecordMarkAppliedParamsSchema>;
+
+// Command: refreshIssues on OpeningStockRecord
+export const OpeningStockRecordRefreshIssuesParamsSchema = z.object({
+  issues: z.string(),
+});
+
+export type OpeningStockRecordRefreshIssuesParams = z.infer<typeof OpeningStockRecordRefreshIssuesParamsSchema>;
+
+// Command: review on OpeningStockRecord
+export const OpeningStockRecordReviewParamsSchema = z.object({
+  kind: z.enum(["ingredient", "equipment", "disposable", "component", "instruction", "unsorted"]),
+  ingredientId: z.string().min(1).optional(),
+  componentId: z.string().min(1).optional(),
+  locationId: z.string().min(1).optional(),
+  locationName: z.string(),
+  quantity: z.number().optional(),
+  sourceUnit: z.string(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
+  catalogQuantity: z.number().optional(),
+  asOfAt: z.coerce.date().optional(),
+  countState: z.enum(["counted", "unverified", "estimated", "unknown"]),
+  issues: z.string(),
+  note: z.string().optional(),
+});
+
+export type OpeningStockRecordReviewParams = z.infer<typeof OpeningStockRecordReviewParamsSchema>;
+
+// Command: setAside on OpeningStockRecord
+export const OpeningStockRecordSetAsideParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type OpeningStockRecordSetAsideParams = z.infer<typeof OpeningStockRecordSetAsideParamsSchema>;
+
+// Command: stage on OpeningStockRecord
+export const OpeningStockRecordStageParamsSchema = z.object({
+  importRunId: z.string().optional(),
+  sourceSystem: z.string(),
+  sourceFile: z.string(),
+  sourceRow: z.string(),
+  itemName: z.string(),
+  kind: z.enum(["ingredient", "equipment", "disposable", "component", "instruction", "unsorted"]),
+  ingredientId: z.string().min(1).optional(),
+  componentId: z.string().min(1).optional(),
+  locationId: z.string().min(1).optional(),
+  locationName: z.string(),
+  quantity: z.number().optional(),
+  sourceUnit: z.string(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
+  catalogQuantity: z.number().optional(),
+  asOfAt: z.coerce.date().optional(),
+  countState: z.enum(["counted", "unverified", "estimated", "unknown"]),
+  issues: z.string(),
+  note: z.string().optional(),
+});
+
+export type OpeningStockRecordStageParams = z.infer<typeof OpeningStockRecordStageParamsSchema>;
 
 // Command: activate on OperatingLocation
 export const OperatingLocationActivateParamsSchema = z.object({});

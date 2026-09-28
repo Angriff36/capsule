@@ -14,6 +14,8 @@ enum ImportDatasetType {
   venues
   payments
   pack_list
+  // Opening stock count sheets (PL-OPENING-STOCK): staged for review only.
+  stock
 }
 
 enum ImportRunStatus {
