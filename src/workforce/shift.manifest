@@ -148,7 +148,8 @@ entity Shift mixin TenantScoped, SoftDeletable {
     guard self.status == "scheduled"
     guard self.deletedAt == null
     guard self.eventStaffingManagedAt != null and self.eventId != null
-    guard roleAllows(user.role, "workforceManageAccess") or (self.eventId != null and roleAllows(user.role, "workforceSelfAccess") and (roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess")))
+    // A worker declining their own event work releases their own shift.
+    guard roleAllows(user.role, "workforceManageAccess") or (self.eventId != null and roleAllows(user.role, "workforceSelfAccess") and (roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess"))) or (user.personId != null and self.personId == user.personId)
     compute previousStatus = self.status
     mutate status = "cancelled"
     mutate cancelledAt = now()

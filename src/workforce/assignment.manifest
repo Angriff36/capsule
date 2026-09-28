@@ -45,6 +45,12 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
   property checkedOutAt: datetime?
   property noShowAt: datetime?
   property unassignedAt: datetime?
+  // Staffing a finished event (recording who worked after the fact) needs a
+  // written reason; it is kept on the assignment (CF-9.1 guards).
+  property overrideReason: string?
+  // The worker (or a manager for them) said they cannot do this work.
+  property declinedAt: datetime?
+  property declineReason: string?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
@@ -68,14 +74,16 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     role: string,
     optional startsAt: datetime,
     optional endsAt: datetime,
-    optional notes: string
+    optional notes: string,
+    optional overrideReason: string
   ) {
     guard self.assignedAt == null
     guard self.status == "assigned"
     guard self.deletedAt == null
     guard self.event != null
-    guard self.person != null and self.person.status == "active"
     guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
+    // A constraint (not a guard) so the person sees this message.
+    constraint assignPersonActive: self.person != null and self.person.status == "active" "Pick an active staff member. Paused staff can't be put on events until their access is restored."
     constraint assignEventMatch: eventId == self.eventId "This assignment is for a different event. Pick the event already on this assignment."
     constraint assignPersonMatch: personId == self.personId "This assignment is for a different person. Pick the person already on this assignment."
     constraint assignRolePresent: length(trim(role)) > 0 "Give this assignment a role."
@@ -86,6 +94,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     mutate startsAt = startsAt != null ? startsAt : self.startsAt
     mutate endsAt = endsAt != null ? endsAt : self.endsAt
     mutate notes = notes != null ? notes : self.notes
+    mutate overrideReason = overrideReason
     mutate followsEventTiming = startsAt == null and endsAt == null
     mutate assignedAt = now()
     emit EventAssignmentAssigned {
@@ -97,6 +106,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
       startsAt: startsAt != null ? startsAt : self.startsAt
       endsAt: endsAt != null ? endsAt : self.endsAt
       status: "assigned"
+      overrideReason: overrideReason
     }
   }
 
@@ -254,6 +264,32 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
       role: self.role
       previousStatus: previousStatus
       status: "unassigned"
+    }
+  }
+
+  // A worker who cannot do the work says so; managers can record it for them.
+  // The row stays as history ("Declined: reason"); the shift is released.
+  command decline(reason: string) {
+    guard self.status == "assigned" or self.status == "confirmed"
+    guard self.assignedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard (user.personId != null and self.personId == user.personId) or roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
+    constraint declineReasonPresent: length(trim(reason)) > 0 "Say why this work can't be done, so the manager can find cover."
+    compute previousStatus = self.status
+    mutate status = "unassigned"
+    mutate unassignedAt = now()
+    mutate declinedAt = now()
+    mutate declineReason = reason
+    emit EventAssignmentDeclined {
+      eventAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      personId: self.personId
+      role: self.role
+      previousStatus: previousStatus
+      status: "unassigned"
+      reason: reason
     }
   }
 
@@ -518,6 +554,18 @@ event EventAssignmentAssigned: "event_assignment.assigned" {
   startsAt: datetime?
   endsAt: datetime?
   status: EventAssignmentStatus
+  overrideReason: string?
+}
+
+event EventAssignmentDeclined: "event_assignment.declined" {
+  eventAssignmentId: string
+  tenantId: string
+  eventId: string
+  personId: string
+  role: string
+  previousStatus: EventAssignmentStatus
+  status: EventAssignmentStatus
+  reason: string
 }
 
 event EventAssignmentTimingChanged: "event_assignment.timing_changed" {

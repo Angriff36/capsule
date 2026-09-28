@@ -216,9 +216,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // EventAssignment has multiple initialization commands (applyApprovedShiftSwap, assign); using the selected initialization command: assign.
   // EventAssignment → api.mutations.EventAssignment_createViaAssign
   rowsAttempted += 1;
-  await client.mutation(api.mutations.EventAssignment_createViaAssign, { "eventId": "eventId-event-assignment-1", "personId": "personId-event-assignment-1", "role": "demo-role-1", "startsAt": 1767268800000, "endsAt": 1767268800000, "notes": "demo-notes-1" } as any);
+  await client.mutation(api.mutations.EventAssignment_createViaAssign, { "eventId": "eventId-event-assignment-1", "personId": "personId-event-assignment-1", "role": "demo-role-1", "startsAt": 1767268800000, "endsAt": 1767268800000, "notes": "demo-notes-1", "overrideReason": "demo-overrideReason-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.EventAssignment_createViaAssign, { "eventId": "eventId-event-assignment-2", "personId": "personId-event-assignment-2", "role": "demo-role-2", "startsAt": 1767355200000, "endsAt": 1767355200000, "notes": "demo-notes-2" } as any);
+  await client.mutation(api.mutations.EventAssignment_createViaAssign, { "eventId": "eventId-event-assignment-2", "personId": "personId-event-assignment-2", "role": "demo-role-2", "startsAt": 1767355200000, "endsAt": 1767355200000, "notes": "demo-notes-2", "overrideReason": "demo-overrideReason-2" } as any);
   // EventCloseout → api.mutations.EventCloseout_createViaCapture
   rowsAttempted += 1;
   await client.mutation(api.mutations.EventCloseout_createViaCapture, { "eventId": "eventId-event-closeout-1", "actualRevenue": 1, "budgetedRevenue": 1, "revenueVariance": 1, "actualIngredientCost": 1, "actualWasteCost": 1, "actualLaborCost": 1, "actualVendorCost": 1, "budgetedCost": 1, "totalActualCost": 1, "costVariance": 1, "grossProfit": 1, "expectedHeadcount": 1, "actualHeadcount": 1, "unresolvedIssues": "demo-unresolvedIssues-1", "performanceNotes": "demo-performanceNotes-1", "notes": "demo-notes-1" } as any);

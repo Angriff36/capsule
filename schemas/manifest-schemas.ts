@@ -1071,6 +1071,9 @@ export const EventAssignmentSchema = z.object({
   checkedOutAt: z.coerce.date().nullable().optional(),
   noShowAt: z.coerce.date().nullable().optional(),
   unassignedAt: z.coerce.date().nullable().optional(),
+  overrideReason: z.string().nullable().optional(),
+  declinedAt: z.coerce.date().nullable().optional(),
+  declineReason: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -5980,6 +5983,7 @@ export const EventAssignmentAssignParamsSchema = z.object({
   startsAt: z.coerce.date().optional(),
   endsAt: z.coerce.date().optional(),
   notes: z.string().optional(),
+  overrideReason: z.string().optional(),
 });
 
 export type EventAssignmentAssignParams = z.infer<typeof EventAssignmentAssignParamsSchema>;
@@ -6006,6 +6010,13 @@ export type EventAssignmentChooseTravelLegParams = z.infer<typeof EventAssignmen
 export const EventAssignmentConfirmParamsSchema = z.object({});
 
 export type EventAssignmentConfirmParams = z.infer<typeof EventAssignmentConfirmParamsSchema>;
+
+// Command: decline on EventAssignment
+export const EventAssignmentDeclineParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type EventAssignmentDeclineParams = z.infer<typeof EventAssignmentDeclineParamsSchema>;
 
 // Command: markNoShow on EventAssignment
 export const EventAssignmentMarkNoShowParamsSchema = z.object({});

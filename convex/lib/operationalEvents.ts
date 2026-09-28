@@ -29,7 +29,7 @@ import {
   prepareStaffNeedCoverageChange, validatePreparedStaffNeedCoverage, finishPostedStaffNeedContinuation,
   validateFilledCoverageCredentials,
 } from "./eventStaffingOperations";
-import { validateScheduledShift, validateShiftWindow } from "./shiftSchedulingEvents";
+import { validateNewEventStaffing, validateScheduledShift, validateShiftWindow } from "./shiftSchedulingEvents";
 import {
   adoptLegacyDraftQuantity,
   reconcileCancelledPurchaseDrafts,
@@ -115,6 +115,7 @@ export async function handleManifestEvent(
   if ((event.entity === "EventAssignment" && event.type === "EventAssignmentAssigned") ||
     (event.entity === "EventStaffNeed" && ["EventStaffNeedPosted", "EventStaffNeedClaimed", "EventStaffNeedFilled"].includes(event.type))) {
     await validateEventStaffingReferences(ctx, event.payload.eventId as Id<"events">, event.payload.personId as Id<"people"> | undefined);
+    await validateNewEventStaffing(ctx, event.entity, event.entityId, event.payload.personId as Id<"people"> | undefined);
   }
   if ((event.entity === "EventAssignment" && event.type === "EventAssignmentTimingChanged") ||
     (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedTimingChanged")) {
@@ -349,7 +350,7 @@ export async function handleManifestEvent(
     return;
   }
   if ((event.entity === "EventAssignment" &&
-    ["EventAssignmentAssigned", "EventAssignmentUnassigned", "EventAssignmentTimingChanged"].includes(event.type)) ||
+    ["EventAssignmentAssigned", "EventAssignmentUnassigned", "EventAssignmentDeclined", "EventAssignmentTimingChanged"].includes(event.type)) ||
     (event.entity === "EventStaffNeed" &&
     ["EventStaffNeedPosted", "EventStaffNeedFilled", "EventStaffNeedCancelled", "EventStaffNeedTimingChanged"].includes(event.type)) ||
     (event.entity === "EventTimelineActivity" &&

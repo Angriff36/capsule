@@ -2,6 +2,73 @@ import { ConvexError } from "convex/values";
 import { findApprovedTimeOffConflict } from "../../src/lib/timeOff";
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
+import { readCrewWindow } from "./eventStaffingOperations";
+
+const day = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  timeZone: "UTC",
+});
+
+/**
+ * CF-9.1 guards for NEW staffing (assign, post, claim, fill), run inside the
+ * generated command's transaction so a refusal writes nothing:
+ * - a cancelled event cannot be staffed;
+ * - a finished event can only be staffed with a written reason (recording who
+ *   worked after the fact) - only an assignment carries one;
+ * - approved time off over the work window is refused, naming the person.
+ * A double booking on another event is NOT refused; the roster shows it.
+ */
+export async function validateNewEventStaffing(
+  ctx: MutationCtx,
+  entity: "EventAssignment" | "EventStaffNeed",
+  id: string,
+  personId: Id<"people"> | undefined,
+): Promise<void> {
+  const row =
+    entity === "EventAssignment"
+      ? await ctx.db.get(id as Id<"eventAssignments">)
+      : await ctx.db.get(id as Id<"eventStaffNeeds">);
+  if (!row) return;
+  const event = await ctx.db.get(row.eventId);
+  if (!event) return;
+  if (event.stage === "cancelled")
+    throw new ConvexError(
+      `${event.title} is cancelled, so no one can be staffed on it.`,
+    );
+  if (event.stage === "completed" || event.stage === "closed_out") {
+    const reason =
+      "overrideReason" in row ? row.overrideReason?.trim() : undefined;
+    if (!reason)
+      throw new ConvexError(
+        `${event.title} has already finished. To record who worked it, give a reason.`,
+      );
+    return;
+  }
+  if (!personId) return;
+  const follows =
+    row.followsEventTiming ?? (row.startsAt == null && row.endsAt == null);
+  const window = follows
+    ? await readCrewWindow(ctx, row.eventId, row)
+    : { startsAt: row.startsAt ?? null, endsAt: row.endsAt ?? null };
+  if (window.startsAt == null || window.endsAt == null) return;
+  const requests = await ctx.db
+    .query("timeOffRequests")
+    .withIndex("by_personId", (q) => q.eq("personId", personId))
+    .collect();
+  const away = findApprovedTimeOffConflict(
+    requests.filter((request) => request.tenantId === row.tenantId),
+    { personId, startsAt: window.startsAt, endsAt: window.endsAt },
+  );
+  if (!away) return;
+  const person = await ctx.db.get(personId);
+  const name = person
+    ? `${person.givenName} ${person.familyName}`.trim()
+    : "This person";
+  throw new ConvexError(
+    `${name} has approved time off from ${day.format(away.startsAt!)} through ${day.format(away.endsAt! - 1)}, during ${event.title}. Pick someone else or change the times.`,
+  );
+}
 
 /**
  * Cross-row scheduling check inside the generated command's transaction.

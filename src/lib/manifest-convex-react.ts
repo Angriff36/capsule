@@ -166,6 +166,7 @@ import {
   EventAssignmentCheckOutParamsSchema,
   EventAssignmentChooseTravelLegParamsSchema,
   EventAssignmentConfirmParamsSchema,
+  EventAssignmentDeclineParamsSchema,
   EventAssignmentMarkNoShowParamsSchema,
   EventAssignmentPlanTimingParamsSchema,
   EventAssignmentUnassignParamsSchema,
@@ -3593,6 +3594,16 @@ export function useEventAssignmentConfirm() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventAssignmentConfirmParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventAssignment.decline. */
+export function useEventAssignmentDecline() {
+  const mutate = useMutation(api.mutations.EventAssignment_decline);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventAssignmentDeclineParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11794,4 +11805,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1250 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1251 as const;

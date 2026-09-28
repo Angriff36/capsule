@@ -77,7 +77,7 @@ function storedStaffingSources(rows: Awaited<ReturnType<typeof readStaffingRows>
  * The window of the run this person travels with (PL-ROUTE-LEGS): a truck on
  * the event, straight to the venue, or (no choice) the main crew timeline.
  */
-async function readCrewWindow(ctx: MutationCtx, eventId: Id<"events">, choice?: CrewLegChoice) {
+export async function readCrewWindow(ctx: MutationCtx, eventId: Id<"events">, choice?: CrewLegChoice) {
   const timing = await readEventTimingPlan(ctx, eventId);
   const crewTime = (key: "staff_on" | "staff_off") => {
     const milestone = timing.milestones.find((row) => row.key === key)!;
