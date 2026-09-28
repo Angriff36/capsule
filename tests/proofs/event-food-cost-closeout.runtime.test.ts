@@ -8,6 +8,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
+import type { EventFoodCost } from "../../convex/lib/culinaryModel/eventFoodCost";
 import {
   CAPTURED_ACTUALS,
   captureCloseout,
@@ -35,8 +36,10 @@ describe("runtime proof: event food cost estimate vs actual", () => {
     const tenantId = "tenant-event-food-cost-closeout";
     const seed = await seedCostedEvent(proof, tenantId);
     const eventId = seed.event.docId as Id<"events">;
-    const read = (role: typeof seed.kitchen) =>
-      role.query(api.culinaryDemand.eventFoodCostReport, { eventId });
+    const read = async (role: typeof seed.kitchen) =>
+      (await role.query(api.culinaryDemand.eventFoodCostReport, {
+        eventId,
+      })) as EventFoodCost;
 
     // Saffron has no price: the known part is butter only and the estimate
     // says it is not complete, so no food-cost % is claimed.

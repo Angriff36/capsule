@@ -7,6 +7,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
+import type { EventFoodCost } from "../../convex/lib/culinaryModel/eventFoodCost";
 import {
   captureCloseout,
   finalizeCloseout,
@@ -82,9 +83,9 @@ describe("runtime proof: the food-cost estimate never writes money", () => {
 
     const estimate = async () =>
       (
-        await finance.query(api.culinaryDemand.eventFoodCostReport, {
+        (await finance.query(api.culinaryDemand.eventFoodCostReport, {
           eventId,
-        })
+        })) as EventFoodCost
       ).estimated.knownCost;
     const first = await estimate();
     await seed.kitchen.mutation(api.culinaryDemand.reconcileEventDemand, {

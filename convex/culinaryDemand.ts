@@ -781,7 +781,11 @@ export const eventFoodCostReport = query({
   args: { eventId: v.id("events") },
   handler: async (ctx, args): Promise<EventFoodCost> => {
     const auth = await getAuthContext(ctx);
-    const tenantId = requireCulinaryReader(auth);
+    const tenantId = requireTenant(auth);
+    if (!canReadCulinaryReports(auth.role) && !canReadEventMoney(auth.role))
+      throw new Error(
+        "Kitchen, finance and managers may read an event's food cost",
+      );
     const event = await requireEvent(ctx, tenantId, args.eventId);
     const catalog = await loadCatalog(ctx, tenantId);
     const eventDishes = await loadEventDishes(ctx, tenantId, args.eventId);

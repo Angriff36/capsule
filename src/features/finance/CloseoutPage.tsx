@@ -30,6 +30,9 @@ import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { EventCostSummaryReport } from "./EventCostSummaryReport";
+import { EventFoodCostPanel } from "./EventFoodCostPanel";
+import { canReadEventFoodCost } from "../../lib/culinaryDemandClient";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useActionNotice } from "../../ui/action-result";
 import {
   closeoutListedCost,
@@ -45,6 +48,7 @@ const payloadBuilder = new CloseoutCapturePayloadBuilder();
 
 export function CloseoutPage() {
   const eventScope = useWorkingEventScope();
+  const authStatus = useAuthStatus();
   const closeouts = useListEventCloseout();
   const events = useListEvent();
   const invoices = useListInvoice();
@@ -238,6 +242,12 @@ export function CloseoutPage() {
           closeout={summaryCloseout}
           invoices={invoices ?? []}
           onClose={() => setSummaryCloseoutId(null)}
+        />
+      ) : null}
+      {summaryCloseout ? (
+        <EventFoodCostPanel
+          eventId={String(summaryCloseout.eventId)}
+          enabled={canReadEventFoodCost(authStatus?.role)}
         />
       ) : null}
 

@@ -28,6 +28,57 @@ export function canReadCulinaryDemand(role: string | null | undefined) {
   );
 }
 
+/** Same roles the server lets read an event's food cost (culinaryDemand.ts). */
+export function canReadEventFoodCost(role: string | null | undefined) {
+  return canReadCulinaryDemand(role) || role === "finance_staff";
+}
+
+/** Food cost priced at the event date, with its gaps; actuals for money readers. */
+export const useEventFoodCost = (eventId: string, enabled = true) =>
+  useQuery(
+    api.culinaryDemand.eventFoodCostReport,
+    enabled ? { eventId: eventId as Id<"events"> } : "skip",
+  );
+
+/** Plain words for what an event's food-cost estimate leaves out. Null when complete. */
+export function foodCostGapText(estimated: {
+  complete: boolean;
+  unknownRows: number;
+  unresolvedItems: number;
+}): string | null {
+  if (estimated.complete) return null;
+  const parts: string[] = [];
+  if (estimated.unknownRows)
+    parts.push(
+      `${estimated.unknownRows} ingredient amount${estimated.unknownRows === 1 ? " has" : "s have"} no price`,
+    );
+  if (estimated.unresolvedItems)
+    parts.push(
+      `${estimated.unresolvedItems} menu item${estimated.unresolvedItems === 1 ? " can't" : "s can't"} be worked out yet`,
+    );
+  if (!parts.length) return "No menu food to cost yet.";
+  return `Food cost is not complete: ${parts.join(" and ")}. The real cost is higher, so the margin shown is too high.`;
+}
+
+/** Why an ingredient amount has no cost, in kitchen words. */
+export function foodCostReasonText(reason: string | null): string {
+  if (reason === "priced at $0") return "price is $0";
+  if (reason === "no price" || reason == null) return "no price yet";
+  if (reason === "ingredient not found") return "removed from the book";
+  return "amount can't be matched to how it is priced";
+}
+
+/** Where a known price came from, in plain words. */
+export function priceSourceText(line: {
+  priceSource: string | null;
+  priceEffectiveAt: number | null;
+}): string {
+  if (line.priceSource === "receipt" && line.priceEffectiveAt != null)
+    return `Receipt price from ${new Date(line.priceEffectiveAt).toLocaleDateString()}`;
+  if (line.priceSource === "catalog") return "Catalog price (no date)";
+  return "No price";
+}
+
 export const useComponentContentReport = (componentId: string) =>
   useQuery(api.culinaryDemand.componentContentReport, {
     componentId: componentId as Id<"components">,
@@ -151,9 +202,13 @@ export function recipeCostLine(cost: {
   knownSubtotal: number;
   unknownLines: number;
   totalLines: number;
+  undatedLines?: number;
 }): string {
   const known = cost.totalLines - cost.unknownLines;
   if (cost.confidence === "none")
     return `Cost unknown · ${known} of ${cost.totalLines} lines priced`;
-  return `Known subtotal ${formatMoney(cost.knownSubtotal)} for ${known} of ${cost.totalLines} lines · ${costConfidenceText(cost.confidence).toLowerCase()}`;
+  const undated = cost.undatedLines
+    ? ` · ${cost.undatedLines} from catalog prices with no date`
+    : "";
+  return `Known subtotal ${formatMoney(cost.knownSubtotal)} for ${known} of ${cost.totalLines} lines · ${costConfidenceText(cost.confidence).toLowerCase()}${undated}`;
 }
