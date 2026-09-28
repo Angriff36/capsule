@@ -195,6 +195,7 @@ const LINK_TABLE: Record<string, string> = {
   locationIds: "storageLocations",
   maintenanceScheduleId: "vehicleMaintenanceSchedules",
   maintenanceTaskId: "equipmentMaintenanceTasks",
+  matchedComponentId: "components",
   matchedIngredientId: "ingredients",
   mentionedPersonIds: "people",
   nativeTargetId: "events",
