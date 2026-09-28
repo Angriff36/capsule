@@ -984,6 +984,39 @@ export const planSharedRecipeBatch = mutation({
   },
 });
 
+/**
+ * The chain of recipes from `childId` down to `parentId` when `childId`
+ * already uses `parentId` somewhere inside it (so putting it under
+ * `parentId` would loop), else null.
+ */
+export function nestedRecipeLoop(
+  children: ReadonlyMap<string, readonly string[]>,
+  parentId: string,
+  childId: string,
+): string[] | null {
+  const cameFrom = new Map<string, string | null>([[childId, null]]);
+  const queue = [childId];
+  while (queue.length) {
+    const current = queue.shift() as string;
+    if (current === parentId) {
+      const path: string[] = [];
+      for (
+        let at: string | null = current;
+        at != null;
+        at = cameFrom.get(at) ?? null
+      )
+        path.unshift(at);
+      return path;
+    }
+    for (const next of children.get(current) ?? []) {
+      if (cameFrom.has(next)) continue;
+      cameFrom.set(next, current);
+      queue.push(next);
+    }
+  }
+  return null;
+}
+
 /** Add a sub-recipe line after walking the child's tree for a cycle. */
 export const addNestedRecipeLine = mutation({
   args: {
@@ -1003,20 +1036,26 @@ export const addNestedRecipeLine = mutation({
     const lines = await byTenant(ctx, "componentComponents", tenantId);
     const children = new Map<string, string[]>();
     for (const l of lines) {
-      if (l.addedAt == null) continue;
+      if (l.addedAt == null || l.deletedAt != null) continue;
       const list = children.get(String(l.componentId)) ?? [];
       list.push(String(l.childComponentId));
       children.set(String(l.componentId), list);
     }
-    const stack = [String(args.childComponentId)];
-    const seen = new Set<string>();
-    while (stack.length) {
-      const current = stack.pop() as string;
-      if (current === String(args.componentId))
-        throw new Error("Adding this sub-recipe would create a cycle");
-      if (seen.has(current)) continue;
-      seen.add(current);
-      for (const next of children.get(current) ?? []) stack.push(next);
+    const loop = nestedRecipeLoop(
+      children,
+      String(args.componentId),
+      String(args.childComponentId),
+    );
+    if (loop) {
+      const names = await Promise.all(
+        loop.map(async (id) => {
+          const row = await ctx.db.get(id as Id<"components">);
+          return row && row.tenantId === tenantId ? row.name : "another recipe";
+        }),
+      );
+      throw new Error(
+        `${names[0]} already uses ${names[names.length - 1]} (${names.join(" → ")}), so it cannot go inside ${names[names.length - 1]}. That would make a loop. Pick a different recipe.`,
+      );
     }
     return await ctx.runMutation(
       api.mutations.ComponentComponent_createViaAdd,

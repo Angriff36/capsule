@@ -877,6 +877,88 @@ describe("nested recipes keep quantities and partial costs", () => {
     );
     expect(demand.unresolved.some((u) => u.kind === "cycle")).toBe(true);
   });
+  it("a cycle or a missing sub-recipe names only its own recipe and leaves the rest of the dish exact", () => {
+    const broken = component({
+      id: "cmp-broken",
+      name: "Broken",
+      yieldQuantity: 1,
+      yieldUnit: "batch",
+      stepCount: 1,
+      componentLines: [
+        { id: "m1", childComponentId: "cmp-gone", quantity: 1, unit: "batch" },
+      ],
+    });
+    const components = new Map(cl.components);
+    components.set(broken.id, broken);
+    const dish: DishLike = {
+      id: "d",
+      name: "Plate",
+      kind: "food",
+      ingredientLines: [],
+      componentLines: [
+        {
+          id: "dm",
+          componentId: "cmp-mac",
+          yieldQuantity: 10,
+          batchMultiplier: 1,
+        },
+        {
+          id: "dc",
+          componentId: "cmp-cyc",
+          yieldQuantity: 1,
+          batchMultiplier: 1,
+        },
+        {
+          id: "db",
+          componentId: "cmp-broken",
+          yieldQuantity: 1,
+          batchMultiplier: 1,
+        },
+      ],
+      tasks: [],
+    };
+    const demand = expandEventDish(
+      eventDish({ id: "ed", dishId: "d", quantityServings: 10 }),
+      {
+        ...lookups({ dishes: [dish] }),
+        components,
+        ingredients: cl.ingredients,
+      },
+    );
+    // The good recipe still asks for exactly 8 qt of cream, once.
+    const cream = demand.contributions.filter(
+      (c) => c.ingredientId === "ing-cream",
+    );
+    expect(cream).toHaveLength(1);
+    expect(cream[0].quantity).toBe(8);
+    // Only the looping and the broken recipes are reported, each by name/id.
+    const cycle = demand.unresolved.filter((u) => u.kind === "cycle");
+    expect(cycle).toHaveLength(1);
+    expect(cycle[0].detail).toContain("cmp-cyc -> cmp-cyc2 -> cmp-cyc");
+    const missing = demand.unresolved.filter(
+      (u) => u.kind === "missing_reference",
+    );
+    expect(missing).toHaveLength(1);
+    expect(missing[0]).toMatchObject({
+      refId: "cmp-gone",
+      detail: "sub-recipe not found",
+    });
+    // Nothing from the loop or the missing recipe reaches the shopping list.
+    expect(
+      demand.contributions.every((c) =>
+        (c.componentPath ?? []).every((id) =>
+          ["cmp-mac", "cmp-alfredo"].includes(id),
+        ),
+      ),
+    ).toBe(true);
+    // Costing flags the same recipes and still prices the good one.
+    expect(
+      componentBatchCost("cmp-broken", { ...cl, components }).confidence,
+    ).not.toBe("full");
+    expect(
+      componentBatchCost("cmp-alfredo", { ...cl, components }).knownSubtotal,
+    ).toBe(20);
+  });
   it("prices a dish portion through a portion spec", () => {
     const dough = component({
       id: "cmp-dough",
