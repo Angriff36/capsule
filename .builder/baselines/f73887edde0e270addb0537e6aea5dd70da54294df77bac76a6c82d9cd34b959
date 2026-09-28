@@ -648,6 +648,12 @@ import {
   SyncErrorMarkResolvedParamsSchema,
   SyncErrorRecordParamsSchema,
   SyncErrorReopenParamsSchema,
+  TaskCancelParamsSchema,
+  TaskCompleteParamsSchema,
+  TaskCreateParamsSchema,
+  TaskReopenParamsSchema,
+  TaskStartParamsSchema,
+  TaskUpdateParamsSchema,
   TaxRateDefineParamsSchema,
   TaxRateReviseParamsSchema,
   TaxRateSetActiveParamsSchema,
@@ -9824,6 +9830,76 @@ export function useCreateSyncError() {
   };
 }
 
+/** Reactive list for Task. */
+export function useListTask() {
+  return useQuery(api.queries.listTask);
+}
+
+/** Reactive get-by-id for Task. Pass "skip" to suspend. */
+export function useGetTask(id: string | "skip") {
+  return useQuery(api.queries.getTask, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for Task.cancel. */
+export function useTaskCancel() {
+  const mutate = useMutation(api.mutations.Task_cancel);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TaskCancelParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Task.complete. */
+export function useTaskComplete() {
+  const mutate = useMutation(api.mutations.Task_complete);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TaskCompleteParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Task.create. */
+export function useTaskCreate() {
+  const mutate = useMutation(api.mutations.Task_create);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TaskCreateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Task.reopen. */
+export function useTaskReopen() {
+  const mutate = useMutation(api.mutations.Task_reopen);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TaskReopenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Task.start. */
+export function useTaskStart() {
+  const mutate = useMutation(api.mutations.Task_start);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TaskStartParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Task.update. */
+export function useTaskUpdate() {
+  const mutate = useMutation(api.mutations.Task_update);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TaskUpdateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Reactive list for TaxRate. */
 export function useListTaxRate() {
   return useQuery(api.queries.listTaxRate);
@@ -11400,4 +11476,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1212 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1220 as const;

@@ -61,6 +61,9 @@ const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = 
       "action": "staffAccess"
     },
     {
+      "action": "taskWrite"
+    },
+    {
       "action": "workforceAccess"
     },
     {
@@ -98,6 +101,9 @@ const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = 
       "action": "staffAccess"
     },
     {
+      "action": "taskWrite"
+    },
+    {
       "action": "workforceSelfAccess"
     }
   ],
@@ -127,6 +133,9 @@ const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = 
     },
     {
       "action": "staffAccess"
+    },
+    {
+      "action": "taskWrite"
     },
     {
       "action": "workforceSelfAccess"
@@ -161,6 +170,9 @@ const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = 
     },
     {
       "action": "staffAccess"
+    },
+    {
+      "action": "taskWrite"
     },
     {
       "action": "workforceSelfAccess"
@@ -211,6 +223,9 @@ const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = 
       "action": "staffAccess"
     },
     {
+      "action": "taskWrite"
+    },
+    {
       "action": "workforceSelfAccess"
     }
   ],
@@ -242,6 +257,9 @@ const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = 
       "action": "staffAccess"
     },
     {
+      "action": "taskWrite"
+    },
+    {
       "action": "workforceSelfAccess"
     }
   ],
@@ -265,6 +283,9 @@ const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = 
     },
     {
       "action": "staffAccess"
+    },
+    {
+      "action": "taskWrite"
     },
     {
       "action": "workforceSelfAccess"
@@ -326,6 +347,9 @@ const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = 
       "action": "staffAccess"
     },
     {
+      "action": "taskWrite"
+    },
+    {
       "action": "workforceAccess"
     },
     {
@@ -364,6 +388,9 @@ const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = 
     },
     {
       "action": "staffAccess"
+    },
+    {
+      "action": "taskWrite"
     },
     {
       "action": "workforceSelfAccess"
@@ -444,6 +471,9 @@ const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = 
       "action": "staffAccess"
     },
     {
+      "action": "taskWrite"
+    },
+    {
       "action": "workforceAccess"
     },
     {
@@ -462,6 +492,9 @@ const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = 
     },
     {
       "action": "staffAccess"
+    },
+    {
+      "action": "taskWrite"
     },
     {
       "action": "workforceAccess"

@@ -3409,6 +3409,26 @@ export const SyncErrorSchema = z.object({
 
 export type SyncError = z.infer<typeof SyncErrorSchema>;
 
+// Entity: Task
+export const TaskSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  assignedToId: z.string().uuid(),
+  createdById: z.string().uuid(),
+  title: z.string(),
+  description: z.string().nullable().optional(),
+  dueAt: z.coerce.date(),
+  status: z.enum(["pending", "in_progress", "completed", "cancelled"]).default("pending"),
+  completedAt: z.coerce.date().nullable().optional(),
+  cancelledAt: z.coerce.date().nullable().optional(),
+  cancellationReason: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type Task = z.infer<typeof TaskSchema>;
+
 // Entity: TaxRate
 export const TaxRateSchema = z.object({
   id: z.string().uuid(),
@@ -9543,6 +9563,48 @@ export const SyncErrorReopenParamsSchema = z.object({
 });
 
 export type SyncErrorReopenParams = z.infer<typeof SyncErrorReopenParamsSchema>;
+
+// Command: cancel on Task
+export const TaskCancelParamsSchema = z.object({
+  reason: z.string().nullable(),
+});
+
+export type TaskCancelParams = z.infer<typeof TaskCancelParamsSchema>;
+
+// Command: complete on Task
+export const TaskCompleteParamsSchema = z.object({});
+
+export type TaskCompleteParams = z.infer<typeof TaskCompleteParamsSchema>;
+
+// Command: create on Task
+export const TaskCreateParamsSchema = z.object({
+  assignedToId: z.string().min(1),
+  title: z.string(),
+  description: z.string().nullable(),
+  dueAt: z.coerce.date(),
+});
+
+export type TaskCreateParams = z.infer<typeof TaskCreateParamsSchema>;
+
+// Command: reopen on Task
+export const TaskReopenParamsSchema = z.object({});
+
+export type TaskReopenParams = z.infer<typeof TaskReopenParamsSchema>;
+
+// Command: start on Task
+export const TaskStartParamsSchema = z.object({});
+
+export type TaskStartParams = z.infer<typeof TaskStartParamsSchema>;
+
+// Command: update on Task
+export const TaskUpdateParamsSchema = z.object({
+  title: z.string().nullable(),
+  description: z.string().nullable(),
+  dueAt: z.coerce.date().nullable(),
+  reassignToId: z.string().uuid().nullable(),
+});
+
+export type TaskUpdateParams = z.infer<typeof TaskUpdateParamsSchema>;
 
 // Command: define on TaxRate
 export const TaxRateDefineParamsSchema = z.object({

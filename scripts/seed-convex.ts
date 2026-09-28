@@ -674,6 +674,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.SyncError_createViaRecord, { "sourceSystem": "demo-sourceSystem-1", "recordType": "demo-recordType-1", "externalId": "externalId-sync-error-1", "kind": "demo-kind-1", "errorMessage": "demo-errorMessage-1", "rawPayload": "demo-rawPayload-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.SyncError_createViaRecord, { "sourceSystem": "demo-sourceSystem-2", "recordType": "demo-recordType-2", "externalId": "externalId-sync-error-2", "kind": "demo-kind-2", "errorMessage": "demo-errorMessage-2", "rawPayload": "demo-rawPayload-2" } as any);
+  // Task → api.mutations.Task_create
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.Task_create, { "assignedToId": "assignedToId-task-1", "title": "Task 1", "description": "demo-description-1", "dueAt": 1767268800000 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.Task_create, { "assignedToId": "assignedToId-task-2", "title": "Task 2", "description": "demo-description-2", "dueAt": 1767355200000 } as any);
   // TaxRate → api.mutations.TaxRate_createViaDefine
   rowsAttempted += 1;
   await client.mutation(api.mutations.TaxRate_createViaDefine, { "name": "TaxRate 1", "percentage": 1, "appliesToFood": false, "appliesToService": false, "appliesToRental": false } as any);
@@ -1503,6 +1508,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "SyncError",
       "createMutation": "SyncError_createViaRecord",
+      "rowCount": 2
+    },
+    {
+      "entity": "Task",
+      "createMutation": "Task_create",
       "rowCount": 2
     },
     {
