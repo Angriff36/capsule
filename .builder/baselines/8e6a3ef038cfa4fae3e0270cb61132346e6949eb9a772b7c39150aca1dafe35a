@@ -1869,6 +1869,7 @@ export const InventoryLotSchema = z.object({
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   supplierLotNumber: z.string().default(""),
+  deliveryReference: z.string().nullable().optional(),
   vendorOrderLineId: z.string().uuid(),
   vendorOrderId: z.string().uuid(),
   vendorId: z.string().uuid(),
@@ -7293,6 +7294,7 @@ export const InventoryLotRecordParamsSchema = z.object({
   cumulativeReceivedQuantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   unitCost: z.number(),
+  deliveryReference: z.string().optional(),
 });
 
 export type InventoryLotRecordParams = z.infer<typeof InventoryLotRecordParamsSchema>;
@@ -10555,6 +10557,7 @@ export const VendorOrderLineRecordReceiptParamsSchema = z.object({
   supplierLotNumber: z.string(),
   discrepancyQuantity: z.number().optional(),
   discrepancyNotes: z.string().optional(),
+  deliveryReference: z.string().optional(),
 });
 
 export type VendorOrderLineRecordReceiptParams = z.infer<typeof VendorOrderLineRecordReceiptParamsSchema>;

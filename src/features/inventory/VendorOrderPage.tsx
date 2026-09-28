@@ -260,6 +260,8 @@ export function VendorOrderPage() {
         discrepancyQuantity: discrepancy ? Number(discrepancy) : undefined,
         discrepancyNotes:
           String(data.get("discrepancyNotes") ?? "").trim() || undefined,
+        deliveryReference:
+          String(data.get("deliveryReference") ?? "").trim() || undefined,
       });
       setReceivingLineId(null);
     });
@@ -741,6 +743,9 @@ export function VendorOrderPage() {
                             <span>
                               {lot.receiptQuantity} {lot.unit} ·{" "}
                               {ingredientName(line.ingredientId)}
+                              {lot.deliveryReference
+                                ? ` · slip ${lot.deliveryReference}`
+                                : ""}
                             </span>
                           </li>
                         ))}
@@ -793,6 +798,14 @@ export function VendorOrderPage() {
                           className="input"
                           autoComplete="off"
                           required
+                        />
+                      </label>
+                      <label className="field-label">
+                        Delivery slip number (optional)
+                        <input
+                          name="deliveryReference"
+                          className="input"
+                          autoComplete="off"
                         />
                       </label>
                       <label className="field-label">

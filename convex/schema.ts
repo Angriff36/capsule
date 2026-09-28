@@ -1695,6 +1695,7 @@ export default defineSchema({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
     supplierLotNumber: v.string(),
+    deliveryReference: v.optional(v.union(v.string(), v.null())),
     vendorOrderLineId: v.id("vendorOrderLines"),
     vendorOrderId: v.id("vendorOrders"),
     vendorId: v.id("vendors"),

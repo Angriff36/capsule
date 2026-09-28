@@ -1766,8 +1766,8 @@ const COMMAND_DISPATCH = {
   },
   "InventoryLot.record": {
     ref: api.mutations.InventoryLot_createViaRecord,
-    params: ["supplierLotNumber","vendorOrderLineId","vendorOrderId","vendorId","ingredientId","ingredientDemandId","eventId","locationId","receiptQuantity","cumulativeReceivedQuantity","unit","unitCost","idempotencyKey"] as const,
-    paramMeta: [{"name":"supplierLotNumber","type":"string","required":true},{"name":"vendorOrderLineId","type":"uuid","required":true},{"name":"vendorOrderId","type":"uuid","required":true},{"name":"vendorId","type":"uuid","required":true},{"name":"ingredientId","type":"uuid","required":true},{"name":"ingredientDemandId","type":"uuid","required":false},{"name":"eventId","type":"uuid","required":false},{"name":"locationId","type":"uuid","required":true},{"name":"receiptQuantity","type":"decimal","required":true},{"name":"cumulativeReceivedQuantity","type":"decimal","required":true},{"name":"unit","type":"UnitOfMeasure","required":true},{"name":"unitCost","type":"money","required":true},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["supplierLotNumber","vendorOrderLineId","vendorOrderId","vendorId","ingredientId","ingredientDemandId","eventId","locationId","receiptQuantity","cumulativeReceivedQuantity","unit","unitCost","deliveryReference","idempotencyKey"] as const,
+    paramMeta: [{"name":"supplierLotNumber","type":"string","required":true},{"name":"vendorOrderLineId","type":"uuid","required":true},{"name":"vendorOrderId","type":"uuid","required":true},{"name":"vendorId","type":"uuid","required":true},{"name":"ingredientId","type":"uuid","required":true},{"name":"ingredientDemandId","type":"uuid","required":false},{"name":"eventId","type":"uuid","required":false},{"name":"locationId","type":"uuid","required":true},{"name":"receiptQuantity","type":"decimal","required":true},{"name":"cumulativeReceivedQuantity","type":"decimal","required":true},{"name":"unit","type":"UnitOfMeasure","required":true},{"name":"unitCost","type":"money","required":true},{"name":"deliveryReference","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "InventoryReservation.consume": {
     ref: api.mutations.InventoryReservation_consume,
@@ -3711,8 +3711,8 @@ const COMMAND_DISPATCH = {
   },
   "VendorOrderLine.recordReceipt": {
     ref: api.mutations.VendorOrderLine_recordReceipt,
-    params: ["docId","quantity","locationId","unitPrice","supplierLotNumber","discrepancyQuantity","discrepancyNotes","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"quantity","type":"decimal","required":true},{"name":"locationId","type":"uuid","required":true},{"name":"unitPrice","type":"money","required":true},{"name":"supplierLotNumber","type":"string","required":true},{"name":"discrepancyQuantity","type":"decimal","required":false},{"name":"discrepancyNotes","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","quantity","locationId","unitPrice","supplierLotNumber","discrepancyQuantity","discrepancyNotes","deliveryReference","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"quantity","type":"decimal","required":true},{"name":"locationId","type":"uuid","required":true},{"name":"unitPrice","type":"money","required":true},{"name":"supplierLotNumber","type":"string","required":true},{"name":"discrepancyQuantity","type":"decimal","required":false},{"name":"discrepancyNotes","type":"string","required":false},{"name":"deliveryReference","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "VendorOrderLine.releaseSupply": {
     ref: api.mutations.VendorOrderLine_releaseSupply,

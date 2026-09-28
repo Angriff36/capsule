@@ -27682,7 +27682,7 @@ export const InventoryItem_updateLevels = mutation({
   },
 });
 
-async function __runInventoryLotRecord(ctx: MutationCtx, { docId, supplierLotNumber, vendorOrderLineId, vendorOrderId, vendorId, ingredientId, ingredientDemandId, eventId, locationId, receiptQuantity, cumulativeReceivedQuantity, unit, unitCost, version }: any, __creation = false) {
+async function __runInventoryLotRecord(ctx: MutationCtx, { docId, supplierLotNumber, vendorOrderLineId, vendorOrderId, vendorId, ingredientId, ingredientDemandId, eventId, locationId, receiptQuantity, cumulativeReceivedQuantity, unit, unitCost, deliveryReference, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -27691,7 +27691,7 @@ async function __runInventoryLotRecord(ctx: MutationCtx, { docId, supplierLotNum
     if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "procurementAccess")) || checkRole(user, "manageAccess")))) throw new Error("Inventory, procurement, and managers may see receipt lots");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update receipt lots");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change receipt lots");
-    if (!(((doc.receivedAt == null) || ((((((((((((doc.supplierLotNumber === supplierLotNumber) && (doc.vendorOrderLineId === vendorOrderLineId)) && (doc.vendorOrderId === vendorOrderId)) && (doc.vendorId === vendorId)) && (doc.ingredientId === ingredientId)) && (doc.ingredientDemandId === ingredientDemandId)) && (doc.eventId === eventId)) && (doc.locationId === locationId)) && (doc.receiptQuantity === receiptQuantity)) && (doc.cumulativeReceivedQuantity === cumulativeReceivedQuantity)) && (doc.unit === unit)) && (doc.unitCost === unitCost))))) throw new Error("Guard 0 failed");
+    if (!(((doc.receivedAt == null) || (((((((((((((doc.supplierLotNumber === supplierLotNumber) && (doc.deliveryReference === deliveryReference)) && (doc.vendorOrderLineId === vendorOrderLineId)) && (doc.vendorOrderId === vendorOrderId)) && (doc.vendorId === vendorId)) && (doc.ingredientId === ingredientId)) && (doc.ingredientDemandId === ingredientDemandId)) && (doc.eventId === eventId)) && (doc.locationId === locationId)) && (doc.receiptQuantity === receiptQuantity)) && (doc.cumulativeReceivedQuantity === cumulativeReceivedQuantity)) && (doc.unit === unit)) && (doc.unitCost === unitCost))))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((supplierLotNumber).trim()).length > 0))) throw new Error("Enter the supplier's lot number so this delivery can be traced.");
     if (!((receiptQuantity > 0))) throw new Error("This receipt's quantity has to be more than zero.");
@@ -27714,6 +27714,7 @@ async function __runInventoryLotRecord(ctx: MutationCtx, { docId, supplierLotNum
       cumulativeReceivedQuantity: cumulativeReceivedQuantity,
       unit: unit,
       unitCost: unitCost,
+      deliveryReference: deliveryReference,
       receivedAt: ((doc.receivedAt == null) ? Date.now() : doc.receivedAt),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -27766,6 +27767,7 @@ export const InventoryLot_record = mutation({
     cumulativeReceivedQuantity: v.number(),
     unit: v.any(),
     unitCost: v.number(),
+    deliveryReference: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -27799,6 +27801,7 @@ export const InventoryLot_createViaRecord = mutation({
     cumulativeReceivedQuantity: v.number(),
     unit: v.any(),
     unitCost: v.number(),
+    deliveryReference: v.optional(v.string()),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -27811,12 +27814,13 @@ export const InventoryLot_createViaRecord = mutation({
     await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderLineId","table":"vendorOrderLines"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"vendorId","table":"vendors"},{"name":"ingredientId","table":"ingredients"},{"name":"ingredientDemandId","table":"ingredientDemands"},{"name":"eventId","table":"events"},{"name":"locationId","table":"storageLocations"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { supplierLotNumber, vendorOrderLineId, vendorOrderId, vendorId, ingredientId, ingredientDemandId, eventId, locationId, receiptQuantity, cumulativeReceivedQuantity, unit, unitCost } = args;
+    const { supplierLotNumber, vendorOrderLineId, vendorOrderId, vendorId, ingredientId, ingredientDemandId, eventId, locationId, receiptQuantity, cumulativeReceivedQuantity, unit, unitCost, deliveryReference } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
       cumulativeReceivedQuantity: args.cumulativeReceivedQuantity,
+      deliveryReference: args.deliveryReference,
       eventId: args.eventId,
       ingredientDemandId: args.ingredientDemandId,
       ingredientId: args.ingredientId,
@@ -27832,7 +27836,7 @@ export const InventoryLot_createViaRecord = mutation({
     if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "procurementAccess")) || checkRole(user, "manageAccess")))) throw new Error("Inventory, procurement, and managers may see receipt lots");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update receipt lots");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change receipt lots");
-    if (!(((__draft.receivedAt == null) || ((((((((((((__draft.supplierLotNumber === supplierLotNumber) && (__draft.vendorOrderLineId === vendorOrderLineId)) && (__draft.vendorOrderId === vendorOrderId)) && (__draft.vendorId === vendorId)) && (__draft.ingredientId === ingredientId)) && (__draft.ingredientDemandId === ingredientDemandId)) && (__draft.eventId === eventId)) && (__draft.locationId === locationId)) && (__draft.receiptQuantity === receiptQuantity)) && (__draft.cumulativeReceivedQuantity === cumulativeReceivedQuantity)) && (__draft.unit === unit)) && (__draft.unitCost === unitCost))))) throw new Error("Guard 0 failed");
+    if (!(((__draft.receivedAt == null) || (((((((((((((__draft.supplierLotNumber === supplierLotNumber) && (__draft.deliveryReference === deliveryReference)) && (__draft.vendorOrderLineId === vendorOrderLineId)) && (__draft.vendorOrderId === vendorOrderId)) && (__draft.vendorId === vendorId)) && (__draft.ingredientId === ingredientId)) && (__draft.ingredientDemandId === ingredientDemandId)) && (__draft.eventId === eventId)) && (__draft.locationId === locationId)) && (__draft.receiptQuantity === receiptQuantity)) && (__draft.cumulativeReceivedQuantity === cumulativeReceivedQuantity)) && (__draft.unit === unit)) && (__draft.unitCost === unitCost))))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((supplierLotNumber).trim()).length > 0))) throw new Error("Enter the supplier's lot number so this delivery can be traced.");
     if (!((receiptQuantity > 0))) throw new Error("This receipt's quantity has to be more than zero.");
@@ -27855,6 +27859,7 @@ export const InventoryLot_createViaRecord = mutation({
     doc.cumulativeReceivedQuantity = cumulativeReceivedQuantity;
     doc.unit = unit;
     doc.unitCost = unitCost;
+    doc.deliveryReference = deliveryReference;
     doc.receivedAt = ((doc.receivedAt == null) ? Date.now() : doc.receivedAt);
     const docId = await ctx.db.insert("inventoryLots", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, tenantId: doc.tenantId, ingredientId: ingredientId, locationId: locationId, quantity: stockDelta, unit: unit, unitCost: unitCost, _subject: { entity: "InventoryLot", command: "record", id: docId } };
@@ -58374,7 +58379,7 @@ export const VendorOrderLine_reconcileDraftRequirement = mutation({
   },
 });
 
-async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quantity, locationId, unitPrice, supplierLotNumber, discrepancyQuantity, discrepancyNotes, version }: any, __creation = false) {
+async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quantity, locationId, unitPrice, supplierLotNumber, discrepancyQuantity, discrepancyNotes, deliveryReference, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -58382,6 +58387,8 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorOrderLine not found");
     const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, doc.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendorOrder = __rel_vendorOrder;
+    (doc as any).receiptLots = await ctx.db.query("inventoryLots").withIndex("by_vendorOrderLineId", (q: any) => q.eq("vendorOrderLineId", docId)).collect();
+    (doc as any).receiptLots = (doc as any).receiptLots.filter((row: any) => row.tenantId === __auth.tenantId);
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may see vendor order lines");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor order lines");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor order lines");
@@ -58389,6 +58396,7 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
     if (!(((doc.status === "added") || (doc.status === "receiving")))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_vendorOrder != null) && ((__rel_vendorOrder.status === "confirmed") || (__rel_vendorOrder.status === "partially_received"))))) throw new Error("Guard 3 failed");
+    if (!(((deliveryReference == null) || (((doc.receiptLots) ?? []).filter((lot: Doc<"inventoryLots">) => (((lot.deletedAt == null) && (lot.deliveryReference === deliveryReference)))).length === 0)))) throw new Error("This delivery slip is already counted on this line. To change the count, fix the received count instead.");
     if (!(((doc.locationId == null) || (locationId === doc.locationId)))) throw new Error("This receipt is for a different location. Pick the location already set on this line.");
     if (!((quantity > 0))) throw new Error("This order line's received amount has to be more than zero. Enter how much arrived.");
     if (!(((doc.receivedQuantity + quantity) <= doc.orderedQuantity))) throw new Error("This order line can't receive more than was ordered. Enter a smaller amount.");
@@ -58427,8 +58435,8 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, vendorId: __rel_vendorOrder.vendorId, ingredientId: __after.ingredientId, ingredientDemandId: __after.ingredientDemandId, eventId: __rel_vendorOrder.eventId, locationId: locationId, supplierLotNumber: supplierLotNumber, previousReceivedQuantity: previousReceived, receivedQuantity: nextReceived, receiptQuantity: quantity, orderedQuantity: __after.orderedQuantity, unit: __after.unit, unitCost: unitPrice, unitPrice: unitPrice, discrepancyQuantity: ((discrepancyQuantity != null) ? discrepancyQuantity : __after.discrepancyQuantity), _subject: { entity: "VendorOrderLine", command: "recordReceipt", id: docId } };
-    const __manifestEvent0 = { type: "VendorOrderLineReceived", entity: "VendorOrderLine", entityId: docId, payload: { vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, vendorId: __rel_vendorOrder.vendorId, ingredientId: __after.ingredientId, ingredientDemandId: __after.ingredientDemandId, eventId: __rel_vendorOrder.eventId, locationId: locationId, supplierLotNumber: supplierLotNumber, previousReceivedQuantity: previousReceived, receivedQuantity: nextReceived, receiptQuantity: quantity, orderedQuantity: __after.orderedQuantity, unit: __after.unit, unitCost: unitPrice, unitPrice: unitPrice, discrepancyQuantity: ((discrepancyQuantity != null) ? discrepancyQuantity : __after.discrepancyQuantity) }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, vendorId: __rel_vendorOrder.vendorId, ingredientId: __after.ingredientId, ingredientDemandId: __after.ingredientDemandId, eventId: __rel_vendorOrder.eventId, locationId: locationId, supplierLotNumber: supplierLotNumber, deliveryReference: deliveryReference, previousReceivedQuantity: previousReceived, receivedQuantity: nextReceived, receiptQuantity: quantity, orderedQuantity: __after.orderedQuantity, unit: __after.unit, unitCost: unitPrice, unitPrice: unitPrice, discrepancyQuantity: ((discrepancyQuantity != null) ? discrepancyQuantity : __after.discrepancyQuantity), _subject: { entity: "VendorOrderLine", command: "recordReceipt", id: docId } };
+    const __manifestEvent0 = { type: "VendorOrderLineReceived", entity: "VendorOrderLine", entityId: docId, payload: { vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, vendorId: __rel_vendorOrder.vendorId, ingredientId: __after.ingredientId, ingredientDemandId: __after.ingredientDemandId, eventId: __rel_vendorOrder.eventId, locationId: locationId, supplierLotNumber: supplierLotNumber, deliveryReference: deliveryReference, previousReceivedQuantity: previousReceived, receivedQuantity: nextReceived, receiptQuantity: quantity, orderedQuantity: __after.orderedQuantity, unit: __after.unit, unitCost: unitPrice, unitPrice: unitPrice, discrepancyQuantity: ((discrepancyQuantity != null) ? discrepancyQuantity : __after.discrepancyQuantity) }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     // Reactions
     const __match0_raw = await ctx.db.query("ingredientPriceObservations").withIndex("by_vendorOrderLineId", (q) => q.eq("vendorOrderLineId", payload.vendorOrderLineId)).collect();
@@ -58458,9 +58466,9 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
     const __match1_rows = __match1_raw.filter((d) => (d as any).vendorOrderLineId === payload.vendorOrderLineId && (d as any).cumulativeReceivedQuantity === payload.receivedQuantity && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
     const __match1_id = __match1_rows.length > 0 ? (__match1_rows[0] as any)._id : null;
     if (__match1_id) {
-      await __runInventoryLotRecord(ctx, { docId: __match1_id, supplierLotNumber: payload.supplierLotNumber, vendorOrderLineId: payload.vendorOrderLineId, vendorOrderId: payload.vendorOrderId, vendorId: payload.vendorId, ingredientId: payload.ingredientId, ingredientDemandId: payload.ingredientDemandId, eventId: payload.eventId, locationId: payload.locationId, receiptQuantity: payload.receiptQuantity, cumulativeReceivedQuantity: payload.receivedQuantity, unit: payload.unit, unitCost: payload.unitCost } as any);
+      await __runInventoryLotRecord(ctx, { docId: __match1_id, supplierLotNumber: payload.supplierLotNumber, vendorOrderLineId: payload.vendorOrderLineId, vendorOrderId: payload.vendorOrderId, vendorId: payload.vendorId, ingredientId: payload.ingredientId, ingredientDemandId: payload.ingredientDemandId, eventId: payload.eventId, locationId: payload.locationId, receiptQuantity: payload.receiptQuantity, cumulativeReceivedQuantity: payload.receivedQuantity, unit: payload.unit, unitCost: payload.unitCost, deliveryReference: payload.deliveryReference } as any);
     } else {
-      const __elseArgs: Record<string, any> = { supplierLotNumber: payload.supplierLotNumber, vendorOrderLineId: payload.vendorOrderLineId, vendorOrderId: payload.vendorOrderId, vendorId: payload.vendorId, ingredientId: payload.ingredientId, ingredientDemandId: payload.ingredientDemandId, eventId: payload.eventId, locationId: payload.locationId, receiptQuantity: payload.receiptQuantity, cumulativeReceivedQuantity: payload.receivedQuantity, unit: payload.unit, unitCost: payload.unitCost };
+      const __elseArgs: Record<string, any> = { supplierLotNumber: payload.supplierLotNumber, vendorOrderLineId: payload.vendorOrderLineId, vendorOrderId: payload.vendorOrderId, vendorId: payload.vendorId, ingredientId: payload.ingredientId, ingredientDemandId: payload.ingredientDemandId, eventId: payload.eventId, locationId: payload.locationId, receiptQuantity: payload.receiptQuantity, cumulativeReceivedQuantity: payload.receivedQuantity, unit: payload.unit, unitCost: payload.unitCost, deliveryReference: payload.deliveryReference };
       const __elseDoc: Record<string, any> = {
         tenantId: __auth.tenantId,
         supplierLotNumber: "",
@@ -58472,7 +58480,7 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
         updatedAt: Date.now(),
         version: 0,
       };
-      for (const __k of ["deletedAt","supplierLotNumber","vendorOrderLineId","vendorOrderId","vendorId","ingredientId","ingredientDemandId","eventId","locationId","receiptQuantity","cumulativeReceivedQuantity","unit","unitCost","receivedAt","createdAt","updatedAt"] as string[]) {
+      for (const __k of ["deletedAt","supplierLotNumber","deliveryReference","vendorOrderLineId","vendorOrderId","vendorId","ingredientId","ingredientDemandId","eventId","locationId","receiptQuantity","cumulativeReceivedQuantity","unit","unitCost","receivedAt","createdAt","updatedAt"] as string[]) {
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("inventoryLots", __elseDoc as any);
@@ -58491,6 +58499,7 @@ export const VendorOrderLine_recordReceipt = mutation({
     supplierLotNumber: v.string(),
     discrepancyQuantity: v.optional(v.number()),
     discrepancyNotes: v.optional(v.string()),
+    deliveryReference: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
