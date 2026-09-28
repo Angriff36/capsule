@@ -528,8 +528,10 @@ import {
   ProductionBatchAllocationReleaseParamsSchema,
   ProductionBatchCancelParamsSchema,
   ProductionBatchCompleteParamsSchema,
+  ProductionBatchCorrectYieldParamsSchema,
   ProductionBatchPlanParamsSchema,
   ProductionBatchReconcilePlanParamsSchema,
+  ProductionBatchResolveShortfallParamsSchema,
   ProductionBatchStartParamsSchema,
   ProposalAcceptParamsSchema,
   ProposalConfirmChangeSourceParamsSchema,
@@ -7948,6 +7950,16 @@ export function useProductionBatchComplete() {
   };
 }
 
+/** Mutation hook for ProductionBatch.correctYield. */
+export function useProductionBatchCorrectYield() {
+  const mutate = useMutation(api.mutations.ProductionBatch_correctYield);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProductionBatchCorrectYieldParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for ProductionBatch.plan. */
 export function useProductionBatchPlan() {
   const mutate = useMutation(api.mutations.ProductionBatch_plan);
@@ -7964,6 +7976,16 @@ export function useProductionBatchReconcilePlan() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ProductionBatchReconcilePlanParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ProductionBatch.resolveShortfall. */
+export function useProductionBatchResolveShortfall() {
+  const mutate = useMutation(api.mutations.ProductionBatch_resolveShortfall);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProductionBatchResolveShortfallParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11685,4 +11707,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1239 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1241 as const;

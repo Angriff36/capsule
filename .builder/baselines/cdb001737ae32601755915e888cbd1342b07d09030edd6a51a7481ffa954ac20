@@ -10478,7 +10478,7 @@ export const listProductionBatch = query({
     let rows = await ctx.db.query("productionBatches").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    return (__plainRows).map((__row) => { (__row as any).yieldVariance = (((__row as any).actualYield == null) ? 0 : ((__row as any).actualYield - (__row as any).plannedYield)); return { ...(__row as any), yieldVariance: (__row as any).yieldVariance }; });
   },
 });
 
@@ -10495,7 +10495,9 @@ export const getProductionBatch = query({
     const __rawDoc = doc;
     if (!__rawDoc) return __rawDoc;
     const __doc = __rawDoc;
-    return __doc;
+    (__doc as any).yieldVariance = (((__doc as any).actualYield == null) ? 0 : ((__doc as any).actualYield - (__doc as any).plannedYield));
+    const __hydrated = { ...(__doc as any), yieldVariance: (__doc as any).yieldVariance };
+    return __hydrated;
   },
 });
 
@@ -10510,7 +10512,7 @@ export const listProductionBatchByTenantId = query({
     let rows = await ctx.db.query("productionBatches").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    return (__plainRows).map((__row) => { (__row as any).yieldVariance = (((__row as any).actualYield == null) ? 0 : ((__row as any).actualYield - (__row as any).plannedYield)); return { ...(__row as any), yieldVariance: (__row as any).yieldVariance }; });
   },
 });
 
@@ -10526,7 +10528,7 @@ export const listProductionBatchByComponentId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    return (__plainRows).map((__row) => { (__row as any).yieldVariance = (((__row as any).actualYield == null) ? 0 : ((__row as any).actualYield - (__row as any).plannedYield)); return { ...(__row as any), yieldVariance: (__row as any).yieldVariance }; });
   },
 });
 
@@ -10542,7 +10544,7 @@ export const listProductionBatchByEventId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    return (__plainRows).map((__row) => { (__row as any).yieldVariance = (((__row as any).actualYield == null) ? 0 : ((__row as any).actualYield - (__row as any).plannedYield)); return { ...(__row as any), yieldVariance: (__row as any).yieldVariance }; });
   },
 });
 

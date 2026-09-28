@@ -2654,11 +2654,29 @@ export const ProductionBatchSchema = z.object({
   completedAt: z.coerce.date().nullable().optional(),
   cancelledAt: z.coerce.date().nullable().optional(),
   cancellationReason: z.string().nullable().optional(),
+  startedById: z.string().uuid().nullable().optional(),
+  completedById: z.string().uuid().nullable().optional(),
+  cancelledById: z.string().uuid().nullable().optional(),
+  wasteQuantity: z.number().nullable().optional(),
+  wasteReason: z.string().nullable().optional(),
+  shortfallQuantity: z.number().nullable().optional(),
+  shortfallResolvedAt: z.coerce.date().nullable().optional(),
+  shortfallResolution: z.string().nullable().optional(),
+  makeUpForBatchId: z.string().uuid().nullable().optional(),
+  yieldCorrectedAt: z.coerce.date().nullable().optional(),
+  yieldCorrectedById: z.string().uuid().nullable().optional(),
+  yieldCorrectionReason: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
 
+// Computed: ProductionBatch
+export const ProductionBatchComputedSchema = ProductionBatchSchema.extend({
+  yieldVariance: z.number(),
+});
+
 export type ProductionBatch = z.infer<typeof ProductionBatchSchema>;
+export type ProductionBatchWithComputed = z.infer<typeof ProductionBatchComputedSchema>;
 
 // Entity: ProductionBatchAllocation
 export const ProductionBatchAllocationSchema = z.object({
@@ -4131,6 +4149,8 @@ export const WasteRecordSchema = z.object({
   recordedAt: z.coerce.date().nullable().optional(),
   voidedAt: z.coerce.date().nullable().optional(),
   voidReason: z.string().nullable().optional(),
+  recordedById: z.string().uuid().nullable().optional(),
+  voidedById: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -8597,9 +8617,19 @@ export type ProductionBatchCancelParams = z.infer<typeof ProductionBatchCancelPa
 // Command: complete on ProductionBatch
 export const ProductionBatchCompleteParamsSchema = z.object({
   actualYield: z.number(),
+  wasteQuantity: z.number().optional(),
+  wasteReason: z.string().optional(),
 });
 
 export type ProductionBatchCompleteParams = z.infer<typeof ProductionBatchCompleteParamsSchema>;
+
+// Command: correctYield on ProductionBatch
+export const ProductionBatchCorrectYieldParamsSchema = z.object({
+  actualYield: z.number(),
+  reason: z.string(),
+});
+
+export type ProductionBatchCorrectYieldParams = z.infer<typeof ProductionBatchCorrectYieldParamsSchema>;
 
 // Command: plan on ProductionBatch
 export const ProductionBatchPlanParamsSchema = z.object({
@@ -8608,6 +8638,7 @@ export const ProductionBatchPlanParamsSchema = z.object({
   yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   eventId: z.string().min(1).optional(),
   notes: z.string().optional(),
+  makeUpForBatchId: z.string().uuid().optional(),
 });
 
 export type ProductionBatchPlanParams = z.infer<typeof ProductionBatchPlanParamsSchema>;
@@ -8622,6 +8653,13 @@ export const ProductionBatchReconcilePlanParamsSchema = z.object({
 });
 
 export type ProductionBatchReconcilePlanParams = z.infer<typeof ProductionBatchReconcilePlanParamsSchema>;
+
+// Command: resolveShortfall on ProductionBatch
+export const ProductionBatchResolveShortfallParamsSchema = z.object({
+  resolution: z.string(),
+});
+
+export type ProductionBatchResolveShortfallParams = z.infer<typeof ProductionBatchResolveShortfallParamsSchema>;
 
 // Command: start on ProductionBatch
 export const ProductionBatchStartParamsSchema = z.object({});

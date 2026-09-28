@@ -345,6 +345,10 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
   property recordedAt: datetime?
   property voidedAt: datetime?
   property voidReason: string?
+  // Who recorded and who voided (PL-BATCH, 2026-09-28): the signed-in staff
+  // profile, never a name the caller sends.
+  property recordedById: uuid?
+  property voidedById: uuid?
 
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
@@ -396,6 +400,7 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
     mutate notes = notes != null ? notes : self.notes
     mutate status = "recorded"
     mutate recordedAt = now()
+    mutate recordedById = user.personId
     emit WasteRecorded {
       wasteRecordId: self.id
       tenantId: self.tenantId
@@ -419,6 +424,7 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
     mutate status = "voided"
     mutate voidedAt = now()
     mutate voidReason = reason
+    mutate voidedById = user.personId
     emit WasteVoided {
       wasteRecordId: self.id
       tenantId: self.tenantId

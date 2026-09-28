@@ -499,9 +499,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.PrepTaskMaterial_createViaLink, { "prepTaskId": "prepTaskId-prep-task-material-2", "eventIngredientContributionId": "eventIngredientContributionId-prep-task-material-2", "productionBatchAllocationId": "productionBatchAllocationId-prep-task-material-2", "dishIngredientId": "dishIngredientId-prep-task-material-2", "dishComponentId": "dishComponentId-prep-task-material-2", "workQuantity": 2, "workUnit": "demo-workUnit-2" } as any);
   // ProductionBatch → api.mutations.ProductionBatch_createViaPlan
   rowsAttempted += 1;
-  await client.mutation(api.mutations.ProductionBatch_createViaPlan, { "componentId": "componentId-production-batch-1", "eventId": "eventId-production-batch-1", "plannedYield": 1, "yieldUnit": "demo-yieldUnit-1", "notes": "demo-notes-1" } as any);
+  await client.mutation(api.mutations.ProductionBatch_createViaPlan, { "componentId": "componentId-production-batch-1", "eventId": "eventId-production-batch-1", "plannedYield": 1, "yieldUnit": "demo-yieldUnit-1", "notes": "demo-notes-1", "makeUpForBatchId": "makeUpForBatchId-production-batch-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.ProductionBatch_createViaPlan, { "componentId": "componentId-production-batch-2", "eventId": "eventId-production-batch-2", "plannedYield": 2, "yieldUnit": "demo-yieldUnit-2", "notes": "demo-notes-2" } as any);
+  await client.mutation(api.mutations.ProductionBatch_createViaPlan, { "componentId": "componentId-production-batch-2", "eventId": "eventId-production-batch-2", "plannedYield": 2, "yieldUnit": "demo-yieldUnit-2", "notes": "demo-notes-2", "makeUpForBatchId": "makeUpForBatchId-production-batch-2" } as any);
   // ProductionBatchAllocation has multiple initialization commands (allocate, release); using the selected initialization command: allocate.
   // ProductionBatchAllocation → api.mutations.ProductionBatchAllocation_createViaAllocate
   rowsAttempted += 1;
