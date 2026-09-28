@@ -17,7 +17,10 @@ import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
-import { calculateInvoiceTax } from "../../src/features/finance/invoiceTax";
+import {
+  calculateInvoiceTax,
+  type TaxRateRecord,
+} from "../../src/features/finance/invoiceTax";
 import {
   createPlannedEvent,
   harness as proposalHarness,
@@ -69,12 +72,11 @@ async function financeSetup(proof: Proof, tenantId: string) {
     appliesToService: false,
     appliesToRental: false,
   });
-  const rates = await finance.run(async (ctx) =>
-    ctx.db
-      .query("taxRates")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .collect(),
-  );
+  const rates = (await finance.run(async (ctx) =>
+    (await ctx.db.query("taxRates").collect()).filter(
+      (row) => row.tenantId === tenantId,
+    ),
+  )) as TaxRateRecord[];
   return { finance, clientId: client.docId, rates };
 }
 
@@ -152,10 +154,9 @@ describe("runtime proof: callers cannot set totals the server works out (AC-372)
     ).rejects.toThrow(/needs a description, a kind/);
 
     const invoices = await finance.run(async (ctx) =>
-      ctx.db
-        .query("invoices")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .collect(),
+      (await ctx.db.query("invoices").collect()).filter(
+        (row) => row.tenantId === tenantId,
+      ),
     );
     expect(invoices).toHaveLength(0);
 
