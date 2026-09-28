@@ -2490,6 +2490,7 @@ export default defineSchema({
     notes: v.optional(v.union(v.string(), v.null())),
     menuDishId: v.optional(v.union(v.string(), v.null())),
     overrideReason: v.optional(v.union(v.string(), v.null())),
+    equipmentId: v.optional(v.union(v.string(), v.null())),
     addedAt: v.optional(v.union(v.number(), v.null())),
     removedAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),

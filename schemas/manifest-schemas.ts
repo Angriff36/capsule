@@ -2720,6 +2720,7 @@ export const ProposalLineItemSchema = z.object({
   notes: z.string().nullable().optional(),
   menuDishId: z.string().uuid().nullable().optional(),
   overrideReason: z.string().nullable().optional(),
+  equipmentId: z.string().uuid().nullable().optional(),
   addedAt: z.coerce.date().nullable().optional(),
   removedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -8591,6 +8592,7 @@ export const ProposalLineItemAddLineParamsSchema = z.object({
   notes: z.string().optional(),
   menuDishId: z.string().uuid().optional(),
   overrideReason: z.string().optional(),
+  equipmentId: z.string().min(1).optional(),
 });
 
 export type ProposalLineItemAddLineParams = z.infer<typeof ProposalLineItemAddLineParamsSchema>;
@@ -8612,6 +8614,7 @@ export const ProposalLineItemReviseLineParamsSchema = z.object({
   notes: z.string().optional(),
   menuDishId: z.string().uuid().optional(),
   overrideReason: z.string().optional(),
+  equipmentId: z.string().min(1).optional(),
 });
 
 export type ProposalLineItemReviseLineParams = z.infer<typeof ProposalLineItemReviseLineParamsSchema>;

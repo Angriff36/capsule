@@ -99,6 +99,7 @@ async function copyLivePricedLines(
       notes: presentText(line.notes),
       menuDishId: presentText(line.menuDishId),
       overrideReason: presentText(line.overrideReason),
+      equipmentId: presentText(line.equipmentId),
     });
   }
 }

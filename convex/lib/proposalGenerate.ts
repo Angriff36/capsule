@@ -96,6 +96,7 @@ export const generateProposalDraft = mutation({
         unit: row.unit ?? undefined,
         sortOrder: source.sortOrder,
         notes: row.notes ?? undefined,
+        equipmentId: row.equipmentId ?? undefined,
         menuDishId: (source.values.menuDishId ?? undefined) as Id<"menuDishes"> | undefined,
       });
       lines.push(generated(source, lineId));

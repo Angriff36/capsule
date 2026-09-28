@@ -41385,7 +41385,7 @@ export const ProposalEnhancement_withdraw = mutation({
   },
 });
 
-async function __runProposalLineItemAddLine(ctx: MutationCtx, { docId, proposalId, description, pricingBasis, unitPrice, amount, quantity, unit, sortOrder, notes, menuDishId, overrideReason, version }: any, __creation = false) {
+async function __runProposalLineItemAddLine(ctx: MutationCtx, { docId, proposalId, description, pricingBasis, unitPrice, amount, quantity, unit, sortOrder, notes, menuDishId, overrideReason, equipmentId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -41418,6 +41418,7 @@ async function __runProposalLineItemAddLine(ctx: MutationCtx, { docId, proposalI
       notes: notes,
       menuDishId: menuDishId,
       overrideReason: overrideReason,
+      equipmentId: equipmentId,
       addedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -41444,6 +41445,7 @@ export const ProposalLineItem_addLine = mutation({
     notes: v.optional(v.string()),
     menuDishId: v.optional(v.string()),
     overrideReason: v.optional(v.string()),
+    equipmentId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -41454,7 +41456,7 @@ export const ProposalLineItem_addLine = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"},{"name":"menuDishId","table":null}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"},{"name":"menuDishId","table":null},{"name":"equipmentId","table":null}]);
     const __result = await __runProposalLineItemAddLine(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -41476,6 +41478,7 @@ export const ProposalLineItem_createViaAddLine = mutation({
     notes: v.optional(v.string()),
     menuDishId: v.optional(v.string()),
     overrideReason: v.optional(v.string()),
+    equipmentId: v.optional(v.string()),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -41485,10 +41488,10 @@ export const ProposalLineItem_createViaAddLine = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"},{"name":"menuDishId","table":null}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"},{"name":"menuDishId","table":null},{"name":"equipmentId","table":null}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { proposalId, description, pricingBasis, unitPrice, amount, quantity, unit, sortOrder, notes, menuDishId, overrideReason } = args;
+    const { proposalId, description, pricingBasis, unitPrice, amount, quantity, unit, sortOrder, notes, menuDishId, overrideReason, equipmentId } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       quantity: args.quantity !== undefined ? args.quantity : 1,
@@ -41497,6 +41500,7 @@ export const ProposalLineItem_createViaAddLine = mutation({
       updatedAt: Date.now(),
       amount: args.amount,
       description: args.description,
+      equipmentId: args.equipmentId,
       menuDishId: args.menuDishId,
       notes: args.notes,
       overrideReason: args.overrideReason,
@@ -41531,6 +41535,7 @@ export const ProposalLineItem_createViaAddLine = mutation({
     doc.notes = notes;
     doc.menuDishId = menuDishId;
     doc.overrideReason = overrideReason;
+    doc.equipmentId = equipmentId;
     doc.addedAt = Date.now();
     const docId = await ctx.db.insert("proposalLineItems", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, lineItemId: docId, tenantId: doc.tenantId, proposalId: proposalId, description: description, pricingBasis: pricingBasis, unitPrice: unitPrice, amount: amount, _subject: { entity: "ProposalLineItem", command: "addLine", id: docId } };
@@ -41598,7 +41603,7 @@ export const ProposalLineItem_removeLine = mutation({
   },
 });
 
-async function __runProposalLineItemReviseLine(ctx: MutationCtx, { docId, description, pricingBasis, unitPrice, amount, quantity, unit, sortOrder, notes, menuDishId, overrideReason, version }: any, __creation = false) {
+async function __runProposalLineItemReviseLine(ctx: MutationCtx, { docId, description, pricingBasis, unitPrice, amount, quantity, unit, sortOrder, notes, menuDishId, overrideReason, equipmentId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -41629,6 +41634,7 @@ async function __runProposalLineItemReviseLine(ctx: MutationCtx, { docId, descri
       notes: notes,
       menuDishId: menuDishId,
       overrideReason: overrideReason,
+      equipmentId: equipmentId,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -41653,6 +41659,7 @@ export const ProposalLineItem_reviseLine = mutation({
     notes: v.optional(v.string()),
     menuDishId: v.optional(v.string()),
     overrideReason: v.optional(v.string()),
+    equipmentId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -41663,7 +41670,7 @@ export const ProposalLineItem_reviseLine = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"},{"name":"menuDishId","table":null}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"},{"name":"menuDishId","table":null},{"name":"equipmentId","table":null}]);
     const __result = await __runProposalLineItemReviseLine(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);

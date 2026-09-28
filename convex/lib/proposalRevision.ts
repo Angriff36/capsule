@@ -9,6 +9,26 @@ import { getAuthContext } from "./authContext";
 // 2dp rounding for comparing stored money(12,2) values (float-stable).
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 
+// AC-547: the rental item a line names, same company and still in use; the
+// same rule proposalPricing.resolveRentalItem enforces at write. Kept local
+// for the reason given on resolveCatalogPrice below.
+async function resolveRentalItem(
+  ctx: { db: any },
+  equipmentId: string,
+  tenantId: string,
+): Promise<{ name: string; ownership: string } | null> {
+  const item: any = await ctx.db.get(equipmentId as Id<"equipments">);
+  if (
+    !item ||
+    item.deletedAt != null ||
+    item.tenantId !== tenantId ||
+    String(item.status) !== "active"
+  ) {
+    return null;
+  }
+  return { name: item.name, ownership: String(item.ownership) };
+}
+
 // Resolve a catalog link's validated sellingPrice, or null if invalid (spec
 // §5.4 L276; codex review findings 3/C): same-tenant, non-removed MenuDish
 // (deletedAt null, addedAt set), priced, in a non-deleted published menu, with
@@ -135,6 +155,10 @@ export interface ProposalRevisionSnapshot {
     menuDishId: string | null;
     catalogPrice: number | null;
     overrideReason: string | null;
+    // AC-547: the rental/decor item this line prices (same company only), with
+    // its name as it was when the proposal went out. Null on other lines and
+    // on revisions made before rental lines existed.
+    rentalItem: { id: string; name: string; ownership: string } | null;
   }>;
   // Optional upgrades offered separately from priced lines. Active rows only
   // (deletedAt null, addedAt set) are frozen into the revision at send.
@@ -285,6 +309,9 @@ export async function buildProposalRevisionSnapshot(
         const catalogPrice = line.menuDishId
           ? await resolveCatalogPrice(ctx, line.menuDishId, proposal.tenantId)
           : null;
+        const rental = line.equipmentId
+          ? await resolveRentalItem(ctx, line.equipmentId, proposal.tenantId)
+          : null;
         return {
           id: line._id.toString(),
           description: line.description,
@@ -298,6 +325,9 @@ export async function buildProposalRevisionSnapshot(
           menuDishId: line.menuDishId ? line.menuDishId.toString() : null,
           catalogPrice,
           overrideReason: line.overrideReason ?? null,
+          rentalItem: rental
+            ? { id: line.equipmentId.toString(), ...rental }
+            : null,
         };
       }),
     )

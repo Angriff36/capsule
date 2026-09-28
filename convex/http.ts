@@ -2666,8 +2666,8 @@ const COMMAND_DISPATCH = {
   },
   "ProposalLineItem.addLine": {
     ref: api.mutations.ProposalLineItem_createViaAddLine,
-    params: ["proposalId","description","pricingBasis","unitPrice","amount","quantity","unit","sortOrder","notes","menuDishId","overrideReason","idempotencyKey"] as const,
-    paramMeta: [{"name":"proposalId","type":"uuid","required":true},{"name":"description","type":"string","required":true},{"name":"pricingBasis","type":"PricingBasis","required":true},{"name":"unitPrice","type":"money","required":true},{"name":"amount","type":"money","required":true},{"name":"quantity","type":"decimal","required":false},{"name":"unit","type":"string","required":false},{"name":"sortOrder","type":"int","required":false},{"name":"notes","type":"string","required":false},{"name":"menuDishId","type":"uuid","required":false},{"name":"overrideReason","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["proposalId","description","pricingBasis","unitPrice","amount","quantity","unit","sortOrder","notes","menuDishId","overrideReason","equipmentId","idempotencyKey"] as const,
+    paramMeta: [{"name":"proposalId","type":"uuid","required":true},{"name":"description","type":"string","required":true},{"name":"pricingBasis","type":"PricingBasis","required":true},{"name":"unitPrice","type":"money","required":true},{"name":"amount","type":"money","required":true},{"name":"quantity","type":"decimal","required":false},{"name":"unit","type":"string","required":false},{"name":"sortOrder","type":"int","required":false},{"name":"notes","type":"string","required":false},{"name":"menuDishId","type":"uuid","required":false},{"name":"overrideReason","type":"string","required":false},{"name":"equipmentId","type":"uuid","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "ProposalLineItem.removeLine": {
     ref: api.mutations.ProposalLineItem_removeLine,
@@ -2676,8 +2676,8 @@ const COMMAND_DISPATCH = {
   },
   "ProposalLineItem.reviseLine": {
     ref: api.mutations.ProposalLineItem_reviseLine,
-    params: ["docId","description","pricingBasis","unitPrice","amount","quantity","unit","sortOrder","notes","menuDishId","overrideReason","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"description","type":"string","required":true},{"name":"pricingBasis","type":"PricingBasis","required":true},{"name":"unitPrice","type":"money","required":true},{"name":"amount","type":"money","required":true},{"name":"quantity","type":"decimal","required":false},{"name":"unit","type":"string","required":false},{"name":"sortOrder","type":"int","required":false},{"name":"notes","type":"string","required":false},{"name":"menuDishId","type":"uuid","required":false},{"name":"overrideReason","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","description","pricingBasis","unitPrice","amount","quantity","unit","sortOrder","notes","menuDishId","overrideReason","equipmentId","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"description","type":"string","required":true},{"name":"pricingBasis","type":"PricingBasis","required":true},{"name":"unitPrice","type":"money","required":true},{"name":"amount","type":"money","required":true},{"name":"quantity","type":"decimal","required":false},{"name":"unit","type":"string","required":false},{"name":"sortOrder","type":"int","required":false},{"name":"notes","type":"string","required":false},{"name":"menuDishId","type":"uuid","required":false},{"name":"overrideReason","type":"string","required":false},{"name":"equipmentId","type":"uuid","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "ProposalRevision.capture": {
     ref: api.mutations.ProposalRevision_createViaCapture,
