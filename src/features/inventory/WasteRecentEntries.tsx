@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { formatCountNoun, formatDate, formatMoney } from "../../lib/format";
-import { useWasteRecordVoidRecord } from "../../lib/manifest-convex-react";
+import {
+  useListPerson,
+  useWasteRecordVoidRecord,
+} from "../../lib/manifest-convex-react";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
@@ -27,6 +30,7 @@ export function WasteRecentEntries({
   periodLabel: string;
 }) {
   const voidRecord = useWasteRecordVoidRecord();
+  const people = useListPerson();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { prompt, host } = useActionPrompt(busy != null);
@@ -47,6 +51,12 @@ export function WasteRecentEntries({
 
   const ingredientName = (id: string) =>
     ingredients?.find((row) => row._id === id)?.name ?? "Unknown ingredient";
+  const recorderName = (id: string | null | undefined) => {
+    const person = id ? people?.find((row) => row._id === id) : undefined;
+    return person
+      ? `${person.givenName ?? ""} ${person.familyName ?? ""}`.trim() || null
+      : null;
+  };
   const eventName = (id: string | null | undefined) =>
     id
       ? (events?.find((row) => row._id === id)?.title ?? "Unknown event")
@@ -121,7 +131,12 @@ export function WasteRecentEntries({
             <tbody>
               {rows.map((record) => (
                 <tr key={record._id}>
-                  <td>{formatDate(occurredAt(record))}</td>
+                  <td>
+                    {formatDate(occurredAt(record))}
+                    {recorderName(record.recordedById) ? (
+                      <small>by {recorderName(record.recordedById)}</small>
+                    ) : null}
+                  </td>
                   <td>
                     <strong>{ingredientName(record.ingredientId)}</strong>
                     {record.notes ? <small>{record.notes}</small> : null}

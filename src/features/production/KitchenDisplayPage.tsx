@@ -18,6 +18,12 @@ import { useActionPrompt } from "../../ui/action-prompt";
 import { useOptimisticStatus } from "../../ui/useOptimisticStatus";
 import { TableSkeleton } from "../../ui/primitives";
 import { BatchAllocationsPanel } from "./BatchAllocationsPanel";
+import { BatchCompletionFields } from "./BatchCompletionFields";
+import { BatchShortfallPanel } from "./BatchShortfallPanel";
+import {
+  batchCompletionArgs,
+  type BatchCompletionEntry,
+} from "./batchCompletion";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { ProductionFailureBanner } from "./ProductionFailureBanner";
 import { ProductionLifecyclePolicy } from "./ProductionLifecyclePolicy";
@@ -98,7 +104,9 @@ export function KitchenDisplayPage() {
   const [eventFilter, setEventFilter] = useState<string>("all");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [actualYields, setActualYields] = useState<Record<string, string>>({});
+  const [batchEntries, setBatchEntries] = useState<
+    Record<string, BatchCompletionEntry>
+  >({});
   const optimistic = useOptimisticStatus();
   const { prompt, host } = useActionPrompt(busy != null);
   const now = Date.now();
@@ -223,22 +231,10 @@ export function KitchenDisplayPage() {
       } else if (action.key === "start") {
         await batchStart({ docId: item.id, version: item.version });
       } else {
-        const enteredYield = actualYields[item.id];
-        const actualYield = Number(enteredYield);
-        if (
-          enteredYield == null ||
-          enteredYield.trim() === "" ||
-          !Number.isFinite(actualYield) ||
-          actualYield < 0
-        ) {
-          throw new Error(
-            "Enter the actual batch yield. It can't be negative.",
-          );
-        }
         await batchComplete({
           docId: item.id,
           version: item.version,
-          actualYield,
+          ...batchCompletionArgs(batchEntries[item.id]),
         });
       }
     } catch (error) {
@@ -367,24 +363,17 @@ export function KitchenDisplayPage() {
                   </p>
                 ) : null}
                 {item.kind === "batch" && bumpAction?.key === "complete" ? (
-                  <label className="kds-detail">
-                    Actual yield ({item.detail.split(" ").at(-1)})
-                    <input
-                      className="input"
-                      type="number"
-                      min="0"
-                      step="any"
-                      required
-                      aria-label={`Actual yield for ${item.title} in ${item.detail.split(" ").at(-1)}`}
-                      value={actualYields[item.id] ?? ""}
-                      onChange={(event) =>
-                        setActualYields((current) => ({
-                          ...current,
-                          [item.id]: event.target.value,
-                        }))
-                      }
-                    />
-                  </label>
+                  <BatchCompletionFields
+                    title={item.title}
+                    unit={item.detail.split(" ").at(-1) ?? ""}
+                    entry={batchEntries[item.id]}
+                    onChange={(entry) =>
+                      setBatchEntries((current) => ({
+                        ...current,
+                        [item.id]: entry,
+                      }))
+                    }
+                  />
                 ) : null}
                 {bumpAction ? (
                   <button
@@ -424,6 +413,7 @@ export function KitchenDisplayPage() {
           })}
         </ul>
       )}
+      <BatchShortfallPanel />
       <BatchAllocationsPanel />
     </main>
   );
