@@ -48808,12 +48808,12 @@ async function __runTaskCreate(ctx: MutationCtx, args: any) {
     const doc: Record<string, any> = {
       tenantId: __auth.tenantId,
       deletedAt: args.deletedAt,
-      createdById: args.createdById,
       completedAt: args.completedAt,
       cancelledAt: args.cancelledAt,
       cancellationReason: args.cancellationReason,
       createdAt: args.createdAt,
       updatedAt: args.updatedAt,
+      createdById: user.personId,
       assignedToId: args.assignedToId,
       title: args.title,
       description: args.description,
@@ -48834,7 +48834,6 @@ async function __runTaskCreate(ctx: MutationCtx, args: any) {
 export const Task_create = mutation({
   args: {
     deletedAt: v.optional(v.union(v.number(), v.null())),
-    createdById: v.id("people"),
     completedAt: v.optional(v.union(v.number(), v.null())),
     cancelledAt: v.optional(v.union(v.number(), v.null())),
     cancellationReason: v.optional(v.union(v.string(), v.null())),

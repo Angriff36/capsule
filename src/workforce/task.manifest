@@ -78,6 +78,7 @@ entity Task mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "taskWrite") or assignedToId == user.personId
       "Leadership can create tasks for anyone; staff can only self-assign"
     guard length(trim(title)) > 0 "Task title is required"
+    mutate createdById = user.personId
     mutate assignedToId = assignedToId
     mutate title = title
     mutate description = description
