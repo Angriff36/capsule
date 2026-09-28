@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   evaluateFinalLock,
-  printedAnswers,
+  finalLockPrint,
+  type FinalLockReport,
   type StoredOverride,
 } from "../src/lib/eventPacket/finalLock/evaluate";
 import {
@@ -139,6 +140,10 @@ function input(): FinalLockInput {
         missingCount: 0,
       },
     ],
+    packItems: [],
+    kitItems: [{ id: "kit-1", version: 1, description: "Coffee airpot" }],
+    proposal: null,
+    staffNeeds: [],
     assignments: [
       { id: "asg-1", version: 1, status: "confirmed", confirmedAt: T - MIN },
     ],
@@ -177,6 +182,11 @@ const get = (answers: FinalLockAnswer[], key: string) => {
   return found;
 };
 const run = (i: FinalLockInput, options = {}) => evaluateFinalLock(i, options);
+/** What a revision stores for a print: the printed payload plus its id. */
+const printedAt = (report: FinalLockReport, revisionId: string) => ({
+  revisionId,
+  ...finalLockPrint(report),
+});
 
 describe("Final Lock answer engine", () => {
   it("records question key and policy version on every derived answer", () => {
@@ -337,7 +347,7 @@ describe("Final Lock answer engine", () => {
 
   it("links each answer to the displaying packet revision", () => {
     const first = run(input());
-    const printed = printedAnswers(first, "rev-1");
+    const printed = printedAt(first, "rev-1");
     const again = run(input(), { printed });
     expect(get(again.answers, "identity.venue").displayedInRevision).toBe(
       "rev-1",
@@ -640,6 +650,8 @@ describe("Final Lock answer engine", () => {
       id: "res-1",
       version: 1,
       name: "Chafers",
+      category: null,
+      rented: false,
       quantity: 10,
       status: "reserved",
       shortBy: 2,
@@ -694,7 +706,7 @@ describe("Final Lock answer engine", () => {
     expect(get(blocked.answers, "identity.venue").sources).toEqual([
       { table: "events", id: "event-1", version: 7, field: "venueName" },
     ]);
-    const printed = printedAnswers(run(allConfirmed(input())), "rev-1");
+    const printed = printedAt(run(allConfirmed(input())), "rev-1");
     const changed = allConfirmed(input());
     changed.event.text.linenColorTables = "White";
     changed.event.text.rainPlan = "Tent on the lawn";
@@ -723,7 +735,7 @@ describe("Final Lock answer engine", () => {
   });
 
   it("a policy version bump marks affected future answers stale deterministically", () => {
-    const printed = printedAnswers(run(allConfirmed(input())), "rev-1");
+    const printed = printedAt(run(allConfirmed(input())), "rev-1");
     const bumped = QUESTIONS.map((q) =>
       q.key === "bussing.plan" ? { ...q, ruleVersion: 2 } : q,
     );
@@ -740,5 +752,173 @@ describe("Final Lock answer engine", () => {
     expect(first).toEqual(second);
     expect(first.staleQuestions).toEqual(["bussing.plan"]);
     expect(first.staleSections).toEqual(["staffing"]);
+  });
+
+  it("a new source version with the same value makes the answer stale and ends an old decision", () => {
+    const base = allConfirmed(input());
+    const printed = printedAt(run(base), "rev-1");
+    const servings = get(run(base).answers, "menu.servings");
+    const decision: StoredOverride = {
+      questionKey: "menu.servings",
+      basedOn: servings.basis,
+      value: { type: "text", text: "Kitchen sends 110" },
+      reason: "Late guests",
+      actor: "user-m",
+      at: "2026-10-01T10:00:00Z",
+    };
+    expect(
+      get(run(base, { overrides: [decision] }).answers, "menu.servings")
+        .override,
+    ).not.toBeNull();
+    // Only the dish line's version moves; every value stays the same.
+    const bumped = allConfirmed(input());
+    bumped.dishes[1]!.version = 2;
+    const later = run(bumped, { printed, overrides: [decision] });
+    expect(later.staleQuestions).toContain("menu.servings");
+    expect(get(later.answers, "menu.servings").override).toBeNull();
+    expect(get(later.answers, "menu.servings").displayedInRevision).toBeNull();
+    // An edit to an unrelated Event field keeps other decisions and prints.
+    const renamed = allConfirmed(input());
+    renamed.event.version = 8;
+    renamed.event.title = "Ashley and Sam's Wedding";
+    const same = run(renamed, { printed, overrides: [decision] });
+    expect(get(same.answers, "menu.servings").override).not.toBeNull();
+    expect(same.staleQuestions).not.toContain("setup.rain_plan");
+  });
+
+  it("servingware joins the proposal, rentals, service style kit and pack list", () => {
+    const i = input();
+    i.event.text.servingwareSource = "Rented china";
+    i.equipment.push({
+      id: "res-china",
+      version: 3,
+      name: "10in china plate",
+      category: "Dinnerware",
+      rented: true,
+      quantity: 100,
+      status: "reserved",
+      shortBy: 0,
+    });
+    const agreed = get(run(i).answers, "servingware.source");
+    expect(agreed.result).toBe("answered");
+    expect(agreed.sources).toContainEqual({
+      table: "equipmentReservations",
+      id: "res-china",
+      version: 3,
+    });
+    // A pack list line of plasticware disagrees with "Rented china".
+    i.packItems.push({ id: "pli-1", version: 1, description: "Plastic forks" });
+    i.proposal = {
+      id: "prop-1",
+      version: 2,
+      lines: [
+        {
+          id: "line-1",
+          version: 1,
+          table: "proposalLineItems",
+          text: "Client-provided plates",
+        },
+      ],
+    };
+    const clash = get(run(i).answers, "servingware.source");
+    expect(clash.result).toBe("unresolved");
+    expect(clash.missing).toEqual([
+      'Accepted proposal line "Client-provided plates" means client-provided pieces, but the servingware source says "Rented china".',
+      'Pack list line "Plastic forks" means plasticware, but the servingware source says "Rented china".',
+    ]);
+    // With no written source, the records answer it; rentals vs "no rentals" clash.
+    const records = input();
+    records.event.text.servingwareSource = null;
+    records.event.text.eventRentals = "No";
+    records.event.text.takeRentalsWithUs = null;
+    records.kitItems.push({
+      id: "kit-2",
+      version: 1,
+      description: "House china plates",
+    });
+    expect(get(run(records).answers, "servingware.source").value).toEqual({
+      type: "list",
+      items: ["Mangia pieces"],
+    });
+    records.equipment.push({ ...i.equipment[0]! });
+    expect(get(run(records).answers, "servingware.source").missing).toEqual([
+      'Rental "10in china plate" means rented pieces, but the day sheet says no rentals.',
+    ]);
+  });
+
+  it("dessert joins menu, service, staffing, equipment and the accepted proposal", () => {
+    const ok = get(run(input()).answers, "dessert.plan");
+    expect(ok.result).toBe("answered");
+    expect(ok.sources).toContainEqual({
+      table: "serviceStyleKitItems",
+      id: "kit-1",
+      version: 1,
+    });
+    // No coffee urn or airpot anywhere.
+    const noUrn = input();
+    noUrn.kitItems = [];
+    expect(get(run(noUrn).answers, "dessert.plan").missing).toEqual([
+      "Mangia runs the coffee bar, but no coffee urn or airpot is reserved or packed.",
+    ]);
+    // No staff asked for or assigned.
+    const noStaff = input();
+    noStaff.assignments = [];
+    expect(get(run(noStaff).answers, "dessert.plan").missing).toEqual([
+      "Mangia serves dessert, but no staff are asked for or assigned on this event.",
+    ]);
+    noStaff.staffNeeds.push({
+      id: "need-1",
+      version: 1,
+      role: "Server",
+      status: "open",
+    });
+    expect(get(run(noStaff).answers, "dessert.plan").result).toBe("answered");
+    // The proposal sells a dessert the menu does not have.
+    const sold = input();
+    sold.proposal = {
+      id: "prop-1",
+      version: 1,
+      lines: [
+        {
+          id: "x-1",
+          version: 1,
+          table: "proposalEnhancements",
+          text: "Espresso bar",
+        },
+      ],
+    };
+    sold.dishes = sold.dishes.filter((d) => d.course !== "Dessert");
+    sold.event.text.beveragesOnMenu = "Lemonade";
+    sold.event.text.dessertService = null;
+    expect(get(run(sold).answers, "dessert.plan")).toMatchObject({
+      result: "unresolved",
+      missing: [
+        'Accepted proposal line "Espresso bar" is not on the event menu.',
+      ],
+    });
+    // Cake cutting sold for the client's own cake: Mangia cuts it.
+    const cutting = input();
+    cutting.dishes = cutting.dishes.filter((d) => d.course !== "Dessert");
+    cutting.event.text.beveragesOnMenu = "Lemonade";
+    cutting.proposal = {
+      id: "prop-1",
+      version: 1,
+      lines: [
+        {
+          id: "c-1",
+          version: 1,
+          table: "proposalLineItems",
+          text: "Cake cutting",
+        },
+      ],
+    };
+    expect(get(run(cutting).answers, "dessert.plan").value).toMatchObject({
+      type: "record",
+      fields: { cutting: "Mangia", serving: "Mangia" },
+    });
+    cutting.event.text.dessertService = "Client";
+    expect(get(run(cutting).answers, "dessert.plan").missing).toEqual([
+      'The accepted proposal sells cake cutting, but dessert service says "Client".',
+    ]);
   });
 });

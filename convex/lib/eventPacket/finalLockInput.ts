@@ -181,6 +181,8 @@ export async function readFinalLockInput(
       id: String(row._id),
       version: version(row),
       name: String(item?.name ?? "Equipment"),
+      category: str(item?.category),
+      rented: item?.ownership === "rented",
       quantity: row.quantity,
       status: row.status,
       shortBy,
@@ -188,6 +190,7 @@ export async function readFinalLockInput(
   }
 
   const packLists = [];
+  const packItems = [];
   for (const row of await eventRows(ctx, "packLists", tenantId, eventId)) {
     if (row.status === "cancelled") continue;
     const items = (
@@ -196,6 +199,12 @@ export async function readFinalLockInput(
         .withIndex("by_packListId", (q) => q.eq("packListId", row._id))
         .collect()
     ).filter((i) => i.tenantId === tenantId && i.deletedAt == null);
+    for (const item of items)
+      packItems.push({
+        id: String(item._id),
+        version: version(item),
+        description: String(item.sentInstead ?? item.description),
+      });
     packLists.push({
       id: String(row._id),
       version: version(row),
@@ -213,6 +222,84 @@ export async function readFinalLockInput(
     status: String(row.status),
     confirmedAt: num(row.confirmedAt),
   }));
+
+  const kitItems = style
+    ? (
+        await ctx.db
+          .query("serviceStyleKitItems")
+          .withIndex("by_serviceStyleId", (q) =>
+            q.eq("serviceStyleId", style._id),
+          )
+          .collect()
+      )
+        .filter(
+          (k) =>
+            k.tenantId === tenantId && k.deletedAt == null && k.status === "active",
+        )
+        .map((k) => ({
+          id: String(k._id),
+          version: version(k),
+          description: String(k.description),
+        }))
+    : [];
+
+  // The accepted proposal is the agreed scope: its lines, extras and dishes.
+  const accepted = (await eventRows(ctx, "proposals", tenantId, eventId))
+    .filter((p) => p.status === "accepted")
+    .sort((a, b) => (b.acceptedAt ?? 0) - (a.acceptedAt ?? 0))[0];
+  let proposal: FinalLockInput["proposal"] = null;
+  if (accepted) {
+    const byProposal = (table: string) =>
+      (ctx.db as any)
+        .query(table)
+        .withIndex("by_proposalId", (q: any) => q.eq("proposalId", accepted._id))
+        .collect()
+        .then((rows: any[]) =>
+          rows.filter(
+            (r) =>
+              r.tenantId === tenantId && r.deletedAt == null && r.removedAt == null,
+          ),
+        );
+    const [lineRows, extraRows, dishRows] = await Promise.all([
+      byProposal("proposalLineItems"),
+      byProposal("proposalEnhancements"),
+      byProposal("proposalDishSelections"),
+    ]);
+    const lines = [];
+    for (const r of lineRows)
+      lines.push({
+        id: String(r._id),
+        version: version(r),
+        table: "proposalLineItems",
+        text: [r.description, r.notes].filter(Boolean).join(" - "),
+      });
+    for (const r of extraRows)
+      lines.push({
+        id: String(r._id),
+        version: version(r),
+        table: "proposalEnhancements",
+        text: [r.name, r.description].filter(Boolean).join(" - "),
+      });
+    for (const r of dishRows) {
+      const dish = await own(ctx, "dishes", r.dishId, tenantId);
+      lines.push({
+        id: String(r._id),
+        version: version(r),
+        table: "proposalDishSelections",
+        text: [r.course, dish?.name].filter(Boolean).join(" - "),
+      });
+    }
+    proposal = { id: String(accepted._id), version: version(accepted), lines };
+  }
+
+  const staffNeeds = (await eventRows(ctx, "eventStaffNeeds", tenantId, eventId))
+    .filter((n) => n.status !== "cancelled")
+    .map((n) => ({
+      id: String(n._id),
+      version: version(n),
+      role: String(n.role),
+      status: String(n.status),
+    }));
 
   const channelRows = (
     await eventRows(ctx, "staffMessages", tenantId, eventId)
@@ -296,6 +383,10 @@ export async function readFinalLockInput(
     vehicles,
     equipment,
     packLists,
+    packItems,
+    kitItems,
+    proposal,
+    staffNeeds,
     assignments,
     channel: {
       messageCount: channelRows.length,

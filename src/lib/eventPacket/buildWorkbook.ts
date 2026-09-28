@@ -7,6 +7,7 @@ import type {
 import { readiness } from "./reconcile";
 import { canMarkNotApplicable, requirements } from "./requirements";
 import forms from "./fixtures/event-workbook.form-definitions.json";
+import type { FinalLockPrintLine } from "./finalLock/evaluate";
 /** A value drawn on top of an original form page at its fixed source anchor. */
 export interface WorkbookOverlay {
   /** Original-page anchor: "header" for the Event Number/Date line, or a form row label prefix for Y/N answers. */
@@ -48,7 +49,12 @@ export interface Workbook {
 }
 export function buildWorkbook(
   snapshot: EventPacketSnapshot,
-  options: { revision?: number; generatedAt?: string } = {},
+  options: {
+    revision?: number;
+    generatedAt?: string;
+    /** Final Lock answers this print shows, exactly as the revision stores them. */
+    finalLock?: FinalLockPrintLine[];
+  } = {},
 ): Workbook {
   const sources = new Map(
     snapshot.artifacts.map((a, i) => [a.fingerprint, `S${i + 1}`]),
@@ -211,6 +217,16 @@ export function buildWorkbook(
         ]
       : []),
   ]);
+  if (options.finalLock?.length)
+    add(
+      "final-lock-answers",
+      "Final Lock answers",
+      options.finalLock.map((line) =>
+        line.result === "unresolved"
+          ? { kind: "issue", text: `${line.label}: ${line.text}`, small: true }
+          : text(`${line.label}: ${line.text}`, true),
+      ),
+    );
   add(
     "brief",
     "Event brief",

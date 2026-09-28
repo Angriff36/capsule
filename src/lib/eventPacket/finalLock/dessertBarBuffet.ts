@@ -11,6 +11,7 @@ import type { FinalLockInput } from "./types";
 
 const DESSERT = /dessert|cake|cupcake|\bpie\b|cookie|brownie|tart|sweet/i;
 const COFFEE = /coffee|espresso/i;
+const COFFEE_GEAR = /coffee|urn|airpot|carafe|espresso/i;
 
 type Kind = "vegetable" | "starch" | "protein" | "salad" | "bread" | "cold";
 const KINDS: [Kind, RegExp][] = [
@@ -49,7 +50,26 @@ export function dessertBarBuffetAnswers(
   const desserts = dishes.filter((d) =>
     DESSERT.test(`${d.course ?? ""} ${d.name}`),
   );
-  const cake = desserts.some((d) => /cake/i.test(d.name));
+  // Accepted proposal scope, staff asked for and coffee equipment.
+  const scope = (input.proposal?.lines ?? []).filter(
+    (l) =>
+      DESSERT.test(l.text) || COFFEE.test(l.text) || /cutting/i.test(l.text),
+  );
+  const cuttingSold = scope.some((l) => /cutting/i.test(l.text));
+  const coffeeGear = [
+    ...input.equipment
+      .filter((e) => COFFEE_GEAR.test(`${e.name} ${e.category ?? ""}`))
+      .map((e) => ({ table: "equipmentReservations", ...e })),
+    ...[...input.kitItems, ...input.packItems]
+      .filter((i) => COFFEE_GEAR.test(i.description))
+      .map((i) => ({
+        table: input.kitItems.includes(i)
+          ? "serviceStyleKitItems"
+          : "packListItems",
+        ...i,
+      })),
+  ];
+  const cake = desserts.some((d) => /cake/i.test(d.name)) || cuttingSold;
   const coffee =
     dishes.some((d) => COFFEE.test(d.name)) ||
     COFFEE.test(text.beveragesOnMenu ?? "");
@@ -57,6 +77,14 @@ export function dessertBarBuffetAnswers(
   const dessertSources = [
     ...ev("dessertService"),
     ...desserts.flatMap((d) => source("eventDishes", d)),
+    ...scope.map((l) => ({ table: l.table, id: l.id, version: l.version })),
+    ...input.staffNeeds.flatMap((n) => source("eventStaffNeeds", n)),
+    ...input.assignments.flatMap((a) => source("eventAssignments", a)),
+    ...coffeeGear.map((g) => ({
+      table: g.table,
+      id: g.id,
+      version: g.version,
+    })),
   ];
   const who =
     dessert.kind === "party"
@@ -64,13 +92,46 @@ export function dessertBarBuffetAnswers(
       : dessert.kind === "yes"
         ? "Mangia"
         : null;
-  if (!desserts.length && !coffee)
+  // Cake cutting is sold for a cake the client brings, so it needs no dish.
+  const onMenu = (l: { text: string }) =>
+    /cutting/i.test(l.text) ||
+    (COFFEE.test(l.text) ? coffee : desserts.length > 0);
+  const clash = [
+    ...scope
+      .filter((l) => !onMenu(l))
+      .map(
+        (l) => `Accepted proposal line "${l.text}" is not on the event menu.`,
+      ),
+    ...(cuttingSold && who !== "Mangia"
+      ? [
+          `The accepted proposal sells cake cutting, but dessert service says ${dessert.kind === "empty" ? "nothing" : `"${text.dessertService?.trim()}"`}.`,
+        ]
+      : []),
+    ...(who === "Mangia" &&
+    !dropOff &&
+    (desserts.length || coffee || cuttingSold) &&
+    !input.staffNeeds.length &&
+    !input.assignments.length
+      ? [
+          "Mangia serves dessert, but no staff are asked for or assigned on this event.",
+        ]
+      : []),
+    ...(who === "Mangia" && coffee && !coffeeGear.length
+      ? [
+          "Mangia runs the coffee bar, but no coffee urn or airpot is reserved or packed.",
+        ]
+      : []),
+  ];
+  if (!desserts.length && !coffee && !cuttingSold)
     out["dessert.plan"] =
-      who && who === "Mangia"
+      (who && who === "Mangia") || clash.length
         ? unresolved(
-            [
-              "Dessert service is set, but no dessert or coffee is on the menu.",
-            ],
+            who === "Mangia"
+              ? [
+                  "Dessert service is set, but no dessert or coffee is on the menu.",
+                  ...clash,
+                ]
+              : clash,
             "Add the dessert to the menu or clear dessert service.",
             "dessert.plan.menu-and-service",
             dessertSources,
@@ -88,6 +149,13 @@ export function dessertBarBuffetAnswers(
       "Change dessert service or the service style.",
       "dessert.plan.staff-needed",
       [...dessertSources, ...source("serviceStyles", input.serviceStyle)],
+    );
+  else if (clash.length)
+    out["dessert.plan"] = unresolved(
+      clash,
+      "Make the dessert service, menu, staff and equipment agree with the accepted proposal.",
+      "dessert.plan.menu-and-service",
+      dessertSources,
     );
   else if (dessert.kind === "no")
     out["dessert.plan"] = answered(

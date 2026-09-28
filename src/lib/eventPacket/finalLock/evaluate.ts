@@ -8,6 +8,7 @@ import { roomServiceAnswers } from "./roomService";
 import { setupAnswers, timelineAnswers } from "./timelineSetup";
 import type {
   AnswerOverride,
+  AnswerSource,
   FinalLockAnswer,
   FinalLockInput,
   FinalLockOutcome,
@@ -26,6 +27,7 @@ export interface PrintedAnswers {
   revisionId: string;
   policyVersion: string;
   answers: Record<string, string>;
+  lines?: FinalLockPrintLine[];
 }
 
 export interface FinalLockOptions {
@@ -61,15 +63,68 @@ function hash(text: string) {
   return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
 }
 
-const derivedFingerprint = (question: Question, draft: Draft) =>
+/**
+ * What one source contributes to an answer's basis. A named Event field is
+ * pinned by its value, so an edit to another Event field does not undo a
+ * manager's decision; every other record is pinned by its version.
+ */
+function sourceBasis(input: FinalLockInput, s: AnswerSource) {
+  if (s.table === "events" && s.field === "primaryContactName")
+    return {
+      table: s.table,
+      id: s.id,
+      field: s.field,
+      value: [
+        input.event.contactName,
+        input.event.contactPhone,
+        input.event.contactEmail,
+      ],
+    };
+  if (s.table === "events" && s.field) {
+    const row = input.event as unknown as Record<string, unknown>;
+    if (s.field in input.event.text)
+      return {
+        table: s.table,
+        id: s.id,
+        field: s.field,
+        value: input.event.text[s.field] ?? null,
+      };
+    if (s.field in row)
+      return {
+        table: s.table,
+        id: s.id,
+        field: s.field,
+        value: row[s.field] ?? null,
+      };
+  }
+  return {
+    table: s.table,
+    id: s.id,
+    field: s.field ?? null,
+    version: s.version,
+  };
+}
+
+/** The full material basis: rule, result, value and every source read. */
+const derivedFingerprint = (
+  input: FinalLockInput,
+  question: Question,
+  draft: Draft,
+) =>
   hash(
     canonicalJson({
       key: question.key,
       ruleVersion: question.ruleVersion,
+      rule: draft.rule,
       result: draft.result,
       value: draft.value,
       missing: draft.missing,
       confirmed: draft.fieldWork?.confirmedAt ?? null,
+      sources: [
+        ...new Set(
+          draft.sources.map((s) => canonicalJson(sourceBasis(input, s))),
+        ),
+      ].sort(),
     }),
   );
 
@@ -96,7 +151,7 @@ export function evaluateFinalLock(
   };
 
   const build = (question: Question, draft: Draft): FinalLockAnswer => {
-    const derived = derivedFingerprint(question, draft);
+    const derived = derivedFingerprint(input, question, draft);
     const override = question.form
       ? undefined
       : options.overrides
@@ -211,14 +266,78 @@ export function evaluateFinalLock(
   return { policyVersion, outcome, answers, staleQuestions, staleSections };
 }
 
-/** What a new packet revision stores so later changes can be traced. */
-export const printedAnswers = (
-  report: FinalLockReport,
-  revisionId: string,
-): PrintedAnswers => ({
-  revisionId,
+/** One printed Final Lock line: what the packet page says for a question. */
+export interface FinalLockPrintLine {
+  questionKey: string;
+  section: Section;
+  label: string;
+  result: FinalLockAnswer["result"];
+  text: string;
+}
+
+/**
+ * The Final Lock answers exactly as a packet prints them. The browser renders
+ * these lines into the PDF and uploads them inside the snapshot; the revision
+ * stores the same payload, so it names only what the PDF showed.
+ */
+export interface FinalLockPrint {
+  policyVersion: string;
+  answers: Record<string, string>;
+  lines: FinalLockPrintLine[];
+}
+
+const valueText = (value: FinalLockValue): string => {
+  switch (value.type) {
+    case "text":
+      return value.text;
+    case "yes_no":
+      return value.yes ? "Yes" : "No";
+    case "choice":
+      return value.choice;
+    case "count":
+      return String(value.count);
+    case "list":
+      return value.items.join(", ");
+    default:
+      return "";
+  }
+};
+
+const lineText = (a: FinalLockAnswer) =>
+  a.override
+    ? `${valueText(a.override.value)} (manager decision: ${a.override.reason})`
+    : a.result === "unresolved"
+      ? `NEEDS REVIEW: ${a.explanation} ${a.action ?? ""}`.trim()
+      : a.result === "not_applicable"
+        ? `Not needed: ${a.explanation}`
+        : a.result === "field_confirmation"
+          ? `Done on the day by the person who does it${a.fieldWork?.confirmedAt ? ` - confirmed ${a.fieldWork.confirmedAt}` : ""}.`
+          : a.explanation;
+
+/**
+ * The part of a print that can go stale: office answers only. Readiness
+ * follows the packet itself and field work happens after the print.
+ */
+const isOfficeKey = (key: string) =>
+  !key.startsWith("field.") && key !== "readiness.dispatch";
+export const officePrint = (print: FinalLockPrint): FinalLockPrint => ({
+  policyVersion: print.policyVersion,
+  answers: Object.fromEntries(
+    Object.entries(print.answers).filter(([key]) => isOfficeKey(key)),
+  ),
+  lines: print.lines.filter((l) => isOfficeKey(l.questionKey)),
+});
+
+export const finalLockPrint = (report: FinalLockReport): FinalLockPrint => ({
   policyVersion: report.policyVersion,
   answers: Object.fromEntries(
     report.answers.map((a) => [a.questionKey, a.fingerprint]),
   ),
+  lines: report.answers.map((a) => ({
+    questionKey: a.questionKey,
+    section: a.section,
+    label: a.label,
+    result: a.result,
+    text: lineText(a),
+  })),
 });

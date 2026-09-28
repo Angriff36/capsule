@@ -53,10 +53,13 @@ async function printPacket(manager: any, eventId: string) {
     mimeType: "application/pdf",
     purpose: "pdf",
     inputFingerprint: current.currentFingerprint,
+    finalLockFingerprint: current.finalLockFingerprint,
   });
   const snap = await manager.action(packet.uploadPacketFile, {
     eventId,
-    bytes: new TextEncoder().encode(JSON.stringify(current.snapshot)).buffer,
+    bytes: new TextEncoder().encode(
+      JSON.stringify({ ...current.snapshot, finalLock: current.finalLock }),
+    ).buffer,
     name: "snapshot.json",
     mimeType: "application/json",
     purpose: "snapshot",
@@ -64,6 +67,7 @@ async function printPacket(manager: any, eventId: string) {
   return (await manager.mutation(packet.recordPacketRevision, {
     eventId,
     inputFingerprint: current.currentFingerprint,
+    finalLockFingerprint: current.finalLockFingerprint,
     pdfStorageId: pdf.storageId,
     snapshotStorageId: snap.storageId,
   })) as { id: string };

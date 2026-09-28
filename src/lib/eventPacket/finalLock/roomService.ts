@@ -8,18 +8,12 @@ import {
   type Said,
 } from "./answer";
 import { isDropOff } from "./policy";
+import { servingwareAnswer } from "./servingware";
 import type { FinalLockInput } from "./types";
 
 const yesLike = (s: Said) => s.kind === "yes" || s.kind === "party";
 const partyOf = (s: Said) =>
   s.kind === "party" ? s.party : s.kind === "yes" ? "Mangia" : null;
-
-const PIECES = [
-  ["Plasticware", /plastic|disposable/i],
-  ["Rented pieces", /rent/i],
-  ["Mangia pieces", /mangia|\bour\b|house china/i],
-  ["Client-provided pieces", /client|customer|host/i],
-] as const;
 
 /** Servingware, rentals, room setup, food service and bussing. */
 export function roomServiceAnswers(
@@ -33,52 +27,9 @@ export function roomServiceAnswers(
 
   // Servingware: where plates, china and flatware come from.
   const rentals = said(text.eventRentals);
-  const disposables = said(text.mangiaDisposables);
-  const stated = text.servingwareSource?.trim() ?? "";
-  const pieces = stated
-    ? PIECES.filter(([, re]) => re.test(stated)).map(([name]) => name)
-    : [
-        ...(yesLike(disposables) ? ["Plasticware"] : []),
-        ...(yesLike(rentals) ? ["Rented pieces"] : []),
-      ];
-  const wareSources = [
-    ...ev("servingwareSource"),
-    ...ev("eventRentals"),
-    ...ev("mangiaDisposables"),
-  ];
-  const wareClash = [
-    ...(stated && !pieces.length
-      ? [
-          `Servingware source "${stated}" does not say plasticware, rented, Mangia or client pieces.`,
-        ]
-      : []),
-    ...(pieces.includes("Rented pieces") && rentals.kind === "no"
-      ? ["Servingware says rented pieces but the day sheet says no rentals."]
-      : []),
-    ...(stated && !pieces.includes("Rented pieces") && yesLike(rentals)
-      ? ["The day sheet has rentals but the servingware source does not."]
-      : []),
-  ];
-  out["servingware.source"] = wareClash.length
-    ? unresolved(
-        wareClash,
-        "Fix the servingware source on the task breakdown.",
-        "servingware.source.task-breakdown-and-day-sheet",
-        wareSources,
-      )
-    : pieces.length
-      ? answered(
-          { type: "list", items: pieces },
-          `Plates, china and flatware: ${pieces.join(", ")}.`,
-          "servingware.source.task-breakdown-and-day-sheet",
-          wareSources,
-        )
-      : unresolved(
-          ["Nobody has said where the plates, china and flatware come from."],
-          "Fill in the servingware source on the task breakdown.",
-          "servingware.source.task-breakdown-and-day-sheet",
-          wareSources,
-        );
+  const ware = servingwareAnswer(input);
+  const pieces = ware.pieces;
+  out["servingware.source"] = ware.draft;
 
   // Rentals: one return owner and one return window.
   const hasRentals = yesLike(rentals) || pieces.includes("Rented pieces");

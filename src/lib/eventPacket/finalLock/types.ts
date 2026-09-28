@@ -164,6 +164,9 @@ export interface FinalLockInput {
   })[];
   equipment: (NativeRow & {
     name: string;
+    category: string | null;
+    /** The item is rented in, not Mangia's own stock. */
+    rented: boolean;
     quantity: number;
     status: string;
     shortBy: number;
@@ -173,6 +176,18 @@ export interface FinalLockInput {
     itemCount: number;
     missingCount: number;
   })[];
+  /** Every open line on the event's pack lists. */
+  packItems: (NativeRow & { description: string })[];
+  /** The event's service style kit (what that style always brings). */
+  kitItems: (NativeRow & { description: string })[];
+  /** The accepted proposal's line items and extras, if one is accepted. */
+  proposal:
+    | (NativeRow & {
+        lines: (NativeRow & { table: string; text: string })[];
+      })
+    | null;
+  /** Staff the event asked for (not cancelled). */
+  staffNeeds: (NativeRow & { role: string; status: string })[];
   assignments: (NativeRow & { status: string; confirmedAt: number | null })[];
   channel: {
     messageCount: number;

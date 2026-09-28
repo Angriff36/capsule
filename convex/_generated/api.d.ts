@@ -78,6 +78,8 @@ import type * as lib_eventDuplicatePlanning from "../lib/eventDuplicatePlanning.
 import type * as lib_eventImportTool from "../lib/eventImportTool.js";
 import type * as lib_eventNumbering from "../lib/eventNumbering.js";
 import type * as lib_eventPacket_commands from "../lib/eventPacket/commands.js";
+import type * as lib_eventPacket_finalLock from "../lib/eventPacket/finalLock.js";
+import type * as lib_eventPacket_finalLockInput from "../lib/eventPacket/finalLockInput.js";
 import type * as lib_eventPacket_reconcileNative from "../lib/eventPacket/reconcileNative.js";
 import type * as lib_eventReadinessProjection from "../lib/eventReadinessProjection.js";
 import type * as lib_eventStaffingOperations from "../lib/eventStaffingOperations.js";
@@ -270,6 +272,8 @@ declare const fullApi: ApiFromModules<{
   "lib/eventImportTool": typeof lib_eventImportTool;
   "lib/eventNumbering": typeof lib_eventNumbering;
   "lib/eventPacket/commands": typeof lib_eventPacket_commands;
+  "lib/eventPacket/finalLock": typeof lib_eventPacket_finalLock;
+  "lib/eventPacket/finalLockInput": typeof lib_eventPacket_finalLockInput;
   "lib/eventPacket/reconcileNative": typeof lib_eventPacket_reconcileNative;
   "lib/eventReadinessProjection": typeof lib_eventReadinessProjection;
   "lib/eventStaffingOperations": typeof lib_eventStaffingOperations;

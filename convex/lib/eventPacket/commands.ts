@@ -22,7 +22,8 @@ import {
 import { readFinalLockInput } from "./finalLockInput";
 import {
   evaluateFinalLock,
-  printedAnswers,
+  finalLockPrint,
+  officePrint,
 } from "../../../src/lib/eventPacket/finalLock/evaluate";
 import { parsePacketSnapshot } from "../../../src/lib/eventPacket/packetContract";
 import { resolveIssue } from "../../../src/lib/eventPacket/resolveIssue";
@@ -63,7 +64,7 @@ const nativeEditableField = (fieldKey: string) =>
     "notes.access",
     "notes.service",
   ].includes(fieldKey) || /^menu\..*\.quantity$/.test(fieldKey);
-const hasManagementAccess = (auth: { role: string; disabledCapabilities: string[] }) =>
+export const hasManagementAccess = (auth: { role: string; disabledCapabilities: string[] }) =>
   roles.has(auth.role) &&
   !orgCapabilityDeniesAction("manageAccess", auth.disabledCapabilities);
 export async function authorize(ctx: any, eventId: Id<"events">) {
@@ -137,29 +138,68 @@ export const listPacketSummaries = query({
     );
   },
 });
+const printFingerprint = (print: unknown) =>
+  fingerprintBytes(new TextEncoder().encode(canonicalJson(print)));
+/** The office part of what a stored revision printed; null for old rows. */
+async function storedOfficeFingerprint(row: { answersJson?: string | null }) {
+  if (!row.answersJson) return null;
+  const { revisionId: _revision, ...print } = JSON.parse(row.answersJson);
+  return print.lines ? printFingerprint(officePrint(print)) : null;
+}
+/** The Final Lock answers a print shows now, with the packet they read. */
+async function currentFinalLockPrint(
+  ctx: QueryCtx | MutationCtx,
+  tenantId: string,
+  eventId: Id<"events">,
+) {
+  const lock = await readFinalLockInput(ctx, tenantId, eventId);
+  const print = finalLockPrint(
+    evaluateFinalLock(lock.input, { overrides: lock.overrides }),
+  );
+  return {
+    packet: lock.packet,
+    print,
+    fingerprint: await printFingerprint(print),
+    officeFingerprint: await printFingerprint(officePrint(print)),
+  };
+}
 export const getPacket = query({
   args: { eventId: v.id("events") },
   handler: async (ctx, { eventId }) => {
     const auth = await authorize(ctx, eventId);
-    const current = await readCurrentPacket(ctx, auth.tenantId, eventId);
+    const lock = await currentFinalLockPrint(ctx, auth.tenantId, eventId);
+    const current = lock.packet;
+    // A revision is current only when both its packet and the Final Lock
+    // answers it printed still match; old prints without answers reprint.
+    const printed = new Map(
+      await Promise.all(
+        current.revisionRows.map(
+          async (r) => [r._id, await storedOfficeFingerprint(r)] as const,
+        ),
+      ),
+    );
+    const matches = (r: (typeof current.revisionRows)[number]) =>
+      r.snapshotFingerprint === current.currentFingerprint &&
+      printed.get(r._id) === lock.officeFingerprint;
     const latest = current.revisionRows
       .slice()
       .sort(
         (a, b) =>
-          Number(b.snapshotFingerprint === current.currentFingerprint) -
-            Number(a.snapshotFingerprint === current.currentFingerprint) ||
+          Number(matches(b)) - Number(matches(a)) ||
           b.createdAt - a.createdAt,
       )[0];
     return clean({
       snapshot: current.snapshot,
       currentFingerprint: current.currentFingerprint,
+      finalLock: lock.print,
+      finalLockFingerprint: lock.fingerprint,
       nativeTargets: current.nativeTargets,
       canManage: true,
       latestRevision: latest
         ? {
             id: latest._id,
             fingerprint: latest.snapshotFingerprint,
-            stale: latest.snapshotFingerprint !== current.currentFingerprint,
+            stale: !matches(latest),
             pdfUrl: await ctx.storage.getUrl(
               latest.pdfStorageId as Id<"_storage">,
             ),
@@ -181,6 +221,10 @@ export const registerFile = internalMutation({
     byteSize: v.number(),
     purpose: v.string(),
     snapshotFingerprint: v.optional(v.string()),
+    /** PDF: fingerprint of the Final Lock answers it shows. */
+    finalLockFingerprint: v.optional(v.string()),
+    /** Snapshot: the Final Lock answers the PDF shows, as uploaded. */
+    finalLockJson: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const auth = await authorize(ctx, args.eventId);
@@ -193,13 +237,22 @@ export const registerFile = internalMutation({
       await ctx.storage.delete(args.storageId);
       return { storageId: old.storageId, fingerprint: old.fingerprint };
     }
+    const {
+      snapshotFingerprint,
+      finalLockFingerprint,
+      finalLockJson,
+      ...file
+    } = args;
     await ctx.db.insert("eventPacketArtifacts", {
       tenantId: auth.tenantId,
-      ...args,
+      ...file,
       storageId: args.storageId,
-      ...{ snapshotFingerprint: undefined },
-      contextJson: args.snapshotFingerprint
-        ? JSON.stringify({ snapshotFingerprint: args.snapshotFingerprint })
+      contextJson: snapshotFingerprint
+        ? JSON.stringify({
+            snapshotFingerprint,
+            ...(finalLockFingerprint ? { finalLockFingerprint } : {}),
+            ...(finalLockJson ? { finalLockJson } : {}),
+          })
         : undefined,
       uploadedBy: auth.id,
       createdAt: Date.now(),
@@ -228,20 +281,24 @@ async function registerPacketBytes(
     mimeType: string;
     purpose: "source" | "pdf" | "snapshot";
     inputFingerprint?: string;
+    finalLockFingerprint?: string;
   },
   bytes: Uint8Array,
 ): Promise<{ storageId: string; fingerprint: string }> {
   const fingerprint = await fingerprintBytes(bytes);
   let snapshotFingerprint: string | undefined =
     args.purpose === "pdf" ? args.inputFingerprint : undefined;
+  let finalLockJson: string | undefined;
   if (args.purpose === "pdf" && !snapshotFingerprint)
     throw new Error(
       "PDF upload requires the fingerprint of the rendered snapshot",
     );
-  if (args.purpose === "snapshot")
-    snapshotFingerprint = await fingerprintSnapshot(
-      parsePacketSnapshot(new TextDecoder().decode(bytes)),
-    );
+  if (args.purpose === "snapshot") {
+    // The printed Final Lock answers ride beside the packet snapshot.
+    const { finalLock, ...packet } = JSON.parse(new TextDecoder().decode(bytes));
+    snapshotFingerprint = await fingerprintSnapshot(parsePacketSnapshot(packet));
+    if (finalLock !== undefined) finalLockJson = canonicalJson(finalLock);
+  }
   if (
     args.purpose === "pdf" &&
     new TextDecoder().decode(bytes.slice(0, 5)) !== "%PDF-"
@@ -256,6 +313,10 @@ async function registerPacketBytes(
     byteSize: bytes.byteLength,
     purpose: args.purpose,
     ...(snapshotFingerprint ? { snapshotFingerprint } : {}),
+    ...(args.purpose === "pdf" && args.finalLockFingerprint
+      ? { finalLockFingerprint: args.finalLockFingerprint }
+      : {}),
+    ...(finalLockJson ? { finalLockJson } : {}),
   });
 }
 
@@ -272,6 +333,7 @@ export const registerPacketUpload = action({
       v.literal("snapshot"),
     ),
     inputFingerprint: v.optional(v.string()),
+    finalLockFingerprint: v.optional(v.string()),
   },
   handler: async (
     ctx: ActionCtx,
@@ -302,6 +364,7 @@ export const uploadPacketFile = action({
       v.literal("snapshot"),
     ),
     inputFingerprint: v.optional(v.string()),
+    finalLockFingerprint: v.optional(v.string()),
   },
   handler: async (
     ctx,
@@ -322,6 +385,7 @@ export const uploadPacketFile = action({
       mimeType: args.mimeType,
       purpose: args.purpose,
       inputFingerprint: args.inputFingerprint,
+      finalLockFingerprint: args.finalLockFingerprint,
     }, bytes);
   },
 });
@@ -637,19 +701,31 @@ export const recordPacketRevision = mutation({
   args: {
     eventId: v.id("events"),
     inputFingerprint: v.string(),
+    /** Fingerprint of the Final Lock answers the PDF shows. */
+    finalLockFingerprint: v.string(),
     pdfStorageId: v.id("_storage"),
     snapshotStorageId: v.id("_storage"),
   },
   handler: async (ctx, args) => {
     const auth = await authorize(ctx, args.eventId);
-    const current = await readCurrentPacket(ctx, auth.tenantId, args.eventId);
+    const lock = await currentFinalLockPrint(ctx, auth.tenantId, args.eventId);
+    const current = lock.packet;
     if (args.inputFingerprint !== current.currentFingerprint)
       throw new Error(
         "Event or source evidence changed; prepare the current workbook again",
       );
-    const existing = current.revisionRows.find(
-      (r) => r.snapshotFingerprint === args.inputFingerprint,
-    );
+    // Reuse only a print of this packet that also showed these answers.
+    let existing = null;
+    for (const r of current.revisionRows)
+      if (
+        r.snapshotFingerprint === args.inputFingerprint &&
+        (await storedOfficeFingerprint(r)) === lock.officeFingerprint
+      )
+        existing = r;
+    if (!existing && args.finalLockFingerprint !== lock.fingerprint)
+      throw new Error(
+        "The Final Lock answers changed after the workbook was made; prepare the current workbook again",
+      );
     if (existing) {
       for (const row of current.revisionRows) {
         if (row._id === existing._id && row.supersededBy)
@@ -675,16 +751,26 @@ export const recordPacketRevision = mutation({
     const snapshot = current.files.find(
       (f) => f.storageId === args.snapshotStorageId && f.purpose === "snapshot",
     );
+    const pdfContext = JSON.parse(pdf?.contextJson ?? "{}");
+    const snapshotContext = JSON.parse(snapshot?.contextJson ?? "{}");
     if (
       !pdf ||
-      JSON.parse(pdf.contextJson ?? "{}").snapshotFingerprint !==
-        args.inputFingerprint ||
+      pdfContext.snapshotFingerprint !== args.inputFingerprint ||
       !snapshot ||
-      JSON.parse(snapshot.contextJson ?? "{}").snapshotFingerprint !==
-        args.inputFingerprint
+      snapshotContext.snapshotFingerprint !== args.inputFingerprint
     )
       throw new Error(
         "Print files must be owned by this event and contain the exact current snapshot",
+      );
+    // The PDF and snapshot must carry exactly the answers checked above.
+    if (
+      pdfContext.finalLockFingerprint !== lock.fingerprint ||
+      typeof snapshotContext.finalLockJson !== "string" ||
+      (await printFingerprint(JSON.parse(snapshotContext.finalLockJson))) !==
+        lock.fingerprint
+    )
+      throw new Error(
+        "Print files must carry the Final Lock answers this workbook shows",
       );
     const id = await ctx.db.insert("eventPacketRevisions", {
       tenantId: auth.tenantId,
@@ -697,18 +783,13 @@ export const recordPacketRevision = mutation({
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
-    // Record the Final Lock answers this print shows, so each answer names
-    // its revision and a later change names the stale questions.
-    const finalLock = await readFinalLockInput(ctx, auth.tenantId, args.eventId);
+    // Store the uploaded answers payload the PDF shows, so each answer
+    // names its revision and a later change names the stale questions.
     await ctx.db.patch(id, {
-      answersJson: canonicalJson(
-        printedAnswers(
-          evaluateFinalLock(finalLock.input, {
-            overrides: finalLock.overrides,
-          }),
-          id,
-        ),
-      ),
+      answersJson: canonicalJson({
+        revisionId: id,
+        ...JSON.parse(snapshotContext.finalLockJson),
+      }),
     });
     for (const old of current.revisionRows)
       if (!old.supersededBy)

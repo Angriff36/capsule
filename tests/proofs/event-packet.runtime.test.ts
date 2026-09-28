@@ -216,10 +216,13 @@ describe("event packet native commands", () => {
       mimeType: "application/pdf",
       purpose: "pdf",
       inputFingerprint: p.currentFingerprint,
+      finalLockFingerprint: p.finalLockFingerprint,
     });
     const snap = await manager.action(api.uploadPacketFile, {
       eventId,
-      bytes: new TextEncoder().encode(JSON.stringify(p.snapshot)).buffer,
+      bytes: new TextEncoder().encode(
+        JSON.stringify({ ...p.snapshot, finalLock: p.finalLock }),
+      ).buffer,
       name: "snapshot.json",
       mimeType: "application/json",
       purpose: "snapshot",
@@ -227,6 +230,7 @@ describe("event packet native commands", () => {
     const args = {
       eventId,
       inputFingerprint: p.currentFingerprint,
+      finalLockFingerprint: p.finalLockFingerprint,
       pdfStorageId: pdf.storageId,
       snapshotStorageId: snap.storageId,
     };

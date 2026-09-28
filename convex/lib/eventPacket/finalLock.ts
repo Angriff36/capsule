@@ -1,28 +1,61 @@
 import { v } from "convex/values";
 import { mutation, query } from "../../_generated/server";
-import { authorize } from "./commands";
+import { getAuthContext, requireTenant } from "../authContext";
+import { authorize, hasManagementAccess } from "./commands";
 import { readFinalLockInput } from "./finalLockInput";
+import { scopedEvent } from "./reconcileNative";
 import { canonicalJson } from "../../../src/lib/eventPacket/model";
-import { evaluateFinalLock } from "../../../src/lib/eventPacket/finalLock/evaluate";
+import {
+  evaluateFinalLock,
+  type FinalLockReport,
+} from "../../../src/lib/eventPacket/finalLock/evaluate";
 import { QUESTIONS } from "../../../src/lib/eventPacket/finalLock/policy";
 
 const clean = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
 
+/** Staff see who pays, not the price; the price stays with managers. */
+function withoutPrice(report: FinalLockReport): FinalLockReport {
+  return {
+    ...report,
+    answers: report.answers.map((a) => {
+      if (a.questionKey !== "identity.billing") return a;
+      const billTo =
+        a.value.type === "record" ? a.value.fields.billTo ?? null : null;
+      return {
+        ...a,
+        value: billTo ? { type: "record", fields: { billTo } } : { type: "none" },
+        explanation: billTo
+          ? `${billTo} pays. Managers see the price.`
+          : "Managers see who pays and the price.",
+        missing: a.missing.length ? ["A manager needs to check who pays."] : [],
+        override: a.override
+          ? { ...a.override, value: { type: "none" }, reason: "Manager decision." }
+          : null,
+      };
+    }),
+  };
+}
+
 /**
  * The event's Final Lock answers: each question's result, value, plain
  * explanation, sources, rule, override, resolver and field-work state,
- * plus the outcome and the sections a later change made stale.
+ * plus the outcome and the sections a later change made stale. Any staff
+ * member of the event's workspace can read them; changing one is a
+ * manager's decision.
  */
 export const getFinalLock = query({
   args: { eventId: v.id("events") },
   handler: async (ctx, { eventId }) => {
-    const auth = await authorize(ctx, eventId);
+    const auth = await getAuthContext(ctx);
+    const tenantId = requireTenant(auth);
+    await scopedEvent(ctx, tenantId, eventId);
     const { input, overrides, printed } = await readFinalLockInput(
       ctx,
-      auth.tenantId,
+      tenantId,
       eventId,
     );
-    return clean(evaluateFinalLock(input, { overrides, printed }));
+    const report = evaluateFinalLock(input, { overrides, printed });
+    return clean(hasManagementAccess(auth) ? report : withoutPrice(report));
   },
 });
 

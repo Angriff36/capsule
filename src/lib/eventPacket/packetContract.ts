@@ -16,9 +16,18 @@ export interface PacketEvidence {
 }
 
 export function parsePacketSnapshot(input: unknown): EventPacketSnapshot {
-  return validateSnapshot(
-    typeof input === "string" ? JSON.parse(input) : input,
-  );
+  const raw = typeof input === "string" ? JSON.parse(input) : input;
+  // A printed snapshot file also carries the Final Lock answers it showed.
+  if (
+    raw &&
+    typeof raw === "object" &&
+    !Array.isArray(raw) &&
+    "finalLock" in raw
+  ) {
+    const { finalLock: _printed, ...packet } = raw as Record<string, unknown>;
+    return validateSnapshot(packet);
+  }
+  return validateSnapshot(raw);
 }
 
 export interface PacketArtifactBytes {
