@@ -374,6 +374,10 @@ entity WeeklyScheduleNotice mixin TenantScoped, SoftDeletable {
   property required shiftSummary: string = ""
   property publishedAt: datetime?
   property acknowledgedAt: datetime?
+  // A re-sent week keeps what the person was told before, so they see what
+  // changed (PL-SCHEDULE-CORRECTION, AC-508).
+  property previousShiftSummary: string?
+  property changedAt: datetime?
 
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
 
@@ -429,9 +433,13 @@ entity WeeklyScheduleNotice mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "workforceManageAccess")
     constraint republishScheduleShiftCount: shiftCount > 0 "Add at least one scheduled shift before you publish."
     constraint republishScheduleSummary: length(trim(shiftSummary)) > 0 "Add a shift summary before you publish."
+    compute toldBefore = self.shiftSummary
+    compute changed = shiftSummary != self.shiftSummary or shiftCount != self.shiftCount
     mutate recipientAuthSubjectId = recipientAuthSubjectId
     mutate shiftCount = shiftCount
     mutate shiftSummary = shiftSummary
+    mutate previousShiftSummary = changed ? toldBefore : self.previousShiftSummary
+    mutate changedAt = changed ? now() : self.changedAt
     mutate publishedAt = now()
     mutate acknowledgedAt = null
     emit WeeklyScheduleRepublished {

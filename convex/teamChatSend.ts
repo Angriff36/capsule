@@ -23,7 +23,11 @@ import { v } from "convex/values";
 import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { mutation } from "./_generated/server";
-import { deleteBlobIfOrphan } from "./lib/blobs";
+import {
+  blobReferenced,
+  deleteBlobIfOrphan,
+  firstAttachmentFor,
+} from "./lib/blobs";
 import { commandIdempotencyScope } from "./lib/commandIdempotency";
 import { chatAuth, encryptField, live } from "./lib/teamChatRead";
 
@@ -161,6 +165,19 @@ export const sendWithFiles = mutation({
     // Same shape and audit event as the generated command. A replay never
     // inserts — the first attempt's rows are the message's files.
     if (!replay) {
+      // A chat file is always a fresh upload. A storage id some record
+      // already uses (another message's photo, another company's file) is
+      // refused: knowing the id must not copy the file into this chat.
+      for (const file of args.files) {
+        if (
+          (await firstAttachmentFor(ctx, file.storageId)) !== null ||
+          (await blobReferenced(ctx, file.storageId))
+        ) {
+          throw new Error(
+            `${file.fileName} is already used somewhere else. Add the file again.`,
+          );
+        }
+      }
       const now = Date.now();
       for (const file of args.files) {
         const attachmentId = await ctx.db.insert("attachments", {

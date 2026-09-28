@@ -1,6 +1,7 @@
 import {
   answered,
   dishSources,
+  equipmentSources,
   eventStyleName,
   notApplicable,
   proposalSources,
@@ -36,16 +37,67 @@ export function roomServiceAnswers(
   const pieces = ware.pieces;
   out["servingware.source"] = ware.draft;
 
-  // Rentals: one return owner and one return window.
-  const hasRentals = yesLike(rentals) || pieces.includes("Rented pieces");
+  // Rentals: one return owner, and a return window for every rented line.
+  const rentedLines = input.equipment.filter((e) => e.rented);
+  const lineName = (e: (typeof rentedLines)[number]) =>
+    `${e.name} x${e.quantity}`;
+  const hasRentals =
+    yesLike(rentals) ||
+    pieces.includes("Rented pieces") ||
+    rentedLines.length > 0;
   const take = said(text.takeRentalsWithUs);
   const leave = said(text.leaveRentalsOnsite);
   const rentalSources = [
     ...ev("eventRentals"),
     ...ev("takeRentalsWithUs"),
     ...ev("leaveRentalsOnsite"),
+    ...rentedLines.flatMap(equipmentSources),
   ];
-  if (
+  const lineProblems = [
+    ...(rentals.kind === "no"
+      ? rentedLines.map(
+          (e) =>
+            `Rental "${e.name}" is reserved, but the day sheet says no rentals.`,
+        )
+      : []),
+    ...rentedLines
+      .filter((e) => (e.endsAt ?? event.endsAt) == null)
+      .map((e) => `Rental "${e.name}" has no return time.`),
+  ];
+  // One owner for every line; each line keeps its own return window.
+  const handled = (
+    handling: string,
+    owner: string,
+    explanation: string,
+  ): Draft =>
+    answered(
+      {
+        type: "record",
+        fields: {
+          handling,
+          owner,
+          windowStartsAt: event.endsAt,
+          ...Object.fromEntries(
+            rentedLines.map((e) => [lineName(e), e.endsAt ?? event.endsAt]),
+          ),
+        },
+      },
+      rentedLines.length
+        ? `${explanation} Rented: ${rentedLines.map(lineName).join(", ")}.`
+        : explanation,
+      "rentals.return.one-owner-one-window",
+      rentalSources,
+    );
+  if (lineProblems.length)
+    out["rentals.return"] = unresolved(
+      lineProblems,
+      rentals.kind === "no"
+        ? "Fix the day sheet or cancel the rented equipment on the event."
+        : "Give each rented item a return time on the event's equipment.",
+      "rentals.return.one-owner-one-window",
+      rentalSources,
+    );
+  else if (
     !hasRentals &&
     (rentals.kind === "no" || rentals.kind === "empty") &&
     !yesLike(take) &&
@@ -74,37 +126,22 @@ export function roomServiceAnswers(
       rentalSources,
     );
   else if (yesLike(take))
-    out["rentals.return"] = answered(
-      {
-        type: "record",
-        fields: {
-          handling: "Mangia takes them away",
-          owner: "Mangia",
-          windowStartsAt: event.endsAt,
-        },
-      },
+    out["rentals.return"] = handled(
+      "Mangia takes them away",
+      "Mangia",
       "Mangia packs the rentals and takes them away when the event ends.",
-      "rentals.return.one-owner-one-window",
-      rentalSources,
     );
-  else if (yesLike(leave))
-    out["rentals.return"] = answered(
-      {
-        type: "record",
-        fields: {
-          handling: "Left onsite for pickup",
-          owner:
-            leave.kind === "party" && leave.party !== "Mangia"
-              ? leave.party
-              : "Rental company",
-          windowStartsAt: event.endsAt,
-        },
-      },
-      `Rentals stay onsite after the event for the ${leave.kind === "party" && leave.party !== "Mangia" ? leave.party.toLowerCase() : "rental company"} to pick up.`,
-      "rentals.return.one-owner-one-window",
-      rentalSources,
+  else if (yesLike(leave)) {
+    const owner =
+      leave.kind === "party" && leave.party !== "Mangia"
+        ? leave.party
+        : "Rental company";
+    out["rentals.return"] = handled(
+      "Left onsite for pickup",
+      owner,
+      `Rentals stay onsite after the event for the ${owner.toLowerCase()} to pick up.`,
     );
-  else
+  } else
     out["rentals.return"] = unresolved(
       ["This event has rentals but nobody is named to return them."],
       "Say on the task breakdown if we take the rentals with us or leave them onsite.",

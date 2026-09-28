@@ -136,7 +136,9 @@ export async function createReview(
     },
     body: JSON.stringify({
       model: pickModel(config.intelligence),
-      max_tokens: 1024,
+      // GLM thinks before it answers and the thinking counts here: at 1024 a
+      // real review spends it all thinking and returns no verdict text.
+      max_tokens: 8192,
       messages: [{ role: "user", content: await buildContent(config) }],
     }),
   });

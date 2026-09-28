@@ -10,6 +10,7 @@ import {
 import { ErrorState, StatusChip, TableSkeleton } from "../../../ui/primitives";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionNotice, useActionFailure } from "../../../ui/action-result";
+import { ServiceStyleMatch } from "./ServiceStyleMatch";
 
 // Source system labels
 const SOURCE_SYSTEM_LABELS: Record<string, string> = {
@@ -43,6 +44,7 @@ const RECORD_TYPE_LABELS: Record<string, string> = {
   stock: "Stock",
   location: "Location",
   pack_list: "Pack List",
+  service_style: "Service style",
 };
 
 // Conflict status labels
@@ -462,6 +464,13 @@ export function ExternalRecordsReconcilePage() {
                             Match
                           </button>
                         )
+                      ) : record.capsuleEntity === "service_style" ? (
+                        <ServiceStyleMatch
+                          linkId={record._id}
+                          disabled={busy}
+                          onDone={setNotice}
+                          onError={setError}
+                        />
                       ) : (
                         <span className="text-ink-3">—</span>
                       )}

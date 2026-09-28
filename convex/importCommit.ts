@@ -116,6 +116,7 @@ import {
 } from "./tppParser";
 import type { Doc, Id } from "./_generated/dataModel";
 import { buildLinkKey } from "./lib/culinaryModel/importMapping";
+import { SERVICE_STYLE_RECORD_TYPE } from "./importServiceStyle";
 
 /**
  * Canonical ExternalRecordLink key for an import-commit identity. Commit links
@@ -901,6 +902,16 @@ export const commitImportRun = action({
         const budgetAmount = Math.max(0, event.budgetAmount ?? 0);
         const quotedPrice = Math.max(0, event.quotedRevenue ?? 0);
 
+        // Service style (AC-064): use the matching Capsule style; an unknown
+        // one never blocks the event — it waits on the matching screen.
+        const styleMatch = event.serviceStyleId
+          ? await ctx.runQuery(internal.importServiceStyle.matchServiceStyle, {
+              tenantId,
+              sourceSystem,
+              code: event.serviceStyleId,
+            })
+          : null;
+
         const idempotencyKey = `tenant-shared/import:${args.importRunId}:event:${event.externalId}`;
         try {
           const created = await ctx.runMutation(
@@ -916,6 +927,8 @@ export const commitImportRun = action({
               budgetAmount,
               quotedPrice,
               venueId,
+              serviceStyleId: styleMatch?._id,
+              serviceStyleName: styleMatch?.name,
               venueName: event.venueName,
               venueAddress: event.venueAddress,
               accessibilityNeeds: event.accessibilityNeeds,
@@ -957,6 +970,24 @@ export const commitImportRun = action({
             resolutionNote: note,
           });
           pending += 1;
+        }
+        // One matching-screen item per unknown old style; the event itself
+        // imports either way.
+        if (event.serviceStyleId && !styleMatch) {
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: SERVICE_STYLE_RECORD_TYPE,
+            externalId: event.serviceStyleId,
+            capsuleEntity: SERVICE_STYLE_RECORD_TYPE,
+            capsuleId: "",
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify({
+              serviceStyle: event.serviceStyleId,
+            }),
+            conflictStatus: "pending_conflict",
+            resolutionNote: `Service style "${event.serviceStyleId.replace(/_/g, " ")}" is not in your service styles. Match it to one; the imported events that use it get that style.`,
+          });
         }
       }
 

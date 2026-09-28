@@ -6,6 +6,10 @@ import {
   useProposalTemplateRevise,
   useListProposalTemplate,
 } from "../../lib/manifest-convex-react";
+import {
+  moveProposalSection,
+  proposalSectionSequence,
+} from "../../lib/proposalSectionOrder";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
@@ -24,6 +28,28 @@ const PROPOSAL_SECTIONS = [
 ] as const;
 
 const ALL_SECTION_IDS = () => new Set(PROPOSAL_SECTIONS.map((s) => s.id));
+
+// AC-259: the cover always opens the proposal; every other section can move.
+const MOVABLE_SECTION_IDS: string[] = PROPOSAL_SECTIONS.filter(
+  (s) => s.id !== "cover_brand",
+).map((s) => s.id);
+
+function movableOrder(saved: string[] | null | undefined): string[] {
+  const sequence = proposalSectionSequence(saved);
+  return sequence
+    ? sequence.filter((id) => MOVABLE_SECTION_IDS.includes(id))
+    : [...MOVABLE_SECTION_IDS];
+}
+
+/** The standard order is saved as empty, so it keeps each page's usual layout. */
+function orderToSave(order: string[]): string[] {
+  return order.every((id, index) => id === MOVABLE_SECTION_IDS[index])
+    ? []
+    : order;
+}
+
+const sectionLabel = (id: string) =>
+  PROPOSAL_SECTIONS.find((s) => s.id === id)?.label ?? id;
 
 function parsePercentage(value: FormDataEntryValue | null): number | undefined {
   if (!value) return undefined;
@@ -65,6 +91,9 @@ export function ProposalTemplatesPage() {
   const [failure, setFailure] = useState<unknown>(null);
   const [selectedSections, setSelectedSections] =
     useState<Set<string>>(ALL_SECTION_IDS);
+  const [sectionOrder, setSectionOrder] = useState<string[]>(() =>
+    movableOrder(null),
+  );
   const { prompt, host } = useActionPrompt(busy);
 
   const activeTemplates = (templates ?? []).filter(
@@ -75,11 +104,13 @@ export function ProposalTemplatesPage() {
     setOpen(false);
     setEditingId(null);
     setSelectedSections(ALL_SECTION_IDS());
+    setSectionOrder(movableOrder(null));
   };
 
   const openForCreate = () => {
     setEditingId(null);
     setSelectedSections(ALL_SECTION_IDS());
+    setSectionOrder(movableOrder(null));
     setOpen(true);
   };
 
@@ -96,6 +127,7 @@ export function ProposalTemplatesPage() {
           name: String(data.get("name")),
           description: String(data.get("description") || "") || undefined,
           visibleSections: visibleSectionsArray,
+          sectionOrder: orderToSave(sectionOrder),
           defaultTerms: String(data.get("defaultTerms") || "") || undefined,
           defaultNotes: String(data.get("defaultNotes") || "") || undefined,
           defaultTaxRate: parsePercentage(data.get("defaultTaxRate")),
@@ -130,6 +162,7 @@ export function ProposalTemplatesPage() {
           name: String(data.get("name")),
           description: String(data.get("description") || "") || undefined,
           visibleSections: visibleSectionsArray,
+          sectionOrder: orderToSave(sectionOrder),
           defaultTerms: String(data.get("defaultTerms") || "") || undefined,
           defaultNotes: String(data.get("defaultNotes") || "") || undefined,
           defaultTaxRate: parsePercentage(data.get("defaultTaxRate")),
@@ -260,21 +293,57 @@ export function ProposalTemplatesPage() {
                 defaultValue={editingTemplate?.description || ""}
               />
             </label>
-            <label className="field-label col-span-2">
-              Visible sections
+            <fieldset className="field-label col-span-2">
+              <legend>Sections, in the order the client sees them</legend>
               <div className="checkbox-group">
-                {PROPOSAL_SECTIONS.map((section) => (
-                  <label key={section.id} className="checkbox-label">
-                    <input
-                      type="checkbox"
-                      checked={selectedSections.has(section.id)}
-                      onChange={() => toggleSection(section.id)}
-                    />
-                    {section.label}
-                  </label>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={selectedSections.has("cover_brand")}
+                    onChange={() => toggleSection("cover_brand")}
+                  />
+                  {sectionLabel("cover_brand")}
+                </label>
+                {sectionOrder.map((id, index) => (
+                  <div key={id} className="flex items-center gap-2">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={selectedSections.has(id)}
+                        onChange={() => toggleSection(id)}
+                      />
+                      {sectionLabel(id)}
+                    </label>
+                    <button
+                      type="button"
+                      className="btn-link btn-link-compact"
+                      disabled={index === 0}
+                      aria-label={`Move ${sectionLabel(id)} up`}
+                      onClick={() =>
+                        setSectionOrder((order) =>
+                          moveProposalSection(order, id, -1),
+                        )
+                      }
+                    >
+                      Up
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-link btn-link-compact"
+                      disabled={index === sectionOrder.length - 1}
+                      aria-label={`Move ${sectionLabel(id)} down`}
+                      onClick={() =>
+                        setSectionOrder((order) =>
+                          moveProposalSection(order, id, 1),
+                        )
+                      }
+                    >
+                      Down
+                    </button>
+                  </div>
                 ))}
               </div>
-            </label>
+            </fieldset>
             <label className="field-label col-span-2">
               Default terms
               <textarea
@@ -426,6 +495,7 @@ export function ProposalTemplatesPage() {
                             setSelectedSections(
                               new Set(row.visibleSections || []),
                             );
+                            setSectionOrder(movableOrder(row.sectionOrder));
                             setOpen(true);
                           }}
                         >

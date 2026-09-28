@@ -45,6 +45,11 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   // explicit null. ABSENT (not null) marks a pre-change record. `accepted` is
   // a terminal status, so a later revision can never re-label an acceptance.
   property acceptedRevisionId: uuid?
+  // AC-098: an acceptance that happened before Capsule (an imported event).
+  // Where it came from and what shows the client agreed. Null = accepted in
+  // Capsule. Never a signature: no SignatureRequest is made for it.
+  property acceptanceSource: string?
+  property acceptanceEvidence: string?
   property unique proposalNumber: string?
   property required searchable title: string = ""
   property eventDate: datetime?
@@ -63,6 +68,9 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   property notes: string?
   property terms: string?
   property visibleSections: list<string>?
+  // PL-PROPOSAL-DRAFT (AC-259/AC-096): section order copied from the template.
+  // Null or empty = the standard order.
+  property sectionOrder: list<string>?
   property required status: ProposalStatus = "draft"
   property draftedAt: datetime?
   property sentAt: datetime?
@@ -76,6 +84,11 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   property supersedeReason: string?
   property supersededById: uuid?
   property replacesProposalId: uuid?  // Links to the proposal this revision replaces
+  // PL-PROPOSAL-DRAFT (AC-416/AC-417): what the last "build from event" wrote -
+  // each generated line's source, the values it wrote, the event facts it read,
+  // and the sources staff took out. convex/lib/proposalGenerate.ts reads it to
+  // refresh an unsent draft without undoing staff edits. Null = typed by hand.
+  property generationJson: string?
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
@@ -120,7 +133,8 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     optional terms: string,
     optional visibleSections: list<string>,
     optional eventId: uuid,
-    optional replacesProposalId: uuid
+    optional replacesProposalId: uuid,
+    optional sectionOrder: list<string>
   ) {
     guard self.draftedAt == null
     guard self.status == "draft"
@@ -148,6 +162,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     mutate notes = notes
     mutate terms = terms
     mutate visibleSections = visibleSections
+    mutate sectionOrder = sectionOrder
     mutate eventId = eventId
     mutate replacesProposalId = replacesProposalId
     mutate draftedAt = now()
@@ -203,6 +218,38 @@ entity Proposal mixin TenantScoped, SoftDeletable {
       guestCount: guestCount
       previousTotal: previousTotal
       total: total
+    }
+  }
+
+  // PL-PROPOSAL-DRAFT: an unsent draft built from its event takes the event's
+  // current date, type and venue, and stores the new generation record. Money
+  // and guest count move only through the line commands and
+  // followEventHeadcount, so this command carries no price.
+  command refreshFromEvent(
+    generationJson: string,
+    optional eventDate: datetime,
+    optional eventEndDate: datetime,
+    optional eventType: string,
+    optional venueName: string,
+    optional venueAddress: string
+  ) {
+    guard self.status == "draft"
+    guard self.draftedAt != null
+    guard self.deletedAt == null
+    guard self.eventId != null
+    guard self.event != null
+    constraint refreshRecord: length(trim(generationJson)) > 0 "Build the proposal from its event again."
+    mutate eventDate = eventDate
+    mutate eventEndDate = eventEndDate
+    mutate eventType = eventType
+    mutate venueName = venueName
+    mutate venueAddress = venueAddress
+    mutate generationJson = generationJson
+    emit ProposalRefreshedFromEvent {
+      proposalId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
     }
   }
 
@@ -264,6 +311,29 @@ entity Proposal mixin TenantScoped, SoftDeletable {
       discountAmount: self.discountAmount
       total: self.total
       dishSelectionProposalId: self.eventId != null ? self.id : null
+    }
+  }
+
+  // AC-098: label an acceptance that happened before Capsule. The only caller
+  // is convex/lib/proposalHistoricalAcceptance.ts, which builds the proposal
+  // from the imported event, sends it (revision captured) and accepts it under
+  // the staff member's own sign-in in the same transaction first. A server-only
+  // step, so nobody can relabel an acceptance signed in Capsule. Set once.
+  private command recordHistoricalAcceptance(source: string, evidence: string) {
+    guard self.status == "accepted"
+    guard self.deletedAt == null
+    guard self.acceptanceSource == null
+    guard self.acceptedRevisionId != null
+    constraint historicalSource: length(trim(source)) > 0 "Say where the acceptance came from, for example the old booking system."
+    constraint historicalEvidence: length(trim(evidence)) > 0 "Say what shows the client agreed, for example the old invoice number or the signed paper."
+    mutate acceptanceSource = source
+    mutate acceptanceEvidence = evidence
+    emit ProposalHistoricalAcceptanceRecorded {
+      proposalId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      source: source
+      evidence: evidence
     }
   }
 
@@ -429,6 +499,13 @@ event ProposalEventHeadcountFollowed: "proposal.event_headcount_followed" {
   total: money(12, 2)
 }
 
+event ProposalRefreshedFromEvent: "proposal.refreshed_from_event" {
+  proposalId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+}
+
 event ProposalSent: "proposal.sent" {
   proposalId: string
   tenantId: string
@@ -465,6 +542,14 @@ event ProposalAccepted: "proposal.accepted" {
   // Non-null only when an Event was linked at accept time — keys the menu
   // selection → EventDish cascade (sales/proposal-dish-selection.manifest).
   dishSelectionProposalId: string?
+}
+
+event ProposalHistoricalAcceptanceRecorded: "proposal.historical_acceptance_recorded" {
+  proposalId: string
+  tenantId: string
+  clientId: string
+  source: string
+  evidence: string
 }
 
 event ProposalEventLinkStaged: "proposal.event_link_staged" {

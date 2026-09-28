@@ -255,6 +255,158 @@ describe("Final Lock answers keep the payer, booked names, sign-off versions and
     ).toBe(true);
   });
 
+  it("finds a truck another event holds at the same time, and gives each rented line its return time", async () => {
+    const { t, manager, eventId } = await setup();
+    const ids = await t.run(async (ctx) => {
+      const vehicleId = await ctx.db.insert("vehicles", {
+        tenantId: "tenant-a",
+        make: "Isuzu",
+        model: "Box truck",
+        registration: "MGA-1",
+        ownership: "owned",
+        payloadCapacityKg: 3000,
+        operationalStatus: "available",
+        version: 1,
+      });
+      const other = async (title: string, startsAt: string, endsAt: string) =>
+        ctx.db.insert("events", {
+          tenantId: "tenant-a",
+          title,
+          eventType: "Party",
+          startsAt: Date.parse(startsAt),
+          endsAt: Date.parse(endsAt),
+          expectedHeadcount: 50,
+          budgetAmount: 0,
+          quotedPrice: 0,
+          stage: "planning",
+          version: 1,
+          deletedAt: null,
+        });
+      const overlapping = await other(
+        "Smith Retirement",
+        "2026-10-10T20:00:00Z",
+        "2026-10-10T23:00:00Z",
+      );
+      const nextDay = await other(
+        "Sunday Brunch",
+        "2026-10-11T15:00:00Z",
+        "2026-10-11T18:00:00Z",
+      );
+      const assign = (event: typeof eventId) =>
+        ctx.db.insert("eventVehicleAssignments", {
+          tenantId: "tenant-a",
+          eventId: event,
+          activeEventId: String(event),
+          vehicleId,
+          version: 3,
+        });
+      await assign(eventId);
+      const busy = await assign(overlapping);
+      await assign(nextDay);
+      const tent = await ctx.db.insert("equipments", {
+        tenantId: "tenant-a",
+        name: "Tent",
+        assetTag: "R-1",
+        category: "Rentals",
+        ownership: "rented",
+        quantity: 1,
+        purchaseValue: 0,
+        condition: "good",
+        status: "active",
+        version: 1,
+      });
+      await ctx.db.insert("equipmentReservations", {
+        tenantId: "tenant-a",
+        equipmentId: tent,
+        eventId,
+        startsAt: Date.parse("2026-10-10T14:00:00Z"),
+        endsAt: Date.parse("2026-10-11T12:00:00Z"),
+        quantity: 1,
+        status: "reserved",
+        version: 1,
+      });
+      await ctx.db.patch(eventId, {
+        eventRentals: "Yes",
+        leaveRentalsOnsite: "Yes",
+      } as any);
+      return { busy };
+    });
+    const report = await manager.query(finalLock.getFinalLock, { eventId });
+    const trucks = answer(report, "vehicles.assigned");
+    expect(trucks.missing).toContain(
+      "Isuzu Box truck is also booked for Smith Retirement at the same time.",
+    );
+    expect(trucks.missing.join(" ")).not.toContain("Sunday Brunch");
+    expect(trucks.sources).toContainEqual({
+      table: "eventVehicleAssignments",
+      id: String(ids.busy),
+      version: 3,
+    });
+    const rentals = answer(report, "rentals.return");
+    expect(rentals.value.fields["Tent x1"]).toBe(
+      Date.parse("2026-10-11T12:00:00Z"),
+    );
+  });
+
+  it("the buffet order reads each hot dish's recipe cost: the less expensive protein goes first", async () => {
+    const { t, manager, eventId } = await setup();
+    await t.run(async (ctx) => {
+      const dishWith = async (name: string, costPerPound: number) => {
+        const ingredientId = await ctx.db.insert("ingredients", {
+          tenantId: "tenant-a",
+          name: `${name} meat`,
+          unit: "pound",
+          costPerUnit: costPerPound,
+          status: "active",
+          version: 1,
+        });
+        const dishId = await ctx.db.insert("dishes", {
+          tenantId: "tenant-a",
+          name,
+          course: "Entree",
+          portionSize: 1,
+          portionUnit: "each",
+          status: "active",
+          version: 1,
+        } as any);
+        await ctx.db.insert("dishIngredients", {
+          tenantId: "tenant-a",
+          dishId,
+          ingredientId,
+          quantity: 0.5,
+          unit: "pound",
+          sortOrder: 0,
+          addedAt: Date.now(),
+          version: 1,
+        } as any);
+        await ctx.db.insert("eventDishes", {
+          tenantId: "tenant-a",
+          eventId,
+          dishId,
+          quantityServings: 100,
+          course: "Entree",
+          addedAt: Date.now(),
+          version: 1,
+        });
+      };
+      await dishWith("Beef Brisket", 9);
+      await dishWith("Chicken Marsala", 4);
+      await ctx.db.patch(eventId, {
+        buffetHotPlates: "Beef Brisket, Chicken Marsala",
+        buffetColdPlates: "Caesar Salad, Rolls and Butter",
+      } as any);
+    });
+    const report = await manager.query(finalLock.getFinalLock, { eventId });
+    const buffet = answer(report, "buffet.arrangement");
+    expect(buffet.result).toBe("unresolved");
+    expect(buffet.missing).toContain(
+      "Chicken Marsala costs less than Beef Brisket: put the less expensive protein first.",
+    );
+    expect(
+      buffet.sources.filter((s: any) => s.table === "dishes"),
+    ).toHaveLength(2);
+  });
+
   it("the stored printed words are exactly the words drawn in the PDF, names with accents and curly quotes included", async () => {
     const { manager, eventId } = await setup();
     const report = await manager.query(finalLock.getFinalLock, { eventId });

@@ -2,7 +2,9 @@ import { ConvexError, v } from "convex/values";
 import { api } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import { action, query } from "./_generated/server";
+import { portalCanPayOnline, portalPayableParts } from "./clientPortalPayments";
 import { resolveClientPortalAccess } from "./lib/clientPortalLinks";
+import { invoiceCheckoutCurrency } from "./lib/stripeCheckout";
 
 const CLIENT_VISIBLE_INVOICE_STATUSES = new Set([
   "sent",
@@ -306,7 +308,14 @@ export const getEvent = query({
         status: invoice.status,
         issuedAt: invoice.issuedAt ?? null,
         createdAt: invoice.createdAt ?? null,
+        currencyCode: invoiceCheckoutCurrency(invoice).toUpperCase(),
+        payable: portalPayableParts(invoice),
       }));
+    const canPayOnline = visibleInvoices.some(
+      (invoice) => invoice.payable.balance > 0,
+    )
+      ? await portalCanPayOnline(ctx, event.tenantId)
+      : false;
 
     const timeline = timelineActivities
       .filter(
@@ -372,6 +381,7 @@ export const getEvent = query({
         stage: event.stage,
       },
       menu,
+      payments: { online: canPayOnline },
       documents: {
         client: documentClient,
         clientName,

@@ -63,6 +63,12 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
   // and remain auditable"). The send seam (convex/lib/proposalRevision.ts)
   // blocks publication of a divergent catalog-linked line lacking a reason.
   property overrideReason: string?
+  // PL-PROPOSAL-DRAFT (AC-547): a rental/decor line names the rentable item
+  // (Equipment) it prices. The line prices, is accepted, feeds the deposit and
+  // is copied into a change like every other line; the authored seams
+  // (convex/lib/proposalPricing.ts assertValidRentalLink) check the item is the
+  // same company's, and the frozen revision records the item's name.
+  property equipmentId: uuid?
   property addedAt: datetime?
   property removedAt: datetime?
 
@@ -89,7 +95,8 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     optional sortOrder: int,
     optional notes: string,
     optional menuDishId: uuid,
-    optional overrideReason: string
+    optional overrideReason: string,
+    optional equipmentId: uuid
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
@@ -109,6 +116,7 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     mutate notes = notes
     mutate menuDishId = menuDishId
     mutate overrideReason = overrideReason
+    mutate equipmentId = equipmentId
     mutate addedAt = now()
     emit ProposalLineItemAdded {
       lineItemId: self.id
@@ -131,7 +139,8 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     optional sortOrder: int,
     optional notes: string,
     optional menuDishId: uuid,
-    optional overrideReason: string
+    optional overrideReason: string,
+    optional equipmentId: uuid
   ) {
     guard self.addedAt != null
     guard self.deletedAt == null
@@ -149,6 +158,7 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     mutate notes = notes
     mutate menuDishId = menuDishId
     mutate overrideReason = overrideReason
+    mutate equipmentId = equipmentId
     emit ProposalLineItemRevised {
       lineItemId: self.id
       tenantId: self.tenantId

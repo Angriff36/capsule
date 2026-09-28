@@ -241,6 +241,9 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     mutate amountDue = nextDue
     mutate status = nextDue == 0 ? "paid" : "partial"
     mutate paidAt = nextDue == 0 ? now() : self.paidAt
+    // A card payment that covers the deposit marks the deposit paid, so no
+    // one records it a second time with markDepositPaid.
+    mutate depositPaidAt = self.depositPaidAt == null and self.depositAmount != null and self.depositAmount > 0 and nextPaid >= self.depositAmount ? now() : self.depositPaidAt
     emit InvoicePaymentApplied {
       invoiceId: self.id
       tenantId: self.tenantId

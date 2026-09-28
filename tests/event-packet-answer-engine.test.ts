@@ -13,6 +13,7 @@ import type {
   FinalLockAnswer,
   FinalLockInput,
 } from "../src/lib/eventPacket/finalLock/types";
+import { externalChannelName } from "../src/lib/eventPacket/finalLock/channelName";
 
 const T = Date.parse("2026-10-10T18:00:00Z");
 const MIN = 60_000;
@@ -38,6 +39,7 @@ function input(): FinalLockInput {
       contactPhone: "555-0100",
       contactEmail: null,
       assignedToId: "person-owner",
+      externalChannel: null,
       ownerName: "Dana",
       quotedPrice: 5000,
       startsAt: T,
@@ -118,6 +120,7 @@ function input(): FinalLockInput {
       followsEventHeadcount: true,
       notes: null,
       dish: { id: `dish-record-${i}`, version: 1 },
+      portionCost: null as number | null,
     })),
     timeline: [],
     vehicles: [
@@ -129,6 +132,9 @@ function input(): FinalLockInput {
         trailerId: null,
         trailerName: null,
         driverId: "person-driver",
+        notes: null,
+        preloaded: false,
+        busyWith: [],
         outOfService: false,
       },
     ],
@@ -556,6 +562,63 @@ describe("Final Lock answer engine", () => {
     expect(get(run(left).answers, "rentals.return").value).toMatchObject({
       fields: { owner: "Rental company" },
     });
+
+    // Every rented equipment line gets the one owner and its own window.
+    const rentedLine = (id: string, name: string, endsAt: number | null) => ({
+      id,
+      version: 2,
+      name,
+      category: null,
+      rented: true,
+      quantity: 4,
+      status: "reserved",
+      shortBy: 0,
+      endsAt,
+      item: { id: `item-${id}`, version: 5 },
+    });
+    const lines = input();
+    lines.equipment.push(
+      rentedLine("res-tent", "Tent", T + 300 * MIN),
+      rentedLine("res-heater", "Heater", null),
+    );
+    const perLine = get(run(lines).answers, "rentals.return");
+    expect(perLine.result).toBe("answered");
+    expect(perLine.value).toEqual({
+      type: "record",
+      fields: {
+        handling: "Mangia takes them away",
+        owner: "Mangia",
+        windowStartsAt: T + 180 * MIN,
+        "Tent x4": T + 300 * MIN,
+        "Heater x4": T + 180 * MIN,
+      },
+    });
+    expect(perLine.explanation).toContain("Rented: Tent x4, Heater x4.");
+    expect(perLine.sources).toEqual(
+      expect.arrayContaining([
+        { table: "equipmentReservations", id: "res-tent", version: 2 },
+        { table: "equipments", id: "item-res-tent", version: 5 },
+      ]),
+    );
+
+    // A rented line with no return time at all is named.
+    const noWindow = input();
+    noWindow.event.endsAt = null;
+    noWindow.equipment.push(rentedLine("res-heater", "Heater", null));
+    const open = get(run(noWindow).answers, "rentals.return");
+    expect(open.result).toBe("unresolved");
+    expect(open.missing).toContain('Rental "Heater" has no return time.');
+
+    // Rented equipment against a "no rentals" day sheet is a clash, not N/A.
+    const clash = input();
+    clash.event.text.eventRentals = "No";
+    clash.event.text.takeRentalsWithUs = "";
+    clash.equipment.push(rentedLine("res-tent", "Tent", T + 300 * MIN));
+    const clashed = get(run(clash).answers, "rentals.return");
+    expect(clashed.result).toBe("unresolved");
+    expect(clashed.missing).toContain(
+      'Rental "Tent" is reserved, but the day sheet says no rentals.',
+    );
   });
 
   it("answers who sets each part of the room", () => {
@@ -676,6 +739,61 @@ describe("Final Lock answer engine", () => {
     ]);
   });
 
+  it("validates buffet arrangement standard and records deliberate exceptions", () => {
+    // Three hot items in order: one table holds two, so a second table or chafer rotation.
+    const std = get(run(input()).answers, "buffet.arrangement");
+    expect(std.result).toBe("answered");
+    expect(std.value).toMatchObject({
+      fields: { tables: "Two tables for the hot items, or rotate chafers" },
+    });
+    expect(std.sources).toContainEqual({
+      table: "dishes",
+      id: "dish-record-3",
+      version: 1,
+    });
+
+    // Two proteins: the less expensive goes first, when both costs are known.
+    const i = input();
+    i.dishes.push({
+      ...i.dishes[3]!,
+      id: "dish-beef",
+      name: "Beef Brisket",
+      dish: { id: "dish-record-beef", version: 1 },
+    });
+    i.event.text.buffetHotPlates = "Green Beans, Beef Brisket, Chicken Marsala";
+    const unknownCost = get(run(i).answers, "buffet.arrangement");
+    expect(unknownCost.result).toBe("answered");
+    i.dishes.find((d) => d.id === "dish-beef")!.portionCost = 6.4;
+    i.dishes.find((d) => d.name === "Chicken Marsala")!.portionCost = 3.1;
+    const pricey = get(run(i).answers, "buffet.arrangement");
+    expect(pricey.result).toBe("unresolved");
+    expect(pricey.missing).toEqual([
+      "Chicken Marsala costs less than Beef Brisket: put the less expensive protein first.",
+    ]);
+
+    // A deliberate exception is a recorded manager decision, not a silent fix.
+    const decided = get(
+      run(i, {
+        overrides: [
+          {
+            questionKey: "buffet.arrangement",
+            basedOn: pricey.basis,
+            value: { type: "text", text: "Brisket first" },
+            reason: "Brisket is the feature of the night",
+            actor: "user-manager",
+            at: "2026-10-09T12:00:00Z",
+          },
+        ],
+      }).answers,
+      "buffet.arrangement",
+    );
+    expect(decided.result).toBe("answered");
+    expect(decided.override?.reason).toBe(
+      "Brisket is the feature of the night",
+    );
+    expect(decided.value).toEqual({ type: "text", text: "Brisket first" });
+  });
+
   it("shows trucks and equipment and treats missing capacity as an exception", () => {
     expect(get(run(input()).answers, "vehicles.assigned").value).toEqual({
       type: "list",
@@ -692,6 +810,7 @@ describe("Final Lock answer engine", () => {
       quantity: 10,
       status: "reserved",
       shortBy: 2,
+      endsAt: null,
       item: { id: "equipment-chafers", version: 1 },
     });
     expect(get(run(i).answers, "vehicles.assigned").missing).toEqual([
@@ -703,6 +822,100 @@ describe("Final Lock answer engine", () => {
     expect(get(run(none).answers, "vehicles.assigned").action).toBe(
       "Assign a truck on the event.",
     );
+  });
+
+  it("names the outside chat channel event-number-event-name and checks a recorded one still matches", () => {
+    expect(externalChannelName("6014", "Ashley's Wedding")).toBe(
+      "6014-ashley-s-wedding",
+    );
+    expect(externalChannelName("6014", "José’s Café & Bar")).toBe(
+      "6014-jose-s-cafe-bar",
+    );
+    expect(externalChannelName(null, "Ashley's Wedding")).toBeNull();
+
+    const none = get(run(input()).answers, "communication.channel");
+    expect(none.result).toBe("answered");
+    expect(none.value).toMatchObject({
+      fields: {
+        outsideChannel: null,
+        outsideChannelName: "6014-ashley-s-wedding",
+      },
+    });
+
+    const linked = input();
+    linked.event.externalChannel = {
+      name: "6014-ashley-s-wedding",
+      id: "C0123",
+      url: "https://mangia.slack.com/archives/C0123",
+    };
+    const ok = get(run(linked).answers, "communication.channel");
+    expect(ok.result).toBe("answered");
+    expect(ok.explanation).toContain(
+      'Mirrored to the outside channel "6014-ashley-s-wedding".',
+    );
+    expect(ok.sources).toContainEqual({
+      table: "events",
+      id: "event-1",
+      version: 7,
+      field: "externalChannel",
+    });
+
+    // The event was renamed after the channel was made: the name must follow.
+    linked.event.title = "Ashley and Sam's Wedding";
+    const renamed = get(run(linked).answers, "communication.channel");
+    expect(renamed.result).toBe("unresolved");
+    expect(renamed.missing).toEqual([
+      'The outside chat channel is named "6014-ashley-s-wedding"; it should be "6014-ashley-and-sam-s-wedding".',
+    ]);
+  });
+
+  it("shows truck availability and load grouping, and names what is missing", () => {
+    // One rig: everything loads on it.
+    const one = get(run(input()).answers, "vehicles.assigned");
+    expect(one.explanation).toContain("everything loads on Box truck");
+
+    // Two rigs: each says what it carries, or the answer stays open.
+    const two = input();
+    two.vehicles.push({
+      ...two.vehicles[0]!,
+      id: "va-2",
+      vehicleId: "vehicle-2",
+      vehicleName: "Sprinter van",
+      trailerId: "trailer-1",
+      trailerName: "Cargo trailer",
+    });
+    expect(get(run(two).answers, "vehicles.assigned").missing).toEqual([
+      "Box truck does not say what it carries.",
+      "Sprinter van + Cargo trailer does not say what it carries.",
+    ]);
+    two.vehicles[0]!.notes = "Kitchen and hot boxes";
+    two.vehicles[1]!.notes = "Rentals and bar";
+    two.vehicles[1]!.preloaded = true;
+    const grouped = get(run(two).answers, "vehicles.assigned");
+    expect(grouped.result).toBe("answered");
+    expect(grouped.value).toEqual({
+      type: "list",
+      items: [
+        "Box truck - carries Kitchen and hot boxes",
+        "Sprinter van + Cargo trailer - carries Rentals and bar - already loaded",
+      ],
+    });
+
+    // The same truck held by another event at the same time is named.
+    const busy = input();
+    busy.vehicles[0]!.busyWith = [
+      { id: "va-other", version: 4, eventTitle: "Smith Retirement" },
+    ];
+    const clash = get(run(busy).answers, "vehicles.assigned");
+    expect(clash.result).toBe("unresolved");
+    expect(clash.missing).toEqual([
+      "Box truck is also booked for Smith Retirement at the same time.",
+    ]);
+    expect(clash.sources).toContainEqual({
+      table: "eventVehicleAssignments",
+      id: "va-other",
+      version: 4,
+    });
   });
 
   it("derives ready-to-leave from actual work and needs two different people before takeoff", () => {
@@ -855,6 +1068,7 @@ describe("Final Lock answer engine", () => {
       quantity: 100,
       status: "reserved",
       shortBy: 0,
+      endsAt: null,
       item: { id: "equipment-china", version: 5 },
     });
     const agreed = get(run(i).answers, "servingware.source");
@@ -1026,6 +1240,7 @@ describe("Final Lock answer engine", () => {
         quantity: 1,
         status: "reserved",
         shortBy: 0,
+        endsAt: null,
         item: { id: "equipment-urn", version: 1 },
       });
       i.dishes.push({
@@ -1039,6 +1254,7 @@ describe("Final Lock answer engine", () => {
         followsEventHeadcount: true,
         notes: null,
         dish: { id: "dish-record-coffee", version: 1 },
+        portionCost: null,
       });
       i.proposal = {
         id: "prop-1",

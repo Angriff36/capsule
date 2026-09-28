@@ -246,12 +246,18 @@ export function dessertBarBuffetAnswers(
       .filter(Boolean);
   const hot = split(text.buffetHotPlates);
   const cold = split(text.buffetColdPlates);
-  const buffetSources = [...ev("buffetHotPlates"), ...ev("buffetColdPlates")];
+  const plateDish = (plate: string) =>
+    dishes.find((d) => d.name.trim().toLowerCase() === plate.toLowerCase());
+  const buffetSources = [
+    ...ev("buffetHotPlates"),
+    ...ev("buffetColdPlates"),
+    ...[...hot, ...cold].flatMap((p) => {
+      const d = plateDish(p);
+      return d ? dishSources(d) : [];
+    }),
+  ];
   const kindOf = (plate: string): Kind | null => {
-    const dish = dishes.find(
-      (d) => d.name.trim().toLowerCase() === plate.toLowerCase(),
-    );
-    const words = `${dish?.course ?? ""} ${plate}`;
+    const words = `${plateDish(plate)?.course ?? ""} ${plate}`;
     return KINDS.find(([, re]) => re.test(words))?.[0] ?? null;
   };
   if (!hot.length && !cold.length) {
@@ -280,13 +286,35 @@ export function dessertBarBuffetAnswers(
     issues.push(
       `Can't tell if ${plate} is a vegetable, starch or protein: set its course on the menu.`,
     );
-  const ranked = hot
-    .map((p) => [p, HOT_RANK[kindOf(p) as Kind]] as const)
-    .filter((r): r is readonly [string, number] => r[1] != null);
-  ranked.slice(1).forEach(([plate, rank], i) => {
-    if (rank < ranked[i]![1])
+  const ranked = hot.flatMap((plate) => {
+    const kind = kindOf(plate);
+    const rank = HOT_RANK[kind as Kind];
+    return rank == null
+      ? []
+      : [
+          {
+            plate,
+            kind: kind!,
+            rank,
+            cost: plateDish(plate)?.portionCost ?? null,
+          },
+        ];
+  });
+  ranked.slice(1).forEach((r, i) => {
+    const prev = ranked[i]!;
+    if (r.rank < prev.rank)
       issues.push(
-        `${plate} comes after ${ranked[i]![0]}: vegetables go closest to the plates, then starches, then proteins.`,
+        `${r.plate} comes after ${prev.plate}: vegetables go closest to the plates, then starches, then proteins.`,
+      );
+    // Within one kind, the less expensive dish goes first (when both costs are known).
+    else if (
+      r.rank === prev.rank &&
+      r.cost != null &&
+      prev.cost != null &&
+      r.cost < prev.cost
+    )
+      issues.push(
+        `${r.plate} costs less than ${prev.plate}: put the less expensive ${r.kind} first.`,
       );
   });
   if (hot.length > 3)
@@ -317,9 +345,19 @@ export function dessertBarBuffetAnswers(
     : answered(
         {
           type: "record",
-          fields: { hot: hot.join(", "), cold: cold.join(", ") },
+          fields: {
+            hot: hot.join(", "),
+            cold: cold.join(", "),
+            // One table holds only two hot items.
+            tables:
+              hot.length > 2
+                ? "Two tables for the hot items, or rotate chafers"
+                : "One table",
+          },
         },
-        "The buffet follows the Mangia standard order.",
+        hot.length > 2
+          ? "The buffet follows the Mangia standard order. One table holds only two hot items: use a second table or rotate chafers."
+          : "The buffet follows the Mangia standard order.",
         "buffet.arrangement.mangia-standard",
         buffetSources,
       );

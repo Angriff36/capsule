@@ -6,6 +6,24 @@ import { ArrowLeftIcon, CheckIcon } from "../../ui/icons";
 import { FieldError, useFieldValidation } from "../../ui/formValidation";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { useActionFailure } from "../../ui/action-result";
+import { QuoteMenuChoice, type QuotePicksValue } from "./QuoteMenuChoice";
+import {
+  QUOTE_MARKETING_NOTICE,
+  QUOTE_PRIVACY_NOTICE,
+} from "../../lib/quoteSelections";
+
+// Where the visitor came from: campaign tags on the link and the page
+// before ours. Read once when the form opens.
+function visitAttribution() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    utmSource: optional(params.get("utm_source") ?? ""),
+    utmMedium: optional(params.get("utm_medium") ?? ""),
+    utmCampaign: optional(params.get("utm_campaign") ?? ""),
+    referrer: optional(document.referrer),
+    landingPage: window.location.pathname + window.location.search,
+  };
+}
 
 function optional(value: string): string | undefined {
   const trimmed = value.trim();
@@ -86,13 +104,26 @@ export function QuoteSubmissionPage() {
   // list hooks and a raw fetch both fail for an anonymous visitor (role-gated
   // queries return [], and /api/actions/<path> is not a real Convex route).
   const options = useQuery(api.quoteBuilder.getQuoteFormOptions);
+  const [menuFit, setMenuFit] = useState<{
+    eventDate?: number;
+    guestCount?: number;
+  }>({});
   const submitQuote = useAction(api.quoteBuilder.submitQuote);
+  const [picks, setPicks] = useState<QuotePicksValue>({
+    picks: [],
+    extras: [],
+  });
+  // One key per form visit: a double tap or a retry after a lost response
+  // returns the first request instead of making a second.
+  const [submissionKey] = useState(() => crypto.randomUUID());
+  const [attribution] = useState(visitAttribution);
 
   const { errors, touched, formProps, handleSubmit } =
     useFieldValidation(quoteFieldRules);
 
   const activeServiceStyles = options?.serviceStyles ?? [];
   const activeOccasions = options?.occasions ?? [];
+  const referralSources = options?.referralSources ?? [];
 
   // Empty-catalog fallback (A5): once the options have loaded and a catalog
   // has no rows, ask for the answer as free text instead of a dead dropdown.
@@ -127,6 +158,16 @@ export function QuoteSubmissionPage() {
         consent: data.get("consent") === "on",
         serviceStyleId: formId<Id<"serviceStyles">>(data.get("serviceStyleId")),
         occasionId: formId<Id<"occasions">>(data.get("occasionId")),
+        menuId: picks.menuId,
+        picks: picks.menuId ? picks.picks : undefined,
+        extras: picks.extras.length > 0 ? picks.extras : undefined,
+        submissionKey,
+        referralSourceId: formId<Id<"referralSources">>(
+          data.get("referralSourceId"),
+        ),
+        howHeardText: optional(String(data.get("howHeardText") ?? "")),
+        marketingConsent: data.get("marketingConsent") === "on",
+        ...attribution,
         serviceStyleText: optional(String(data.get("serviceStyleText") ?? "")),
         occasionText: optional(String(data.get("occasionText") ?? "")),
         venueName: optional(String(data.get("venueName") ?? "")),
@@ -213,6 +254,16 @@ export function QuoteSubmissionPage() {
 
           <form
             onSubmit={handleSubmit(submit)}
+            onChange={(event) => {
+              // Date and guests decide which menus can be picked.
+              const data = new FormData(event.currentTarget);
+              const date = String(data.get("eventDate") ?? "");
+              const guests = Number(data.get("guestCount") ?? 0);
+              setMenuFit({
+                eventDate: date ? Date.parse(`${date}T12:00`) : undefined,
+                guestCount: guests > 0 ? guests : undefined,
+              });
+            }}
             {...formProps}
             className="space-y-6"
           >
@@ -491,6 +542,12 @@ export function QuoteSubmissionPage() {
                 Menu Preferences
               </h2>
               <div className="space-y-4">
+                <QuoteMenuChoice
+                  eventDate={menuFit.eventDate}
+                  guestCount={menuFit.guestCount}
+                  disabled={busy}
+                  onChange={setPicks}
+                />
                 <div>
                   <label
                     htmlFor="menuPreferences"
@@ -550,6 +607,44 @@ export function QuoteSubmissionPage() {
               </div>
             </section>
 
+            {/* How they heard about us (attribution) */}
+            <section>
+              <label
+                htmlFor={
+                  referralSources.length > 0
+                    ? "referralSourceId"
+                    : "howHeardText"
+                }
+                className="block text-xs font-medium text-ink-2 mb-1"
+              >
+                How did you hear about us?
+              </label>
+              {referralSources.length > 0 ? (
+                <select
+                  id="referralSourceId"
+                  name="referralSourceId"
+                  className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
+                  disabled={busy}
+                >
+                  <option value="">Choose one...</option>
+                  {referralSources.map((source) => (
+                    <option key={source._id} value={source._id}>
+                      {source.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  id="howHeardText"
+                  name="howHeardText"
+                  className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
+                  placeholder="e.g., a friend, Instagram, a wedding show"
+                  disabled={busy}
+                />
+              )}
+            </section>
+
             {/* Consent */}
             <section className="border-t border-line pt-6">
               <div className="flex items-start">
@@ -562,12 +657,25 @@ export function QuoteSubmissionPage() {
                   disabled={busy}
                 />
                 <label htmlFor="consent" className="ml-3 text-xs text-ink-2">
-                  I consent to the processing of my personal data for the
-                  purpose of preparing a quote for my event. I understand my
-                  data will be handled according to our privacy notice.
+                  {QUOTE_PRIVACY_NOTICE}
                 </label>
               </div>
               <FieldError name="consent" errors={errors} touched={touched} />
+              <div className="flex items-start mt-4">
+                <input
+                  type="checkbox"
+                  id="marketingConsent"
+                  name="marketingConsent"
+                  className="mt-1 h-4 w-4 text-ink border-line-2 rounded-xs"
+                  disabled={busy}
+                />
+                <label
+                  htmlFor="marketingConsent"
+                  className="ml-3 text-xs text-ink-2"
+                >
+                  {QUOTE_MARKETING_NOTICE}
+                </label>
+              </div>
             </section>
 
             {/* Submit Button */}

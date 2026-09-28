@@ -1,0 +1,130 @@
+// OperatingLocation — a kitchen, commissary or branch the crew leaves from
+// (spec §8.4, PL-ROUTES). Headquarters is not a hard-coded global address:
+// each company keeps its own locations, and an event picks the one it leaves
+// from, so a second kitchen produces the right drive time.
+
+use "../foundation/base.manifest"
+
+enum OperatingLocationStatus {
+  active
+  inactive
+}
+
+entity OperatingLocation mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string = ""
+  property addressLine1: string?
+  property addressLine2: string?
+  property city: string?
+  property region: string?
+  property postalCode: string?
+  property countryCode: string?
+  // IANA time zone name, for example America/New_York.
+  property timeZone: string?
+  property required status: OperatingLocationStatus = "active"
+  // Explicit nullable flag (not the auto timestamps mixin) so the create guard works.
+  property addedAt: datetime?
+
+  computed isActive: boolean = self.status == "active" and self.deletedAt == null
+
+  constraint operatingLocationName: self.addedAt == null or length(trim(self.name)) > 0 "Give this kitchen a name."
+
+  transition status from "active" to ["inactive"]
+  transition status from "inactive" to ["active"]
+
+  default policy operatingLocationRead read: roleAllows(user.role, "staffAccess") "Staff may see the company kitchens"
+  default policy operatingLocationWrite write: roleAllows(user.role, "manageAccess") "Managers may update the company kitchens"
+  default policy operatingLocationExecute execute: roleAllows(user.role, "manageAccess") "Managers may change the company kitchens"
+
+  command add(
+    name: string,
+    addressLine1: string,
+    optional addressLine2: string,
+    city: string,
+    optional region: string,
+    optional postalCode: string,
+    countryCode: string,
+    timeZone: string
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    constraint addOperatingLocationName: length(trim(name)) > 0 "Give this kitchen a name."
+    constraint addOperatingLocationStreet: length(trim(addressLine1)) > 0 "Enter the kitchen's street address."
+    constraint addOperatingLocationCity: length(trim(city)) > 0 "Enter the kitchen's city."
+    constraint addOperatingLocationCountry: length(trim(countryCode)) == 2 "Enter a two-letter country code, like US."
+    constraint addOperatingLocationTimeZone: length(trim(timeZone)) > 0 "Choose the kitchen's time zone."
+    mutate name = name
+    mutate addressLine1 = addressLine1
+    mutate addressLine2 = addressLine2
+    mutate city = city
+    mutate region = region
+    mutate postalCode = postalCode
+    mutate countryCode = toUpperCase(countryCode)
+    mutate timeZone = timeZone
+    mutate addedAt = now()
+    emit OperatingLocationAdded {
+      operatingLocationId: self.id
+      tenantId: self.tenantId
+      name: name
+    }
+  }
+
+  // Full address form: every change bumps the version, so a stored drive
+  // time from the old address reads as out of date.
+  command revise(
+    name: string,
+    addressLine1: string,
+    optional addressLine2: string,
+    city: string,
+    optional region: string,
+    optional postalCode: string,
+    countryCode: string,
+    timeZone: string
+  ) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint reviseOperatingLocationName: length(trim(name)) > 0 "Give this kitchen a name."
+    constraint reviseOperatingLocationStreet: length(trim(addressLine1)) > 0 "Enter the kitchen's street address."
+    constraint reviseOperatingLocationCity: length(trim(city)) > 0 "Enter the kitchen's city."
+    constraint reviseOperatingLocationCountry: length(trim(countryCode)) == 2 "Enter a two-letter country code, like US."
+    constraint reviseOperatingLocationTimeZone: length(trim(timeZone)) > 0 "Choose the kitchen's time zone."
+    mutate name = name
+    mutate addressLine1 = addressLine1
+    mutate addressLine2 = addressLine2
+    mutate city = city
+    mutate region = region
+    mutate postalCode = postalCode
+    mutate countryCode = toUpperCase(countryCode)
+    mutate timeZone = timeZone
+    emit OperatingLocationRevised {
+      operatingLocationId: self.id
+      tenantId: self.tenantId
+      name: name
+    }
+  }
+
+  command deactivate() {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate status = "inactive"
+    emit OperatingLocationDeactivated {
+      operatingLocationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command activate() {
+    guard self.status == "inactive"
+    guard self.deletedAt == null
+    mutate status = "active"
+    emit OperatingLocationActivated {
+      operatingLocationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store OperatingLocation in durable
+}

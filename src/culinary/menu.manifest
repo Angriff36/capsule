@@ -29,6 +29,9 @@ entity Menu mixin TenantScoped, SoftDeletable {
   property publishedAt: datetime?
   property archivedAt: datetime?
   property archiveReason: string?
+  // Season: the event dates this menu can be booked for. Empty = all year.
+  property availableFrom: datetime?
+  property availableUntil: datetime?
 
   computed isPublished: boolean = self.status == "published"
   computed isEditable: boolean = self.status == "draft"
@@ -124,6 +127,22 @@ entity Menu mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Set or clear the season. Leave both empty for an all-year menu.
+  command setSeason(optional availableFrom: datetime, optional availableUntil: datetime) {
+    guard self.status == "draft" or self.status == "published"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    constraint seasonOrder: availableFrom == null or availableUntil == null or availableUntil >= availableFrom "The season has to end on or after the day it starts."
+    mutate availableFrom = availableFrom
+    mutate availableUntil = availableUntil
+    emit MenuSeasonSet {
+      menuId: self.id
+      tenantId: self.tenantId
+      availableFrom: availableFrom
+      availableUntil: availableUntil
+    }
+  }
+
   command markPublished() {
     guard self.status == "draft"
     guard self.draftedAt != null
@@ -206,7 +225,14 @@ event MenuPricingUpdated: "menu.pricing_updated" {
   maxGuests: number
 }
 
-event MenuPublished: "menu.published" {
+event MenuSeasonSet: "menu.season_set" {
+  menuId: string
+  tenantId: string
+  availableFrom: datetime?
+  availableUntil: datetime?
+}
+
+event MenuPublished:"menu.published" {
   menuId: string
   tenantId: string
   name: string

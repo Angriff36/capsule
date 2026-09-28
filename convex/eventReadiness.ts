@@ -16,6 +16,9 @@ import {
 } from "./lib/eventReadinessProjection";
 import { openReconciliationFlags } from "./lib/reconciliationFlags";
 import { readCurrentPacket } from "./lib/eventPacket/reconcileNative";
+import { readFinalLockInput } from "./lib/eventPacket/finalLockInput";
+import { evaluateFinalLock } from "../src/lib/eventPacket/finalLock/evaluate";
+import { readEventRouteStatus } from "./eventRoutes";
 
 const live = (row: { deletedAt?: unknown }) => row.deletedAt == null;
 
@@ -127,6 +130,41 @@ export const getEventReadiness = query({
       ])
     ).flat();
 
+    // The Final Lock answers (AC-388), the same evaluation the workbook
+    // panel shows. The summary carries question keys and counts only —
+    // never answer values — so a staff read never carries a price.
+    const {
+      input: lockInput,
+      overrides,
+      printed,
+    } = await readFinalLockInput(ctx, tenantId, id);
+    const lockReport = evaluateFinalLock(lockInput, { overrides, printed });
+    const finalLock = {
+      outcome: lockReport.outcome,
+      unresolvedQuestionKeys: lockReport.answers
+        .filter((answer) => answer.result === "unresolved" && !answer.fieldWork)
+        .map((answer) => answer.questionKey),
+      staleQuestionKeys: lockReport.staleQuestions,
+      openFieldWorkCount: lockReport.answers.filter(
+        (answer) => answer.fieldWork && !answer.fieldWork.confirmedAt,
+      ).length,
+    };
+
+    // Drive time (PL-ROUTES): only once there is a venue to drive to.
+    let route: EventReadinessFacts["route"] = null;
+    if (event.venueId || (event.venueAddress ?? "").trim()) {
+      const status = await readEventRouteStatus(ctx, tenantId, id, Date.now());
+      if (status && !status.finished) {
+        const missing = status.legs.find((leg) => leg.state === "missing");
+        const stale = status.legs.find((leg) => leg.state === "stale");
+        route = {
+          required: status.routeRequired,
+          stale: status.routeStale,
+          reason: missing?.problem ?? stale?.staleReasons[0] ?? null,
+        };
+      }
+    }
+
     const presentId = (value: unknown): string | null => {
       const raw = value == null ? "" : String(value);
       return raw.trim().length > 0 ? raw : null;
@@ -180,6 +218,8 @@ export const getEventReadiness = query({
         .filter(isOpenPacketIssue)
         .map((row: any) => String(row._id)),
       packetOutOfDateRevisionId,
+      finalLock,
+      route,
       closeoutId: closeout ? String(closeout._id) : null,
       closeoutStatus: closeout ? (closeout.status ?? null) : null,
       reconciliationFlags,

@@ -16,6 +16,7 @@ describe("plain words on sales screens", () => {
     const files = [
       "src/features/sales/QuoteSubmissionsReviewPage.tsx",
       "src/features/sales/QuoteSubmissionPage.tsx",
+      "src/lib/quoteSelections.ts",
       "src/features/clients/ProposalAcceptancePage.tsx",
       "src/features/clients/ClientCommunicationPanel.tsx",
       "src/features/clients/ContractsPage.tsx",

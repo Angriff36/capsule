@@ -1,4 +1,5 @@
 import type { ConvexCommandEvent } from "@angriff36/manifest/projections/convex";
+import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { reconcileEventPrepWork } from "./prepWorkReconciliation";
@@ -42,12 +43,26 @@ import { assertProposalFollowTotals } from "./proposalFollowTotals";
 import { ensureEventNumber } from "./eventNumbering";
 import { recordAcceptedProposalRevision } from "./proposalAcceptanceRevision";
 import { deleteBlobIfOrphan } from "./blobs";
+import { queueRouteRefresh } from "./routeFollowUp";
+import { queueTimingRecalculation } from "./timingFollowUp";
+import { handleTravelLegEvent } from "./travelLegEvents";
 
 /** Runs after declared reactions, inside the originating command transaction. */
 export async function handleManifestEvent(
   ctx: MutationCtx,
   event: ConvexCommandEvent,
 ): Promise<void> {
+  await queueRouteRefresh(ctx, event);
+  await queueTimingRecalculation(ctx, event);
+  if (await handleTravelLegEvent(ctx, event)) return;
+  if (event.entity === "WeeklyScheduleNotice" &&
+    (event.type === "WeeklySchedulePublished" || event.type === "WeeklyScheduleRepublished")) {
+    // The person's phone notice for a new or changed week (AC-326/AC-508).
+    await ctx.scheduler.runAfter(0, internal.schedulePushSend.deliver, {
+      noticeId: event.entityId as Id<"weeklyScheduleNotices">,
+    });
+    return;
+  }
   if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedCoverageChangeRequested") {
     await prepareStaffNeedCoverageChange(ctx, event.entityId as Id<"eventStaffNeeds">);
     return;

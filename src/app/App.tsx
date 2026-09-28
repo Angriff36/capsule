@@ -4,6 +4,7 @@ import { ClientPortalPage } from "../features/clientPortal/ClientPortalPage";
 import { ProposalAcceptancePage } from "../features/clients/ProposalAcceptancePage";
 import { SharedProposalPage } from "../features/clients/SharedProposalPage";
 import { QuoteSubmissionPage } from "../features/sales/QuoteSubmissionPage";
+import { PublicMenuPage } from "../features/sales/PublicMenuPage";
 import { EventAllergenBriefingPage } from "../features/events/EventAllergenBriefingPage";
 import { EventCapacityPlannerPage } from "../features/events/EventCapacityPlannerPage";
 import { EventCreatePage } from "../features/events/EventCreatePage";
@@ -455,6 +456,11 @@ const BrandingPage = lazy(() =>
     default: module.BrandingPage,
   })),
 );
+const KitchensPage = lazy(() =>
+  import("../features/admin/KitchensPage").then((module) => ({
+    default: module.KitchensPage,
+  })),
+);
 const CatalogsPage = lazy(() =>
   import("../features/admin/CatalogsPage").then((module) => ({
     default: module.CatalogsPage,
@@ -569,6 +575,7 @@ export function App() {
   const acceptanceMatch = useMatch("/accept/:callbackToken");
   const shareMatch = useMatch("/share/:token");
   const quoteMatch = useMatch("/quote");
+  const publicMenuMatch = useMatch("/menu");
 
   if (clientPortalMatch?.params.token) {
     return (
@@ -604,6 +611,14 @@ export function App() {
       <AppErrorBoundary>
         <ActionResultHost />
         <QuoteSubmissionPage />
+      </AppErrorBoundary>
+    );
+  }
+
+  if (publicMenuMatch) {
+    return (
+      <AppErrorBoundary>
+        <PublicMenuPage />
       </AppErrorBoundary>
     );
   }
@@ -1413,6 +1428,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <BrandingPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin/kitchens"
+              element={
+                <SupplyRoute>
+                  <KitchensPage />
                 </SupplyRoute>
               }
             />

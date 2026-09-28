@@ -80,6 +80,8 @@ async function createEvent(
       clientId: client.docId,
       title,
       eventType: "corporate dinner",
+      venueName: "Proof Hall",
+      serviceStyleName: "Plated",
       startsAt: S.startsAt,
       endsAt: S.endsAt,
       expectedHeadcount: HEAD_COUNT,

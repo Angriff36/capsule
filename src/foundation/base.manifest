@@ -154,6 +154,13 @@ enum OrganizationStatus {
   deactivated
 }
 
+// How a route fetch treats traffic: expected traffic at the departure time,
+// or plain road time.
+enum RouteTrafficPolicy {
+  traffic_aware
+  no_traffic
+}
+
 entity Organization mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -174,6 +181,22 @@ entity Organization mixin TenantScoped, SoftDeletable {
   // exchangeRate so reports can fold the issued total back into this code.
   property defaultCurrencyCode: string?
   property defaultExchangeRateScale: int = 6
+  // Drive-time rules (spec §8.4, PL-ROUTES): extra minutes added before the
+  // shop departure time, whether the route uses expected traffic, and how many
+  // hours a fetched route stays current. Unset reads as 15 / traffic / 24.
+  property routeSafetyBufferMinutes: int?
+  property routeTrafficPolicy: RouteTrafficPolicy?
+  property routeRefreshHours: int?
+  // Event timing rules (spec §8.4, PL-TIMING): on-site setup before serve
+  // for full and limited service, crew briefing before loading, the load
+  // time used when no load rule matches, and the load rules themselves (JSON
+  // list read by src/lib/eventTimingPolicy.ts). Unset reads as 180 / 90 / 0 /
+  // 60 and no rules.
+  property timingFullServiceSetupMinutes: int?
+  property timingLimitedServiceSetupMinutes: int?
+  property timingBriefingMinutes: int?
+  property timingLoadBaselineMinutes: int?
+  property timingLoadRulesJson: string?
 
   computed isOperable: boolean = self.status == "active" and self.deletedAt == null
   // 3-character ISO 4217, uppercase. Defaults to USD when unset so existing
@@ -281,6 +304,50 @@ entity Organization mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Company drive-time rules; the event route read and refresh use them.
+  command configureRoutePolicy(
+    safetyBufferMinutes: int,
+    trafficPolicy: RouteTrafficPolicy,
+    refreshHours: int
+  ) {
+    guard self.deletedAt == null
+    constraint routeBufferRange: safetyBufferMinutes >= 0 and safetyBufferMinutes <= 240 "Use a safety buffer from 0 to 240 minutes."
+    constraint routeRefreshRange: refreshHours >= 1 and refreshHours <= 720 "Refresh drive times every 1 to 720 hours."
+    mutate routeSafetyBufferMinutes = safetyBufferMinutes
+    mutate routeTrafficPolicy = trafficPolicy
+    mutate routeRefreshHours = refreshHours
+    emit OrganizationRoutePolicyConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+      safetyBufferMinutes: safetyBufferMinutes
+      refreshHours: refreshHours
+    }
+  }
+
+  // Company event timing rules; open events that follow them are re-planned.
+  command configureTimingPolicy(
+    fullServiceSetupMinutes: int,
+    limitedServiceSetupMinutes: int,
+    briefingMinutes: int,
+    loadBaselineMinutes: int,
+    optional loadRulesJson: string
+  ) {
+    guard self.deletedAt == null
+    constraint timingFullSetupRange: fullServiceSetupMinutes >= 0 and fullServiceSetupMinutes <= 720 "Use a full service setup time from 0 to 720 minutes."
+    constraint timingLimitedSetupRange: limitedServiceSetupMinutes >= 0 and limitedServiceSetupMinutes <= 720 "Use a limited service setup time from 0 to 720 minutes."
+    constraint timingBriefingRange: briefingMinutes >= 0 and briefingMinutes <= 240 "Use a briefing time from 0 to 240 minutes."
+    constraint timingLoadBaselineRange: loadBaselineMinutes >= 0 and loadBaselineMinutes <= 480 "Use a standard load time from 0 to 480 minutes."
+    mutate timingFullServiceSetupMinutes = fullServiceSetupMinutes
+    mutate timingLimitedServiceSetupMinutes = limitedServiceSetupMinutes
+    mutate timingBriefingMinutes = briefingMinutes
+    mutate timingLoadBaselineMinutes = loadBaselineMinutes
+    mutate timingLoadRulesJson = loadRulesJson
+    emit OrganizationTimingPolicyConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   command suspend(reason: string = "") {
     guard self.status == "active"
     guard self.deletedAt == null
@@ -362,6 +429,18 @@ event OrganizationDefaultCurrencySet: "organization.default_currency_set" {
   organizationId: string
   tenantId: string
   currencyCode: string
+}
+
+event OrganizationRoutePolicyConfigured: "organization.route_policy_configured" {
+  organizationId: string
+  tenantId: string
+  safetyBufferMinutes: int
+  refreshHours: int
+}
+
+event OrganizationTimingPolicyConfigured: "organization.timing_policy_configured" {
+  organizationId: string
+  tenantId: string
 }
 
 event OrganizationDeactivated: "organization.deactivated" {

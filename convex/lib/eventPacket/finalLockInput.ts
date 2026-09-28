@@ -2,6 +2,7 @@ import type { QueryCtx, MutationCtx } from "../../_generated/server";
 import type { Id } from "../../_generated/dataModel";
 import { decrypt } from "../encryption";
 import { overlappingReservationQuantity } from "../equipmentReservationAvailability";
+import { dishPortionCosts } from "./dishCosts";
 import { eventRows, readCurrentPacket } from "./reconcileNative";
 import type { FinalLockInput } from "../../../src/lib/eventPacket/finalLock/types";
 import type {
@@ -109,8 +110,25 @@ export async function readFinalLockInput(
           : null,
       notes: str(line.specialInstructions),
       dish: dish ? { id: String(dish._id), version: version(dish) } : null,
+      portionCost: null as number | null,
     });
   }
+  // Cost of one portion of each hot buffet dish (less expensive goes first).
+  const hotPlates = new Set(
+    (str(event.buffetHotPlates) ?? "")
+      .split(",")
+      .map((p) => p.trim().toLowerCase())
+      .filter(Boolean),
+  );
+  const costs = await dishPortionCosts(
+    ctx,
+    tenantId,
+    dishes
+      .filter((d) => d.dish && hotPlates.has(d.name.trim().toLowerCase()))
+      .map((d) => d.dish!.id),
+  );
+  for (const d of dishes)
+    d.portionCost = d.dish ? (costs.get(d.dish.id) ?? null) : null;
 
   const timeline = (
     await eventRows(ctx, "eventTimelineActivities", tenantId, eventId)
@@ -138,6 +156,42 @@ export async function readFinalLockInput(
       v
         ? `${v.make ?? ""} ${v.model ?? ""}`.trim() || String(v.registration)
         : null;
+    // The same truck or trailer held by another event at an overlapping time.
+    const busyWith = [];
+    const seen = new Set<string>();
+    for (const field of ["vehicleId", "trailerId"] as const) {
+      const id = row[field];
+      if (typeof id !== "string") continue;
+      const others = await ctx.db
+        .query("eventVehicleAssignments")
+        .withIndex(`by_${field}`, (q: any) => q.eq(field, id))
+        .collect();
+      for (const other of others as any[]) {
+        if (
+          other.tenantId !== tenantId ||
+          other.eventId === String(eventId) ||
+          other.releasedAt != null ||
+          other.deletedAt != null ||
+          seen.has(String(other._id))
+        )
+          continue;
+        const otherEvent = await own(ctx, "events", other.eventId, tenantId);
+        const [a0, a1, b0, b1] = [
+          num(event.startsAt),
+          num(event.endsAt),
+          num(otherEvent?.startsAt),
+          num(otherEvent?.endsAt),
+        ];
+        if (a0 == null || a1 == null || b0 == null || b1 == null) continue;
+        if (b0 >= a1 || a0 >= b1) continue;
+        seen.add(String(other._id));
+        busyWith.push({
+          id: String(other._id),
+          version: version(other),
+          eventTitle: String(otherEvent?.title ?? "another event"),
+        });
+      }
+    }
     vehicles.push({
       id: String(row._id),
       version: version(row),
@@ -146,6 +200,9 @@ export async function readFinalLockInput(
       trailerId: str(row.trailerId),
       trailerName: label(trailer),
       driverId: str(row.driverId),
+      notes: str(row.notes),
+      preloaded: row.preloadedAt != null,
+      busyWith,
       outOfService: [vehicle, trailer].some(
         (v) =>
           v &&
@@ -187,6 +244,7 @@ export async function readFinalLockInput(
       quantity: row.quantity,
       status: row.status,
       shortBy,
+      endsAt: row.endsAt ?? null,
       item: item ? { id: String(item._id), version: version(item) } : null,
     });
   }
@@ -387,6 +445,13 @@ export async function readFinalLockInput(
       },
       salesLockedAt: num(event.salesLockedAt),
       operationalRequirements: str(event.operationalRequirements),
+      externalChannel: str(event.externalChannelId)
+        ? {
+            name: str(event.externalChannelName) ?? "",
+            id: str(event.externalChannelId)!,
+            url: str(event.externalChannelUrl),
+          }
+        : null,
       text: Object.fromEntries(TEXT_FIELDS.map((f) => [f, str(event[f])])),
     },
     serviceStyle: style

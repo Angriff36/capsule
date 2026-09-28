@@ -59,6 +59,18 @@ export type EventReadinessFacts = {
   /** The newest printed packet revision when the event changed after it was
    * printed (no revision holds the current snapshot); null otherwise. */
   packetOutOfDateRevisionId?: string | null;
+  /** The Final Lock answer engine's outcome for the event as it is now,
+   * summarized without answer values (readiness is readable by any staff
+   * member, so nothing here may carry a price). */
+  finalLock?: FinalLockReadinessSummary | null;
+  /** Kitchen-to-venue drive time (PL-ROUTES); null when the event has no
+   * venue yet or is finished. */
+  route?: {
+    required: boolean;
+    stale: boolean;
+    /** The first leg's problem or out-of-date reason, plain words. */
+    reason: string | null;
+  } | null;
   closeoutId: string | null;
   closeoutStatus: "draft" | "finalized" | null;
   /** Open change flags from the invoice, proposal and closeout
@@ -74,6 +86,18 @@ export type EventReconciliationFlag = {
   status: string;
   /** Invoices only: Invoice.followEventPrice may run on this draft. */
   canFollowPrice?: boolean;
+};
+
+/** The Final Lock answer engine's outcome (spec §14.2), carried as question
+ * keys and counts only — never answer values. */
+export type FinalLockReadinessSummary = {
+  outcome: "clear" | "needs_review" | "field_work_pending" | "stale";
+  /** Office questions with no answer or a contradiction yet. */
+  unresolvedQuestionKeys: string[];
+  /** Questions whose printed words no longer match the facts now. */
+  staleQuestionKeys: string[];
+  /** Day-of forms nobody has confirmed yet. */
+  openFieldWorkCount: number;
 };
 
 type FlagText = {
@@ -273,6 +297,29 @@ export function projectEventReadiness(
     );
   }
 
+  // Drive time (spec §8.4): ROUTE_REQUIRED when a leg has no drive time from
+  // the route service; out of date when a kept one no longer matches.
+  const route = facts.route;
+  if (route?.required) {
+    add(
+      "planning",
+      "planning.route_required",
+      [facts.eventId],
+      "warning",
+      `No drive time yet. ${route.reason ?? ""}`.trim(),
+      "refreshEventRoute",
+    );
+  } else if (route?.stale) {
+    add(
+      "planning",
+      "planning.route_stale",
+      [facts.eventId],
+      "warning",
+      `The drive time is out of date. ${route.reason ?? ""}`.trim(),
+      "refreshEventRoute",
+    );
+  }
+
   // kitchen
   if (!facts.hasMenuDishes) {
     add(
@@ -362,6 +409,57 @@ export function projectEventReadiness(
       "warning",
       "The event changed after its packet was printed. The printed packet was not changed. Prepare the packet again.",
       "EventPacket.recordPacketRevision",
+    );
+  }
+  // Final Lock answers (spec §14.2): the answer engine's outcome reaches the
+  // office here. An out-of-date packet warning already covers a fingerprint
+  // miss, so the stale issue fires only while the packet itself still
+  // matches but an answer changed behind it — facts the packet fingerprint
+  // never saw (the event conversation, an accepted proposal, a recipe cost).
+  const finalLock = facts.finalLock;
+  if (
+    finalLock &&
+    finalLock.outcome === "needs_review" &&
+    finalLock.unresolvedQuestionKeys.length > 0
+  ) {
+    add(
+      "packet",
+      "packet.final_lock_needs_review",
+      finalLock.unresolvedQuestionKeys,
+      "warning",
+      `${finalLock.unresolvedQuestionKeys.length} Final Lock question${
+        finalLock.unresolvedQuestionKeys.length === 1 ? "" : "s"
+      } still need an answer or a manager decision.`,
+      "overrideFinalLockAnswer",
+    );
+  }
+  if (
+    finalLock &&
+    finalLock.outcome === "stale" &&
+    !hasId(facts.packetOutOfDateRevisionId) &&
+    finalLock.staleQuestionKeys.length > 0
+  ) {
+    add(
+      "packet",
+      "packet.final_lock_stale",
+      finalLock.staleQuestionKeys,
+      "warning",
+      "The facts behind the Final Lock answers changed after they were printed. The printed answers were not changed. Prepare the packet again.",
+      "EventPacket.recordPacketRevision",
+    );
+  }
+  if (
+    finalLock &&
+    finalLock.outcome === "field_work_pending" &&
+    finalLock.openFieldWorkCount > 0
+  ) {
+    add(
+      "packet",
+      "packet.final_lock_field_work",
+      [],
+      "info",
+      "Office planning is done; the day-of Final Lock confirmations are still open.",
+      "resolveOperationalIssue",
     );
   }
 

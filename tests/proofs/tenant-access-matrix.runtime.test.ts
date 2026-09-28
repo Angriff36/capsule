@@ -156,6 +156,7 @@ const LINK_TABLE: Record<string, string> = {
   brandLogoStorageId: "@file",
   capsuleId: "events",
   capturedByAuthSubjectId: "@sign-in",
+  channelId: "@outside",
   childComponentId: "components",
   closedById: "@sign-in",
   completedByPersonId: "people",
@@ -177,6 +178,7 @@ const LINK_TABLE: Record<string, string> = {
   eventStaffingPersonId: "people",
   eventStaffingSourceIds: "eventStaffNeeds",
   externalAccountId: "@outside",
+  externalChannelId: "@outside",
   externalCandidateId: "@outside",
   externalId: "@outside",
   externalInterviewId: "@outside",
@@ -188,6 +190,7 @@ const LINK_TABLE: Record<string, string> = {
   lastImportRunId: "importRuns",
   lastSeenImportRunId: "importRuns",
   leadPersonId: "people",
+  loadRuleId: "@outside",
   locationId: "storageLocations",
   locationIds: "storageLocations",
   maintenanceScheduleId: "vehicleMaintenanceSchedules",
@@ -252,6 +255,7 @@ const LINK_TABLE: Record<string, string> = {
   reviewerId: "people",
   revisedById: "proposals",
   revokedByPersonId: "people",
+  rideVehicleAssignmentId: "eventVehicleAssignments",
   salespersonId: "people",
   senderAuthSubjectId: "@sign-in",
   sequenceAfterDishTaskId: "dishTasks",
@@ -289,6 +293,9 @@ const LINK_TABLE: Record<string, string> = {
   taskOwnerAuthSubjectId: "@sign-in",
   taxId: "@outside",
   threadId: "messageThreads",
+  timingLoadOverrideByPersonId: "people",
+  timingLoadRuleId: "@outside",
+  timingSetupOverrideByPersonId: "people",
   updatedById: "@sign-in",
   uploadedByAuthSubjectId: "@sign-in",
   uploadedById: "@sign-in",
@@ -514,15 +521,21 @@ function variants(entry: Entry): (string | null)[] {
 
 /**
  * The website quote form is open to anyone by design: it lists the names of
- * the published company's active service styles and occasions. It must give
- * nothing else — only _id, name and sortOrder on each option.
+ * the published company's active service styles, occasions and "how did you
+ * hear about us" choices (PL-QUOTE). It must give nothing else — only _id,
+ * name and sortOrder on each option.
  */
 const PUBLIC_QUOTE_FORM = "quoteBuilder:getQuoteFormOptions";
 function publicQuoteFormExtras(value: unknown): string[] {
   const extra: string[] = [];
   const form = (value ?? {}) as Record<string, unknown>;
   for (const [key, list] of Object.entries(form)) {
-    if (key !== "serviceStyles" && key !== "occasions") extra.push(key);
+    if (
+      key !== "serviceStyles" &&
+      key !== "occasions" &&
+      key !== "referralSources"
+    )
+      extra.push(key);
     for (const option of Array.isArray(list) ? (list as Doc[]) : []) {
       for (const field of Object.keys(option)) {
         if (!["_id", "name", "sortOrder"].includes(field))

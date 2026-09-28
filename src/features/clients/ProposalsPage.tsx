@@ -39,9 +39,17 @@ import {
 import { ProposalSignatureRevokeAction } from "../sales/ProposalSignatureRevokeAction";
 import { ProposalChangeAction } from "./ProposalChangeAction";
 import { ProposalChangeLabel } from "./ProposalChangeLabel";
+import {
+  HistoricalAcceptanceLabel,
+  RecordAcceptedBeforeCapsule,
+} from "./ProposalHistoricalAcceptance";
 import { ProposalCreateForm } from "./ProposalCreateForm";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
 import { ProposalReadinessNotice } from "./ProposalReadinessNotice";
+import {
+  ProposalDraftCheck,
+  useGenerateProposalDraft,
+} from "./ProposalDraftCheck";
 import { generateAcceptanceUrl } from "./proposalSignatureRequest";
 import { useSendProposalWithRevisionCapture } from "./useSendProposalWithRevisionCapture";
 import { ProposalPricingPanel } from "./ProposalPricingPanel";
@@ -136,7 +144,30 @@ export function ProposalsPage() {
       setNotice(`Share link: ${url}`);
     }
   };
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  // One button builds the draft from the event, or brings the draft it built
+  // before up to date (convex/lib/proposalGenerate.ts); staff edits are kept.
+  const generateDraft = useGenerateProposalDraft();
+  const buildFromEvent = async (eventId: Id<"events">) => {
+    setBusy("build-from-event");
+    setFailure(null);
+    try {
+      const result = await generateDraft({ eventId });
+      setShowDraft(false);
+      setNotice(
+        result.created
+          ? "Proposal built from the event. Check it, then send it."
+          : result.changed
+            ? "Proposal brought up to date with the event. Staff changes were kept."
+            : "This event's proposal already matches the event.",
+      );
+      setSearchParams({ proposal: result.proposalId });
+    } catch (error) {
+      setFailure(error);
+    } finally {
+      setBusy(null);
+    }
+  };
   const fromEventId = searchParams.get("event");
   const fromEvent =
     fromEventId && events
@@ -460,8 +491,31 @@ export function ProposalsPage() {
           >
             {showTerminal ? "Hide declined/expired" : "Show declined/expired"}
           </button>
+          {fromEvent ? (
+            <button
+              className="btn btn-primary"
+              type="button"
+              disabled={busy != null}
+              onClick={() => void buildFromEvent(fromEvent._id)}
+            >
+              Build from event
+            </button>
+          ) : null}
+          {fromEvent ? (
+            <RecordAcceptedBeforeCapsule
+              event={fromEvent}
+              prompt={prompt}
+              busy={busy}
+              run={run}
+              onNotice={setNotice}
+              onOpen={(proposalId) => {
+                setShowDraft(false);
+                setSearchParams({ proposal: proposalId });
+              }}
+            />
+          ) : null}
           <button
-            className="btn btn-primary"
+            className={fromEvent ? "btn btn-ghost" : "btn btn-primary"}
             type="button"
             onClick={() => setShowDraft((value) => !value)}
           >
@@ -539,6 +593,10 @@ export function ProposalsPage() {
                         </Link>
                         <ProposalChangeLabel
                           replacesProposalId={row.replacesProposalId}
+                        />
+                        <HistoricalAcceptanceLabel
+                          source={row.acceptanceSource}
+                          evidence={row.acceptanceEvidence}
                         />
                       </td>
                       <td>{clientDisplayName(row.clientId, clients)}</td>
@@ -631,6 +689,10 @@ export function ProposalsPage() {
                               visibleSections: (
                                 row.visibleSections ?? []
                               ).filter(
+                                (section): section is string =>
+                                  typeof section === "string",
+                              ),
+                              sectionOrder: (row.sectionOrder ?? []).filter(
                                 (section): section is string =>
                                   typeof section === "string",
                               ),
@@ -796,6 +858,16 @@ export function ProposalsPage() {
                                 : action.label}
                             </button>
                           ))}
+                        {String(row.status) === "sent" ||
+                        String(row.status) === "viewed" ? (
+                          <ProposalChangeAction
+                            proposalId={row._id}
+                            busy={busy}
+                            run={run}
+                            onNotice={setNotice}
+                            accepted={false}
+                          />
+                        ) : null}
                         {String(row.status) === "accepted" ? (
                           <>
                             <ProposalChangeAction
@@ -853,6 +925,13 @@ export function ProposalsPage() {
                               line.deletedAt == null,
                           )}
                         />
+                        {String(row.status) === "draft" ? (
+                          <ProposalDraftCheck
+                            proposalId={row._id}
+                            onFailure={setFailure}
+                            onNotice={setNotice}
+                          />
+                        ) : null}
                       </td>
                     </tr>
                     {menuOpenFor === row._id ? (

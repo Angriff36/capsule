@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, type QueryCtx } from "./_generated/server";
 
 /**
  * AUTHOR SEAM — public, token-authorized proposal share links (spec §4.6).
@@ -12,7 +12,8 @@ import { mutation, query } from "./_generated/server";
  * query. `getSharedProposal` is read-only; `recordShareView` is a raw
  * `ctx.db.patch` (no generated guard, no Clerk auth) that bumps view stats. Both
  * enforce revocation + expiry against the row before doing anything, so a
- * revoked/expired link resolves to nothing.
+ * revoked/expired link resolves to nothing. A link saved without an end date
+ * stops 90 days after it was made.
  *
  * The link is pinned to an immutable ProposalRevision (captured at send), so the
  * client always sees the exact terms that were shared — later proposal edits
@@ -37,6 +38,7 @@ type SharedProposal = {
     notes: string | null;
     terms: string | null;
     visibleSections: string[];
+    sectionOrder: string[];
   };
   // §5.2 L263 "Venue logistics snapshot": the client-facing projection of the
   // frozen venue logistics (§8.2). Null when the proposal wasn't linked to a
@@ -82,30 +84,105 @@ type SharedProposal = {
   capturedAt: number | null;
   linkCreatedAt: number | null;
   linkExpiresAt: number | null;
+  // AC-097 / AC-253: this proposal was replaced by a newer one. The old link
+  // still shows what was shared, and names the newer proposal; its link token
+  // is given when that proposal has a working link.
+  replacedBy: { title: string; shareToken: string | null } | null;
 };
+
+/** A link saved without an end date stops working 90 days after it was made. */
+export const SHARE_LINK_DEFAULT_LIFETIME_MS = 90 * 24 * 60 * 60 * 1000;
+
+function linkEndsAt(link: Doc<"shareLinks">): number {
+  return (
+    link.expiresAt ??
+    (link.createdAt ?? link._creationTime) + SHARE_LINK_DEFAULT_LIFETIME_MS
+  );
+}
+
+/**
+ * Revocation + expiry are read-time checks against the persisted row. The
+ * proposal must still exist in the same workspace, and the pinned revision
+ * must be a captured (frozen) copy — an uncaptured revision can still change.
+ */
+async function openShareLink(
+  ctx: QueryCtx,
+  token: string,
+): Promise<{
+  link: Doc<"shareLinks">;
+  revision: Doc<"proposalRevisions">;
+  proposal: Doc<"proposals">;
+} | null> {
+  const linkId = ctx.db.normalizeId("shareLinks", token);
+  if (!linkId) return null;
+  const link: Doc<"shareLinks"> | null = await ctx.db.get(linkId);
+  if (!link || link.deletedAt != null) return null;
+  if (link.status !== "active") return null;
+  if (linkEndsAt(link) <= Date.now()) return null;
+
+  const [revision, proposal] = await Promise.all([
+    ctx.db.get(link.proposalRevisionId),
+    ctx.db.get(link.proposalId),
+  ]);
+  if (
+    !revision ||
+    revision.deletedAt != null ||
+    revision.capturedAt == null ||
+    revision.tenantId !== link.tenantId ||
+    revision.proposalId !== link.proposalId
+  ) {
+    return null;
+  }
+  if (
+    !proposal ||
+    proposal.deletedAt != null ||
+    proposal.tenantId !== link.tenantId
+  ) {
+    return null;
+  }
+  return { link, revision, proposal };
+}
+
+/** A newer working link to the same proposal, if one exists. */
+async function workingLinkFor(
+  ctx: QueryCtx,
+  proposalId: Id<"proposals">,
+): Promise<string | null> {
+  const links = await ctx.db
+    .query("shareLinks")
+    .withIndex("by_proposalId", (q) => q.eq("proposalId", proposalId))
+    .collect();
+  const newestFirst = links.sort(
+    (a, b) =>
+      (b.createdAt ?? b._creationTime) - (a.createdAt ?? a._creationTime),
+  );
+  for (const link of newestFirst) {
+    if (await openShareLink(ctx, link._id)) return link._id;
+  }
+  return null;
+}
+
+/** The proposal that replaced this one (same company), or null. */
+async function replacementOf(
+  ctx: QueryCtx,
+  proposal: Doc<"proposals">,
+): Promise<SharedProposal["replacedBy"]> {
+  if (proposal.status !== "superseded" || !proposal.supersededById) return null;
+  const nextId = ctx.db.normalizeId("proposals", proposal.supersededById);
+  const next = nextId ? await ctx.db.get(nextId) : null;
+  if (!next || next.deletedAt != null || next.tenantId !== proposal.tenantId) {
+    return { title: "a newer proposal", shareToken: null };
+  }
+  return { title: next.title, shareToken: await workingLinkFor(ctx, next._id) };
+}
 
 /** Resolve a share token to the pinned revision's client-safe view, or null. */
 export const getSharedProposal = query({
   args: { token: v.string() },
   handler: async (ctx, { token }): Promise<SharedProposal | null> => {
-    const linkId = ctx.db.normalizeId("shareLinks", token);
-    if (!linkId) return null;
-    const link: Doc<"shareLinks"> | null = await ctx.db.get(linkId);
-    if (!link || link.deletedAt != null) return null;
-    // Revocation + expiry are read-time checks against the persisted row.
-    if (link.status !== "active") return null;
-    if (link.expiresAt != null && link.expiresAt <= Date.now()) return null;
-
-    const revision: Doc<"proposalRevisions"> | null = await ctx.db.get(
-      link.proposalRevisionId,
-    );
-    if (
-      !revision ||
-      revision.deletedAt != null ||
-      revision.tenantId !== link.tenantId
-    ) {
-      return null;
-    }
+    const opened = await openShareLink(ctx, token);
+    if (!opened) return null;
+    const { link, revision, proposal: liveProposal } = opened;
 
     let snapshot: Record<string, unknown> = {};
     try {
@@ -173,6 +250,11 @@ export const getSharedProposal = query({
               (section): section is string => typeof section === "string",
             )
           : [],
+        sectionOrder: Array.isArray(proposal.sectionOrder)
+          ? proposal.sectionOrder.filter(
+              (section): section is string => typeof section === "string",
+            )
+          : [],
       },
       venueLogistics,
       clientName:
@@ -228,7 +310,8 @@ export const getSharedProposal = query({
       revisionNumber: revision.revisionNumber,
       capturedAt: revision.capturedAt ?? null,
       linkCreatedAt: link.createdAt ?? null,
-      linkExpiresAt: link.expiresAt ?? null,
+      linkExpiresAt: linkEndsAt(link),
+      replacedBy: await replacementOf(ctx, liveProposal),
     };
   },
 });
@@ -241,15 +324,12 @@ export const getSharedProposal = query({
 export const recordShareView = mutation({
   args: { token: v.string(), viewerIdentity: v.optional(v.string()) },
   handler: async (ctx, { token, viewerIdentity }): Promise<void> => {
-    const linkId = ctx.db.normalizeId("shareLinks", token);
-    if (!linkId) return;
-    const link: Doc<"shareLinks"> | null = await ctx.db.get(linkId);
-    if (!link || link.deletedAt != null) return;
-    if (link.status !== "active") return;
-    if (link.expiresAt != null && link.expiresAt <= Date.now()) return;
+    const opened = await openShareLink(ctx, token);
+    if (!opened) return;
+    const { link } = opened;
 
     const now = Date.now();
-    await ctx.db.patch(linkId, {
+    await ctx.db.patch(link._id, {
       viewCount: (link.viewCount ?? 0) + 1,
       firstViewedAt: link.firstViewedAt ?? now,
       lastViewedAt: now,

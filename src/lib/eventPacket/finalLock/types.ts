@@ -130,6 +130,8 @@ export interface FinalLockInput {
     };
     salesLockedAt: number | null;
     operationalRequirements: string | null;
+    /** The event's channel in an outside team chat, when it has one. */
+    externalChannel: { name: string; id: string; url: string | null } | null;
     /** Day sheet, setup notes and task breakdown text, keyed by field name. */
     text: Record<string, string | null>;
   };
@@ -152,6 +154,8 @@ export interface FinalLockInput {
     notes: string | null;
     /** The dish record the line names (its name can come from there). */
     dish: NativeRow | null;
+    /** Cost of one portion from its recipe, when every line's cost is known. */
+    portionCost: number | null;
   })[];
   timeline: (NativeRow & {
     name: string;
@@ -164,6 +168,11 @@ export interface FinalLockInput {
     trailerId: string | null;
     trailerName: string | null;
     driverId: string | null;
+    /** What this rig carries, as written on the assignment. */
+    notes: string | null;
+    preloaded: boolean;
+    /** Other events holding the same truck or trailer at an overlapping time. */
+    busyWith: (NativeRow & { eventTitle: string })[];
     outOfService: boolean;
   })[];
   equipment: (NativeRow & {
@@ -174,6 +183,8 @@ export interface FinalLockInput {
     quantity: number;
     status: string;
     shortBy: number;
+    /** When the reservation ends: a rented line's return window. */
+    endsAt: number | null;
     /** The equipment record its name, category and ownership come from. */
     item: NativeRow | null;
   })[];
