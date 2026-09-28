@@ -883,6 +883,7 @@ export const EventSchema = z.object({
   occasionName: z.string().nullable().optional(),
   referralSourceId: z.string().uuid().nullable().optional(),
   venueId: z.string().uuid().nullable().optional(),
+  operatingLocationId: z.string().uuid().nullable().optional(),
   assignedToId: z.string().uuid().nullable().optional(),
   ownerName: z.string().nullable().optional(),
   title: z.string().default(""),
@@ -2190,6 +2191,33 @@ export const OneOnOneActionSchema = z.object({
 
 export type OneOnOneAction = z.infer<typeof OneOnOneActionSchema>;
 
+// Entity: OperatingLocation
+export const OperatingLocationSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  name: z.string().default(""),
+  addressLine1: z.string().nullable().optional(),
+  addressLine2: z.string().nullable().optional(),
+  city: z.string().nullable().optional(),
+  region: z.string().nullable().optional(),
+  postalCode: z.string().nullable().optional(),
+  countryCode: z.string().nullable().optional(),
+  timeZone: z.string().nullable().optional(),
+  status: z.enum(["active", "inactive"]).default("active"),
+  addedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+// Computed: OperatingLocation
+export const OperatingLocationComputedSchema = OperatingLocationSchema.extend({
+  isActive: z.boolean(),
+});
+
+export type OperatingLocation = z.infer<typeof OperatingLocationSchema>;
+export type OperatingLocationWithComputed = z.infer<typeof OperatingLocationComputedSchema>;
+
 // Entity: Organization
 export const OrganizationSchema = z.object({
   id: z.string().uuid(),
@@ -2204,6 +2232,9 @@ export const OrganizationSchema = z.object({
   brandLogoStorageId: z.string().nullable().optional(),
   defaultCurrencyCode: z.string().nullable().optional(),
   defaultExchangeRateScale: z.number().int().optional().default(6),
+  routeSafetyBufferMinutes: z.number().int().nullable().optional(),
+  routeTrafficPolicy: z.enum(["traffic_aware", "no_traffic"]).nullable().optional(),
+  routeRefreshHours: z.number().int().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -3897,6 +3928,7 @@ export const VenueSchema = z.object({
   countryCode: z.string().nullable().optional(),
   latitude: z.number().nullable().optional(),
   longitude: z.number().nullable().optional(),
+  timeZone: z.string().nullable().optional(),
   contactName: z.string().nullable().optional(),
   contactEmail: z.string().nullable().optional(),
   contactPhone: z.string().nullable().optional(),
@@ -5398,6 +5430,14 @@ export const EquipmentServiceEntryRecordParamsSchema = z.object({
 
 export type EquipmentServiceEntryRecordParams = z.infer<typeof EquipmentServiceEntryRecordParamsSchema>;
 
+// Command: applyRouteTravel on Event
+export const EventApplyRouteTravelParamsSchema = z.object({
+  outboundTravelMinutes: z.number().optional(),
+  returnTravelMinutes: z.number().optional(),
+});
+
+export type EventApplyRouteTravelParams = z.infer<typeof EventApplyRouteTravelParamsSchema>;
+
 // Command: approve on Event
 export const EventApproveParamsSchema = z.object({});
 
@@ -5510,6 +5550,13 @@ export const EventChangeVenueParamsSchema = z.object({
 });
 
 export type EventChangeVenueParams = z.infer<typeof EventChangeVenueParamsSchema>;
+
+// Command: chooseOperatingLocation on Event
+export const EventChooseOperatingLocationParamsSchema = z.object({
+  operatingLocationId: z.string().min(1).optional(),
+});
+
+export type EventChooseOperatingLocationParams = z.infer<typeof EventChooseOperatingLocationParamsSchema>;
 
 // Command: clearBinderBuilt on Event
 export const EventClearBinderBuiltParamsSchema = z.object({});
@@ -7560,6 +7607,44 @@ export const OneOnOneActionCloseParamsSchema = z.object({});
 
 export type OneOnOneActionCloseParams = z.infer<typeof OneOnOneActionCloseParamsSchema>;
 
+// Command: activate on OperatingLocation
+export const OperatingLocationActivateParamsSchema = z.object({});
+
+export type OperatingLocationActivateParams = z.infer<typeof OperatingLocationActivateParamsSchema>;
+
+// Command: add on OperatingLocation
+export const OperatingLocationAddParamsSchema = z.object({
+  name: z.string(),
+  addressLine1: z.string(),
+  addressLine2: z.string().optional(),
+  city: z.string(),
+  region: z.string().optional(),
+  postalCode: z.string().optional(),
+  countryCode: z.string(),
+  timeZone: z.string(),
+});
+
+export type OperatingLocationAddParams = z.infer<typeof OperatingLocationAddParamsSchema>;
+
+// Command: deactivate on OperatingLocation
+export const OperatingLocationDeactivateParamsSchema = z.object({});
+
+export type OperatingLocationDeactivateParams = z.infer<typeof OperatingLocationDeactivateParamsSchema>;
+
+// Command: revise on OperatingLocation
+export const OperatingLocationReviseParamsSchema = z.object({
+  name: z.string(),
+  addressLine1: z.string(),
+  addressLine2: z.string().optional(),
+  city: z.string(),
+  region: z.string().optional(),
+  postalCode: z.string().optional(),
+  countryCode: z.string(),
+  timeZone: z.string(),
+});
+
+export type OperatingLocationReviseParams = z.infer<typeof OperatingLocationReviseParamsSchema>;
+
 // Command: configureBranding on Organization
 export const OrganizationConfigureBrandingParamsSchema = z.object({
   displayName: z.string(),
@@ -7569,6 +7654,15 @@ export const OrganizationConfigureBrandingParamsSchema = z.object({
 });
 
 export type OrganizationConfigureBrandingParams = z.infer<typeof OrganizationConfigureBrandingParamsSchema>;
+
+// Command: configureRoutePolicy on Organization
+export const OrganizationConfigureRoutePolicyParamsSchema = z.object({
+  safetyBufferMinutes: z.number().int(),
+  trafficPolicy: z.enum(["traffic_aware", "no_traffic"]),
+  refreshHours: z.number().int(),
+});
+
+export type OrganizationConfigureRoutePolicyParams = z.infer<typeof OrganizationConfigureRoutePolicyParamsSchema>;
 
 // Command: deactivate on Organization
 export const OrganizationDeactivateParamsSchema = z.object({});
@@ -10287,6 +10381,13 @@ export const VenueRegisterParamsSchema = z.object({
 });
 
 export type VenueRegisterParams = z.infer<typeof VenueRegisterParamsSchema>;
+
+// Command: setTimeZone on Venue
+export const VenueSetTimeZoneParamsSchema = z.object({
+  timeZone: z.string().optional(),
+});
+
+export type VenueSetTimeZoneParams = z.infer<typeof VenueSetTimeZoneParamsSchema>;
 
 // Command: updateDetails on Venue
 export const VenueUpdateDetailsParamsSchema = z.object({

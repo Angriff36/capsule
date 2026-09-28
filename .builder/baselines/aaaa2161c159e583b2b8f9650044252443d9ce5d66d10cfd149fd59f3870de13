@@ -417,6 +417,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.OneOnOneAction_createViaCapture, { "oneOnOneId": "oneOnOneId-one-on-one-action-1", "ownerPersonId": "ownerPersonId-one-on-one-action-1", "description": "demo-description-1", "dueDate": 1767268800000 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.OneOnOneAction_createViaCapture, { "oneOnOneId": "oneOnOneId-one-on-one-action-2", "ownerPersonId": "ownerPersonId-one-on-one-action-2", "description": "demo-description-2", "dueDate": 1767355200000 } as any);
+  // OperatingLocation → api.mutations.OperatingLocation_createViaAdd
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.OperatingLocation_createViaAdd, { "name": "OperatingLocation 1", "addressLine1": "demo-addressLine1-1", "addressLine2": "demo-addressLine2-1", "city": "demo-city-1", "region": "demo-region-1", "postalCode": "demo-postalCode-1", "countryCode": "demo-countryCode-1", "timeZone": "demo-timeZone-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.OperatingLocation_createViaAdd, { "name": "OperatingLocation 2", "addressLine1": "demo-addressLine1-2", "addressLine2": "demo-addressLine2-2", "city": "demo-city-2", "region": "demo-region-2", "postalCode": "demo-postalCode-2", "countryCode": "demo-countryCode-2", "timeZone": "demo-timeZone-2" } as any);
   // Organization has multiple initialization commands (register, rename); using the selected initialization command: register.
   // Organization → api.mutations.Organization_createViaRegister
   rowsAttempted += 1;
@@ -1253,6 +1258,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "OneOnOneAction",
       "createMutation": "OneOnOneAction_createViaCapture",
+      "rowCount": 2
+    },
+    {
+      "entity": "OperatingLocation",
+      "createMutation": "OperatingLocation_createViaAdd",
       "rowCount": 2
     },
     {

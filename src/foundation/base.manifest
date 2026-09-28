@@ -154,6 +154,13 @@ enum OrganizationStatus {
   deactivated
 }
 
+// How a route fetch treats traffic: expected traffic at the departure time,
+// or plain road time.
+enum RouteTrafficPolicy {
+  traffic_aware
+  no_traffic
+}
+
 entity Organization mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -174,6 +181,12 @@ entity Organization mixin TenantScoped, SoftDeletable {
   // exchangeRate so reports can fold the issued total back into this code.
   property defaultCurrencyCode: string?
   property defaultExchangeRateScale: int = 6
+  // Drive-time rules (spec §8.4, PL-ROUTES): extra minutes added before the
+  // shop departure time, whether the route uses expected traffic, and how many
+  // hours a fetched route stays current. Unset reads as 15 / traffic / 24.
+  property routeSafetyBufferMinutes: int?
+  property routeTrafficPolicy: RouteTrafficPolicy?
+  property routeRefreshHours: int?
 
   computed isOperable: boolean = self.status == "active" and self.deletedAt == null
   // 3-character ISO 4217, uppercase. Defaults to USD when unset so existing
@@ -281,6 +294,26 @@ entity Organization mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Company drive-time rules; the event route read and refresh use them.
+  command configureRoutePolicy(
+    safetyBufferMinutes: int,
+    trafficPolicy: RouteTrafficPolicy,
+    refreshHours: int
+  ) {
+    guard self.deletedAt == null
+    constraint routeBufferRange: safetyBufferMinutes >= 0 and safetyBufferMinutes <= 240 "Use a safety buffer from 0 to 240 minutes."
+    constraint routeRefreshRange: refreshHours >= 1 and refreshHours <= 720 "Refresh drive times every 1 to 720 hours."
+    mutate routeSafetyBufferMinutes = safetyBufferMinutes
+    mutate routeTrafficPolicy = trafficPolicy
+    mutate routeRefreshHours = refreshHours
+    emit OrganizationRoutePolicyConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+      safetyBufferMinutes: safetyBufferMinutes
+      refreshHours: refreshHours
+    }
+  }
+
   command suspend(reason: string = "") {
     guard self.status == "active"
     guard self.deletedAt == null
@@ -362,6 +395,13 @@ event OrganizationDefaultCurrencySet: "organization.default_currency_set" {
   organizationId: string
   tenantId: string
   currencyCode: string
+}
+
+event OrganizationRoutePolicyConfigured: "organization.route_policy_configured" {
+  organizationId: string
+  tenantId: string
+  safetyBufferMinutes: int
+  refreshHours: int
 }
 
 event OrganizationDeactivated: "organization.deactivated" {

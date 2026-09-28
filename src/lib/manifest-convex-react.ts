@@ -153,6 +153,7 @@ import {
   EquipmentServiceEntryRecordParamsSchema,
   EquipmentUpdateConditionParamsSchema,
   EventAllergenCheckRecordParamsSchema,
+  EventApplyRouteTravelParamsSchema,
   EventApproveParamsSchema,
   EventArchiveParamsSchema,
   EventAssignOwnerParamsSchema,
@@ -173,6 +174,7 @@ import {
   EventChangeRequirementsParamsSchema,
   EventChangeServiceStyleParamsSchema,
   EventChangeVenueParamsSchema,
+  EventChooseOperatingLocationParamsSchema,
   EventClearBinderBuiltParamsSchema,
   EventCloseOutParamsSchema,
   EventCloseoutCaptureParamsSchema,
@@ -402,9 +404,14 @@ import {
   OneOnOneActionCaptureParamsSchema,
   OneOnOneActionCloseParamsSchema,
   OneOnOneHoldParamsSchema,
+  OperatingLocationActivateParamsSchema,
+  OperatingLocationAddParamsSchema,
+  OperatingLocationDeactivateParamsSchema,
+  OperatingLocationReviseParamsSchema,
   OrganizationCapabilitySettingRegisterParamsSchema,
   OrganizationCapabilitySettingSetEnabledParamsSchema,
   OrganizationConfigureBrandingParamsSchema,
+  OrganizationConfigureRoutePolicyParamsSchema,
   OrganizationDeactivateParamsSchema,
   OrganizationReactivateParamsSchema,
   OrganizationRegisterParamsSchema,
@@ -744,6 +751,7 @@ import {
   VenueRoomAddParamsSchema,
   VenueRoomRemoveParamsSchema,
   VenueRoomReviseParamsSchema,
+  VenueSetTimeZoneParamsSchema,
   VenueUpdateDetailsParamsSchema,
   VenueVendorRelationshipEstablishParamsSchema,
   VenueVendorRelationshipRetireParamsSchema,
@@ -3020,6 +3028,16 @@ export function useGetEvent(id: string | "skip") {
   return useQuery(api.queries.getEvent, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for Event.applyRouteTravel. */
+export function useEventApplyRouteTravel() {
+  const mutate = useMutation(api.mutations.Event_applyRouteTravel);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventApplyRouteTravelParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Event.approve. */
 export function useEventApprove() {
   const mutate = useMutation(api.mutations.Event_approve);
@@ -3136,6 +3154,16 @@ export function useEventChangeVenue() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventChangeVenueParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Event.chooseOperatingLocation. */
+export function useEventChooseOperatingLocation() {
+  const mutate = useMutation(api.mutations.Event_chooseOperatingLocation);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventChooseOperatingLocationParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -6386,6 +6414,67 @@ export function useCreateOneOnOneAction() {
   };
 }
 
+/** Reactive list for OperatingLocation. */
+export function useListOperatingLocation() {
+  return useQuery(api.queries.listOperatingLocation);
+}
+
+/** Reactive get-by-id for OperatingLocation. Pass "skip" to suspend. */
+export function useGetOperatingLocation(id: string | "skip") {
+  return useQuery(api.queries.getOperatingLocation, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for OperatingLocation.activate. */
+export function useOperatingLocationActivate() {
+  const mutate = useMutation(api.mutations.OperatingLocation_activate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OperatingLocationActivateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for OperatingLocation.add. */
+export function useOperatingLocationAdd() {
+  const mutate = useMutation(api.mutations.OperatingLocation_add);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OperatingLocationAddParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for OperatingLocation.deactivate. */
+export function useOperatingLocationDeactivate() {
+  const mutate = useMutation(api.mutations.OperatingLocation_deactivate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OperatingLocationDeactivateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for OperatingLocation.revise. */
+export function useOperatingLocationRevise() {
+  const mutate = useMutation(api.mutations.OperatingLocation_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OperatingLocationReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for OperatingLocation.add. */
+export function useCreateOperatingLocation() {
+  const mutate = useMutation(api.mutations.OperatingLocation_createViaAdd);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = OperatingLocationAddParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for Organization. */
 export function useListOrganization() {
   return useQuery(api.queries.listOrganization);
@@ -6402,6 +6491,16 @@ export function useOrganizationConfigureBranding() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = OrganizationConfigureBrandingParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Organization.configureRoutePolicy. */
+export function useOrganizationConfigureRoutePolicy() {
+  const mutate = useMutation(api.mutations.Organization_configureRoutePolicy);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationConfigureRoutePolicyParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11018,6 +11117,16 @@ export function useVenueRegister() {
   };
 }
 
+/** Mutation hook for Venue.setTimeZone. */
+export function useVenueSetTimeZone() {
+  const mutate = useMutation(api.mutations.Venue_setTimeZone);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VenueSetTimeZoneParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Venue.updateDetails. */
 export function useVenueUpdateDetails() {
   const mutate = useMutation(api.mutations.Venue_updateDetails);
@@ -11477,4 +11586,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1219 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1230 as const;
