@@ -1,4 +1,5 @@
 import { canonicalJson, type Section } from "../model";
+import { printableText } from "../printableText";
 import type { Draft } from "./answer";
 import { dessertBarBuffetAnswers } from "./dessertBarBuffet";
 import { identityAnswers, menuAnswers } from "./identityMenu";
@@ -233,7 +234,7 @@ export function evaluateFinalLock(
     const line: FinalLockPrintLine = {
       questionKey: a.questionKey,
       section: a.section,
-      label: a.label,
+      label: printableText(a.label),
       result: a.result,
       text: lineText(a),
     };
@@ -367,12 +368,28 @@ const valueText = (value: FinalLockValue): string => {
       return String(value.count);
     case "list":
       return value.items.join(", ");
+    case "record": {
+      const { billTo, quotedPrice, ...rest } = value.fields;
+      if (billTo != null)
+        return quotedPrice != null
+          ? `${billTo} pays ${quotedPrice}`
+          : `${billTo} pays`;
+      return Object.values(rest)
+        .filter((v) => v != null && v !== "")
+        .join(", ");
+    }
     default:
       return "";
   }
 };
 
-export const lineText = (a: FinalLockAnswer) =>
+/**
+ * The printed words of one answer, already in the form the PDF draws them
+ * (printableText), so what is stored, compared and drawn is the same text.
+ */
+export const lineText = (a: FinalLockAnswer) => printableText(answerWords(a));
+
+const answerWords = (a: FinalLockAnswer) =>
   a.override
     ? `${valueText(a.override.value)} (manager decision: ${a.override.reason})`
     : a.result === "unresolved"

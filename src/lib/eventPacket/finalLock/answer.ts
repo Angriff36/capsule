@@ -13,6 +13,28 @@ export const eventStyleName = (input: FinalLockInput): string | null =>
   input.serviceStyle?.name.trim() ||
   null;
 
+/**
+ * Where the style name came from: the event's booked name when it has one
+ * (a later catalog rename or edit does not touch the answer), otherwise the
+ * live catalog row.
+ */
+export const styleSources = (input: FinalLockInput): AnswerSource[] =>
+  input.event.serviceStyleName?.trim()
+    ? source("events", input.event, "serviceStyleName")
+    : [
+        ...source("events", input.event, "serviceStyleName"),
+        ...source("serviceStyles", input.serviceStyle),
+      ];
+
+/** Where the customer name came from, booked name first (as above). */
+export const customerSources = (input: FinalLockInput): AnswerSource[] =>
+  input.event.clientName?.trim()
+    ? source("events", input.event, "clientName")
+    : [
+        ...source("events", input.event, "clientName"),
+        ...source("clients", input.client),
+      ];
+
 /** What one rule decides; evaluate() adds the question and policy facts. */
 export interface Draft {
   result: FinalLockResult;

@@ -59,6 +59,7 @@ export function layoutAnswerPages(
   for (const line of lines) {
     const issue = line.result === "unresolved";
     const size = issue ? 8.4 : 10;
+    // Stored lines are already printable; this changes nothing for them.
     const rows = wrap(font, printableText(`${line.label}: ${line.text}`), size);
     rows.forEach((text, i) =>
       add(

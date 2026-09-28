@@ -334,7 +334,12 @@ export async function readFinalLockInput(
   const verificationSource = (checkKey: string) => {
     const row = verificationRows.get(checkKey);
     return row
-      ? { table: "eventPacketResolutions", id: String(row._id), version: version(row) }
+      ? {
+          table: "eventPacketResolutions",
+          id: String(row._id),
+          // Saved once, never edited: version 1, older rows included.
+          version: version(row) ?? 1,
+        }
       : null;
   };
   const resolvedChecks = new Set(

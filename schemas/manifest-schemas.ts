@@ -1322,6 +1322,7 @@ export const EventPacketResolutionSchema = z.object({
   decidedAt: z.coerce.date().optional(),
   decisionJson: z.string().optional(),
   verificationJson: z.string().nullable().optional(),
+  version: z.number().int().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });

@@ -59,25 +59,21 @@ export function operationsAnswers(
   const chatSources = chat.lastMessageId
     ? [{ table: "staffMessages", id: chat.lastMessageId, version: null }]
     : [];
-  out["communication.channel"] = chat.messageCount
-    ? answered(
-        {
-          type: "record",
-          fields: {
-            messages: chat.messageCount,
-            attachments: chat.attachmentCount,
-          },
-        },
-        `The event chat has ${chat.messageCount} message${chat.messageCount === 1 ? "" : "s"} and ${chat.attachmentCount} file${chat.attachmentCount === 1 ? "" : "s"}.`,
-        "communication.channel.one-event-chat",
-        chatSources,
-      )
-    : unresolved(
-        ["The event chat is empty."],
-        "Post the first note in the event chat so the team has one place for decisions.",
-        "communication.channel.one-event-chat",
-        chatSources,
-      );
+  // Every event has its own chat; an empty one is not a problem to fix.
+  out["communication.channel"] = answered(
+    {
+      type: "record",
+      fields: {
+        messages: chat.messageCount,
+        attachments: chat.attachmentCount,
+      },
+    },
+    chat.messageCount
+      ? `The event chat has ${chat.messageCount} message${chat.messageCount === 1 ? "" : "s"} and ${chat.attachmentCount} file${chat.attachmentCount === 1 ? "" : "s"}.`
+      : "The event chat is ready; no messages yet.",
+    "communication.channel.one-event-chat",
+    chatSources,
+  );
   return out;
 }
 

@@ -10,7 +10,10 @@ import {
   lineText,
   type FinalLockReport,
 } from "../../../src/lib/eventPacket/finalLock/evaluate";
-import type { FinalLockAnswer } from "../../../src/lib/eventPacket/finalLock/types";
+import type {
+  FinalLockAnswer,
+  FinalLockValue,
+} from "../../../src/lib/eventPacket/finalLock/types";
 import { QUESTIONS } from "../../../src/lib/eventPacket/finalLock/policy";
 
 const clean = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
@@ -33,7 +36,13 @@ function withoutPrice(report: FinalLockReport): FinalLockReport {
         : "Managers see who pays and the price.",
       missing: a.missing.length ? ["A manager needs to check who pays."] : [],
       override: a.override
-        ? { ...a.override, value: { type: "none" }, reason: "Manager decision." }
+        ? {
+            ...a.override,
+            value: billTo
+              ? { type: "record", fields: { billTo } }
+              : { type: "none" },
+            reason: "Manager decision.",
+          }
         : null,
     };
   });
@@ -86,6 +95,8 @@ export const overrideFinalLockAnswer = mutation({
     eventId: v.id("events"),
     questionKey: v.string(),
     basedOn: v.string(),
+    /** For who pays: the payer goes in `answer`, the price here. */
+    price: v.optional(v.number()),
     answer: v.string(),
     reason: v.string(),
   },
@@ -113,6 +124,17 @@ export const overrideFinalLockAnswer = mutation({
       throw new Error(
         "The facts behind this answer changed; look at it again before deciding",
       );
+    if (args.price != null && !(Number.isFinite(args.price) && args.price >= 0))
+      throw new Error("Enter the price as a number, 0 or more");
+    // Who pays keeps the payer and the price apart, so staff who may not
+    // see the price still see the payer.
+    const value: FinalLockValue =
+      args.questionKey === BILLING
+        ? {
+            type: "record",
+            fields: { billTo: answer, quotedPrice: args.price ?? null },
+          }
+        : { type: "text", text: answer };
     const at = new Date().toISOString();
     const decisionId = `finallock:${args.questionKey}:${at}`;
     await ctx.db.insert("eventPacketResolutions", {
@@ -126,7 +148,7 @@ export const overrideFinalLockAnswer = mutation({
         kind: "final_lock_override",
         questionKey: args.questionKey,
         basedOn: args.basedOn,
-        value: { type: "text", text: answer },
+        value,
         reason,
         actor: auth.id,
         at,

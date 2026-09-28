@@ -5,6 +5,7 @@ import {
   proposalSources,
   said,
   source,
+  styleSources,
   unresolved,
   type Draft,
 } from "./answer";
@@ -119,12 +120,12 @@ export function bussingAnswer(input: FinalLockInput): Draft {
           ],
           "Clear the bussing answer or change the service style.",
           "bussing.plan.staff-needed",
-          [...ev("bussing"), ...source("serviceStyles", input.serviceStyle)],
+          [...ev("bussing"), ...styleSources(input)],
         )
       : notApplicable(
           "Drop-off: no staff stay to clear tables.",
           "bussing.plan.drop-off",
-          source("serviceStyles", input.serviceStyle),
+          styleSources(input),
         );
   if (eventFull)
     return answered(

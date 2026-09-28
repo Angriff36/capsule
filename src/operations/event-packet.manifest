@@ -51,6 +51,10 @@ entity EventPacketResolution mixin TenantScoped {
   property decidedAt: datetime
   property decisionJson: string
   property verificationJson: string?
+  // A decision is saved once and never edited, so its version is always 1
+  // (rows saved before this field existed read as 1 too). A Final Lock
+  // answer names this version with the sign-off it was read from.
+  property version: int?
   constraint packetDecisionActor: length(trim(self.actor)) > 0 "A decision needs its authenticated actor"
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   default policy packetResolutionRead read: roleAllows(user.role, "eventPacketSeamOnly") "Private approvals remain behind manager review"

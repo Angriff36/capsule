@@ -7,6 +7,7 @@ import {
   proposalSources,
   said,
   source,
+  styleSources,
   unresolved,
   type Draft,
 } from "./answer";
@@ -147,7 +148,7 @@ export function dessertBarBuffetAnswers(
       ],
       "Change dessert service or the service style.",
       "dessert.plan.staff-needed",
-      [...dessertSources, ...source("serviceStyles", input.serviceStyle)],
+      [...dessertSources, ...styleSources(input)],
     );
   else if (clash.length)
     out["dessert.plan"] = unresolved(
@@ -263,10 +264,7 @@ export function dessertBarBuffetAnswers(
             dropOff
               ? "buffet.arrangement.drop-off"
               : "buffet.arrangement.no-buffet",
-            [
-              ...ev("buffetTableSetup"),
-              ...source("serviceStyles", input.serviceStyle),
-            ],
+            [...ev("buffetTableSetup"), ...styleSources(input)],
           )
         : unresolved(
             ["No buffet plate order is recorded."],

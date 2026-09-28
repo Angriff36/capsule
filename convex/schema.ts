@@ -1199,6 +1199,7 @@ export default defineSchema({
     decidedAt: v.optional(v.number()),
     decisionJson: v.optional(v.string()),
     verificationJson: v.optional(v.union(v.string(), v.null())),
+    version: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
   })

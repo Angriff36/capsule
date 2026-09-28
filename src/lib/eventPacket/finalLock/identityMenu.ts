@@ -1,8 +1,10 @@
 import {
   answered,
+  customerSources,
   dishSources as dishRecords,
   eventStyleName,
   source,
+  styleSources as bookedStyleSources,
   unresolved,
   type Draft,
 } from "./answer";
@@ -14,7 +16,7 @@ const ev = (input: FinalLockInput, field: string) =>
 
 /** Event identity (spec §14.2): Sales owns every blank or clash. */
 export function identityAnswers(input: FinalLockInput): Record<string, Draft> {
-  const { event, serviceStyle, client, venue } = input;
+  const { event, client, venue } = input;
   const out: Record<string, Draft> = {};
 
   // The event keeps the names it was booked with; a later catalog rename
@@ -22,8 +24,7 @@ export function identityAnswers(input: FinalLockInput): Record<string, Draft> {
   const styleName = eventStyleName(input);
   const styleSources = [
     ...ev(input, "serviceStyleId"),
-    ...ev(input, "serviceStyleName"),
-    ...source("serviceStyles", serviceStyle),
+    ...bookedStyleSources(input),
   ];
   out["identity.service_style"] = styleName
     ? answered(
@@ -91,11 +92,7 @@ export function identityAnswers(input: FinalLockInput): Record<string, Draft> {
     );
 
   const customer = event.clientName?.trim() || client?.name.trim() || "";
-  const clientSources = [
-    ...ev(input, "clientId"),
-    ...ev(input, "clientName"),
-    ...source("clients", client),
-  ];
+  const clientSources = [...ev(input, "clientId"), ...customerSources(input)];
   out["identity.customer"] = customer
     ? answered(
         { type: "choice", choice: customer },
@@ -358,13 +355,13 @@ export function menuAnswers(input: FinalLockInput): Record<string, Draft> {
           misfit,
           "Change the dish service or the event service style.",
           "menu.service_fit.matches-style",
-          [...dishSources, ...source("serviceStyles", input.serviceStyle)],
+          [...dishSources, ...bookedStyleSources(input)],
         )
       : answered(
           { type: "yes_no", yes: true },
           `Every dish fits ${style}.`,
           "menu.service_fit.matches-style",
-          [...dishSources, ...source("serviceStyles", input.serviceStyle)],
+          [...dishSources, ...bookedStyleSources(input)],
         );
   return out;
 }

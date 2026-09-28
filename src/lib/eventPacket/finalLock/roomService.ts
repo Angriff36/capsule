@@ -6,6 +6,7 @@ import {
   proposalSources,
   said,
   source,
+  styleSources,
   unresolved,
   type Draft,
   type Said,
@@ -145,7 +146,7 @@ export function roomServiceAnswers(
       return (out[key] = notApplicable(
         `Drop-off: Mangia does not set the ${words}.`,
         `${key}.drop-off`,
-        [...ev(field), ...source("serviceStyles", input.serviceStyle)],
+        [...ev(field), ...styleSources(input)],
       ));
     if (sold.length > 1)
       return (out[key] = unresolved(
@@ -367,7 +368,7 @@ export function roomServiceAnswers(
     ? notApplicable(
         "Drop-off: no staff stay to serve the buffet.",
         "food.buffet_served.drop-off",
-        source("serviceStyles", input.serviceStyle),
+        styleSources(input),
       )
     : buffet.kind === "no"
       ? notApplicable(

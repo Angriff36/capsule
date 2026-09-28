@@ -717,6 +717,7 @@ export const resolveOperationalIssue = mutation({
       ...(verification
         ? { verificationJson: canonicalJson(verification) }
         : {}),
+      version: 1,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });

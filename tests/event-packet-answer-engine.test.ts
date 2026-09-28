@@ -294,7 +294,19 @@ describe("Final Lock answer engine", () => {
         field: "expectedHeadcount",
       },
     ]);
+    // The booked customer name is read from the event; with no booked name
+    // the live customer record is the source.
     expect(get(answers, "identity.customer").sources).toContainEqual({
+      table: "events",
+      id: "event-1",
+      version: 7,
+      field: "clientName",
+    });
+    const unbooked = input();
+    unbooked.event.clientName = null;
+    expect(
+      get(run(unbooked).answers, "identity.customer").sources,
+    ).toContainEqual({
       table: "clients",
       id: "client-1",
       version: 2,
