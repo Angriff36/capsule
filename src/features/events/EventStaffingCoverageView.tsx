@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { formatDate, formatTime } from "../../lib/format";
 import { StatusChip } from "../../ui/primitives";
 import { ReviewFlagInline } from "./review-flags/ReviewFlagInline";
+import { staffNeedDemandSummary } from "./eventStaffNeedDemand";
+import { StaffNeedSuggestions } from "./StaffNeedSuggestions";
 import {
   EventTimelineStaffRoster,
   type PersonRow,
@@ -19,6 +21,14 @@ export type EventStaffNeedRow = StaffNeedRow & {
   readonly cancellationReason?: string | null;
   readonly previousStaffNeedId?: string | null;
   readonly coverageContinuedAt?: number | null;
+  readonly qualificationName?: string | null;
+  readonly certificationType?: string | null;
+  readonly skills?: string | null;
+  readonly uniform?: string | null;
+  readonly workLocation?: string | null;
+  readonly payBasis?: string | null;
+  readonly budgetHourlyRate?: number | null;
+  readonly templateSlot?: number | null;
 };
 
 /** Renders the "Edit times" control for one assignment or staffing request. */
@@ -114,6 +124,7 @@ export function EventStaffingCoverageView({
   onReleaseClaim,
   onCancel,
   onChangeCoverage,
+  onDescribeDemand,
   timingControl,
   conflictsFor,
 }: {
@@ -133,6 +144,7 @@ export function EventStaffingCoverageView({
   onReleaseClaim?: (need: EventStaffNeedRow) => void;
   onCancel: (need: EventStaffNeedRow) => void;
   onChangeCoverage?: (need: EventStaffNeedRow) => void;
+  onDescribeDemand?: (need: EventStaffNeedRow) => void;
   timingControl?: StaffTimingControlRenderer;
   conflictsFor: (
     personId: string,
@@ -336,6 +348,14 @@ export function EventStaffingCoverageView({
                           ? ` · ${formatDate(need.startsAt)} ${formatTime(need.startsAt)}${need.endsAt != null ? ` – ${formatTime(need.endsAt)}` : " · End time needed"}`
                           : " · Timing needed"}
                       </p>
+                      {staffNeedDemandSummary(need) ? (
+                        <p
+                          className="text-sm text-ink-2"
+                          data-testid="event-staff-need-demand"
+                        >
+                          {staffNeedDemandSummary(need)}
+                        </p>
+                      ) : null}
                     </td>
                     <td className="block px-3 py-2 md:table-cell align-top">
                       <StatusChip status={String(need.status)} />
@@ -376,6 +396,15 @@ export function EventStaffingCoverageView({
                             })}
                           </select>
                         </label>
+                      ) : null}
+                      {canManage && claimable ? (
+                        <StaffNeedSuggestions
+                          needId={need._id}
+                          disabled={busy != null}
+                          onPick={(personId) =>
+                            onNeedPersonChange(need._id, personId)
+                          }
+                        />
                       ) : (
                         <span className="text-base text-ink-3">—</span>
                       )}
@@ -451,6 +480,16 @@ export function EventStaffingCoverageView({
                         {canManage && claimable ? (
                           <>
                             {timingControl?.("need", need._id)}
+                            {onDescribeDemand ? (
+                              <button
+                                type="button"
+                                className="btn btn-ghost btn-sm"
+                                disabled={busy != null}
+                                onClick={() => onDescribeDemand(need)}
+                              >
+                                What the work needs
+                              </button>
+                            ) : null}
                             <button
                               type="button"
                               className="btn btn-ghost btn-sm"

@@ -9,6 +9,7 @@ import {
   useEventStaffNeedChangeCoverage,
   useEventStaffNeedChooseTravelLeg,
   useEventStaffNeedClaim,
+  useEventStaffNeedDescribeDemand,
   useEventStaffNeedFill,
   useEventStaffNeedPlanTiming,
   useEventStaffNeedReleaseClaim,
@@ -39,6 +40,9 @@ import { EventStaffingAddForm } from "./EventStaffingAddForm";
 import { EventStaffTimingControl } from "./EventStaffTimingForm";
 import { EventStaffTravelSelect } from "./EventStaffTravelSelect";
 import { useEventRouteLegs } from "../../lib/useEventRouteLegs";
+import { useAutoFillEventStaffNeeds } from "../../lib/workforceScheduling";
+import { askStaffNeedDemand } from "./staffNeedDemandPrompt";
+import { autoFillSummary } from "./eventStaffNeedDemand";
 import type { Id } from "../../lib/api";
 import { collectStaffRoles } from "./EventStaffingRoleSelect";
 import {
@@ -80,6 +84,9 @@ export function EventStaffingTab({ eventId }: Props) {
   const planNeedTiming = useEventStaffNeedPlanTiming();
   const chooseAssignmentLeg = useEventAssignmentChooseTravelLeg();
   const chooseNeedLeg = useEventStaffNeedChooseTravelLeg();
+  const describeDemand = useEventStaffNeedDescribeDemand();
+  const autoFill = useAutoFillEventStaffNeeds();
+  const [autoFillNote, setAutoFillNote] = useState<string | null>(null);
   const routeLegs = useEventRouteLegs(eventId as Id<"events">);
   const trucks = (routeLegs?.legs ?? []).filter((leg) => leg.kind === "rig");
   const [busy, setBusy] = useState<string | null>(null);
@@ -362,9 +369,35 @@ export function EventStaffingTab({ eventId }: Props) {
           <p className="text-base text-ink-3">
             Crew, planned times, open shifts, and availability conflicts.
           </p>
+          {canManage && openShiftCount > 0 ? (
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={busy != null}
+              onClick={() =>
+                void run("autoFill", async () => {
+                  setAutoFillNote(
+                    autoFillSummary(
+                      await autoFill({ eventId: eventId as Id<"events"> }),
+                    ),
+                  );
+                })
+              }
+            >
+              Fill open shifts from suggestions
+            </button>
+          ) : null}
         </div>
       </header>
       {failure ? <FailureBanner failure={failure} /> : null}
+      {autoFillNote ? (
+        <p
+          role="status"
+          className="border-y border-line py-2 text-base text-ink-2"
+        >
+          {autoFillNote}
+        </p>
+      ) : null}
       <EventShiftChangesPanel eventId={eventId} />
       {activities !== undefined &&
       (crewWindow.startsAt == null || crewWindow.endsAt == null) ? (
@@ -567,6 +600,23 @@ export function EventStaffingTab({ eventId }: Props) {
                 });
               })();
             }}
+            onDescribeDemand={
+              canManage
+                ? (need) => {
+                    void (async () => {
+                      const demand = await askStaffNeedDemand(prompt, need);
+                      if (!demand) return;
+                      void run(`demand:${need._id}`, () =>
+                        describeDemand({
+                          docId: need._id,
+                          version: need.version,
+                          ...demand,
+                        }),
+                      );
+                    })();
+                  }
+                : undefined
+            }
             timingControl={timingControl}
             conflictsFor={conflictsFor}
           />
