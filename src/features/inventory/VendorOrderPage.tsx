@@ -39,9 +39,11 @@ import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { VendorOrderReceiptCorrection } from "./VendorOrderReceiptCorrection";
 import {
+  activeLocations,
   NEW_LOCATION_FIELD,
   ReceiptLocationField,
 } from "./ReceiptLocationField";
+import { findByName } from "./inlineCatalogChoice";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
@@ -242,17 +244,21 @@ export function VendorOrderPage() {
     const discrepancy = String(data.get("discrepancyQuantity") ?? "").trim();
     const newLocationName = String(data.get(NEW_LOCATION_FIELD) ?? "").trim();
     void run(`${line._id}:receipt`, async () => {
-      // Fresh workspace: the field was a name box, so register the location
-      // first and receive into it (#143).
-      const locationId = newLocationName
-        ? String(
-            (
-              (await createLocation({ name: newLocationName })) as {
-                docId: string;
-              }
-            ).docId,
-          )
-        : String(data.get("locationId"));
+      // The field was a name box, so register the location first and receive
+      // into it (#143). A retry after a failed receipt reuses the location
+      // the first try made.
+      const existing = findByName(activeLocations(locations), newLocationName);
+      const locationId = !newLocationName
+        ? String(data.get("locationId"))
+        : existing
+          ? existing._id
+          : String(
+              (
+                (await createLocation({ name: newLocationName })) as {
+                  docId: string;
+                }
+              ).docId,
+            );
       await recordReceipt({
         docId: line._id,
         version: line.version,
