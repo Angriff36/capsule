@@ -26,6 +26,7 @@ enum ComponentImportMatchStatus {
   new
   confirmed_existing
   confirmed_new
+  subrecipe
 }
 
 entity ComponentImport mixin TenantScoped, SoftDeletable {
@@ -314,6 +315,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     guard self.resultingComponentId != null
     guard self.resultingComponent != null and self.resultingComponent.deletedAt == null
     guard count_of(filter(self.lines, (line) => line.matchedIngredientId != null and (line.matchedIngredient == null or line.matchedIngredient.deletedAt != null or line.matchedIngredient.tenantId != self.tenantId))) == 0
+    guard count_of(filter(self.lines, (line) => line.matchedComponentId != null and (line.matchedComponent == null or line.matchedComponent.deletedAt != null or line.matchedComponent.tenantId != self.tenantId))) == 0
     guard self.deletedAt == null
     mutate status = "completed"
     mutate completedAt = now()
@@ -357,14 +359,19 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
   property required matchStatus: ComponentImportMatchStatus = "unresolved"
   property matchedIngredientId: uuid?
   property possibleMatchIngredientIds: list<string> = []
+  // A line that uses another recipe from the recipe book (a sub-recipe) links
+  // that recipe here instead of an ingredient.
+  property matchedComponentId: uuid?
   property resolvedAt: datetime?
   property revisedAt: datetime?
 
   belongsTo import: ComponentImport fields [tenantId, importId] references [tenantId, id]
   belongsTo matchedIngredient: Ingredient fields [tenantId, matchedIngredientId] references [tenantId, id]
+  belongsTo matchedComponent: Component fields [tenantId, matchedComponentId] references [tenantId, id]
 
   constraint lineMatchedIngredientAllowed: self.matchedIngredientId == null or self.matchStatus == "exact" or self.matchStatus == "confirmed_existing" or self.matchStatus == "confirmed_new" "This line isn't ready to keep that ingredient. Confirm the match first, or attach the ingredient you created."
   constraint lineConfirmedNewWithoutMatch: self.matchStatus != "confirmed_new" or self.matchedIngredientId == null or self.resolvedAt != null "This new line isn't finished yet. Finish it before you attach the ingredient you created."
+  constraint lineMatchedComponentAllowed: self.matchedComponentId == null or self.matchStatus == "subrecipe" "Only a sub-recipe line can point at another recipe."
 
   default policy componentImportLineRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see recipe import lines"
   default policy componentImportLineWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update recipe import lines"
@@ -480,6 +487,26 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The line uses another recipe from the recipe book. Like recordComponent,
+  // the link is stored here and checked at ComponentImport.complete() (and by
+  // the authored save seam before this runs): a relation guard here would read
+  // the old stored key before the assignment.
+  command linkSubrecipe(matchedComponentId: uuid) {
+    guard self.resolvedAt == null
+    guard self.deletedAt == null
+    mutate matchStatus = "subrecipe"
+    mutate matchedIngredientId = null
+    mutate possibleMatchIngredientIds = []
+    mutate matchedComponentId = matchedComponentId
+    mutate resolvedAt = now()
+    emit ComponentImportLineSubrecipeLinked {
+      componentImportLineId: self.id
+      tenantId: self.tenantId
+      importId: self.importId
+      matchedComponentId: matchedComponentId
+    }
+  }
+
   // The created ingredient is produced by the same tenant's finalizer, so the
   // link is stored here and validated at ComponentImport.complete(): the old
   // relation guard dereferenced the previous stored foreign key (null for a
@@ -529,6 +556,7 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate matchStatus = "unresolved"
     mutate matchedIngredientId = null
+    mutate matchedComponentId = null
     mutate possibleMatchIngredientIds = []
     mutate resolvedAt = null
     emit ComponentImportLineResolutionReset {
@@ -673,6 +701,13 @@ event ComponentImportLineCreatedIngredientAttached: "component_import_line.creat
   tenantId: string
   importId: string
   matchedIngredientId: string
+}
+
+event ComponentImportLineSubrecipeLinked: "component_import_line.subrecipe_linked" {
+  componentImportLineId: string
+  tenantId: string
+  importId: string
+  matchedComponentId: string
 }
 
 event ComponentImportLineResolutionReset: "component_import_line.resolution_reset" {

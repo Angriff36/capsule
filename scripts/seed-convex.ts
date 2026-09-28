@@ -93,7 +93,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.ComponentImport_createViaUpload, { "sourceKind": "demo-sourceKind-1", "sourceFilename": "ComponentImport 1", "rawSourceText": "demo-rawSourceText-1", "sourceByteCount": 1, "sourceFingerprint": "demo-sourceFingerprint-1", "csvSheetText": "demo-csvSheetText-1", "csvLinesText": "demo-csvLinesText-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.ComponentImport_createViaUpload, { "sourceKind": "demo-sourceKind-2", "sourceFilename": "ComponentImport 2", "rawSourceText": "demo-rawSourceText-2", "sourceByteCount": 2, "sourceFingerprint": "demo-sourceFingerprint-2", "csvSheetText": "demo-csvSheetText-2", "csvLinesText": "demo-csvLinesText-2" } as any);
-  // ComponentImportLine has multiple initialization commands (confirmExisting, confirmNew, discard, stage); using the selected initialization command: stage.
+  // ComponentImportLine has multiple initialization commands (confirmExisting, confirmNew, discard, linkSubrecipe, stage); using the selected initialization command: stage.
   // ComponentImportLine → api.mutations.ComponentImportLine_createViaStage
   rowsAttempted += 1;
   await client.mutation(api.mutations.ComponentImportLine_createViaStage, { "importId": "importId-component-import-line-1", "sourceOrder": 1, "sourceLine": "demo-sourceLine-1", "parsedQuantity": 1, "parsedUnit": "demo-parsedUnit-1", "parsedIngredientName": "ComponentImportLine 1", "preparationNote": "demo-preparationNote-1" } as any);

@@ -345,9 +345,10 @@ export default defineSchema({
     parsedUnit: v.optional(v.union(v.literal("each"), v.literal("gram"), v.literal("kilogram"), v.literal("ounce"), v.literal("pound"), v.literal("milliliter"), v.literal("liter"), v.literal("teaspoon"), v.literal("tablespoon"), v.literal("cup"), v.literal("pint"), v.literal("quart"), v.literal("gallon"), v.literal("portion"), v.literal("serving"), v.literal("batch"), v.literal("melon"), v.literal("bottle"), v.literal("fluid_ounce"), v.literal("piece"), v.literal("slice"), v.literal("pizza"), v.literal("package"), v.literal("case"), v.literal("can"), v.literal("tub"), v.null())),
     parsedIngredientName: v.optional(v.union(v.string(), v.null())),
     preparationNote: v.optional(v.union(v.string(), v.null())),
-    matchStatus: v.union(v.literal("unresolved"), v.literal("exact"), v.literal("possible"), v.literal("new"), v.literal("confirmed_existing"), v.literal("confirmed_new")),
+    matchStatus: v.union(v.literal("unresolved"), v.literal("exact"), v.literal("possible"), v.literal("new"), v.literal("confirmed_existing"), v.literal("confirmed_new"), v.literal("subrecipe")),
     matchedIngredientId: v.optional(v.union(v.id("ingredients"), v.null())),
     possibleMatchIngredientIds: v.optional(v.array(v.string())),
+    matchedComponentId: v.optional(v.union(v.id("components"), v.null())),
     resolvedAt: v.optional(v.union(v.number(), v.null())),
     revisedAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
@@ -356,7 +357,8 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_importId", ["importId"])
-    .index("by_matchedIngredientId", ["matchedIngredientId"]),
+    .index("by_matchedIngredientId", ["matchedIngredientId"])
+    .index("by_matchedComponentId", ["matchedComponentId"]),
   componentIngredients: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

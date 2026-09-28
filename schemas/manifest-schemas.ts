@@ -380,9 +380,10 @@ export const ComponentImportLineSchema = z.object({
   parsedUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).nullable().optional(),
   parsedIngredientName: z.string().nullable().optional(),
   preparationNote: z.string().nullable().optional(),
-  matchStatus: z.enum(["unresolved", "exact", "possible", "new", "confirmed_existing", "confirmed_new"]).default("unresolved"),
+  matchStatus: z.enum(["unresolved", "exact", "possible", "new", "confirmed_existing", "confirmed_new", "subrecipe"]).default("unresolved"),
   matchedIngredientId: z.string().uuid().nullable().optional(),
   possibleMatchIngredientIds: z.array(z.string()).optional().default([]),
+  matchedComponentId: z.string().uuid().nullable().optional(),
   resolvedAt: z.coerce.date().nullable().optional(),
   revisedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -4706,6 +4707,13 @@ export const ComponentImportLineDiscardParamsSchema = z.object({
 });
 
 export type ComponentImportLineDiscardParams = z.infer<typeof ComponentImportLineDiscardParamsSchema>;
+
+// Command: linkSubrecipe on ComponentImportLine
+export const ComponentImportLineLinkSubrecipeParamsSchema = z.object({
+  matchedComponentId: z.string().min(1),
+});
+
+export type ComponentImportLineLinkSubrecipeParams = z.infer<typeof ComponentImportLineLinkSubrecipeParamsSchema>;
 
 // Command: markNew on ComponentImportLine
 export const ComponentImportLineMarkNewParamsSchema = z.object({});
