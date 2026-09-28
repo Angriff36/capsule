@@ -90,6 +90,14 @@ export interface ProposalRevisionSnapshot {
     id: string;
     name: string;
   };
+  // AC-378/AC-420: a change to an accepted proposal names the proposal and
+  // the exact revision the client accepted, and the event. Null on an
+  // ordinary proposal; absent on revisions made before this field existed.
+  changeOf?: {
+    proposalId: string;
+    acceptedRevisionId: string | null;
+    eventId: string | null;
+  } | null;
   // §8.2 / §5.2 (spec L263 "Venue logistics snapshot" required section, L376
   // "snapshot the venue information needed to reproduce the client and
   // operations plan"): the venue's logistics frozen into the immutable
@@ -407,6 +415,7 @@ export async function buildProposalRevisionSnapshot(
       id: client._id.toString(),
       name: client.clientType === "company" ? (client.companyName ?? "Unknown Company") : `${client.givenName ?? ""} ${client.familyName ?? ""}`.trim() || "Unknown Client",
     },
+    changeOf: await acceptedChangeSource(ctx, proposal),
     venue: await resolveVenueLogistics(ctx, proposal),
     dishSelections: dishSelectionsData,
     timeline: timelineData,
@@ -418,6 +427,29 @@ export async function buildProposalRevisionSnapshot(
   };
 
   return JSON.stringify(snapshot);
+}
+
+/** The accepted proposal this one changes, with its accepted revision. */
+async function acceptedChangeSource(
+  ctx: { db: any },
+  proposal: Doc<"proposals">,
+): Promise<ProposalRevisionSnapshot["changeOf"]> {
+  if (!proposal.replacesProposalId) return null;
+  const source: Doc<"proposals"> | null = await ctx.db.get(
+    proposal.replacesProposalId as Id<"proposals">,
+  );
+  if (!source || source.tenantId !== proposal.tenantId || source.status !== "accepted") {
+    return null;
+  }
+  return {
+    proposalId: String(source._id),
+    acceptedRevisionId: source.acceptedRevisionId ? String(source.acceptedRevisionId) : null,
+    eventId: proposal.eventId
+      ? String(proposal.eventId)
+      : source.eventId
+        ? String(source.eventId)
+        : null,
+  };
 }
 
 /** Highest revision number along the proposals this one replaces. */

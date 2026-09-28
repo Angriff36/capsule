@@ -18,6 +18,7 @@ import { api } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import { v } from "convex/values";
 import { getAuthContext } from "./authContext";
+import { followGuestCount } from "./proposalGenerate";
 
 export interface StartProposalChangeResult {
   docId: Id<"proposals">;
@@ -241,6 +242,19 @@ export const startProposalChange = mutation({
       created.docId,
     );
     await copyLiveExtras(ctx, proposal._id, created.docId);
+    // AC-378: a change usually exists because the event moved on (150 → 175
+    // guests). The new draft starts at the event's current guest count, priced
+    // by the central calc; the accepted proposal keeps its own count.
+    const event = proposal.eventId ? await ctx.db.get(proposal.eventId) : null;
+    if (
+      event &&
+      event.tenantId === proposal.tenantId &&
+      event.deletedAt == null &&
+      typeof event.expectedHeadcount === "number" &&
+      event.expectedHeadcount !== proposal.guestCount
+    ) {
+      await followGuestCount(ctx, created.docId, event.expectedHeadcount);
+    }
     return { docId: created.docId, alreadyStarted: false, leftOffDishNames };
   },
 });

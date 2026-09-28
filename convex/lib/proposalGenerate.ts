@@ -181,7 +181,7 @@ function headerFacts(proposal: Doc<"proposals">) {
 }
 
 /** Same step the headcount follow-through uses, priced by the central calc. */
-async function followGuestCount(
+export async function followGuestCount(
   ctx: MutationCtx,
   proposalId: Id<"proposals">,
   guestCount: number,
