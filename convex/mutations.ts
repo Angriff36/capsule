@@ -27875,6 +27875,7 @@ async function __runInvoiceApplyPayment(ctx: MutationCtx, { docId, paymentAmount
       amountDue: nextDue,
       status: ((nextDue === 0) ? "paid" : "partial"),
       paidAt: ((nextDue === 0) ? Date.now() : doc.paidAt),
+      depositPaidAt: (((((doc.depositPaidAt == null) && (doc.depositAmount != null)) && (doc.depositAmount > 0)) && (nextPaid >= doc.depositAmount)) ? Date.now() : doc.depositPaidAt),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
