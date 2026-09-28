@@ -51,6 +51,8 @@ enum CapsuleEntityType {
   unit
   event_dish
   prep_task
+  // An old-system service style matched to a Capsule service style (AC-064).
+  service_style
 }
 
 // Revision-2: whether a link is a machine suggestion, an approved identity, or

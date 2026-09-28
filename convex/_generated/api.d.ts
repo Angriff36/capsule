@@ -43,6 +43,7 @@ import type * as http from "../http.js";
 import type * as importCommit from "../importCommit.js";
 import type * as importCoordinator from "../importCoordinator.js";
 import type * as importPipeline from "../importPipeline.js";
+import type * as importServiceStyle from "../importServiceStyle.js";
 import type * as ingredientLookup from "../ingredientLookup.js";
 import type * as inventoryAudit from "../inventoryAudit.js";
 import type * as invoicePayments from "../invoicePayments.js";
@@ -252,6 +253,7 @@ declare const fullApi: ApiFromModules<{
   importCommit: typeof importCommit;
   importCoordinator: typeof importCoordinator;
   importPipeline: typeof importPipeline;
+  importServiceStyle: typeof importServiceStyle;
   ingredientLookup: typeof ingredientLookup;
   inventoryAudit: typeof inventoryAudit;
   invoicePayments: typeof invoicePayments;
