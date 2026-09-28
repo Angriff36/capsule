@@ -57,7 +57,8 @@ End your answer with exactly one line: VERDICT: APPROVE   or   VERDICT: REJECT -
 "@
   $out = Join-Path $wt '.loop-verdict.txt'
   Remove-Item $out -Force -ErrorAction SilentlyContinue
-  codex exec -s read-only -m gpt-5.6-sol -C $wt -o $out $prompt *> $null
+  # Ryan 2026-09-22: "I don't think it needs highest reasoning" - xhigh made each round take 20-40 minutes.
+  codex exec -s read-only -m gpt-5.6-sol -c model_reasoning_effort="high" -C $wt -o $out $prompt *> $null
   $reviewer = 'gpt-5.6-sol'
   $text = if (Test-Path $out) { Get-Content $out -Raw } else { '' }
   if ($text -notmatch '(?m)^VERDICT: (APPROVE|REJECT)') {
