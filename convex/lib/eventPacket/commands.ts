@@ -714,6 +714,44 @@ export const recordPacketRevision = mutation({
       throw new Error(
         "Event or source evidence changed; prepare the current workbook again",
       );
+    const answersChanged = new Error(
+      "The Final Lock answers changed after the workbook was made; prepare the current workbook again",
+    );
+    // Every print, a retry too, must upload files that carry the answers
+    // it names, checked before any earlier print is reused.
+    const pdf = current.files.find(
+      (f) => f.storageId === args.pdfStorageId && f.purpose === "pdf",
+    );
+    const snapshot = current.files.find(
+      (f) => f.storageId === args.snapshotStorageId && f.purpose === "snapshot",
+    );
+    const pdfContext = JSON.parse(pdf?.contextJson ?? "{}");
+    const snapshotContext = JSON.parse(snapshot?.contextJson ?? "{}");
+    if (
+      !pdf ||
+      pdfContext.snapshotFingerprint !== args.inputFingerprint ||
+      !snapshot ||
+      snapshotContext.snapshotFingerprint !== args.inputFingerprint
+    )
+      throw new Error(
+        "Print files must be owned by this event and contain the exact current snapshot",
+      );
+    // The PDF and snapshot must carry exactly the answers the print names.
+    const uploaded =
+      typeof snapshotContext.finalLockJson === "string"
+        ? JSON.parse(snapshotContext.finalLockJson)
+        : null;
+    if (
+      !uploaded?.lines ||
+      pdfContext.finalLockFingerprint !== args.finalLockFingerprint ||
+      (await printFingerprint(uploaded)) !== args.finalLockFingerprint
+    )
+      throw new Error(
+        "Print files must carry the Final Lock answers this workbook shows",
+      );
+    // The office answers printed must be the current ones.
+    if ((await printFingerprint(officePrint(uploaded))) !== lock.officeFingerprint)
+      throw answersChanged;
     // Reuse only a print of this packet that also showed these answers.
     let existing = null;
     for (const r of current.revisionRows)
@@ -722,10 +760,9 @@ export const recordPacketRevision = mutation({
         (await storedOfficeFingerprint(r)) === lock.officeFingerprint
       )
         existing = r;
+    // A new print must show every answer as it is now.
     if (!existing && args.finalLockFingerprint !== lock.fingerprint)
-      throw new Error(
-        "The Final Lock answers changed after the workbook was made; prepare the current workbook again",
-      );
+      throw answersChanged;
     if (existing) {
       for (const row of current.revisionRows) {
         if (row._id === existing._id && row.supersededBy)
@@ -745,33 +782,6 @@ export const recordPacketRevision = mutation({
         reused: true,
       };
     }
-    const pdf = current.files.find(
-      (f) => f.storageId === args.pdfStorageId && f.purpose === "pdf",
-    );
-    const snapshot = current.files.find(
-      (f) => f.storageId === args.snapshotStorageId && f.purpose === "snapshot",
-    );
-    const pdfContext = JSON.parse(pdf?.contextJson ?? "{}");
-    const snapshotContext = JSON.parse(snapshot?.contextJson ?? "{}");
-    if (
-      !pdf ||
-      pdfContext.snapshotFingerprint !== args.inputFingerprint ||
-      !snapshot ||
-      snapshotContext.snapshotFingerprint !== args.inputFingerprint
-    )
-      throw new Error(
-        "Print files must be owned by this event and contain the exact current snapshot",
-      );
-    // The PDF and snapshot must carry exactly the answers checked above.
-    if (
-      pdfContext.finalLockFingerprint !== lock.fingerprint ||
-      typeof snapshotContext.finalLockJson !== "string" ||
-      (await printFingerprint(JSON.parse(snapshotContext.finalLockJson))) !==
-        lock.fingerprint
-    )
-      throw new Error(
-        "Print files must carry the Final Lock answers this workbook shows",
-      );
     const id = await ctx.db.insert("eventPacketRevisions", {
       tenantId: auth.tenantId,
       eventId: args.eventId,

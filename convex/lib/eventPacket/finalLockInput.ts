@@ -108,6 +108,7 @@ export async function readFinalLockInput(
           ? line.followsEventHeadcount
           : null,
       notes: str(line.specialInstructions),
+      dish: dish ? { id: String(dish._id), version: version(dish) } : null,
     });
   }
 
@@ -186,6 +187,7 @@ export async function readFinalLockInput(
       quantity: row.quantity,
       status: row.status,
       shortBy,
+      item: item ? { id: String(item._id), version: version(item) } : null,
     });
   }
 
@@ -272,6 +274,7 @@ export async function readFinalLockInput(
         version: version(r),
         table: "proposalLineItems",
         text: [r.description, r.notes].filter(Boolean).join(" - "),
+        related: [],
       });
     for (const r of extraRows)
       lines.push({
@@ -279,6 +282,7 @@ export async function readFinalLockInput(
         version: version(r),
         table: "proposalEnhancements",
         text: [r.name, r.description].filter(Boolean).join(" - "),
+        related: [],
       });
     for (const r of dishRows) {
       const dish = await own(ctx, "dishes", r.dishId, tenantId);
@@ -287,6 +291,9 @@ export async function readFinalLockInput(
         version: version(r),
         table: "proposalDishSelections",
         text: [r.course, dish?.name].filter(Boolean).join(" - "),
+        related: dish
+          ? [{ table: "dishes", id: String(dish._id), version: version(dish) }]
+          : [],
       });
     }
     proposal = { id: String(accepted._id), version: version(accepted), lines };

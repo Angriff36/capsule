@@ -1,6 +1,9 @@
 import {
   answered,
+  dishSources,
+  equipmentSources,
   notApplicable,
+  proposalSources,
   said,
   source,
   unresolved,
@@ -59,32 +62,27 @@ export function dessertBarBuffetAnswers(
   const coffeeGear = [
     ...input.equipment
       .filter((e) => COFFEE_GEAR.test(`${e.name} ${e.category ?? ""}`))
-      .map((e) => ({ table: "equipmentReservations", ...e })),
-    ...[...input.kitItems, ...input.packItems]
+      .flatMap(equipmentSources),
+    ...input.kitItems
       .filter((i) => COFFEE_GEAR.test(i.description))
-      .map((i) => ({
-        table: input.kitItems.includes(i)
-          ? "serviceStyleKitItems"
-          : "packListItems",
-        ...i,
-      })),
+      .flatMap((i) => source("serviceStyleKitItems", i)),
+    ...input.packItems
+      .filter((i) => COFFEE_GEAR.test(i.description))
+      .flatMap((i) => source("packListItems", i)),
   ];
   const cake = desserts.some((d) => /cake/i.test(d.name)) || cuttingSold;
+  const coffeeDishes = dishes.filter((d) => COFFEE.test(d.name));
   const coffee =
-    dishes.some((d) => COFFEE.test(d.name)) ||
-    COFFEE.test(text.beveragesOnMenu ?? "");
+    coffeeDishes.length > 0 || COFFEE.test(text.beveragesOnMenu ?? "");
   const dessert = said(text.dessertService);
   const dessertSources = [
     ...ev("dessertService"),
-    ...desserts.flatMap((d) => source("eventDishes", d)),
-    ...scope.map((l) => ({ table: l.table, id: l.id, version: l.version })),
+    ...ev("beveragesOnMenu"),
+    ...[...desserts, ...coffeeDishes].flatMap((d) => dishSources(d)),
+    ...scope.flatMap((l) => proposalSources(input.proposal, l)),
     ...input.staffNeeds.flatMap((n) => source("eventStaffNeeds", n)),
     ...input.assignments.flatMap((a) => source("eventAssignments", a)),
-    ...coffeeGear.map((g) => ({
-      table: g.table,
-      id: g.id,
-      version: g.version,
-    })),
+    ...coffeeGear,
   ];
   const who =
     dessert.kind === "party"

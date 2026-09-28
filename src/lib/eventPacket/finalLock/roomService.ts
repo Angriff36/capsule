@@ -1,12 +1,14 @@
 import {
   answered,
   notApplicable,
+  proposalSources,
   said,
   source,
   unresolved,
   type Draft,
   type Said,
 } from "./answer";
+import { bussingAnswer } from "./bussing";
 import { isDropOff } from "./policy";
 import { servingwareAnswer } from "./servingware";
 import type { FinalLockInput } from "./types";
@@ -114,34 +116,85 @@ export function roomServiceAnswers(
   const noDrinks =
     said(text.barService).kind === "no" &&
     said(text.beveragesOnMenu).kind === "no";
+  // The accepted proposal is the agreed scope: a line that sells a part of
+  // the room names who sets it (Mangia unless the line names someone else).
+  const scopeLines = (re: RegExp) =>
+    (input.proposal?.lines ?? []).filter((l) => re.test(l.text));
+  const lineParty = (lineText: string) => {
+    const s = said(lineText);
+    return s.kind === "party" ? s.party : "Mangia";
+  };
   const whoSets = (
     key: string,
     field: string,
     words: string,
+    scope: RegExp,
     notNeeded?: [boolean, string, string],
   ) => {
     const s = said(text[field]);
-    if (dropOff && s.kind === "empty")
+    const lines = scopeLines(scope);
+    const sold = [...new Set(lines.map((l) => lineParty(l.text)))];
+    const sources = [
+      ...ev(field),
+      ...lines.flatMap((l) => proposalSources(input.proposal, l)),
+    ];
+    const fix = `Make the task breakdown and the accepted proposal agree on who sets the ${words}.`;
+    if (dropOff && s.kind === "empty" && !lines.length)
       return (out[key] = notApplicable(
         `Drop-off: Mangia does not set the ${words}.`,
         `${key}.drop-off`,
         [...ev(field), ...source("serviceStyles", input.serviceStyle)],
       ));
+    if (sold.length > 1)
+      return (out[key] = unresolved(
+        lines.map(
+          (l) =>
+            `Accepted proposal line "${l.text}" says ${lineParty(l.text)} sets the ${words}.`,
+        ),
+        fix,
+        `${key}.accepted-scope`,
+        sources,
+      ));
+    if (s.kind === "empty" && sold.length === 1)
+      return (out[key] = answered(
+        { type: "choice", choice: sold[0]! },
+        `${sold[0]} sets the ${words}: the accepted proposal includes it.`,
+        `${key}.accepted-scope`,
+        sources,
+      ));
     if (notNeeded?.[0] && s.kind === "empty")
       return (out[key] = notApplicable(notNeeded[1], notNeeded[2], ev(field)));
     if (s.kind === "no")
-      return (out[key] = notApplicable(
-        `The task breakdown says no ${words} are needed.`,
-        `${key}.marked-not-needed`,
-        ev(field),
-      ));
+      return (out[key] = lines.length
+        ? unresolved(
+            [
+              `The task breakdown says no ${words} are needed, but accepted proposal line "${lines[0]!.text}" includes them.`,
+            ],
+            fix,
+            `${key}.accepted-scope`,
+            sources,
+          )
+        : notApplicable(
+            `The task breakdown says no ${words} are needed.`,
+            `${key}.marked-not-needed`,
+            ev(field),
+          ));
     const party = partyOf(s);
+    if (party && sold.length && sold[0] !== party)
+      return (out[key] = unresolved(
+        [
+          `The task breakdown says ${party} sets the ${words}, but accepted proposal line "${lines[0]!.text}" says ${sold[0]}.`,
+        ],
+        fix,
+        `${key}.accepted-scope`,
+        sources,
+      ));
     if (party)
       return (out[key] = answered(
         { type: "choice", choice: party },
         `${party} sets the ${words}.`,
         `${key}.task-breakdown`,
-        ev(field),
+        sources,
       ));
     out[key] = unresolved(
       [
@@ -151,23 +204,55 @@ export function roomServiceAnswers(
       ],
       `Say who sets the ${words} on the task breakdown.`,
       `${key}.task-breakdown`,
-      ev(field),
+      sources,
     );
   };
-  whoSets("room.guest_tables", "guestTableSetup", "guest tables and chairs");
-  whoSets("room.place_settings", "placeSettings", "flatware and china");
-  whoSets("room.water_goblets", "tablesideWater", "water goblets");
-  whoSets("room.buffet_tables", "buffetTableSetup", "buffet tables");
-  whoSets("room.appetizer_tables", "appetizerTableSetup", "appetizer tables", [
-    noApps,
-    "No stationary appetizers are on this event.",
-    "room.appetizer_tables.no-stationary-appetizers",
-  ]);
-  whoSets("room.beverage_tables", "beverageTableSetup", "drinks table", [
-    noDrinks,
-    "No bar and no drinks are on this event.",
-    "room.beverage_tables.no-drinks",
-  ]);
+  whoSets(
+    "room.guest_tables",
+    "guestTableSetup",
+    "guest tables and chairs",
+    /guest table|tables? and chairs?|chair set ?up|table set ?up/i,
+  );
+  whoSets(
+    "room.place_settings",
+    "placeSettings",
+    "flatware and china",
+    /place setting|table setting|flatware|china set/i,
+  );
+  whoSets(
+    "room.water_goblets",
+    "tablesideWater",
+    "water goblets",
+    /goblet|tableside water|water service/i,
+  );
+  whoSets(
+    "room.buffet_tables",
+    "buffetTableSetup",
+    "buffet tables",
+    /buffet table|buffet set ?up/i,
+  );
+  whoSets(
+    "room.appetizer_tables",
+    "appetizerTableSetup",
+    "appetizer tables",
+    /appetizer (table|station)|hors d.oeuvre (table|station)/i,
+    [
+      noApps,
+      "No stationary appetizers are on this event.",
+      "room.appetizer_tables.no-stationary-appetizers",
+    ],
+  );
+  whoSets(
+    "room.beverage_tables",
+    "beverageTableSetup",
+    "drinks table",
+    /(beverage|drinks?) (table|station)|bar set ?up/i,
+    [
+      noDrinks,
+      "No bar and no drinks are on this event.",
+      "room.beverage_tables.no-drinks",
+    ],
+  );
 
   // Food service.
   const stationary = said(text.stationaryApps);
@@ -310,44 +395,6 @@ export function roomServiceAnswers(
               ev("buffetService"),
             );
 
-  // Bussing: bus after dinner by default; full bussing only when stated.
-  const bussing = text.bussing?.trim() ?? "";
-  out["bussing.plan"] = dropOff
-    ? bussing && said(bussing).kind !== "no"
-      ? unresolved(
-          [
-            `Bussing says "${bussing}" but a drop-off has no staff to clear tables.`,
-          ],
-          "Clear the bussing answer or change the service style.",
-          "bussing.plan.staff-needed",
-          [...ev("bussing"), ...source("serviceStyles", input.serviceStyle)],
-        )
-      : notApplicable(
-          "Drop-off: no staff stay to clear tables.",
-          "bussing.plan.drop-off",
-          source("serviceStyles", input.serviceStyle),
-        )
-    : /full/i.test(bussing)
-      ? answered(
-          { type: "record", fields: { afterDinner: true, full: true } },
-          "Full bussing, including glassware, as the event says.",
-          "bussing.plan.event-says",
-          ev("bussing"),
-        )
-      : said(bussing).kind === "no"
-        ? answered(
-            { type: "record", fields: { afterDinner: false, full: false } },
-            "No bussing: the event says so.",
-            "bussing.plan.event-says",
-            ev("bussing"),
-          )
-        : answered(
-            { type: "record", fields: { afterDinner: true, full: false } },
-            bussing
-              ? `Bus after dinner (${bussing}); no full bussing.`
-              : "Bus after dinner; no full bussing unless the contract says so.",
-            bussing ? "bussing.plan.event-says" : "bussing.plan.mangia-default",
-            ev("bussing"),
-          );
+  out["bussing.plan"] = bussingAnswer(input);
   return out;
 }

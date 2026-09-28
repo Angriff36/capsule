@@ -1,4 +1,11 @@
-import { answered, NONE, source, unresolved, type Draft } from "./answer";
+import {
+  answered,
+  equipmentSources,
+  NONE,
+  source,
+  unresolved,
+  type Draft,
+} from "./answer";
 import { QUESTIONS, type Question } from "./policy";
 import { dayTimes } from "./timelineSetup";
 import type { FinalLockInput } from "./types";
@@ -11,7 +18,7 @@ export function operationsAnswers(
   const vehicles = input.vehicles;
   const vehicleSources = [
     ...vehicles.flatMap((v) => source("eventVehicleAssignments", v)),
-    ...input.equipment.flatMap((e) => source("equipmentReservations", e)),
+    ...input.equipment.flatMap(equipmentSources),
   ];
   const problems = [
     ...(vehicles.length ? [] : ["No truck is assigned to this event."]),
@@ -83,6 +90,8 @@ const SIGNOFFS = [
 export function readinessAnswer(
   input: FinalLockInput,
   officeOpen: string[],
+  /** The printed Final Lock answers or policy no longer match. */
+  answersStale = false,
 ): { draft: Draft; officeOpen: boolean } {
   const active = input.assignments.filter(
     (a) => a.status !== "unassigned" && a.status !== "no_show",
@@ -95,7 +104,8 @@ export function readinessAnswer(
     opsFinal: officeOpen.length === 0,
     packetCurrent:
       input.packet.latestRevisionId != null &&
-      !input.packet.latestRevisionStale,
+      !input.packet.latestRevisionStale &&
+      !answersStale,
     staffingCommunicated:
       active.length > 0 &&
       active.every(

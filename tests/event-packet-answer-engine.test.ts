@@ -116,6 +116,7 @@ function input(): FinalLockInput {
       quantityServings: 100,
       followsEventHeadcount: true,
       notes: null,
+      dish: { id: `dish-record-${i}`, version: 1 },
     })),
     timeline: [],
     vehicles: [
@@ -282,7 +283,13 @@ describe("Final Lock answer engine", () => {
       id: "client-1",
       version: 2,
     });
-    expect(get(answers, "menu.order").sources).toHaveLength(8);
+    // Each of the 8 menu lines and the dish record it names.
+    expect(get(answers, "menu.order").sources).toHaveLength(16);
+    expect(get(answers, "menu.order").sources).toContainEqual({
+      table: "dishes",
+      id: "dish-record-0",
+      version: 1,
+    });
     expect(get(answers, "vehicles.assigned").sources[0]).toEqual({
       table: "eventVehicleAssignments",
       id: "va-1",
@@ -655,6 +662,7 @@ describe("Final Lock answer engine", () => {
       quantity: 10,
       status: "reserved",
       shortBy: 2,
+      item: { id: "equipment-chafers", version: 1 },
     });
     expect(get(run(i).answers, "vehicles.assigned").missing).toEqual([
       "Box truck is out of service.",
@@ -798,6 +806,7 @@ describe("Final Lock answer engine", () => {
       quantity: 100,
       status: "reserved",
       shortBy: 0,
+      item: { id: "equipment-china", version: 5 },
     });
     const agreed = get(run(i).answers, "servingware.source");
     expect(agreed.result).toBe("answered");
@@ -817,6 +826,7 @@ describe("Final Lock answer engine", () => {
           version: 1,
           table: "proposalLineItems",
           text: "Client-provided plates",
+          related: [],
         },
       ],
     };
@@ -884,6 +894,7 @@ describe("Final Lock answer engine", () => {
           version: 1,
           table: "proposalEnhancements",
           text: "Espresso bar",
+          related: [],
         },
       ],
     };
@@ -909,6 +920,7 @@ describe("Final Lock answer engine", () => {
           version: 1,
           table: "proposalLineItems",
           text: "Cake cutting",
+          related: [],
         },
       ],
     };
@@ -919,6 +931,211 @@ describe("Final Lock answer engine", () => {
     cutting.event.text.dessertService = "Client";
     expect(get(run(cutting).answers, "dessert.plan").missing).toEqual([
       'The accepted proposal sells cake cutting, but dessert service says "Client".',
+    ]);
+  });
+
+  it("an answer-only or policy-only change makes readiness unresolved and keeps the stale outcome", () => {
+    const base = allConfirmed(input());
+    const printed = printedAt(run(base), "rev-1");
+    const current = run(base, { printed });
+    expect(current.outcome).toBe("clear");
+    expect(get(current.answers, "readiness.dispatch").result).toBe("answered");
+    // Only a Final Lock answer changes; the packet fingerprint does not.
+    const rain = allConfirmed(input());
+    rain.event.text.rainPlan = "Tent on the lawn";
+    const answerOnly = run(rain, { printed });
+    expect(answerOnly.outcome).toBe("stale");
+    expect(get(answerOnly.answers, "readiness.dispatch")).toMatchObject({
+      result: "unresolved",
+      missing: ["The printed event packet is out of date."],
+    });
+    // Only the policy version changes.
+    const policyOnly = run(allConfirmed(input()), {
+      printed,
+      policyVersion: "next",
+    });
+    expect(policyOnly.staleQuestions).toEqual([]);
+    expect(policyOnly.outcome).toBe("stale");
+    expect(get(policyOnly.answers, "readiness.dispatch").result).toBe(
+      "unresolved",
+    );
+    // An older print that showed no answers is out of date too.
+    const legacy = run(allConfirmed(input()), { printed: null });
+    expect(legacy.outcome).toBe("stale");
+    expect(get(legacy.answers, "readiness.dispatch").result).toBe("unresolved");
+  });
+
+  it("every record an answer reads is in its basis: equipment, proposal and menu records", () => {
+    const base = () => {
+      const i = allConfirmed(input());
+      i.equipment.push({
+        id: "res-urn",
+        version: 1,
+        name: "Coffee urn",
+        category: "Beverage",
+        rented: false,
+        quantity: 1,
+        status: "reserved",
+        shortBy: 0,
+        item: { id: "equipment-urn", version: 1 },
+      });
+      i.dishes.push({
+        id: "dish-coffee",
+        version: 1,
+        name: "Coffee service",
+        course: "Beverage",
+        serviceStyle: null,
+        sortOrder: 9,
+        quantityServings: 100,
+        followsEventHeadcount: true,
+        notes: null,
+        dish: { id: "dish-record-coffee", version: 1 },
+      });
+      i.proposal = {
+        id: "prop-1",
+        version: 1,
+        lines: [
+          {
+            id: "line-cake",
+            version: 1,
+            table: "proposalLineItems",
+            text: "Cake cutting",
+            related: [],
+          },
+          {
+            id: "line-plates",
+            version: 1,
+            table: "proposalLineItems",
+            text: "Rented china plates",
+            related: [],
+          },
+          {
+            id: "line-dessert",
+            version: 1,
+            table: "proposalDishSelections",
+            text: "Dessert - Chocolate Cake",
+            related: [{ table: "dishes", id: "dish-record-7", version: 1 }],
+          },
+        ],
+      };
+      return i;
+    };
+    const cases: [string, (i: FinalLockInput) => void, string[]][] = [
+      [
+        "equipment record",
+        (i) => (i.equipment[0]!.item!.version = 2),
+        ["vehicles.assigned", "dessert.plan"],
+      ],
+      [
+        "accepted proposal",
+        (i) => (i.proposal!.version = 2),
+        ["servingware.source", "dessert.plan", "bussing.plan"],
+      ],
+      [
+        "coffee menu line",
+        (i) => (i.dishes.at(-1)!.version = 2),
+        ["dessert.plan"],
+      ],
+      [
+        "coffee dish record",
+        (i) => (i.dishes.at(-1)!.dish!.version = 2),
+        ["dessert.plan"],
+      ],
+      [
+        "proposal dish record",
+        (i) => (i.proposal!.lines[2]!.related[0]!.version = 2),
+        ["dessert.plan"],
+      ],
+    ];
+    const before = run(base()).answers;
+    for (const [what, bump, keys] of cases) {
+      const i = base();
+      bump(i);
+      const after = run(i).answers;
+      for (const key of keys) {
+        expect(get(after, key).value, `${what}: ${key}`).toEqual(
+          get(before, key).value,
+        );
+        expect(get(after, key).basis, `${what}: ${key}`).not.toBe(
+          get(before, key).basis,
+        );
+      }
+    }
+  });
+
+  it("room setup and bussing read the accepted proposal and surface disagreements", () => {
+    const i = input();
+    i.event.text.guestTableSetup = null;
+    i.proposal = {
+      id: "prop-1",
+      version: 1,
+      lines: [
+        {
+          id: "l-tables",
+          version: 1,
+          table: "proposalLineItems",
+          text: "Guest table and chair setup",
+          related: [],
+        },
+        {
+          id: "l-goblets",
+          version: 1,
+          table: "proposalEnhancements",
+          text: "Water goblets provided by client",
+          related: [],
+        },
+        {
+          id: "l-buss",
+          version: 1,
+          table: "proposalLineItems",
+          text: "Full bussing including glassware",
+          related: [],
+        },
+      ],
+    };
+    const scoped = run(i).answers;
+    expect(get(scoped, "room.guest_tables")).toMatchObject({
+      result: "answered",
+      value: { type: "choice", choice: "Mangia" },
+      rule: "room.guest_tables.accepted-scope",
+    });
+    expect(get(scoped, "room.guest_tables").sources).toContainEqual({
+      table: "proposalLineItems",
+      id: "l-tables",
+      version: 1,
+    });
+    expect(get(scoped, "room.water_goblets")).toMatchObject({
+      result: "unresolved",
+      missing: [
+        'The task breakdown says Mangia sets the water goblets, but accepted proposal line "Water goblets provided by client" says Client.',
+      ],
+    });
+    const none = input();
+    none.event.text.guestTableSetup = "No";
+    none.proposal = i.proposal;
+    expect(get(run(none).answers, "room.guest_tables").missing).toEqual([
+      'The task breakdown says no guest tables and chairs are needed, but accepted proposal line "Guest table and chair setup" includes them.',
+    ]);
+    // A blank bussing answer follows the contract; a different one clashes.
+    expect(get(scoped, "bussing.plan")).toMatchObject({
+      rule: "bussing.plan.contract-says",
+      value: { type: "record", fields: { afterDinner: true, full: true } },
+    });
+    i.event.text.bussing = "After dinner";
+    const clash = get(run(i).answers, "bussing.plan");
+    expect(clash.missing).toEqual([
+      'The event says bussing "After dinner", but accepted contract line "Full bussing including glassware" sells full bussing.',
+    ]);
+    expect(clash.sources).toContainEqual({
+      table: "proposalLineItems",
+      id: "l-buss",
+      version: 1,
+    });
+    const noSale = input();
+    noSale.event.text.bussing = "Full clear";
+    noSale.proposal = { id: "prop-2", version: 1, lines: [] };
+    expect(get(run(noSale).answers, "bussing.plan").missing).toEqual([
+      "The event says full bussing, but the accepted contract does not sell it.",
     ]);
   });
 });

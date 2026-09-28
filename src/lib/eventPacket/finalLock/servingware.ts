@@ -1,4 +1,12 @@
-import { answered, said, source, unresolved, type Draft } from "./answer";
+import {
+  answered,
+  equipmentSources,
+  proposalSources,
+  said,
+  source,
+  unresolved,
+  type Draft,
+} from "./answer";
 import type { AnswerSource, FinalLockInput } from "./types";
 
 type Piece =
@@ -20,7 +28,7 @@ const pieceIn = (text: string) =>
 interface Seen {
   piece: Piece;
   what: string;
-  source: AnswerSource;
+  sources: AnswerSource[];
 }
 
 /**
@@ -50,7 +58,7 @@ export function servingwareAnswer(input: FinalLockInput): {
       seen.push({
         piece,
         what: `Accepted proposal line "${line.text}"`,
-        source: { table: line.table, id: line.id, version: line.version },
+        sources: proposalSources(input.proposal, line),
       });
   }
   for (const row of input.equipment)
@@ -60,11 +68,7 @@ export function servingwareAnswer(input: FinalLockInput): {
           ? "Rented pieces"
           : (pieceIn(row.name) ?? "Mangia pieces"),
         what: `${row.rented ? "Rental" : "Equipment"} "${row.name}"`,
-        source: {
-          table: "equipmentReservations",
-          id: row.id,
-          version: row.version,
-        },
+        sources: equipmentSources(row),
       });
   for (const [rows, table, what] of [
     [input.kitItems, "serviceStyleKitItems", "Service style kit item"],
@@ -75,7 +79,7 @@ export function servingwareAnswer(input: FinalLockInput): {
         seen.push({
           piece: pieceIn(row.description) ?? "Mangia pieces",
           what: `${what} "${row.description}"`,
-          source: { table, id: row.id, version: row.version },
+          sources: source(table, row),
         });
 
   const pieces = [
@@ -93,7 +97,7 @@ export function servingwareAnswer(input: FinalLockInput): {
     ...ev("servingwareSource"),
     ...ev("eventRentals"),
     ...ev("mangiaDisposables"),
-    ...seen.map((s) => s.source),
+    ...seen.flatMap((s) => s.sources),
   ];
   const rule = "servingware.source.records-and-task-breakdown";
   const clash = [

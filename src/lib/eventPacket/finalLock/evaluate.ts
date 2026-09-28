@@ -203,38 +203,15 @@ export function evaluateFinalLock(
     return build(q, draft);
   });
   const officeUnresolved = answers.some((a) => a.result === "unresolved");
-  const readiness = policy.find((q) => q.key === "readiness.dispatch");
-  let readinessOfficeOpen = false;
-  let readinessOpen = false;
-  if (readiness) {
-    const ready = readinessAnswer(
-      input,
-      answers.filter((a) => a.result === "unresolved").map((a) => a.label),
-    );
-    const answer = build(readiness, ready.draft);
-    readinessOpen = answer.result === "unresolved";
-    readinessOfficeOpen = readinessOpen && ready.officeOpen;
-    answers.push(answer);
-  }
-  for (const q of policy.filter((item) => item.form))
-    answers.push(build(q, drafts[q.key]!));
 
   // Derived fingerprints the revision printed; the version is in each hash.
   // Readiness follows the packet itself and field work happens after the
   // print, so only office answers can make a printed packet stale.
   const printed = options.printed ?? null;
-  const officeKeys = new Set(office.map((q) => q.key));
-  for (const answer of answers)
-    if (printed?.answers[answer.questionKey] === answer.fingerprint)
-      answer.displayedInRevision = printed.revisionId;
   const staleQuestions = printed
     ? [
         ...answers
-          .filter(
-            (a) =>
-              officeKeys.has(a.questionKey) &&
-              printed.answers[a.questionKey] !== a.fingerprint,
-          )
+          .filter((a) => printed.answers[a.questionKey] !== a.fingerprint)
           .map((a) => a.questionKey),
         ...Object.keys(printed.answers).filter(
           (key) =>
@@ -244,6 +221,34 @@ export function evaluateFinalLock(
         ),
       ]
     : [];
+  // With the print known, the printed packet is out of date when its answers
+  // or policy changed, or it printed no answers at all (an older print).
+  const answersStale =
+    options.printed !== undefined &&
+    input.packet.latestRevisionId != null &&
+    (printed == null ||
+      printed.policyVersion !== policyVersion ||
+      staleQuestions.length > 0);
+
+  const readiness = policy.find((q) => q.key === "readiness.dispatch");
+  let readinessOfficeOpen = false;
+  let readinessOpen = false;
+  if (readiness) {
+    const ready = readinessAnswer(
+      input,
+      answers.filter((a) => a.result === "unresolved").map((a) => a.label),
+      answersStale,
+    );
+    const answer = build(readiness, ready.draft);
+    readinessOpen = answer.result === "unresolved";
+    readinessOfficeOpen = readinessOpen && ready.officeOpen;
+    answers.push(answer);
+  }
+  for (const q of policy.filter((item) => item.form))
+    answers.push(build(q, drafts[q.key]!));
+  for (const answer of answers)
+    if (printed?.answers[answer.questionKey] === answer.fingerprint)
+      answer.displayedInRevision = printed.revisionId;
   const staleSections = [
     ...new Set(
       staleQuestions.flatMap((key) =>
@@ -257,7 +262,9 @@ export function evaluateFinalLock(
   const outcome: FinalLockOutcome =
     officeUnresolved || readinessOfficeOpen
       ? "needs_review"
-      : staleQuestions.length || input.packet.latestRevisionStale
+      : answersStale ||
+          staleQuestions.length ||
+          input.packet.latestRevisionStale
         ? "stale"
         : readinessOpen ||
             answers.some((a) => a.fieldWork && !a.fieldWork.confirmedAt)

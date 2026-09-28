@@ -3,6 +3,10 @@ import { describe, expect, it } from "vitest";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import schema from "../../convex/schema";
+import {
+  canonicalJson,
+  fingerprintBytes,
+} from "../../src/lib/eventPacket/model";
 import { modules } from "./convex-test-modules";
 
 const packet = api.lib.eventPacket.commands;
@@ -261,6 +265,16 @@ describe("Final Lock answers from native event records", () => {
     expect(answer(later, "identity.venue").displayedInRevision).toBe(
       revision.id,
     );
+    // Readiness knows the printed answers are out of date.
+    expect(answer(printed, "readiness.dispatch").missing).not.toContain(
+      "The printed event packet is out of date.",
+    );
+    expect(answer(later, "readiness.dispatch")).toMatchObject({
+      result: "unresolved",
+    });
+    expect(answer(later, "readiness.dispatch").missing).toContain(
+      "The printed event packet is out of date.",
+    );
     // The printed packet is out of date once a printed answer changed.
     const moved = await manager.query(packet.getPacket, { eventId });
     expect(moved.currentFingerprint).toBe(p.currentFingerprint);
@@ -358,5 +372,83 @@ describe("Final Lock answers from native event records", () => {
       await uploadPrint(manager, eventId, current, "same"),
     );
     expect(again).toMatchObject({ id: reprint.id, reused: true });
+  });
+
+  it("checks the uploaded answers before reusing an earlier print", async () => {
+    const { manager, eventId } = await setup();
+    const read = () => manager.query(packet.getPacket, { eventId });
+    // Files whose answers and named fingerprint agree with each other.
+    const consistent = async (p: any, finalLock: any, tag: string) =>
+      uploadPrint(
+        manager,
+        eventId,
+        {
+          ...p,
+          finalLock,
+          finalLockFingerprint: await fingerprintBytes(
+            new TextEncoder().encode(canonicalJson(finalLock)),
+          ),
+        },
+        tag,
+      );
+    // With no print yet (first loop) and with a print to reuse (second loop).
+    let first: { id: string } | null = null;
+    for (const round of ["before", "after"]) {
+      const p = await read();
+      const refused = [
+        // Files that show changed or no answers.
+        await uploadPrint(
+          manager,
+          eventId,
+          { ...p, finalLock: { ...p.finalLock, lines: [] } },
+          `${round}-changed`,
+        ),
+        await uploadPrint(
+          manager,
+          eventId,
+          { ...p, finalLock: undefined },
+          `${round}-missing`,
+        ),
+        // A print naming other answers than its files carry.
+        {
+          ...(await uploadPrint(manager, eventId, p, `${round}-named`)),
+          finalLockFingerprint: "not-the-answers",
+        },
+      ];
+      for (const files of refused)
+        await expect(
+          manager.mutation(packet.recordPacketRevision, files),
+        ).rejects.toThrow(/must carry the Final Lock answers/);
+      // Files that agree with themselves but show an office answer that is
+      // not the current one.
+      const edited = {
+        ...p.finalLock,
+        lines: p.finalLock.lines.map((l: any) =>
+          l.questionKey === "setup.rain_plan" ? { ...l, text: "Edited" } : l,
+        ),
+      };
+      await expect(
+        manager.mutation(
+          packet.recordPacketRevision,
+          await consistent(p, edited, `${round}-edited`),
+        ),
+      ).rejects.toThrow(/Final Lock answers changed/);
+      if (!first) {
+        first = await manager.mutation(
+          packet.recordPacketRevision,
+          await uploadPrint(manager, eventId, p, "first"),
+        );
+        // Pressing print again with the same files reuses the print.
+        const firstFiles = await uploadPrint(manager, eventId, p, "again");
+        expect(
+          await manager.mutation(packet.recordPacketRevision, firstFiles),
+        ).toMatchObject({ id: first.id, reused: true });
+      }
+    }
+    const ok = await manager.mutation(
+      packet.recordPacketRevision,
+      await uploadPrint(manager, eventId, await read(), "retry"),
+    );
+    expect(ok).toMatchObject({ id: first!.id, reused: true });
   });
 });

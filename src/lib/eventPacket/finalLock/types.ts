@@ -148,6 +148,8 @@ export interface FinalLockInput {
     quantityServings: number | null;
     followsEventHeadcount: boolean | null;
     notes: string | null;
+    /** The dish record the line names (its name can come from there). */
+    dish: NativeRow | null;
   })[];
   timeline: (NativeRow & {
     name: string;
@@ -170,6 +172,8 @@ export interface FinalLockInput {
     quantity: number;
     status: string;
     shortBy: number;
+    /** The equipment record its name, category and ownership come from. */
+    item: NativeRow | null;
   })[];
   packLists: (NativeRow & {
     status: string;
@@ -183,7 +187,12 @@ export interface FinalLockInput {
   /** The accepted proposal's line items and extras, if one is accepted. */
   proposal:
     | (NativeRow & {
-        lines: (NativeRow & { table: string; text: string })[];
+        lines: (NativeRow & {
+          table: string;
+          text: string;
+          /** Other records the line text is read from (a dish's name). */
+          related: AnswerSource[];
+        })[];
       })
     | null;
   /** Staff the event asked for (not cancelled). */

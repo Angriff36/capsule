@@ -1,4 +1,10 @@
-import { answered, source, unresolved, type Draft } from "./answer";
+import {
+  answered,
+  dishSources as dishRecords,
+  source,
+  unresolved,
+  type Draft,
+} from "./answer";
 import { isDropOff } from "./policy";
 import type { FinalLockInput } from "./types";
 
@@ -202,7 +208,7 @@ const PASSED_OR_STATION = /\b(passed|station|carv)/i;
 export function menuAnswers(input: FinalLockInput): Record<string, Draft> {
   const dishes = input.dishes;
   const out: Record<string, Draft> = {};
-  const dishSources = dishes.flatMap((d) => source("eventDishes", d));
+  const dishSources = dishes.flatMap((d) => dishRecords(d));
   if (!dishes.length) {
     const none = unresolved(
       ["No dishes are on the menu."],
@@ -303,7 +309,7 @@ export function menuAnswers(input: FinalLockInput): Record<string, Draft> {
         shells.map((d) => `Menu line "${d.name}" is a blank placeholder.`),
         "Replace or remove the placeholder menu lines.",
         "menu.no_empty_shell.named-dishes",
-        shells.flatMap((d) => source("eventDishes", d)),
+        shells.flatMap((d) => dishRecords(d)),
       )
     : answered(
         { type: "yes_no", yes: true },
@@ -318,7 +324,7 @@ export function menuAnswers(input: FinalLockInput): Record<string, Draft> {
         open.map((d) => `${d.name} note still asks: "${d.notes!.trim()}".`),
         "Answer the open question in the dish note.",
         "menu.production_notes.no-open-question",
-        open.flatMap((d) => source("eventDishes", d, "specialInstructions")),
+        open.flatMap((d) => dishRecords(d, "specialInstructions")),
       )
     : answered(
         {

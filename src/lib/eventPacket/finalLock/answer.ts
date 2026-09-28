@@ -29,6 +29,28 @@ export const source = (
     ? [{ table, id: row.id, version: row.version, ...(field ? { field } : {}) }]
     : [];
 
+/** An event menu line and the dish record it names. */
+export const dishSources = (
+  d: NativeRow & { dish: NativeRow | null },
+  field?: string,
+) => [...source("eventDishes", d, field), ...source("dishes", d.dish)];
+
+/** An equipment reservation and the equipment record it reserves. */
+export const equipmentSources = (e: NativeRow & { item: NativeRow | null }) => [
+  ...source("equipmentReservations", e),
+  ...source("equipments", e.item),
+];
+
+/** An accepted proposal line, its proposal and the records it names. */
+export const proposalSources = (
+  proposal: NativeRow | null,
+  line: NativeRow & { table: string; related: AnswerSource[] },
+): AnswerSource[] => [
+  ...source("proposals", proposal),
+  { table: line.table, id: line.id, version: line.version },
+  ...line.related,
+];
+
 export const answered = (
   value: FinalLockValue,
   explanation: string,
