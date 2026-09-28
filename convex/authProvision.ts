@@ -72,6 +72,9 @@ export const linkProvisionedSubject = internalMutation({
     if (!row || row.deletedAt != null || row.tenantId !== auth.tenantId) {
       throw new Error("Team member not found.");
     }
+    if (String(row.status) !== "active") {
+      throw new Error("Restore this person's access before sending a sign-in.");
+    }
     if (row.authSubjectId === authSubjectId) return;
     if (row.authSubjectId) {
       throw new Error(
@@ -125,22 +128,36 @@ export const provisionStaffSignIn = action({
     if (!appUrl)
       throw new Error("CAPSULE_PUBLIC_APP_URL is missing on this deployment.");
     const directory = new ClerkStaffAccountDirectory(secret);
-    const existing = await directory.findByEmail(person.email);
-    const passwords = new StaffSignInPasswordFactory();
-    let account = existing;
-    if (!account) {
-      account = await directory.createWithPassword({
-        email: person.email,
-        givenName: person.givenName,
-        familyName: person.familyName,
-        password: passwords.next(),
-      });
+    // A retry, or a resend after an email correction, keeps the sign-in this
+    // person already has: never look up or create a second account for them.
+    if (!person.authSubjectId) {
+      const existing = await directory.findByEmail(person.email);
+      if (existing) {
+        // Refuses (before any outside change) when that account already
+        // belongs to another team member.
+        await ctx.runMutation(internal.authProvision.linkProvisionedSubject, {
+          personId,
+          authSubjectId: existing.userId,
+        });
+      } else {
+        const created = await directory.createWithPassword({
+          email: person.email,
+          givenName: person.givenName,
+          familyName: person.familyName,
+          password: new StaffSignInPasswordFactory().next(),
+        });
+        try {
+          await ctx.runMutation(internal.authProvision.linkProvisionedSubject, {
+            personId,
+            authSubjectId: created.userId,
+          });
+        } catch (error) {
+          // Compensate: the account was made for this link only.
+          await directory.deleteUser(created.userId).catch(() => undefined);
+          throw error;
+        }
+      }
     }
-
-    await ctx.runMutation(internal.authProvision.linkProvisionedSubject, {
-      personId,
-      authSubjectId: account.userId,
-    });
 
     let emailed: boolean;
     try {

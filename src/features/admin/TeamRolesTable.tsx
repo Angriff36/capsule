@@ -18,6 +18,9 @@ export function TeamRolesTable({
   rateByPersonId,
   onSendSignIn,
   onUnlinkAccount,
+  myPersonId,
+  onPauseAccess,
+  onRestoreAccess,
   onNotice,
   onError,
   onBusy,
@@ -31,6 +34,10 @@ export function TeamRolesTable({
   rateByPersonId: ReadonlyMap<string, number | null>;
   onSendSignIn: (person: TeamPerson) => Promise<void>;
   onUnlinkAccount: (person: TeamPerson) => Promise<void>;
+  /** The signed-in person; their own row has no Pause (it would lock them out). */
+  myPersonId: string | null;
+  onPauseAccess: (person: TeamPerson) => Promise<void>;
+  onRestoreAccess: (person: TeamPerson) => Promise<void>;
   onNotice: (message: string | null) => void;
   onError: (message: string | null) => void;
   onBusy: (key: string | null) => void;
@@ -122,6 +129,10 @@ export function TeamRolesTable({
                   busy={busy === person._id}
                   onSendSignIn={onSendSignIn}
                   onUnlink={onUnlinkAccount}
+                  onPause={
+                    person._id === myPersonId ? undefined : onPauseAccess
+                  }
+                  onRestore={onRestoreAccess}
                 />
               </td>
               <td className="border-b border-line px-3 py-3">

@@ -300,9 +300,16 @@ entity Person mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Pause access (PR09-01 "suspend"). The linked sign-in resolves to no role
+  // while the row is inactive (authContext REMOVED); assignments, time and
+  // payroll rows are untouched, and reactivate() restores the same sign-in.
+  // Same escalation rule as linkAccount: pausing or restoring an admin's
+  // access is admin-only. (Team roles hides Pause on your own row; the
+  // command itself still lets a person remove themselves.)
   command deactivate() {
     guard self.status == "active"
     guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess") or not roleAllows(self.role, "adminAccess")
     mutate status = "inactive"
     emit PersonDeactivated {
       personId: self.id
@@ -313,6 +320,7 @@ entity Person mixin TenantScoped, SoftDeletable {
   command reactivate() {
     guard self.status == "inactive"
     guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess") or not roleAllows(self.role, "adminAccess")
     mutate status = "active"
     emit PersonReactivated {
       personId: self.id

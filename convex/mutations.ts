@@ -38214,6 +38214,7 @@ async function __runPersonDeactivate(ctx: MutationCtx, { docId, version }: any, 
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!((checkRole(user, "adminAccess") || (!checkRole(doc.role, "adminAccess"))))) throw new Error("Guard 2 failed");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -38476,6 +38477,7 @@ async function __runPersonReactivate(ctx: MutationCtx, { docId, version }: any, 
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.status === "inactive"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!((checkRole(user, "adminAccess") || (!checkRole(doc.role, "adminAccess"))))) throw new Error("Guard 2 failed");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
