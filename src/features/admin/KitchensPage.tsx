@@ -19,6 +19,7 @@ import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useActionFailure, useActionNotice } from "../../ui/action-result";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
+import { EventTimingRulesSection } from "./EventTimingRulesSection";
 import { useTenantBranding } from "./tenantBranding";
 
 const canManage = (role: string | undefined) =>
@@ -220,7 +221,7 @@ export function KitchensPage() {
     <div className="operations-stage space-y-6">
       <PageHeader
         title="Kitchens & drive times"
-        lead="Where your crews leave from, and the rules Capsule uses to work out drive times to each venue."
+        lead="Where your crews leave from, the rules Capsule uses to work out drive times to each venue, and the setup, load and briefing times it plans for each event."
       />
       <AdminWorkspaceNav />
       {!canEdit ? (
@@ -428,6 +429,13 @@ export function KitchensPage() {
           </button>
         </form>
       </Section>
+
+      <EventTimingRulesSection
+        record={record ?? null}
+        canEdit={canEdit}
+        busy={busy}
+        run={run}
+      />
     </div>
   );
 }

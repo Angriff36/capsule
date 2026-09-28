@@ -165,8 +165,8 @@ export function EventDriveTimePanel({
         ))}
       </ul>
       <p className="mt-2 text-sm text-ink-2">
-        The way out includes {route.policy.safetyBufferMinutes} spare minutes
-        (company rule).
+        The crew leaves {route.policy.safetyBufferMinutes} spare minutes before
+        the drive time (company rule).
       </p>
       {failure && (
         <div className="mt-3">

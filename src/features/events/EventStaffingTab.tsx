@@ -32,6 +32,7 @@ import {
   type StaffingConflictNote,
 } from "./EventStaffingSummaryAside";
 import { FailureBanner } from "./FailureBanner";
+import { EventShiftChangesPanel } from "./EventShiftChangesPanel";
 import { EventStaffingAddForm } from "./EventStaffingAddForm";
 import { EventStaffTimingControl } from "./EventStaffTimingForm";
 import { collectStaffRoles } from "./EventStaffingRoleSelect";
@@ -327,6 +328,7 @@ export function EventStaffingTab({ eventId }: Props) {
         </div>
       </header>
       {failure ? <FailureBanner failure={failure} /> : null}
+      <EventShiftChangesPanel eventId={eventId} />
       {activities !== undefined &&
       (crewWindow.startsAt == null || crewWindow.endsAt == null) ? (
         <p
