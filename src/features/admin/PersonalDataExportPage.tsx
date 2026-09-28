@@ -119,7 +119,7 @@ export function PersonalDataExportView({
     <div className="operations-stage space-y-6">
       <PageHeader
         title="Personal data exports"
-        lead="Prepare a complete, portable record for a client contact or staff person without database access."
+        lead="Prepare a complete, portable copy of everything on file for a client contact or staff person, without database access."
       />
       <AdminWorkspaceNav />
 
@@ -217,13 +217,13 @@ export function PersonalDataExportView({
             {!selected ? (
               <EmptyState
                 title="Choose a person"
-                hint="Their available records and download formats will appear here."
+                hint="What's on file for them, and the download formats, will appear here."
               />
             ) : dataPackage === undefined ? (
               <QueryLoadState
                 loadingTooLong={false}
                 title="Preparing package"
-                detail={`Collecting records associated with ${selected.displayName}.`}
+                detail={`Collecting what's on file for ${selected.displayName}.`}
               />
             ) : dataPackage === null ? (
               <ErrorState
@@ -238,8 +238,8 @@ export function PersonalDataExportView({
                     {dataPackage.subject.displayName}
                   </h3>
                   <p className="mt-1 text-sm text-ink-3">
-                    {recordCount} {recordCount === 1 ? "record" : "records"}{" "}
-                    across {sections.length}{" "}
+                    {recordCount} {recordCount === 1 ? "item" : "items"} across{" "}
+                    {sections.length}{" "}
                     {sections.length === 1 ? "section" : "sections"}
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">
@@ -281,8 +281,8 @@ export function PersonalDataExportView({
 
                 <p className="mt-4 text-xs leading-relaxed text-ink-3">
                   JSON preserves the complete nested structure. CSV uses
-                  section, record, field, and value columns so mixed record
-                  types stay in one spreadsheet-safe file.
+                  section, row ID, field, and value columns so mixed row types
+                  stay in one spreadsheet-safe file.
                 </p>
               </div>
             )}

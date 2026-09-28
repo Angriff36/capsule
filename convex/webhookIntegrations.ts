@@ -22,6 +22,7 @@ import { decrypt, encrypt } from "./lib/encryption";
 const ENDPOINT_ENTITY = "WebhookEndpoint";
 const DELIVERY_ENTITY = "WebhookDelivery";
 const TICK_ENTITY = "WebhookDispatchTick";
+const CHAIN_START_TYPE = "WebhookDispatchChainStarted";
 
 const DISPATCH_INTERVAL_MS = 60_000;
 const IDLE_INTERVAL_MS = 5 * 60_000;
@@ -118,6 +119,7 @@ interface DispatchContext {
   attemptCounts: Array<{ key: string; attempts: number }>;
   successWatermarkByEndpoint: Array<{ endpointId: string; watermark: number }>;
   lastTickAt: number | null;
+  currentChainId: string | null;
 }
 
 function canManage(role: string): boolean {
@@ -407,12 +409,20 @@ export const registerEndpoint = action({
       registeredAt: Date.now(),
       registeredBy: auth.id,
     });
+    // The newest chain owns the tenant; older chains end at their next tick,
+    // so registering several endpoints never leaves several chains running.
+    const chainId = crypto.randomUUID();
+    await ctx.runMutation(internal.webhookIntegrations.recordChainStart, {
+      tenantId,
+      chainId,
+    });
     await ctx.scheduler.runAfter(
       0,
       internal.webhookIntegrations.dispatchPending,
       {
         tenantId,
         scheduleNext: true,
+        chainId,
       },
     );
     return { endpointId };
@@ -599,8 +609,15 @@ export const loadDispatchContext = internalQuery({
     }
 
     let lastTickAt: number | null = null;
+    let currentChainId: string | null = null;
     for (const row of tickRows) {
-      if (asRecord(row.payload).tenantId !== args.tenantId) continue;
+      const payload = asRecord(row.payload);
+      if (payload.tenantId !== args.tenantId) continue;
+      if (row.type === CHAIN_START_TYPE) {
+        // Rows come in insertion order, so the last one is the newest chain.
+        currentChainId = stringValue(payload.chainId) ?? currentChainId;
+        continue;
+      }
       if (row.createdAt > (lastTickAt ?? 0)) lastTickAt = row.createdAt;
     }
 
@@ -615,6 +632,7 @@ export const loadDispatchContext = internalQuery({
         ([endpointId, watermark]) => ({ endpointId, watermark }),
       ),
       lastTickAt,
+      currentChainId,
     };
   },
 });
@@ -794,8 +812,25 @@ export const recordTick = internalMutation({
   },
 });
 
+export const recordChainStart = internalMutation({
+  args: { tenantId: v.string(), chainId: v.string() },
+  handler: async (ctx, args) => {
+    await ctx.db.insert("manifestEvents", {
+      type: CHAIN_START_TYPE,
+      entity: TICK_ENTITY,
+      entityId: args.tenantId,
+      payload: { tenantId: args.tenantId, chainId: args.chainId },
+      createdAt: Date.now(),
+    });
+  },
+});
+
 export const dispatchPending = internalAction({
-  args: { tenantId: v.string(), scheduleNext: v.boolean() },
+  args: {
+    tenantId: v.string(),
+    scheduleNext: v.boolean(),
+    chainId: v.optional(v.string()),
+  },
   handler: async (
     ctx,
     args,
@@ -805,13 +840,27 @@ export const dispatchPending = internalAction({
       { tenantId: args.tenantId },
     );
 
+    // A newer chain owns this tenant: end this one without work or reschedule.
+    if (
+      args.scheduleNext &&
+      context.currentChainId != null &&
+      args.chainId !== context.currentChainId
+    ) {
+      return { delivered: 0, attempted: 0 };
+    }
+    const next = {
+      tenantId: args.tenantId,
+      scheduleNext: true,
+      chainId: args.chainId,
+    };
+
     const now = Date.now();
     if (context.endpoints.length === 0) {
       if (args.scheduleNext) {
         await ctx.scheduler.runAfter(
           IDLE_INTERVAL_MS,
           internal.webhookIntegrations.dispatchPending,
-          { tenantId: args.tenantId, scheduleNext: true },
+          next,
         );
       }
       return { delivered: 0, attempted: 0 };
@@ -827,7 +876,7 @@ export const dispatchPending = internalAction({
         await ctx.scheduler.runAfter(
           DISPATCH_INTERVAL_MS,
           internal.webhookIntegrations.dispatchPending,
-          { tenantId: args.tenantId, scheduleNext: true },
+          next,
         );
       }
       return { delivered: 0, attempted: 0 };
@@ -901,7 +950,7 @@ export const dispatchPending = internalAction({
       await ctx.scheduler.runAfter(
         DISPATCH_INTERVAL_MS,
         internal.webhookIntegrations.dispatchPending,
-        { tenantId: args.tenantId, scheduleNext: true },
+        next,
       );
     }
     return { delivered, attempted };

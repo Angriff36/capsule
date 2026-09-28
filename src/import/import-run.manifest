@@ -86,7 +86,7 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   // computed name deltas; commit requires an explanation when it is true.
   property indexNameMismatch: boolean?
 
-  constraint recordCountsPresent: self.recordCounts != null "Record counts must be present"
+  constraint recordCountsPresent: self.recordCounts != null "This import needs its item counts filled in."
 
   transition status from "started" to ["parsing", "failed"]
   transition status from "parsing" to ["validating", "failed"]
@@ -109,7 +109,7 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.status == "started"
-    constraint startActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    constraint startActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     mutate sourceSystem = sourceSystem
     mutate datasetType = datasetType
     mutate actorId = actorId != null ? actorId : ""
@@ -131,8 +131,8 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   ) {
     guard self.status == "started"
     guard self.deletedAt == null
-    constraint recordParseCountsPresent: recordCounts != null "Record counts are required"
-    constraint recordParseActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    constraint recordParseCountsPresent: recordCounts != null "This import needs its item counts."
+    constraint recordParseActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     mutate recordCounts = recordCounts
     mutate actorId = actorId != null ? actorId : self.actorId
     mutate parsedAt = now()
@@ -149,7 +149,7 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     guard self.status == "parsing"
     guard self.parsedAt != null
     guard self.deletedAt == null
-    constraint validateActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    constraint validateActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     mutate actorId = actorId != null ? actorId : self.actorId
     mutate validatedAt = now()
     mutate status = "validating"
@@ -164,7 +164,7 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     guard self.status == "validating"
     guard self.validatedAt != null
     guard self.deletedAt == null
-    constraint beginReviewActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    constraint beginReviewActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     mutate actorId = actorId != null ? actorId : self.actorId
     mutate reviewStartedAt = now()
     mutate status = "reviewing"
@@ -182,8 +182,8 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     guard self.status == "reviewing"
     guard self.reviewStartedAt != null
     guard self.deletedAt == null
-    constraint approveReviewCountsPresent: finalRecordCounts != null "Final record counts are required"
-    constraint approveReviewActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    constraint approveReviewCountsPresent: finalRecordCounts != null "This import needs its final item counts."
+    constraint approveReviewActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     mutate recordCounts = finalRecordCounts
     mutate actorId = actorId != null ? actorId : self.actorId
     mutate reviewApprovedAt = now()
@@ -216,7 +216,7 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     // the read seams apply; a pre-release run must stay completable.
     guard (self.unaccountedRecordCount != null ? self.unaccountedRecordCount : 0) == 0
     guard self.deletedAt == null
-    constraint commitActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    constraint commitActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     mutate actorId = actorId != null ? actorId : self.actorId
     mutate commitStartedAt = now()
     mutate completionTime = now()
@@ -237,8 +237,8 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     guard self.status != "completed"
     guard self.status != "reverted"
     guard self.deletedAt == null
-    constraint markFailedDetailsPresent: length(trim(failureDetails)) > 0 "Failure details are required"
-    constraint markFailedActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    constraint markFailedDetailsPresent: length(trim(failureDetails)) > 0 "Say what went wrong."
+    constraint markFailedActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     compute previousStatus = self.status
     mutate failureDetails = failureDetails
     mutate actorId = actorId != null ? actorId : self.actorId
@@ -257,7 +257,7 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     guard self.status == "completed"
     guard self.completionTime != null
     guard self.deletedAt == null
-    constraint revertActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    constraint revertActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     mutate actorId = actorId != null ? actorId : self.actorId
     mutate revertedAt = now()
     mutate endTime = now()
@@ -281,10 +281,10 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.createdAt != null
     guard self.status == "started" or self.status == "parsing"
-    constraint archiveInventoryCountNonNegative: archiveWorkbookCount >= 0 "Archive workbook count must not be negative"
-    constraint archiveInventoryIndexNonNegative: indexWorkbookCount == null or indexWorkbookCount >= 0 "Index workbook count must not be negative"
-    constraint archiveInventoryStorageIdPresent: archiveStorageId == null or length(trim(archiveStorageId)) > 0 "Archive storage id must be non-empty when present"
-    constraint archiveInventoryChecksumPresent: archiveChecksum == null or length(trim(archiveChecksum)) > 0 "Archive checksum must be non-empty when present"
+    constraint archiveInventoryCountNonNegative: archiveWorkbookCount >= 0 "This import's file count from the upload can't be negative. Use zero or more."
+    constraint archiveInventoryIndexNonNegative: indexWorkbookCount == null or indexWorkbookCount >= 0 "This import's expected file count can't be negative. Use zero or more."
+    constraint archiveInventoryStorageIdPresent: archiveStorageId == null or length(trim(archiveStorageId)) > 0 "If you give a storage ID for the upload, it can't be blank."
+    constraint archiveInventoryChecksumPresent: archiveChecksum == null or length(trim(archiveChecksum)) > 0 "If you give a checksum for the upload, it can't be blank."
     mutate archiveStorageId = archiveStorageId
     mutate archiveChecksum = archiveChecksum
     mutate archiveWorkbookCount = archiveWorkbookCount
@@ -311,8 +311,8 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint explainDiscrepancyNotePresent: length(trim(note)) > 0 "Discrepancy note is required"
-    constraint explainDiscrepancyActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    constraint explainDiscrepancyNotePresent: length(trim(note)) > 0 "Say why the file counts don't match."
+    constraint explainDiscrepancyActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     mutate actorId = actorId != null ? actorId : self.actorId
     mutate discrepancyExplained = true
     mutate discrepancyNote = note
@@ -338,9 +338,9 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.createdAt != null
     guard self.status == "started" or self.status == "parsing" or self.status == "validating" or self.status == "reviewing" or self.status == "committing"
-    constraint dispositionSummaryCountsPresent: length(trim(dispositionCounts)) > 0 "Disposition counts are required"
-    constraint dispositionSummaryUnaccountedNonNegative: unaccountedRecordCount >= 0 "Unaccounted record count must not be negative"
-    constraint dispositionSummaryActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    constraint dispositionSummaryCountsPresent: length(trim(dispositionCounts)) > 0 "This import needs its file outcome counts."
+    constraint dispositionSummaryUnaccountedNonNegative: unaccountedRecordCount >= 0 "This import's count of files not yet accounted for can't be negative. Use zero or more."
+    constraint dispositionSummaryActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     mutate dispositionCounts = dispositionCounts
     mutate unaccountedRecordCount = unaccountedRecordCount
     mutate actorId = actorId != null ? actorId : self.actorId
@@ -366,8 +366,8 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.createdAt != null
     guard self.status == "committing"
-    constraint commitCheckpointPresent: length(trim(commitCheckpoint)) > 0 "Commit checkpoint is required"
-    constraint commitCheckpointActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    constraint commitCheckpointPresent: length(trim(commitCheckpoint)) > 0 "This import needs to say how far its committing has gotten."
+    constraint commitCheckpointActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     mutate commitCheckpoint = commitCheckpoint
     mutate actorId = actorId != null ? actorId : self.actorId
     emit ImportRunCommitCheckpointRecorded {

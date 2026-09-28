@@ -122,7 +122,7 @@ describe("MessageInboxPage delivery honesty", () => {
         "No external delivery provider is connected",
       );
       expect(container.textContent).toContain(
-        "Legacy queued — not delivered; no provider is connected",
+        "Queued — not delivered; no provider is connected",
       );
       const action = Array.from(container.querySelectorAll("button")).find(
         (node) => node.textContent === "Copy draft",

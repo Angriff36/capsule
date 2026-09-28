@@ -241,7 +241,7 @@ describe("runtime proof: completion freezes changePricing, correction restates t
         budgetAmount: 2800,
         quotedPrice: 5200,
       }),
-    ).rejects.toThrow(/Correction reason is required/);
+    ).rejects.toThrow(/Say why you're correcting this event\./);
     expect((await readEvent(events, eventId)).quotedPrice).toBe(S.quotedPrice);
     expect(await correctionRows(events, eventId)).toHaveLength(0);
 

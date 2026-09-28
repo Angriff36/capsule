@@ -379,7 +379,9 @@ export function ProposalsPage() {
         const recipientEmail = client.email;
         if (!recipientEmail) {
           setFailure(
-            new Error("Client email is required for signature request"),
+            new Error(
+              "Give this client an email address before you request a signature.",
+            ),
           );
           return;
         }

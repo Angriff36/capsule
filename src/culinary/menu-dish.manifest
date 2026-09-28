@@ -40,8 +40,8 @@ entity MenuDish mixin TenantScoped, SoftDeletable {
     guard self.addedAt == null
     guard self.deletedAt == null
     guard self.menu != null and self.menu.status == "draft"
-    constraint addMenuMatch: menuId == self.menuId "Add menuId must match the seeded menu reference"
-    constraint addSellingPriceNonnegative: sellingPrice == null or sellingPrice >= 0 "Menu dish selling price cannot be negative"
+    constraint addMenuMatch: menuId == self.menuId "This menu dish is for a different menu. Pick the menu already on this menu dish."
+    constraint addSellingPriceNonnegative: sellingPrice == null or sellingPrice >= 0 "This menu dish's price can't be negative. Use zero or more."
     mutate menuId = menuId
     mutate dishId = dishId
     mutate sortOrder = sortOrder != null ? sortOrder : 0
@@ -91,7 +91,7 @@ entity MenuDish mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.menu != null and (self.menu.status == "draft" or self.menu.status == "published")
     guard roleAllows(user.role, "kitchenManageAccess")
-    constraint sellingPriceNonnegative: sellingPrice >= 0 "Menu dish selling price cannot be negative"
+    constraint sellingPriceNonnegative: sellingPrice >= 0 "This menu dish's price can't be negative. Use zero or more."
     compute previousSellingPrice = self.sellingPrice
     mutate sellingPrice = sellingPrice
     emit MenuDishSellingPriceUpdated {
@@ -108,7 +108,7 @@ entity MenuDish mixin TenantScoped, SoftDeletable {
     guard self.addedAt != null
     guard self.deletedAt == null
     guard self.menu != null and (self.menu.status == "draft" or self.menu.status == "published")
-    constraint removeMenuDishReason: length(trim(reason)) > 0 "Removal reason is required"
+    constraint removeMenuDishReason: length(trim(reason)) > 0 "Say why you're removing this."
     mutate deletedAt = now()
     mutate removedAt = now()
     emit MenuDishRemoved {

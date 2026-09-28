@@ -237,9 +237,9 @@ export function EventMarginTab({ eventId }: Props) {
       <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b border-line pb-3">
         <h2 className="font-display text-2xl leading-none text-ink">Margin</h2>
         <p className="max-w-xl text-base text-ink-3">
-          Food cost uses the recipe × catalog (or receipt) estimate when no
-          submitted PO exists. Labor and equipment use live committed figures
-          when available.
+          Food cost uses the recipe estimate from catalog (or receipt) prices
+          until a PO is submitted. Labor and equipment use the current booked
+          costs when there are any.
         </p>
       </header>
 
@@ -259,17 +259,18 @@ export function EventMarginTab({ eventId }: Props) {
               className="banner banner-danger"
               data-testid="event-margin-recipe-unpriced"
             >
-              Recipe estimate is $0 because recipe units do not match catalog.
-              These units are not converted. Food cost still uses the recipe
-              estimate (no submitted PO).
+              Recipe estimate is $0 because the recipe units don't match how
+              these ingredients are priced, so they can't be costed. Food cost
+              still uses the recipe estimate until a PO is submitted.
             </p>
           ) : recipeRollup.foodCost === 0 ? (
             <p
               className="banner border-line bg-inset text-ink-3"
               data-testid="event-margin-recipe-zero"
             >
-              Recipe estimate is $0 — no same-unit priced ingredient lines. Food
-              cost still uses the recipe estimate until a submitted PO exists.
+              Recipe estimate is $0 — no ingredient has a price in the unit the
+              recipe uses. Food cost still uses the recipe estimate until a PO
+              is submitted.
             </p>
           ) : null}
 
@@ -278,9 +279,9 @@ export function EventMarginTab({ eventId }: Props) {
             recipeEstimatedFoodCost={recipeRollup.foodCost}
             recipeUnpricedReason={
               recipeRollup.foodCost === 0 && recipeRollup.mismatches.length > 0
-                ? "Recipe estimate is $0 because recipe units do not match catalog. These units are not converted."
+                ? "Recipe estimate is $0 because the recipe units don't match how these ingredients are priced."
                 : recipeRollup.foodCost === 0
-                  ? "Recipe estimate is $0 — no same-unit priced ingredient lines."
+                  ? "Recipe estimate is $0 — no ingredient has a price in the unit the recipe uses."
                   : undefined
             }
           />

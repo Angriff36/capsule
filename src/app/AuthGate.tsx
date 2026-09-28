@@ -88,7 +88,7 @@ function SignInScreen() {
 
 export function AuthSetupRequired() {
   return (
-    <GateShell title="Authentication setup required">
+    <GateShell title="Sign-in isn't set up yet">
       <p className="leading-relaxed text-ink-2">
         Capsule can't start until sign-in is configured. Finish this one-time
         setup to continue:
@@ -100,12 +100,11 @@ export function AuthSetupRequired() {
         </li>
         <li>
           Set <code className="font-mono">CLERK_JWT_ISSUER_DOMAIN</code> on the
-          Convex deployment (
-          <code className="font-mono">npx convex env set</code>).
+          app's server (<code className="font-mono">npx convex env set</code>).
         </li>
         <li>
-          Confirm the Clerk application has the Convex integration enabled and
-          session-token claims <code className="font-mono">role</code> and{" "}
+          Check that the sign-in service is connected to the app's server and
+          sends <code className="font-mono">role</code> and{" "}
           <code className="font-mono">tenantId</code>.
         </li>
       </ol>

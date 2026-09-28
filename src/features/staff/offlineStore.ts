@@ -231,7 +231,7 @@ export function enqueueAction(
 ): QueuedAction {
   if (!scope)
     throw new Error(
-      "Your staff identity must be confirmed before saving offline work.",
+      "We can't save this offline yet — confirm your staff identity first.",
     );
   const full: QueuedAction = {
     ...action,

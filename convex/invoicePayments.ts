@@ -199,7 +199,7 @@ export const recordLedgerEvent = internalMutation({
  * the caterer, not to Capsule. Throws rather than silently charging into the
  * platform account.
  */
-async function requireConnectedAccountId(
+export async function requireConnectedAccountId(
   ctx: ActionCtx,
   tenantId: string,
 ): Promise<string> {
@@ -224,7 +224,7 @@ async function requireConnectedAccountId(
   return accountId;
 }
 
-function connectedAccountHeaders(
+export function connectedAccountHeaders(
   stripeSecretKey: string,
   connectedAccountId: string,
 ): Record<string, string> {

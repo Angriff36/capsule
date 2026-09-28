@@ -49,7 +49,7 @@ entity Message mixin TenantScoped, SoftDeletable {
 
   belongsTo thread: MessageThread fields [tenantId, threadId] references [tenantId, id]
 
-  constraint messageBodyPresent: length(trim(self.bodyText)) > 0 "Message text is required"
+  constraint messageBodyPresent: length(trim(self.bodyText)) > 0 "Write something in the message"
 
   default policy messageRead read: roleAllows(user.role, "staffAccess") "Staff may see messages"
   default policy messageWrite write: roleAllows(user.role, "staffAccess") "Staff may update messages"
@@ -71,7 +71,7 @@ entity Message mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard user.id != null
-    constraint postBodyPresent: length(trim(bodyText)) > 0 "Message text is required"
+    constraint postBodyPresent: length(trim(bodyText)) > 0 "Write something in the message"
     mutate threadId = threadId
     mutate direction = direction
     mutate status = status

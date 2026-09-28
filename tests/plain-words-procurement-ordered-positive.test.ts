@@ -49,6 +49,8 @@ describe("plain words on leftover order-line ordered-amount-positive copy", () =
       "This order line's price per unit can't be negative. Use zero or more.",
     );
     // Later leftovers on this same file are pinned, not rewritten.
-    expect(visible).toContain("Discrepancy quantity cannot be negative");
+    expect(visible).toContain(
+      "The discrepancy amount can't be negative. Use zero or more.",
+    );
   });
 });

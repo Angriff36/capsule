@@ -73,7 +73,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
 
-  constraint demandQuantityNonnegative: self.calculatedAt == null or self.requiredQuantity >= 0 "Required quantity cannot be negative"
+  constraint demandQuantityNonnegative: self.calculatedAt == null or self.requiredQuantity >= 0 "The required amount can't be negative. Use zero or more."
 
   transition status from "pending" to ["calculated"]
   transition status from "calculated" to ["confirmed", "superseded"]
@@ -161,13 +161,13 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.event != null
     guard self.ingredient != null and self.ingredient.status == "active"
-    constraint calculateEventMatch: eventId == self.eventId "Calculate eventId must match the seeded event reference"
-    constraint calculateIngredientMatch: ingredientId == self.ingredientId "Calculate ingredientId must match the seeded ingredient reference"
-    constraint calculateQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
-    constraint calculateServingsNonnegative: servings == null or servings >= 0 "Servings cannot be negative"
-    constraint calculateComponentLineNonnegative: sourceComponentLineQuantity == null or sourceComponentLineQuantity >= 0 "Source component line quantity cannot be negative"
-    constraint calculateBatchNonnegative: sourceBatchMultiplier == null or sourceBatchMultiplier >= 0 "Source batch multiplier cannot be negative"
-    constraint calculateYieldPositive: sourceYieldQuantity == null or sourceYieldQuantity > 0 "Source yield quantity must be positive when provided"
+    constraint calculateEventMatch: eventId == self.eventId "This demand is for a different event. Pick the event already on this demand."
+    constraint calculateIngredientMatch: ingredientId == self.ingredientId "This demand is for a different ingredient. Pick the ingredient already on this demand."
+    constraint calculateQuantityPositive: requiredQuantity > 0 "Enter a required amount more than zero."
+    constraint calculateServingsNonnegative: servings == null or servings >= 0 "Servings can't be negative. Use zero or more."
+    constraint calculateComponentLineNonnegative: sourceComponentLineQuantity == null or sourceComponentLineQuantity >= 0 "The recipe line amount can't be negative. Use zero or more."
+    constraint calculateBatchNonnegative: sourceBatchMultiplier == null or sourceBatchMultiplier >= 0 "The batch multiplier can't be negative. Use zero or more."
+    constraint calculateYieldPositive: sourceYieldQuantity == null or sourceYieldQuantity > 0 "If you enter a yield amount, it has to be more than zero."
     mutate eventId = eventId
     mutate ingredientId = ingredientId
     mutate preferredVendorId = self.ingredient.preferredVendorId
@@ -264,8 +264,8 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     guard self.status == "calculated" or self.status == "confirmed"
     guard self.calculatedAt != null
     guard self.deletedAt == null
-    constraint recalculateQuantityPositive: newQuantity > 0 "Recalculated quantity must be positive"
-    constraint recalculateReasonRequired: length(trim(reason)) > 0 "Recalculation reason is required"
+    constraint recalculateQuantityPositive: newQuantity > 0 "Enter a recalculated amount more than zero."
+    constraint recalculateReasonRequired: length(trim(reason)) > 0 "Say why you're recalculating this."
     compute previousQuantity = self.requiredQuantity
     mutate requiredQuantity = newQuantity
     mutate lastRecalculationReason = reason
@@ -303,7 +303,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     guard self.calculatedAt != null
     guard self.deletedAt == null
     guard roleAllows(user.role, "inventoryManageAccess")
-    constraint supersedeReasonRequired: length(trim(reason)) > 0 "Supersede reason is required"
+    constraint supersedeReasonRequired: length(trim(reason)) > 0 "Say why you're replacing this."
     compute previousQuantity = self.requiredQuantity
     mutate status = "superseded"
     mutate supersededAt = now()
@@ -353,8 +353,8 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
 
   computed costImpact: money(12, 2) = self.quantity * self.unitCost
 
-  constraint wasteQuantityPositive: self.recordedAt == null or self.quantity > 0 "Waste quantity must be positive once recorded"
-  constraint wasteCostNonnegative: self.unitCost >= 0 "Waste unit cost cannot be negative"
+  constraint wasteQuantityPositive: self.recordedAt == null or self.quantity > 0 "Enter a waste amount more than zero before you save it."
+  constraint wasteCostNonnegative: self.unitCost >= 0 "The waste unit cost can't be negative. Use zero or more."
 
   transition status from "pending" to ["recorded"]
   transition status from "recorded" to ["voided"]
@@ -380,11 +380,11 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.ingredient != null and self.ingredient.status == "active"
     guard self.location != null and self.location.status == "active"
-    constraint recordIngredientMatch: ingredientId == self.ingredientId "Record ingredientId must match the seeded ingredient reference"
-    constraint recordLocationMatch: locationId == self.locationId "Record locationId must match the seeded location reference"
-    constraint recordStockMatch: inventoryItemId == null or self.inventoryItemId == null or inventoryItemId == self.inventoryItemId "Record inventoryItemId must match the seeded stock reference when provided"
-    constraint recordQuantityPositive: quantity > 0 "Waste quantity must be positive"
-    constraint recordCostNonnegative: unitCost == null or unitCost >= 0 "Waste unit cost cannot be negative"
+    constraint recordIngredientMatch: ingredientId == self.ingredientId "This waste entry is for a different ingredient. Pick the ingredient already on this entry."
+    constraint recordLocationMatch: locationId == self.locationId "This waste entry is for a different location. Pick the location already on this entry."
+    constraint recordStockMatch: inventoryItemId == null or self.inventoryItemId == null or inventoryItemId == self.inventoryItemId "This waste entry is for a different stock item. Pick the stock item already on this entry, or leave it blank."
+    constraint recordQuantityPositive: quantity > 0 "Enter a waste amount more than zero."
+    constraint recordCostNonnegative: unitCost == null or unitCost >= 0 "The waste unit cost can't be negative. Use zero or more."
     mutate ingredientId = ingredientId
     mutate locationId = locationId
     mutate eventId = eventId != null ? eventId : self.eventId
@@ -415,7 +415,7 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
     guard self.recordedAt != null
     guard self.deletedAt == null
     guard roleAllows(user.role, "inventoryManageAccess")
-    constraint voidReasonRequired: length(trim(reason)) > 0 "Void reason is required"
+    constraint voidReasonRequired: length(trim(reason)) > 0 "Say why you're voiding this."
     mutate status = "voided"
     mutate voidedAt = now()
     mutate voidReason = reason

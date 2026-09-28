@@ -275,7 +275,7 @@ function Checkpoint({
   if (complete) {
     return (
       <div className="equipment-checkpoint">
-        <strong>{condition?.replaceAll("_", " ") ?? "Recorded"}</strong>
+        <strong>{condition?.replaceAll("_", " ") ?? "Checked"}</strong>
         {comparison ? (
           <span data-tone={comparison.tone}>{comparison.label}</span>
         ) : null}

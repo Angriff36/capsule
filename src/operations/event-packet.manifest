@@ -17,7 +17,7 @@ entity EventPacketArtifact mixin TenantScoped, SoftDeletable {
   property metadataJson: string?
   property observationsJson: string?
   property contextJson: string?
-  constraint packetArtifactSize: self.byteSize >= 0 "Source byte size cannot be negative"
+  constraint packetArtifactSize: self.byteSize >= 0 "This file's size can't be negative. Use zero or more."
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   default policy packetArtifactRead read: roleAllows(user.role, "eventPacketSeamOnly") "The original packet files stay behind the scenes"
   default policy packetArtifactWrite write: roleAllows(user.role, "eventPacketSeamOnly") "The event packet keeps the source files"

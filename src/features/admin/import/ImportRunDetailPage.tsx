@@ -53,7 +53,7 @@ const STATUS_LABELS: Record<string, string> = {
 const DISPOSITION_LABELS: Record<string, string> = {
   pending: "Pending",
   normalized: "Normalized",
-  linked_reference: "Linked reference",
+  linked_reference: "Linked to existing",
   duplicate_view: "Duplicate view",
   needs_mapping: "Needs a match",
   unsupported: "Unsupported",
@@ -627,7 +627,7 @@ export function ImportRunDetailPage() {
                   : commitNoun === "lead"
                     ? "Lead (an inquiry — it links to a client if it converts)"
                     : commitNoun === "payment"
-                      ? "payment reference in the leftover match list (it gets matched to a Capsule payment later)"
+                      ? "payment sitting in the leftover match list (it gets matched to a Capsule payment later)"
                       : commitNoun === "menu"
                         ? "Dish in your menu catalog (needs kitchen access; the old price is kept with the import details)"
                         : commitNoun === "pack list"
@@ -853,7 +853,7 @@ export function ImportRunDetailPage() {
             )}
             <p className="mt-3 text-xs text-ink-3">
               Dispositions describe the source archive, not live kitchen or
-              office items — unsupported, duplicate and linked-reference content
+              office items — unsupported, duplicate, and already-linked content
               stays listed here after commit.
             </p>
           </div>
@@ -904,8 +904,8 @@ export function ImportRunDetailPage() {
             <li>
               • <strong>Approve &amp; Commit</strong>: Confirm the counts, then
               paste rows from your old system to create the real items — venues,
-              client accounts, events, leads, payment references, menu dishes,
-              and pack lists — all tied to this import
+              client accounts, events, leads, payment entries, menu dishes, and
+              pack lists — all tied to this import
             </li>
             <li>
               • <strong>Fail</strong>: Mark the import as failed (requires

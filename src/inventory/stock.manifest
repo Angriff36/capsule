@@ -46,8 +46,8 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   computed availableQuantity: decimal(12, 4) = self.quantityOnHand - self.totalReserved
 
   constraint stockNonnegative: self.stockedAt == null or self.quantityOnHand >= 0 "This item's on-hand amount can't be negative. Use zero or more."
-  constraint stockParNonnegative: self.parLevel >= 0 "Par level cannot be negative"
-  constraint stockReorderNonnegative: self.reorderThreshold >= 0 "Reorder threshold cannot be negative"
+  constraint stockParNonnegative: self.parLevel >= 0 "This item's par level can't be negative. Use zero or more."
+  constraint stockReorderNonnegative: self.reorderThreshold >= 0 "This item's reorder threshold can't be negative. Use zero or more."
   constraint stockCostNonnegative: self.unitCost >= 0 "This item's cost per unit can't be negative. Use zero or more."
 
   default policy inventoryItemRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may see stock items"
@@ -65,16 +65,16 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   ) {
     guard self.stockedAt == null
     guard self.deletedAt == null
-    constraint openStockIngredientMatch: ingredientId == self.ingredientId "Open ingredientId must match the seeded ingredient reference"
-    constraint openStockLocationMatch: locationId == self.locationId "Open locationId must match the seeded location reference"
+    constraint openStockIngredientMatch: ingredientId == self.ingredientId "This stock line is for a different ingredient. Pick the ingredient already on this stock line."
+    constraint openStockLocationMatch: locationId == self.locationId "This stock line is for a different location. Pick the location already on this stock line."
     // Stock is counted in the ingredient's catalog unit. Nothing converts
     // between units (they are opaque labels — see UnitOfMeasure), so a line
     // opened in a different unit silently breaks on-hand vs demand math,
     // low-stock alerts, and suggested purchase quantities (issue #150).
-    constraint openStockUnitMatchesCatalog: self.ingredient != null and unit == self.ingredient.unit "Stock line unit must match the ingredient's catalog unit — units do not convert"
+    constraint openStockUnitMatchesCatalog: self.ingredient != null and unit == self.ingredient.unit "This stock line's unit has to match the ingredient's catalog unit. Units don't convert automatically."
     constraint openStockQuantityNonnegative: quantityOnHand == null or quantityOnHand >= 0 "This item's on-hand amount can't be negative. Use zero or more."
-    constraint openStockParNonnegative: parLevel == null or parLevel >= 0 "Par level cannot be negative"
-    constraint openStockReorderNonnegative: reorderThreshold == null or reorderThreshold >= 0 "Reorder threshold cannot be negative"
+    constraint openStockParNonnegative: parLevel == null or parLevel >= 0 "This item's par level can't be negative. Use zero or more."
+    constraint openStockReorderNonnegative: reorderThreshold == null or reorderThreshold >= 0 "This item's reorder threshold can't be negative. Use zero or more."
     constraint openStockCostNonnegative: unitCost == null or unitCost >= 0 "This item's cost per unit can't be negative. Use zero or more."
     compute previousQuantity = self.quantityOnHand
     mutate ingredientId = ingredientId
@@ -101,15 +101,15 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   // Receipt lots supply a delta once; repeated lot materialization sends zero.
   command receiveDelivery(ingredientId: uuid, locationId: uuid, quantity: decimal(12, 4), unit: UnitOfMeasure, unitCost: money(12, 2)) {
     guard self.deletedAt == null
-    constraint deliveryIngredientMatch: ingredientId == self.ingredientId "Receipt ingredient must match stock"
-    constraint deliveryLocationMatch: locationId == self.locationId "Receipt location must match stock"
-    constraint deliveryNonnegative: quantity >= 0 and unitCost >= 0 "Receipt quantity and price cannot be negative"
+    constraint deliveryIngredientMatch: ingredientId == self.ingredientId "This delivery is for a different ingredient. Pick the ingredient already on this stock line."
+    constraint deliveryLocationMatch: locationId == self.locationId "This delivery is for a different location. Pick the location already on this stock line."
+    constraint deliveryNonnegative: quantity >= 0 and unitCost >= 0 "The delivered amount and price can't be negative. Use zero or more."
     compute stockUnit = self.stockedAt != null ? self.unit : self.ingredient.unit
     compute sourceMass = unit == "gram" ? 1 : unit == "kilogram" ? 1000 : unit == "ounce" ? 28.349523125 : unit == "pound" ? 453.59237 : 0
     compute sourceVolume = unit == "milliliter" ? 1 : unit == "liter" ? 1000 : unit == "teaspoon" ? 4.92892159375 : unit == "tablespoon" ? 14.78676478125 : unit == "cup" ? 236.5882365 : unit == "pint" ? 473.176473 : unit == "quart" ? 946.352946 : unit == "gallon" ? 3785.411784 : 0
     compute targetMass = stockUnit == "gram" ? 1 : stockUnit == "kilogram" ? 1000 : stockUnit == "ounce" ? 28.349523125 : stockUnit == "pound" ? 453.59237 : 0
     compute targetVolume = stockUnit == "milliliter" ? 1 : stockUnit == "liter" ? 1000 : stockUnit == "teaspoon" ? 4.92892159375 : stockUnit == "tablespoon" ? 14.78676478125 : stockUnit == "cup" ? 236.5882365 : stockUnit == "pint" ? 473.176473 : stockUnit == "quart" ? 946.352946 : stockUnit == "gallon" ? 3785.411784 : 0
-    constraint deliveryUnitCompatible: unit == (self.stockedAt != null ? self.unit : self.ingredient.unit) or ((unit == "gram" or unit == "kilogram" or unit == "ounce" or unit == "pound") and ((self.stockedAt != null ? self.unit : self.ingredient.unit) == "gram" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "kilogram" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "ounce" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "pound")) or ((unit == "milliliter" or unit == "liter" or unit == "teaspoon" or unit == "tablespoon" or unit == "cup" or unit == "pint" or unit == "quart" or unit == "gallon") and ((self.stockedAt != null ? self.unit : self.ingredient.unit) == "milliliter" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "liter" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "teaspoon" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "tablespoon" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "cup" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "pint" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "quart" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "gallon")) "Receipt unit needs a measured conversion to the stock unit"
+    constraint deliveryUnitCompatible: unit == (self.stockedAt != null ? self.unit : self.ingredient.unit) or ((unit == "gram" or unit == "kilogram" or unit == "ounce" or unit == "pound") and ((self.stockedAt != null ? self.unit : self.ingredient.unit) == "gram" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "kilogram" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "ounce" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "pound")) or ((unit == "milliliter" or unit == "liter" or unit == "teaspoon" or unit == "tablespoon" or unit == "cup" or unit == "pint" or unit == "quart" or unit == "gallon") and ((self.stockedAt != null ? self.unit : self.ingredient.unit) == "milliliter" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "liter" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "teaspoon" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "tablespoon" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "cup" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "pint" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "quart" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "gallon")) "This delivery's unit doesn't convert to the stock unit. Use a matching unit."
     compute unitRatio = unit == stockUnit ? 1 : (targetMass > 0 ? sourceMass / targetMass : sourceVolume / targetVolume)
     compute previousQuantity = self.quantityOnHand
     compute receivedQuantity = quantity * unitRatio
@@ -157,7 +157,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   command adjustQuantity(delta: decimal(12, 4), reason: string) {
     guard self.stockedAt != null
     guard self.deletedAt == null
-    constraint adjustReasonRequired: length(trim(reason)) > 0 "Adjustment reason is required"
+    constraint adjustReasonRequired: length(trim(reason)) > 0 "Say why you're changing this item's amount."
     constraint adjustResultNonnegative: self.quantityOnHand + delta >= 0 "This item's on-hand amount can't be negative. Use zero or more."
     compute previousQuantity = self.quantityOnHand
     compute nextQuantity = self.quantityOnHand + delta
@@ -180,15 +180,15 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   command applyReceiptCorrection(ingredientId: uuid, locationId: uuid, delta: decimal(12, 4), unit: UnitOfMeasure, reason: string) {
     guard self.stockedAt != null
     guard self.deletedAt == null
-    constraint correctionIngredientMatch: ingredientId == self.ingredientId "Receipt ingredient must match stock"
-    constraint correctionLocationMatch: locationId == self.locationId "Receipt location must match stock"
+    constraint correctionIngredientMatch: ingredientId == self.ingredientId "This delivery is for a different ingredient. Pick the ingredient already on this stock line."
+    constraint correctionLocationMatch: locationId == self.locationId "This delivery is for a different location. Pick the location already on this stock line."
     constraint correctionReasonRequired: length(trim(reason)) > 0 "Say why this count changed."
     compute stockUnit = self.unit
     compute sourceMass = unit == "gram" ? 1 : unit == "kilogram" ? 1000 : unit == "ounce" ? 28.349523125 : unit == "pound" ? 453.59237 : 0
     compute sourceVolume = unit == "milliliter" ? 1 : unit == "liter" ? 1000 : unit == "teaspoon" ? 4.92892159375 : unit == "tablespoon" ? 14.78676478125 : unit == "cup" ? 236.5882365 : unit == "pint" ? 473.176473 : unit == "quart" ? 946.352946 : unit == "gallon" ? 3785.411784 : 0
     compute targetMass = stockUnit == "gram" ? 1 : stockUnit == "kilogram" ? 1000 : stockUnit == "ounce" ? 28.349523125 : stockUnit == "pound" ? 453.59237 : 0
     compute targetVolume = stockUnit == "milliliter" ? 1 : stockUnit == "liter" ? 1000 : stockUnit == "teaspoon" ? 4.92892159375 : stockUnit == "tablespoon" ? 14.78676478125 : stockUnit == "cup" ? 236.5882365 : stockUnit == "pint" ? 473.176473 : stockUnit == "quart" ? 946.352946 : stockUnit == "gallon" ? 3785.411784 : 0
-    constraint correctionUnitCompatible: unit == self.unit or ((unit == "gram" or unit == "kilogram" or unit == "ounce" or unit == "pound") and (self.unit == "gram" or self.unit == "kilogram" or self.unit == "ounce" or self.unit == "pound")) or ((unit == "milliliter" or unit == "liter" or unit == "teaspoon" or unit == "tablespoon" or unit == "cup" or unit == "pint" or unit == "quart" or unit == "gallon") and (self.unit == "milliliter" or self.unit == "liter" or self.unit == "teaspoon" or self.unit == "tablespoon" or self.unit == "cup" or self.unit == "pint" or self.unit == "quart" or self.unit == "gallon")) "Receipt unit needs a measured conversion to the stock unit"
+    constraint correctionUnitCompatible: unit == self.unit or ((unit == "gram" or unit == "kilogram" or unit == "ounce" or unit == "pound") and (self.unit == "gram" or self.unit == "kilogram" or self.unit == "ounce" or self.unit == "pound")) or ((unit == "milliliter" or unit == "liter" or unit == "teaspoon" or unit == "tablespoon" or unit == "cup" or unit == "pint" or unit == "quart" or unit == "gallon") and (self.unit == "milliliter" or self.unit == "liter" or self.unit == "teaspoon" or self.unit == "tablespoon" or self.unit == "cup" or self.unit == "pint" or self.unit == "quart" or self.unit == "gallon")) "This delivery's unit doesn't convert to the stock unit. Use a matching unit."
     compute unitRatio = unit == stockUnit ? 1 : (targetMass > 0 ? sourceMass / targetMass : sourceVolume / targetVolume)
     compute converted = delta * unitRatio
     constraint correctionResultNonnegative: self.quantityOnHand + (delta * (unit == self.unit ? 1 : ((self.unit == "gram" or self.unit == "kilogram" or self.unit == "ounce" or self.unit == "pound") ? ((unit == "gram" ? 1 : unit == "kilogram" ? 1000 : unit == "ounce" ? 28.349523125 : unit == "pound" ? 453.59237 : 0) / (self.unit == "gram" ? 1 : self.unit == "kilogram" ? 1000 : self.unit == "ounce" ? 28.349523125 : self.unit == "pound" ? 453.59237 : 0)) : ((unit == "milliliter" ? 1 : unit == "liter" ? 1000 : unit == "teaspoon" ? 4.92892159375 : unit == "tablespoon" ? 14.78676478125 : unit == "cup" ? 236.5882365 : unit == "pint" ? 473.176473 : unit == "quart" ? 946.352946 : unit == "gallon" ? 3785.411784 : 0) / (self.unit == "milliliter" ? 1 : self.unit == "liter" ? 1000 : self.unit == "teaspoon" ? 4.92892159375 : self.unit == "tablespoon" ? 14.78676478125 : self.unit == "cup" ? 236.5882365 : self.unit == "pint" ? 473.176473 : self.unit == "quart" ? 946.352946 : self.unit == "gallon" ? 3785.411784 : 0))))) >= 0 "This item's on-hand amount can't be negative. Use zero or more."
@@ -211,7 +211,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   command recount(actualQuantity: decimal(12, 4)) {
     guard self.stockedAt != null
     guard self.deletedAt == null
-    constraint recountNonnegative: actualQuantity >= 0 "Recount quantity cannot be negative"
+    constraint recountNonnegative: actualQuantity >= 0 "This item's counted amount can't be negative. Use zero or more."
     compute previousQuantity = self.quantityOnHand
     mutate quantityOnHand = actualQuantity
     emit InventoryRecounted {
@@ -230,7 +230,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     guard self.stockedAt != null
     guard self.deletedAt == null
     constraint transferOutPositive: quantity > 0 "This item's transfer amount has to be more than zero. Enter how much to move."
-    constraint transferOutAvailable: self.quantityOnHand >= quantity "Cannot transfer more than quantity on hand"
+    constraint transferOutAvailable: self.quantityOnHand >= quantity "This item can't send more than it has on hand. Enter a smaller amount."
     compute previousQuantity = self.quantityOnHand
     compute nextQuantity = self.quantityOnHand - quantity
     mutate quantityOnHand = nextQuantity
@@ -277,8 +277,8 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     guard self.stockedAt != null
     guard self.deletedAt == null
     guard roleAllows(user.role, "inventoryManageAccess")
-    constraint levelsParNonnegative: parLevel >= 0 "Par level cannot be negative"
-    constraint levelsReorderNonnegative: reorderThreshold >= 0 "Reorder threshold cannot be negative"
+    constraint levelsParNonnegative: parLevel >= 0 "This item's par level can't be negative. Use zero or more."
+    constraint levelsReorderNonnegative: reorderThreshold >= 0 "This item's reorder threshold can't be negative. Use zero or more."
     constraint levelsCostNonnegative: unitCost == null or unitCost >= 0 "This item's cost per unit can't be negative. Use zero or more."
     mutate parLevel = parLevel
     mutate reorderThreshold = reorderThreshold
@@ -297,7 +297,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   command setExpiry(optional bestBeforeAt: datetime, optional useByAt: datetime) {
     guard self.stockedAt != null
     guard self.deletedAt == null
-    constraint expiryOrder: bestBeforeAt == null or useByAt == null or bestBeforeAt <= useByAt "Best-before cannot be after use-by"
+    constraint expiryOrder: bestBeforeAt == null or useByAt == null or bestBeforeAt <= useByAt "The best-before date can't be after the use-by date."
     // Overwrite semantics: omitting a date clears it (relabeling a lot).
     mutate bestBeforeAt = bestBeforeAt
     mutate useByAt = useByAt
@@ -317,7 +317,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "inventoryManageAccess")
     // Release/consume active holds before decommissioning the stock line.
     guard count_of(self.reservations, (r) => r.status == "active") == 0
-    constraint removeStockReason: length(trim(reason)) > 0 "Removal reason is required"
+    constraint removeStockReason: length(trim(reason)) > 0 "Say why you're removing this."
     compute previousQuantity = self.quantityOnHand
     mutate deletedAt = now()
     mutate removedAt = now()
@@ -392,7 +392,7 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   belongsTo inventorySettings: InventorySettings fields [tenantId] references [tenantId]
 
-  constraint reservationQuantityPositive: self.reservedAt == null or self.quantity > 0 "Reservation quantity must be positive"
+  constraint reservationQuantityPositive: self.reservedAt == null or self.quantity > 0 "Enter a reservation amount more than zero."
 
   transition status from "pending" to ["active"]
   transition status from "active" to ["released", "consumed"]
@@ -420,13 +420,13 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
     // sales_lock is live ops, not a stock freeze (backend §4.2).
     guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
     guard self.inventoryItem != null and self.inventoryItem.stockedAt != null and self.inventoryItem.deletedAt == null
-    constraint reserveItemMatch: inventoryItemId == self.inventoryItemId "Reserve inventoryItemId must match the seeded stock reference"
-    constraint reserveEventMatch: eventId == self.eventId "Reserve eventId must match the seeded event reference"
-    constraint reserveIngredientMatch: ingredientId == self.inventoryItem.ingredientId "Reserve ingredientId must match the stock ingredient"
+    constraint reserveItemMatch: inventoryItemId == self.inventoryItemId "This reservation is for a different stock item. Pick the stock item already on this reservation."
+    constraint reserveEventMatch: eventId == self.eventId "This reservation is for a different event. Pick the event already on this reservation."
+    constraint reserveIngredientMatch: ingredientId == self.inventoryItem.ingredientId "This reservation's ingredient doesn't match its stock item's ingredient."
     // Lot provenance prevents a recall report from attributing an issue to a
     // different ingredient or storage location. Legacy stock may omit a lot.
-    constraint reserveLotMatch: inventoryLotId == null or (self.inventoryLot != null and self.inventoryLot.deletedAt == null and self.inventoryLot.ingredientId == ingredientId and self.inventoryLot.locationId == self.inventoryItem.locationId) "Selected lot must match the reserved ingredient and stock location"
-    constraint reserveQuantityPositive: quantity > 0 "Reservation quantity must be positive"
+    constraint reserveLotMatch: inventoryLotId == null or (self.inventoryLot != null and self.inventoryLot.deletedAt == null and self.inventoryLot.ingredientId == ingredientId and self.inventoryLot.locationId == self.inventoryItem.locationId) "This lot doesn't match the ingredient or location you're reserving."
+    constraint reserveQuantityPositive: quantity > 0 "Enter a reservation amount more than zero."
     // Free stock = on hand minus active holds. Skipped when the company turned
     // stock-level checks off (Ryan, 2026-09-24).
     constraint reserveFitsFreeStock: self.inventoryItem == null or (self.inventorySettings != null and self.inventorySettings.deletedAt == null and self.inventorySettings.stockLevelsTracked == false) or quantity <= self.inventoryItem.quantityOnHand - sum(self.inventoryItem.reservations, (r) => r.status == "active" ? r.quantity : 0) "Not enough free stock: other events already hold some of it. Lower the amount, or turn off stock-level checks on the stock book."
@@ -453,7 +453,7 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.reservedAt != null
     guard self.deletedAt == null
-    constraint releaseReasonRequired: length(trim(reason)) > 0 "Release reason is required"
+    constraint releaseReasonRequired: length(trim(reason)) > 0 "Say why you're releasing this."
     compute previousQuantity = self.quantity
     mutate status = "released"
     mutate releasedAt = now()

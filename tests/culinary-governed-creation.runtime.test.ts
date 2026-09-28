@@ -207,7 +207,7 @@ describe("culinary governed creation", () => {
         unit: "each",
         costPerUnit: 0,
       }),
-    ).rejects.toThrow("Ingredient name is required");
+    ).rejects.toThrow("Give this ingredient a name.");
 
     const ingredients = await actor.run(async (ctx) =>
       ctx.db.query("ingredients").collect(),

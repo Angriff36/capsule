@@ -239,17 +239,19 @@ describe("plain words on the kitchen recipe book", () => {
     expect(textParser).toContain("Paste a recipe to begin.");
     expect(csvParser).toContain('"Untitled recipe"');
     expect(csvParser).toContain('"Untitled import"');
-    expect(finalizer).toContain('"Recipe name is required"');
-    expect(finalizer).toContain('"Recipe yield quantity must be positive"');
-    expect(finalizer).toContain('"Recipe yield unit is required"');
+    expect(finalizer).toContain('"Give this recipe a name."');
+    expect(finalizer).toContain(
+      `"This recipe's yield has to be more than zero. Enter how much it makes."`,
+    );
+    expect(finalizer).toContain(`"Pick a unit for this recipe's yield."`);
     expect(repository).toContain('"Recipe import not found"');
 
     for (const fresh of [
       "Untitled recipe",
       "Paste a recipe to begin.",
-      "Recipe name is required",
-      "Recipe yield quantity must be positive",
-      "Recipe yield unit is required",
+      "Give this recipe a name.",
+      "This recipe's yield has to be more than zero. Enter how much it makes.",
+      "Pick a unit for this recipe's yield.",
       "Recipe import not found",
     ]) {
       expectPlain(fresh);

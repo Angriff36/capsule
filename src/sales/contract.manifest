@@ -44,7 +44,7 @@ entity Contract mixin TenantScoped, SoftDeletable {
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
   ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
 
-  constraint contractDraftComplete: self.draftedAt == null or length(trim(self.title)) > 0 "Drafted contracts require a title"
+  constraint contractDraftComplete: self.draftedAt == null or length(trim(self.title)) > 0 "Give this contract a title"
 
   transition status from "draft" to ["sent"]
   transition status from "sent" to ["viewed", "expired", "voided"]
@@ -71,9 +71,9 @@ entity Contract mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.event != null
     guard self.client != null
-    constraint draftEventMatch: eventId == self.eventId "Draft eventId must match the seeded event reference"
-    constraint draftClientMatch: clientId == self.clientId "Draft clientId must match the seeded client reference"
-    constraint draftTitle: length(trim(title)) > 0 "Contract title is required"
+    constraint draftEventMatch: eventId == self.eventId "This contract is for a different event. Use the event already on this contract."
+    constraint draftClientMatch: clientId == self.clientId "This contract is for a different client. Use the client already on this contract."
+    constraint draftTitle: length(trim(title)) > 0 "Give this contract a title"
     mutate eventId = eventId
     mutate clientId = clientId
     mutate title = title
@@ -95,7 +95,7 @@ entity Contract mixin TenantScoped, SoftDeletable {
     guard self.status == "draft"
     guard self.draftedAt != null
     guard self.deletedAt == null
-    constraint sendTitle: length(trim(self.title)) > 0 "Contract title is required before send"
+    constraint sendTitle: length(trim(self.title)) > 0 "Give this contract a title before you send it"
     mutate status = "sent"
     mutate sentAt = now()
     emit ContractSent {
@@ -122,7 +122,7 @@ entity Contract mixin TenantScoped, SoftDeletable {
   command sign(signedBy: string) {
     guard self.status == "viewed"
     guard self.deletedAt == null
-    constraint signerPresent: length(trim(signedBy)) > 0 "Signer name is required"
+    constraint signerPresent: length(trim(signedBy)) > 0 "Give the name of who signed"
     compute signedAtValue = now()
     mutate status = "signed"
     mutate signedBy = signedBy
@@ -152,7 +152,7 @@ entity Contract mixin TenantScoped, SoftDeletable {
   command markVoided(reason: string) {
     guard self.status == "sent" or self.status == "viewed"
     guard self.deletedAt == null
-    constraint voidReasonPresent: length(trim(reason)) > 0 "Void reason is required"
+    constraint voidReasonPresent: length(trim(reason)) > 0 "Give a reason for voiding this contract"
     mutate status = "voided"
     mutate voidReason = reason
     mutate voidedAt = now()

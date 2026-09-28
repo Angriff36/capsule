@@ -41,10 +41,10 @@ entity PayrollInput mixin TenantScoped, SoftDeletable {
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
   ref shift: Shift fields [tenantId, shiftId] references [tenantId, id]
 
-  constraint payrollPreparedMinutesNonnegative: self.preparedAt == null or (self.regularMinutes >= 0 and self.overtimeMinutes >= 0 and self.totalMinutes >= 0) "Prepared payroll minutes cannot be negative"
-  constraint payrollTotalMinutesConsistent: self.preparedAt == null or self.totalMinutes == self.regularMinutes + self.overtimeMinutes "Total minutes must equal regular plus overtime"
-  constraint payrollPeriodOrder: self.preparedAt == null or self.periodEnd >= self.periodStart "Payroll period end must be at or after period start"
-  constraint payrollRatesNonnegative: self.preparedAt == null or ((self.hourlyRate == null or self.hourlyRate >= 0) and (self.overtimeRate == null or self.overtimeRate >= 0) and (self.grossAmount == null or self.grossAmount >= 0)) "Payroll rate and amount fields cannot be negative"
+  constraint payrollPreparedMinutesNonnegative: self.preparedAt == null or (self.regularMinutes >= 0 and self.overtimeMinutes >= 0 and self.totalMinutes >= 0) "This payroll input's minutes can't be negative. Use zero or more."
+  constraint payrollTotalMinutesConsistent: self.preparedAt == null or self.totalMinutes == self.regularMinutes + self.overtimeMinutes "This payroll input's total minutes has to equal regular plus overtime minutes."
+  constraint payrollPeriodOrder: self.preparedAt == null or self.periodEnd >= self.periodStart "This payroll input's period has to end on or after it starts."
+  constraint payrollRatesNonnegative: self.preparedAt == null or ((self.hourlyRate == null or self.hourlyRate >= 0) and (self.overtimeRate == null or self.overtimeRate >= 0) and (self.grossAmount == null or self.grossAmount >= 0)) "This payroll input's rate and amount fields can't be negative. Use zero or more."
 
   transition status from "draft" to ["prepared", "voided"]
   transition status from "prepared" to ["finalized", "voided"]
@@ -76,10 +76,10 @@ entity PayrollInput mixin TenantScoped, SoftDeletable {
     constraint preparePersonMatch: personId == self.personId "This payroll input is for a different person. Pick the person already on this payroll input."
     constraint prepareEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "This payroll input is for a different event. Pick the event already on this payroll input."
     constraint prepareShiftMatch: shiftId == null or self.shiftId == null or shiftId == self.shiftId "This payroll input is for a different shift. Pick the shift already on this payroll input."
-    constraint preparePeriodOrder: periodEnd >= periodStart "Payroll period end must be at or after period start"
-    constraint prepareMinutesNonnegative: regularMinutes >= 0 and overtimeMinutes >= 0 and totalMinutes >= 0 "Payroll minutes cannot be negative"
-    constraint prepareTotalMinutes: totalMinutes == regularMinutes + overtimeMinutes "Total minutes must equal regular plus overtime"
-    constraint prepareRatesNonnegative: (hourlyRate == null or hourlyRate >= 0) and (overtimeRate == null or overtimeRate >= 0) and (grossAmount == null or grossAmount >= 0) "Payroll rate and amount fields cannot be negative"
+    constraint preparePeriodOrder: periodEnd >= periodStart "This payroll input's period has to end on or after it starts."
+    constraint prepareMinutesNonnegative: regularMinutes >= 0 and overtimeMinutes >= 0 and totalMinutes >= 0 "This payroll input's minutes can't be negative. Use zero or more."
+    constraint prepareTotalMinutes: totalMinutes == regularMinutes + overtimeMinutes "This payroll input's total minutes has to equal regular plus overtime minutes."
+    constraint prepareRatesNonnegative: (hourlyRate == null or hourlyRate >= 0) and (overtimeRate == null or overtimeRate >= 0) and (grossAmount == null or grossAmount >= 0) "This payroll input's rate and amount fields can't be negative. Use zero or more."
     mutate personId = personId
     mutate periodStart = periodStart
     mutate periodEnd = periodEnd
@@ -127,7 +127,7 @@ entity PayrollInput mixin TenantScoped, SoftDeletable {
   command markVoided(reason: string) {
     guard self.status == "draft" or self.status == "prepared" or self.status == "finalized"
     guard self.deletedAt == null
-    constraint voidReasonPresent: length(trim(reason)) > 0 "Void reason is required"
+    constraint voidReasonPresent: length(trim(reason)) > 0 "Say why you're voiding this payroll input."
     mutate status = "voided"
     mutate voidedAt = now()
     mutate voidReason = reason

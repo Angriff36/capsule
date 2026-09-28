@@ -303,9 +303,9 @@ export function LotTraceabilityPage() {
       <aside className="lot-trace-method" role="note">
         <strong>Evidence boundary</strong>
         <span>
-          This register uses consumed InventoryReservation facts carrying an
-          InventoryLot reference. It never infers a lot from ingredient,
-          location, or timing alone.
+          This register only uses stock that was used up with a lot attached to
+          it. It never guesses a lot from the ingredient, location, or timing
+          alone.
         </span>
         {unattributed > 0 ? (
           <span className="lot-trace-unattributed">

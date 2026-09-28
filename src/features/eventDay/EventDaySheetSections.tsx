@@ -315,7 +315,7 @@ function AllergenLine({ report }: { report: DishAllergenReport | null }) {
       {report != null && report.unflaggedCount > 0
         ? "Allergens unverified — ingredient flags not set"
         : report != null && report.unresolvedCount > 0
-          ? "Allergens unverified — recipe lines did not resolve"
+          ? "Allergens unverified — some recipe ingredients couldn't be found"
           : "No recipe visible — allergens unverified"}
     </span>
   );

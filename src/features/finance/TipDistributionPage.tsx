@@ -548,7 +548,7 @@ export function TipDistributionPage() {
           <p className="tip-bridge-note tip-no-print">
             Each share is created as a prepared payroll input for review — no
             pay goes out until you finalize it in Payroll. The gratuity amount
-            is recorded on the payroll note and carried into the payroll export.
+            goes on the payroll note and carries into the payroll export.
           </p>
         </>
       )}

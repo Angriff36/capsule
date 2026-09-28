@@ -180,7 +180,7 @@ entity Organization mixin TenantScoped, SoftDeletable {
   // tenants without a configured default continue to report in USD.
   computed functionalCurrencyCode: string = self.defaultCurrencyCode != null and length(trim(self.defaultCurrencyCode)) == 3 ? self.defaultCurrencyCode : "USD"
 
-  constraint namePresent: length(trim(self.name)) > 0 "Organization name is required"
+  constraint namePresent: length(trim(self.name)) > 0 "Give your company a name."
 
   transition status from "active" to ["suspended", "deactivated"]
   transition status from "suspended" to ["active", "deactivated"]
@@ -202,7 +202,7 @@ entity Organization mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "adminAccess")
-    constraint registerName: length(trim(name)) > 0 "Organization name is required"
+    constraint registerName: length(trim(name)) > 0 "Give your company a name."
     mutate name = name
     mutate brandDisplayName = brandDisplayName
     mutate brandAddress = brandAddress
@@ -222,7 +222,7 @@ entity Organization mixin TenantScoped, SoftDeletable {
   command rename(name: string) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint renameName: length(trim(name)) > 0 "Organization name is required"
+    constraint renameName: length(trim(name)) > 0 "Give your company a name."
     mutate name = name
     emit OrganizationRenamed {
       organizationId: self.id
@@ -271,7 +271,7 @@ entity Organization mixin TenantScoped, SoftDeletable {
   // uppercase codes only — the same code is reused by financial reports.
   command setDefaultCurrency(currencyCode: string) {
     guard self.deletedAt == null
-    constraint setDefaultCurrencyCodeFormat: length(trim(currencyCode)) == 3 "Currency code must be a three-letter ISO 4217 code"
+    constraint setDefaultCurrencyCodeFormat: length(trim(currencyCode)) == 3 "Enter a three-letter currency code, like USD."
     compute normalizedCode = toUpperCase(currencyCode)
     mutate defaultCurrencyCode = normalizedCode
     emit OrganizationDefaultCurrencySet {

@@ -43,8 +43,8 @@ entity ClientCommunication mixin TenantScoped {
     guard self.clientContactId == null or self.clientContact != null
     guard self.eventId == null or self.event != null
     constraint recordTarget: (clientContactId != null and eventId == null) or (clientContactId == null and eventId != null) "Choose one contact or event"
-    constraint recordSummary: length(trim(summary)) > 0 "Communication summary is required"
-    constraint recordAuthor: length(trim(authorName)) > 0 "Communication author is required"
+    constraint recordSummary: length(trim(summary)) > 0 "Give this note a summary"
+    constraint recordAuthor: length(trim(authorName)) > 0 "Say who wrote this note"
     mutate clientContactId = clientContactId
     mutate eventId = eventId
     mutate occurredAt = occurredAt

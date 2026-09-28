@@ -54,12 +54,12 @@ describe("plain words on leftover stock transfer distinct-lines copy", () => {
     expect(visible).toContain("Inventory staff may see stock transfers");
     expect(visible).toContain("Inventory staff may update stock transfers");
     expect(visible).toContain("Inventory staff may change stock transfers");
+    expect(visible).toContain(
+      "This transfer's ingredient doesn't match the send-from stock item. Pick the ingredient that stock item holds.",
+    );
     // Later leftovers on this same file are pinned, not rewritten.
     expect(visible).toContain(
-      "Transfer ingredientId must match the source stock ingredient",
-    );
-    expect(visible).toContain(
-      "Source and destination must hold the same ingredient",
+      "This transfer's source and destination have to hold the same ingredient.",
     );
   });
 });

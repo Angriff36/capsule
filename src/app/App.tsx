@@ -547,7 +547,7 @@ class AppErrorBoundary extends Component<
       return (
         <div className="mx-auto mt-16 max-w-120">
           <ErrorState
-            title="This screen failed to render"
+            title="This screen didn't load"
             detail={
               // Raw messages leak internal query names / request ids in prod.
               import.meta.env.DEV

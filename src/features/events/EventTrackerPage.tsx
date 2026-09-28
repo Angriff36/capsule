@@ -350,7 +350,7 @@ export function EventTrackerPage() {
         return canLock ? { label: "Lock sales", run: lockForSales } : null;
       case "sales_lock":
         return canLock
-          ? { label: "Confirm lock & start execution", run: confirmSalesLock }
+          ? { label: "Confirm lock & start the event", run: confirmSalesLock }
           : null;
       default:
         return null;

@@ -197,7 +197,7 @@ export function PackListTemplatesPage() {
       setFailure({
         category: "validation",
         title: "Check the entered details",
-        detail: "Template name is required.",
+        detail: "Give this template a name.",
       });
       return;
     }
@@ -207,7 +207,7 @@ export function PackListTemplatesPage() {
       setFailure({
         category: "validation",
         title: "Check the entered details",
-        detail: "Guest-count band max must be greater than or equal to min.",
+        detail: "Guests to has to be the same as or higher than guests from.",
       });
       return;
     }

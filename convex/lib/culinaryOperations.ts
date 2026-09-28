@@ -137,7 +137,7 @@ export const reconcileImportedPackingFluidOunces = mutation({
     for (const input of args.items) {
       if (selected.has(input.itemId)) throw new Error("Packing item selected twice");
       selected.add(input.itemId);
-      if (!input.sourceReference.trim()) throw new Error("The original fluid-ounce source is required");
+      if (!input.sourceReference.trim()) throw new Error("Say where the fluid-ounce amount came from.");
       const item = await ctx.db.get(input.itemId);
       if (!item || item.tenantId !== tenantId || item.deletedAt != null || item.packListId !== list._id)
         throw new Error("Packing item not found in this list");

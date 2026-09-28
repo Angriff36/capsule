@@ -28,8 +28,8 @@ entity ClientMerge mixin TenantScoped, SoftDeletable {
     guard self.primaryClient.deletedAt == null
     guard self.duplicateClient.status == "active"
     guard self.duplicateClient.deletedAt == null
-    constraint mergePrimaryMatch: primaryClientId == self.primaryClientId "Primary client must match the seeded account"
-    constraint mergeDuplicateMatch: duplicateClientId == self.duplicateClientId "Duplicate client must match the seeded account"
+    constraint mergePrimaryMatch: primaryClientId == self.primaryClientId "This merge is for a different primary client. Use the primary client already on this merge."
+    constraint mergeDuplicateMatch: duplicateClientId == self.duplicateClientId "This merge is for a different duplicate client. Use the duplicate client already on this merge."
     constraint mergeDistinctClients: primaryClientId != duplicateClientId "Choose two different clients"
     mutate primaryClientId = primaryClientId
     mutate duplicateClientId = duplicateClientId

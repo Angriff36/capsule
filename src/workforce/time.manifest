@@ -42,8 +42,8 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
   // no now() in computed. Named workedMinutes to avoid shadowing the builtin.
   computed workedMinutes: number? = self.clockOutAt != null and self.clockInAt != null ? durationBetween(self.clockInAt, self.clockOutAt) / durationMinutes(1) : null
 
-  constraint timeRecordClosedComplete: self.status == "open" or (self.clockInAt != null and self.clockOutAt != null and self.clockOutAt >= self.clockInAt) "Closed or corrected time entries require clock-out at or after clock-in"
-  constraint timeRecordBreakNonNegative: self.breakMinutes == null or self.breakMinutes >= 0 "Break minutes must be non-negative"
+  constraint timeRecordClosedComplete: self.status == "open" or (self.clockInAt != null and self.clockOutAt != null and self.clockOutAt >= self.clockInAt) "This time entry's clock-out has to be at or after its clock-in."
+  constraint timeRecordBreakNonNegative: self.breakMinutes == null or self.breakMinutes >= 0 "Break minutes can't be negative. Use zero or more."
 
   transition status from "open" to ["closed"]
   transition status from "closed" to ["corrected"]
@@ -96,7 +96,7 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard user.id != null
     guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
-    constraint clockOutBreakNonNegative: breakMinutes == null or breakMinutes >= 0 "Break minutes must be non-negative"
+    constraint clockOutBreakNonNegative: breakMinutes == null or breakMinutes >= 0 "Break minutes can't be negative. Use zero or more."
     mutate clockOutAt = now()
     mutate breakMinutes = breakMinutes != null ? breakMinutes : self.breakMinutes
     mutate notes = notes != null ? notes : self.notes
@@ -125,8 +125,8 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
     guard self.clockOutAt != null
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess")
-    constraint correctDates: clockOutAt >= clockInAt "Corrected clock-out must be at or after clock-in"
-    constraint correctBreakNonNegative: breakMinutes == null or breakMinutes >= 0 "Break minutes must be non-negative"
+    constraint correctDates: clockOutAt >= clockInAt "The corrected clock-out has to be at or after the clock-in."
+    constraint correctBreakNonNegative: breakMinutes == null or breakMinutes >= 0 "Break minutes can't be negative. Use zero or more."
     compute previousClockInAt = self.clockInAt
     compute previousClockOutAt = self.clockOutAt
     compute previousBreakMinutes = self.breakMinutes
@@ -175,8 +175,8 @@ entity Qualification mixin TenantScoped, SoftDeletable {
 
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
 
-  constraint qualificationGrantedComplete: self.grantedAt == null or (length(trim(self.name)) > 0 and self.certificationType != null and length(trim(self.certificationType)) > 0 and self.issuingBody != null and length(trim(self.issuingBody)) > 0 and self.issuedAt != null and (self.expiresAt == null or self.expiresAt > self.issuedAt)) "Granted certifications require a name, type, issuing body, issue date, and valid optional expiry"
-  constraint qualificationExpiryOrder: self.expiresAt == null or self.issuedAt == null or self.expiresAt > self.issuedAt "Qualification expiry must be after issued date"
+  constraint qualificationGrantedComplete: self.grantedAt == null or (length(trim(self.name)) > 0 and self.certificationType != null and length(trim(self.certificationType)) > 0 and self.issuingBody != null and length(trim(self.issuingBody)) > 0 and self.issuedAt != null and (self.expiresAt == null or self.expiresAt > self.issuedAt)) "Give this certification a name, type, issuing body, and issue date. If it expires, the expiry has to be after the issue date."
+  constraint qualificationExpiryOrder: self.expiresAt == null or self.issuedAt == null or self.expiresAt > self.issuedAt "This certification's expiry has to be after its issue date."
 
   transition status from "active" to ["expired", "revoked"]
   transition status from "expired" to []
@@ -202,10 +202,10 @@ entity Qualification mixin TenantScoped, SoftDeletable {
     guard self.person != null and self.person.status == "active"
     guard roleAllows(user.role, "workforceManageAccess")
     constraint grantPersonMatch: personId == self.personId "This qualification is for a different person. Pick the person already on this qualification."
-    constraint grantNamePresent: length(trim(name)) > 0 "Qualification name is required"
-    constraint grantTypePresent: length(trim(certificationType)) > 0 "Certification type is required"
-    constraint grantIssuingBodyPresent: length(trim(issuingBody)) > 0 "Issuing body is required"
-    constraint grantExpiryOrder: expiresAt == null or expiresAt > issuedAt "Qualification expiry must be after issued date"
+    constraint grantNamePresent: length(trim(name)) > 0 "Give this certification a name."
+    constraint grantTypePresent: length(trim(certificationType)) > 0 "Pick a certification type."
+    constraint grantIssuingBodyPresent: length(trim(issuingBody)) > 0 "Say who issued this certification."
+    constraint grantExpiryOrder: expiresAt == null or expiresAt > issuedAt "This certification's expiry has to be after its issue date."
     mutate personId = personId
     mutate name = name
     mutate certificationType = certificationType

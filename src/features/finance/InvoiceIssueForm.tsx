@@ -246,7 +246,8 @@ export function InvoiceIssueForm({
             ))}
           </select>
           <span className="mt-1 block text-xs font-normal text-ink-3">
-            Tenant functional currency is {formatCurrencyLabel(functionalCode)}.
+            Your business's functional currency is{" "}
+            {formatCurrencyLabel(functionalCode)}.
           </span>
         </label>
         <label className="field-label">
@@ -265,7 +266,7 @@ export function InvoiceIssueForm({
           <span className="mt-1 block text-xs font-normal text-ink-3">
             {isFunctionalCurrency
               ? "Locked at 1.000000 — invoice is already in the functional currency."
-              : `1 ${normalizedCurrencyCode} = ${parsedExchangeRate || 0} ${functionalCode} (recorded at issue).`}
+              : `1 ${normalizedCurrencyCode} = ${parsedExchangeRate || 0} ${functionalCode} (set at issue).`}
           </span>
         </label>
       </div>

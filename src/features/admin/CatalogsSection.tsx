@@ -88,7 +88,7 @@ export function CatalogsSection({
     const name = String(data.get("name") ?? "").trim();
     const code = String(data.get("code") ?? "").trim();
     if (!name || !code) {
-      setError("Name and code are required.");
+      setError(`Give this ${singular} a name and a code.`);
       return;
     }
     const sortRaw = String(data.get("sortOrder") ?? "").trim();
@@ -130,7 +130,7 @@ export function CatalogsSection({
       const values = await prompt.askFields({
         title: `Rename ${row.name}`,
         description:
-          "The label people see. Existing records keep their link to this row.",
+          "The label people see. Anything already saved stays linked to this row.",
         fields: [
           {
             name: "name",

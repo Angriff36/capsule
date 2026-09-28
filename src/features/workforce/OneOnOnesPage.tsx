@@ -169,7 +169,7 @@ export function OneOnOnesPage() {
             Record each one-on-one — agenda, goals, wins, opportunities, and
             decisions — then track follow-up actions by owner and due date. Open
             actions roll into the next meeting, and closing one never rewrites
-            the prior record.
+            the one before it.
           </p>
         </div>
         <div aria-label="One-on-one actions">

@@ -287,7 +287,7 @@ export function ProfitMarginDashboard({
 
       {!validRange ? (
         <p className="profit-range-error" role="alert">
-          The start date must be on or before the end date.
+          Pick a start date on or before the end date.
         </p>
       ) : null}
 
@@ -481,7 +481,7 @@ export function ProfitMarginDashboard({
         <p>
           Only finalized closeouts are included. Gross margin is revenue less
           food cost. Net margin is revenue less food, labor, equipment/vendor
-          hire, and overhead/miscellaneous costs. Closeouts record waste and
+          hire, and overhead/miscellaneous costs. Closeouts log waste and
           miscellaneous spend as one number, so this report shows that combined
           bucket as overheads.
         </p>

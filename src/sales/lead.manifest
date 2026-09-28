@@ -39,9 +39,9 @@ entity Lead mixin TenantScoped, SoftDeletable {
 
   computed displayName: string = self.leadType == "company" ? self.companyName : self.givenName + " " + self.familyName
 
-  constraint leadIdentityComplete: self.capturedAt == null or (self.leadType == "company" and self.companyName != null and length(trim(self.companyName)) > 0) or (self.leadType == "person" and self.givenName != null and length(trim(self.givenName)) > 0) "Company leads require a company name; person leads require a given name"
-  constraint leadSourceComplete: self.capturedAt == null or length(trim(self.source)) > 0 "Lead source is required"
-  constraint leadEstimatedValueNonnegative: self.estimatedValue >= 0 "Lead estimated value cannot be negative"
+  constraint leadIdentityComplete: self.capturedAt == null or (self.leadType == "company" and self.companyName != null and length(trim(self.companyName)) > 0) or (self.leadType == "person" and self.givenName != null and length(trim(self.givenName)) > 0) "Give a company name for a company lead, or a given name for a person lead"
+  constraint leadSourceComplete: self.capturedAt == null or length(trim(self.source)) > 0 "Say where this lead came from"
+  constraint leadEstimatedValueNonnegative: self.estimatedValue >= 0 "This lead's estimated value can't be negative. Use zero or more."
   constraint leadProbabilityRange: self.probability >= 0 and self.probability <= 100 "Lead probability must be between 0 and 100"
 
   default policy leadRead read: roleAllows(user.role, "salesAccess") "Sales staff may see leads"
@@ -63,9 +63,9 @@ entity Lead mixin TenantScoped, SoftDeletable {
   ) {
     guard self.capturedAt == null
     guard self.deletedAt == null
-    constraint captureLeadIdentity: (leadType == "company" and companyName != null and length(trim(companyName)) > 0) or (leadType == "person" and givenName != null and length(trim(givenName)) > 0) "Company leads require a company name; person leads require a given name"
-    constraint captureLeadSource: length(trim(source)) > 0 "Lead source is required"
-    constraint captureLeadValue: estimatedValue >= 0 "Lead estimated value cannot be negative"
+    constraint captureLeadIdentity: (leadType == "company" and companyName != null and length(trim(companyName)) > 0) or (leadType == "person" and givenName != null and length(trim(givenName)) > 0) "Give a company name for a company lead, or a given name for a person lead"
+    constraint captureLeadSource: length(trim(source)) > 0 "Say where this lead came from"
+    constraint captureLeadValue: estimatedValue >= 0 "This lead's estimated value can't be negative. Use zero or more."
     constraint captureLeadProbability: probability == null or (probability >= 0 and probability <= 100) "Lead probability must be between 0 and 100"
     mutate leadType = leadType
     mutate companyName = companyName
@@ -102,8 +102,8 @@ entity Lead mixin TenantScoped, SoftDeletable {
   ) {
     guard self.capturedAt != null
     guard self.deletedAt == null
-    constraint reviseLeadIdentity: (leadType == "company" and companyName != null and length(trim(companyName)) > 0) or (leadType == "person" and givenName != null and length(trim(givenName)) > 0) "Company leads require a company name; person leads require a given name"
-    constraint reviseLeadSource: length(trim(source)) > 0 "Lead source is required"
+    constraint reviseLeadIdentity: (leadType == "company" and companyName != null and length(trim(companyName)) > 0) or (leadType == "person" and givenName != null and length(trim(givenName)) > 0) "Give a company name for a company lead, or a given name for a person lead"
+    constraint reviseLeadSource: length(trim(source)) > 0 "Say where this lead came from"
     mutate leadType = leadType
     mutate companyName = companyName
     mutate givenName = givenName
@@ -123,7 +123,7 @@ entity Lead mixin TenantScoped, SoftDeletable {
   command updatePipeline(stage: LeadStage, estimatedValue: money(12, 2), probability: number) {
     guard self.capturedAt != null
     guard self.deletedAt == null
-    constraint updateLeadValue: estimatedValue >= 0 "Lead estimated value cannot be negative"
+    constraint updateLeadValue: estimatedValue >= 0 "This lead's estimated value can't be negative. Use zero or more."
     constraint updateLeadProbability: probability >= 0 and probability <= 100 "Lead probability must be between 0 and 100"
     compute previousStage = self.stage
     mutate stage = stage

@@ -147,7 +147,7 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
       } else {
         parsePacketSnapshot(json);
         throw new Error(
-          "This snapshot contains references only. Select its portable packet export or original source files so Capsule can retain the evidence.",
+          "This file only points to its source files instead of holding them. Pick its portable packet export, or the original source files, so Capsule can keep the evidence.",
         );
       }
     } else {

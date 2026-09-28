@@ -86,7 +86,11 @@ export function ProposalEnhancementsPanel({
     }
     const price = Number(editor.price);
     if (!Number.isFinite(price) || price < 0) {
-      onFailure?.(new Error("Enhancement price must be zero or greater."));
+      onFailure?.(
+        new Error(
+          "This enhancement's price can't be negative. Use zero or more.",
+        ),
+      );
       return;
     }
     const description = editor.description.trim() || undefined;

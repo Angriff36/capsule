@@ -364,7 +364,7 @@ describe("runtime proof: safe culinary operations", () => {
           projection: createdProjection,
         },
       ),
-    ).rejects.toThrow(/positive/i);
+    ).rejects.toThrow(/more than zero/i);
     expect(await kitchen.query(api.queries.listComponent, {})).toEqual([]);
     expect(await kitchen.query(api.queries.listIngredient, {})).toEqual([]);
     const args = {
@@ -504,7 +504,7 @@ describe("runtime proof: safe culinary operations", () => {
           operationKey,
         },
       ),
-    ).rejects.toThrow(/positive/i);
+    ).rejects.toThrow(/more than zero/i);
     const afterFailure = await kitchen.run(async (ctx) => ({
       component: await ctx.db.get(component.docId as never),
       lines: await ctx.db.query("componentIngredients").collect(),
@@ -1034,7 +1034,7 @@ Warm oil gently and steep herbs.`;
           review: { importId: broken.importId, expectedRevision: 0 },
         },
       ),
-    ).rejects.toThrow(/positive/i);
+    ).rejects.toThrow(/more than zero/i);
     expect(await kitchen.query(api.queries.listComponent, {})).toHaveLength(1);
     expect(
       (await kitchen.query(api.queries.listIngredient, {})) as unknown[],

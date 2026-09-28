@@ -139,7 +139,7 @@ export function ClientDetailPage() {
     const data = new FormData(form);
     const givenName = String(data.get("givenName") || "").trim();
     if (!givenName) {
-      setFailure(new Error("Contact given name is required."));
+      setFailure(new Error("Give this contact a first name."));
       return;
     }
     void run("add-contact", async () => {

@@ -207,7 +207,9 @@ export function KitchenDisplayPage() {
           !Number.isFinite(actualYield) ||
           actualYield < 0
         ) {
-          throw new Error("Enter a nonnegative actual batch yield.");
+          throw new Error(
+            "Enter the actual batch yield. It can't be negative.",
+          );
         }
         await batchComplete({
           docId: item.id,

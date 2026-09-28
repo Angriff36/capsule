@@ -118,7 +118,7 @@ export function EventAllergenBriefingPage() {
     return (
       <ErrorState
         title="Event not found"
-        detail="The address is missing an event id."
+        detail="This link doesn't point to an event. Open the event again from the events list."
       />
     );
   }
@@ -133,7 +133,7 @@ export function EventAllergenBriefingPage() {
     return (
       <ErrorState
         title="Event unavailable"
-        detail="It may not exist, may have been deleted, or your role may not permit access."
+        detail="It may have been deleted, or you may not have access to it."
       />
     );
   }

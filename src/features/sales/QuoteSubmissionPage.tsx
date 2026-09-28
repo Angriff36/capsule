@@ -29,33 +29,33 @@ function quoteFieldRules(data: FormData): Record<string, string> {
   const errors: Record<string, string> = {};
 
   if (!clientName.trim()) {
-    errors.clientName = "Name is required";
+    errors.clientName = "Give your name.";
   }
 
   if (!email.trim()) {
-    errors.email = "Email is required";
+    errors.email = "Give your email address.";
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     errors.email = "Please enter a valid email address";
   }
 
   if (!eventDate) {
-    errors.eventDate = "Event date is required";
+    errors.eventDate = "Give an event date.";
   } else {
     const date = new Date(eventDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (date < today) {
-      errors.eventDate = "Event date cannot be in the past";
+      errors.eventDate = "The event date can't be in the past.";
     }
   }
 
   if (guestCount <= 0) {
-    errors.guestCount = "Guest count must be at least 1";
+    errors.guestCount = "Guest count has to be 1 or more.";
   }
 
   const consent = data.get("consent");
   if (!consent) {
-    errors.consent = "Please accept the data processing consent";
+    errors.consent = "Please agree to how we'll use your data.";
   }
 
   return errors;
@@ -171,7 +171,7 @@ export function QuoteSubmissionPage() {
           </h1>
           <p className="text-ink-2 mb-6">{success.message}</p>
           <div className="text-xs text-ink-3 mb-8">
-            Reference ID: {success.submissionId}
+            Confirmation number: {success.submissionId}
           </div>
           <a href="/" className="btn btn-primary">
             Return to Home

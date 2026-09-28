@@ -24,7 +24,7 @@ entity ClientOutreachTask mixin TenantScoped {
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
 
-  constraint reminderReasonComplete: self.openedAt == null or length(trim(self.reason)) > 0 "Open follow-up reminders require a reason"
+  constraint reminderReasonComplete: self.openedAt == null or length(trim(self.reason)) > 0 "Give this follow-up reminder a reason"
 
   transition status from "open" to ["completed", "dismissed"]
   transition status from "completed" to []
@@ -36,7 +36,7 @@ entity ClientOutreachTask mixin TenantScoped {
 
   command open(clientId: uuid, reason: string) {
     guard self.openedAt == null
-    constraint openReminderReason: length(trim(reason)) > 0 "Follow-up reason is required"
+    constraint openReminderReason: length(trim(reason)) > 0 "Give this follow-up reminder a reason"
     mutate clientId = clientId
     mutate reason = reason
     mutate status = "open"

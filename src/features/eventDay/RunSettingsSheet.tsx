@@ -38,7 +38,7 @@ export function RunSettingsSheet({
   const pushStatusHint = push.blocked
     ? "Notifications are blocked in this phone's settings"
     : push.keyMissing
-      ? "Not set up on this deployment yet"
+      ? "Not set up in Capsule yet"
       : push.accountEnabled
         ? push.deviceActive
           ? runStatus?.enabled

@@ -356,7 +356,7 @@ export function KitchenDashboardPage() {
     if (status === "completed")
       return "This step is done. Its amount is what the yield was measured against.";
     if (status === "cancelled") return "This step was cancelled.";
-    return "This step cannot be re-measured.";
+    return "This step can't be measured again.";
   };
 
   /** Change a step's quantity or unit in place, through PrepTask.revise. */

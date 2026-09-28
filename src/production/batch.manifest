@@ -40,8 +40,8 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
   belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
-  constraint batchPlannedPositive: self.plannedAt == null or self.plannedYield > 0 "Planned yield must be positive once planned"
-  constraint batchActualNonnegative: self.actualYield == null or self.actualYield >= 0 "Actual yield cannot be negative"
+  constraint batchPlannedPositive: self.plannedAt == null or self.plannedYield > 0 "Enter a planned yield more than zero before you plan this batch."
+  constraint batchActualNonnegative: self.actualYield == null or self.actualYield >= 0 "The actual yield can't be negative. Use zero or more."
 
   transition status from "planned" to ["in_progress", "cancelled"]
   transition status from "in_progress" to ["completed", "cancelled"]
@@ -65,9 +65,9 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
     guard self.status == "planned"
     guard self.plannedAt == null or self.componentId == componentId
     guard self.plannedAt != null or (self.component != null and self.component.status == "published")
-    constraint planComponentMatch: componentId == self.componentId "Plan componentId must match the seeded component reference"
-    constraint planEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Plan eventId must match the seeded event reference when provided"
-    constraint planYieldPositive: plannedYield > 0 or self.plannedYield > 0 "Planned yield must be positive"
+    constraint planComponentMatch: componentId == self.componentId "This batch is for a different component. Pick the component already on this batch."
+    constraint planEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "This batch is for a different event. Pick the event already on this batch, or leave it blank."
+    constraint planYieldPositive: plannedYield > 0 or self.plannedYield > 0 "Enter a planned yield more than zero."
     mutate componentId = componentId
     mutate eventId = eventId != null ? eventId : self.eventId
     mutate plannedYield = self.plannedAt != null ? self.plannedYield : plannedYield
@@ -98,8 +98,8 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
     guard self.status == "planned"
     guard self.plannedAt != null
     guard self.deletedAt == null
-    constraint reconcileExactNonnegative: plannedExact >= 0 "Exact quantity cannot be negative"
-    constraint reconcileRoundedCoversExact: plannedRounded >= plannedExact "Rounded quantity cannot be below the exact need"
+    constraint reconcileExactNonnegative: plannedExact >= 0 "The exact amount can't be negative. Use zero or more."
+    constraint reconcileRoundedCoversExact: plannedRounded >= plannedExact "The rounded amount can't be less than the exact amount needed."
     mutate plannedExact = plannedExact
     mutate plannedRounded = plannedRounded
     mutate surplusQuantity = plannedRounded - plannedExact
@@ -140,7 +140,7 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
     guard self.status == "in_progress"
     guard self.startedAt != null
     guard self.deletedAt == null
-    constraint completeYieldNonnegative: actualYield >= 0 "Actual yield cannot be negative"
+    constraint completeYieldNonnegative: actualYield >= 0 "The actual yield can't be negative. Use zero or more."
     compute previousStatus = self.status
     mutate actualYield = actualYield
     mutate status = "completed"
@@ -162,7 +162,7 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
     guard self.status == "planned" or self.status == "in_progress"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenLeadAccess")
-    constraint cancelBatchReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancelBatchReason: length(trim(reason)) > 0 "Say why you're cancelling this batch."
     compute previousStatus = self.status
     mutate status = "cancelled"
     mutate cancelledAt = now()
@@ -297,8 +297,8 @@ entity ProductionBatchAllocation mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
 
-  constraint allocationQuantityNonnegative: self.allocatedAt == null or self.allocatedQuantity >= 0 "Allocated quantity cannot be negative"
-  constraint allocationOwner: self.allocatedAt == null or self.isSurplus == true or self.eventId != null "An allocation belongs to an event or is surplus"
+  constraint allocationQuantityNonnegative: self.allocatedAt == null or self.allocatedQuantity >= 0 "The allocated amount can't be negative. Use zero or more."
+  constraint allocationOwner: self.allocatedAt == null or self.isSurplus == true or self.eventId != null "This allocation has to belong to an event, or be marked as surplus."
 
   transition status from "planned" to ["produced", "released"]
   transition status from "produced" to ["portioned", "released"]
@@ -320,9 +320,9 @@ entity ProductionBatchAllocation mixin TenantScoped, SoftDeletable {
   ) {
     guard self.allocatedAt == null
     guard self.deletedAt == null
-    constraint allocateQuantity: allocatedQuantity >= 0 "Allocated quantity cannot be negative"
-    constraint allocateShare: formulaShare >= 0 "Formula share cannot be negative"
-    constraint allocateOwner: (isSurplus != null and isSurplus) or eventId != null "An allocation belongs to an event or is surplus"
+    constraint allocateQuantity: allocatedQuantity >= 0 "The allocated amount can't be negative. Use zero or more."
+    constraint allocateShare: formulaShare >= 0 "The formula share can't be negative. Use zero or more."
+    constraint allocateOwner: (isSurplus != null and isSurplus) or eventId != null "This allocation has to belong to an event, or be marked as surplus."
     mutate productionBatchId = productionBatchId
     mutate eventId = eventId
     mutate eventDishId = eventDishId
@@ -363,7 +363,7 @@ entity ProductionBatchAllocation mixin TenantScoped, SoftDeletable {
   command release(reason: string) {
     guard self.status == "planned" or self.status == "produced"
     guard self.deletedAt == null
-    constraint releaseAllocationReason: length(trim(reason)) > 0 "Release reason is required"
+    constraint releaseAllocationReason: length(trim(reason)) > 0 "Say why you're releasing this."
     mutate status = "released"
     mutate releaseReason = reason
     mutate deletedAt = now()

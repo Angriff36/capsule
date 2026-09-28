@@ -62,8 +62,8 @@ entity Dish mixin TenantScoped, SoftDeletable {
   computed isRetired: boolean = self.status == "retired"
   computed isCanonicalRoot: boolean = self.canonicalDishId == null and self.mergedIntoDishId == null
 
-  constraint dishIdentityComplete: self.introducedAt == null or length(trim(self.name)) > 0 "Introduced dishes require a name"
-  constraint dishPortionPositive: self.introducedAt == null or self.portionSize > 0 "Dish portion size must be positive"
+  constraint dishIdentityComplete: self.introducedAt == null or length(trim(self.name)) > 0 "Give this dish a name."
+  constraint dishPortionPositive: self.introducedAt == null or self.portionSize > 0 "This dish's portion size has to be more than zero."
 
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
@@ -88,8 +88,8 @@ entity Dish mixin TenantScoped, SoftDeletable {
   ) {
     guard self.introducedAt == null
     guard self.deletedAt == null
-    constraint introduceDishName: length(trim(name)) > 0 "Dish name is required"
-    constraint introduceDishPortion: portionSize > 0 "Dish portion size must be positive"
+    constraint introduceDishName: length(trim(name)) > 0 "Give this dish a name."
+    constraint introduceDishPortion: portionSize > 0 "This dish's portion size has to be more than zero."
     mutate name = name
     mutate portionSize = portionSize
     mutate portionUnit = portionUnit
@@ -131,7 +131,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
   ) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint reviseDishName: length(trim(name)) > 0 "Dish name is required"
+    constraint reviseDishName: length(trim(name)) > 0 "Give this dish a name."
     mutate name = name
     mutate description = description
     mutate category = category
@@ -162,7 +162,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
   command saveServiceInstructions(instructions: string, source: string) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint serviceInstructionsSourcePresent: length(trim(source)) > 0 "Service instruction source is required"
+    constraint serviceInstructionsSourcePresent: length(trim(source)) > 0 "Say where these serving instructions came from."
     mutate serviceInstructions = instructions
     mutate serviceInstructionsSource = source
     emit DishServiceInstructionsSaved {
@@ -175,7 +175,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
   command updatePortioning(portionSize: decimal(10, 2), portionUnit: UnitOfMeasure) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint updateDishPortion: portionSize > 0 "Dish portion size must be positive"
+    constraint updateDishPortion: portionSize > 0 "This dish's portion size has to be more than zero."
     compute previousPortionSize = self.portionSize
     compute previousPortionUnit = self.portionUnit
     mutate portionSize = portionSize
@@ -251,7 +251,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
   command setPrimaryImage(storageId: string, optional fileName: string) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint primaryImageStorage: length(trim(storageId)) > 0 "Primary image storage id is required"
+    constraint primaryImageStorage: length(trim(storageId)) > 0 "Add a photo before you set it as the main picture."
     mutate primaryImageStorageId = storageId
     mutate primaryImageFileName = fileName
     emit DishPrimaryImageSet {
@@ -279,7 +279,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.mergedIntoDishId == null
     constraint linkEditionSelf: sourceDishId != self.id "A dish cannot be an edition of itself"
-    constraint linkEditionNumber: editionNumber == null or editionNumber > 0 "Edition number must be positive"
+    constraint linkEditionNumber: editionNumber == null or editionNumber > 0 "This edition number has to be more than zero."
     mutate canonicalDishId = sourceDishId
     mutate editionNumber = editionNumber != null ? editionNumber : self.editionNumber
     emit DishEditionCreated {
@@ -297,7 +297,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.mergedIntoDishId == null
     constraint mergeIntoSelf: targetDishId != self.id "Cannot merge a dish into itself"
-    constraint mergeIntoReason: length(trim(reason)) > 0 "Merge reason is required"
+    constraint mergeIntoReason: length(trim(reason)) > 0 "Say why you're merging this."
     mutate mergedIntoDishId = targetDishId
     mutate status = "retired"
     mutate retiredAt = now()
@@ -349,8 +349,8 @@ entity DishIngredient mixin TenantScoped, SoftDeletable {
   computed unitsMatchIngredientPrice: boolean = self.unit == self.ingredient.unit
   computed liveIngredientCost: money(12, 2) = self.unit == self.ingredient.unit ? self.quantity * (self.wasteFactor != null ? self.wasteFactor : 1) * self.ingredient.costPerUnit : 0
 
-  constraint dishLineQuantityPositive: self.addedAt == null or self.quantity > 0 "Dish ingredient quantity must be positive"
-  constraint dishLineWasteFactorPositive: self.addedAt == null or self.wasteFactor == null or self.wasteFactor > 0 "Waste factor must be greater than 0"
+  constraint dishLineQuantityPositive: self.addedAt == null or self.quantity > 0 "This dish ingredient's amount has to be more than zero."
+  constraint dishLineWasteFactorPositive: self.addedAt == null or self.wasteFactor == null or self.wasteFactor > 0 "This waste amount has to be more than zero."
 
   default policy dishIngredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see dish ingredient lines"
   default policy dishIngredientWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update dish ingredient lines"
@@ -367,8 +367,8 @@ entity DishIngredient mixin TenantScoped, SoftDeletable {
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
-    constraint addDishLineQuantity: quantity > 0 "Dish ingredient quantity must be positive"
-    constraint addDishLineWasteFactor: wasteFactor == null or wasteFactor > 0 "Waste factor must be greater than 0"
+    constraint addDishLineQuantity: quantity > 0 "This dish ingredient's amount has to be more than zero."
+    constraint addDishLineWasteFactor: wasteFactor == null or wasteFactor > 0 "This waste amount has to be more than zero."
     mutate dishId = dishId
     mutate ingredientId = ingredientId
     mutate quantity = quantity
@@ -391,7 +391,7 @@ entity DishIngredient mixin TenantScoped, SoftDeletable {
   command adjustQuantity(quantity: decimal(10, 4), unit: UnitOfMeasure) {
     guard self.addedAt != null
     guard self.deletedAt == null
-    constraint adjustDishLineQuantity: quantity > 0 "Dish ingredient quantity must be positive"
+    constraint adjustDishLineQuantity: quantity > 0 "This dish ingredient's amount has to be more than zero."
     compute previousQuantity = self.quantity
     mutate quantity = quantity
     mutate unit = unit
@@ -409,7 +409,7 @@ entity DishIngredient mixin TenantScoped, SoftDeletable {
   command remove(reason: string) {
     guard self.addedAt != null
     guard self.deletedAt == null
-    constraint removeDishLineReason: length(trim(reason)) > 0 "Removal reason is required"
+    constraint removeDishLineReason: length(trim(reason)) > 0 "Say why you're removing this."
     mutate deletedAt = now()
     emit DishIngredientRemoved {
       dishIngredientId: self.id
@@ -493,7 +493,7 @@ entity DishComponent mixin TenantScoped, SoftDeletable {
   command setPortionSpec(portionSpecId: uuid, pieceCount: decimal(12, 4), optional quantityBasis: QuantityBasis) {
     guard self.attachedAt != null
     guard self.deletedAt == null
-    constraint portionSpecPiecesPositive: pieceCount > 0 "Pieces per portion must be positive"
+    constraint portionSpecPiecesPositive: pieceCount > 0 "The pieces per portion have to be more than zero."
     mutate portionSpecId = portionSpecId
     mutate pieceCount = pieceCount
     mutate quantityBasis = quantityBasis != null ? quantityBasis : self.quantityBasis
@@ -510,7 +510,7 @@ entity DishComponent mixin TenantScoped, SoftDeletable {
   command detach(reason: string) {
     guard self.attachedAt != null
     guard self.deletedAt == null
-    constraint detachReason: length(trim(reason)) > 0 "Detach reason is required"
+    constraint detachReason: length(trim(reason)) > 0 "Say why you're detaching this."
     mutate deletedAt = now()
     mutate removedAt = now()
     emit DishComponentDetached {
@@ -935,7 +935,7 @@ entity DishTaskMaterial mixin TenantScoped, SoftDeletable {
   belongsTo dishComponent: DishComponent fields [tenantId, dishComponentId] references [tenantId, id]
   belongsTo dishContainer: DishContainer fields [tenantId, dishContainerId] references [tenantId, id]
 
-  constraint materialHasTarget: self.linkedAt == null or self.dishIngredientId != null or self.dishComponentId != null or self.dishContainerId != null "A task material must point at a requirement"
+  constraint materialHasTarget: self.linkedAt == null or self.dishIngredientId != null or self.dishComponentId != null or self.dishContainerId != null "Pick what this task uses — an ingredient, a recipe, or a container."
 
   default policy dishTaskMaterialRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may see task materials"
   default policy dishTaskMaterialWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may update task materials"
@@ -951,8 +951,8 @@ entity DishTaskMaterial mixin TenantScoped, SoftDeletable {
   ) {
     guard self.linkedAt == null
     guard self.deletedAt == null
-    constraint linkMaterialTarget: dishIngredientId != null or dishComponentId != null or dishContainerId != null "A task material must point at a requirement"
-    constraint linkWorkQuantity: workQuantity == null or workQuantity > 0 "Work quantity must be positive"
+    constraint linkMaterialTarget: dishIngredientId != null or dishComponentId != null or dishContainerId != null "Pick what this task uses — an ingredient, a recipe, or a container."
+    constraint linkWorkQuantity: workQuantity == null or workQuantity > 0 "This work amount has to be more than zero."
     mutate dishTaskId = dishTaskId
     mutate dishIngredientId = dishIngredientId
     mutate dishComponentId = dishComponentId
@@ -973,7 +973,7 @@ entity DishTaskMaterial mixin TenantScoped, SoftDeletable {
   command unlink(reason: string) {
     guard self.linkedAt != null
     guard self.deletedAt == null
-    constraint unlinkMaterialReason: length(trim(reason)) > 0 "Reason is required"
+    constraint unlinkMaterialReason: length(trim(reason)) > 0 "Give a reason."
     mutate deletedAt = now()
     emit DishTaskMaterialUnlinked {
       dishTaskMaterialId: self.id

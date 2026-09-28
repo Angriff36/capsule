@@ -54,9 +54,8 @@ describe("plain words on leftover stock transfer record move-amount copy", () =>
     expect(visible).toContain(
       "This transfer can't send to the same stock item it takes from. Pick a different send-to item.",
     );
-    // Later leftovers on this same file are pinned, not rewritten.
     expect(visible).toContain(
-      "Transfer ingredientId must match the source stock ingredient",
+      "This transfer's ingredient doesn't match the send-from stock item. Pick the ingredient that stock item holds.",
     );
   });
 });

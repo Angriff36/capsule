@@ -155,7 +155,7 @@ export const PAGE_GUIDES: PageGuide[] = [
     prefix: "/kitchen/prep",
     title: "Kitchen dashboard",
     purpose:
-      "The command view for a service day — prep progress, blockers, and quality checks.",
+      "The main view for a service day — prep progress, blockers, and quality checks.",
     steps: [
       "Watch for blocked tasks and clear what's blocking them.",
       "Use it on a wall screen during busy days.",
@@ -446,7 +446,9 @@ export const PAGE_GUIDES: PageGuide[] = [
     prefix: "/staff/training",
     title: "Training",
     purpose: "Completed trainings that unlock certain shift types.",
-    steps: ["Record completions so people can be scheduled for those roles."],
+    steps: [
+      "Note who's finished training so they can be scheduled for those roles.",
+    ],
   },
   {
     prefix: "/staff/reviews",
@@ -477,7 +479,7 @@ export const PAGE_GUIDES: PageGuide[] = [
     prefix: "/staff/hiring",
     title: "Hiring",
     purpose: "Candidates moving through your hiring steps.",
-    steps: ["Move candidates along; record interview outcomes."],
+    steps: ["Move candidates along; note each interview's outcome."],
   },
   {
     prefix: "/clients",
@@ -559,14 +561,14 @@ export const PAGE_GUIDES: PageGuide[] = [
     purpose: "Bill clients and track what's been paid.",
     steps: [
       "Issue the invoice from the event.",
-      "Send it; record payments as they arrive.",
+      "Send it, then log payments as they arrive.",
     ],
   },
   {
     prefix: "/finance/payments",
     title: "Payments",
     purpose: "Money received, matched against invoices.",
-    steps: ["Record each payment and match it to its invoice."],
+    steps: ["Log each payment and match it to its invoice."],
   },
   {
     prefix: "/finance/payment-methods",
@@ -584,7 +586,7 @@ export const PAGE_GUIDES: PageGuide[] = [
   {
     prefix: "/finance/payroll",
     title: "Payroll",
-    purpose: "Pay runs built from recorded hours.",
+    purpose: "Pay runs built from the hours on file.",
     steps: ["Prepare the run, check the hours, and export."],
   },
   {
@@ -603,7 +605,7 @@ export const PAGE_GUIDES: PageGuide[] = [
     prefix: "/finance/commission-terms",
     title: "Commission terms",
     purpose: "What each venue takes, written down.",
-    steps: ["Record each venue's cut so event profit is honest."],
+    steps: ["Log each venue's cut so event profit is honest."],
   },
   {
     prefix: "/finance/attribution",

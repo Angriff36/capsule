@@ -5813,6 +5813,14 @@ export const EventCloseoutFinalizeParamsSchema = z.object({});
 
 export type EventCloseoutFinalizeParams = z.infer<typeof EventCloseoutFinalizeParamsSchema>;
 
+// Command: followEventCommercial on EventCloseout
+export const EventCloseoutFollowEventCommercialParamsSchema = z.object({
+  budgetedRevenue: z.number(),
+  budgetedCost: z.number(),
+});
+
+export type EventCloseoutFollowEventCommercialParams = z.infer<typeof EventCloseoutFollowEventCommercialParamsSchema>;
+
 // Command: addToEvent on EventDish
 export const EventDishAddToEventParamsSchema = z.object({
   eventId: z.string().min(1),
@@ -7107,6 +7115,13 @@ export const InvoiceAssignNumberParamsSchema = z.object({
 });
 
 export type InvoiceAssignNumberParams = z.infer<typeof InvoiceAssignNumberParamsSchema>;
+
+// Command: followEventPrice on Invoice
+export const InvoiceFollowEventPriceParamsSchema = z.object({
+  total: z.number(),
+});
+
+export type InvoiceFollowEventPriceParams = z.infer<typeof InvoiceFollowEventPriceParamsSchema>;
 
 // Command: issue on Invoice
 export const InvoiceIssueParamsSchema = z.object({
@@ -8444,6 +8459,15 @@ export type ProposalDraftParams = z.infer<typeof ProposalDraftParamsSchema>;
 export const ProposalExpireParamsSchema = z.object({});
 
 export type ProposalExpireParams = z.infer<typeof ProposalExpireParamsSchema>;
+
+// Command: followEventHeadcount on Proposal
+export const ProposalFollowEventHeadcountParamsSchema = z.object({
+  guestCount: z.number(),
+  subtotal: z.number(),
+  total: z.number(),
+});
+
+export type ProposalFollowEventHeadcountParams = z.infer<typeof ProposalFollowEventHeadcountParamsSchema>;
 
 // Command: linkEvent on Proposal
 export const ProposalLinkEventParamsSchema = z.object({});

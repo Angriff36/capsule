@@ -38,7 +38,7 @@ entity Delivery mixin TenantScoped, SoftDeletable {
   belongsTo driver: Person fields [tenantId, driverId] references [tenantId, id]
   belongsTo vehicle: Vehicle fields [tenantId, vehicleId] references [tenantId, id]
 
-  constraint deliveryScheduledComplete: self.scheduledAt == null or (length(trim(self.destination)) > 0 and self.windowStartsAt != null and self.windowEndsAt != null and self.windowEndsAt > self.windowStartsAt) "Scheduled deliveries require a destination and a valid delivery window"
+  constraint deliveryScheduledComplete: self.scheduledAt == null or (length(trim(self.destination)) > 0 and self.windowStartsAt != null and self.windowEndsAt != null and self.windowEndsAt > self.windowStartsAt) "Give this delivery a destination and a start and end time before you schedule it."
 
   transition status from "scheduled" to ["in_transit", "failed", "cancelled"]
   transition status from "in_transit" to ["delivered", "failed", "cancelled"]
@@ -69,8 +69,8 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     constraint schedulePackListMatch: packListId == self.packListId "This delivery is for a different pack list. Pick the pack list already on this delivery."
     constraint scheduleEventMatch: eventId == self.eventId "This delivery is for a different event. Pick the event already on this delivery."
     constraint scheduleDriverMatch: driverId == null or self.driverId == null or driverId == self.driverId "This delivery is for a different driver. Leave the driver blank or pick the one already on this delivery."
-    constraint scheduleDestinationPresent: length(trim(destination)) > 0 or length(trim(self.destination)) > 0 "Delivery destination is required"
-    constraint scheduleWindowDates: (self.scheduledAt != null) or (windowEndsAt > windowStartsAt) "Delivery window end must be after its start"
+    constraint scheduleDestinationPresent: length(trim(destination)) > 0 or length(trim(self.destination)) > 0 "Give this delivery a destination."
+    constraint scheduleWindowDates: (self.scheduledAt != null) or (windowEndsAt > windowStartsAt) "This delivery's window end has to be after its start. Fix the times."
     mutate packListId = packListId
     mutate eventId = eventId
     mutate destination = length(trim(self.destination)) > 0 ? self.destination : destination
@@ -140,7 +140,7 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     guard self.scheduledAt != null
     guard self.deletedAt == null
     guard roleAllows(user.role, "logisticsManageAccess")
-    constraint failDeliveryReason: length(trim(reason)) > 0 "Failure reason is required"
+    constraint failDeliveryReason: length(trim(reason)) > 0 "Say why this delivery failed."
     compute previousStatus = self.status
     mutate status = "failed"
     mutate failedAt = now()
@@ -161,7 +161,7 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     guard self.status == "scheduled" or self.status == "in_transit"
     guard self.deletedAt == null
     guard roleAllows(user.role, "logisticsManageAccess")
-    constraint cancelDeliveryReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancelDeliveryReason: length(trim(reason)) > 0 "Say why you're cancelling this delivery."
     compute previousStatus = self.status
     mutate status = "cancelled"
     mutate cancelledAt = now()

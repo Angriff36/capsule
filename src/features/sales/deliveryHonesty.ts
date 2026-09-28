@@ -8,13 +8,13 @@ export function replyDisposition(provider: string): ReplyDisposition {
   return {
     canRecord: false,
     notice:
-      "Cannot send: no external delivery provider is connected. Your draft is preserved; copy it into your email, SMS, or social provider.",
+      "No external delivery provider is connected, so this can't be sent. Your draft is kept — copy it into your email, SMS, or social provider.",
   };
 }
 
 export function deliveryStatusLabel(status: string): string | null {
   if (status === "queued")
-    return "Legacy queued — not delivered; no provider is connected";
+    return "Queued — not delivered; no provider is connected";
   if (status === "failed") return "Delivery failed — not delivered";
   return null;
 }

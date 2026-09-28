@@ -52,7 +52,7 @@ entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
 
   ref owner: Person fields [tenantId, ownerId] references [tenantId, id]
 
-  constraint savedReportDefinedComplete: self.definedAt == null or (length(trim(self.name)) > 0 and length(trim(self.chartType)) > 0 and self.ownerId != null) "Defined reports require a name, chart type, and owner"
+  constraint savedReportDefinedComplete: self.definedAt == null or (length(trim(self.name)) > 0 and length(trim(self.chartType)) > 0 and self.ownerId != null) "A saved report needs a name, a chart type, and an owner."
 
   transition status from "active" to ["archived"]
   transition status from "archived" to ["active"]
@@ -77,8 +77,8 @@ entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard user.personId != null
-    constraint createName: length(trim(name)) > 0 "Report name is required"
-    constraint createChartType: length(trim(chartType)) > 0 "Chart type is required"
+    constraint createName: length(trim(name)) > 0 "Give this report a name."
+    constraint createChartType: length(trim(chartType)) > 0 "Pick a chart type."
     mutate ownerId = user.personId
     mutate name = name
     mutate subjectArea = subjectArea
@@ -104,7 +104,7 @@ entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard user.id != null
     guard self.ownerId == user.personId or roleAllows(user.role, "manageAccess")
-    constraint renameName: length(trim(name)) > 0 "Report name is required"
+    constraint renameName: length(trim(name)) > 0 "Give this report a name."
     mutate name = name
     emit SavedReportRenamed {
       savedReportDefinitionId: self.id
@@ -125,7 +125,7 @@ entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard user.id != null
     guard self.ownerId == user.personId or roleAllows(user.role, "manageAccess")
-    constraint updateChartType: chartType == null or length(trim(chartType)) > 0 "Chart type cannot be blank"
+    constraint updateChartType: chartType == null or length(trim(chartType)) > 0 "Pick a chart type."
     mutate chartType = chartType != null ? chartType : self.chartType
     mutate definition = definition != null ? definition : self.definition
     mutate subjectArea = subjectArea != null ? subjectArea : self.subjectArea

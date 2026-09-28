@@ -826,8 +826,8 @@ export function StockCountPage() {
                         : `${pendingLines.length} ${pendingLines.length === 1 ? "line remains" : "lines remain"}.`}
                   </strong>
                   <span>
-                    Closing preserves the frozen expectations, physical counts,
-                    and posted adjustment references.
+                    Closing keeps the frozen expectations, physical counts, and
+                    posted adjustments.
                   </span>
                 </div>
                 {selectedSession.status === "in_progress" ? (

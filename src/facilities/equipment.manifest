@@ -58,8 +58,8 @@ entity Equipment mixin TenantScoped, SoftDeletable {
   computed isActive: boolean = self.status == "active"
   computed totalValue: money(12, 2) = self.quantity * self.purchaseValue
 
-  constraint equipmentQuantityNonnegative: self.quantity >= 0 "Equipment quantity cannot be negative"
-  constraint equipmentValueNonnegative: self.purchaseValue >= 0 "Purchase value cannot be negative"
+  constraint equipmentQuantityNonnegative: self.quantity >= 0 "This equipment's amount on hand can't be negative. Use zero or more."
+  constraint equipmentValueNonnegative: self.purchaseValue >= 0 "This equipment's purchase value can't be negative. Use zero or more."
 
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
@@ -80,11 +80,11 @@ entity Equipment mixin TenantScoped, SoftDeletable {
   ) {
     guard self.registeredAt == null
     guard self.deletedAt == null
-    constraint registerEquipmentName: length(trim(name)) > 0 "Equipment name is required"
-    constraint registerEquipmentAssetTag: length(trim(assetTag)) > 0 "Asset tag is required"
-    constraint registerEquipmentCategory: length(trim(category)) > 0 "Category is required"
-    constraint registerEquipmentQuantity: quantity == null or quantity > 0 "Quantity must be positive"
-    constraint registerEquipmentValue: purchaseValue == null or purchaseValue >= 0 "Purchase value cannot be negative"
+    constraint registerEquipmentName: length(trim(name)) > 0 "Give this equipment a name."
+    constraint registerEquipmentAssetTag: length(trim(assetTag)) > 0 "Give this equipment its tag number."
+    constraint registerEquipmentCategory: length(trim(category)) > 0 "Pick what kind of equipment this is."
+    constraint registerEquipmentQuantity: quantity == null or quantity > 0 "This equipment's amount has to be more than zero. Enter how many you have."
+    constraint registerEquipmentValue: purchaseValue == null or purchaseValue >= 0 "This equipment's purchase value can't be negative. Use zero or more."
     mutate name = name
     mutate assetTag = assetTag
     mutate category = category
@@ -114,9 +114,9 @@ entity Equipment mixin TenantScoped, SoftDeletable {
     guard self.registeredAt != null
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint reviseEquipmentName: length(trim(name)) > 0 "Equipment name is required"
-    constraint reviseEquipmentCategory: length(trim(category)) > 0 "Category is required"
-    constraint reviseEquipmentValue: purchaseValue == null or purchaseValue >= 0 "Purchase value cannot be negative"
+    constraint reviseEquipmentName: length(trim(name)) > 0 "Give this equipment a name."
+    constraint reviseEquipmentCategory: length(trim(category)) > 0 "Pick what kind of equipment this is."
+    constraint reviseEquipmentValue: purchaseValue == null or purchaseValue >= 0 "This equipment's purchase value can't be negative. Use zero or more."
     mutate name = name
     mutate category = category
     mutate ownership = ownership != null ? ownership : self.ownership
@@ -149,7 +149,7 @@ entity Equipment mixin TenantScoped, SoftDeletable {
   command recount(actualQuantity: int) {
     guard self.registeredAt != null
     guard self.deletedAt == null
-    constraint recountEquipmentNonnegative: actualQuantity >= 0 "Recount quantity cannot be negative"
+    constraint recountEquipmentNonnegative: actualQuantity >= 0 "This equipment's counted amount can't be negative. Use zero or more."
     compute previousQuantity = self.quantity
     mutate quantity = actualQuantity
     emit EquipmentRecounted {
@@ -165,7 +165,7 @@ entity Equipment mixin TenantScoped, SoftDeletable {
     guard self.registeredAt != null
     guard self.deletedAt == null
     guard roleAllows(user.role, "inventoryManageAccess") or roleAllows(user.role, "logisticsManageAccess")
-    constraint retireEquipmentReason: length(trim(reason)) > 0 "Retirement reason is required"
+    constraint retireEquipmentReason: length(trim(reason)) > 0 "Say why you're retiring this equipment."
     mutate status = "retired"
     mutate retiredAt = now()
     mutate retirementReason = reason
@@ -263,7 +263,7 @@ entity EquipmentReservation mixin TenantScoped, SoftDeletable {
   belongsTo equipment: Equipment fields [tenantId, equipmentId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
-  constraint equipmentReservationComplete: self.reservedAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.quantity > 0) "Equipment handoffs require a valid date range and positive quantity"
+  constraint equipmentReservationComplete: self.reservedAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.quantity > 0) "This equipment handoff needs a valid date range and a quantity more than zero."
 
   transition status from "reserved" to ["checked_out", "cancelled"]
   transition status from "checked_out" to ["returned"]
@@ -276,7 +276,7 @@ entity EquipmentReservation mixin TenantScoped, SoftDeletable {
   command checkOut(condition: EquipmentCondition, optional note: string) {
     guard self.status == "reserved"
     guard self.deletedAt == null
-    constraint checkoutEquipmentServiceable: self.equipment != null and self.equipment.condition != "out_of_service" "Equipment marked out of service cannot be checked out"
+    constraint checkoutEquipmentServiceable: self.equipment != null and self.equipment.condition != "out_of_service" "This equipment is marked out of service, so it can't be checked out. Pick other equipment."
     mutate status = "checked_out"
     mutate checkoutCondition = condition
     mutate checkoutNote = note
@@ -381,7 +381,7 @@ entity EquipmentMaintenanceTask mixin TenantScoped, SoftDeletable {
   belongsTo equipment: Equipment fields [tenantId, equipmentId] references [tenantId, id]
   hasMany serviceEntries: EquipmentServiceEntry
 
-  constraint maintenanceTaskComplete: self.scheduledAt == null or (length(trim(self.taskName)) > 0 and self.intervalDays > 0 and self.nextDueAt != null) "Scheduled maintenance requires a task, recurrence interval, and due date"
+  constraint maintenanceTaskComplete: self.scheduledAt == null or (length(trim(self.taskName)) > 0 and self.intervalDays > 0 and self.nextDueAt != null) "Scheduled maintenance needs a task name, a recurring interval, and a due date."
 
   default policy maintenanceTaskRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may see equipment maintenance"
   default policy maintenanceTaskWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may update equipment maintenance"
@@ -397,9 +397,9 @@ entity EquipmentMaintenanceTask mixin TenantScoped, SoftDeletable {
     guard self.scheduledAt == null
     guard self.deletedAt == null
     guard self.equipment != null
-    constraint scheduleMaintenanceEquipmentMatch: equipmentId == self.equipmentId "Maintenance equipment must match the selected catalog item"
-    constraint scheduleMaintenanceName: length(trim(taskName)) > 0 "Maintenance task is required"
-    constraint scheduleMaintenanceInterval: intervalDays > 0 "Recurring interval must be at least one day"
+    constraint scheduleMaintenanceEquipmentMatch: equipmentId == self.equipmentId "This maintenance task is for different equipment. Pick the equipment already on this task."
+    constraint scheduleMaintenanceName: length(trim(taskName)) > 0 "Say what this maintenance task is."
+    constraint scheduleMaintenanceInterval: intervalDays > 0 "The recurring interval has to be at least one day."
     mutate taskName = taskName
     mutate intervalDays = intervalDays
     mutate nextDueAt = nextDueAt
@@ -418,7 +418,7 @@ entity EquipmentMaintenanceTask mixin TenantScoped, SoftDeletable {
   command applyService(completedAt: datetime, nextDueAt: datetime) {
     guard self.scheduledAt != null
     guard self.deletedAt == null
-    constraint applyServiceNextDue: nextDueAt > completedAt "Next maintenance due date must be after the completed service"
+    constraint applyServiceNextDue: nextDueAt > completedAt "The next due date has to be after the date the service was completed."
     compute isLatestService = self.lastServicedAt == null or completedAt >= self.lastServicedAt
     mutate lastServicedAt = isLatestService ? completedAt : self.lastServicedAt
     mutate nextDueAt = isLatestService ? nextDueAt : self.nextDueAt
@@ -470,7 +470,7 @@ entity EquipmentServiceEntry mixin TenantScoped, SoftDeletable {
   belongsTo maintenanceTask: EquipmentMaintenanceTask fields [tenantId, maintenanceTaskId] references [tenantId, id]
   belongsTo equipment: Equipment fields [tenantId, equipmentId] references [tenantId, id]
 
-  constraint equipmentServiceComplete: self.loggedAt == null or (length(trim(self.technician)) > 0 and self.cost >= 0 and self.completedAt != null and self.nextDueAt != null) "Completed service requires a technician, nonnegative cost, completion time, and next due date"
+  constraint equipmentServiceComplete: self.loggedAt == null or (length(trim(self.technician)) > 0 and self.cost >= 0 and self.completedAt != null and self.nextDueAt != null) "A completed service needs a technician, a cost that isn't negative, a completion time, and a next due date."
 
   default policy equipmentServiceRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may see equipment service history"
   default policy equipmentServiceWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may add equipment service"
@@ -489,12 +489,12 @@ entity EquipmentServiceEntry mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.maintenanceTask != null
     guard self.equipment != null
-    constraint recordServiceTaskMatch: maintenanceTaskId == self.maintenanceTaskId "Service entry must match the selected maintenance task"
-    constraint recordServiceEquipmentMatch: equipmentId == self.equipmentId and self.maintenanceTask.equipmentId == equipmentId "Service entry equipment must match its maintenance task"
-    constraint recordServiceTechnician: length(trim(technician)) > 0 "Technician is required"
-    constraint recordServiceCost: cost >= 0 "Service cost cannot be negative"
-    constraint recordServiceTime: completedAt <= now() "Service completion cannot be in the future"
-    constraint recordServiceNextDue: nextDueAt > completedAt "Next maintenance due date must be after the completed service"
+    constraint recordServiceTaskMatch: maintenanceTaskId == self.maintenanceTaskId "This service entry is for a different maintenance task. Pick the maintenance task already on this entry."
+    constraint recordServiceEquipmentMatch: equipmentId == self.equipmentId and self.maintenanceTask.equipmentId == equipmentId "This service entry's equipment has to match its maintenance task's equipment."
+    constraint recordServiceTechnician: length(trim(technician)) > 0 "Say who did the work."
+    constraint recordServiceCost: cost >= 0 "This service's cost can't be negative. Use zero or more."
+    constraint recordServiceTime: completedAt <= now() "The completion time can't be in the future."
+    constraint recordServiceNextDue: nextDueAt > completedAt "The next due date has to be after the date the service was completed."
     mutate technician = technician
     mutate cost = cost
     mutate notes = notes

@@ -129,7 +129,7 @@ describe("runtime proof: Event.changeServiceStyle reference check", () => {
           docId: event.docId,
           serviceStyleId: refused,
         }),
-      ).rejects.toThrow("Events must reference an active service style");
+      ).rejects.toThrow("Pick a service style that is still offered.");
     }
     const unchanged = await owner.run(async (ctx) =>
       ctx.db.get(event.docId as never),

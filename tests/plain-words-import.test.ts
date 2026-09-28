@@ -181,7 +181,7 @@ describe("plain words on leftover import manifests", () => {
     expect(visible).toContain("Staff may see import lists");
     expectPlain("Staff may see import lists");
     expect(visible).toContain("Staff may update import lists");
-    expect(visible).toContain("Dataset category is required");
+    expect(visible).toContain("Pick what kind of data this import handles.");
   });
 
   it("keeps leftover admin nav labels free of run and record jargon", () => {

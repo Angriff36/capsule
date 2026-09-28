@@ -177,7 +177,7 @@ export function PurchasingQueueSplit({
                             "Loading stock..."
                           ) : (
                             <>
-                              Recorded stock:{" "}
+                              Stock on file:{" "}
                               {stock.onHand == null
                                 ? "unknown"
                                 : `${formatQty(stock.onHand)} ${need.unit}`}{" "}

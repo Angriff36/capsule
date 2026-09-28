@@ -41,7 +41,7 @@ entity VenueNote mixin TenantScoped, SoftDeletable {
   belongsTo event: Event? fields [tenantId, eventId] references [tenantId, id]
   belongsTo author: Person fields [tenantId, authorPersonId] references [tenantId, id]
 
-  constraint venueNoteContent: self.postedAt == null or length(trim(self.content)) > 0 "Note content is required"
+  constraint venueNoteContent: self.postedAt == null or length(trim(self.content)) > 0 "Write something in this note."
 
   default policy venueNoteRead read: roleAllows(user.role, "eventAccess") and (self.visibility != "management_only" or roleAllows(user.role, "manageAccess")) "Event staff may see venue notes; management-only notes require managers"
   default policy venueNoteWrite write: roleAllows(user.role, "eventAccess") "Event staff may update venue notes"
@@ -60,8 +60,8 @@ entity VenueNote mixin TenantScoped, SoftDeletable {
     guard self.postedAt == null
     guard self.deletedAt == null
     guard user.id != null
-    constraint postVenueNoteContent: length(trim(content)) > 0 "Note content is required"
-    constraint postVenueNoteAuthor: length(trim(authorName)) > 0 "Author name is required"
+    constraint postVenueNoteContent: length(trim(content)) > 0 "Write something in this note."
+    constraint postVenueNoteAuthor: length(trim(authorName)) > 0 "Give this note an author name."
     mutate venueId = venueId
     mutate eventId = eventId
     mutate authorPersonId = authorPersonId
@@ -90,7 +90,7 @@ entity VenueNote mixin TenantScoped, SoftDeletable {
     guard self.postedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    constraint reviseVenueNoteContent: length(trim(content)) > 0 "Note content is required"
+    constraint reviseVenueNoteContent: length(trim(content)) > 0 "Write something in this note."
     mutate content = content
     mutate category = category
     mutate visibility = visibility

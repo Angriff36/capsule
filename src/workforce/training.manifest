@@ -30,8 +30,8 @@ entity TrainingModule mixin TenantScoped, SoftDeletable {
   hasMany completions: TrainingCompletion
   hasMany shiftTypes: ShiftType
 
-  constraint trainingModuleComplete: self.definedAt == null or length(trim(self.name)) > 0 "Defined training modules require a name"
-  constraint trainingModulePassingScore: self.passingScore >= 0 and self.passingScore <= 100 "Passing score must be between 0 and 100"
+  constraint trainingModuleComplete: self.definedAt == null or length(trim(self.name)) > 0 "Give this training module a name."
+  constraint trainingModulePassingScore: self.passingScore >= 0 and self.passingScore <= 100 "Set a passing score between 0 and 100."
 
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
@@ -49,8 +49,8 @@ entity TrainingModule mixin TenantScoped, SoftDeletable {
     guard self.definedAt == null
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess")
-    constraint defineTrainingModuleName: length(trim(name)) > 0 "Training module name is required"
-    constraint defineTrainingModulePassingScore: passingScore >= 0 and passingScore <= 100 "Passing score must be between 0 and 100"
+    constraint defineTrainingModuleName: length(trim(name)) > 0 "Give this training module a name."
+    constraint defineTrainingModulePassingScore: passingScore >= 0 and passingScore <= 100 "Set a passing score between 0 and 100."
     mutate name = name
     mutate category = category
     mutate passingScore = passingScore
@@ -111,8 +111,8 @@ entity TrainingCompletion mixin TenantScoped, SoftDeletable {
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
   belongsTo trainingModule: TrainingModule fields [tenantId, trainingModuleId] references [tenantId, id]
 
-  constraint trainingCompletionScore: self.assessmentScore >= 0 and self.assessmentScore <= 100 "Assessment score must be between 0 and 100"
-  constraint trainingCompletionComplete: self.recordedAt == null or self.completedAt != null "Recorded training completions require a completion date"
+  constraint trainingCompletionScore: self.assessmentScore >= 0 and self.assessmentScore <= 100 "Give an assessment score between 0 and 100."
+  constraint trainingCompletionComplete: self.recordedAt == null or self.completedAt != null "Give this training completion a date."
 
   default policy trainingCompletionRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may see training completions"
   default policy trainingCompletionWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may update training completions"
@@ -130,10 +130,10 @@ entity TrainingCompletion mixin TenantScoped, SoftDeletable {
     guard self.person != null and self.person.status == "active"
     guard self.trainingModule != null and self.trainingModule.status == "active" and self.trainingModule.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess")
-    constraint recordTrainingPersonMatch: personId == self.personId "Completion person must match the selected staff member"
-    constraint recordTrainingModuleMatch: trainingModuleId == self.trainingModuleId "Completion module must match the selected training module"
-    constraint recordTrainingScoreRange: assessmentScore >= 0 and assessmentScore <= 100 "Assessment score must be between 0 and 100"
-    constraint recordTrainingPassingScore: assessmentScore >= self.trainingModule.passingScore "Assessment score must meet the module passing score"
+    constraint recordTrainingPersonMatch: personId == self.personId "This training completion is for a different person. Pick the staff member already on this training completion."
+    constraint recordTrainingModuleMatch: trainingModuleId == self.trainingModuleId "This training completion is for a different module. Pick the training module already on this completion."
+    constraint recordTrainingScoreRange: assessmentScore >= 0 and assessmentScore <= 100 "Give an assessment score between 0 and 100."
+    constraint recordTrainingPassingScore: assessmentScore >= self.trainingModule.passingScore "This score needs to meet the training module's passing score."
     mutate personId = personId
     mutate trainingModuleId = trainingModuleId
     mutate completedAt = completedAt
@@ -168,7 +168,7 @@ entity ShiftType mixin TenantScoped, SoftDeletable {
 
   belongsTo requiredTrainingModule: TrainingModule fields [tenantId, requiredTrainingModuleId] references [tenantId, id]
 
-  constraint shiftTypeComplete: self.definedAt == null or length(trim(self.name)) > 0 "Defined shift types require a name"
+  constraint shiftTypeComplete: self.definedAt == null or length(trim(self.name)) > 0 "Give this shift type a name."
 
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
@@ -186,7 +186,7 @@ entity ShiftType mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess")
     guard requiredTrainingModuleId == null or (self.requiredTrainingModule != null and self.requiredTrainingModule.status == "active" and self.requiredTrainingModule.deletedAt == null)
-    constraint defineShiftTypeName: length(trim(name)) > 0 "Shift type name is required"
+    constraint defineShiftTypeName: length(trim(name)) > 0 "Give this shift type a name."
     mutate name = name
     mutate description = description
     mutate requiredTrainingModuleId = requiredTrainingModuleId

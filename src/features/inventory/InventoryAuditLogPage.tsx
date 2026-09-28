@@ -243,7 +243,9 @@ export function InventoryAuditLogPage() {
         ) : !selectedItem ? (
           <div className="document-empty">
             <p>Open a stock line first.</p>
-            <span>The audit ledger appears after an InventoryItem exists.</span>
+            <span>
+              The audit ledger appears once this item has a stock line.
+            </span>
           </div>
         ) : newestFirst.length === 0 ? (
           <div className="document-empty">

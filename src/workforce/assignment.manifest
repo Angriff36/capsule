@@ -44,7 +44,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
 
-  constraint assignmentOpenedComplete: self.assignedAt == null or (length(trim(self.role)) > 0 and (self.startsAt == null or self.endsAt == null or self.endsAt > self.startsAt)) "Assigned staffing requires a role and a valid optional shift window"
+  constraint assignmentOpenedComplete: self.assignedAt == null or (length(trim(self.role)) > 0 and (self.startsAt == null or self.endsAt == null or self.endsAt > self.startsAt)) "This assignment needs a role. If it has a start and end, the end has to be after the start."
 
   transition status from "assigned" to ["confirmed", "checked_in", "no_show", "unassigned"]
   transition status from "confirmed" to ["checked_in", "no_show", "unassigned"]
@@ -73,8 +73,8 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
     constraint assignEventMatch: eventId == self.eventId "This assignment is for a different event. Pick the event already on this assignment."
     constraint assignPersonMatch: personId == self.personId "This assignment is for a different person. Pick the person already on this assignment."
-    constraint assignRolePresent: length(trim(role)) > 0 "Assignment role is required"
-    constraint assignShiftDates: startsAt == null or endsAt == null or endsAt > startsAt "Assignment shift end must be after its start"
+    constraint assignRolePresent: length(trim(role)) > 0 "Give this assignment a role."
+    constraint assignShiftDates: startsAt == null or endsAt == null or endsAt > startsAt "This assignment's shift end has to be after its start."
     mutate eventId = eventId
     mutate personId = personId
     mutate role = role
@@ -100,7 +100,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     guard self.status == "assigned" or self.status == "confirmed"
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and followsEventTiming == true and (self.followsEventTiming == true or (self.followsEventTiming == null and self.startsAt == null and self.endsAt == null)) and (roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess"))))
-    constraint planAssignmentDates: startsAt == null or endsAt == null or endsAt > startsAt "Shift end must be after its start"
+    constraint planAssignmentDates: startsAt == null or endsAt == null or endsAt > startsAt "This shift's end has to be after its start."
     mutate startsAt = startsAt
     mutate endsAt = endsAt
     mutate followsEventTiming = followsEventTiming
@@ -281,8 +281,8 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
   ref previousStaffNeed: EventStaffNeed fields [tenantId, previousStaffNeedId] references [tenantId, id]
   ref coverageReplacementPerson: Person fields [tenantId, coverageReplacementPersonId] references [tenantId, id]
 
-  constraint staffNeedRole: self.postedAt == null or length(trim(self.role)) > 0 "Staff need role is required once posted"
-  constraint staffNeedWindow: self.startsAt == null or self.endsAt == null or self.endsAt > self.startsAt "Staff need end must be after its start"
+  constraint staffNeedRole: self.postedAt == null or length(trim(self.role)) > 0 "Give this staffing need a role before you post it."
+  constraint staffNeedWindow: self.startsAt == null or self.endsAt == null or self.endsAt > self.startsAt "This staffing need's end has to be after its start."
 
   transition status from "open" to ["claimed", "filled", "cancelled"]
   transition status from "claimed" to ["filled", "open", "cancelled"]
@@ -307,8 +307,8 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
     guard self.postedAt == null
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
-    constraint postOpenRole: length(trim(role)) > 0 "Staff need role is required"
-    constraint postOpenWindow: startsAt == null or endsAt == null or endsAt > startsAt "Staff need end must be after its start"
+    constraint postOpenRole: length(trim(role)) > 0 "Give this staffing need a role."
+    constraint postOpenWindow: startsAt == null or endsAt == null or endsAt > startsAt "This staffing need's end has to be after its start."
     mutate eventId = eventId
     mutate role = role
     mutate description = description
@@ -332,7 +332,7 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
     guard self.status != "cancelled"
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and followsEventTiming == true and (self.followsEventTiming == true or (self.followsEventTiming == null and self.startsAt == null and self.endsAt == null)) and (roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess"))))
-    constraint planStaffNeedDates: startsAt == null or endsAt == null or endsAt > startsAt "Shift end must be after its start"
+    constraint planStaffNeedDates: startsAt == null or endsAt == null or endsAt > startsAt "This shift's end has to be after its start."
     mutate startsAt = startsAt
     mutate endsAt = endsAt
     mutate followsEventTiming = followsEventTiming
@@ -419,7 +419,7 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
     // Replays must not create another replacement for the same request.
     guard self.coverageContinuedAt == null
     guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
-    constraint changedCoverageWindow: startsAt == null or endsAt == null or endsAt > startsAt "Coverage end must be after its start"
+    constraint changedCoverageWindow: startsAt == null or endsAt == null or endsAt > startsAt "This coverage's end has to be after its start."
     compute wasCancelled = self.status == "cancelled"
     mutate coverageContinuedAt = now()
     mutate coverageReplacementPersonId = personId
@@ -454,7 +454,7 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
     guard self.status == "open" or self.status == "claimed" or self.status == "filled"
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
-    constraint cancelStaffNeedReason: length(trim(reason)) > 0 "Cancel reason is required"
+    constraint cancelStaffNeedReason: length(trim(reason)) > 0 "Say why you're cancelling this staffing need."
     mutate status = "cancelled"
     mutate cancelledAt = now()
     mutate cancellationReason = reason

@@ -106,7 +106,7 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
   constraint uniqueVenueVendor: self.venueId != null and self.vendorId != null and self.category != null "Venue, vendor, and category are required"
   constraint effectiveDateOrder: self.effectiveFrom == null or self.effectiveUntil == null or self.effectiveFrom <= self.effectiveUntil "Effective from must be before effective until"
   constraint discountRange: self.discountPercent == null or (self.discountPercent >= 0 and self.discountPercent <= 100) "Discount percent must be between 0 and 100"
-  constraint positiveMinimum: self.minimumOrder == null or self.minimumOrder >= 0 "Minimum order cannot be negative"
+  constraint positiveMinimum: self.minimumOrder == null or self.minimumOrder >= 0 "Minimum order can't be negative. Use zero or more."
 
   // Status transitions: bidirectional between all states
   transition status from "preferred" to ["approved", "restricted", "banned"]
@@ -143,8 +143,8 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     // made every establish fail. deletedAt is null on create, so its guard
     // still passes.
     guard self.deletedAt == null
-    constraint establishVenue: venueId != null and length(trim(venueId)) > 0 "Venue is required"
-    constraint establishVendor: vendorId != null and length(trim(vendorId)) > 0 "Vendor is required"
+    constraint establishVenue: venueId != null and length(trim(venueId)) > 0 "Pick a venue."
+    constraint establishVendor: vendorId != null and length(trim(vendorId)) > 0 "Pick a vendor."
     mutate venueId = venueId
     mutate vendorId = vendorId
     mutate category = category
@@ -228,7 +228,7 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     reason: string
   ) {
     guard self.deletedAt == null
-    constraint retireReason: length(trim(reason)) > 0 "Retirement reason is required"
+    constraint retireReason: length(trim(reason)) > 0 "Say why you're retiring this."
     mutate deletedAt = now()
     emit VenueVendorRelationshipRetired {
       relationshipId: self.id

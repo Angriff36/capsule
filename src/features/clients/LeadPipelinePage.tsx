@@ -175,7 +175,9 @@ export function LeadPipelinePage() {
     const estimatedValue = amount(data.get("estimatedValue"));
     const probability = amount(data.get("probability"));
     if (!Number.isFinite(estimatedValue) || !Number.isFinite(probability)) {
-      setFailure(new Error("Estimated value and probability must be numbers."));
+      setFailure(
+        new Error("Enter numbers for the estimated value and probability."),
+      );
       return;
     }
     const referralSourceId = optional(data.get("referralSourceId"));
@@ -209,7 +211,9 @@ export function LeadPipelinePage() {
     const estimatedValue = amount(data.get("estimatedValue"));
     const probability = amount(data.get("probability"));
     if (!Number.isFinite(estimatedValue) || !Number.isFinite(probability)) {
-      setFailure(new Error("Estimated value and probability must be numbers."));
+      setFailure(
+        new Error("Enter numbers for the estimated value and probability."),
+      );
       return;
     }
     void run(`${lead._id}:pipeline`, async () => {
@@ -284,7 +288,9 @@ export function LeadPipelinePage() {
     }
     const proposalValue = amount(data.get("proposalValue"));
     if (!Number.isFinite(proposalValue) || proposalValue < 0) {
-      setFailure(new Error("Proposal value must be a non-negative number."));
+      setFailure(
+        new Error("This proposal's value can't be negative. Use zero or more."),
+      );
       return;
     }
     void run(`${lead._id}:proposal`, async () => {

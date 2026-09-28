@@ -62,11 +62,14 @@ describe("plain words on leftover facilities equipment manifests", () => {
     expect(visible).not.toContain(
       "Equipment reservations require a valid date range and positive quantity",
     );
-    expect(visible).toContain(
+    expect(visible).not.toContain(
       "Equipment handoffs require a valid date range and positive quantity",
     );
+    expect(visible).toContain(
+      "This equipment handoff needs a valid date range and a quantity more than zero.",
+    );
     expectPlain(
-      "Equipment handoffs require a valid date range and positive quantity",
+      "This equipment handoff needs a valid date range and a quantity more than zero.",
     );
 
     // already-landed write/read leftovers must stay put
@@ -80,7 +83,44 @@ describe("plain words on leftover facilities equipment manifests", () => {
       "Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event",
     );
 
-    // later leftover, unchanged
-    expect(visible).toContain("Equipment quantity cannot be negative");
+    // negative amount on hand now reads in plain words
+    expect(visible).not.toContain("Equipment quantity cannot be negative");
+    expect(visible).toContain(
+      "This equipment's amount on hand can't be negative. Use zero or more.",
+    );
+
+    // negative purchase value now reads in plain words
+    expect(visible).not.toContain("Purchase value cannot be negative");
+    expect(visible).toContain(
+      "This equipment's purchase value can't be negative. Use zero or more.",
+    );
+
+    // zero or negative amount at register now reads in plain words
+    expect(visible).not.toContain("Quantity must be positive");
+    expect(visible).toContain(
+      "This equipment's amount has to be more than zero. Enter how many you have.",
+    );
+
+    // blank equipment name at register/reviseDetails now reads in plain words
+    expect(visible).not.toContain("Equipment name is required");
+    expect(visible).toContain("Give this equipment a name.");
+
+    // blank asset tag / category at register/reviseDetails now read in plain words
+    expect(visible).not.toContain("Asset tag is required");
+    expect(visible).not.toContain("Category is required");
+    expect(visible).toContain("Give this equipment its tag number.");
+    expect(visible).toContain("Pick what kind of equipment this is.");
+
+    // blank retire reason now reads in plain words
+    expect(visible).not.toContain("Retirement reason is required");
+    expect(visible).toContain("Say why you're retiring this equipment.");
+
+    // out-of-service checkout refusal now reads in plain words
+    expect(visible).not.toContain(
+      "Equipment marked out of service cannot be checked out",
+    );
+    expect(visible).toContain(
+      "This equipment is marked out of service, so it can't be checked out. Pick other equipment.",
+    );
   });
 });

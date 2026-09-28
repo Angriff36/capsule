@@ -49,11 +49,11 @@ entity ServiceStyleKitItem mixin TenantScoped, SoftDeletable {
 
   belongsTo serviceStyle: ServiceStyle fields [tenantId, serviceStyleId] references [tenantId, id]
 
-  constraint kitItemDescription: self.addedAt == null or length(trim(self.description)) > 0 "Kit line description is required"
-  constraint kitItemBase: self.baseQuantity >= 0 "Base quantity cannot be negative"
+  constraint kitItemDescription: self.addedAt == null or length(trim(self.description)) > 0 "Give this kit line a description."
+  constraint kitItemBase: self.baseQuantity >= 0 "Base quantity can't be negative. Use zero or more."
   constraint kitItemPerGuests: self.guestsPerUnit == null or self.guestsPerUnit >= 1 "Guests per unit must be at least 1"
   constraint kitItemQuantity: self.addedAt == null or self.baseQuantity > 0 or self.guestsPerUnit != null "A kit line needs a base quantity or a guests-per-unit rule"
-  constraint kitItemSort: self.sortOrder >= 0 "Sort order cannot be negative"
+  constraint kitItemSort: self.sortOrder >= 0 "Sort order can't be negative. Use zero or more."
 
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
@@ -77,7 +77,7 @@ entity ServiceStyleKitItem mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     // The relation resolves inside the caller's workspace only.
     guard self.serviceStyle != null and self.serviceStyle.deletedAt == null
-    constraint addKitItemDescription: length(trim(description)) > 0 "Kit line description is required"
+    constraint addKitItemDescription: length(trim(description)) > 0 "Give this kit line a description."
     mutate serviceStyleId = serviceStyleId
     mutate activeServiceStyleId = serviceStyleId
     mutate activeKitKey = self.tenantId + ":" + serviceStyleId
@@ -106,7 +106,7 @@ entity ServiceStyleKitItem mixin TenantScoped, SoftDeletable {
   ) {
     guard self.addedAt != null
     guard self.deletedAt == null
-    constraint reviseKitItemDescription: length(trim(description)) > 0 "Kit line description is required"
+    constraint reviseKitItemDescription: length(trim(description)) > 0 "Give this kit line a description."
     mutate description = description
     mutate baseQuantity = baseQuantity
     mutate guestsPerUnit = guestsPerUnit

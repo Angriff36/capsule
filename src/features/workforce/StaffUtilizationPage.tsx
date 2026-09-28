@@ -300,7 +300,7 @@ export function StaffUtilizationDashboard({
 
       {!rangeIsValid ? (
         <div className="staff-utilization-range-error" role="alert">
-          The reporting end date must be on or after the start date.
+          The reporting end date has to be on or after the start date.
         </div>
       ) : loading ? (
         <section className="staff-utilization-panel">
@@ -408,7 +408,7 @@ export function StaffUtilizationDashboard({
                           <strong>{row.personName}</strong>
                           <small>
                             {row.shiftCount} committed shifts ·{" "}
-                            {row.confirmedRecordCount} confirmed records
+                            {row.confirmedRecordCount} confirmed time entries
                           </small>
                         </td>
                         <td>{formatHours(row.scheduledHours)}</td>

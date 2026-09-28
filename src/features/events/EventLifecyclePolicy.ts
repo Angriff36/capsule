@@ -68,7 +68,7 @@ const ACTIONS: ReadonlyArray<
     // (eventAccess, EventExecutionStarted). Neither freezes on unfinished
     // prep/pack/delivery — readiness is a projection, not a gate.
     key: "confirmSalesLock",
-    label: "Confirm sales lock & start execution",
+    label: "Confirm sales lock & start the event",
     kind: "primary",
     lifecycle: EventConfirmSalesLockLifecycle,
   },
@@ -80,7 +80,7 @@ const ACTIONS: ReadonlyArray<
   },
   {
     key: "beginExecution",
-    label: "Begin execution",
+    label: "Start the event",
     kind: "primary",
     lifecycle: EventBeginExecutionLifecycle,
   },

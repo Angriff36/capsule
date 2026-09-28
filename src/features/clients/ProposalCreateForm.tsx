@@ -385,7 +385,9 @@ export function ProposalCreateForm({
       taxAmount: draftTax,
     });
     if (pricing.total < 0) {
-      onFailure(new Error("Total cannot be negative."));
+      onFailure(
+        new Error("This proposal's total can't be negative. Use zero or more."),
+      );
       return;
     }
     void run("draft-proposal", async () => {

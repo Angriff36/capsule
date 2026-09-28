@@ -134,7 +134,7 @@ export function PackListItemTable({
                     <small className="block">Dish unavailable</small>
                   )
                 ) : packingAssociationMissing(item.description) ? (
-                  <small className="block">Association not recorded</small>
+                  <small className="block">No link on file</small>
                 ) : null}
                 {item.note ? (
                   <small className="block">Note: {item.note}</small>

@@ -27,8 +27,8 @@ entity VenueRoom mixin TenantScoped, SoftDeletable {
 
   belongsTo venue: Venue fields [tenantId, venueId] references [tenantId, id]
 
-  constraint venueRoomName: self.addedAt == null or length(trim(self.name)) > 0 "Room name is required"
-  constraint venueRoomCapacity: self.capacity >= 0 "Room capacity cannot be negative"
+  constraint venueRoomName: self.addedAt == null or length(trim(self.name)) > 0 "Give this room a name."
+  constraint venueRoomCapacity: self.capacity >= 0 "Room capacity can't be negative. Use zero or more."
 
   default policy venueRoomRead read: roleAllows(user.role, "eventAccess") "Event staff may see venue rooms"
   default policy venueRoomWrite write: roleAllows(user.role, "eventAccess") "Event staff may update venue rooms"
@@ -45,8 +45,8 @@ entity VenueRoom mixin TenantScoped, SoftDeletable {
     guard self.addedAt == null
     guard self.deletedAt == null
     guard user.id != null
-    constraint addVenueRoomName: length(trim(name)) > 0 "Room name is required"
-    constraint addVenueRoomCapacity: capacity >= 0 "Room capacity cannot be negative"
+    constraint addVenueRoomName: length(trim(name)) > 0 "Give this room a name."
+    constraint addVenueRoomCapacity: capacity >= 0 "Room capacity can't be negative. Use zero or more."
     mutate venueId = venueId
     mutate name = name
     mutate roomType = roomType
@@ -74,8 +74,8 @@ entity VenueRoom mixin TenantScoped, SoftDeletable {
     guard self.addedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    constraint reviseVenueRoomName: length(trim(name)) > 0 "Room name is required"
-    constraint reviseVenueRoomCapacity: capacity >= 0 "Room capacity cannot be negative"
+    constraint reviseVenueRoomName: length(trim(name)) > 0 "Give this room a name."
+    constraint reviseVenueRoomCapacity: capacity >= 0 "Room capacity can't be negative. Use zero or more."
     mutate name = name
     mutate roomType = roomType
     mutate capacity = capacity

@@ -16,6 +16,7 @@ import {
   TableSkeleton,
 } from "../../ui/primitives";
 import { formatDate } from "../../lib/format";
+import { StaffPayRatesSection } from "./StaffPayRatesSection";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -192,6 +193,8 @@ export function StaffOverviewPage() {
           </ul>
         )}
       </Section>
+
+      <StaffPayRatesSection people={people} />
     </div>
   );
 }

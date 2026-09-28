@@ -10,6 +10,10 @@ import {
   type QueryCtx,
 } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
+import {
+  connectedAccountHeaders,
+  requireConnectedAccountId,
+} from "./invoicePayments";
 import { decrypt } from "./lib/encryption";
 import {
   buildInvoiceReminderPdf,
@@ -483,6 +487,7 @@ export const configureSchedule = action({
         "Add an email to the client account or an active billing contact before enabling reminders.",
       );
     }
+    await requireConnectedAccountId(ctx, invoice.tenantId);
 
     const offsetsDays = normalizeInvoiceReminderOffsets(args.offsetsDays);
     const schedule: ScheduleRecord = {
@@ -522,10 +527,11 @@ function assertScheduledAttemptCurrent(
 async function stripeSessionPaid(
   sessionId: string,
   stripeSecretKey: string,
+  connectedAccountId: string,
 ): Promise<boolean> {
   const response = await fetch(
     `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
-    { headers: { Authorization: `Bearer ${stripeSecretKey}` } },
+    { headers: connectedAccountHeaders(stripeSecretKey, connectedAccountId) },
   );
   if (response.status === 404) return false;
   if (!response.ok) {
@@ -544,6 +550,7 @@ async function createStripeSession(
   context: DeliveryContext,
   attempt: DeliveryAttempt,
   environment: ProviderEnvironment,
+  connectedAccountId: string,
 ): Promise<{ sessionId: string; url: string }> {
   if (!context.recipient)
     throw new Error("Invoice recipient email is missing.");
@@ -574,7 +581,10 @@ async function createStripeSession(
   const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${environment.stripeSecretKey}`,
+      ...connectedAccountHeaders(
+        environment.stripeSecretKey,
+        connectedAccountId,
+      ),
       "Content-Type": "application/x-www-form-urlencoded",
       "Idempotency-Key": `invoice-reminder/${context.invoice._id}/${attempt.configId}/${attempt.offsetDays}`,
     },
@@ -749,13 +759,25 @@ async function deliverReminder(
   if (wasDelivered(context.ledger, attempt.configId, attempt.offsetDays)) {
     return { status: "already_delivered" };
   }
+  // Reminder payment links charge the caterer Stripe account (issue #112),
+  // the same account the invoice payment sync reads them from.
+  const connectedAccountId = await requireConnectedAccountId(
+    ctx,
+    attempt.tenantId,
+  );
 
   const sessions = paymentSessions(context.ledger);
   const uniqueSessionIds = [
     ...new Set(sessions.slice(0, 24).map((session) => session.sessionId)),
   ];
   for (const sessionId of uniqueSessionIds) {
-    if (await stripeSessionPaid(sessionId, environment.stripeSecretKey)) {
+    if (
+      await stripeSessionPaid(
+        sessionId,
+        environment.stripeSecretKey,
+        connectedAccountId,
+      )
+    ) {
       return { status: "suppressed", reason: "stripe_payment_received" };
     }
   }
@@ -766,7 +788,12 @@ async function deliverReminder(
       session.offsetDays === attempt.offsetDays,
   );
   if (!currentSession) {
-    const created = await createStripeSession(context, attempt, environment);
+    const created = await createStripeSession(
+      context,
+      attempt,
+      environment,
+      connectedAccountId,
+    );
     currentSession = {
       configId: attempt.configId,
       offsetDays: attempt.offsetDays,

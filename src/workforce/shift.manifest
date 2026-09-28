@@ -54,7 +54,7 @@ entity Shift mixin TenantScoped, SoftDeletable {
   ref swapTargetQualification: Qualification fields [tenantId, swapTargetQualificationId] references [tenantId, id]
   ref swapTargetTrainingCompletion: TrainingCompletion fields [tenantId, swapTargetTrainingCompletionId] references [tenantId, id]
 
-  constraint shiftScheduledComplete: self.scheduledAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt) "Scheduled shifts require a valid start/end range"
+  constraint shiftScheduledComplete: self.scheduledAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt) "Give this shift a start and end, with the end after the start."
 
   transition status from "scheduled" to ["started", "cancelled", "no_show"]
   transition status from "started" to ["completed", "cancelled", "no_show"]
@@ -86,14 +86,14 @@ entity Shift mixin TenantScoped, SoftDeletable {
     constraint schedulePersonMatch: personId == self.personId "This shift is for a different person. Pick the person already on this shift."
     constraint scheduleEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "This shift is for a different event. Pick the event already on this shift."
     constraint scheduleEventPresent: (eventId == null and self.eventId == null) or (self.event != null and self.event.deletedAt == null) "Select an event in this workspace"
-    constraint scheduleDates: endsAt > startsAt "Shift end must be after its start"
-    constraint scheduleShiftTypeActive: shiftTypeId == null or (self.shiftType != null and self.shiftType.deletedAt == null and self.shiftType.status == "active") "Selected shift type must be active"
-    constraint scheduleTrainingProofRequired: shiftTypeId == null or self.shiftType == null or self.shiftType.requiredTrainingModuleId == null or requiredTrainingCompletionId != null "This shift type requires completed training before scheduling"
-    constraint scheduleTrainingProofPersonMatch: requiredTrainingCompletionId == null or (self.requiredTrainingCompletion != null and self.requiredTrainingCompletion.deletedAt == null and self.requiredTrainingCompletion.recordedAt != null and self.requiredTrainingCompletion.personId == personId) "Training completion must be recorded for the selected person"
-    constraint scheduleTrainingProofModuleMatch: requiredTrainingCompletionId == null or (self.shiftType != null and self.shiftType.requiredTrainingModuleId != null and self.requiredTrainingCompletion != null and self.requiredTrainingCompletion.trainingModuleId == self.shiftType.requiredTrainingModuleId) "Training completion must match the module required by the shift type"
-    constraint scheduleQualificationPersonMatch: requiredQualificationId == null or (self.requiredQualification != null and self.requiredQualification.personId == personId) "Required certification must belong to the selected person"
-    constraint scheduleQualificationActive: requiredQualificationId == null or (self.requiredQualification != null and self.requiredQualification.deletedAt == null and self.requiredQualification.status == "active") "Required certification must be active"
-    constraint scheduleQualificationValidity: requiredQualificationId == null or (self.requiredQualification != null and (self.requiredQualification.expiresAt == null or self.requiredQualification.expiresAt >= endsAt)) "Required certification must remain valid through the shift"
+    constraint scheduleDates: endsAt > startsAt "This shift's end has to be after its start."
+    constraint scheduleShiftTypeActive: shiftTypeId == null or (self.shiftType != null and self.shiftType.deletedAt == null and self.shiftType.status == "active") "Pick a shift type that's still active."
+    constraint scheduleTrainingProofRequired: shiftTypeId == null or self.shiftType == null or self.shiftType.requiredTrainingModuleId == null or requiredTrainingCompletionId != null "This shift type needs proof of training before you can schedule someone for it."
+    constraint scheduleTrainingProofPersonMatch: requiredTrainingCompletionId == null or (self.requiredTrainingCompletion != null and self.requiredTrainingCompletion.deletedAt == null and self.requiredTrainingCompletion.recordedAt != null and self.requiredTrainingCompletion.personId == personId) "This training needs to be on file for the selected person."
+    constraint scheduleTrainingProofModuleMatch: requiredTrainingCompletionId == null or (self.shiftType != null and self.shiftType.requiredTrainingModuleId != null and self.requiredTrainingCompletion != null and self.requiredTrainingCompletion.trainingModuleId == self.shiftType.requiredTrainingModuleId) "This training has to match what the shift type requires."
+    constraint scheduleQualificationPersonMatch: requiredQualificationId == null or (self.requiredQualification != null and self.requiredQualification.personId == personId) "This certification has to belong to the selected person."
+    constraint scheduleQualificationActive: requiredQualificationId == null or (self.requiredQualification != null and self.requiredQualification.deletedAt == null and self.requiredQualification.status == "active") "Pick a certification that's still active."
+    constraint scheduleQualificationValidity: requiredQualificationId == null or (self.requiredQualification != null and (self.requiredQualification.expiresAt == null or self.requiredQualification.expiresAt >= endsAt)) "Pick a certification that stays valid through the whole shift."
     // Approved time-off overlap is read by the transactional ShiftScheduled
     // callback for every generated command path (projection collection gap #75).
     mutate personId = personId
@@ -130,7 +130,7 @@ entity Shift mixin TenantScoped, SoftDeletable {
     guard self.status == "scheduled"
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess") or (self.eventId != null and roleAllows(user.role, "workforceSelfAccess") and (roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess")))
-    constraint planShiftDates: startsAt == null or endsAt == null or endsAt > startsAt "Shift end must be after its start"
+    constraint planShiftDates: startsAt == null or endsAt == null or endsAt > startsAt "This shift's end has to be after its start."
     mutate startsAt = startsAt
     mutate endsAt = endsAt
     mutate scheduledAt = startsAt != null and endsAt != null ? (self.scheduledAt != null ? self.scheduledAt : now()) : null
@@ -188,7 +188,7 @@ entity Shift mixin TenantScoped, SoftDeletable {
     guard self.status == "scheduled"
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess") or (self.eventId != null and roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
-    constraint rescheduleShiftDates: endsAt > startsAt "Shift end must be after its start"
+    constraint rescheduleShiftDates: endsAt > startsAt "This shift's end has to be after its start."
     mutate startsAt = startsAt
     mutate endsAt = endsAt
     mutate scheduledAt = self.scheduledAt != null ? self.scheduledAt : now()
@@ -248,7 +248,7 @@ entity Shift mixin TenantScoped, SoftDeletable {
     guard self.status == "scheduled" or self.status == "started"
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess") or (self.eventId != null and roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
-    constraint cancelShiftReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancelShiftReason: length(trim(reason)) > 0 "Say why you're cancelling this shift."
     compute previousStatus = self.status
     mutate status = "cancelled"
     mutate cancelledAt = now()
@@ -319,11 +319,11 @@ entity Shift mixin TenantScoped, SoftDeletable {
     guard self.swapTargetPerson.authSubjectId != null
     guard self.swapTargetQualificationId == null or (self.swapTargetQualification != null and self.swapTargetQualification.deletedAt == null and self.swapTargetQualification.status == "active")
     guard self.swapTargetTrainingCompletionId == null or (self.swapTargetTrainingCompletion != null and self.swapTargetTrainingCompletion.deletedAt == null and self.swapTargetTrainingCompletion.recordedAt != null)
-    constraint applySwapAuthorizationSource: self.swapAuthorization.requesterPersonId == self.personId "Swap approval does not match the assigned staff member"
-    constraint applySwapAuthorizationTarget: self.swapAuthorization.recipientPersonId == self.swapTargetPersonId "Swap approval does not match the recipient"
+    constraint applySwapAuthorizationSource: self.swapAuthorization.requesterPersonId == self.personId "This swap approval doesn't match the staff member assigned to this shift."
+    constraint applySwapAuthorizationTarget: self.swapAuthorization.recipientPersonId == self.swapTargetPersonId "This swap approval doesn't match the person receiving the shift."
     constraint applySwapQualificationSnapshot: self.swapAuthorization.sourceQualificationId == self.requiredQualificationId "The shift certification requirement changed after approval"
-    constraint applySwapQualificationTarget: self.swapAuthorization.targetQualificationId == self.swapTargetQualificationId "Swap approval does not match the replacement certification"
-    constraint applySwapTrainingTarget: self.swapAuthorization.targetTrainingCompletionId == self.swapTargetTrainingCompletionId "Swap approval does not match the recipient training proof"
+    constraint applySwapQualificationTarget: self.swapAuthorization.targetQualificationId == self.swapTargetQualificationId "This swap approval doesn't match the new certification."
+    constraint applySwapTrainingTarget: self.swapAuthorization.targetTrainingCompletionId == self.swapTargetTrainingCompletionId "This swap approval doesn't match the new person's training."
     compute previousPersonId = self.personId
     compute shiftSwapRequestId = self.swapAuthorizationId
     mutate personId = self.swapTargetPersonId
@@ -377,9 +377,9 @@ entity WeeklyScheduleNotice mixin TenantScoped, SoftDeletable {
 
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
 
-  constraint weeklyScheduleWindowValid: self.weekEndsAt > self.weekStartsAt "Work week end must be after its start"
-  constraint weeklyScheduleHasShifts: self.publishedAt == null or self.shiftCount > 0 "Published schedules require at least one shift"
-  constraint weeklyScheduleHasSummary: self.publishedAt == null or length(trim(self.shiftSummary)) > 0 "Published schedules require a staff summary"
+  constraint weeklyScheduleWindowValid: self.weekEndsAt > self.weekStartsAt "This work week's end has to be after its start."
+  constraint weeklyScheduleHasShifts: self.publishedAt == null or self.shiftCount > 0 "Add at least one shift before you publish this schedule."
+  constraint weeklyScheduleHasSummary: self.publishedAt == null or length(trim(self.shiftSummary)) > 0 "Add a staff summary before you publish this schedule."
 
   default policy weeklyScheduleNoticeRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may see schedule notices"
   default policy weeklyScheduleNoticeWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may update schedule notices"
@@ -398,9 +398,9 @@ entity WeeklyScheduleNotice mixin TenantScoped, SoftDeletable {
     guard self.person != null
     guard roleAllows(user.role, "workforceManageAccess")
     constraint publishSchedulePersonMatch: personId == self.personId "This schedule notice is for a different person. Pick the person already on this schedule notice."
-    constraint publishScheduleWindow: weekEndsAt > weekStartsAt "Work week end must be after its start"
-    constraint publishScheduleShiftCount: shiftCount > 0 "Publish requires at least one scheduled shift"
-    constraint publishScheduleSummary: length(trim(shiftSummary)) > 0 "Publish requires a shift summary"
+    constraint publishScheduleWindow: weekEndsAt > weekStartsAt "This work week's end has to be after its start."
+    constraint publishScheduleShiftCount: shiftCount > 0 "Add at least one scheduled shift before you publish."
+    constraint publishScheduleSummary: length(trim(shiftSummary)) > 0 "Add a shift summary before you publish."
     mutate personId = personId
     mutate recipientAuthSubjectId = recipientAuthSubjectId
     mutate weekStartsAt = weekStartsAt
@@ -427,8 +427,8 @@ entity WeeklyScheduleNotice mixin TenantScoped, SoftDeletable {
     guard self.publishedAt != null
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess")
-    constraint republishScheduleShiftCount: shiftCount > 0 "Publish requires at least one scheduled shift"
-    constraint republishScheduleSummary: length(trim(shiftSummary)) > 0 "Publish requires a shift summary"
+    constraint republishScheduleShiftCount: shiftCount > 0 "Add at least one scheduled shift before you publish."
+    constraint republishScheduleSummary: length(trim(shiftSummary)) > 0 "Add a shift summary before you publish."
     mutate recipientAuthSubjectId = recipientAuthSubjectId
     mutate shiftCount = shiftCount
     mutate shiftSummary = shiftSummary

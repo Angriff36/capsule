@@ -40,7 +40,7 @@ export const setEmployeeNumber = mutation({
     }
     const employeeNumber = args.employeeNumber.trim();
     if (!employeeNumber) {
-      throw new Error("Employee number is required.");
+      throw new Error("Enter an employee number.");
     }
     const stored = await ctx.db.get(args.docId);
     if (!stored || String(stored.tenantId) !== auth.tenantId) {

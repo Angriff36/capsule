@@ -177,7 +177,7 @@ function SavedReportsPage() {
       if (!values) return;
       const name = String(values.name || "").trim();
       if (!name) {
-        setFailure(new Error("Report name is required."));
+        setFailure(new Error("Give this report a name."));
         return;
       }
       void run(`${row._id}:rename`, async () => {
@@ -254,7 +254,7 @@ function SavedReportsPage() {
           <h1 className="display-title">Live reports</h1>
           <p className="mt-3 max-w-160 text-ink-2">
             Saved views of current Capsule operations. Open a report to see live
-            KPIs, a chart, and the source records behind every number.
+            KPIs, a chart, and the source rows behind every number.
           </p>
         </div>
         <div className="supply-row-actions">

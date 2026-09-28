@@ -113,7 +113,11 @@ export function PaymentsPage() {
       return;
     }
     if (!(amount > 0)) {
-      setFailure(new Error("Payment amount must be positive."));
+      setFailure(
+        new Error(
+          "This payment's amount has to be more than zero. Enter how much was paid.",
+        ),
+      );
       return;
     }
     if (
@@ -140,7 +144,7 @@ export function PaymentsPage() {
       form.reset();
       setSelectedInvoiceId("");
       setShowRecord(false);
-      setNotice("Payment recorded. Settle it to apply the balance.");
+      setNotice("Payment added. Settle it to apply the balance.");
     });
   };
 
@@ -198,8 +202,8 @@ export function PaymentsPage() {
           <p className="eyebrow">Finance · Payments</p>
           <h1 className="display-title mt-2">Payment collection</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Record a payment against a sent invoice, then settle it so the
-            invoice balance applies automatically.
+            Add a payment against a sent invoice, then settle it so the invoice
+            balance applies automatically.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -215,7 +219,7 @@ export function PaymentsPage() {
             type="button"
             onClick={() => setShowRecord((value) => !value)}
           >
-            {showRecord ? "Close form" : "Record payment"}
+            {showRecord ? "Close form" : "Add payment"}
           </button>
         </div>
       </header>
@@ -232,7 +236,7 @@ export function PaymentsPage() {
         <form className="supply-form" onSubmit={submitRecord}>
           <div className="supply-form-heading">
             <div>
-              <p className="eyebrow">Record</p>
+              <p className="eyebrow">Payment</p>
               <h2>New payment</h2>
             </div>
           </div>
@@ -331,7 +335,7 @@ export function PaymentsPage() {
                   type="submit"
                   disabled={busy != null}
                 >
-                  {busy === "record-payment" ? "Recording…" : "Record payment"}
+                  {busy === "record-payment" ? "Adding…" : "Add payment"}
                 </button>
               </div>
             </>
@@ -371,19 +375,19 @@ export function PaymentsPage() {
                   className="btn btn-ghost btn-sm"
                   onClick={() => setShowRecord(true)}
                 >
-                  Record payment
+                  Add payment
                 </button>
               </div>
             ) : (
               <>
-                <span>Record a payment after an invoice is sent.</span>
+                <span>Add a payment after an invoice is sent.</span>
                 <div className="mt-3 flex justify-center">
                   <button
                     type="button"
                     className="btn btn-primary btn-sm"
                     onClick={() => setShowRecord(true)}
                   >
-                    Record payment
+                    Add payment
                   </button>
                 </div>
               </>

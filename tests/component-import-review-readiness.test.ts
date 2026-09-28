@@ -192,7 +192,7 @@ describe("finalization readiness", () => {
     const confirmed = confirmAllAsNew(review);
 
     await expect(finalizer.finalize(confirmed)).rejects.toThrow(
-      /yield unit is required/i,
+      /pick a unit for this recipe's yield/i,
     );
     expect(calls).toEqual([]);
   });

@@ -79,9 +79,9 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   // intentionally the edge entity's first PrepTask relation for Convex inverse hydration.
   hasMany incomingDependencies: PrepTaskDependency
 
-  constraint prepNameComplete: self.claimedAt == null or length(trim(self.name)) > 0 "Prep tasks require a name once opened"
-  constraint prepQuantityPositive: self.claimedAt == null or self.quantity >= 0 "Prep quantity cannot be negative"
-  constraint prepCompletedNonnegative: self.completedQuantity == null or self.completedQuantity >= 0 "Completed quantity cannot be negative"
+  constraint prepNameComplete: self.claimedAt == null or length(trim(self.name)) > 0 "Give this prep task a name."
+  constraint prepQuantityPositive: self.claimedAt == null or self.quantity >= 0 "This task's amount can't be negative. Use zero or more."
+  constraint prepCompletedNonnegative: self.completedQuantity == null or self.completedQuantity >= 0 "The completed amount can't be negative. Use zero or more."
 
   transition status from "pending" to ["claimed", "blocked", "cancelled"]
   transition status from "claimed" to ["in_progress", "pending", "blocked", "cancelled"]
@@ -122,11 +122,11 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     // eventDishId + eventId are command params so createViaOpen can seed both parents.
     guard self.eventDishId != null
     guard self.eventId != null
-    constraint openEventDishMatch: eventDishId == self.eventDishId "Open eventDishId must match the seeded event dish reference"
-    constraint openEventMatch: eventId == self.eventId "Open eventId must match the seeded event reference"
-    constraint openEventAlign: self.eventDish == null or eventId == self.eventDish.eventId "PrepTask eventId must match EventDish.eventId"
-    constraint openNameRequired: length(trim(name)) > 0 "Prep task name is required"
-    constraint openQuantityPositive: quantity >= 0 "Prep quantity cannot be negative"
+    constraint openEventDishMatch: eventDishId == self.eventDishId "This prep task is for a different menu line. Pick the menu line already on this task."
+    constraint openEventMatch: eventId == self.eventId "This prep task is for a different event. Pick the event already on this task."
+    constraint openEventAlign: self.eventDish == null or eventId == self.eventDish.eventId "This prep task's event doesn't match its menu line's event."
+    constraint openNameRequired: length(trim(name)) > 0 "Give this prep task a name."
+    constraint openQuantityPositive: quantity >= 0 "This task's amount can't be negative. Use zero or more."
     mutate eventDishId = eventDishId
     mutate eventId = eventId
     // An event-specific override keeps its own name and notes across replays.
@@ -187,8 +187,8 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   ) {
     guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress" or self.status == "blocked"
     guard self.deletedAt == null
-    constraint reviseNamePresent: name == null or length(trim(name)) > 0 "Prep task name cannot be blank"
-    constraint reviseQuantityPositive: quantity == null or quantity > 0 "Prep quantity must be positive"
+    constraint reviseNamePresent: name == null or length(trim(name)) > 0 "Give this prep task a name."
+    constraint reviseQuantityPositive: quantity == null or quantity > 0 "Enter an amount more than zero for this prep task."
     mutate name = name != null ? name : self.name
     mutate quantity = quantity != null ? quantity : self.quantity
     mutate unit = unit != null ? unit : self.unit
@@ -220,7 +220,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "pending"
     guard self.deletedAt == null
     guard self.isGenerated == true
-    constraint refreshQuantityPositive: quantity >= 0 "Generated prep task quantity cannot be negative"
+    constraint refreshQuantityPositive: quantity >= 0 "This task's amount can't be negative. Use zero or more."
     mutate quantity = quantity
     mutate unit = unit != null ? unit : self.unit
     mutate specialInstructions = specialInstructions != null ? specialInstructions : self.specialInstructions
@@ -311,7 +311,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint linkRecipeTask: self.dishTaskId == null or self.dishTaskId == dishTaskId "Prep already belongs to a different recipe step"
     constraint linkRecipeDish: self.dishId == null or self.dishId == dishId "Prep already belongs to a different dish"
-    constraint linkRecipeEventDish: self.eventDish == null or self.eventDish.dishId == dishId "Recipe dish must match the event menu line"
+    constraint linkRecipeEventDish: self.eventDish == null or self.eventDish.dishId == dishId "This recipe's dish doesn't match this event's menu line."
     constraint linkRecipeComponent: self.componentId == null or self.componentId == componentId "Prep already belongs to a different component"
     mutate dishTaskId = dishTaskId
     mutate dishId = dishId
@@ -331,8 +331,8 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   command markOverride(overrideOfDishTaskId: uuid, reason: string, optional name: string, optional specialInstructions: string) {
     guard self.deletedAt == null
     guard self.status == "pending" or self.status == "claimed" or self.status == "blocked"
-    constraint overrideReasonPresent: length(trim(reason)) > 0 "Override reason is required"
-    constraint overrideNamePresent: name == null or length(trim(name)) > 0 "Prep task name cannot be blank"
+    constraint overrideReasonPresent: length(trim(reason)) > 0 "Say why you're overriding this."
+    constraint overrideNamePresent: name == null or length(trim(name)) > 0 "Give this prep task a name."
     mutate overrideOfDishTaskId = overrideOfDishTaskId
     mutate overrideReason = reason
     mutate name = name != null ? name : self.name
@@ -361,8 +361,8 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   command resolveChoice(choice: string) {
     guard self.deletedAt == null
     guard self.resolution == "choice_pending"
-    constraint choicePresent: length(trim(choice)) > 0 "A choice is required"
-    constraint choiceListed: self.choiceOptions == null or self.choiceOptions contains choice "Choice must be one of the listed options"
+    constraint choicePresent: length(trim(choice)) > 0 "Pick a choice."
+    constraint choiceListed: self.choiceOptions == null or self.choiceOptions contains choice "Pick one of the listed choices."
     mutate chosenOption = choice
     mutate resolution = "resolved"
     emit PrepTaskChoiceResolved {
@@ -379,7 +379,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.resolution == null or self.resolution != "choice_pending"
     guard self.deletedAt == null
     guard user.personId != null
-    constraint claimQuantityReady: self.quantity > 0 "Prep quantity must be positive before claim"
+    constraint claimQuantityReady: self.quantity > 0 "This task needs an amount more than zero before you can claim it."
     compute previousStatus = self.status
     // user.id is the IdP subject; this field is a Person reference
     // (belongsTo ... references [tenantId, id]). Writing user.id here stored a
@@ -413,7 +413,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress" or self.status == "blocked"
     guard self.deletedAt == null
     guard personId != null
-    constraint assignQuantityReady: self.quantity > 0 "Prep quantity must be positive before assign"
+    constraint assignQuantityReady: self.quantity > 0 "This task needs an amount more than zero before you can assign it."
     compute previousStatus = self.status
     compute previousAssignee = self.assignedToId
     compute nextStatus = self.status == "in_progress" ? "in_progress" : (self.status == "blocked" ? "blocked" : "claimed")
@@ -465,7 +465,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.claimedAt != null
     guard self.assignedToId != null
     guard self.deletedAt == null
-    constraint startPredecessorsComplete: count_of(self.incomingDependencies, (dependency) => dependency.isSatisfied == false) == 0 "Required predecessor prep tasks must be complete before this task can start"
+    constraint startPredecessorsComplete: count_of(self.incomingDependencies, (dependency) => dependency.isSatisfied == false) == 0 "Finish the prep tasks this one depends on before you start it."
     compute previousStatus = self.status
     mutate status = "in_progress"
     mutate startedAt = now()
@@ -487,7 +487,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "in_progress"
     guard self.startedAt != null
     guard self.deletedAt == null
-    constraint completeQuantityNonnegative: completedQuantity == null or completedQuantity >= 0 "Completed quantity cannot be negative"
+    constraint completeQuantityNonnegative: completedQuantity == null or completedQuantity >= 0 "The completed amount can't be negative. Use zero or more."
     compute previousStatus = self.status
     compute nextCompleted = completedQuantity != null ? completedQuantity : self.quantity
     mutate completedQuantity = nextCompleted
@@ -512,7 +512,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenLeadAccess")
-    constraint blockReasonRequired: length(trim(reason)) > 0 "Block reason is required"
+    constraint blockReasonRequired: length(trim(reason)) > 0 "Say why you're blocking this."
     compute previousStatus = self.status
     mutate status = "blocked"
     mutate blockedAt = now()
@@ -563,7 +563,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress" or self.status == "blocked"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenLeadAccess")
-    constraint cancelPrepReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancelPrepReason: length(trim(reason)) > 0 "Say why you're cancelling this."
     compute previousStatus = self.status
     mutate status = "cancelled"
     mutate cancelledAt = now()
@@ -593,7 +593,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   command standDown(reason: string) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenLeadAccess") or roleAllows(user.role, "eventManageAccess")
-    constraint standDownPrepReason: length(trim(reason)) > 0 "Stand-down reason is required"
+    constraint standDownPrepReason: length(trim(reason)) > 0 "Say why you're standing this down."
     compute previousStatus = self.status
     compute alreadySettled = self.status == "completed" or self.status == "cancelled"
     mutate status = alreadySettled ? self.status : "cancelled"
@@ -642,7 +642,7 @@ entity PrepTaskDependency mixin TenantScoped {
     guard self.predecessorTask != null
     guard self.dependentTask.status == "pending"
     constraint dependencyTasksDistinct: dependentTaskId != predecessorTaskId "A prep task cannot depend on itself"
-    constraint dependencyEventAlign: self.dependentTask.eventId == self.predecessorTask.eventId "Predecessor prep tasks must belong to the same event"
+    constraint dependencyEventAlign: self.dependentTask.eventId == self.predecessorTask.eventId "The task this depends on has to belong to the same event."
     mutate dependentTaskId = dependentTaskId
     mutate predecessorTaskId = predecessorTaskId
     mutate isSatisfied = self.predecessorTask.status == "completed"
@@ -950,7 +950,7 @@ entity PrepTaskMaterial mixin TenantScoped, SoftDeletable {
   ) {
     guard self.linkedAt == null
     guard self.deletedAt == null
-    constraint linkPrepMaterialTarget: eventIngredientContributionId != null or productionBatchAllocationId != null or dishIngredientId != null or dishComponentId != null "A prep task material must point at a requirement or allocation"
+    constraint linkPrepMaterialTarget: eventIngredientContributionId != null or productionBatchAllocationId != null or dishIngredientId != null or dishComponentId != null "Link this to a requirement or an allocation."
     mutate prepTaskId = prepTaskId
     mutate eventIngredientContributionId = eventIngredientContributionId
     mutate productionBatchAllocationId = productionBatchAllocationId
@@ -969,7 +969,7 @@ entity PrepTaskMaterial mixin TenantScoped, SoftDeletable {
   command unlink(reason: string) {
     guard self.linkedAt != null
     guard self.deletedAt == null
-    constraint unlinkPrepMaterialReason: length(trim(reason)) > 0 "Reason is required"
+    constraint unlinkPrepMaterialReason: length(trim(reason)) > 0 "Say why you're unlinking this."
     mutate deletedAt = now()
     emit PrepTaskMaterialUnlinked {
       prepTaskMaterialId: self.id

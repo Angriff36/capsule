@@ -96,9 +96,10 @@ export const register = mutation({
       );
     }
     const endpoint = args.endpoint.trim();
-    if (endpoint.length === 0) throw new Error("Endpoint is required");
+    if (endpoint.length === 0)
+      throw new Error("This device couldn't turn on notifications. Try again.");
     if (args.p256dh.trim().length === 0 || args.auth.trim().length === 0) {
-      throw new Error("Push keys are required");
+      throw new Error("This device couldn't turn on notifications. Try again.");
     }
     const now = Date.now();
     const userAgent = args.userAgent?.slice(0, 200);

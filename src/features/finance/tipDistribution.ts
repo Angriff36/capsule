@@ -55,7 +55,7 @@ export function distributeTipPool(
   method: TipPoolingMethod,
 ): TipShare[] {
   if (!Number.isSafeInteger(totalCents) || totalCents < 0) {
-    throw new Error("Gratuity must be a non-negative amount in whole cents.");
+    throw new Error("This gratuity total can't be negative. Use zero or more.");
   }
   if (participants.length === 0) {
     throw new Error("Include at least one assigned staff member.");

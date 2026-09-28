@@ -131,8 +131,8 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   computed isDiscontinued: boolean = self.status == "discontinued"
   computed isCanonicalRoot: boolean = self.canonicalIngredientId == null and self.mergedIntoIngredientId == null
 
-  constraint ingredientIdentityComplete: self.introducedAt == null or length(trim(self.name)) > 0 "Introduced ingredients require a name"
-  constraint ingredientCostNonnegative: self.costPerUnit >= 0 "Ingredient cost per unit cannot be negative"
+  constraint ingredientIdentityComplete: self.introducedAt == null or length(trim(self.name)) > 0 "Give this ingredient a name."
+  constraint ingredientCostNonnegative: self.costPerUnit >= 0 "This ingredient's cost can't be negative. Use zero or more."
 
   transition status from "active" to ["discontinued"]
   transition status from "discontinued" to ["active"]
@@ -152,8 +152,8 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   ) {
     guard self.introducedAt == null
     guard self.deletedAt == null
-    constraint introduceIngredientName: length(trim(name)) > 0 "Ingredient name is required"
-    constraint introduceIngredientCost: costPerUnit >= 0 "Ingredient cost per unit cannot be negative"
+    constraint introduceIngredientName: length(trim(name)) > 0 "Give this ingredient a name."
+    constraint introduceIngredientCost: costPerUnit >= 0 "This ingredient's cost can't be negative. Use zero or more."
     mutate name = name
     mutate unit = unit
     mutate costPerUnit = costPerUnit
@@ -201,7 +201,7 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   ) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint updateIngredientName: length(trim(name)) > 0 "Ingredient name is required"
+    constraint updateIngredientName: length(trim(name)) > 0 "Give this ingredient a name."
     mutate name = name
     mutate unit = unit
     mutate category = category
@@ -241,15 +241,15 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   ) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint nutritionCaloriesNonnegative: caloriesPerUnit == null or caloriesPerUnit >= 0 "Calories cannot be negative"
-    constraint nutritionProteinNonnegative: proteinGramsPerUnit == null or proteinGramsPerUnit >= 0 "Protein cannot be negative"
-    constraint nutritionCarbsNonnegative: carbsGramsPerUnit == null or carbsGramsPerUnit >= 0 "Carbohydrates cannot be negative"
-    constraint nutritionFatNonnegative: fatGramsPerUnit == null or fatGramsPerUnit >= 0 "Fat cannot be negative"
-    constraint nutritionFiberNonnegative: fiberGramsPerUnit == null or fiberGramsPerUnit >= 0 "Fiber cannot be negative"
-    constraint nutritionSugarNonnegative: sugarGramsPerUnit == null or sugarGramsPerUnit >= 0 "Sugar cannot be negative"
-    constraint nutritionSodiumNonnegative: sodiumMgPerUnit == null or sodiumMgPerUnit >= 0 "Sodium cannot be negative"
-    constraint nutritionCalciumNonnegative: calciumMgPerUnit == null or calciumMgPerUnit >= 0 "Calcium cannot be negative"
-    constraint nutritionIronNonnegative: ironMgPerUnit == null or ironMgPerUnit >= 0 "Iron cannot be negative"
+    constraint nutritionCaloriesNonnegative: caloriesPerUnit == null or caloriesPerUnit >= 0 "This ingredient's calories can't be negative. Use zero or more."
+    constraint nutritionProteinNonnegative: proteinGramsPerUnit == null or proteinGramsPerUnit >= 0 "This ingredient's protein can't be negative. Use zero or more."
+    constraint nutritionCarbsNonnegative: carbsGramsPerUnit == null or carbsGramsPerUnit >= 0 "This ingredient's carbs can't be negative. Use zero or more."
+    constraint nutritionFatNonnegative: fatGramsPerUnit == null or fatGramsPerUnit >= 0 "This ingredient's fat can't be negative. Use zero or more."
+    constraint nutritionFiberNonnegative: fiberGramsPerUnit == null or fiberGramsPerUnit >= 0 "This ingredient's fiber can't be negative. Use zero or more."
+    constraint nutritionSugarNonnegative: sugarGramsPerUnit == null or sugarGramsPerUnit >= 0 "This ingredient's sugar can't be negative. Use zero or more."
+    constraint nutritionSodiumNonnegative: sodiumMgPerUnit == null or sodiumMgPerUnit >= 0 "This ingredient's sodium can't be negative. Use zero or more."
+    constraint nutritionCalciumNonnegative: calciumMgPerUnit == null or calciumMgPerUnit >= 0 "This ingredient's calcium can't be negative. Use zero or more."
+    constraint nutritionIronNonnegative: ironMgPerUnit == null or ironMgPerUnit >= 0 "This ingredient's iron can't be negative. Use zero or more."
     mutate caloriesPerUnit = caloriesPerUnit
     mutate proteinGramsPerUnit = proteinGramsPerUnit
     mutate carbsGramsPerUnit = carbsGramsPerUnit
@@ -269,7 +269,7 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenAccess")
-    constraint costingNonnegative: costPerUnit >= 0 "Ingredient cost per unit cannot be negative"
+    constraint costingNonnegative: costPerUnit >= 0 "This ingredient's cost can't be negative. Use zero or more."
     compute previousCostPerUnit = self.costPerUnit
     mutate costPerUnit = costPerUnit
     emit IngredientCostingUpdated {
@@ -330,7 +330,7 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   command setPrimaryImage(storageId: string, optional fileName: string) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint primaryImageStorage: length(trim(storageId)) > 0 "Primary image storage id is required"
+    constraint primaryImageStorage: length(trim(storageId)) > 0 "Add a photo before you set it as the main picture."
     mutate primaryImageStorageId = storageId
     mutate primaryImageFileName = fileName
     emit IngredientPrimaryImageSet {
@@ -357,7 +357,7 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.mergedIntoIngredientId == null
     constraint linkIngredientEditionSelf: sourceIngredientId != self.id "An ingredient cannot be an edition of itself"
-    constraint linkIngredientEditionNumber: editionNumber == null or editionNumber > 0 "Edition number must be positive"
+    constraint linkIngredientEditionNumber: editionNumber == null or editionNumber > 0 "This edition number has to be more than zero."
     mutate canonicalIngredientId = sourceIngredientId
     mutate editionNumber = editionNumber != null ? editionNumber : self.editionNumber
     emit IngredientEditionCreated {
@@ -374,7 +374,7 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.mergedIntoIngredientId == null
     constraint mergeIngredientSelf: targetIngredientId != self.id "Cannot merge an ingredient into itself"
-    constraint mergeIngredientReason: length(trim(reason)) > 0 "Merge reason is required"
+    constraint mergeIngredientReason: length(trim(reason)) > 0 "Say why you're merging this."
     mutate mergedIntoIngredientId = targetIngredientId
     mutate status = "discontinued"
     mutate discontinuedAt = now()
@@ -493,7 +493,7 @@ entity ItemUnitMapping mixin TenantScoped, SoftDeletable {
 
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
 
-  constraint mappingQuantityPositive: self.recordedAt == null or self.equalsQuantity > 0 "Mapping quantity must be positive"
+  constraint mappingQuantityPositive: self.recordedAt == null or self.equalsQuantity > 0 "This conversion amount has to be more than zero."
 
   default policy itemUnitMappingRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Kitchen, inventory and managers may see unit mappings"
   default policy itemUnitMappingWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Kitchen, inventory and managers may update unit mappings"
@@ -513,7 +513,7 @@ entity ItemUnitMapping mixin TenantScoped, SoftDeletable {
     guard self.recordedAt == null
     guard self.deletedAt == null
     constraint recordMappingTarget: ingredientId != null or componentId != null "A unit mapping needs an ingredient or a recipe"
-    constraint recordMappingPositive: equalsQuantity > 0 "Mapping quantity must be positive"
+    constraint recordMappingPositive: equalsQuantity > 0 "This conversion amount has to be more than zero."
     mutate ingredientId = ingredientId
     mutate componentId = componentId
     mutate kind = kind
@@ -536,7 +536,7 @@ entity ItemUnitMapping mixin TenantScoped, SoftDeletable {
   command retire(reason: string) {
     guard self.recordedAt != null
     guard self.deletedAt == null
-    constraint retireMappingReason: length(trim(reason)) > 0 "Reason is required"
+    constraint retireMappingReason: length(trim(reason)) > 0 "Give a reason."
     mutate deletedAt = now()
     emit ItemUnitMappingRetired {
       itemUnitMappingId: self.id

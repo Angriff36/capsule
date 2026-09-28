@@ -997,7 +997,7 @@ export function ParallelRunDashboardPage() {
                   <tr>
                     <th>Old system</th>
                     <th>Type</th>
-                    <th>Reference in the old system</th>
+                    <th>ID in the old system</th>
                     <th>In Capsule</th>
                     <th>Status</th>
                     <th>Actions</th>

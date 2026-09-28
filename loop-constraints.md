@@ -24,7 +24,9 @@
   subject starts "[loop] HIGH-SCRUTINY:" and STATE.md lists them under
   "Landed - check before release" so the release review sees them.
 - Check `loop-ledger.json` before any attempt: 3 failures on an item →
-  escalate in STATE.md, do not retry.
+  it goes to the back of the line; take the next item, then come back to it
+  and read every saved review before the retry. There is no retry limit
+  (Ryan, 2026-09-21: "Blockers get fixed and retried until done").
 - The `file:../builder` dependency was REMOVED 2026-07-19 (it broke CI's
   bun install). Builder is now a local tool (`scripts/manifest-regen.ts`
   resolves the sibling ../builder checkout); regen freshness is enforced by
@@ -74,7 +76,7 @@
   the pre-push hook blocks every other push to `main`.
 - Reviewer selection (owner 2026-09-20): **the reviewer must come from a
   different PROVIDER than the maker**, and the lander picks and runs it — the
-  maker never does. The maker is GLM (z.ai) or MiniMax; the reviewer is
+  maker never does. The maker is Opus 5.5 (Anthropic) first, then GLM 5.3 flash (z.ai), then MiniMax M3 (Ryan 2026-09-25); the reviewer is
   Codex gpt-5.6-sol (OpenAI), and when Codex gives no verdict (quota/outage),
   grok via Cursor CLI (`cursor-grok-4.5-high-fast`, xAI). No verdict from
   either → the attempt is recorded as FAIL and nothing lands. The lander
@@ -123,7 +125,6 @@
   unless the backlog item or owner explicitly asks. Never run the full
   `bun run check` gate unless the change warrants it. Never disable tests
   to go green.
-- Max 3 attempts per item, enforced via loop-ledger.json + `loop-context --check`.
 - `convex deploy` / `bun run deploy` are forbidden.
 
 ## Budget

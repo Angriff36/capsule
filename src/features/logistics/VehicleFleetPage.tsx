@@ -478,7 +478,7 @@ export function VehicleFleetPage() {
         <section className="working-ledger">
           <div className="ledger-heading">
             <div>
-              <p className="eyebrow">Dispatch source record</p>
+              <p className="eyebrow">Dispatch source</p>
               <h2>Vehicle catalog</h2>
             </div>
             <span>
@@ -599,7 +599,7 @@ export function VehicleFleetPage() {
         <section className="working-ledger">
           <div className="ledger-heading">
             <div>
-              <p className="eyebrow">Dispatch source record</p>
+              <p className="eyebrow">Dispatch source</p>
               <h2>Trailer catalog</h2>
             </div>
             <span>
@@ -758,7 +758,7 @@ function VehicleForm({
     <form className="supply-form" onSubmit={onSubmit}>
       <div className="supply-form-heading">
         <div>
-          <p className="eyebrow">Fleet record</p>
+          <p className="eyebrow">Fleet details</p>
           <h2>{vehicle ? "Edit vehicle" : "Register vehicle"}</h2>
         </div>
         <div className="supply-row-actions">
@@ -874,7 +874,7 @@ function TrailerForm({
     <form className="supply-form" onSubmit={onSubmit}>
       <div className="supply-form-heading">
         <div>
-          <p className="eyebrow">Fleet record</p>
+          <p className="eyebrow">Fleet details</p>
           <h2>{trailer ? "Edit trailer" : "Register trailer"}</h2>
         </div>
         <div className="supply-row-actions">

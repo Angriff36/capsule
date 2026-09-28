@@ -846,8 +846,8 @@ export function VenueDetailPage() {
           <h3 className="text-lg font-medium text-danger">Danger Zone</h3>
           <p className="mt-2 text-xs text-danger">
             Deactivating a venue will mark it as inactive. It will no longer
-            appear in dropdowns for new events, but will remain visible in
-            historical event records.
+            appear in dropdowns for new events, but will still show up on past
+            events.
           </p>
           <button
             className="btn btn-danger mt-4"

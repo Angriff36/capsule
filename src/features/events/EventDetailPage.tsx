@@ -94,8 +94,8 @@ export function EventDetailPage() {
   if (event === undefined) {
     return (
       <QueryLoadState
-        title="Event data is not loading"
-        detail="The workspace did not return this event. Check the session or backend connection, then retry."
+        title="This event isn't loading"
+        detail="We couldn't load this event. Check your connection, then refresh the page."
         loadingTooLong={loadingTooLong}
       />
     );
@@ -104,7 +104,7 @@ export function EventDetailPage() {
     return (
       <ErrorState
         title="Event unavailable"
-        detail="It may not exist, may have been deleted, or your role may not permit access."
+        detail="It may have been deleted, or you may not have access to it."
         onRetry={() => window.location.reload()}
       />
     );
@@ -180,10 +180,10 @@ function EventDetailContent({
   );
   const reviseBlockedReason = canRevise
     ? undefined
-    : `Planning revisions are disabled while the event is ${String(event.stage).replaceAll("_", " ")}.`;
+    : `This event is ${String(event.stage).replaceAll("_", " ")}, so its planning details can't be changed now.`;
   const headcountBlockedReason = canChangeHeadcount
     ? undefined
-    : `Headcount changes are not permitted while the event is ${String(event.stage).replaceAll("_", " ")}.`;
+    : `This event is ${String(event.stage).replaceAll("_", " ")}, so its guest count can't be changed now.`;
   const activeVenues = (venues ?? []).filter(
     (venue) =>
       venue.status === "active" &&

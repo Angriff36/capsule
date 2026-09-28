@@ -205,7 +205,7 @@ export function MessageInboxPage() {
     if (!selected.providerThreadId) {
       setFailure(
         classifyCommandFailure(
-          new Error("This thread has no provider thread id to ingest against"),
+          new Error("This thread has no provider thread id to log against"),
         ),
       );
       return;
@@ -213,7 +213,7 @@ export function MessageInboxPage() {
     if (!providerMessageId || !body) {
       setFailure(
         classifyCommandFailure(
-          new Error("Provider message id and body are required"),
+          new Error("Give this message a provider message id and some text"),
         ),
       );
       return;
@@ -410,7 +410,7 @@ export function MessageInboxPage() {
         <div className="empty-state">
           <strong>No message threads yet</strong>
           <span>
-            Open a thread to start, or ingest an inbound provider message.
+            Open a thread to start, or log an incoming provider message.
           </span>
         </div>
       ) : (
@@ -529,8 +529,8 @@ export function MessageInboxPage() {
                     disabled={!selected.providerThreadId}
                     title={
                       selected.providerThreadId
-                        ? "Log an inbound provider message"
-                        : "Only provider threads (with a provider thread id) can ingest inbound"
+                        ? "Log an incoming provider message"
+                        : "Only provider threads (with a provider thread id) can log incoming messages"
                     }
                   >
                     {showLog ? "Cancel" : "Log incoming message"}
@@ -556,7 +556,7 @@ export function MessageInboxPage() {
                     <div className="grid gap-2">
                       <input
                         className="input"
-                        placeholder="Provider message id (dedup key)"
+                        placeholder="Provider message id (stops duplicates)"
                         value={liMsgId}
                         onChange={(e) => setLiMsgId(e.target.value)}
                       />
@@ -583,7 +583,7 @@ export function MessageInboxPage() {
                 <div className="flex-1 space-y-2 overflow-y-auto px-4 py-3">
                   {threadMessages.length === 0 ? (
                     <p className="text-sm text-ink-3">
-                      No messages yet. Reply or log an inbound below.
+                      No messages yet. Reply, or log an incoming message below.
                     </p>
                   ) : (
                     threadMessages.map((m) => {

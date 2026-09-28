@@ -30,7 +30,7 @@ entity VenueCommissionTerm mixin TenantScoped, SoftDeletable {
 
   belongsTo venue: Venue fields [tenantId, venueId] references [tenantId, id]
 
-  constraint commissionPercentValid: self.commissionPercent >= 0 and self.commissionPercent <= 100 "Commission percent must be between 0 and 100"
+  constraint commissionPercentValid: self.commissionPercent >= 0 and self.commissionPercent <= 100 "This venue's commission percent has to be between 0 and 100."
 
   default policy venueTermRead read: roleAllows(user.role, "financeAccess") "Finance staff may see venue commission terms"
   default policy venueTermWrite write: roleAllows(user.role, "financeAccess") "Finance staff may update venue commission terms"
@@ -61,8 +61,8 @@ entity VenueCommissionTerm mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.definedAt != null
-    guard self.retiredAt == null "Cannot revise retired terms"
-    guard commissionPercent == null or (commissionPercent >= 0 and commissionPercent <= 100) "Commission percent must be between 0 and 100"
+    guard self.retiredAt == null "This venue commission term is already retired. You can't revise it."
+    guard commissionPercent == null or (commissionPercent >= 0 and commissionPercent <= 100) "This venue's commission percent has to be between 0 and 100."
 
     mutate commissionPercent = commissionPercent != null ? commissionPercent : self.commissionPercent
     mutate effectiveEndDate = effectiveEndDate != null ? effectiveEndDate : self.effectiveEndDate
@@ -72,7 +72,7 @@ entity VenueCommissionTerm mixin TenantScoped, SoftDeletable {
   command retire() {
     guard self.deletedAt == null
     guard self.definedAt != null
-    guard self.retiredAt == null "Already retired"
+    guard self.retiredAt == null "This venue commission term is already retired."
 
     mutate retiredAt = now()
     mutate effectiveEndDate = now()
@@ -147,11 +147,11 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
   ref requestedBy: Person fields [tenantId, requestedById] references [tenantId, id]
   ref approvedBy: Person fields [tenantId, approvedById] references [tenantId, id]
 
-  constraint percentBasisValid: self.allocationMethod != "percent" or (self.percentBasis > 0 and self.percentBasis <= 100) "Percent basis must be between 0 and 100"
+  constraint percentBasisValid: self.allocationMethod != "percent" or (self.percentBasis > 0 and self.percentBasis <= 100) "This attribution's percent basis has to be between 0 and 100."
 
-  constraint allocationNonnegative: self.allocatedAmount >= 0 "Allocated amount cannot be negative"
+  constraint allocationNonnegative: self.allocatedAmount >= 0 "This attribution's allocated amount can't be negative. Use zero or more."
 
-  constraint approvalConsistent: self.status == "approved" and self.approvedAt != null and self.approvedById != null or self.status != "approved" "Approved status requires approver and timestamp"
+  constraint approvalConsistent: self.status == "approved" and self.approvedAt != null and self.approvedById != null or self.status != "approved" "An approved attribution needs an approver and a time it was approved."
 
   transition status from "draft" to ["pending_approval", "approved", "rejected"]
   transition status from "pending_approval" to ["approved", "rejected", "draft"]
@@ -221,7 +221,7 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.status == "pending_approval"
     guard roleAllows(user.role, "financeAccess") or roleAllows(user.role, "salesManageAccess")
-    guard length(trim(rejectionReason)) > 0 "Rejection reason is required"
+    guard length(trim(rejectionReason)) > 0 "Say why you're rejecting this attribution."
 
     mutate status = "rejected"
     mutate rejectionReason = rejectionReason
@@ -230,7 +230,7 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
   command apply(eventRevenue: money(12, 2)) {
     guard self.deletedAt == null
     guard self.status == "approved"
-    guard eventRevenue >= 0 "Event revenue cannot be negative"
+    guard eventRevenue >= 0 "This event's revenue can't be negative. Use zero or more."
 
     compute allocation = self.allocationMethod == "percent" ? round((eventRevenue * self.percentBasis) / 100, 2) : self.fixedAmount
 
@@ -249,8 +249,8 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.status == "draft" or self.status == "rejected"
-    guard percentBasis == null or (percentBasis > 0 and percentBasis <= 100) "Percent basis must be between 0 and 100"
-    guard fixedAmount == null or fixedAmount >= 0 "Fixed amount cannot be negative"
+    guard percentBasis == null or (percentBasis > 0 and percentBasis <= 100) "This attribution's percent basis has to be between 0 and 100."
+    guard fixedAmount == null or fixedAmount >= 0 "This attribution's fixed amount can't be negative. Use zero or more."
 
     mutate percentBasis = percentBasis != null ? percentBasis : self.percentBasis
     mutate fixedAmount = fixedAmount != null ? fixedAmount : self.fixedAmount

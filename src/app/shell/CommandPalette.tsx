@@ -184,7 +184,7 @@ export function CommandPalette({
       }}
       role="dialog"
       aria-modal="true"
-      aria-label="Command palette"
+      aria-label="Search"
     >
       <div className="mx-auto w-full max-w-130 rounded-sm border border-line-2 bg-panel shadow-[0_18px_50px_-12px_rgba(34,30,22,0.4)]">
         <input

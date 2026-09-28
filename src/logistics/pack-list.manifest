@@ -51,7 +51,7 @@ entity PackList mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   hasMany items: PackListItem
 
-  constraint packListOpenedNamed: self.openedAt == null or length(trim(self.name)) > 0 "Opened pack lists require a name"
+  constraint packListOpenedNamed: self.openedAt == null or length(trim(self.name)) > 0 "Give this pack list a name."
 
   transition status from "draft" to ["packing", "cancelled"]
   transition status from "packing" to ["packed", "cancelled"]
@@ -85,8 +85,8 @@ entity PackList mixin TenantScoped, SoftDeletable {
     // The service style kit lands once, on the first open. A re-open (the
     // EventApproved cascade) must not put back a line the packer removed.
     compute wasOpen = self.openedAt != null
-    constraint openEventMatch: eventId == self.eventId "Open eventId must match the seeded event reference"
-    constraint openNamePresent: length(trim(name)) > 0 or length(trim(self.name)) > 0 "Pack list name is required"
+    constraint openEventMatch: eventId == self.eventId "This pack list is for a different event. Pick the event already on this pack list."
+    constraint openNamePresent: length(trim(name)) > 0 or length(trim(self.name)) > 0 "Give this pack list a name."
     mutate eventId = eventId
     mutate activeEventId = eventId
     mutate name = length(trim(self.name)) > 0 ? self.name : name
@@ -244,7 +244,7 @@ entity PackList mixin TenantScoped, SoftDeletable {
     guard self.status == "draft" or self.status == "packing" or self.status == "packed" or self.status == "loaded"
     guard self.deletedAt == null
     guard roleAllows(user.role, "logisticsManageAccess")
-    constraint cancelPackListReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancelPackListReason: length(trim(reason)) > 0 "Say why you're cancelling this pack list."
     compute previousStatus = self.status
     mutate status = "cancelled"
     mutate activeEventId = null
@@ -337,8 +337,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
   belongsTo productionBatch: ProductionBatch fields [tenantId, productionBatchId] references [tenantId, id]
 
-  constraint itemListedComplete: self.listedAt == null or (length(trim(self.description)) > 0 and self.requiredQuantity >= 0) "Listed pack items require a description and nonnegative required quantity"
-  constraint itemPackedNonnegative: self.packedQuantity >= 0 "Packed quantity cannot be negative"
+  constraint itemListedComplete: self.listedAt == null or (length(trim(self.description)) > 0 and self.requiredQuantity >= 0) "Give this pack item a description, and make sure the amount needed isn't negative."
+  constraint itemPackedNonnegative: self.packedQuantity >= 0 "This item's packed amount can't be negative. Use zero or more."
   // Packed is an observed fact; a later plan reduction can leave surplus.
   computed surplusQuantity: decimal(12, 4) = max(0, self.packedQuantity - self.requiredQuantity)
 
@@ -368,8 +368,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     constraint addItemPackListMatch: packListId == self.packListId "This pack item is for a different pack list. Pick the pack list already on this pack item."
     constraint addItemDishMatch: dishId == null or self.dishId == null or dishId == self.dishId "This pack item is for a different dish. Pick the dish already on this pack item."
     constraint addItemBatchMatch: productionBatchId == null or self.productionBatchId == null or productionBatchId == self.productionBatchId "This pack item is for a different batch. Pick the batch already on this pack item."
-    constraint addItemDescriptionPresent: length(trim(description)) > 0 "Pack item description is required"
-    constraint addItemQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
+    constraint addItemDescriptionPresent: length(trim(description)) > 0 "Give this pack item a description."
+    constraint addItemQuantityPositive: requiredQuantity > 0 "This pack item's required amount has to be more than zero. Enter how much is needed."
     mutate packListId = packListId
     mutate description = description
     mutate dishId = dishId != null ? dishId : self.dishId
@@ -395,9 +395,9 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   command ensureContainer(packListId: uuid, dishContainerId: uuid, eventDishId: uuid, dishId: uuid, description: string, quantityServings: number, unit: UnitOfMeasure) {
     guard self.deletedAt == null
     // Generated lines must retain their original event and container references.
-    constraint containerReferencesMatch: self.packListId == packListId and self.dishContainerId == dishContainerId and self.eventDishId == eventDishId and self.dishId == dishId "Container references must match the packing line"
+    constraint containerReferencesMatch: self.packListId == packListId and self.dishContainerId == dishContainerId and self.eventDishId == eventDishId and self.dishId == dishId "This container's details don't match this line anymore. Refresh and try again."
     guard self.packList != null and self.dishContainer != null and self.eventDish != null
-    constraint containerEventMatch: self.packList.eventId == self.eventDish.eventId and self.eventDish.dishId == dishId and self.dishContainer.dishId == dishId "Container and menu line must belong to this event and dish"
+    constraint containerEventMatch: self.packList.eventId == self.eventDish.eventId and self.eventDish.dishId == dishId and self.dishContainer.dishId == dishId "This container and menu line have to be for the same event and dish."
     compute eligible = self.packList.status != "dispatched" and self.packList.status != "cancelled"
     compute planned = quantityServings > 0 ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
     mutate description = self.listedAt == null ? description : self.description
@@ -424,10 +424,10 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     guard self.dishContainer.deletedAt == null
     // Apply only the records reviewed for this repair, preserving intervening staff edits.
     guard self.version == expectedItemVersion and self.packList.version == expectedPackListVersion and self.dishContainer.version == expectedContainerVersion
-    constraint adoptionKeepsEventDish: self.eventDishId == null or self.eventDishId == eventDishId "Packing line already belongs to a different event dish"
-    constraint adoptionServingsValid: containerServings >= 0 "Servings cannot be negative"
-    constraint adoptionDishMatches: self.dishContainer.dishId == self.dishId "Container must match the packing dish"
-    constraint adoptionUnitMatches: followsDishServings == false or self.unit == self.dishContainer.unit "Automatic packing requires the container template unit"
+    constraint adoptionKeepsEventDish: self.eventDishId == null or self.eventDishId == eventDishId "This packing line is for a different menu line. Pick the menu line already on this packing line."
+    constraint adoptionServingsValid: containerServings >= 0 "Servings can't be negative. Use zero or more."
+    constraint adoptionDishMatches: self.dishContainer.dishId == self.dishId "This container has to be for the same dish as this packing line."
+    constraint adoptionUnitMatches: followsDishServings == false or self.unit == self.dishContainer.unit "Automatic packing needs the unit from the container template. Turn off automatic packing to use a different unit."
     guard count_of(filter(self.packList.event.eventDishes, (item) => item.id == eventDishId and item.dishId == self.dishId and item.deletedAt == null and item.quantityServings == containerServings and item.version == expectedEventDishVersion)) == 1
     // One menu line and container must not become two packing requirements.
     guard count_of(filter(self.packList.items, (item) => item.id != self.id and item.deletedAt == null and item.eventDishId == eventDishId and item.dishContainerId == self.dishContainerId)) == 0
@@ -447,8 +447,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     guard self.packList.event.stage != "completed" and self.packList.event.stage != "closed_out" and self.packList.event.stage != "cancelled"
     guard self.dishId == null and self.eventDishId == null and self.dishContainerId == null and self.followsDishServings != true and self.associationSource == null
     guard count_of(filter(self.packList.event.eventDishes, (item) => item.id == eventDishId and item.dishId == dishId and item.deletedAt == null and item.removedAt == null and item.version == expectedEventDishVersion)) == 1
-    constraint associationSourceRequired: length(trim(sourceReference)) > 0 "The original packing association source is required"
-    constraint associationDescriptionMatches: self.description == expectedDescription "Packing description changed since source review"
+    constraint associationSourceRequired: length(trim(sourceReference)) > 0 "Say where this packing link came from."
+    constraint associationDescriptionMatches: self.description == expectedDescription "This line's description changed since it was reviewed. Check it before continuing."
     mutate dishId = dishId
     mutate eventDishId = eventDishId
     mutate associationSource = sourceReference
@@ -468,7 +468,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     // Template-driven lines must be repaired at their source instead.
     guard self.dishContainerId == null and self.followsDishServings != true
     guard self.unit == "ounce" and self.unitCorrectionSource == null
-    constraint fluidCorrectionSourceRequired: length(trim(sourceReference)) > 0 "The original fluid-ounce source is required"
+    constraint fluidCorrectionSourceRequired: length(trim(sourceReference)) > 0 "Say where this fluid-ounce fix came from."
     mutate requiredQuantity = self.requiredQuantity / 8
     mutate packedQuantity = self.packedQuantity / 8
     mutate unit = "cup"
@@ -496,7 +496,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     guard self.listedAt != null
     guard self.deletedAt == null
     guard self.packList != null and (self.packList.status == "packing" or self.packList.status == "packed" or self.packList.status == "loaded" or self.packList.status == "dispatched")
-    constraint recordPackedCountPositive: packedQuantity > 0 "Packed quantity must be positive"
+    constraint recordPackedCountPositive: packedQuantity > 0 "Enter a packed amount more than zero."
     constraint recordPackedCountShort: packedQuantity < self.requiredQuantity "This is the full amount. Mark the line packed."
     compute previousPacked = self.packedQuantity
     mutate packedQuantity = packedQuantity
@@ -522,8 +522,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     // Stragglers stay packable after the list moves on (packed/loaded/dispatched):
     // the record of what physically went out matters more than state purity (#118).
     guard self.packList != null and (self.packList.status == "packing" or self.packList.status == "packed" or self.packList.status == "loaded" or self.packList.status == "dispatched")
-    constraint markPackedQuantityPositive: packedQuantity > 0 "Packed quantity must be positive"
-    constraint markPackedNotOver: packedQuantity <= self.requiredQuantity "Packed quantity cannot exceed required quantity"
+    constraint markPackedQuantityPositive: packedQuantity > 0 "Enter a packed amount more than zero."
+    constraint markPackedNotOver: packedQuantity <= self.requiredQuantity "You can't pack more than what's required. Enter a smaller amount."
     constraint markPackedComplete: packedQuantity == self.requiredQuantity "Save a short count on this line until you have the full amount"
     compute previousStatus = self.status
     compute previousPacked = self.packedQuantity
@@ -574,8 +574,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     guard self.listedAt != null
     guard self.deletedAt == null
     guard self.packList != null and (self.packList.status == "draft" or self.packList.status == "packing")
-    constraint adjustQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
-    constraint adjustQuantityAbovePacked: requiredQuantity >= self.packedQuantity "Required quantity cannot be below packed quantity"
+    constraint adjustQuantityPositive: requiredQuantity > 0 "Enter a required amount more than zero."
+    constraint adjustQuantityAbovePacked: requiredQuantity >= self.packedQuantity "You can't set the required amount below what's already packed."
     compute previousRequired = self.requiredQuantity
     mutate requiredQuantity = requiredQuantity
     mutate followsDishServings = false
@@ -598,7 +598,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   // changed on this event.
   command ensureKitItem(packListId: uuid, serviceStyleKitItemId: uuid, description: string, requiredQuantity: decimal(12, 4), unit: UnitOfMeasure, optional note: string) {
     guard self.deletedAt == null
-    constraint kitReferencesMatch: self.packListId == packListId and self.serviceStyleKitItemId == serviceStyleKitItemId "Kit references must match the packing line"
+    constraint kitReferencesMatch: self.packListId == packListId and self.serviceStyleKitItemId == serviceStyleKitItemId "This kit line doesn't match this packing line anymore."
     guard self.packList != null
     compute wasListed = self.listedAt != null
     mutate description = self.listedAt == null ? description : self.description

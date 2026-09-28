@@ -79,9 +79,9 @@ entity ImportDataset mixin TenantScoped, SoftDeletable {
   property lastImportRunId: string?     // Reference to last successful import
 
   // Constraints
-  constraint datasetCategoryValid: self.datasetCategory != null "Dataset category is required"
-  constraint configValid: length(trim(self.config)) > 0 "Dataset config is required"
-  constraint importOrderPositive: self.importOrder > 0 "Import order must be positive"
+  constraint datasetCategoryValid: self.datasetCategory != null "Pick what kind of data this import handles."
+  constraint configValid: length(trim(self.config)) > 0 "This import needs its setup filled in."
+  constraint importOrderPositive: self.importOrder > 0 "This import's order has to be more than zero. Enter which position it runs in."
 
   // Policies
   default policy importDatasetRead read: roleAllows(user.role, "importAccess") "Staff may see import lists"
@@ -101,8 +101,8 @@ entity ImportDataset mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.createdAt == null
-    constraint datasetCategoryValid: datasetCategory != null "Dataset category is required"
-    constraint configPresent: length(trim(config)) > 0 "Dataset config is required"
+    constraint datasetCategoryValid: datasetCategory != null "Pick what kind of data this import handles."
+    constraint configPresent: length(trim(config)) > 0 "This import needs its setup filled in."
     mutate datasetCategory = datasetCategory
     mutate targetEntity = targetEntity
     mutate config = config
@@ -132,7 +132,7 @@ entity ImportDataset mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint configPresent: length(trim(config)) > 0 "Dataset config is required"
+    constraint configPresent: length(trim(config)) > 0 "This import needs its setup filled in."
     mutate config = config
     mutate fieldMappingCount = fieldMappingCount != null ? fieldMappingCount : self.fieldMappingCount
     mutate name = name != null ? name : self.name
@@ -173,7 +173,7 @@ entity ImportDataset mixin TenantScoped, SoftDeletable {
   command recordLastImport(importRunId: string) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint importRunPresent: length(trim(importRunId)) > 0 "Import run ID is required"
+    constraint importRunPresent: length(trim(importRunId)) > 0 "Say which import this was."
     mutate lastImportRunId = importRunId
     emit ImportDatasetLastImportRecorded {
       importDatasetId: self.id
