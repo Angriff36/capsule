@@ -184,6 +184,43 @@ export function readinessAnswer(
 /** Readiness checks only people on the floor can finish. */
 const PHYSICAL_CHECKS: string[] = ["packComplete", "twoPersonSignature"];
 
+/**
+ * The readiness line a packet prints. It names only what the office settles
+ * before the print (sales lock, office answers), so recording the print does
+ * not change it. The packet's own state, staff replies, packing and the
+ * two-person check change after the print and are tracked live.
+ */
+export function readinessPrintAnswer(
+  input: FinalLockInput,
+  officeOpen: string[],
+): Draft {
+  const checks = {
+    salesLock: input.event.salesLockedAt != null,
+    opsFinal: officeOpen.length === 0,
+  };
+  const words: Record<keyof typeof checks, string> = {
+    salesLock: "Sales has not locked the event.",
+    opsFinal: `Office questions still open: ${officeOpen.join(", ")}.`,
+  };
+  const open = (Object.keys(checks) as (keyof typeof checks)[]).filter(
+    (k) => !checks[k],
+  );
+  const sources = source("events", input.event, "salesLockedAt");
+  return open.length
+    ? unresolved(
+        open.map((k) => words[k]),
+        `Finish first: ${words[open[0]!]}`,
+        "readiness.dispatch.printed-office-side",
+        sources,
+      )
+    : answered(
+        { type: "record", fields: { ...checks } },
+        "Sales locked and office answers done. Staff replies, packing and the two-person check before takeoff are tracked live in Capsule.",
+        "readiness.dispatch.printed-office-side",
+        sources,
+      );
+}
+
 /** When each physical form is due, from the day plan. */
 const DUE_AT: Record<string, string> = {
   "field.leaving-shop": "shop_departure",

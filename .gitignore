@@ -11,6 +11,8 @@ dist/
 coverage/
 test-results/
 .artifacts/
+# Loop maker test output (the maker session cannot delete files).
+/.artifacts-*.txt
 .pw-verify/
 graphify-out/
 

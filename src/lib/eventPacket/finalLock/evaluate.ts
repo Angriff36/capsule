@@ -2,7 +2,12 @@ import { canonicalJson, type Section } from "../model";
 import type { Draft } from "./answer";
 import { dessertBarBuffetAnswers } from "./dessertBarBuffet";
 import { identityAnswers, menuAnswers } from "./identityMenu";
-import { fieldAnswers, operationsAnswers, readinessAnswer } from "./operations";
+import {
+  fieldAnswers,
+  operationsAnswers,
+  readinessAnswer,
+  readinessPrintAnswer,
+} from "./operations";
 import { POLICY_VERSION, QUESTIONS, type Question } from "./policy";
 import { roomServiceAnswers } from "./roomService";
 import { setupAnswers, timelineAnswers } from "./timelineSetup";
@@ -43,6 +48,8 @@ export interface FinalLockReport {
   answers: FinalLockAnswer[];
   staleQuestions: string[];
   staleSections: Section[];
+  /** Exactly what a packet printed from these facts shows. */
+  print: FinalLockPrint;
 }
 
 /** Short stable hash (cyrb53) so fingerprints fit on a revision row. */
@@ -203,23 +210,59 @@ export function evaluateFinalLock(
     return build(q, draft);
   });
   const officeUnresolved = answers.some((a) => a.result === "unresolved");
+  const officeOpenLabels = answers
+    .filter((a) => a.result === "unresolved")
+    .map((a) => a.label);
 
-  // Derived fingerprints the revision printed; the version is in each hash.
-  // Readiness follows the packet itself and field work happens after the
-  // print, so only office answers can make a printed packet stale.
+  // What a print of these facts shows, line for line. Every line is fixed at
+  // print time: office answers as they are, readiness from the office side
+  // only, and each field form as the blank form done on the day. So a print
+  // matches itself once recorded, and any later change to any line shows.
+  const readiness = policy.find((q) => q.key === "readiness.dispatch");
+  const lines: FinalLockPrintLine[] = [];
+  const printAnswers: Record<string, string> = {};
+  const printLine = (a: FinalLockAnswer) => {
+    lines.push({
+      questionKey: a.questionKey,
+      section: a.section,
+      label: a.label,
+      result: a.result,
+      text: lineText(a),
+    });
+    printAnswers[a.questionKey] = a.fingerprint;
+  };
+  for (const a of answers) printLine(a);
+  if (readiness)
+    printLine(build(readiness, readinessPrintAnswer(input, officeOpenLabels)));
+  for (const q of policy.filter((item) => item.form))
+    printLine({
+      ...build(q, drafts[q.key]!),
+      fieldWork: null,
+      fingerprint: hash(
+        canonicalJson({
+          key: q.key,
+          ruleVersion: q.ruleVersion,
+          form: q.form,
+          rule: drafts[q.key]!.rule,
+        }),
+      ),
+    });
+  const print: FinalLockPrint = {
+    policyVersion,
+    answers: printAnswers,
+    lines,
+  };
+
+  // Every printed line is compared: office, readiness and field forms, plus
+  // lines the print showed that the policy no longer asks.
   const printed = options.printed ?? null;
   const staleQuestions = printed
     ? [
-        ...answers
-          .filter((a) => printed.answers[a.questionKey] !== a.fingerprint)
-          .map((a) => a.questionKey),
-        ...Object.keys(printed.answers).filter(
-          (key) =>
-            !policy.some((q) => q.key === key) &&
-            !key.startsWith("field.") &&
-            key !== "readiness.dispatch",
-        ),
-      ]
+        ...new Set([
+          ...Object.keys(print.answers),
+          ...Object.keys(printed.answers),
+        ]),
+      ].filter((key) => printed.answers[key] !== print.answers[key])
     : [];
   // With the print known, the printed packet is out of date when its answers
   // or policy changed, or it printed no answers at all (an older print).
@@ -230,15 +273,10 @@ export function evaluateFinalLock(
       printed.policyVersion !== policyVersion ||
       staleQuestions.length > 0);
 
-  const readiness = policy.find((q) => q.key === "readiness.dispatch");
   let readinessOfficeOpen = false;
   let readinessOpen = false;
   if (readiness) {
-    const ready = readinessAnswer(
-      input,
-      answers.filter((a) => a.result === "unresolved").map((a) => a.label),
-      answersStale,
-    );
+    const ready = readinessAnswer(input, officeOpenLabels, answersStale);
     const answer = build(readiness, ready.draft);
     readinessOpen = answer.result === "unresolved";
     readinessOfficeOpen = readinessOpen && ready.officeOpen;
@@ -247,7 +285,10 @@ export function evaluateFinalLock(
   for (const q of policy.filter((item) => item.form))
     answers.push(build(q, drafts[q.key]!));
   for (const answer of answers)
-    if (printed?.answers[answer.questionKey] === answer.fingerprint)
+    if (
+      printed &&
+      printed.answers[answer.questionKey] === print.answers[answer.questionKey]
+    )
       answer.displayedInRevision = printed.revisionId;
   const staleSections = [
     ...new Set(
@@ -270,7 +311,14 @@ export function evaluateFinalLock(
             answers.some((a) => a.fieldWork && !a.fieldWork.confirmedAt)
           ? "field_work_pending"
           : "clear";
-  return { policyVersion, outcome, answers, staleQuestions, staleSections };
+  return {
+    policyVersion,
+    outcome,
+    answers,
+    staleQuestions,
+    staleSections,
+    print,
+  };
 }
 
 /** One printed Final Lock line: what the packet page says for a question. */
@@ -321,30 +369,5 @@ const lineText = (a: FinalLockAnswer) =>
           ? `Done on the day by the person who does it${a.fieldWork?.confirmedAt ? ` - confirmed ${a.fieldWork.confirmedAt}` : ""}.`
           : a.explanation;
 
-/**
- * The part of a print that can go stale: office answers only. Readiness
- * follows the packet itself and field work happens after the print.
- */
-const isOfficeKey = (key: string) =>
-  !key.startsWith("field.") && key !== "readiness.dispatch";
-export const officePrint = (print: FinalLockPrint): FinalLockPrint => ({
-  policyVersion: print.policyVersion,
-  answers: Object.fromEntries(
-    Object.entries(print.answers).filter(([key]) => isOfficeKey(key)),
-  ),
-  lines: print.lines.filter((l) => isOfficeKey(l.questionKey)),
-});
-
-export const finalLockPrint = (report: FinalLockReport): FinalLockPrint => ({
-  policyVersion: report.policyVersion,
-  answers: Object.fromEntries(
-    report.answers.map((a) => [a.questionKey, a.fingerprint]),
-  ),
-  lines: report.answers.map((a) => ({
-    questionKey: a.questionKey,
-    section: a.section,
-    label: a.label,
-    result: a.result,
-    text: lineText(a),
-  })),
-});
+export const finalLockPrint = (report: FinalLockReport): FinalLockPrint =>
+  report.print;

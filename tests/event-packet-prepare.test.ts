@@ -5,6 +5,10 @@ import type { FinalLockPrint } from "../src/lib/eventPacket/finalLock/evaluate";
 import { buildWorkbook } from "../src/lib/eventPacket/buildWorkbook";
 import { parsePacketSnapshot } from "../src/lib/eventPacket/packetContract";
 import { prepareNativeWorkbook } from "../src/lib/eventPacket/prepareNativeWorkbook";
+import { renderWorkbook } from "../src/lib/eventPacket/renderWorkbook";
+import { finalLockPageCount } from "../src/lib/eventPacket/finalLock/answersPage";
+import { appendFinalLockPages } from "../src/lib/eventPacket/finalLock/pdfStamp";
+import { extractPagesFromPdfDocument } from "../src/lib/pdf/extractPdfText";
 
 describe("native workbook preparation", () => {
   const snapshot = fixture as EventPacketSnapshot;
@@ -77,17 +81,26 @@ describe("native workbook preparation", () => {
       snapshotStorageId: "snapshot",
     });
   });
-  it("draws the Final Lock answers on their own workbook page", () => {
+  it("the server draws the Final Lock answer pages, and the workbook's page numbers count them", async () => {
     const workbook = buildWorkbook(snapshot, { finalLock: finalLock.lines });
-    const page = workbook.sections.find((s) => s.id === "final-lock-answers");
-    expect(page?.blocks.map((b) => b.text)).toEqual([
-      "Rain plan: Rain plan: move under the pavilion.",
-    ]);
-    expect(
-      buildWorkbook(snapshot).sections.some(
-        (s) => s.id === "final-lock-answers",
-      ),
-    ).toBe(false);
+    const rendered = await renderWorkbook(workbook);
+    const extra = await finalLockPageCount(finalLock.lines);
+    expect(extra).toBe(1);
+    const stamped = await appendFinalLockPages(rendered.bytes, finalLock, {
+      invoiceNumber: "6837",
+      eventDate: "2026-10-10",
+    });
+    const { getDocument } = await import("pdfjs-dist/legacy/build/pdf.mjs");
+    const pages = await extractPagesFromPdfDocument(
+      await getDocument({ data: stamped, disableFontFace: true }).promise,
+    );
+    const total = rendered.audit.mergedPageCount;
+    expect(pages).toHaveLength(total);
+    expect(pages[0]!.text).toContain(`/ ${total}`);
+    const last = pages.at(-1)!.text;
+    expect(last).toContain("Final Lock answers");
+    expect(last).toContain("Rain plan: Rain plan: move under the pavilion.");
+    expect(last).toContain(`Page ${total} / ${total}`);
   });
   it("propagates a concurrent-change rejection and never reports a stale print as current", async () => {
     await expect(

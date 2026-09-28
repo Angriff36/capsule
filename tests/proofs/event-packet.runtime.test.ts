@@ -5,13 +5,11 @@ import schema from "../../convex/schema";
 import { modules } from "./convex-test-modules";
 import { fingerprintBytes } from "../../src/lib/eventPacket/model";
 import { PDFDocument } from "pdf-lib";
-import { stampFinalLock } from "../../src/lib/eventPacket/finalLock/pdfStamp";
 
-/** A real PDF carrying the Final Lock answers it shows, as the browser makes. */
-async function stampedPdf(finalLockFingerprint: string) {
+/** A real PDF; the server adds the Final Lock answer pages itself. */
+async function workbookPdf() {
   const doc = await PDFDocument.create();
   doc.addPage();
-  stampFinalLock(doc, finalLockFingerprint);
   return doc.save();
 }
 const api = anyApi.lib.eventPacket.commands;
@@ -221,7 +219,7 @@ describe("event packet native commands", () => {
     const p = await manager.query(api.getPacket, { eventId });
     const pdf = await manager.action(api.uploadPacketFile, {
       eventId,
-      bytes: (await stampedPdf(p.finalLockFingerprint)).buffer,
+      bytes: (await workbookPdf()).buffer,
       name: "workbook.pdf",
       mimeType: "application/pdf",
       purpose: "pdf",

@@ -736,11 +736,19 @@ describe("Final Lock answer engine", () => {
     more.event.expectedHeadcount = 120;
     const review2 = run(more, { printed });
     expect(review2.outcome).toBe("stale");
+    // The printed readiness line named no open office question; now it does.
     expect(review2.staleQuestions.sort()).toEqual([
       "identity.guest_count",
       "menu.servings",
+      "readiness.dispatch",
     ]);
-    expect(review2.staleSections.sort()).toEqual(["contacts", "menu"]);
+    expect(review2.staleSections.sort()).toEqual(
+      [
+        "contacts",
+        "menu",
+        get(review2.answers, "readiness.dispatch").section,
+      ].sort(),
+    );
     // A printed setup answer that is later removed: Stale, not Needs review.
     const printedLinen = allConfirmed(input());
     printedLinen.event.text.linenColorTables = "Ivory";
@@ -1192,5 +1200,87 @@ describe("Final Lock answer engine", () => {
       expect(open.missing[0]).toContain('"Full bussing including glassware"');
       expect(open.missing[0]).toContain(`"${against}"`);
     }
+    // Event full against a "No full bussing" line names that line.
+    const eventFullVsNot = input();
+    eventFullVsNot.event.text.bussing = "Full bussing";
+    eventFullVsNot.proposal = {
+      id: "prop-5",
+      version: 1,
+      lines: [line("l-nf", "No full bussing")],
+    };
+    expect(get(run(eventFullVsNot).answers, "bussing.plan")).toMatchObject({
+      result: "unresolved",
+      rule: "bussing.plan.contract-agrees",
+      missing: [
+        'The event says full bussing ("Full bussing"), but accepted contract line "No full bussing" says no full bussing.',
+      ],
+    });
+    // Every disagreeing line is named, on both sides.
+    const many = input();
+    many.event.text.bussing = null;
+    many.proposal = {
+      id: "prop-6",
+      version: 1,
+      lines: [
+        line("l-full-1", "Full bussing including glassware"),
+        line("l-full-2", "Full bussing of all tables"),
+        line("l-nf", "No full bussing"),
+        line("l-none", "No bussing"),
+      ],
+    };
+    expect(get(run(many).answers, "bussing.plan").missing).toEqual([
+      'Accepted contract line "Full bussing including glassware" sells full bussing, but line "No full bussing" says no full bussing.',
+      'Accepted contract line "Full bussing including glassware" sells full bussing, but line "No bussing" says no bussing.',
+      'Accepted contract line "Full bussing of all tables" sells full bussing, but line "No full bussing" says no full bussing.',
+      'Accepted contract line "Full bussing of all tables" sells full bussing, but line "No bussing" says no bussing.',
+    ]);
+    const eventFullVsMany = input();
+    eventFullVsMany.event.text.bussing = "Full bussing";
+    eventFullVsMany.proposal = {
+      id: "prop-7",
+      version: 1,
+      lines: [line("l-nf", "No full bussing"), line("l-none", "No bussing")],
+    };
+    expect(get(run(eventFullVsMany).answers, "bussing.plan").missing).toEqual([
+      'The event says full bussing ("Full bussing"), but accepted contract line "No full bussing" says no full bussing.',
+      'The event says full bussing ("Full bussing"), but accepted contract line "No bussing" says no bussing.',
+    ]);
+  });
+
+  it("a print matches itself once recorded: every printed line, readiness and field forms included", () => {
+    // Print before any revision exists, then record it as the latest.
+    const before = allConfirmed(input());
+    before.packet.latestRevisionId = null;
+    before.confirmations = {};
+    const first = run(before);
+    const printed = printedAt(first, "rev-1");
+    expect(Object.keys(printed.answers).sort()).toEqual(
+      QUESTIONS.map((q) => q.key).sort(),
+    );
+    const after = allConfirmed(input());
+    after.confirmations = {};
+    const recorded = run(after, { printed });
+    expect(recorded.staleQuestions).toEqual([]);
+    expect(recorded.outcome).not.toBe("stale");
+    expect(get(recorded.answers, "readiness.dispatch").result).toBe("answered");
+    expect(recorded.print).toEqual(first.print);
+    // Field work done after the print does not make the paper wrong.
+    const done = run(allConfirmed(input()), { printed });
+    expect(done.staleQuestions).toEqual([]);
+    expect(done.outcome).toBe("clear");
+    // A later change to the printed readiness line makes the print stale.
+    const unlocked = allConfirmed(input());
+    unlocked.event.salesLockedAt = null;
+    const reopened = run(unlocked, { printed });
+    expect(reopened.staleQuestions).toEqual(["readiness.dispatch"]);
+    expect(reopened.outcome).toBe("stale");
+    // A printed line the policy no longer asks is a change too.
+    const extra = {
+      ...printed,
+      answers: { ...printed.answers, "field.retired": "x" },
+    };
+    expect(
+      run(allConfirmed(input()), { printed: extra }).staleQuestions,
+    ).toEqual(["field.retired"]);
   });
 });

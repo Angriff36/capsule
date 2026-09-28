@@ -23,9 +23,9 @@ import { readFinalLockInput } from "./finalLockInput";
 import {
   evaluateFinalLock,
   finalLockPrint,
-  officePrint,
+  type FinalLockPrint,
 } from "../../../src/lib/eventPacket/finalLock/evaluate";
-import { readFinalLockStamp } from "../../../src/lib/eventPacket/finalLock/pdfStamp";
+import { appendFinalLockPages } from "../../../src/lib/eventPacket/finalLock/pdfStamp";
 import { parsePacketSnapshot } from "../../../src/lib/eventPacket/packetContract";
 import { resolveIssue } from "../../../src/lib/eventPacket/resolveIssue";
 import {
@@ -141,12 +141,6 @@ export const listPacketSummaries = query({
 });
 const printFingerprint = (print: unknown) =>
   fingerprintBytes(new TextEncoder().encode(canonicalJson(print)));
-/** The office part of what a stored revision printed; null for old rows. */
-async function storedOfficeFingerprint(row: { answersJson?: string | null }) {
-  if (!row.answersJson) return null;
-  const { revisionId: _revision, ...print } = JSON.parse(row.answersJson);
-  return print.lines ? printFingerprint(officePrint(print)) : null;
-}
 /** Everything a stored revision printed, as canonical JSON; null for old rows. */
 function storedPrintJson(row: { answersJson?: string | null }) {
   if (!row.answersJson) return null;
@@ -167,7 +161,6 @@ async function currentFinalLockPrint(
     packet: lock.packet,
     print,
     fingerprint: await printFingerprint(print),
-    officeFingerprint: await printFingerprint(officePrint(print)),
   };
 }
 export const getPacket = query({
@@ -176,18 +169,12 @@ export const getPacket = query({
     const auth = await authorize(ctx, eventId);
     const lock = await currentFinalLockPrint(ctx, auth.tenantId, eventId);
     const current = lock.packet;
-    // A revision is current only when both its packet and the Final Lock
-    // answers it printed still match; old prints without answers reprint.
-    const printed = new Map(
-      await Promise.all(
-        current.revisionRows.map(
-          async (r) => [r._id, await storedOfficeFingerprint(r)] as const,
-        ),
-      ),
-    );
+    // A revision is current only when both its packet and every Final Lock
+    // line it printed still match; old prints without answers reprint.
+    const currentJson = canonicalJson(lock.print);
     const matches = (r: (typeof current.revisionRows)[number]) =>
       r.snapshotFingerprint === current.currentFingerprint &&
-      printed.get(r._id) === lock.officeFingerprint;
+      storedPrintJson(r) === currentJson;
     const latest = current.revisionRows
       .slice()
       .sort(
@@ -290,9 +277,16 @@ async function registerPacketBytes(
     inputFingerprint?: string;
     finalLockFingerprint?: string;
   },
-  bytes: Uint8Array,
+  uploadedBytes: Uint8Array,
+  /** The Final Lock answers as they are now, read by the caller's query. */
+  current: {
+    finalLock: FinalLockPrint;
+    finalLockFingerprint: string;
+    snapshot: { identity: { invoiceNumber: string; eventDate: string } };
+  },
 ): Promise<{ storageId: string; fingerprint: string }> {
-  const fingerprint = await fingerprintBytes(bytes);
+  let bytes = uploadedBytes;
+  let storageId = args.storageId;
   let snapshotFingerprint: string | undefined =
     args.purpose === "pdf" ? args.inputFingerprint : undefined;
   let finalLockJson: string | undefined;
@@ -311,29 +305,39 @@ async function registerPacketBytes(
     new TextDecoder().decode(bytes.slice(0, 5)) !== "%PDF-"
   )
     throw new Error("Expected a PDF file");
-  // The answers a PDF shows are read from its own bytes, never taken on
-  // the caller's word.
-  const pdfFinalLock =
-    args.purpose === "pdf" ? await readFinalLockStamp(bytes) : null;
-  if (
-    args.purpose === "pdf" &&
-    (!pdfFinalLock ||
-      (args.finalLockFingerprint !== undefined &&
-        args.finalLockFingerprint !== pdfFinalLock))
-  )
-    throw new Error(
-      "This PDF does not carry the Final Lock answers it shows; prepare the workbook again",
+  if (args.purpose === "pdf") {
+    // The server draws the Final Lock answer pages into the PDF itself, from
+    // the answers as they are now, so no uploaded file can leave them out.
+    if (
+      args.finalLockFingerprint !== undefined &&
+      args.finalLockFingerprint !== current.finalLockFingerprint
+    )
+      throw new Error(
+        "The Final Lock answers changed after the workbook was made; prepare the current workbook again",
+      );
+    bytes = await appendFinalLockPages(
+      uploadedBytes,
+      current.finalLock,
+      current.snapshot.identity,
     );
+    storageId = await ctx.storage.store(
+      new Blob([new Uint8Array(bytes)], { type: args.mimeType }),
+    );
+    await ctx.storage.delete(args.storageId);
+    finalLockJson = canonicalJson(current.finalLock);
+  }
   return ctx.runMutation(internal.lib.eventPacket.commands.registerFile, {
     eventId: args.eventId,
-    fingerprint,
-    storageId: args.storageId,
+    fingerprint: await fingerprintBytes(bytes),
+    storageId,
     name: args.name,
     mimeType: args.mimeType,
     byteSize: bytes.byteLength,
     purpose: args.purpose,
     ...(snapshotFingerprint ? { snapshotFingerprint } : {}),
-    ...(pdfFinalLock ? { finalLockFingerprint: pdfFinalLock } : {}),
+    ...(args.purpose === "pdf"
+      ? { finalLockFingerprint: current.finalLockFingerprint }
+      : {}),
     ...(finalLockJson ? { finalLockJson } : {}),
   });
 }
@@ -362,9 +366,14 @@ export const registerPacketUpload = action({
     if (!blob) throw new Error("Uploaded packet file was not found");
     const bytes = new Uint8Array(await blob.arrayBuffer());
     try {
-      return await registerPacketBytes(ctx, args, bytes);
+      const current = await ctx.runQuery(
+        api.lib.eventPacket.commands.getPacket,
+        { eventId: args.eventId },
+      );
+      return await registerPacketBytes(ctx, args, bytes, current);
     } catch (error) {
-      await ctx.storage.delete(args.storageId);
+      // A PDF upload may already have been replaced by the server's copy.
+      await ctx.storage.delete(args.storageId).catch(() => undefined);
       throw error;
     }
   },
@@ -389,9 +398,10 @@ export const uploadPacketFile = action({
     args,
   ): Promise<{ storageId: string; fingerprint: string }> => {
     await authorize(ctx, args.eventId);
-    await ctx.runQuery(api.lib.eventPacket.commands.getPacket, {
-      eventId: args.eventId,
-    });
+    const current = await ctx.runQuery(
+      api.lib.eventPacket.commands.getPacket,
+      { eventId: args.eventId },
+    );
     const bytes = new Uint8Array(args.bytes);
     const storageId = await ctx.storage.store(
       new Blob([bytes], { type: args.mimeType }),
@@ -404,7 +414,7 @@ export const uploadPacketFile = action({
       purpose: args.purpose,
       inputFingerprint: args.inputFingerprint,
       finalLockFingerprint: args.finalLockFingerprint,
-    }, bytes);
+    }, bytes, current);
   },
 });
 export const importEvidence = mutation({
@@ -754,24 +764,24 @@ export const recordPacketRevision = mutation({
       throw new Error(
         "Print files must be owned by this event and contain the exact current snapshot",
       );
-    // The PDF and snapshot must carry exactly the answers the print names.
+    // The PDF's answer pages were drawn by the server from these answers;
+    // the snapshot must name the very same answers.
     const uploaded =
       typeof snapshotContext.finalLockJson === "string"
         ? JSON.parse(snapshotContext.finalLockJson)
         : null;
     if (
       !uploaded?.lines ||
-      pdfContext.finalLockFingerprint !== args.finalLockFingerprint ||
+      pdfContext.finalLockJson !== snapshotContext.finalLockJson ||
       (await printFingerprint(uploaded)) !== args.finalLockFingerprint
     )
       throw new Error(
         "Print files must carry the Final Lock answers this workbook shows",
       );
-    // The office answers printed must be the current ones.
-    if ((await printFingerprint(officePrint(uploaded))) !== lock.officeFingerprint)
-      throw answersChanged;
-    // Reuse only a print of this packet that showed exactly these answers,
-    // readiness and field lines too.
+    // A new print and a retry alike must show every line as it is now:
+    // office answers, readiness and field forms.
+    if (args.finalLockFingerprint !== lock.fingerprint) throw answersChanged;
+    // Reuse only a print of this packet that stored exactly these lines.
     const uploadedJson = canonicalJson(uploaded);
     let existing = null;
     for (const r of current.revisionRows)
@@ -780,9 +790,6 @@ export const recordPacketRevision = mutation({
         storedPrintJson(r) === uploadedJson
       )
         existing = r;
-    // A new print must show every answer as it is now.
-    if (!existing && args.finalLockFingerprint !== lock.fingerprint)
-      throw answersChanged;
     if (existing) {
       for (const row of current.revisionRows) {
         if (row._id === existing._id && row.supersededBy)

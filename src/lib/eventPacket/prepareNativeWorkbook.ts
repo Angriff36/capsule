@@ -41,7 +41,6 @@ export async function prepareNativeWorkbook(ports: PacketPreparationPorts) {
     revision: current.snapshot.revisions.length + 1,
     generatedAt: new Date().toISOString(),
     finalLock: current.finalLock.lines,
-    finalLockFingerprint: current.finalLockFingerprint,
   });
   const rendered = await renderWorkbook(workbook);
   if (rendered.audit.violations.length)

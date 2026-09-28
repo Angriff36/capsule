@@ -31,21 +31,32 @@ export function bussingAnswer(input: FinalLockInput): Draft {
   const bussLines = (input.proposal?.lines ?? []).filter((l) =>
     /buss|clear(ing)? (the )?tables/i.test(l.text),
   );
-  const contractFull = bussLines.find((l) => isFull(l.text));
-  const contractNone = bussLines.find((l) => isNone(l.text));
-  const contractNotFull = bussLines.find((l) => notFull(l.text));
+  const fullLines = bussLines.filter((l) => isFull(l.text));
+  const noneLines = bussLines.filter((l) => isNone(l.text));
+  // Every line that denies full bussing: "no bussing" or "no full bussing".
+  const againstLines = bussLines.filter(
+    (l) => isNone(l.text) || notFull(l.text),
+  );
+  const contractFull = fullLines[0];
+  const contractNone = noneLines[0];
+  const contractNotFull = againstLines[0];
+  const says = (text: string) =>
+    isNone(text) ? "no bussing" : "no full bussing";
   const bussSources = [
     ...ev("bussing"),
     ...source("proposals", input.proposal),
     ...bussLines.flatMap((l) => proposalSources(input.proposal, l)),
   ];
-  // Two accepted contract lines that disagree cannot answer the question.
-  const against = contractNone ?? contractNotFull;
-  if (contractFull && against)
+  // Accepted contract lines that disagree cannot answer the question; every
+  // line on each side is named.
+  if (fullLines.length && againstLines.length)
     return unresolved(
-      [
-        `Accepted contract line "${contractFull.text}" sells full bussing, but line "${against.text}" says ${contractNone ? "no bussing" : "no full bussing"}.`,
-      ],
+      fullLines.flatMap((full) =>
+        againstLines.map(
+          (against) =>
+            `Accepted contract line "${full.text}" sells full bussing, but line "${against.text}" says ${says(against.text)}.`,
+        ),
+      ),
       "Fix the accepted contract so its bussing lines agree.",
       "bussing.plan.contract-lines-agree",
       bussSources,
@@ -53,17 +64,30 @@ export function bussingAnswer(input: FinalLockInput): Draft {
   const eventFull = isFull(bussing);
   const eventNo = said(bussing).kind === "no" || isNone(bussing);
   const bussClash = dropOff
-    ? null
-    : contractFull && bussing && !eventFull
-      ? `The event says bussing "${bussing}", but accepted contract line "${contractFull.text}" sells full bussing.`
-      : contractNone && bussing && !eventNo
-        ? `The event says bussing "${bussing}", but accepted contract line "${contractNone.text}" says no bussing.`
-        : eventFull && input.proposal && !contractFull
-          ? "The event says full bussing, but the accepted contract does not sell it."
-          : null;
-  if (bussClash)
+    ? []
+    : eventFull && againstLines.length
+      ? againstLines.map(
+          (l) =>
+            `The event says full bussing ("${bussing}"), but accepted contract line "${l.text}" says ${says(l.text)}.`,
+        )
+      : bussing && !eventFull && fullLines.length
+        ? fullLines.map(
+            (l) =>
+              `The event says bussing "${bussing}", but accepted contract line "${l.text}" sells full bussing.`,
+          )
+        : bussing && !eventNo && noneLines.length
+          ? noneLines.map(
+              (l) =>
+                `The event says bussing "${bussing}", but accepted contract line "${l.text}" says no bussing.`,
+            )
+          : eventFull && input.proposal && !fullLines.length
+            ? [
+                "The event says full bussing, but the accepted contract does not sell it.",
+              ]
+            : [];
+  if (bussClash.length)
     return unresolved(
-      [bussClash],
+      bussClash,
       "Make the bussing answer on the event match the accepted contract.",
       "bussing.plan.contract-agrees",
       bussSources,

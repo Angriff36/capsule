@@ -10,7 +10,8 @@ import {
 import { PDFDocument } from "pdf-lib";
 import { buildWorkbook } from "../../src/lib/eventPacket/buildWorkbook";
 import { renderWorkbook } from "../../src/lib/eventPacket/renderWorkbook";
-import { stampFinalLock } from "../../src/lib/eventPacket/finalLock/pdfStamp";
+import { printableText } from "../../src/lib/eventPacket/printableText";
+import { extractPagesFromPdfDocument } from "../../src/lib/pdf/extractPdfText";
 import { modules } from "./convex-test-modules";
 
 const packet = api.lib.eventPacket.commands;
@@ -70,16 +71,34 @@ async function setup() {
 const answer = (report: any, key: string) =>
   report.answers.find((a: any) => a.questionKey === key);
 
-/** A small real PDF that carries a Final Lock fingerprint in its own info. */
-async function stampedPdf(fingerprint: string | null, tag: string) {
+/** A small real PDF with no Final Lock answers on it. */
+async function plainPdf(tag: string) {
   const doc = await PDFDocument.create();
   doc.addPage();
   doc.setTitle(tag);
-  if (fingerprint) stampFinalLock(doc, fingerprint);
   return doc.save();
 }
 
-/** Upload a print the way the browser does: PDF plus snapshot with answers. */
+/** The words on every page of a PDF, spaces removed (rows may wrap). */
+async function pdfWords(bytes: Uint8Array) {
+  const { getDocument } = await import("pdfjs-dist/legacy/build/pdf.mjs");
+  const pages = await extractPagesFromPdfDocument(
+    await getDocument({ data: bytes.slice(), disableFontFace: true }).promise,
+  );
+  return {
+    count: pages.length,
+    words: pages
+      .map((pg) => pg.text)
+      .join("")
+      .replace(/\s+/g, ""),
+  };
+}
+
+/**
+ * Upload a print the way the browser does: PDF plus snapshot with answers.
+ * `pdfFinalLockFingerprint` is the answers the PDF upload names, when it
+ * differs from the answers the snapshot and the record name.
+ */
 async function uploadPrint(
   manager: ReturnType<ReturnType<typeof convexTest>["withIdentity"]>,
   eventId: Id<"events">,
@@ -87,7 +106,7 @@ async function uploadPrint(
   tag: string,
   pdfBytes?: Uint8Array,
 ) {
-  const bytes = pdfBytes ?? (await stampedPdf(p.finalLockFingerprint, tag));
+  const bytes = pdfBytes ?? (await plainPdf(tag));
   const pdf = await manager.action(packet.uploadPacketFile, {
     eventId,
     bytes: bytes.slice().buffer,
@@ -95,7 +114,7 @@ async function uploadPrint(
     mimeType: "application/pdf",
     purpose: "pdf",
     inputFingerprint: p.currentFingerprint,
-    finalLockFingerprint: p.finalLockFingerprint,
+    finalLockFingerprint: p.pdfFinalLockFingerprint ?? p.finalLockFingerprint,
   });
   const snap = await manager.action(packet.uploadPacketFile, {
     eventId,
@@ -271,8 +290,12 @@ describe("Final Lock answers from native event records", () => {
       rainPlan: "Tent on the lawn",
     });
     const later = await manager.query(finalLock.getFinalLock, { eventId });
-    expect(later.staleQuestions).toEqual(["setup.rain_plan"]);
-    expect(later.staleSections).toEqual(["layouts"]);
+    // The rain plan was open on the printed readiness line; both changed.
+    expect(later.staleQuestions.sort()).toEqual([
+      "readiness.dispatch",
+      "setup.rain_plan",
+    ]);
+    expect(later.staleSections).toContain("layouts");
     expect(answer(later, "setup.rain_plan")).toMatchObject({
       result: "answered",
       displayedInRevision: null,
@@ -392,7 +415,8 @@ describe("Final Lock answers from native event records", () => {
   it("checks the uploaded answers before reusing an earlier print", async () => {
     const { manager, eventId } = await setup();
     const read = () => manager.query(packet.getPacket, { eventId });
-    // Files whose answers and named fingerprint agree with each other.
+    // A snapshot and record naming other answers than the server drew into
+    // the PDF (the PDF upload itself names the current answers).
     const consistent = async (p: any, finalLock: any, tag: string) =>
       uploadPrint(
         manager,
@@ -400,6 +424,7 @@ describe("Final Lock answers from native event records", () => {
         {
           ...p,
           finalLock,
+          pdfFinalLockFingerprint: p.finalLockFingerprint,
           finalLockFingerprint: await fingerprintBytes(
             new TextEncoder().encode(canonicalJson(finalLock)),
           ),
@@ -435,20 +460,18 @@ describe("Final Lock answers from native event records", () => {
         await expect(
           manager.mutation(packet.recordPacketRevision, files),
         ).rejects.toThrow(/must carry the Final Lock answers/);
-      // Files that agree with themselves but show an office answer that is
-      // not the current one.
+      // A snapshot that shows an office answer that is not the current one
+      // (and not what the server drew into the PDF).
       const edited = {
         ...p.finalLock,
         lines: p.finalLock.lines.map((l: any) =>
           l.questionKey === "setup.rain_plan" ? { ...l, text: "Edited" } : l,
         ),
       };
+      const editedFiles = await consistent(p, edited, `${round}-edited`);
       await expect(
-        manager.mutation(
-          packet.recordPacketRevision,
-          await consistent(p, edited, `${round}-edited`),
-        ),
-      ).rejects.toThrow(/Final Lock answers changed/);
+        manager.mutation(packet.recordPacketRevision, editedFiles),
+      ).rejects.toThrow(/must carry the Final Lock answers/);
       if (!first) {
         firstPrint = p;
         first = await manager.mutation(
@@ -485,21 +508,33 @@ describe("Final Lock answers from native event records", () => {
         ),
       };
       expect(altered.lines.some((l: any) => l.text === "Altered")).toBe(true);
+      const alteredFingerprint = await fingerprintBytes(
+        new TextEncoder().encode(canonicalJson(altered)),
+      );
+      // A PDF upload naming the altered answers is refused outright.
+      await expect(
+        uploadPrint(
+          manager,
+          eventId,
+          { ...p, finalLockFingerprint: alteredFingerprint },
+          `altered-pdf-${key}`,
+        ),
+      ).rejects.toThrow(/Final Lock answers changed/);
+      // A snapshot naming them is refused at the record.
       const files = await uploadPrint(
         manager,
         eventId,
         {
           ...p,
           finalLock: altered,
-          finalLockFingerprint: await fingerprintBytes(
-            new TextEncoder().encode(canonicalJson(altered)),
-          ),
+          pdfFinalLockFingerprint: p.finalLockFingerprint,
+          finalLockFingerprint: alteredFingerprint,
         },
         `altered-${key}`,
       );
       await expect(
         manager.mutation(packet.recordPacketRevision, files),
-      ).rejects.toThrow(/Final Lock answers changed/);
+      ).rejects.toThrow(/must carry the Final Lock answers/);
     }
     expect(
       await manager.mutation(
@@ -507,33 +542,68 @@ describe("Final Lock answers from native event records", () => {
         await uploadPrint(manager, eventId, p, "same"),
       ),
     ).toMatchObject({ id: first.id, reused: true });
+    // A fresh read after the first print: the recorded print is current,
+    // every printed line (readiness and field forms too) is still the same,
+    // and a retry from that read reuses the same print.
+    const fresh = await manager.query(packet.getPacket, { eventId });
+    expect(fresh.latestRevision).toMatchObject({ id: first.id, stale: false });
+    expect(fresh.finalLock).toEqual(p.finalLock);
+    expect(fresh.finalLockFingerprint).toBe(p.finalLockFingerprint);
+    const report = await manager.query(finalLock.getFinalLock, { eventId });
+    expect(report.outcome).not.toBe("stale");
+    expect(report.staleQuestions).toEqual([]);
+    for (const key of [
+      "readiness.dispatch",
+      "field.arrival",
+      "setup.rain_plan",
+    ])
+      expect(answer(report, key).displayedInRevision).toBe(first.id);
+    expect(
+      await manager.mutation(
+        packet.recordPacketRevision,
+        await uploadPrint(manager, eventId, fresh, "retry-after-read"),
+      ),
+    ).toMatchObject({ id: first.id, reused: true });
   });
 
-  it("reads the answers from the PDF itself: a real rendered workbook passes, a mismatched PDF is refused", async () => {
-    const { manager, eventId, version } = await setup();
+  it("the server draws the checked answers into the stored PDF: a blank PDF with the old answer stamp still shows every answer", async () => {
+    const { t, manager, eventId, version } = await setup();
     const p = await manager.query(packet.getPacket, { eventId });
-    const render = async (q: any) =>
-      (
-        await renderWorkbook(
-          buildWorkbook(q.snapshot, {
-            revision: 1,
-            generatedAt: "2026-09-28T00:00:00Z",
-            finalLock: q.finalLock.lines,
-            finalLockFingerprint: q.finalLockFingerprint,
-          }),
-        )
-      ).bytes;
-    const oldPdf = await render(p);
-    // A PDF with no answers stamped, or other answers than it names, is refused.
-    for (const bytes of [
-      await stampedPdf(null, "blank"),
-      await stampedPdf("other-answers", "other"),
-    ])
-      await expect(
-        uploadPrint(manager, eventId, p, "bad", bytes),
-      ).rejects.toThrow(/does not carry the Final Lock answers/);
-    // After a Final-Lock-only change, the older rendered PDF cannot be
-    // recorded with the new answers.
+    const storedPdf = async (revisionId: string) =>
+      new Uint8Array(
+        await t.run(async (ctx) => {
+          const row = (await ctx.db.get(
+            revisionId as Id<"eventPacketRevisions">,
+          ))!;
+          const blob = await ctx.storage.get(
+            row.pdfStorageId as Id<"_storage">,
+          );
+          return blob!.arrayBuffer();
+        }),
+      );
+    const showsEvery = async (bytes: Uint8Array, lines: any[]) => {
+      const { words } = await pdfWords(bytes);
+      expect(words).toContain("FinalLockanswers");
+      for (const l of lines)
+        expect(words).toContain(
+          printableText(`${l.label}: ${l.text}`).replace(/\s+/g, ""),
+        );
+    };
+    // A blank one-page PDF carrying the old caller-written answer stamp.
+    const blankDoc = await PDFDocument.create();
+    blankDoc.addPage();
+    blankDoc.setSubject(`capsule-final-lock:${p.finalLockFingerprint}`);
+    const blank = await blankDoc.save();
+    expect((await pdfWords(blank)).words).toBe("");
+    const first = await manager.mutation(
+      packet.recordPacketRevision,
+      await uploadPrint(manager, eventId, p, "blank", blank),
+    );
+    const stored = await storedPdf(first.id);
+    expect((await pdfWords(stored)).count).toBeGreaterThan(1);
+    await showsEvery(stored, p.finalLock.lines);
+    // After a Final-Lock-only change, a PDF upload naming the old answers
+    // is refused.
     await manager.mutation(api.mutations.Event_updateSetupNotes, {
       docId: eventId,
       version: await version(),
@@ -541,23 +611,32 @@ describe("Final Lock answers from native event records", () => {
     });
     const fresh = await manager.query(packet.getPacket, { eventId });
     await expect(
-      uploadPrint(manager, eventId, fresh, "stale-pdf", oldPdf),
-    ).rejects.toThrow(/does not carry the Final Lock answers/);
-    const pdfFingerprintWithOld = await uploadPrint(
-      manager,
-      eventId,
-      p,
-      "old",
-      oldPdf,
-    );
-    await expect(
-      manager.mutation(packet.recordPacketRevision, pdfFingerprintWithOld),
+      uploadPrint(
+        manager,
+        eventId,
+        { ...fresh, pdfFinalLockFingerprint: p.finalLockFingerprint },
+        "stale-pdf",
+      ),
     ).rejects.toThrow(/Final Lock answers changed/);
-    // The real rendered workbook of the current answers is recorded.
+    // The real rendered workbook of the current answers is recorded with
+    // the server's answer pages at the end, numbered with the workbook.
+    const rendered = await renderWorkbook(
+      buildWorkbook(fresh.snapshot, {
+        revision: 2,
+        generatedAt: "2026-09-28T00:00:00Z",
+        finalLock: fresh.finalLock.lines,
+      }),
+    );
     const ok = await manager.mutation(
       packet.recordPacketRevision,
-      await uploadPrint(manager, eventId, fresh, "real", await render(fresh)),
+      await uploadPrint(manager, eventId, fresh, "real", rendered.bytes),
     );
     expect(ok.reused).toBe(false);
+    const real = await storedPdf(ok.id);
+    const { count, words } = await pdfWords(real);
+    expect(count).toBe(rendered.audit.mergedPageCount);
+    expect(words).toContain(`Page${count}/${count}`);
+    expect(words).toContain("Tentonthelawn");
+    await showsEvery(real, fresh.finalLock.lines);
   });
 });
