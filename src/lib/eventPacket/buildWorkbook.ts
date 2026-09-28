@@ -7,6 +7,7 @@ import type {
 import { readiness } from "./reconcile";
 import { canMarkNotApplicable, requirements } from "./requirements";
 import forms from "./fixtures/event-workbook.form-definitions.json";
+import type { FinalLockPrintLine } from "./finalLock/evaluate";
 /** A value drawn on top of an original form page at its fixed source anchor. */
 export interface WorkbookOverlay {
   /** Original-page anchor: "header" for the Event Number/Date line, or a form row label prefix for Y/N answers. */
@@ -39,6 +40,8 @@ export interface Workbook {
   generatedAt: string;
   status: "READY" | "NEEDS ATTENTION";
   sections: WorkbookSection[];
+  /** The Final Lock answers the server adds as the last pages. */
+  finalLock?: FinalLockPrintLine[];
   completeness: {
     formPages: number;
     fieldForms: number;
@@ -48,7 +51,16 @@ export interface Workbook {
 }
 export function buildWorkbook(
   snapshot: EventPacketSnapshot,
-  options: { revision?: number; generatedAt?: string } = {},
+  options: {
+    revision?: number;
+    generatedAt?: string;
+    /**
+     * Final Lock answers this print shows, exactly as the revision stores
+     * them. The server draws them as the last pages; the workbook counts
+     * those pages in its page numbers.
+     */
+    finalLock?: FinalLockPrintLine[];
+  } = {},
 ): Workbook {
   const sources = new Map(
     snapshot.artifacts.map((a, i) => [a.fingerprint, `S${i + 1}`]),
@@ -675,6 +687,7 @@ export function buildWorkbook(
     generatedAt,
     status,
     sections,
+    ...(options.finalLock?.length ? { finalLock: options.finalLock } : {}),
     completeness: {
       formPages: pages.size,
       fieldForms: sections.filter((s) => s.id.startsWith("field.")).length,

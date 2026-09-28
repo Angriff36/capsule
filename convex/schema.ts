@@ -887,6 +887,9 @@ export default defineSchema({
     decorKit: v.optional(v.union(v.string(), v.null())),
     rainPlan: v.optional(v.union(v.string(), v.null())),
     setupDiagram: v.optional(v.union(v.string(), v.null())),
+    venueSurface: v.optional(v.union(v.string(), v.null())),
+    tentAndFlooring: v.optional(v.union(v.string(), v.null())),
+    handwashing: v.optional(v.union(v.string(), v.null())),
     servingwareSource: v.optional(v.union(v.string(), v.null())),
     takeRentalsWithUs: v.optional(v.union(v.string(), v.null())),
     leaveRentalsOnsite: v.optional(v.union(v.string(), v.null())),
@@ -1196,6 +1199,7 @@ export default defineSchema({
     decidedAt: v.optional(v.number()),
     decisionJson: v.optional(v.string()),
     verificationJson: v.optional(v.union(v.string(), v.null())),
+    version: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
   })
@@ -1210,6 +1214,7 @@ export default defineSchema({
     stage: v.optional(v.string()),
     createdBy: v.optional(v.string()),
     supersededBy: v.optional(v.union(v.string(), v.null())),
+    answersJson: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
   })

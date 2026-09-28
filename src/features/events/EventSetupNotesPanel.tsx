@@ -49,6 +49,17 @@ const SETUP_FIELDS: readonly SheetField[] = [
     label: "Setup diagram",
     placeholder: "Binder page 3",
   },
+  { key: "venueSurface", label: "Ground surface", placeholder: "Grass" },
+  {
+    key: "tentAndFlooring",
+    label: "Tent, flooring and tarps",
+    placeholder: "20x40 tent, no floor, tarps under the buffet",
+  },
+  {
+    key: "handwashing",
+    label: "Handwashing",
+    placeholder: "Handwashing station packed",
+  },
 ];
 
 const TASK_FIELDS: readonly SheetField[] = [
@@ -216,6 +227,9 @@ export function EventSetupNotesPanel({ eventId }: Props) {
         decorKit: event.decorKit ?? "",
         rainPlan: event.rainPlan ?? "",
         setupDiagram: event.setupDiagram ?? "",
+        venueSurface: event.venueSurface ?? "",
+        tentAndFlooring: event.tentAndFlooring ?? "",
+        handwashing: event.handwashing ?? "",
       }
     : null;
 
@@ -239,6 +253,9 @@ export function EventSetupNotesPanel({ eventId }: Props) {
           decorKit: next.decorKit,
           rainPlan: next.rainPlan,
           setupDiagram: next.setupDiagram,
+          venueSurface: next.venueSurface,
+          tentAndFlooring: next.tentAndFlooring,
+          handwashing: next.handwashing,
         });
       }}
     />

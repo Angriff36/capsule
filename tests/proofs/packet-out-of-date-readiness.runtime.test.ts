@@ -10,6 +10,7 @@
 import { convexTest } from "convex-test";
 import { anyApi } from "convex/server";
 import { describe, expect, it } from "vitest";
+import { PDFDocument } from "pdf-lib";
 import schema from "../../convex/schema";
 import { modules } from "./convex-test-modules";
 
@@ -43,20 +44,29 @@ async function setup() {
   return { t, manager, eventId };
 }
 
+/** A real PDF; the server adds the Final Lock answer pages itself. */
+async function workbookPdf() {
+  const doc = await PDFDocument.create();
+  doc.addPage();
+  return doc.save();
+}
+
 async function printPacket(manager: any, eventId: string) {
   const current = await manager.query(packet.getPacket, { eventId });
   const pdf = await manager.action(packet.uploadPacketFile, {
     eventId,
-    bytes: new TextEncoder().encode("%PDF-test " + current.currentFingerprint)
-      .buffer,
+    bytes: (await workbookPdf()).buffer,
     name: "workbook.pdf",
     mimeType: "application/pdf",
     purpose: "pdf",
     inputFingerprint: current.currentFingerprint,
+    finalLockFingerprint: current.finalLockFingerprint,
   });
   const snap = await manager.action(packet.uploadPacketFile, {
     eventId,
-    bytes: new TextEncoder().encode(JSON.stringify(current.snapshot)).buffer,
+    bytes: new TextEncoder().encode(
+      JSON.stringify({ ...current.snapshot, finalLock: current.finalLock }),
+    ).buffer,
     name: "snapshot.json",
     mimeType: "application/json",
     purpose: "snapshot",
@@ -64,6 +74,7 @@ async function printPacket(manager: any, eventId: string) {
   return (await manager.mutation(packet.recordPacketRevision, {
     eventId,
     inputFingerprint: current.currentFingerprint,
+    finalLockFingerprint: current.finalLockFingerprint,
     pdfStorageId: pdf.storageId,
     snapshotStorageId: snap.storageId,
   })) as { id: string };

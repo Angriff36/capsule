@@ -14921,7 +14921,7 @@ export const Event_updateImportDraft = mutation({
   },
 });
 
-async function __runEventUpdateSetupNotes(ctx: MutationCtx, { docId, linenColorTables, linenColorBaskets, servingwareKit, decorKit, rainPlan, setupDiagram, version }: any, __creation = false) {
+async function __runEventUpdateSetupNotes(ctx: MutationCtx, { docId, linenColorTables, linenColorBaskets, servingwareKit, decorKit, rainPlan, setupDiagram, venueSurface, tentAndFlooring, handwashing, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const context = (ctx as any);
@@ -14943,6 +14943,9 @@ async function __runEventUpdateSetupNotes(ctx: MutationCtx, { docId, linenColorT
       decorKit: ((decorKit != null) ? decorKit : doc.decorKit),
       rainPlan: ((rainPlan != null) ? rainPlan : doc.rainPlan),
       setupDiagram: ((setupDiagram != null) ? setupDiagram : doc.setupDiagram),
+      venueSurface: ((venueSurface != null) ? venueSurface : doc.venueSurface),
+      tentAndFlooring: ((tentAndFlooring != null) ? tentAndFlooring : doc.tentAndFlooring),
+      handwashing: ((handwashing != null) ? handwashing : doc.handwashing),
       version: ((doc as any).version ?? 0) + 1
     };
     const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
@@ -14964,6 +14967,9 @@ export const Event_updateSetupNotes = mutation({
     decorKit: v.optional(v.string()),
     rainPlan: v.optional(v.string()),
     setupDiagram: v.optional(v.string()),
+    venueSurface: v.optional(v.string()),
+    tentAndFlooring: v.optional(v.string()),
+    handwashing: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },

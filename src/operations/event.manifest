@@ -712,6 +712,11 @@ entity Event mixin TenantScoped, SoftDeletable {
   property decorKit: string?
   property rainPlan: string?
   property setupDiagram: string?
+  // Weather and site setup the Final Lock answers need for an outdoor or
+  // unknown venue ("Grass", "20x40 tent, no floor, tarps", "Station packed").
+  property venueSurface: string?
+  property tentAndFlooring: string?
+  property handwashing: string?
   // Event Task Breakdown lines (Event Forms One Print, tab 1) that the day
   // sheet above does not hold. One free-text value each ("Plasticware",
   // "Rented", "Client provided", "Yes", "No", "Serve", "Self-serve").
@@ -1347,7 +1352,10 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional servingwareKit: string,
     optional decorKit: string,
     optional rainPlan: string,
-    optional setupDiagram: string
+    optional setupDiagram: string,
+    optional venueSurface: string,
+    optional tentAndFlooring: string,
+    optional handwashing: string
   ) {
     guard self.deletedAt == null
     mutate linenColorTables = linenColorTables != null ? linenColorTables : self.linenColorTables
@@ -1356,6 +1364,9 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate decorKit = decorKit != null ? decorKit : self.decorKit
     mutate rainPlan = rainPlan != null ? rainPlan : self.rainPlan
     mutate setupDiagram = setupDiagram != null ? setupDiagram : self.setupDiagram
+    mutate venueSurface = venueSurface != null ? venueSurface : self.venueSurface
+    mutate tentAndFlooring = tentAndFlooring != null ? tentAndFlooring : self.tentAndFlooring
+    mutate handwashing = handwashing != null ? handwashing : self.handwashing
     emit EventSetupNotesUpdated {
       eventId: self.id
       tenantId: self.tenantId

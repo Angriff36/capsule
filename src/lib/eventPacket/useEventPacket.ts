@@ -3,11 +3,15 @@ import { api, type Id } from "../api";
 import { importSources } from "./importSources";
 import { prepareNativeWorkbook } from "./prepareNativeWorkbook";
 import type { EventPacketSnapshot, FieldValue } from "./model";
+import type { FinalLockPrint } from "./finalLock/evaluate";
 import type { PacketWorkbookSummary } from "./summaryProjection";
 
 export interface PacketView {
   snapshot: EventPacketSnapshot;
   currentFingerprint: string;
+  /** The Final Lock answers a print made now would show. */
+  finalLock: FinalLockPrint;
+  finalLockFingerprint: string;
   latestRevision: { id: string; fingerprint: string; stale: boolean } | null;
   nativeTargets?: Record<string, { id: string; label: string }[]>;
 }
@@ -50,6 +54,7 @@ export function useEventPacket(eventId: Id<"events">) {
     name: string;
     purpose: "source" | "pdf" | "snapshot";
     inputFingerprint?: string;
+    finalLockFingerprint?: string;
   }) => {
     const uploadUrl = await generateUploadUrl({ eventId });
     const response = await fetch(uploadUrl, {
@@ -69,6 +74,7 @@ export function useEventPacket(eventId: Id<"events">) {
       mimeType: file.mimeType,
       purpose: file.purpose,
       inputFingerprint: file.inputFingerprint,
+      finalLockFingerprint: file.finalLockFingerprint,
     });
   };
   return {
