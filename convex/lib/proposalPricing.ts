@@ -29,6 +29,7 @@ import { api, internal } from "../_generated/api";
 import { v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import { computeProposalPricing, type PricingBasis } from "../../src/lib/pricing";
+import { effectiveSellingPrice } from "../../src/lib/catalogEligibility";
 import { getAuthContext } from "./authContext";
 
 // Active, non-deleted priced lines for a proposal. JS loose-equality filter
@@ -64,18 +65,20 @@ export async function resolveCatalogPrice(
     !menuDish ||
     menuDish.deletedAt != null ||
     menuDish.addedAt == null ||
-    menuDish.tenantId !== tenantId ||
-    menuDish.sellingPrice == null
+    menuDish.tenantId !== tenantId
   ) {
     return null;
   }
+  // The price in force today — a dated price change applies from its day on.
+  const price = effectiveSellingPrice(menuDish, Date.now());
+  if (price == null) return null;
   const menu = await ctx.db.get(menuDish.menuId);
   if (!menu || menu.deletedAt != null || String(menu.status) !== "published") {
     return null;
   }
   const dish = await ctx.db.get(menuDish.dishId);
   if (!dish || String(dish.status) !== "active") return null;
-  return Number(menuDish.sellingPrice);
+  return price;
 }
 
 // Enforce a valid catalog link at write (throws on invalid). Thin throwing

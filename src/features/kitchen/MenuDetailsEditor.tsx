@@ -1,8 +1,24 @@
 import { useState, type FormEvent } from "react";
 import {
   useMenuReviseDetails,
+  useMenuSetSeason,
   useMenuUpdatePricing,
 } from "../../lib/manifest-convex-react";
+
+type SaveKey = "details" | "pricing" | "season";
+
+// Season dates are whole days: the start counts from the start of its day,
+// the end until the end of its day (browser time).
+const dayStart = (day: string) =>
+  day ? new Date(`${day}T00:00:00`).getTime() : undefined;
+const dayEnd = (day: string) =>
+  day ? new Date(`${day}T23:59:59.999`).getTime() : undefined;
+const toDay = (ms: number | null | undefined) => {
+  if (ms == null) return "";
+  const d = new Date(ms);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
 
 // One "Edit menu" section. Details and pricing are two separate commands with
 // different guards, so each keeps its own Save button. Every field of a command
@@ -20,6 +36,8 @@ export type MenuDetailsTarget = {
   minGuests: number;
   maxGuests: number;
   status: string;
+  availableFrom?: number | null;
+  availableUntil?: number | null;
 };
 
 export function MenuDetailsEditor({
@@ -31,6 +49,9 @@ export function MenuDetailsEditor({
 }>) {
   const reviseDetails = useMenuReviseDetails();
   const updatePricing = useMenuUpdatePricing();
+  const setSeason = useMenuSetSeason();
+  const [seasonFrom, setSeasonFrom] = useState(toDay(menu.availableFrom));
+  const [seasonUntil, setSeasonUntil] = useState(toDay(menu.availableUntil));
 
   const [name, setName] = useState(menu.name);
   const [description, setDescription] = useState(menu.description ?? "");
@@ -42,7 +63,7 @@ export function MenuDetailsEditor({
   );
   const [minGuests, setMinGuests] = useState(String(menu.minGuests));
   const [maxGuests, setMaxGuests] = useState(String(menu.maxGuests));
-  const [saving, setSaving] = useState<"details" | "pricing" | null>(null);
+  const [saving, setSaving] = useState<SaveKey | null>(null);
 
   // reviseDetails guards `status == "draft"`; updatePricing allows draft and
   // published. Archived menus are read-only until they are restored.
@@ -57,7 +78,7 @@ export function MenuDetailsEditor({
 
   const args = { docId: menu._id, version: menu.version };
 
-  const run = async (key: "details" | "pricing", work: () => Promise<void>) => {
+  const run = async (key: SaveKey, work: () => Promise<void>) => {
     setSaving(key);
     onFailure(null);
     try {
@@ -98,6 +119,19 @@ export function MenuDetailsEditor({
         pricePerPerson: perPerson,
         minGuests: min,
         maxGuests: max,
+      });
+    });
+  };
+
+  const onSaveSeason = (event: FormEvent) => {
+    event.preventDefault();
+    if (!canEditPricing) return;
+    void run("season", async () => {
+      // Both dates are always sent: an empty one clears that end.
+      await setSeason({
+        ...args,
+        availableFrom: dayStart(seasonFrom),
+        availableUntil: dayEnd(seasonUntil),
       });
     });
   };
@@ -235,6 +269,46 @@ export function MenuDetailsEditor({
             title={pricingTitle}
           >
             {saving === "pricing" ? "Saving…" : "Save pricing"}
+          </button>
+        </div>
+      </form>
+
+      <form className="mt-6 grid gap-3 sm:grid-cols-2" onSubmit={onSaveSeason}>
+        <div className="culinary-section-heading sm:col-span-2">
+          <h3 className="text-lg font-semibold text-ink">Season</h3>
+          <span>Leave both empty to offer this menu all year</span>
+        </div>
+        <label className="field-label">
+          <span>Offered from</span>
+          <input
+            className="input"
+            type="date"
+            value={seasonFrom}
+            disabled={!canEditPricing || saving != null}
+            title={pricingTitle}
+            onChange={(event) => setSeasonFrom(event.target.value)}
+          />
+        </label>
+        <label className="field-label">
+          <span>Offered until</span>
+          <input
+            className="input"
+            type="date"
+            value={seasonUntil}
+            min={seasonFrom || undefined}
+            disabled={!canEditPricing || saving != null}
+            title={pricingTitle}
+            onChange={(event) => setSeasonUntil(event.target.value)}
+          />
+        </label>
+        <div className="sm:col-span-2">
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={!canEditPricing || saving != null}
+            title={pricingTitle}
+          >
+            {saving === "season" ? "Saving…" : "Save season"}
           </button>
         </div>
       </form>

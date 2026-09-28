@@ -2050,6 +2050,8 @@ export const MenuSchema = z.object({
   publishedAt: z.coerce.date().nullable().optional(),
   archivedAt: z.coerce.date().nullable().optional(),
   archiveReason: z.string().nullable().optional(),
+  availableFrom: z.coerce.date().nullable().optional(),
+  availableUntil: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2072,6 +2074,8 @@ export const MenuDishSchema = z.object({
   dishId: z.string().uuid(),
   sortOrder: z.number().int().default(0),
   sellingPrice: z.number().nullable().optional(),
+  scheduledSellingPrice: z.number().nullable().optional(),
+  scheduledPriceEffectiveAt: z.coerce.date().nullable().optional(),
   course: z.string().nullable().optional(),
   serviceStyle: z.string().nullable().optional(),
   specialInstructions: z.string().nullable().optional(),
@@ -7359,6 +7363,14 @@ export const MenuReviseDetailsParamsSchema = z.object({
 
 export type MenuReviseDetailsParams = z.infer<typeof MenuReviseDetailsParamsSchema>;
 
+// Command: setSeason on Menu
+export const MenuSetSeasonParamsSchema = z.object({
+  availableFrom: z.coerce.date().optional(),
+  availableUntil: z.coerce.date().optional(),
+});
+
+export type MenuSetSeasonParams = z.infer<typeof MenuSetSeasonParamsSchema>;
+
 // Command: unpublish on Menu
 export const MenuUnpublishParamsSchema = z.object({
   reason: z.string(),
@@ -7395,6 +7407,14 @@ export const MenuDishRemoveParamsSchema = z.object({
 });
 
 export type MenuDishRemoveParams = z.infer<typeof MenuDishRemoveParamsSchema>;
+
+// Command: schedulePriceChange on MenuDish
+export const MenuDishSchedulePriceChangeParamsSchema = z.object({
+  sellingPrice: z.number(),
+  effectiveAt: z.coerce.date(),
+});
+
+export type MenuDishSchedulePriceChangeParams = z.infer<typeof MenuDishSchedulePriceChangeParamsSchema>;
 
 // Command: updateDetails on MenuDish
 export const MenuDishUpdateDetailsParamsSchema = z.object({

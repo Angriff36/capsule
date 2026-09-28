@@ -5,6 +5,7 @@ import { api, internal } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import { v } from "convex/values";
 import { getAuthContext } from "./authContext";
+import { effectiveSellingPrice } from "../../src/lib/catalogEligibility";
 
 // 2dp rounding for comparing stored money(12,2) values (float-stable).
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
@@ -47,18 +48,20 @@ async function resolveCatalogPrice(
     !md ||
     md.deletedAt != null ||
     md.addedAt == null ||
-    md.tenantId !== tenantId ||
-    md.sellingPrice == null
+    md.tenantId !== tenantId
   ) {
     return null;
   }
+  // The price in force today — a dated price change applies from its day on.
+  const price = effectiveSellingPrice(md, Date.now());
+  if (price == null) return null;
   const menu: any = await ctx.db.get(md.menuId);
   if (!menu || menu.deletedAt != null || String(menu.status) !== "published") {
     return null;
   }
   const dish: any = await ctx.db.get(md.dishId);
   if (!dish || String(dish.status) !== "active") return null;
-  return Number(md.sellingPrice);
+  return price;
 }
 
 // Snapshot data structure for proposal revisions

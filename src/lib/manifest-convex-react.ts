@@ -379,12 +379,14 @@ import {
   MenuArchiveParamsSchema,
   MenuDishAddParamsSchema,
   MenuDishRemoveParamsSchema,
+  MenuDishSchedulePriceChangeParamsSchema,
   MenuDishUpdateDetailsParamsSchema,
   MenuDishUpdateSellingPriceParamsSchema,
   MenuDraftParamsSchema,
   MenuMarkPublishedParamsSchema,
   MenuRestoreParamsSchema,
   MenuReviseDetailsParamsSchema,
+  MenuSetSeasonParamsSchema,
   MenuUnpublishParamsSchema,
   MenuUpdatePricingParamsSchema,
   MessagePostParamsSchema,
@@ -6048,6 +6050,16 @@ export function useMenuReviseDetails() {
   };
 }
 
+/** Mutation hook for Menu.setSeason. */
+export function useMenuSetSeason() {
+  const mutate = useMutation(api.mutations.Menu_setSeason);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = MenuSetSeasonParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Menu.unpublish. */
 export function useMenuUnpublish() {
   const mutate = useMutation(api.mutations.Menu_unpublish);
@@ -6105,6 +6117,16 @@ export function useMenuDishRemove() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = MenuDishRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for MenuDish.schedulePriceChange. */
+export function useMenuDishSchedulePriceChange() {
+  const mutate = useMutation(api.mutations.MenuDish_schedulePriceChange);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = MenuDishSchedulePriceChangeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11455,4 +11477,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1217 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1219 as const;
