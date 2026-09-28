@@ -154,6 +154,8 @@ export function KitchenDisplayPage() {
             made: prepMadeSoFarLabel(task, tasks ?? []),
             blockReason: task.blockReason ?? null,
             componentId: task.componentId ?? null,
+            dishId: task.dishId ?? null,
+            instructions: task.specialInstructions ?? null,
           },
         };
       }),

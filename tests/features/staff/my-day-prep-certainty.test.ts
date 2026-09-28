@@ -124,6 +124,10 @@ describe("My Day prep facts and versions (AC-492)", () => {
     // Plate waits on the sauce: its Start is locked and says why.
     const plateRow = row("Plate chicken");
     expect(plateRow.textContent).toContain("Waiting on Make sauce");
+    // A step with no sub-recipe still leads to its method: the dish steps.
+    expect(plateRow.querySelector("a")?.textContent).toBe(
+      "Steps for Roast chicken",
+    );
     const start = plateRow.querySelector<HTMLButtonElement>(
       'button[aria-label="Start: Plate chicken"]',
     )!;

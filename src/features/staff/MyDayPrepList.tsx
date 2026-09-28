@@ -186,6 +186,14 @@ export function MyDayPrepList({
                         >
                           Recipe: {task.name?.trim() || "Prep task"}
                         </CulinaryEntityLink>
+                      ) : (entry?.dishId ?? task.dishId) ? (
+                        <CulinaryEntityLink
+                          kind="dish"
+                          id={(entry?.dishId ?? task.dishId)!}
+                          className="inline-flex min-h-11 items-center text-base text-accent underline underline-offset-2"
+                        >
+                          Steps for {dish?.name ?? "this dish"}
+                        </CulinaryEntityLink>
                       ) : null}
                       {task.status === "blocked" && (
                         <p className="my-day-prep-note">
