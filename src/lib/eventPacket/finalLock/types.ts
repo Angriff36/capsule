@@ -1,0 +1,189 @@
+import type { Section } from "../model";
+
+/** The four results a Final Lock question can have (spec §14.2). */
+export type FinalLockResult =
+  "answered" | "not_applicable" | "unresolved" | "field_confirmation";
+
+/** Typed answer value; `none` only for unresolved and field work. */
+export type FinalLockValue =
+  | { type: "text"; text: string }
+  | { type: "yes_no"; yes: boolean }
+  | { type: "choice"; choice: string }
+  | { type: "count"; count: number }
+  | { type: "list"; items: string[] }
+  | { type: "times"; times: Record<string, number | null> }
+  | {
+      type: "record";
+      fields: Record<string, string | number | boolean | null>;
+    }
+  | { type: "none" };
+
+export type FinalLockGroup =
+  | "identity"
+  | "menu"
+  | "timeline"
+  | "setup"
+  | "servingware"
+  | "rentals"
+  | "room"
+  | "food"
+  | "bussing"
+  | "dessert"
+  | "beverage"
+  | "buffet"
+  | "vehicles"
+  | "communication"
+  | "readiness"
+  | "field";
+
+export type Resolver = "Sales" | "Operations" | "Kitchen" | "Logistics";
+
+/** A native record an answer was read from, at the version it was read. */
+export interface AnswerSource {
+  table: string;
+  id: string;
+  version: number | null;
+  field?: string;
+}
+
+export interface AnswerOverride {
+  value: FinalLockValue;
+  reason: string;
+  actor: string;
+  at: string;
+}
+
+export interface FieldWork {
+  form: string;
+  dueAt: number | null;
+  confirmedAt: string | null;
+  confirmedBy: string | null;
+}
+
+export interface FinalLockAnswer {
+  questionKey: string;
+  group: FinalLockGroup;
+  section: Section;
+  label: string;
+  policyVersion: string;
+  ruleVersion: number;
+  result: FinalLockResult;
+  value: FinalLockValue;
+  explanation: string;
+  sources: AnswerSource[];
+  rule: string;
+  /** Exact missing or contradictory facts (unresolved only). */
+  missing: string[];
+  /** The one action that resolves it (unresolved only). */
+  action: string | null;
+  resolver: Resolver;
+  override: AnswerOverride | null;
+  fieldWork: FieldWork | null;
+  /** Packet revision that printed this exact answer, if any. */
+  displayedInRevision: string | null;
+  /** Stable text of what the answer says; a change marks it stale. */
+  fingerprint: string;
+  /** Fingerprint of the derived answer; an override must name it. */
+  basis: string;
+}
+
+export type FinalLockOutcome =
+  "clear" | "needs_review" | "field_work_pending" | "stale";
+
+export interface NativeRow {
+  id: string;
+  version: number | null;
+}
+
+/** Native facts the engine reads. Built by the Convex seam, tested directly. */
+export interface FinalLockInput {
+  event: NativeRow & {
+    title: string;
+    eventNumber: string | null;
+    stage: string;
+    serviceStyleId: string | null;
+    serviceStyleName: string | null;
+    expectedHeadcount: number | null;
+    venueId: string | null;
+    venueName: string | null;
+    venueAddress: string | null;
+    venueCapacity: number | null;
+    clientId: string | null;
+    contactName: string | null;
+    contactPhone: string | null;
+    contactEmail: string | null;
+    assignedToId: string | null;
+    ownerName: string | null;
+    quotedPrice: number | null;
+    startsAt: number | null;
+    endsAt: number | null;
+    serviceStartsAt: number | null;
+    timing: {
+      setup: number | null;
+      load: number | null;
+      outbound: number | null;
+      cleanup: number | null;
+      returnTravel: number | null;
+      unload: number | null;
+    };
+    salesLockedAt: number | null;
+    operationalRequirements: string | null;
+    /** Day sheet, setup notes and task breakdown text, keyed by field name. */
+    text: Record<string, string | null>;
+  };
+  serviceStyle: (NativeRow & { name: string }) | null;
+  client: (NativeRow & { name: string; status: string }) | null;
+  venue:
+    | (NativeRow & {
+        name: string;
+        venueType: string | null;
+        loadInInstructions: string | null;
+      })
+    | null;
+  dishes: (NativeRow & {
+    name: string;
+    course: string | null;
+    serviceStyle: string | null;
+    sortOrder: number | null;
+    quantityServings: number | null;
+    followsEventHeadcount: boolean | null;
+    notes: string | null;
+  })[];
+  timeline: (NativeRow & {
+    name: string;
+    milestone: string | null;
+    startsAt: number | null;
+  })[];
+  vehicles: (NativeRow & {
+    vehicleId: string | null;
+    vehicleName: string | null;
+    trailerId: string | null;
+    trailerName: string | null;
+    driverId: string | null;
+    outOfService: boolean;
+  })[];
+  equipment: (NativeRow & {
+    name: string;
+    quantity: number;
+    status: string;
+    shortBy: number;
+  })[];
+  packLists: (NativeRow & {
+    status: string;
+    itemCount: number;
+    missingCount: number;
+  })[];
+  assignments: (NativeRow & { status: string; confirmedAt: number | null })[];
+  channel: {
+    messageCount: number;
+    attachmentCount: number;
+    lastMessageId: string | null;
+  };
+  packet: {
+    latestRevisionId: string | null;
+    latestRevisionStale: boolean;
+    signoffs: { key: string; actor: string; at: string }[];
+  };
+  /** Physical confirmations recorded by people, keyed by form key. */
+  confirmations: Record<string, { actor: string; at: string }>;
+}

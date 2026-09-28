@@ -70,6 +70,9 @@ entity EventPacketRevision mixin TenantScoped {
   property stage: string
   property createdBy: string
   property supersededBy: string?
+  // Final Lock answers this print showed: policy version + one fingerprint
+  // per question, so a later change names the stale questions and sections.
+  property answersJson: string?
   constraint packetRevisionFingerprint: length(trim(self.snapshotFingerprint)) > 0 "A print needs its exact input fingerprint"
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   default policy packetRevisionRead read: roleAllows(user.role, "eventPacketSeamOnly") "PDF and source snapshots need scoped manager access"

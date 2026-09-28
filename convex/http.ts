@@ -931,8 +931,8 @@ const COMMAND_DISPATCH = {
   },
   "Event.updateSetupNotes": {
     ref: api.mutations.Event_updateSetupNotes,
-    params: ["docId","linenColorTables","linenColorBaskets","servingwareKit","decorKit","rainPlan","setupDiagram","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"linenColorTables","type":"string","required":false},{"name":"linenColorBaskets","type":"string","required":false},{"name":"servingwareKit","type":"string","required":false},{"name":"decorKit","type":"string","required":false},{"name":"rainPlan","type":"string","required":false},{"name":"setupDiagram","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","linenColorTables","linenColorBaskets","servingwareKit","decorKit","rainPlan","setupDiagram","venueSurface","tentAndFlooring","handwashing","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"linenColorTables","type":"string","required":false},{"name":"linenColorBaskets","type":"string","required":false},{"name":"servingwareKit","type":"string","required":false},{"name":"decorKit","type":"string","required":false},{"name":"rainPlan","type":"string","required":false},{"name":"setupDiagram","type":"string","required":false},{"name":"venueSurface","type":"string","required":false},{"name":"tentAndFlooring","type":"string","required":false},{"name":"handwashing","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "Event.updateTaskBreakdown": {
     ref: api.mutations.Event_updateTaskBreakdown,

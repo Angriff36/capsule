@@ -962,6 +962,9 @@ export const EventSchema = z.object({
   decorKit: z.string().nullable().optional(),
   rainPlan: z.string().nullable().optional(),
   setupDiagram: z.string().nullable().optional(),
+  venueSurface: z.string().nullable().optional(),
+  tentAndFlooring: z.string().nullable().optional(),
+  handwashing: z.string().nullable().optional(),
   servingwareSource: z.string().nullable().optional(),
   takeRentalsWithUs: z.string().nullable().optional(),
   leaveRentalsOnsite: z.string().nullable().optional(),
@@ -1336,6 +1339,7 @@ export const EventPacketRevisionSchema = z.object({
   stage: z.string().optional(),
   createdBy: z.string().optional(),
   supersededBy: z.string().nullable().optional(),
+  answersJson: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -5696,6 +5700,9 @@ export const EventUpdateSetupNotesParamsSchema = z.object({
   decorKit: z.string().optional(),
   rainPlan: z.string().optional(),
   setupDiagram: z.string().optional(),
+  venueSurface: z.string().optional(),
+  tentAndFlooring: z.string().optional(),
+  handwashing: z.string().optional(),
 });
 
 export type EventUpdateSetupNotesParams = z.infer<typeof EventUpdateSetupNotesParamsSchema>;

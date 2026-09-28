@@ -19,6 +19,11 @@ import {
   persistIssues,
   localDate,
 } from "./reconcileNative";
+import { readFinalLockInput } from "./finalLockInput";
+import {
+  evaluateFinalLock,
+  printedAnswers,
+} from "../../../src/lib/eventPacket/finalLock/evaluate";
 import { parsePacketSnapshot } from "../../../src/lib/eventPacket/packetContract";
 import { resolveIssue } from "../../../src/lib/eventPacket/resolveIssue";
 import {
@@ -61,7 +66,7 @@ const nativeEditableField = (fieldKey: string) =>
 const hasManagementAccess = (auth: { role: string; disabledCapabilities: string[] }) =>
   roles.has(auth.role) &&
   !orgCapabilityDeniesAction("manageAccess", auth.disabledCapabilities);
-async function authorize(ctx: any, eventId: Id<"events">) {
+export async function authorize(ctx: any, eventId: Id<"events">) {
   const auth = await getAuthContext(ctx);
   const tenantId = requireTenant(auth);
   if (!hasManagementAccess(auth)) throw new Error("Management access required");
@@ -691,6 +696,19 @@ export const recordPacketRevision = mutation({
       createdBy: auth.id,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+    });
+    // Record the Final Lock answers this print shows, so each answer names
+    // its revision and a later change names the stale questions.
+    const finalLock = await readFinalLockInput(ctx, auth.tenantId, args.eventId);
+    await ctx.db.patch(id, {
+      answersJson: canonicalJson(
+        printedAnswers(
+          evaluateFinalLock(finalLock.input, {
+            overrides: finalLock.overrides,
+          }),
+          id,
+        ),
+      ),
     });
     for (const old of current.revisionRows)
       if (!old.supersededBy)
