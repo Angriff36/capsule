@@ -59,6 +59,7 @@ import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 import { MyDayCalendar, MyDaySection as Section } from "./MyDayDashboard";
 import { MyDayPrepList } from "./MyDayPrepList";
+import { MyDayTasksCard } from "./MyDayTasksCard";
 import { MyPastShiftsCard } from "./MyPastShiftsCard";
 import { buildStaffUtilizationReport } from "../workforce/staffUtilization";
 
@@ -787,6 +788,7 @@ export function MyDayPage() {
                     perform={perform}
                   />
                 )}
+                <MyDayTasksCard personId={me._id as Parameters<typeof MyDayTasksCard>[0]["personId"]} />
               </Section>
             </div>
           </div>

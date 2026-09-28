@@ -744,3 +744,92 @@
   justify-content: flex-end;
   margin-top: 4px;
 }
+
+
+/* Personal task list on My Day. Matches the prep-list card visually so
+   the two read as siblings. Overdue groups get a warn-toned border so
+   they catch the eye above the rest of the day. */
+.my-day-tasks-card {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 18px 18px 16px;
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  background: var(--color-inset);
+}
+.my-day-tasks-card h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 20px;
+  margin: 0;
+}
+.my-day-tasks-card > p {
+  margin: 0;
+}
+.my-day-tasks-group {
+  display: grid;
+  gap: 6px;
+}
+.my-day-tasks-group.is-warn {
+  border: 1px solid var(--color-warn);
+  background: var(--color-warn-soft);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.my-day-tasks-group h4 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+  margin: 0;
+}
+.my-day-tasks-group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.my-day-tasks-group li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: var(--color-panel);
+}
+.my-day-tasks-line {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.my-day-tasks-line strong {
+  font-weight: 500;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.my-day-tasks-line small {
+  font-size: 12px;
+  color: var(--color-ink-3);
+}
+.my-day-tasks-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.my-day-tasks-actions button {
+  padding: 4px 10px;
+  font-size: 12.5px;
+  border-radius: 99px;
+  border: 1px solid var(--color-line-2);
+  background: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+.my-day-tasks-actions button:hover {
+  border-color: var(--color-ink);
+}
