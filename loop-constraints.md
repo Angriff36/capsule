@@ -17,9 +17,14 @@
   moving tree, and were thrown away — most of them never looked at.
 - **One writer at a time; the unit of work is a CAPABILITY (Ryan 2026-09-27).**
   The product builder works one IMPLEMENTATION_PLAN.md item (for example all of
-  PL-AUTH) in one campaign worktree, hands off at meaningful review
-  checkpoints, and continues the same capability after each landing. Rounds
-  run back to back with no round limit. NEVER hold two campaigns open
+  PL-AUTH) and goes straight on to the next, all in one batch worktree.
+  Rounds run back to back with no round limit.
+- **Daily review (Ryan 2026-09-28: "the reviewer should only check work once a
+  day then have its back and forth on all the changes with no delay until it
+  passes").** No review during the day. Once a day `.claude/loop-review-due.ps1`
+  opens the review; the maker then only answers review findings and hands off,
+  and the lander reviews the whole batch at once, round after round with no
+  wait, until it approves and lands the batch on dev. NEVER hold two campaigns open
   together — nearly every change regenerates the same Builder-owned files,
   so parallel writers collide.
 - High-scrutiny areas (auth, payments, billing, schema, manifest sources) are
