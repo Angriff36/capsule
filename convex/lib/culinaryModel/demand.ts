@@ -166,6 +166,8 @@ export interface UnresolvedItem {
   refId: string;
   label: string;
   detail: string;
+  /** Plain kitchen sentence for screens (unresolvedText.ts), set by the read queries. */
+  text?: string;
 }
 
 export interface EventDishDemand {

@@ -59,17 +59,31 @@ export function useReconcileLiveEventsForComponent() {
 
 /** Kitchen wording for each unresolved kind the demand engine reports. */
 export const UNRESOLVED_KIND_LABEL: Record<string, string> = {
-  unit: "Unit not mapped",
-  basis: "Yield not confirmed",
-  recipe_content: "Recipe not on file",
-  choice_pending: "Choice pending",
-  cycle: "Recipe cycle",
-  missing_reference: "Missing reference",
-  supply_kind: "Supply, no food demand",
+  unit: "Amount can't be converted",
+  basis: "Raw or cooked amount not known",
+  recipe_content: "Recipe not written yet",
+  choice_pending: "Choice to make",
+  cycle: "Recipe inside itself",
+  missing_reference: "Removed from the book",
+  supply_kind: "Not food",
 };
 
 export const unresolvedKindLabel = (kind: string): string =>
   UNRESOLVED_KIND_LABEL[kind] ?? "Needs attention";
+
+/** The sentence a screen shows for one unresolved item. */
+export const unresolvedItemText = (item: {
+  label: string;
+  detail: string;
+  text?: string;
+}): string => item.text ?? `${item.label} — ${item.detail}`;
+
+/** Kitchen words for how much of a recipe's cost is known. */
+export function costConfidenceText(confidence: string): string {
+  if (confidence === "complete") return "Fully priced";
+  if (confidence === "partial") return "Partly priced";
+  return "Not priced";
+}
 
 /** Kitchen wording for the recipe content status. */
 export const RECIPE_CONTENT_STATUS_LABEL: Record<string, string> = {
@@ -93,5 +107,5 @@ export function recipeCostLine(cost: {
   const known = cost.totalLines - cost.unknownLines;
   if (cost.confidence === "none")
     return `Cost unknown · ${known} of ${cost.totalLines} lines priced`;
-  return `Known subtotal ${formatMoney(cost.knownSubtotal)} for ${known} of ${cost.totalLines} lines · confidence ${cost.confidence}`;
+  return `Known subtotal ${formatMoney(cost.knownSubtotal)} for ${known} of ${cost.totalLines} lines · ${costConfidenceText(cost.confidence).toLowerCase()}`;
 }

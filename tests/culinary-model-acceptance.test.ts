@@ -18,6 +18,7 @@ import {
   type EventDishLike,
   type ExistingContributionRow,
 } from "../convex/lib/culinaryModel/demand";
+import { unresolvedText } from "../convex/lib/culinaryModel/unresolvedText";
 import {
   absenceDecision,
   assignOrdinal,
@@ -943,6 +944,24 @@ describe("nested recipes keep quantities and partial costs", () => {
       refId: "cmp-gone",
       detail: "sub-recipe not found",
     });
+    // Screens get plain sentences with names, never record ids.
+    const names = { components, dishes: new Map([[dish.id, dish]]) };
+    expect(unresolvedText(cycle[0], names)).toBe(
+      "Cyclic ends up inside itself: Cyclic uses Cyclic 2, and Cyclic 2 uses Cyclic. Take one of those sub-recipes out. Until then nothing from this recipe is counted for ordering.",
+    );
+    expect(unresolvedText(missing[0], names)).toBe(
+      "A sub-recipe used on Plate was removed from the recipe book and its name is no longer on file, so it is not counted. The rest of the dish is.",
+    );
+    expect(
+      unresolvedText(missing[0], {
+        ...names,
+        removedNames: new Map([["cmp-gone", "Garlic confit"]]),
+      }),
+    ).toBe(
+      "Garlic confit, a sub-recipe used on Plate, was removed from the recipe book, so it is not counted. The rest of the dish is.",
+    );
+    for (const item of demand.unresolved)
+      expect(unresolvedText(item, names)).not.toMatch(/cmp-|ing-|_/);
     // Nothing from the loop or the missing recipe reaches the shopping list.
     expect(
       demand.contributions.every((c) =>

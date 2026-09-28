@@ -40,7 +40,9 @@ import {
   type PortionSpecLike,
   type RoundingRule,
   type RoundingScope,
+  type UnresolvedItem,
 } from "./lib/culinaryModel/demand";
+import { withUnresolvedText } from "./lib/culinaryModel/unresolvedText";
 import {
   isUnitCode,
   type ItemUnitMappingLike,
@@ -491,6 +493,16 @@ async function reviewEvent(
       quantityServings: ed.quantityServings,
     };
   });
+  const names = {
+    ...catalog.lookups,
+    removedNames: await removedRecordNames(
+      ctx,
+      tenantId,
+      results.flatMap((r) => r.unresolved),
+    ),
+  };
+  for (const result of results)
+    result.unresolved = withUnresolvedText(result.unresolved, names);
   const all = results.flatMap((r) => r.contributions);
   return {
     eventId: String(eventId),
@@ -500,6 +512,39 @@ async function reviewEvent(
     batchSatisfied,
     activeAllocationIds,
   };
+}
+
+/**
+ * Names of removed recipes, ingredients and dishes that unresolved items still
+ * point at (soft-deleted rows keep their name), so notices can say what went.
+ */
+async function removedRecordNames(
+  ctx: Ctx,
+  tenantId: string,
+  items: UnresolvedItem[],
+): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  for (const item of items) {
+    if (item.kind !== "missing_reference" || out.has(item.refId)) continue;
+    const row =
+      item.detail === "ingredient not found"
+        ? await getIfId(ctx, "ingredients", item.refId)
+        : item.detail === "dish not found"
+          ? await getIfId(ctx, "dishes", item.refId)
+          : await getIfId(ctx, "components", item.refId);
+    if (row && row.tenantId === tenantId && row.name)
+      out.set(item.refId, String(row.name));
+  }
+  return out;
+}
+
+async function getIfId<T extends "ingredients" | "dishes" | "components">(
+  ctx: Ctx,
+  table: T,
+  id: string,
+) {
+  const normalized = ctx.db.normalizeId(table, id);
+  return normalized ? await ctx.db.get(normalized) : null;
 }
 
 /** Full demand review for one event: contributions, recipe needs, unresolved items, purchasing totals. */
@@ -594,7 +639,11 @@ export const kitchenUnresolvedReport = query({
       const demands = eventDishes.map((ed) =>
         expandEventDish(ed, catalog.lookups),
       );
-      const unresolved = demands.flatMap((d) => d.unresolved);
+      const found = demands.flatMap((d) => d.unresolved);
+      const unresolved = withUnresolvedText(found, {
+        ...catalog.lookups,
+        removedNames: await removedRecordNames(ctx, tenantId, found),
+      });
       const purchasing = purchasingTotals(
         demands.flatMap((d) => d.contributions),
       );

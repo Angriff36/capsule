@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
+  unresolvedItemText,
   unresolvedKindLabel,
   useEventDemandReview,
   useReconcileEventDemand,
@@ -127,7 +128,7 @@ export function EventUnresolvedMaterialsNotice({
                 key={`${item.kind}:${item.eventDishId}:${item.refId}`}
                 className="text-base text-ink-2"
               >
-                {item.label} — {item.detail}
+                {unresolvedItemText(item)}
               </li>
             ))}
           </ul>
