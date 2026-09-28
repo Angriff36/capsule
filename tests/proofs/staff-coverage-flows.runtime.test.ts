@@ -160,13 +160,13 @@ describe("staff coverage model (AC-494, 496, 497, 498)", () => {
     };
     await c.manage(M.Shift_reschedule, {
       docId: calShift!._id,
-      version: calShift!.version,
+      version: (await c.read<Doc<"shifts">>(calShift!._id)).version,
       ...handMoved,
     });
     const [deeShift] = await c.liveShifts(dee.personId);
     await dee.run(M.Shift_start, {
       docId: deeShift!._id,
-      version: deeShift!.version,
+      version: (await c.read<Doc<"shifts">>(deeShift!._id)).version,
     });
     const deeStarted = await c.read<Doc<"shifts">>(deeShift!._id);
 
@@ -221,7 +221,7 @@ describe("replacement keeps history (AC-499)", () => {
     const [eveShift] = await c.liveShifts(eve.personId);
     await eve.run(M.Shift_start, {
       docId: eveShift!._id,
-      version: eveShift!.version,
+      version: (await c.read<Doc<"shifts">>(eveShift!._id)).version,
     });
 
     await c.manage(M.EventStaffNeed_changeCoverage, {

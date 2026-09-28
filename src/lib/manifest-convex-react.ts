@@ -499,7 +499,10 @@ import {
   PersonReactivateParamsSchema,
   PersonSetEmployeeNumberParamsSchema,
   PersonSetPayRateParamsSchema,
+  PersonSetSchedulingHoldParamsSchema,
   PersonSetSmsAlertsParamsSchema,
+  PersonSetStaffingVendorParamsSchema,
+  PersonSetWorkPreferencesParamsSchema,
   PersonTerminateParamsSchema,
   PersonUnlinkAccountParamsSchema,
   PrepTaskAssignParamsSchema,
@@ -7628,12 +7631,42 @@ export function usePersonSetPayRate() {
   };
 }
 
+/** Mutation hook for Person.setSchedulingHold. */
+export function usePersonSetSchedulingHold() {
+  const mutate = useMutation(api.mutations.Person_setSchedulingHold);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PersonSetSchedulingHoldParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Person.setSmsAlerts. */
 export function usePersonSetSmsAlerts() {
   const mutate = useMutation(api.mutations.Person_setSmsAlerts);
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = PersonSetSmsAlertsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Person.setStaffingVendor. */
+export function usePersonSetStaffingVendor() {
+  const mutate = useMutation(api.mutations.Person_setStaffingVendor);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PersonSetStaffingVendorParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Person.setWorkPreferences. */
+export function usePersonSetWorkPreferences() {
+  const mutate = useMutation(api.mutations.Person_setWorkPreferences);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PersonSetWorkPreferencesParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11881,4 +11914,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1259 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1262 as const;

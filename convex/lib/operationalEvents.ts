@@ -51,6 +51,7 @@ import { queueRouteRefresh } from "./routeFollowUp";
 import { queueTimingRecalculation } from "./timingFollowUp";
 import { handleTravelLegEvent } from "./travelLegEvents";
 import { assertSignInUnclaimed } from "./personAuthPick";
+import { assertHireNotDuplicate } from "../personEmail";
 
 /** Runs after declared reactions, inside the originating command transaction. */
 export async function handleManifestEvent(
@@ -78,6 +79,7 @@ export async function handleManifestEvent(
   }
   if (event.entity === "Person" && (event.type === "PersonHired" || event.type === "PersonAccountLinked")) {
     await assertSignInUnclaimed(ctx, event.entityId as Id<"people">);
+    if (event.type === "PersonHired") await assertHireNotDuplicate(ctx, event.entityId as Id<"people">);
     return;
   }
   if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedCoverageChangeRequested") {

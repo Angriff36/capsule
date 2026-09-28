@@ -2577,6 +2577,10 @@ export const PersonSchema = z.object({
   terminationDate: z.coerce.date().nullable().optional(),
   hourlyRate: z.number().nullable().optional(),
   smsAlertsOptIn: z.boolean().nullable().optional(),
+  preferredRoles: z.array(z.string()).optional().default([]),
+  approvedWorkLocations: z.array(z.string()).optional().default([]),
+  schedulingHoldReason: z.string().nullable().optional(),
+  staffingVendor: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -8514,6 +8518,7 @@ export const PersonHireParamsSchema = z.object({
   employmentType: z.enum(["full_time", "part_time", "contractor", "temporary"]).optional(),
   employeeNumber: z.string().optional(),
   authSubjectId: z.string().optional(),
+  staffingVendor: z.string().optional(),
 });
 
 export type PersonHireParams = z.infer<typeof PersonHireParamsSchema>;
@@ -8544,12 +8549,34 @@ export const PersonSetPayRateParamsSchema = z.object({
 
 export type PersonSetPayRateParams = z.infer<typeof PersonSetPayRateParamsSchema>;
 
+// Command: setSchedulingHold on Person
+export const PersonSetSchedulingHoldParamsSchema = z.object({
+  reason: z.string().optional(),
+});
+
+export type PersonSetSchedulingHoldParams = z.infer<typeof PersonSetSchedulingHoldParamsSchema>;
+
 // Command: setSmsAlerts on Person
 export const PersonSetSmsAlertsParamsSchema = z.object({
   optIn: z.boolean(),
 });
 
 export type PersonSetSmsAlertsParams = z.infer<typeof PersonSetSmsAlertsParamsSchema>;
+
+// Command: setStaffingVendor on Person
+export const PersonSetStaffingVendorParamsSchema = z.object({
+  vendorName: z.string().optional(),
+});
+
+export type PersonSetStaffingVendorParams = z.infer<typeof PersonSetStaffingVendorParamsSchema>;
+
+// Command: setWorkPreferences on Person
+export const PersonSetWorkPreferencesParamsSchema = z.object({
+  preferredRoles: z.array(z.string()),
+  approvedWorkLocations: z.array(z.string()),
+});
+
+export type PersonSetWorkPreferencesParams = z.infer<typeof PersonSetWorkPreferencesParamsSchema>;
 
 // Command: terminate on Person
 export const PersonTerminateParamsSchema = z.object({

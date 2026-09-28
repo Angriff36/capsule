@@ -4,7 +4,13 @@
 // reset and the Team roles row all point at one mailbox.
 import { ConvexError, v } from "convex/values";
 import { api, internal } from "./_generated/api";
-import { action, internalQuery } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
+import {
+  action,
+  internalQuery,
+  type MutationCtx,
+  type QueryCtx,
+} from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import { ClerkStaffAccountDirectory } from "./lib/clerkStaffAccount";
 import { decrypt } from "./lib/encryption";
@@ -33,19 +39,12 @@ export const loadPersonForEmailCorrection = internalQuery({
     // Another live team member already on that address: the correction
     // would make two profiles claim one mailbox (and one sign-in). Name them
     // so the manager fixes the right row instead of silently merging.
-    let conflictName: string | null = null;
-    const team = await ctx.db
-      .query("people")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", auth.tenantId))
-      .collect();
-    for (const other of team) {
-      if (other._id === personId || other.deletedAt != null) continue;
-      if (String(other.status) === "terminated") continue;
-      if ((await readStoredEmail(ctx, other.email)) === wanted) {
-        conflictName = `${other.givenName} ${other.familyName}`.trim();
-        break;
-      }
-    }
+    const conflictName = await findEmailHolder(
+      ctx,
+      auth.tenantId,
+      wanted,
+      personId,
+    );
     return {
       role: String(row.role),
       version: row.version,
@@ -141,6 +140,46 @@ export const correctStaffEmail = action({
     }
   },
 });
+
+/** Name of another live, not-terminated team member on this email, if any. */
+async function findEmailHolder(
+  ctx: QueryCtx,
+  tenantId: string,
+  email: string,
+  exceptId: Id<"people">,
+): Promise<string | null> {
+  const team = await ctx.db
+    .query("people")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .collect();
+  for (const other of team) {
+    if (other._id === exceptId || other.deletedAt != null) continue;
+    if (String(other.status) === "terminated") continue;
+    if ((await readStoredEmail(ctx, other.email)) === email)
+      return `${other.givenName} ${other.familyName}`.trim();
+  }
+  return null;
+}
+
+/**
+ * One Person per worker (spec §12.2, AC-511): a new hire whose email another
+ * live team member already uses is refused in the same transaction - an
+ * agency worker who also works for us directly keeps ONE profile.
+ */
+export async function assertHireNotDuplicate(
+  ctx: MutationCtx,
+  personId: Id<"people">,
+): Promise<void> {
+  const person = await ctx.db.get(personId);
+  if (!person) return;
+  const email = await readStoredEmail(ctx, person.email);
+  if (!email) return;
+  const holder = await findEmailHolder(ctx, person.tenantId, email, personId);
+  if (holder)
+    throw new ConvexError(
+      `${holder} already has a staff profile with ${email}. Use that profile instead of adding them again; for an agency worker, set their agency on it.`,
+    );
+}
 
 /** Person.email is an encrypted field; decode the envelope, else take it raw. */
 async function readStoredEmail(ctx: unknown, raw: unknown): Promise<string> {
