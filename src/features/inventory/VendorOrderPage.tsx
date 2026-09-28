@@ -11,6 +11,7 @@ import {
   useListIngredient,
   useListIngredientDemand,
   useListInventoryLot,
+  useListItemUnitMapping,
   useListPurchaseNeed,
   useListStorageLocation,
   useListVendor,
@@ -51,6 +52,7 @@ import {
   cancelVendorOrderLine,
 } from "./VendorOrderLineCancel";
 import { orderLineUnitIssues } from "./orderLineUnitIssues";
+import { VendorOrderLinePacks } from "./VendorOrderLinePacks";
 
 const policy = new SupplyLifecyclePolicy();
 
@@ -66,6 +68,7 @@ export function VendorOrderPage() {
   const events = useListEvent();
   const ingredients = useListIngredient();
   const inventoryLots = useListInventoryLot();
+  const unitMappings = useListItemUnitMapping();
   const locations = useListStorageLocation();
   const createLocation = useCreateStorageLocation();
   const createLine = useCreateVendorOrderLine();
@@ -646,6 +649,21 @@ export function VendorOrderPage() {
                       {isDraft && line.quantityReviewReason ? (
                         <small role="status">{line.quantityReviewReason}</small>
                       ) : null}
+                      <VendorOrderLinePacks
+                        line={line}
+                        mappings={unitMappings ?? []}
+                        canEdit={isDraft && line.status === "added"}
+                        busy={busy != null}
+                        onOrderPacks={(quantity) =>
+                          void run(`${line._id}:quantity`, async () => {
+                            await reviseLine({
+                              docId: line._id,
+                              version: line.version,
+                              orderedQuantity: quantity,
+                            });
+                          })
+                        }
+                      />
                     </div>
                     <div>
                       <StatusChip status={String(line.status)} />
