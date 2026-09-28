@@ -484,7 +484,11 @@ async function decideRecipeDuplicate(
     if (sameSource.recipeIdentityFingerprint === candidate.identity) {
       return { action: "link", recipe: sameSource, outcome: "identical_source", identity: candidate.identity };
     }
-    return { action: "conflict", recipe: sameSource, identity: candidate.identity };
+    // Same text finished differently under the same name is a conflict. A new
+    // name is the person's answer ("rename this recipe"): it stands on its own.
+    if (nameEquals(sameSource)) {
+      return { action: "conflict", recipe: sameSource, identity: candidate.identity };
+    }
   }
   const sameIdentity = live.find((row) => row.recipeIdentityFingerprint === candidate.identity);
   if (sameIdentity) {
@@ -567,6 +571,11 @@ async function finalizeReviewedImport(
     const requested = projection.lines[index];
     if (stored.parsedQuantity == null) throw new Error(`line ${index + 1} quantity needs correction before finalization`);
     if (stored.parsedUnit == null) throw new Error(`line ${index + 1} unit needs correction before finalization`);
+    // A line's own bad amount is the first thing to fix; it must not be hidden
+    // behind the recipe-book duplicate check below.
+    if (!(stored.parsedQuantity > 0)) {
+      throw new Error(`Line ${index + 1}'s amount has to be more than zero. Fix it before finishing this recipe.`);
+    }
     if (stored.parsedQuantity !== requested.quantity) {
       throw new Error(`line ${index + 1} quantity does not match the saved review`);
     }
