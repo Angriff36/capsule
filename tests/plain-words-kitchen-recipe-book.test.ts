@@ -184,7 +184,7 @@ describe("plain words on the kitchen recipe book", () => {
     expect(panes).toContain("Plain text recipe (.txt)");
     expect(panes).toContain("Paste recipe text or choose");
     expect(panes).toContain("Recipe name");
-    expect(panes).toContain("<h3>Ingredients</h3>");
+    expect(panes).toContain("<h3>Ingredients and sub-recipes</h3>");
     expect(panes).toContain("Save and edit recipe");
     expect(readiness).toContain("Paste recipe text before parsing.");
     expect(readiness).toContain("Recipe sheet loaded");

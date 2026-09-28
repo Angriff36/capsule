@@ -17,8 +17,13 @@ const FRACTIONS: Record<string, number> = {
   "⅞": 0.875,
 };
 
+// "1½" / "1 ½" (whole number + fraction glyph) comes first so the glyph is
+// never read as the start of the unit or the name.
 const QUANTITY_TOKEN =
-  "(?:(?:\\d+\\s+)?\\d+\\/\\d+|\\d+(?:\\.\\d+)?|[½¼¾⅓⅔⅛⅜⅝⅞])";
+  "(?:\\d+\\s*[½¼¾⅓⅔⅛⅜⅝⅞]|(?:\\d+\\s+)?\\d+\\/\\d+|\\d+(?:\\.\\d+)?|[½¼¾⅓⅔⅛⅜⅝⅞])";
+
+/** "fl oz", "fl. oz.", "floz", "fluid ounce(s)": volume, never the mass ounce. */
+const FLUID_OUNCE_UNIT = /^(fl\.?\s*oz|fluid\s+ounces?)\.?\s+(.+)$/iu;
 
 const SUBRECIPE_PREFIX = /^(?:sub[\s-]?recipe|recipe)\s*:\s*/i;
 const SUBRECIPE_MARK =
@@ -317,10 +322,15 @@ export class ComponentTextParser {
     let unitRaw = "";
     let unit: UnitOfMeasure | null = null;
 
-    const unitMatch = rest.match(
-      /^([#A-Za-z½¼¾]+)\b(?:\s*\(([^)]+)\))?\s+(.*)$/u,
-    );
-    if (
+    const fluidOunce = rest.match(FLUID_OUNCE_UNIT);
+    const unitMatch = fluidOunce
+      ? null
+      : rest.match(/^([#A-Za-z½¼¾]+)\b\.?(?:\s*\(([^)]+)\))?\s+(.*)$/u);
+    if (fluidOunce) {
+      unitRaw = fluidOunce[1];
+      unit = "fluid_ounce";
+      rest = fluidOunce[2].trim();
+    } else if (
       unitMatch &&
       (unitMatch[1] === "#" || this.units.isKnownAlias(unitMatch[1]))
     ) {
@@ -373,6 +383,8 @@ export class ComponentTextParser {
   private parseQuantity(raw: string): number {
     const token = raw.trim();
     if (FRACTIONS[token] != null) return FRACTIONS[token];
+    const glyph = token.match(/^(\d+)\s*([½¼¾⅓⅔⅛⅜⅝⅞])$/u);
+    if (glyph) return Number(glyph[1]) + FRACTIONS[glyph[2]];
     const mixed = token.match(/^(\d+)\s+(\d+)\/(\d+)$/);
     if (mixed) {
       return Number(mixed[1]) + Number(mixed[2]) / Number(mixed[3]);
@@ -381,8 +393,9 @@ export class ComponentTextParser {
     if (fraction) {
       return Number(fraction[1]) / Number(fraction[2]);
     }
-    const value = Number(token);
-    return Number.isFinite(value) ? value : 1;
+    // A token that is not a real amount (for example "1/0") stays missing so
+    // review asks for it; it never becomes one.
+    return Number(token);
   }
 
   private looksLikeIngredient(line: string): boolean {

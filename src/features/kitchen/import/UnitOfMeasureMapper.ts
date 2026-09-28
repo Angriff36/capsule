@@ -131,13 +131,23 @@ const ALIASES: Record<string, UnitOfMeasure> = {
  * dimension is actually known. Size adjectives ("small", "medium",
  * "large") describe the item, not a unit, so they are excluded — an
  * unrecognized source measurement must stay a review correction, never
- * fall back to "each" (PR03-03).
+ * fall back to "each" (PR03-03). A can is a purchase pack, not one of the
+ * item, so it keeps its own unit and converts only through the item's pack
+ * size. Fluid ounces are volume and never the mass ounce.
  */
-const UNIT_ALIASES: Record<string, UnitOfMeasure> = Object.fromEntries(
-  Object.entries(ALIASES).filter(
-    ([alias]) => !["small", "medium", "large"].includes(alias),
-  ),
-) as Record<string, UnitOfMeasure>;
+const UNIT_ALIASES: Record<string, UnitOfMeasure> = {
+  ...(Object.fromEntries(
+    Object.entries(ALIASES).filter(
+      ([alias]) => !["small", "medium", "large"].includes(alias),
+    ),
+  ) as Record<string, UnitOfMeasure>),
+  can: "can",
+  cans: "can",
+  floz: "fluid_ounce",
+  "fl oz": "fluid_ounce",
+  "fluid ounce": "fluid_ounce",
+  "fluid ounces": "fluid_ounce",
+};
 
 export class UnitOfMeasureMapper {
   /**
