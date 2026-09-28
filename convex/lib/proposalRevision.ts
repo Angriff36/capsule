@@ -143,7 +143,8 @@ export interface ProposalRevisionSnapshot {
     sortOrder: number;
   }>;
   tenant: {
-    name: string;
+    /** Null when the company has no name on record (AC-096). */
+    name: string | null;
   };
 }
 
@@ -255,12 +256,10 @@ export async function buildProposalRevisionSnapshot(
   // row) — same resolution as convex/authProvision.ts companyNameForProvision:
   // active row first, any live row second, brandDisplayName (the
   // customer-facing name the PDF masthead shows) before the legal name. The
-  // revision is immutable, so a placeholder would be frozen into it forever;
-  // "Tenant" survives only when the tenant has no organization record (R2-13).
-  // AC-096: sendProposalWithRevisionCapture refuses to send without a real
-  // name, so "Tenant" never reaches a sent revision.
-  const tenantName =
-    (await resolveTenantBrandName(ctx, proposal.tenantId)) ?? "Tenant";
+  // revision is immutable, so a placeholder would be frozen into it forever.
+  // AC-096: with no organization name the revision stores null, never a
+  // made-up "Tenant"; the draft report asks the office to add the name.
+  const tenantName = await resolveTenantBrandName(ctx, proposal.tenantId);
 
   // Get priced line items (spec §5.4) — effective prices snapshotted here.
   // JS loose-equality filter (not the Convex DSL .eq) because governed-creation
@@ -493,13 +492,6 @@ export const sendProposalWithRevisionCapture = mutation({
     const auth = await getAuthContext(ctx);
     if (!auth.tenantId || auth.tenantId !== tenantId) {
       throw new Error("Proposal not found");
-    }
-    // AC-096: a sent revision is frozen, so it must carry the company's real
-    // name, never a placeholder.
-    if ((await resolveTenantBrandName(ctx, tenantId)) == null) {
-      throw new Error(
-        "Add your company name in company settings before you send a proposal, so the client sees who it is from.",
-      );
     }
     const overrideLines = (
       await ctx.db
