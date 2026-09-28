@@ -38,16 +38,23 @@ export class TenantSystemCommandRunner {
   private constructor(
     private readonly callerContext: MutationCtx,
     readonly tenantId: string,
+    private readonly actorKey?: string,
   ) {}
 
+  /**
+   * `actorKey` names who the system acts for (e.g. a hashed public-form
+   * submitter) so generated `rateLimit { scope: user }` buckets are per
+   * actor rather than one per tenant. Omit it for ordinary elevation.
+   */
   static forTenant(
     ctx: MutationCtx,
     tenantId: string,
+    options?: { actorKey?: string },
   ): TenantSystemCommandRunner {
     if (tenantId.trim().length === 0) {
       throw new Error("A system command run needs the tenant it acts for");
     }
-    return new TenantSystemCommandRunner(ctx, tenantId);
+    return new TenantSystemCommandRunner(ctx, tenantId, options?.actorKey);
   }
 
   /**
@@ -69,8 +76,8 @@ export class TenantSystemCommandRunner {
 
   private systemIdentity() {
     return {
-      tokenIdentifier: `capsule-system|${this.tenantId}`,
-      subject: `capsule-system:${this.tenantId}`,
+      tokenIdentifier: `capsule-system|${this.tenantId}${this.actorKey ? `|${this.actorKey}` : ""}`,
+      subject: `capsule-system:${this.tenantId}${this.actorKey ? `:${this.actorKey}` : ""}`,
       issuer: "capsule-system",
       tenantId: this.tenantId,
       role: "system",

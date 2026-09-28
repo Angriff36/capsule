@@ -7,7 +7,7 @@
 // raw-writes AND references Client/Venue/Event/EventGuest; draftProposalWithLines
 // references clients/events (its args) but writes nothing directly, so it must
 // not share a file with the recompute seam (which does raw-patch line items +
-// proposal totals). See scripts/check-event-manifest-integration.ts.
+// proposal totals). See scripts/check-manifest-integration.ts (event guard).
 //
 // Creates a draft proposal AND all its priced lines in ONE transaction: the
 // central calc derives authoritative totals + every line amount up front, so an

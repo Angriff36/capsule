@@ -285,6 +285,8 @@ export type EventDayBriefing = {
   packListItems: EventDayPackListItem[];
   people: EventDayPerson[];
   me: EventDayMe;
+  /** "withheld": numbers blank for this viewer (not event/sales, not on this event). */
+  contactAccess: "full" | "withheld";
 };
 
 /** undefined = loading; null = signed out / no role / no tenant. */

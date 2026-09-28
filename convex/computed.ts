@@ -4,6 +4,8 @@
 
 import type { Doc } from "./_generated/dataModel";
 
+import { roleGateDenies } from "./lib/orgCapabilityGate";
+
 const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = {
   "admin": [
     {
@@ -486,10 +488,16 @@ const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = 
   ]
 };
 
-function checkRole(userRole: unknown, action: unknown, target?: unknown): boolean {
+// userOrRole: the acting user's auth object (gated by roleGateDenies) or a role name.
+function checkRole(userOrRole: unknown, action: unknown, target?: unknown): boolean {
+  let userRole: unknown = userOrRole;
+  const requestedTarget = typeof target === "string" ? target : undefined;
+  if (userOrRole !== null && typeof userOrRole === "object") {
+    userRole = (userOrRole as { role?: unknown }).role;
+    if (typeof action === "string" && roleGateDenies(userOrRole, action, requestedTarget)) return false;
+  }
   if (typeof userRole !== "string" || typeof action !== "string") return false;
   const perms = ROLE_PERMISSIONS[userRole];
-  const requestedTarget = typeof target === "string" ? target : undefined;
   return perms ? perms.some((permission) =>
     (permission.action === action || permission.action === "all") &&
     (permission.target === undefined || permission.target === requestedTarget)
@@ -672,7 +680,7 @@ export function computeEvent(doc: Record<string, any>, { user }: { user: any }):
   doc.isArchived = __isArchived;
   const __timingCanRecalculate = ((((doc.deletedAt == null) && (doc.stage !== "completed")) && (doc.stage !== "closed_out")) && (doc.stage !== "cancelled"));
   doc.timingCanRecalculate = __timingCanRecalculate;
-  const __staffingCanManage = (checkRole(user.role, "workforceManageAccess") || (checkRole(user.role, "workforceSelfAccess") && checkRole(user.role, "eventManageAccess")));
+  const __staffingCanManage = (checkRole(user, "workforceManageAccess") || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess")));
   doc.staffingCanManage = __staffingCanManage;
   const __timingSuggestedSetupMinutes = (((doc.serviceStyle != null) && (doc.serviceStyle.name === "Full Service")) ? 180 : (((doc.serviceStyle != null) && (doc.serviceStyle.name === "Limited Service")) ? 90 : null));
   doc.timingSuggestedSetupMinutes = __timingSuggestedSetupMinutes;

@@ -9,16 +9,18 @@
     }
   },
   "featureRoots": [
-    "src/features/workforce"
+    "src/features/kitchen"
   ],
   "convexLibRoot": "convex/lib",
   "ownedTables": [
-    "availabilityWindows",
-    "eventAssignments",
-    "payrollInputs",
-    "qualifications",
-    "shifts",
-    "timeRecords"
+    "componentImportLines",
+    "componentImports",
+    "componentIngredients",
+    "components",
+    "dishes",
+    "eventDishes",
+    "ingredients",
+    "menus"
   ],
   "forbidDirectConvexHooks": true,
   "forbiddenImportPatterns": [
@@ -26,14 +28,14 @@
     "(?:^|/)convex/_generated(?:/|$)",
     "^convex/react$"
   ],
-  "lifecycleLiteralPattern": "\\b(?:from|to)\\s*:\\s*[\"'](?:assigned|confirmed|checked_in|checked_out|no_show|unassigned|scheduled|started|completed|cancelled|active|withdrawn|open|closed|corrected|expired|revoked)[\"']",
+  "lifecycleLiteralPattern": "\\b(?:from|to)\\s*:\\s*[\"'](?:draft|published|retired|active|discontinued|archived)[\"']",
   "lifecyclePolicies": [
     {
-      "pathSuffix": "/WorkforceLifecyclePolicy.ts",
+      "pathSuffix": "/CulinaryLifecyclePolicy.ts",
       "bindingsImport": "../../generated/manifest-wiring-bindings\"",
       "requiredSymbols": [
-        "ShiftStartLifecycle",
-        "EventAssignmentCheckInLifecycle"
+        "ComponentPublishVersionLifecycle",
+        "MenuMarkPublishedLifecycle"
       ]
     }
   ],
