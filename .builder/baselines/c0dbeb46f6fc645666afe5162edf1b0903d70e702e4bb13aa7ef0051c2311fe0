@@ -18910,7 +18910,7 @@ async function __runEventIngredientContributionRecord(ctx: MutationCtx, { docId,
         updatedAt: Date.now(),
         version: 0,
       };
-      for (const __k of ["deletedAt","eventId","ingredientId","preferredVendorId","requiredQuantity","unit","servings","dishId","sourceComponentLineQuantity","sourceBatchMultiplier","sourceYieldQuantity","status","purchaseEligibleEventId","purchasingWeekStart","calculatedAt","confirmedAt","fulfilledAt","supersededAt","supersedeReason","lastRecalculationReason","createdAt","updatedAt"] as string[]) {
+      for (const __k of ["deletedAt","eventId","ingredientId","preferredVendorId","requiredQuantity","unit","servings","dishId","sourceComponentLineQuantity","sourceBatchMultiplier","sourceYieldQuantity","status","purchaseEligibleEventId","purchasingWeekStart","calculatedAt","confirmedAt","fulfilledAt","supersededAt","supersedeReason","lastRecalculationReason","unitReviewReason","createdAt","updatedAt"] as string[]) {
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
@@ -19124,7 +19124,7 @@ export const EventIngredientContribution_createViaRecord = mutation({
         updatedAt: Date.now(),
         version: 0,
       };
-      for (const __k of ["deletedAt","eventId","ingredientId","preferredVendorId","requiredQuantity","unit","servings","dishId","sourceComponentLineQuantity","sourceBatchMultiplier","sourceYieldQuantity","status","purchaseEligibleEventId","purchasingWeekStart","calculatedAt","confirmedAt","fulfilledAt","supersededAt","supersedeReason","lastRecalculationReason","createdAt","updatedAt"] as string[]) {
+      for (const __k of ["deletedAt","eventId","ingredientId","preferredVendorId","requiredQuantity","unit","servings","dishId","sourceComponentLineQuantity","sourceBatchMultiplier","sourceYieldQuantity","status","purchaseEligibleEventId","purchasingWeekStart","calculatedAt","confirmedAt","fulfilledAt","supersededAt","supersedeReason","lastRecalculationReason","unitReviewReason","createdAt","updatedAt"] as string[]) {
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
@@ -19267,7 +19267,7 @@ async function __runEventIngredientContributionRetire(ctx: MutationCtx, { docId,
         updatedAt: Date.now(),
         version: 0,
       };
-      for (const __k of ["deletedAt","eventId","ingredientId","preferredVendorId","requiredQuantity","unit","servings","dishId","sourceComponentLineQuantity","sourceBatchMultiplier","sourceYieldQuantity","status","purchaseEligibleEventId","purchasingWeekStart","calculatedAt","confirmedAt","fulfilledAt","supersededAt","supersedeReason","lastRecalculationReason","createdAt","updatedAt"] as string[]) {
+      for (const __k of ["deletedAt","eventId","ingredientId","preferredVendorId","requiredQuantity","unit","servings","dishId","sourceComponentLineQuantity","sourceBatchMultiplier","sourceYieldQuantity","status","purchaseEligibleEventId","purchasingWeekStart","calculatedAt","confirmedAt","fulfilledAt","supersededAt","supersedeReason","lastRecalculationReason","unitReviewReason","createdAt","updatedAt"] as string[]) {
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
@@ -19383,7 +19383,7 @@ async function __runEventIngredientContributionRetirePreviousUnit(ctx: MutationC
         updatedAt: Date.now(),
         version: 0,
       };
-      for (const __k of ["deletedAt","eventId","ingredientId","preferredVendorId","requiredQuantity","unit","servings","dishId","sourceComponentLineQuantity","sourceBatchMultiplier","sourceYieldQuantity","status","purchaseEligibleEventId","purchasingWeekStart","calculatedAt","confirmedAt","fulfilledAt","supersededAt","supersedeReason","lastRecalculationReason","createdAt","updatedAt"] as string[]) {
+      for (const __k of ["deletedAt","eventId","ingredientId","preferredVendorId","requiredQuantity","unit","servings","dishId","sourceComponentLineQuantity","sourceBatchMultiplier","sourceYieldQuantity","status","purchaseEligibleEventId","purchasingWeekStart","calculatedAt","confirmedAt","fulfilledAt","supersededAt","supersedeReason","lastRecalculationReason","unitReviewReason","createdAt","updatedAt"] as string[]) {
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
@@ -19502,7 +19502,7 @@ async function __runEventIngredientContributionRevise(ctx: MutationCtx, { docId,
         updatedAt: Date.now(),
         version: 0,
       };
-      for (const __k of ["deletedAt","eventId","ingredientId","preferredVendorId","requiredQuantity","unit","servings","dishId","sourceComponentLineQuantity","sourceBatchMultiplier","sourceYieldQuantity","status","purchaseEligibleEventId","purchasingWeekStart","calculatedAt","confirmedAt","fulfilledAt","supersededAt","supersedeReason","lastRecalculationReason","createdAt","updatedAt"] as string[]) {
+      for (const __k of ["deletedAt","eventId","ingredientId","preferredVendorId","requiredQuantity","unit","servings","dishId","sourceComponentLineQuantity","sourceBatchMultiplier","sourceYieldQuantity","status","purchaseEligibleEventId","purchasingWeekStart","calculatedAt","confirmedAt","fulfilledAt","supersededAt","supersedeReason","lastRecalculationReason","unitReviewReason","createdAt","updatedAt"] as string[]) {
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
@@ -19622,7 +19622,7 @@ async function __runEventIngredientContributionSupersede(ctx: MutationCtx, { doc
         updatedAt: Date.now(),
         version: 0,
       };
-      for (const __k of ["deletedAt","eventId","ingredientId","preferredVendorId","requiredQuantity","unit","servings","dishId","sourceComponentLineQuantity","sourceBatchMultiplier","sourceYieldQuantity","status","purchaseEligibleEventId","purchasingWeekStart","calculatedAt","confirmedAt","fulfilledAt","supersededAt","supersedeReason","lastRecalculationReason","createdAt","updatedAt"] as string[]) {
+      for (const __k of ["deletedAt","eventId","ingredientId","preferredVendorId","requiredQuantity","unit","servings","dishId","sourceComponentLineQuantity","sourceBatchMultiplier","sourceYieldQuantity","status","purchaseEligibleEventId","purchasingWeekStart","calculatedAt","confirmedAt","fulfilledAt","supersededAt","supersedeReason","lastRecalculationReason","unitReviewReason","createdAt","updatedAt"] as string[]) {
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
@@ -26044,14 +26044,23 @@ async function __runIngredientDemandSyncFromContributions(ctx: MutationCtx, { do
     const catalogUnit = ((__rel_ingredient != null) ? __rel_ingredient.unit : unit);
     const targetMass = ((catalogUnit === "gram") ? 1 : ((catalogUnit === "kilogram") ? 1000 : ((catalogUnit === "ounce") ? 28.349523125 : ((catalogUnit === "pound") ? 453.59237 : 0))));
     const targetVolume = ((catalogUnit === "milliliter") ? 1 : ((catalogUnit === "liter") ? 1000 : ((catalogUnit === "teaspoon") ? 4.92892159375 : ((catalogUnit === "tablespoon") ? 14.78676478125 : ((catalogUnit === "cup") ? 236.5882365 : ((catalogUnit === "pint") ? 473.176473 : ((catalogUnit === "quart") ? 946.352946 : ((catalogUnit === "gallon") ? 3785.411784 : 0))))))));
+    const unitMass = ((unit === "gram") ? 1 : ((unit === "kilogram") ? 1000 : ((unit === "ounce") ? 28.349523125 : ((unit === "pound") ? 453.59237 : 0))));
+    const unitVolume = ((unit === "milliliter") ? 1 : ((unit === "liter") ? 1000 : ((unit === "teaspoon") ? 4.92892159375 : ((unit === "tablespoon") ? 14.78676478125 : ((unit === "cup") ? 236.5882365 : ((unit === "pint") ? 473.176473 : ((unit === "quart") ? 946.352946 : ((unit === "gallon") ? 3785.411784 : 0))))))));
     const massRaw = (((((total_gram != null) ? total_gram : 0) + ((total_kilogram != null) ? total_kilogram : 0)) + ((total_ounce != null) ? total_ounce : 0)) + ((total_pound != null) ? total_pound : 0));
     const massBase = ((((((total_gram != null) ? total_gram : 0) * 1) + (((total_kilogram != null) ? total_kilogram : 0) * 1000)) + (((total_ounce != null) ? total_ounce : 0) * 28.349523125)) + (((total_pound != null) ? total_pound : 0) * 453.59237));
     const volumeRaw = (((((((((total_milliliter != null) ? total_milliliter : 0) + ((total_liter != null) ? total_liter : 0)) + ((total_teaspoon != null) ? total_teaspoon : 0)) + ((total_tablespoon != null) ? total_tablespoon : 0)) + ((total_cup != null) ? total_cup : 0)) + ((total_pint != null) ? total_pint : 0)) + ((total_quart != null) ? total_quart : 0)) + ((total_gallon != null) ? total_gallon : 0));
     const volumeBase = ((((((((((total_milliliter != null) ? total_milliliter : 0) * 1) + (((total_liter != null) ? total_liter : 0) * 1000)) + (((total_teaspoon != null) ? total_teaspoon : 0) * 4.92892159375)) + (((total_tablespoon != null) ? total_tablespoon : 0) * 14.78676478125)) + (((total_cup != null) ? total_cup : 0) * 236.5882365)) + (((total_pint != null) ? total_pint : 0) * 473.176473)) + (((total_quart != null) ? total_quart : 0) * 946.352946)) + (((total_gallon != null) ? total_gallon : 0) * 3785.411784));
-    const compatibleMass = ((targetMass > 0) && (Math.abs((massRaw - requiredQuantity)) < 1e-8));
-    const compatibleVolume = ((targetVolume > 0) && (Math.abs((volumeRaw - requiredQuantity)) < 1e-8));
-    const demandUnit = ((compatibleMass || compatibleVolume) ? catalogUnit : unit);
-    const nextQuantity = Math.max(0, (compatibleMass ? (massBase / targetMass) : (compatibleVolume ? (volumeBase / targetVolume) : requiredQuantity)));
+    const otherRaw = Math.max(0, ((requiredQuantity - massRaw) - volumeRaw));
+    const catalogIsCount = ((targetMass === 0) && (targetVolume === 0));
+    const catalogPart = ((targetMass > 0) ? (massBase / targetMass) : ((targetVolume > 0) ? (volumeBase / targetVolume) : otherRaw));
+    const leftOutAmount = ((targetMass > 0) ? (volumeRaw + otherRaw) : ((targetVolume > 0) ? (massRaw + otherRaw) : (massRaw + volumeRaw)));
+    const unitInBuyingKind = ((targetMass > 0) ? (unitMass > 0) : ((targetVolume > 0) ? (unitVolume > 0) : ((unitMass === 0) && (unitVolume === 0))));
+    const useBuyingKind = (((catalogPart > 1e-8) || (leftOutAmount <= 1e-8)) || unitInBuyingKind);
+    const buyingKindUnit = (((catalogIsCount && (unitMass === 0)) && (unitVolume === 0)) ? unit : catalogUnit);
+    const otherKindQuantity = ((unitMass > 0) ? (massBase / unitMass) : ((unitVolume > 0) ? (volumeBase / unitVolume) : otherRaw));
+    const demandUnit = (useBuyingKind ? buyingKindUnit : unit);
+    const nextQuantity = Math.max(0, (useBuyingKind ? catalogPart : otherKindQuantity));
+    const unitIssue = ((leftOutAmount <= 1e-8) ? null : (useBuyingKind ? (("Some recipe amounts for this item are in units that don't turn into " + catalogUnit) + ", so they are left out of this amount. Record how the units convert, or fix the recipe unit.") : (((("This amount is in " + unit) + ", but the item is bought by the ") + catalogUnit) + ". Record how the units convert, or fix the recipe unit.")));
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -26074,6 +26083,7 @@ async function __runIngredientDemandSyncFromContributions(ctx: MutationCtx, { do
       preferredVendorId: __rel_ingredient.preferredVendorId,
       requiredQuantity: nextQuantity,
       unit: demandUnit,
+      unitReviewReason: unitIssue,
       purchasingWeekStart: ((purchasingWeekStart != null) ? purchasingWeekStart : doc.purchasingWeekStart),
       status: ((previousStatus === "pending") ? "calculated" : previousStatus),
       calculatedAt: ((doc.calculatedAt == null) ? Date.now() : doc.calculatedAt),

@@ -1599,6 +1599,7 @@ export default defineSchema({
     supersededAt: v.optional(v.union(v.number(), v.null())),
     supersedeReason: v.optional(v.union(v.string(), v.null())),
     lastRecalculationReason: v.optional(v.union(v.string(), v.null())),
+    unitReviewReason: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),

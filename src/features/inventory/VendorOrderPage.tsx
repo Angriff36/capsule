@@ -9,6 +9,7 @@ import {
   useGetVendorOrder,
   useListEvent,
   useListIngredient,
+  useListIngredientDemand,
   useListInventoryLot,
   useListPurchaseNeed,
   useListStorageLocation,
@@ -49,6 +50,7 @@ import {
   canCancelVendorOrderLine,
   cancelVendorOrderLine,
 } from "./VendorOrderLineCancel";
+import { orderLineUnitIssues } from "./orderLineUnitIssues";
 
 const policy = new SupplyLifecyclePolicy();
 
@@ -60,6 +62,7 @@ export function VendorOrderPage() {
   const lines = useListVendorOrderLine();
   const demandLinks = useListVendorOrderLineDemand();
   const needs = useListPurchaseNeed();
+  const demands = useListIngredientDemand();
   const events = useListEvent();
   const ingredients = useListIngredient();
   const inventoryLots = useListInventoryLot();
@@ -120,6 +123,11 @@ export function VendorOrderPage() {
   const openNeeds = (needs ?? []).filter(
     (need) => need.deletedAt == null && need.status === "open",
   );
+  const unitIssues = orderLineUnitIssues({
+    lines: orderLines,
+    links: demandLinks ?? [],
+    demands: demands ?? [],
+  });
   const vendor = vendors?.find((item) => item._id === order.vendorId);
   const orderContacts = (vendorContacts ?? []).filter(
     (contact) =>
@@ -599,6 +607,11 @@ export function VendorOrderPage() {
                             : need.status === "cancelled"
                               ? " · purchasing cancelled"
                               : ""}
+                        </small>
+                      ))}
+                      {(unitIssues.get(line._id) ?? []).map((issue) => (
+                        <small key={`unit-${issue.eventId}`} role="status">
+                          {eventName(issue.eventId)}: {issue.reason}
                         </small>
                       ))}
                     </div>

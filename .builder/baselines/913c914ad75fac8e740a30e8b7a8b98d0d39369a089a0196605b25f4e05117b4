@@ -1753,6 +1753,7 @@ export const IngredientDemandSchema = z.object({
   supersededAt: z.coerce.date().nullable().optional(),
   supersedeReason: z.string().nullable().optional(),
   lastRecalculationReason: z.string().nullable().optional(),
+  unitReviewReason: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });

@@ -73,7 +73,7 @@ describe("runtime proof: weekly draft reconcile (AC-078)", () => {
     });
 
     const ordersBefore = await orders(roles.procurement, tenantId);
-    const batchesBefore = await liveRows<{ _id: string }>(
+    const batchesBefore = await liveRows<{ _id: string; tenantId: string }>(
       roles.procurement,
       "productionBatches",
       tenantId,
@@ -117,7 +117,7 @@ describe("runtime proof: weekly draft reconcile (AC-078)", () => {
     expect(Number(saltAfter!.plannedQuantity)).toBeCloseTo(1.2, 4);
 
     // Buying more flour is not a reason to plan more cooking.
-    const batchesAfter = await liveRows<{ _id: string }>(
+    const batchesAfter = await liveRows<{ _id: string; tenantId: string }>(
       roles.procurement,
       "productionBatches",
       tenantId,
