@@ -16,18 +16,35 @@ export function operationsAnswers(
 ): Record<string, Draft> {
   const out: Record<string, Draft> = {};
   const vehicles = input.vehicles;
+  const rig = (v: (typeof vehicles)[number]) =>
+    [v.vehicleName ?? "Truck", v.trailerName].filter(Boolean).join(" + ");
   const vehicleSources = [
-    ...vehicles.flatMap((v) => source("eventVehicleAssignments", v)),
+    ...vehicles.flatMap((v) => [
+      ...source("eventVehicleAssignments", v),
+      ...v.busyWith.flatMap((b) => source("eventVehicleAssignments", b)),
+    ]),
     ...input.equipment.flatMap(equipmentSources),
   ];
+  // With more than one rig, each must say what it carries.
+  const split = vehicles.length > 1;
   const problems = [
     ...(vehicles.length ? [] : ["No truck is assigned to this event."]),
     ...vehicles
       .filter((v) => v.outOfService)
       .map((v) => `${v.vehicleName ?? "A truck"} is out of service.`),
+    ...vehicles.flatMap((v) =>
+      v.busyWith.map(
+        (b) => `${rig(v)} is also booked for ${b.eventTitle} at the same time.`,
+      ),
+    ),
     ...vehicles
       .filter((v) => !v.driverId)
       .map((v) => `${v.vehicleName ?? "A truck"} has no driver.`),
+    ...(split
+      ? vehicles
+          .filter((v) => !v.notes?.trim())
+          .map((v) => `${rig(v)} does not say what it carries.`)
+      : []),
     ...input.equipment
       .filter((e) => e.shortBy > 0)
       .map((e) => `${e.name} is short by ${e.shortBy}.`),
@@ -45,12 +62,16 @@ export function operationsAnswers(
         {
           type: "list",
           items: vehicles.map((v) =>
-            [v.vehicleName ?? "Truck", v.trailerName]
+            [
+              rig(v),
+              split ? `carries ${v.notes!.trim()}` : null,
+              v.preloaded ? "already loaded" : null,
+            ]
               .filter(Boolean)
-              .join(" + "),
+              .join(" - "),
           ),
         },
-        `${vehicles.length} truck${vehicles.length === 1 ? "" : "s"} with drivers; ${input.equipment.length} equipment reservation${input.equipment.length === 1 ? "" : "s"} covered.`,
+        `${vehicles.length} truck${vehicles.length === 1 ? "" : "s"} with drivers, free for this event${split ? ", each with its own load" : `; everything loads on ${rig(vehicles[0]!)}`}; ${input.equipment.length} equipment reservation${input.equipment.length === 1 ? "" : "s"} covered.`,
         "vehicles.assigned.truck-driver-equipment",
         vehicleSources,
       );

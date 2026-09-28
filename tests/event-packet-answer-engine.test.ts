@@ -129,6 +129,9 @@ function input(): FinalLockInput {
         trailerId: null,
         trailerName: null,
         driverId: "person-driver",
+        notes: null,
+        preloaded: false,
+        busyWith: [],
         outOfService: false,
       },
     ],
@@ -761,6 +764,55 @@ describe("Final Lock answer engine", () => {
     expect(get(run(none).answers, "vehicles.assigned").action).toBe(
       "Assign a truck on the event.",
     );
+  });
+
+  it("shows truck availability and load grouping, and names what is missing", () => {
+    // One rig: everything loads on it.
+    const one = get(run(input()).answers, "vehicles.assigned");
+    expect(one.explanation).toContain("everything loads on Box truck");
+
+    // Two rigs: each says what it carries, or the answer stays open.
+    const two = input();
+    two.vehicles.push({
+      ...two.vehicles[0]!,
+      id: "va-2",
+      vehicleId: "vehicle-2",
+      vehicleName: "Sprinter van",
+      trailerId: "trailer-1",
+      trailerName: "Cargo trailer",
+    });
+    expect(get(run(two).answers, "vehicles.assigned").missing).toEqual([
+      "Box truck does not say what it carries.",
+      "Sprinter van + Cargo trailer does not say what it carries.",
+    ]);
+    two.vehicles[0]!.notes = "Kitchen and hot boxes";
+    two.vehicles[1]!.notes = "Rentals and bar";
+    two.vehicles[1]!.preloaded = true;
+    const grouped = get(run(two).answers, "vehicles.assigned");
+    expect(grouped.result).toBe("answered");
+    expect(grouped.value).toEqual({
+      type: "list",
+      items: [
+        "Box truck - carries Kitchen and hot boxes",
+        "Sprinter van + Cargo trailer - carries Rentals and bar - already loaded",
+      ],
+    });
+
+    // The same truck held by another event at the same time is named.
+    const busy = input();
+    busy.vehicles[0]!.busyWith = [
+      { id: "va-other", version: 4, eventTitle: "Smith Retirement" },
+    ];
+    const clash = get(run(busy).answers, "vehicles.assigned");
+    expect(clash.result).toBe("unresolved");
+    expect(clash.missing).toEqual([
+      "Box truck is also booked for Smith Retirement at the same time.",
+    ]);
+    expect(clash.sources).toContainEqual({
+      table: "eventVehicleAssignments",
+      id: "va-other",
+      version: 4,
+    });
   });
 
   it("derives ready-to-leave from actual work and needs two different people before takeoff", () => {

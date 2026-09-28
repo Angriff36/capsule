@@ -164,6 +164,11 @@ export interface FinalLockInput {
     trailerId: string | null;
     trailerName: string | null;
     driverId: string | null;
+    /** What this rig carries, as written on the assignment. */
+    notes: string | null;
+    preloaded: boolean;
+    /** Other events holding the same truck or trailer at an overlapping time. */
+    busyWith: (NativeRow & { eventTitle: string })[];
     outOfService: boolean;
   })[];
   equipment: (NativeRow & {

@@ -138,6 +138,42 @@ export async function readFinalLockInput(
       v
         ? `${v.make ?? ""} ${v.model ?? ""}`.trim() || String(v.registration)
         : null;
+    // The same truck or trailer held by another event at an overlapping time.
+    const busyWith = [];
+    const seen = new Set<string>();
+    for (const field of ["vehicleId", "trailerId"] as const) {
+      const id = row[field];
+      if (typeof id !== "string") continue;
+      const others = await ctx.db
+        .query("eventVehicleAssignments")
+        .withIndex(`by_${field}`, (q: any) => q.eq(field, id))
+        .collect();
+      for (const other of others as any[]) {
+        if (
+          other.tenantId !== tenantId ||
+          other.eventId === String(eventId) ||
+          other.releasedAt != null ||
+          other.deletedAt != null ||
+          seen.has(String(other._id))
+        )
+          continue;
+        const otherEvent = await own(ctx, "events", other.eventId, tenantId);
+        const [a0, a1, b0, b1] = [
+          num(event.startsAt),
+          num(event.endsAt),
+          num(otherEvent?.startsAt),
+          num(otherEvent?.endsAt),
+        ];
+        if (a0 == null || a1 == null || b0 == null || b1 == null) continue;
+        if (b0 >= a1 || a0 >= b1) continue;
+        seen.add(String(other._id));
+        busyWith.push({
+          id: String(other._id),
+          version: version(other),
+          eventTitle: String(otherEvent?.title ?? "another event"),
+        });
+      }
+    }
     vehicles.push({
       id: String(row._id),
       version: version(row),
@@ -146,6 +182,9 @@ export async function readFinalLockInput(
       trailerId: str(row.trailerId),
       trailerName: label(trailer),
       driverId: str(row.driverId),
+      notes: str(row.notes),
+      preloaded: row.preloadedAt != null,
+      busyWith,
       outOfService: [vehicle, trailer].some(
         (v) =>
           v &&
