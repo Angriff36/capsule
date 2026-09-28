@@ -7,7 +7,26 @@
  * in use — an event document, another message's photo, a dish image — by
  * naming its storage id.
  */
-import type { MutationCtx } from "../_generated/server";
+import type { Doc } from "../_generated/dataModel";
+import type { MutationCtx, QueryCtx } from "../_generated/server";
+
+/**
+ * The first Attachment row ever written for a blob, live or removed. Every
+ * upload flow writes this row right after the upload, so it names the
+ * company and record the bytes were uploaded for. A later row that names
+ * the same storage id — in another company, or on another chat message —
+ * never owns the file (PR12-05: knowing a storage id grants nothing).
+ */
+export async function firstAttachmentFor(
+  ctx: QueryCtx,
+  storageId: string,
+): Promise<Doc<"attachments"> | null> {
+  return await ctx.db
+    .query("attachments")
+    .withIndex("by_storageId", (q) => q.eq("storageId", storageId))
+    .order("asc")
+    .first();
+}
 
 export async function blobReferenced(
   ctx: MutationCtx,
