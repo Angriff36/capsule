@@ -9,8 +9,10 @@
   **The independent review is the safety boundary**: every change is
   worktree-isolated, test-verified, and reviewed by a different provider than
   the maker (see Check & Land). APPROVE → the lander puts the fix on the
-  shared `dev` branch at once: no PR, no human step. `dev` is the work copy; production changes only
-  when the owner says "release". The loop does NOT pre-filter work into "safe"
+  shared `dev` branch at once: no PR, no human step. `dev` is the work copy. Every build round goes to `dev` at once
+  (loop-publish.ps1); the daily review checks everything on `dev` not yet in
+  production, and its APPROVE releases to production (Ryan 2026-09-28: "once the
+  reviewer clears it it should go to production"). The loop does NOT pre-filter work into "safe"
   and "unsafe". Anything reviewable is attemptable.
   Why the change: the owner does not code and cannot approve PRs. Under the
   draft-PR design 26 of 37 loop PRs sat unapproved, went stale against a
