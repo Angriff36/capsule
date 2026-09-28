@@ -6,7 +6,7 @@
 // framework-agnostic — swap in Jest/node:test as your project uses.
 //
 // These call a live model and cost tokens: run them in the build loop as backpressure
-// for subjective criteria, not on every unit-test run. They need ANTHROPIC_API_KEY.
+// for subjective criteria, not on every unit-test run. They need ZAI_API_KEY.
 
 import { test, expect } from "vitest";
 import { createReview, loadActiveCriteria } from "@/lib/llm-review";
