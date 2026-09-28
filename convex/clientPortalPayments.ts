@@ -241,15 +241,16 @@ export const startPayment = action({
     const currency = invoiceCheckoutCurrency(invoice);
     const portalUrl = `${setup.appOrigin}/portal/events/${encodeURIComponent(args.token)}`;
     const invoiceNumber = String(invoice.invoiceNumber || invoice._id);
-    // Two presses at the same moment send the same key, so Stripe hands both
-    // the same checkout.
+    // Two presses at the same moment see the same checkouts so far and send
+    // the same key, so Stripe hands both the same checkout. Once that checkout
+    // is saved, the count moves on, so a try after it expires gets a new one.
     const idempotencyKey = [
       "client-portal",
       String(invoice._id),
       args.part,
       toStripeAmount(amount, currency),
       toStripeAmount(invoice.amountPaid, currency),
-      Math.floor(Date.now() / (60 * 60 * 1000)),
+      view.sessions.length,
     ].join("/");
     let created: { sessionId: string; url: string };
     try {
