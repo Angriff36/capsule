@@ -9,6 +9,7 @@ import {
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
+import { EventDriveTimePanel } from "./EventDriveTimePanel";
 import {
   durationFields,
   startDraft,
@@ -144,6 +145,12 @@ export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
           available for corrections.
         </p>
       )}
+      <EventDriveTimePanel
+        eventId={eventId}
+        operatingLocationId={plan.event.operatingLocationId ?? null}
+        version={plan.event.version}
+        canChange={plan.event.timingCanRecalculate}
+      />
       {failure && (
         <div className="mt-3">
           <FailureBanner failure={failure} />

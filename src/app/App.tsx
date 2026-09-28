@@ -456,6 +456,11 @@ const BrandingPage = lazy(() =>
     default: module.BrandingPage,
   })),
 );
+const KitchensPage = lazy(() =>
+  import("../features/admin/KitchensPage").then((module) => ({
+    default: module.KitchensPage,
+  })),
+);
 const CatalogsPage = lazy(() =>
   import("../features/admin/CatalogsPage").then((module) => ({
     default: module.CatalogsPage,
@@ -1423,6 +1428,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <BrandingPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin/kitchens"
+              element={
+                <SupplyRoute>
+                  <KitchensPage />
                 </SupplyRoute>
               }
             />

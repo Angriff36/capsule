@@ -6,6 +6,7 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { api } from "../../convex/_generated/api";
+import type { Id } from "../../convex/_generated/dataModel";
 import {
   fakeRoutes,
   routeWorld,
@@ -129,7 +130,7 @@ describe("route source facts (AC-425)", () => {
       {
         name: "Route Proof Catering",
       },
-    )) as { docId: string };
+    )) as { docId: Id<"organizations"> };
     await owner.mutation(M.Organization_configureRoutePolicy, {
       docId: organization.docId,
       safetyBufferMinutes: 30,
