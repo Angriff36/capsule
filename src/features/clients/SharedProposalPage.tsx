@@ -373,6 +373,25 @@ export function SharedProposalPage({ token }: { token: string }) {
           </div>
 
           <div className="p-8">
+            {data.replacedBy ? (
+              <div className="bg-warning-soft border-l-4 border-warning p-4 mb-6">
+                <p className="text-ink">
+                  This proposal was replaced by {data.replacedBy.title}.
+                </p>
+                <p className="text-2xs text-ink-2 mt-1">
+                  {data.replacedBy.shareToken ? (
+                    <a
+                      className="text-link"
+                      href={`/share/${data.replacedBy.shareToken}`}
+                    >
+                      Open the new proposal
+                    </a>
+                  ) : (
+                    "Ask us for the link to the new proposal."
+                  )}
+                </p>
+              </div>
+            ) : null}
             {orderedBlocks.map((block, index) => (
               <Fragment key={index}>{block}</Fragment>
             ))}

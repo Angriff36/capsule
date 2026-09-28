@@ -84,6 +84,10 @@ type SharedProposal = {
   capturedAt: number | null;
   linkCreatedAt: number | null;
   linkExpiresAt: number | null;
+  // AC-097 / AC-253: this proposal was replaced by a newer one. The old link
+  // still shows what was shared, and names the newer proposal; its link token
+  // is given when that proposal has a working link.
+  replacedBy: { title: string; shareToken: string | null } | null;
 };
 
 /** A link saved without an end date stops working 90 days after it was made. */
@@ -107,6 +111,7 @@ async function openShareLink(
 ): Promise<{
   link: Doc<"shareLinks">;
   revision: Doc<"proposalRevisions">;
+  proposal: Doc<"proposals">;
 } | null> {
   const linkId = ctx.db.normalizeId("shareLinks", token);
   if (!linkId) return null;
@@ -135,7 +140,40 @@ async function openShareLink(
   ) {
     return null;
   }
-  return { link, revision };
+  return { link, revision, proposal };
+}
+
+/** A newer working link to the same proposal, if one exists. */
+async function workingLinkFor(
+  ctx: QueryCtx,
+  proposalId: Id<"proposals">,
+): Promise<string | null> {
+  const links = await ctx.db
+    .query("shareLinks")
+    .withIndex("by_proposalId", (q) => q.eq("proposalId", proposalId))
+    .collect();
+  const newestFirst = links.sort(
+    (a, b) =>
+      (b.createdAt ?? b._creationTime) - (a.createdAt ?? a._creationTime),
+  );
+  for (const link of newestFirst) {
+    if (await openShareLink(ctx, link._id)) return link._id;
+  }
+  return null;
+}
+
+/** The proposal that replaced this one (same company), or null. */
+async function replacementOf(
+  ctx: QueryCtx,
+  proposal: Doc<"proposals">,
+): Promise<SharedProposal["replacedBy"]> {
+  if (proposal.status !== "superseded" || !proposal.supersededById) return null;
+  const nextId = ctx.db.normalizeId("proposals", proposal.supersededById);
+  const next = nextId ? await ctx.db.get(nextId) : null;
+  if (!next || next.deletedAt != null || next.tenantId !== proposal.tenantId) {
+    return { title: "a newer proposal", shareToken: null };
+  }
+  return { title: next.title, shareToken: await workingLinkFor(ctx, next._id) };
 }
 
 /** Resolve a share token to the pinned revision's client-safe view, or null. */
@@ -144,7 +182,7 @@ export const getSharedProposal = query({
   handler: async (ctx, { token }): Promise<SharedProposal | null> => {
     const opened = await openShareLink(ctx, token);
     if (!opened) return null;
-    const { link, revision } = opened;
+    const { link, revision, proposal: liveProposal } = opened;
 
     let snapshot: Record<string, unknown> = {};
     try {
@@ -273,6 +311,7 @@ export const getSharedProposal = query({
       capturedAt: revision.capturedAt ?? null,
       linkCreatedAt: link.createdAt ?? null,
       linkExpiresAt: linkEndsAt(link),
+      replacedBy: await replacementOf(ctx, liveProposal),
     };
   },
 });
