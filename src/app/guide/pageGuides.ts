@@ -235,6 +235,17 @@ export const PAGE_GUIDES: PageGuide[] = [
     ],
   },
   {
+    prefix: "/inventory/opening-stock",
+    title: "Opening stock",
+    purpose:
+      "Bring in a stock count sheet and pick which counts become the stock on hand.",
+    steps: [
+      "Choose the count sheet (CSV). Every row lands here; stock on hand does not change yet.",
+      "Fix the rows that need it, or set them aside.",
+      "Press Use as opening stock on each food row you want to start from.",
+    ],
+  },
+  {
     prefix: "/inventory/audit",
     title: "Stock history",
     purpose:

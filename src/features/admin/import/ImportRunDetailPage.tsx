@@ -35,6 +35,7 @@ const DATASET_TYPE_LABELS: Record<string, string> = {
   venues: "Venues",
   payments: "Payments",
   pack_list: "Pack Lists",
+  stock: "Opening stock",
 };
 
 // Status labels

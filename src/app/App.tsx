@@ -49,6 +49,11 @@ const StockCountPage = lazy(() =>
     default: module.StockCountPage,
   })),
 );
+const OpeningStockPage = lazy(() =>
+  import("../features/inventory/OpeningStockPage").then((module) => ({
+    default: module.OpeningStockPage,
+  })),
+);
 const InventoryAuditLogPage = lazy(() =>
   import("../features/inventory/InventoryAuditLogPage").then((module) => ({
     default: module.InventoryAuditLogPage,
@@ -804,6 +809,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <StockCountPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/inventory/opening-stock"
+              element={
+                <SupplyRoute>
+                  <OpeningStockPage />
                 </SupplyRoute>
               }
             />
