@@ -174,6 +174,7 @@ import type * as notifications from "../notifications.js";
 import type * as personEmail from "../personEmail.js";
 import type * as personEmployeeNumber from "../personEmployeeNumber.js";
 import type * as personalDataExport from "../personalDataExport.js";
+import type * as publicMenu from "../publicMenu.js";
 import type * as pushSubscriptions from "../pushSubscriptions.js";
 import type * as qboSync from "../qboSync.js";
 import type * as queries from "../queries.js";
@@ -381,6 +382,7 @@ declare const fullApi: ApiFromModules<{
   personEmail: typeof personEmail;
   personEmployeeNumber: typeof personEmployeeNumber;
   personalDataExport: typeof personalDataExport;
+  publicMenu: typeof publicMenu;
   pushSubscriptions: typeof pushSubscriptions;
   qboSync: typeof qboSync;
   queries: typeof queries;
