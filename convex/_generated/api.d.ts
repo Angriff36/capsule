@@ -199,6 +199,8 @@ import type * as recurringEvents from "../recurringEvents.js";
 import type * as runOfShowAlerts from "../runOfShowAlerts.js";
 import type * as runOfShowAlertsSend from "../runOfShowAlertsSend.js";
 import type * as sagas from "../sagas.js";
+import type * as schedulePush from "../schedulePush.js";
+import type * as schedulePushSend from "../schedulePushSend.js";
 import type * as search from "../search.js";
 import type * as shareLinks from "../shareLinks.js";
 import type * as shiftTimingChanges from "../shiftTimingChanges.js";
@@ -423,6 +425,8 @@ declare const fullApi: ApiFromModules<{
   runOfShowAlerts: typeof runOfShowAlerts;
   runOfShowAlertsSend: typeof runOfShowAlertsSend;
   sagas: typeof sagas;
+  schedulePush: typeof schedulePush;
+  schedulePushSend: typeof schedulePushSend;
   search: typeof search;
   shareLinks: typeof shareLinks;
   shiftTimingChanges: typeof shiftTimingChanges;

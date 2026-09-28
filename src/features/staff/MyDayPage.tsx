@@ -799,12 +799,26 @@ export function MyDayPage() {
                                     label="Received"
                                   />
                                 ) : (
-                                  <StatusChip status="pending" label="New" />
+                                  <StatusChip
+                                    status="pending"
+                                    label={notice.changedAt ? "Changed" : "New"}
+                                  />
                                 )}
                               </div>
                               <p className="schedule-notice-summary">
                                 {notice.shiftSummary}
                               </p>
+                              {notice.changedAt &&
+                                notice.previousShiftSummary && (
+                                  <p
+                                    className="schedule-notice-summary text-ink-2"
+                                    data-testid="schedule-notice-was"
+                                  >
+                                    Changed {dayLabel(notice.changedAt)} at{" "}
+                                    {timeLabel(notice.changedAt)}. Before it
+                                    was: {notice.previousShiftSummary}
+                                  </p>
+                                )}
                               {notice.acknowledgedAt ? (
                                 <p className="schedule-notice-confirmation">
                                   Acknowledged {dayLabel(notice.acknowledgedAt)}{" "}

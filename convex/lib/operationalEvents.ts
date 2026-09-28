@@ -1,4 +1,5 @@
 import type { ConvexCommandEvent } from "@angriff36/manifest/projections/convex";
+import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { reconcileEventPrepWork } from "./prepWorkReconciliation";
@@ -54,6 +55,14 @@ export async function handleManifestEvent(
   await queueRouteRefresh(ctx, event);
   await queueTimingRecalculation(ctx, event);
   if (await handleTravelLegEvent(ctx, event)) return;
+  if (event.entity === "WeeklyScheduleNotice" &&
+    (event.type === "WeeklySchedulePublished" || event.type === "WeeklyScheduleRepublished")) {
+    // The person's phone notice for a new or changed week (AC-326/AC-508).
+    await ctx.scheduler.runAfter(0, internal.schedulePushSend.deliver, {
+      noticeId: event.entityId as Id<"weeklyScheduleNotices">,
+    });
+    return;
+  }
   if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedCoverageChangeRequested") {
     await prepareStaffNeedCoverageChange(ctx, event.entityId as Id<"eventStaffNeeds">);
     return;

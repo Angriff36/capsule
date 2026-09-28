@@ -4166,6 +4166,8 @@ export const WeeklyScheduleNoticeSchema = z.object({
   shiftSummary: z.string().default(""),
   publishedAt: z.coerce.date().nullable().optional(),
   acknowledgedAt: z.coerce.date().nullable().optional(),
+  previousShiftSummary: z.string().nullable().optional(),
+  changedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });

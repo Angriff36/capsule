@@ -60806,6 +60806,8 @@ async function __runWeeklyScheduleNoticeRepublishSchedule(ctx: MutationCtx, { do
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
     if (!((shiftCount > 0))) throw new Error("Add at least one scheduled shift before you publish.");
     if (!((((shiftSummary).trim()).length > 0))) throw new Error("Add a shift summary before you publish.");
+    const toldBefore = doc.shiftSummary;
+    const changed = ((shiftSummary !== doc.shiftSummary) || (shiftCount !== doc.shiftCount));
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -60813,6 +60815,8 @@ async function __runWeeklyScheduleNoticeRepublishSchedule(ctx: MutationCtx, { do
       recipientAuthSubjectId: recipientAuthSubjectId,
       shiftCount: shiftCount,
       shiftSummary: shiftSummary,
+      previousShiftSummary: (changed ? toldBefore : doc.previousShiftSummary),
+      changedAt: (changed ? Date.now() : doc.changedAt),
       publishedAt: Date.now(),
       acknowledgedAt: null,
       version: ((doc as any).version ?? 0) + 1
