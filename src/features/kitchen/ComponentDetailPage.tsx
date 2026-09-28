@@ -760,6 +760,7 @@ export function ComponentDetailPage() {
           csvLinesText={sourceImport.csvLinesText ?? undefined}
           importId={String(sourceImport._id)}
           status={sourceImport.status}
+          duplicateOutcome={sourceImport.duplicateOutcome ?? undefined}
         />
       ) : null}
 

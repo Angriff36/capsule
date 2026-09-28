@@ -629,6 +629,11 @@ export function ComponentImportPage() {
                   status={
                     storedImport == null ? undefined : storedImport.status
                   }
+                  duplicateOutcome={
+                    storedImport == null
+                      ? undefined
+                      : (storedImport.duplicateOutcome ?? undefined)
+                  }
                 />
               ) : (
                 <ComponentImportSourcePane
