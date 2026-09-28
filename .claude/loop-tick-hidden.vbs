@@ -2,7 +2,7 @@
 ' console window, so a round does not pop up over the owner's work. loop-tick.cmd does
 ' ONE build round; exit code 10 means "a round finished, more work may wait", so the
 ' next round starts at once - no round limit (Ryan 2026-09-27). Any other exit code
-' stops the run until the next hourly start. It WAITS for each round: while it waits
+' stops the run until the next scheduled start (every 5 minutes; loop-lock.ps1 keeps it to one runner). It WAITS for each round: while it waits
 ' the scheduled task counts as running, so a second copy never starts beside it
 ' (loop-constraints.md: one writer at a time).
 Set sh = CreateObject("WScript.Shell")

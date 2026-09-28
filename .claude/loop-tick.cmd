@@ -15,6 +15,7 @@ REM loop-maker-settings.json adds the maker-only deny list (no push, no PRs, no 
 cd /d C:\Projects\capsule
 set BUILDER_DIR=C:\Projects\builder
 findstr /C:"loop-pause-all" STATE.md >nul 2>&1 && exit /b 0
+pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-lock.ps1" || exit /b 0
 if exist ".loop-worktrees\_nothing-left" del ".loop-worktrees\_nothing-left"
 pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-review-due.ps1" >> ".claude\loop-tick.log" 2>&1
 REM A hand-off left from an earlier run (no reviewer was available) is reviewed
