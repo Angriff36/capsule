@@ -23,6 +23,7 @@ import {
 } from "../../convex/quoteBuilder";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
+import { ensureTestFieldEncryptionKey } from "./test-field-encryption-key";
 
 const LIMIT = 5;
 
@@ -34,12 +35,7 @@ function harness() {
   });
 }
 
-beforeAll(() => {
-  if (!process.env.CONVEX_FIELD_ENCRYPTION_KEY) {
-    process.env.CONVEX_FIELD_ENCRYPTION_KEY =
-      "A1MKNFPVRhFaPf83T45BwooVzAogtiphQhYraAD5gqU=";
-  }
-});
+beforeAll(ensureTestFieldEncryptionKey);
 
 type Actor = ReturnType<ReturnType<typeof harness>["asRole"]>;
 type Submitted = { submissionId: string; isDuplicate: boolean };

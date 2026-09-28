@@ -10,6 +10,7 @@ import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
+import { ensureTestFieldEncryptionKey } from "./test-field-encryption-key";
 
 function harness() {
   return createManifestTestContext({
@@ -19,12 +20,7 @@ function harness() {
   });
 }
 
-beforeAll(() => {
-  if (!process.env.CONVEX_FIELD_ENCRYPTION_KEY) {
-    process.env.CONVEX_FIELD_ENCRYPTION_KEY =
-      "A1MKNFPVRhFaPf83T45BwooVzAogtiphQhYraAD5gqU=";
-  }
-});
+beforeAll(ensureTestFieldEncryptionKey);
 
 type Proof = ReturnType<typeof harness>;
 type Actor = ReturnType<Proof["asRole"]>;
