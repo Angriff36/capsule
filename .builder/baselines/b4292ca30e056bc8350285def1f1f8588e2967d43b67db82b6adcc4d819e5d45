@@ -2658,6 +2658,7 @@ export const ProposalSchema = z.object({
   supersedeReason: z.string().nullable().optional(),
   supersededById: z.string().uuid().nullable().optional(),
   replacesProposalId: z.string().uuid().nullable().optional(),
+  generationJson: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -8482,6 +8483,18 @@ export type ProposalMarkViewedParams = z.infer<typeof ProposalMarkViewedParamsSc
 export const ProposalReassignClientParamsSchema = z.object({});
 
 export type ProposalReassignClientParams = z.infer<typeof ProposalReassignClientParamsSchema>;
+
+// Command: refreshFromEvent on Proposal
+export const ProposalRefreshFromEventParamsSchema = z.object({
+  generationJson: z.string(),
+  eventDate: z.coerce.date().optional(),
+  eventEndDate: z.coerce.date().optional(),
+  eventType: z.string().optional(),
+  venueName: z.string().optional(),
+  venueAddress: z.string().optional(),
+});
+
+export type ProposalRefreshFromEventParams = z.infer<typeof ProposalRefreshFromEventParamsSchema>;
 
 // Command: send on Proposal
 export const ProposalSendParamsSchema = z.object({});

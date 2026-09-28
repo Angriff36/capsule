@@ -131,8 +131,11 @@ import type * as lib_proposalAcceptanceRevision from "../lib/proposalAcceptanceR
 import type * as lib_proposalBookingVenue from "../lib/proposalBookingVenue.js";
 import type * as lib_proposalChangeDraft from "../lib/proposalChangeDraft.js";
 import type * as lib_proposalDraft from "../lib/proposalDraft.js";
+import type * as lib_proposalDraftReport from "../lib/proposalDraftReport.js";
 import type * as lib_proposalEventCreation from "../lib/proposalEventCreation.js";
 import type * as lib_proposalFollowTotals from "../lib/proposalFollowTotals.js";
+import type * as lib_proposalGenerate from "../lib/proposalGenerate.js";
+import type * as lib_proposalGenerateSources from "../lib/proposalGenerateSources.js";
 import type * as lib_proposalPricing from "../lib/proposalPricing.js";
 import type * as lib_proposalReconciliation from "../lib/proposalReconciliation.js";
 import type * as lib_proposalRevision from "../lib/proposalRevision.js";
@@ -334,8 +337,11 @@ declare const fullApi: ApiFromModules<{
   "lib/proposalBookingVenue": typeof lib_proposalBookingVenue;
   "lib/proposalChangeDraft": typeof lib_proposalChangeDraft;
   "lib/proposalDraft": typeof lib_proposalDraft;
+  "lib/proposalDraftReport": typeof lib_proposalDraftReport;
   "lib/proposalEventCreation": typeof lib_proposalEventCreation;
   "lib/proposalFollowTotals": typeof lib_proposalFollowTotals;
+  "lib/proposalGenerate": typeof lib_proposalGenerate;
+  "lib/proposalGenerateSources": typeof lib_proposalGenerateSources;
   "lib/proposalPricing": typeof lib_proposalPricing;
   "lib/proposalReconciliation": typeof lib_proposalReconciliation;
   "lib/proposalRevision": typeof lib_proposalRevision;

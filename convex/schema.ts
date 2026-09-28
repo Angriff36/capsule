@@ -2424,6 +2424,7 @@ export default defineSchema({
     supersedeReason: v.optional(v.union(v.string(), v.null())),
     supersededById: v.optional(v.union(v.id("proposals"), v.null())),
     replacesProposalId: v.optional(v.union(v.id("proposals"), v.null())),
+    generationJson: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),

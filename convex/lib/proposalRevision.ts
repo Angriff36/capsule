@@ -187,6 +187,26 @@ async function resolveVenueLogistics(
   };
 }
 
+// The tenant's customer-facing name from its live organization record (the
+// Branding row) — same resolution as convex/authProvision.ts
+// companyNameForProvision: active row first, any live row second,
+// brandDisplayName (the name the PDF masthead shows) before the legal name.
+// Null when the tenant has no name at all (AC-096).
+export async function resolveTenantBrandName(
+  ctx: { db: any },
+  tenantId: string,
+): Promise<string | null> {
+  const organizations = await ctx.db
+    .query("organizations")
+    .withIndex("by_tenantId", (q: any) => q.eq("tenantId", tenantId))
+    .collect();
+  const organization =
+    organizations.find(
+      (row: any) => row.deletedAt == null && String(row.status) === "active",
+    ) ?? organizations.find((row: any) => row.deletedAt == null);
+  return organization?.brandDisplayName?.trim() || organization?.name?.trim() || null;
+}
+
 // Build proposal revision snapshot from live proposal data
 export async function buildProposalRevisionSnapshot(
   ctx: { db: any; auth: any },
@@ -237,18 +257,10 @@ export async function buildProposalRevisionSnapshot(
   // customer-facing name the PDF masthead shows) before the legal name. The
   // revision is immutable, so a placeholder would be frozen into it forever;
   // "Tenant" survives only when the tenant has no organization record (R2-13).
-  const organizations = await ctx.db
-    .query("organizations")
-    .withIndex("by_tenantId", (q: any) => q.eq("tenantId", proposal.tenantId))
-    .collect();
-  const organization =
-    organizations.find(
-      (row: any) => row.deletedAt == null && String(row.status) === "active",
-    ) ?? organizations.find((row: any) => row.deletedAt == null);
+  // AC-096: sendProposalWithRevisionCapture refuses to send without a real
+  // name, so "Tenant" never reaches a sent revision.
   const tenantName =
-    organization?.brandDisplayName?.trim() ||
-    organization?.name?.trim() ||
-    "Tenant";
+    (await resolveTenantBrandName(ctx, proposal.tenantId)) ?? "Tenant";
 
   // Get priced line items (spec §5.4) — effective prices snapshotted here.
   // JS loose-equality filter (not the Convex DSL .eq) because governed-creation
@@ -481,6 +493,13 @@ export const sendProposalWithRevisionCapture = mutation({
     const auth = await getAuthContext(ctx);
     if (!auth.tenantId || auth.tenantId !== tenantId) {
       throw new Error("Proposal not found");
+    }
+    // AC-096: a sent revision is frozen, so it must carry the company's real
+    // name, never a placeholder.
+    if ((await resolveTenantBrandName(ctx, tenantId)) == null) {
+      throw new Error(
+        "Add your company name in company settings before you send a proposal, so the client sees who it is from.",
+      );
     }
     const overrideLines = (
       await ctx.db

@@ -76,6 +76,11 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   property supersedeReason: string?
   property supersededById: uuid?
   property replacesProposalId: uuid?  // Links to the proposal this revision replaces
+  // PL-PROPOSAL-DRAFT (AC-416/AC-417): what the last "build from event" wrote -
+  // each generated line's source, the values it wrote, the event facts it read,
+  // and the sources staff took out. convex/lib/proposalGenerate.ts reads it to
+  // refresh an unsent draft without undoing staff edits. Null = typed by hand.
+  property generationJson: string?
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
@@ -203,6 +208,38 @@ entity Proposal mixin TenantScoped, SoftDeletable {
       guestCount: guestCount
       previousTotal: previousTotal
       total: total
+    }
+  }
+
+  // PL-PROPOSAL-DRAFT: an unsent draft built from its event takes the event's
+  // current date, type and venue, and stores the new generation record. Money
+  // and guest count move only through the line commands and
+  // followEventHeadcount, so this command carries no price.
+  command refreshFromEvent(
+    generationJson: string,
+    optional eventDate: datetime,
+    optional eventEndDate: datetime,
+    optional eventType: string,
+    optional venueName: string,
+    optional venueAddress: string
+  ) {
+    guard self.status == "draft"
+    guard self.draftedAt != null
+    guard self.deletedAt == null
+    guard self.eventId != null
+    guard self.event != null
+    constraint refreshRecord: length(trim(generationJson)) > 0 "Build the proposal from its event again."
+    mutate eventDate = eventDate
+    mutate eventEndDate = eventEndDate
+    mutate eventType = eventType
+    mutate venueName = venueName
+    mutate venueAddress = venueAddress
+    mutate generationJson = generationJson
+    emit ProposalRefreshedFromEvent {
+      proposalId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
     }
   }
 
@@ -427,6 +464,13 @@ event ProposalEventHeadcountFollowed: "proposal.event_headcount_followed" {
   guestCount: number
   previousTotal: money(12, 2)
   total: money(12, 2)
+}
+
+event ProposalRefreshedFromEvent: "proposal.refreshed_from_event" {
+  proposalId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
 }
 
 event ProposalSent: "proposal.sent" {
