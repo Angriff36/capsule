@@ -420,6 +420,34 @@ export async function buildProposalRevisionSnapshot(
   return JSON.stringify(snapshot);
 }
 
+/** Highest revision number along the proposals this one replaces. */
+async function earlierRevisionNumber(
+  ctx: { db: any },
+  proposal: Doc<"proposals">,
+): Promise<number> {
+  let highest = 0;
+  const seen = new Set<string>([String(proposal._id)]);
+  let previousId = proposal.replacesProposalId;
+  while (previousId && !seen.has(String(previousId))) {
+    seen.add(String(previousId));
+    const previous: Doc<"proposals"> | null = await ctx.db.get(
+      previousId as Id<"proposals">,
+    );
+    if (!previous || previous.tenantId !== proposal.tenantId) break;
+    const revisions = (
+      await ctx.db
+        .query("proposalRevisions")
+        .withIndex("by_proposalId", (q: any) => q.eq("proposalId", previous._id))
+        .collect()
+    ).filter((row: any) => row.deletedAt == null);
+    for (const revision of revisions) {
+      highest = Math.max(highest, revision.revisionNumber);
+    }
+    previousId = previous.replacesProposalId;
+  }
+  return highest;
+}
+
 // Capture a proposal revision (internal mutation, called after proposal send)
 export const captureProposalRevision = internalMutation({
   args: {
@@ -447,14 +475,14 @@ export const captureProposalRevision = internalMutation({
         .collect()
     ).filter((row: any) => row.deletedAt == null);
 
-    let nextRevisionNumber = 1;
-    if (existingRevisions.length > 0) {
-      const maxRevision = existingRevisions.reduce(
-        (max, rev) => (rev.revisionNumber > max ? rev.revisionNumber : max),
-        0
-      );
-      nextRevisionNumber = maxRevision + 1;
-    }
+    // AC-256: a new version of a proposal carries on its numbering, so the
+    // client sees Revision 2 after Revision 1 of the proposal it replaces.
+    const maxRevision = Math.max(
+      0,
+      ...existingRevisions.map((rev) => rev.revisionNumber),
+      await earlierRevisionNumber(ctx, proposal),
+    );
+    const nextRevisionNumber = maxRevision + 1;
 
     // Build the snapshot
     const snapshot = await buildProposalRevisionSnapshot(ctx, proposal);
@@ -576,6 +604,25 @@ export const sendProposalWithRevisionCapture = mutation({
             : "Proposal sent to client",
       },
     );
+    // AC-256/AC-257: sending a new version replaces the sent, unanswered
+    // proposal it was made from, in the same transaction. An accepted source
+    // stays accepted (a change never rewrites a signed agreement).
+    const replaces = proposal.replacesProposalId
+      ? await ctx.db.get(proposal.replacesProposalId as Id<"proposals">)
+      : null;
+    if (
+      replaces &&
+      replaces.tenantId === tenantId &&
+      replaces.deletedAt == null &&
+      (replaces.status === "sent" || replaces.status === "viewed")
+    ) {
+      await ctx.runMutation(api.mutations.Proposal_supersede, {
+        docId: replaces._id,
+        version: replaces.version,
+        revisedById: args.docId,
+        reason: "Replaced by a newer version",
+      });
+    }
     return sent;
   },
 });

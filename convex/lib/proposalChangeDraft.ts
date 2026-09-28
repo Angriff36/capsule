@@ -1,4 +1,7 @@
-// Start a commercial change from an accepted proposal.
+// Start a commercial change from an accepted proposal, or revise a proposal
+// that was sent and not yet answered (AC-256/AC-257). A revised sent proposal
+// is replaced when its new version is sent
+// (proposalRevision.sendProposalWithRevisionCapture supersedes it then).
 //
 // Accepted proposals are frozen. supersede only rewrites sent or viewed
 // copies, so it must not be used here. This mutation opens a new draft that
@@ -204,8 +207,11 @@ export const startProposalChange = mutation({
       throw new Error("Proposal not found");
     }
     if (proposal.deletedAt != null) throw new Error("Proposal not found");
-    if (proposal.status !== "accepted") {
-      throw new Error("Only an accepted proposal can start a change.");
+    const accepted = proposal.status === "accepted";
+    if (!accepted && proposal.status !== "sent" && proposal.status !== "viewed") {
+      throw new Error(
+        "Only a sent or accepted proposal can be changed. Edit a draft directly.",
+      );
     }
     const existing = await openChangeDraft(ctx, proposal);
     if (existing) {
@@ -220,11 +226,14 @@ export const startProposalChange = mutation({
       api.mutations.Proposal_createViaDraft,
       changeDraftArgs(proposal),
     );
-    // A draft just created by that command is version 1.
-    await ctx.runMutation(api.mutations.Proposal_confirmChangeSource, {
-      docId: created.docId,
-      version: 1,
-    });
+    // A draft just created by that command is version 1. The accepted-source
+    // check applies to changes of an accepted proposal only.
+    if (accepted) {
+      await ctx.runMutation(api.mutations.Proposal_confirmChangeSource, {
+        docId: created.docId,
+        version: 1,
+      });
+    }
     await copyLivePricedLines(ctx, proposal._id, created.docId);
     const leftOffDishNames = await copyLiveMenuChoices(
       ctx,

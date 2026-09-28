@@ -837,6 +837,16 @@ export function ProposalsPage() {
                                 : action.label}
                             </button>
                           ))}
+                        {String(row.status) === "sent" ||
+                        String(row.status) === "viewed" ? (
+                          <ProposalChangeAction
+                            proposalId={row._id}
+                            busy={busy}
+                            run={run}
+                            onNotice={setNotice}
+                            accepted={false}
+                          />
+                        ) : null}
                         {String(row.status) === "accepted" ? (
                           <>
                             <ProposalChangeAction
