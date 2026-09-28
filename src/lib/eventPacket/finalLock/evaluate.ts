@@ -195,7 +195,13 @@ export function evaluateFinalLock(
       fieldWork: draft.fieldWork ?? null,
       displayedInRevision: null,
       fingerprint: override
-        ? hash(canonicalJson({ derived, override: override.value }))
+        ? hash(
+            canonicalJson({
+              derived,
+              override: override.value,
+              reason: override.reason,
+            }),
+          )
         : derived,
       basis: derived,
     };
@@ -221,15 +227,20 @@ export function evaluateFinalLock(
   const readiness = policy.find((q) => q.key === "readiness.dispatch");
   const lines: FinalLockPrintLine[] = [];
   const printAnswers: Record<string, string> = {};
+  // One identity per printed line - the answer's facts plus the exact words
+  // printed - used for recording, staleness and "shown in revision" alike.
   const printLine = (a: FinalLockAnswer) => {
-    lines.push({
+    const line: FinalLockPrintLine = {
       questionKey: a.questionKey,
       section: a.section,
       label: a.label,
       result: a.result,
       text: lineText(a),
-    });
-    printAnswers[a.questionKey] = a.fingerprint;
+    };
+    lines.push(line);
+    printAnswers[a.questionKey] = hash(
+      canonicalJson({ fingerprint: a.fingerprint, line }),
+    );
   };
   for (const a of answers) printLine(a);
   if (readiness)
@@ -284,9 +295,12 @@ export function evaluateFinalLock(
   }
   for (const q of policy.filter((item) => item.form))
     answers.push(build(q, drafts[q.key]!));
+  // A field form was printed blank; once someone completes it, the completed
+  // answer is not what the packet showed.
   for (const answer of answers)
     if (
       printed &&
+      !answer.fieldWork?.confirmedAt &&
       printed.answers[answer.questionKey] === print.answers[answer.questionKey]
     )
       answer.displayedInRevision = printed.revisionId;
@@ -358,7 +372,7 @@ const valueText = (value: FinalLockValue): string => {
   }
 };
 
-const lineText = (a: FinalLockAnswer) =>
+export const lineText = (a: FinalLockAnswer) =>
   a.override
     ? `${valueText(a.override.value)} (manager decision: ${a.override.reason})`
     : a.result === "unresolved"

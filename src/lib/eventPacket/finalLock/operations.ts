@@ -147,6 +147,7 @@ export function readinessAnswer(
     ...source("events", input.event, "salesLockedAt"),
     ...input.packLists.flatMap((p) => source("packLists", p)),
     ...active.flatMap((a) => source("eventAssignments", a)),
+    ...signed.flatMap((s) => (s?.source ? [s.source] : [])),
     ...(input.packet.latestRevisionId
       ? [
           {
@@ -253,7 +254,7 @@ export function fieldAnswers(
         ? `${question.label} was done on the day by a named person.`
         : `${question.label} is done on the day by a named person; it cannot be answered from the office.`,
       rule: "field.physical-work-needs-a-person",
-      sources: [],
+      sources: done?.source ? [done.source] : [],
       missing: [],
       action: done
         ? null

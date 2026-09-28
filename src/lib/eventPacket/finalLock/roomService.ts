@@ -1,6 +1,7 @@
 import {
   answered,
   dishSources,
+  eventStyleName,
   notApplicable,
   proposalSources,
   said,
@@ -25,7 +26,7 @@ export function roomServiceAnswers(
   const { event } = input;
   const text = event.text;
   const ev = (field: string) => source("events", event, field);
-  const dropOff = isDropOff(input.serviceStyle?.name ?? null);
+  const dropOff = isDropOff(eventStyleName(input));
   const out: Record<string, Draft> = {};
 
   // Servingware: where plates, china and flatware come from.

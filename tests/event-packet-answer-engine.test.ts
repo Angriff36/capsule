@@ -33,6 +33,7 @@ function input(): FinalLockInput {
       venueAddress: "1 Shore Road",
       venueCapacity: 150,
       clientId: "client-1",
+      clientName: "Ashley Smith",
       contactName: "Ashley",
       contactPhone: "555-0100",
       contactEmail: null,
@@ -157,11 +158,21 @@ function input(): FinalLockInput {
           key: "check.signature.warehouse-ops",
           actor: "user-w",
           at: "2026-10-10T15:00:00Z",
+          source: {
+            table: "eventPacketResolutions",
+            id: "sig-w",
+            version: null,
+          },
         },
         {
           key: "check.signature.event-lead",
           actor: "user-l",
           at: "2026-10-10T15:05:00Z",
+          source: {
+            table: "eventPacketResolutions",
+            id: "sig-l",
+            version: null,
+          },
         },
       ],
     },
@@ -174,6 +185,11 @@ const allConfirmed = (i: FinalLockInput) => {
     i.confirmations[q.form!] = {
       actor: "user-crew",
       at: "2026-10-10T16:00:00Z",
+      source: {
+        table: "eventPacketResolutions",
+        id: `done-${q.form}`,
+        version: null,
+      },
     };
   return i;
 };
@@ -397,13 +413,15 @@ describe("Final Lock answer engine", () => {
 
   it("raises a Sales exception for blank or conflicting identity facts", () => {
     const i = input();
-    i.event.serviceStyleName = "Drop Off";
+    i.event.serviceStyleName = null;
+    i.event.serviceStyleId = null;
+    i.serviceStyle = null;
     i.event.expectedHeadcount = 200;
     i.event.eventNumber = null;
     const { answers } = run(i);
-    expect(get(answers, "identity.service_style").missing[0]).toContain(
-      '"Drop Off"',
-    );
+    expect(get(answers, "identity.service_style").missing).toEqual([
+      "No service style is set on the event.",
+    ]);
     expect(get(answers, "identity.venue").missing[0]).toBe(
       "Lakeside Lawn holds 150 but the event has 200 guests.",
     );
@@ -1282,5 +1300,136 @@ describe("Final Lock answer engine", () => {
     expect(
       run(allConfirmed(input()), { printed: extra }).staleQuestions,
     ).toEqual(["field.retired"]);
+  });
+
+  it("identity reads the names the event was booked with; a later catalog rename is not a clash; zero is a real price", () => {
+    const i = input();
+    i.serviceStyle!.name = "Full Service Deluxe";
+    i.client!.name = "Ashley Smith-Jones";
+    const answers = run(i).answers;
+    expect(get(answers, "identity.service_style")).toMatchObject({
+      result: "answered",
+      value: { type: "choice", choice: "Full Service" },
+    });
+    expect(get(answers, "identity.customer")).toMatchObject({
+      result: "answered",
+      value: { type: "choice", choice: "Ashley Smith" },
+    });
+    expect(get(answers, "identity.billing").value).toEqual({
+      type: "record",
+      fields: { billTo: "Ashley Smith", quotedPrice: 5000 },
+    });
+    // No snapshot yet: the linked records answer it.
+    const live = input();
+    live.event.clientName = null;
+    live.event.serviceStyleName = null;
+    expect(get(run(live).answers, "identity.customer").value).toEqual({
+      type: "choice",
+      choice: "Ashley Smith",
+    });
+    expect(get(run(live).answers, "identity.service_style").value).toEqual({
+      type: "choice",
+      choice: "Full Service",
+    });
+    // A comped event has a real price of zero.
+    const comped = input();
+    comped.event.quotedPrice = 0;
+    expect(get(run(comped).answers, "identity.billing")).toMatchObject({
+      result: "answered",
+      value: { fields: { quotedPrice: 0 } },
+    });
+    for (const bad of [null, Number.NaN, -1]) {
+      const b = input();
+      b.event.quotedPrice = bad;
+      expect(get(run(b).answers, "identity.billing").missing).toEqual([
+        "No quoted price on the event.",
+      ]);
+    }
+  });
+
+  it("one line identity: a new override reason on the same value makes the printed line stale", () => {
+    const i = allConfirmed(input());
+    i.event.text.buffetHotPlates =
+      "Chicken Marsala, Green Beans, Roasted Potatoes";
+    const open = get(run(i).answers, "buffet.arrangement");
+    const decide = (reason: string, at: string): StoredOverride => ({
+      questionKey: "buffet.arrangement",
+      basedOn: open.basis,
+      value: { type: "text", text: "Chicken first" },
+      reason,
+      actor: "user-manager",
+      at,
+    });
+    const first = decide("The couple asked for it", "2026-10-09T12:00:00Z");
+    const printed = printedAt(run(i, { overrides: [first] }), "rev-1");
+    const same = run(i, { overrides: [first], printed });
+    expect(same.staleQuestions).toEqual([]);
+    expect(get(same.answers, "buffet.arrangement").displayedInRevision).toBe(
+      "rev-1",
+    );
+    const second = decide("The planner asked for it", "2026-10-09T13:00:00Z");
+    const later = run(i, { overrides: [first, second], printed });
+    expect(later.staleQuestions).toEqual(["buffet.arrangement"]);
+    expect(later.outcome).toBe("stale");
+    expect(
+      get(later.answers, "buffet.arrangement").displayedInRevision,
+    ).toBeNull();
+  });
+
+  it("a field form completed after the print is not the answer the print showed", () => {
+    const blank = input();
+    const printed = printedAt(run(blank), "rev-1");
+    const before = run(input(), { printed });
+    expect(get(before.answers, "field.arrival").displayedInRevision).toBe(
+      "rev-1",
+    );
+    const done = input();
+    done.confirmations["field.arrival"] = {
+      actor: "user-crew",
+      at: "2026-10-10T16:00:00Z",
+      source: {
+        table: "eventPacketResolutions",
+        id: "done-arrival",
+        version: null,
+      },
+    };
+    const after = run(done, { printed });
+    expect(after.staleQuestions).toEqual([]);
+    expect(get(after.answers, "field.arrival").displayedInRevision).toBeNull();
+    expect(get(after.answers, "field.leaving-shop").displayedInRevision).toBe(
+      "rev-1",
+    );
+  });
+
+  it("completed field forms and the two-person check name the records they were read from", () => {
+    const answers = run(allConfirmed(input())).answers;
+    expect(get(answers, "field.arrival").sources).toEqual([
+      {
+        table: "eventPacketResolutions",
+        id: "done-field.arrival",
+        version: null,
+      },
+    ]);
+    const readiness = get(answers, "readiness.dispatch").sources;
+    expect(readiness).toContainEqual({
+      table: "eventPacketResolutions",
+      id: "sig-w",
+      version: null,
+    });
+    expect(readiness).toContainEqual({
+      table: "eventPacketResolutions",
+      id: "sig-l",
+      version: null,
+    });
+    // A different sign-off record behind the same check changes the basis.
+    const resigned = allConfirmed(input());
+    resigned.packet.signoffs[1]!.source = {
+      table: "eventPacketResolutions",
+      id: "sig-l-2",
+      version: null,
+    };
+    expect(get(run(resigned).answers, "readiness.dispatch").basis).not.toBe(
+      get(answers, "readiness.dispatch").basis,
+    );
   });
 });

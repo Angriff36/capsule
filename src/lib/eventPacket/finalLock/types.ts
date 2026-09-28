@@ -109,6 +109,8 @@ export interface FinalLockInput {
     venueAddress: string | null;
     venueCapacity: number | null;
     clientId: string | null;
+    /** The customer name the event booked (a later rename does not change it). */
+    clientName: string | null;
     contactName: string | null;
     contactPhone: string | null;
     contactEmail: string | null;
@@ -206,8 +208,17 @@ export interface FinalLockInput {
   packet: {
     latestRevisionId: string | null;
     latestRevisionStale: boolean;
-    signoffs: { key: string; actor: string; at: string }[];
+    signoffs: {
+      key: string;
+      actor: string;
+      at: string;
+      /** The record the sign-off was saved on. */
+      source: AnswerSource | null;
+    }[];
   };
   /** Physical confirmations recorded by people, keyed by form key. */
-  confirmations: Record<string, { actor: string; at: string }>;
+  confirmations: Record<
+    string,
+    { actor: string; at: string; source: AnswerSource | null }
+  >;
 }

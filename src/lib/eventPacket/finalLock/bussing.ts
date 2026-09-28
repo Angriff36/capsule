@@ -1,5 +1,6 @@
 import {
   answered,
+  eventStyleName,
   notApplicable,
   proposalSources,
   said,
@@ -26,7 +27,7 @@ const isNone = (s: string) =>
 export function bussingAnswer(input: FinalLockInput): Draft {
   const { event } = input;
   const ev = (field: string) => source("events", event, field);
-  const dropOff = isDropOff(input.serviceStyle?.name ?? null);
+  const dropOff = isDropOff(eventStyleName(input));
   const bussing = event.text.bussing?.trim() ?? "";
   const bussLines = (input.proposal?.lines ?? []).filter((l) =>
     /buss|clear(ing)? (the )?tables/i.test(l.text),

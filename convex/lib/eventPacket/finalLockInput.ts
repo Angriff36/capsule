@@ -317,6 +317,26 @@ export async function readFinalLockInput(
   const verifications = packet.snapshot.checklistVerifications.filter(
     (v) => v.answer === "yes",
   );
+  const resolutions = await eventRows(
+    ctx,
+    "eventPacketResolutions",
+    tenantId,
+    eventId,
+  );
+  // The record each check's latest verification was saved on (same order the
+  // packet reads them), so an answer names the sign-off it was read from.
+  const verificationRows = new Map<string, any>();
+  for (const r of resolutions
+    .slice()
+    .sort((a, b) => a.decidedAt - b.decidedAt))
+    if (r.verificationJson)
+      verificationRows.set(JSON.parse(r.verificationJson).checkKey, r);
+  const verificationSource = (checkKey: string) => {
+    const row = verificationRows.get(checkKey);
+    return row
+      ? { table: "eventPacketResolutions", id: String(row._id), version: version(row) }
+      : null;
+  };
   const resolvedChecks = new Set(
     packet.snapshot.issues
       .filter((i) => i.status === "resolved")
@@ -342,6 +362,7 @@ export async function readFinalLockInput(
       venueAddress: str(event.venueAddress) ?? str(venueRow?.addressLine1),
       venueCapacity: num(event.venueCapacity),
       clientId: str(event.clientId),
+      clientName: str(event.clientName),
       contactName: await plain(ctx, event.primaryContactName, "primaryContactName"),
       contactPhone: await plain(ctx, event.primaryContactPhone, "primaryContactPhone"),
       contactEmail: await plain(ctx, event.primaryContactEmail, "primaryContactEmail"),
@@ -416,21 +437,23 @@ export async function readFinalLockInput(
             v.checkKey.startsWith("check.signature.") &&
             resolvedChecks.has(v.checkKey),
         )
-        .map((v) => ({ key: v.checkKey, actor: v.actor, at: v.at })),
+        .map((v) => ({
+          key: v.checkKey,
+          actor: v.actor,
+          at: v.at,
+          source: verificationSource(v.checkKey),
+        })),
     },
     confirmations: Object.fromEntries(
       verifications
         .filter((v) => /^field\.[a-z-]+$/.test(v.checkKey))
-        .map((v) => [v.checkKey, { actor: v.actor, at: v.at }]),
+        .map((v) => [
+          v.checkKey,
+          { actor: v.actor, at: v.at, source: verificationSource(v.checkKey) },
+        ]),
     ),
   };
 
-  const resolutions = await eventRows(
-    ctx,
-    "eventPacketResolutions",
-    tenantId,
-    eventId,
-  );
   const overrides: StoredOverride[] = resolutions
     .filter((r) => String(r.issueKey).startsWith("finallock."))
     .map((r) => JSON.parse(r.decisionJson))

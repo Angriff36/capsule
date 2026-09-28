@@ -181,9 +181,15 @@ describe("Final Lock answers from native event records", () => {
       type: "record",
       fields: { billTo: "Lakeside Weddings" },
     });
-    expect(JSON.stringify(answer(seen, "identity.billing"))).not.toContain(
-      "5000",
+    // No part of the staff reply carries the price, printed lines included.
+    const billingLine = (r: any) =>
+      r.print.lines.find((l: any) => l.questionKey === "identity.billing").text;
+    expect(billingLine(report)).toContain("5000");
+    expect(billingLine(seen)).toBe(
+      "Lakeside Weddings pays. Managers see the price.",
     );
+    expect(JSON.stringify(report)).toMatch(/\b5000\b/);
+    expect(JSON.stringify(seen)).not.toMatch(/\b5000\b/);
     // Deciding an answer is still a manager's job.
     await expect(
       staff.mutation(finalLock.overrideFinalLockAnswer, {

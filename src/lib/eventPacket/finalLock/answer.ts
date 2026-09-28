@@ -1,10 +1,17 @@
 import type {
   AnswerSource,
   FieldWork,
+  FinalLockInput,
   FinalLockResult,
   FinalLockValue,
   NativeRow,
 } from "./types";
+
+/** The service style the event was booked with, before the live catalog name. */
+export const eventStyleName = (input: FinalLockInput): string | null =>
+  input.event.serviceStyleName?.trim() ||
+  input.serviceStyle?.name.trim() ||
+  null;
 
 /** What one rule decides; evaluate() adds the question and policy facts. */
 export interface Draft {

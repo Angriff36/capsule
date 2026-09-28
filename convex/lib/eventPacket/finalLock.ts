@@ -7,34 +7,51 @@ import { scopedEvent } from "./reconcileNative";
 import { canonicalJson } from "../../../src/lib/eventPacket/model";
 import {
   evaluateFinalLock,
+  lineText,
   type FinalLockReport,
 } from "../../../src/lib/eventPacket/finalLock/evaluate";
+import type { FinalLockAnswer } from "../../../src/lib/eventPacket/finalLock/types";
 import { QUESTIONS } from "../../../src/lib/eventPacket/finalLock/policy";
 
 const clean = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
 
-/** Staff see who pays, not the price; the price stays with managers. */
+/**
+ * Staff see who pays, not the price; the price stays with managers. The
+ * billing answer and its printed line are both rewritten, so no part of the
+ * reply carries the price.
+ */
 function withoutPrice(report: FinalLockReport): FinalLockReport {
+  const answers = report.answers.map((a): FinalLockAnswer => {
+    if (a.questionKey !== BILLING) return a;
+    const billTo =
+      a.value.type === "record" ? a.value.fields.billTo ?? null : null;
+    return {
+      ...a,
+      value: billTo ? { type: "record", fields: { billTo } } : { type: "none" },
+      explanation: billTo
+        ? `${billTo} pays. Managers see the price.`
+        : "Managers see who pays and the price.",
+      missing: a.missing.length ? ["A manager needs to check who pays."] : [],
+      override: a.override
+        ? { ...a.override, value: { type: "none" }, reason: "Manager decision." }
+        : null,
+    };
+  });
+  const billing = answers.find((a) => a.questionKey === BILLING);
   return {
     ...report,
-    answers: report.answers.map((a) => {
-      if (a.questionKey !== "identity.billing") return a;
-      const billTo =
-        a.value.type === "record" ? a.value.fields.billTo ?? null : null;
-      return {
-        ...a,
-        value: billTo ? { type: "record", fields: { billTo } } : { type: "none" },
-        explanation: billTo
-          ? `${billTo} pays. Managers see the price.`
-          : "Managers see who pays and the price.",
-        missing: a.missing.length ? ["A manager needs to check who pays."] : [],
-        override: a.override
-          ? { ...a.override, value: { type: "none" }, reason: "Manager decision." }
-          : null,
-      };
-    }),
+    answers,
+    print: {
+      ...report.print,
+      lines: report.print.lines.map((line) =>
+        line.questionKey === BILLING && billing
+          ? { ...line, text: lineText(billing) }
+          : line,
+      ),
+    },
   };
 }
+const BILLING = "identity.billing";
 
 /**
  * The event's Final Lock answers: each question's result, value, plain

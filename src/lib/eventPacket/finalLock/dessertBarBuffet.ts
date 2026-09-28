@@ -2,6 +2,7 @@ import {
   answered,
   dishSources,
   equipmentSources,
+  eventStyleName,
   notApplicable,
   proposalSources,
   said,
@@ -47,7 +48,7 @@ export function dessertBarBuffetAnswers(
   const { event, dishes } = input;
   const text = event.text;
   const ev = (field: string) => source("events", event, field);
-  const dropOff = isDropOff(input.serviceStyle?.name ?? null);
+  const dropOff = isDropOff(eventStyleName(input));
   const out: Record<string, Draft> = {};
 
   const desserts = dishes.filter((d) =>

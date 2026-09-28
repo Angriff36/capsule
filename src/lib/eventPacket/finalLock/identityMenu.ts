@@ -1,6 +1,7 @@
 import {
   answered,
   dishSources as dishRecords,
+  eventStyleName,
   source,
   unresolved,
   type Draft,
@@ -16,37 +17,27 @@ export function identityAnswers(input: FinalLockInput): Record<string, Draft> {
   const { event, serviceStyle, client, venue } = input;
   const out: Record<string, Draft> = {};
 
+  // The event keeps the names it was booked with; a later catalog rename
+  // does not change them and is not a clash.
+  const styleName = eventStyleName(input);
   const styleSources = [
     ...ev(input, "serviceStyleId"),
+    ...ev(input, "serviceStyleName"),
     ...source("serviceStyles", serviceStyle),
   ];
-  if (!serviceStyle)
-    out["identity.service_style"] = unresolved(
-      ["No service style is set on the event."],
-      "Choose the service style on the event.",
-      "identity.service_style.required",
-      styleSources,
-    );
-  else if (
-    event.serviceStyleName &&
-    event.serviceStyleName.trim().toLowerCase() !==
-      serviceStyle.name.trim().toLowerCase()
-  )
-    out["identity.service_style"] = unresolved(
-      [
-        `The event shows "${event.serviceStyleName}" but its service style is "${serviceStyle.name}".`,
-      ],
-      "Choose the service style on the event again.",
-      "identity.service_style.agrees",
-      styleSources,
-    );
-  else
-    out["identity.service_style"] = answered(
-      { type: "choice", choice: serviceStyle.name },
-      `Service style is ${serviceStyle.name}.`,
-      "identity.service_style.from-event",
-      styleSources,
-    );
+  out["identity.service_style"] = styleName
+    ? answered(
+        { type: "choice", choice: styleName },
+        `Service style is ${styleName}.`,
+        "identity.service_style.from-event",
+        styleSources,
+      )
+    : unresolved(
+        ["No service style is set on the event."],
+        "Choose the service style on the event.",
+        "identity.service_style.required",
+        styleSources,
+      );
 
   const guests = event.expectedHeadcount;
   out["identity.guest_count"] =
@@ -99,14 +90,16 @@ export function identityAnswers(input: FinalLockInput): Record<string, Draft> {
       venueSources,
     );
 
+  const customer = event.clientName?.trim() || client?.name.trim() || "";
   const clientSources = [
     ...ev(input, "clientId"),
+    ...ev(input, "clientName"),
     ...source("clients", client),
   ];
-  out["identity.customer"] = client
+  out["identity.customer"] = customer
     ? answered(
-        { type: "choice", choice: client.name },
-        `Customer is ${client.name}.`,
+        { type: "choice", choice: customer },
+        `Customer is ${customer}.`,
         "identity.customer.from-client",
         clientSources,
       )
@@ -173,16 +166,17 @@ export function identityAnswers(input: FinalLockInput): Record<string, Draft> {
           ev(input, "assignedToId"),
         );
 
+  // Zero is a real quoted price (a comped or in-house event).
+  const price = event.quotedPrice;
+  const priced = price != null && Number.isFinite(price) && price >= 0;
   const billingMissing = [
-    ...(client ? [] : ["No customer to send the bill to."]),
-    ...(event.quotedPrice != null && event.quotedPrice > 0
-      ? []
-      : ["No quoted price on the event."]),
+    ...(customer ? [] : ["No customer to send the bill to."]),
+    ...(priced ? [] : ["No quoted price on the event."]),
   ];
   out["identity.billing"] = billingMissing.length
     ? unresolved(
         billingMissing,
-        client
+        customer
           ? "Enter the quoted price on the event."
           : "Link the customer on the event.",
         "identity.billing.customer-and-price",
@@ -191,9 +185,9 @@ export function identityAnswers(input: FinalLockInput): Record<string, Draft> {
     : answered(
         {
           type: "record",
-          fields: { billTo: client!.name, quotedPrice: event.quotedPrice },
+          fields: { billTo: customer, quotedPrice: price },
         },
-        `${client!.name} pays the quoted ${event.quotedPrice}.`,
+        `${customer} pays the quoted ${price}.`,
         "identity.billing.from-event-and-client",
         [...clientSources, ...ev(input, "quotedPrice")],
       );
@@ -336,7 +330,7 @@ export function menuAnswers(input: FinalLockInput): Record<string, Draft> {
         dishSources,
       );
 
-  const style = input.serviceStyle?.name ?? null;
+  const style = eventStyleName(input);
   const misfit = dishes.flatMap((d) => {
     if (isDropOff(style) && PASSED_OR_STATION.test(d.course ?? ""))
       return [
