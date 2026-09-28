@@ -6,6 +6,7 @@ import { ArrowLeftIcon, CheckIcon } from "../../ui/icons";
 import { FieldError, useFieldValidation } from "../../ui/formValidation";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { useActionFailure } from "../../ui/action-result";
+import { QuoteMenuChoice } from "./QuoteMenuChoice";
 
 function optional(value: string): string | undefined {
   const trimmed = value.trim();
@@ -86,6 +87,10 @@ export function QuoteSubmissionPage() {
   // list hooks and a raw fetch both fail for an anonymous visitor (role-gated
   // queries return [], and /api/actions/<path> is not a real Convex route).
   const options = useQuery(api.quoteBuilder.getQuoteFormOptions);
+  const [menuFit, setMenuFit] = useState<{
+    eventDate?: number;
+    guestCount?: number;
+  }>({});
   const submitQuote = useAction(api.quoteBuilder.submitQuote);
 
   const { errors, touched, formProps, handleSubmit } =
@@ -127,6 +132,7 @@ export function QuoteSubmissionPage() {
         consent: data.get("consent") === "on",
         serviceStyleId: formId<Id<"serviceStyles">>(data.get("serviceStyleId")),
         occasionId: formId<Id<"occasions">>(data.get("occasionId")),
+        menuId: formId<Id<"menus">>(data.get("menuId")),
         serviceStyleText: optional(String(data.get("serviceStyleText") ?? "")),
         occasionText: optional(String(data.get("occasionText") ?? "")),
         venueName: optional(String(data.get("venueName") ?? "")),
@@ -213,6 +219,16 @@ export function QuoteSubmissionPage() {
 
           <form
             onSubmit={handleSubmit(submit)}
+            onChange={(event) => {
+              // Date and guests decide which menus can be picked.
+              const data = new FormData(event.currentTarget);
+              const date = String(data.get("eventDate") ?? "");
+              const guests = Number(data.get("guestCount") ?? 0);
+              setMenuFit({
+                eventDate: date ? Date.parse(`${date}T12:00`) : undefined,
+                guestCount: guests > 0 ? guests : undefined,
+              });
+            }}
             {...formProps}
             className="space-y-6"
           >
@@ -491,6 +507,11 @@ export function QuoteSubmissionPage() {
                 Menu Preferences
               </h2>
               <div className="space-y-4">
+                <QuoteMenuChoice
+                  eventDate={menuFit.eventDate}
+                  guestCount={menuFit.guestCount}
+                  disabled={busy}
+                />
                 <div>
                   <label
                     htmlFor="menuPreferences"

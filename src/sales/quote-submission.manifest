@@ -48,6 +48,9 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
   // Menu preferences (from form - MVP uses text/categories)
   property menuPreferences: string?
   property dietaryRestrictions: string?
+  // The published menu the visitor picked from the public menu. Conversion
+  // prices the draft proposal from it through the catalog price rule.
+  property menuId: uuid?
 
   // Additional notes and consent
   property notes: string?

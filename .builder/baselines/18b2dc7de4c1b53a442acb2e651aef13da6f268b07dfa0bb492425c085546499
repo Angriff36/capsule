@@ -43830,6 +43830,7 @@ async function __runQuoteSubmissionCreate(ctx: MutationCtx, args: any) {
     const doc: Record<string, any> = {
       tenantId: __auth.tenantId,
       deletedAt: args.deletedAt,
+      menuId: args.menuId,
       createdAt: args.createdAt,
       updatedAt: args.updatedAt,
       dedupKey: args.dedupKey,
@@ -43881,6 +43882,7 @@ async function __runQuoteSubmissionCreate(ctx: MutationCtx, args: any) {
 export const QuoteSubmission_create = mutation({
   args: {
     deletedAt: v.optional(v.union(v.number(), v.null())),
+    menuId: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     dedupKey: v.string(),

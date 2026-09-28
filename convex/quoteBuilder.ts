@@ -7,6 +7,7 @@ import {
   query,
 } from "./_generated/server";
 import { Doc, Id } from "./_generated/dataModel";
+import { publishedMenu } from "./lib/quoteMenuLines";
 
 // Event-authorized, deliberately narrow view of the booking details operations
 // needs. Generated reads remain the authority for event and sales permissions.
@@ -215,6 +216,7 @@ export const ingressQuoteSubmission = internalMutation({
     guestCount: v.number(),
     serviceStyleId: v.optional(v.id("serviceStyles")),
     occasionId: v.optional(v.id("occasions")),
+    menuId: v.optional(v.id("menus")),
     serviceStyleText: v.string(),
     occasionText: v.string(),
     venueName: v.string(),
@@ -257,6 +259,9 @@ export const ingressQuoteSubmission = internalMutation({
       if (!ss || ss.tenantId !== tenantId || ss.status !== "active") {
         throw new ConvexError("Invalid service style selection");
       }
+    }
+    if (args.menuId && !(await publishedMenu(ctx, tenantId, args.menuId))) {
+      throw new ConvexError("That menu is no longer offered. Pick another.");
     }
     if (args.occasionId) {
       const oc = await ctx.db.get(args.occasionId);
@@ -305,6 +310,7 @@ export const ingressQuoteSubmission = internalMutation({
       guestCount: args.guestCount,
       serviceStyleId: args.serviceStyleId ?? null,
       occasionId: args.occasionId ?? null,
+      menuId: args.menuId ?? null,
       // Free-text answers from the empty-catalog fallback inputs (A5): stored
       // as text because no catalog row exists to reference.
       serviceStyleText: args.serviceStyleText.trim() || null,
@@ -388,6 +394,7 @@ export const submitQuote = action({
     consent: v.boolean(),
     serviceStyleId: v.optional(v.id("serviceStyles")),
     occasionId: v.optional(v.id("occasions")),
+    menuId: v.optional(v.id("menus")),
     serviceStyleText: v.optional(v.string()),
     occasionText: v.optional(v.string()),
     venueName: v.optional(v.string()),
@@ -448,6 +455,7 @@ export const submitQuote = action({
         guestCount: args.guestCount,
         serviceStyleId: args.serviceStyleId,
         occasionId: args.occasionId,
+        menuId: args.menuId,
         serviceStyleText: bounded(args.serviceStyleText),
         occasionText: bounded(args.occasionText),
         venueName: bounded(args.venueName),
@@ -745,6 +753,28 @@ export const processQuoteSubmission = action({
       } catch (error) {
         errors.push(
           `proposal: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+
+    // Chosen menu (AC-241): price the draft from the catalog the public menu
+    // showed. Lines are added only while the proposal has none, so a retried
+    // conversion never adds them twice.
+    if (proposalId && submission.menuId) {
+      try {
+        const menuLines = await ctx.runQuery(
+          internal.lib.quoteMenuLines.chosenMenuLines,
+          { proposalId, menuId: submission.menuId as Id<"menus"> },
+        );
+        for (const [sortOrder, line] of menuLines.entries()) {
+          await ctx.runMutation(
+            api.lib.proposalPricing.addProposalLineAndRecompute,
+            { proposalId, sortOrder, ...line },
+          );
+        }
+      } catch (error) {
+        errors.push(
+          `menu: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     }

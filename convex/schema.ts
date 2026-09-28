@@ -2657,6 +2657,7 @@ export default defineSchema({
     venueAddress: v.optional(v.union(v.string(), v.null())),
     menuPreferences: v.optional(v.union(v.string(), v.null())),
     dietaryRestrictions: v.optional(v.union(v.string(), v.null())),
+    menuId: v.optional(v.union(v.string(), v.null())),
     notes: v.optional(v.union(v.string(), v.null())),
     consentGrantedAt: v.optional(v.number()),
     clientId: v.optional(v.union(v.id("clients"), v.null())),

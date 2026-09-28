@@ -2897,6 +2897,7 @@ export const QuoteSubmissionSchema = z.object({
   venueAddress: z.string().nullable().optional(),
   menuPreferences: z.string().nullable().optional(),
   dietaryRestrictions: z.string().nullable().optional(),
+  menuId: z.string().uuid().nullable().optional(),
   notes: z.string().nullable().optional(),
   consentGrantedAt: z.coerce.date().optional(),
   clientId: z.string().uuid().nullable().optional(),
