@@ -27,6 +27,7 @@ vi.mock("../../../src/lib/manifest-convex-react", () => ({
   useListPrepTask: () => [],
   useListPrepTaskDependency: () => [],
   useListEvent: () => [],
+  useListPerson: () => [],
   useProductionBatchComplete: () => harness.complete,
   useProductionBatchStart: () => vi.fn(async () => undefined),
   useProductionBatchCancel: () => vi.fn(async () => undefined),

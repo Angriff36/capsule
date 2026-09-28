@@ -1,7 +1,12 @@
-import { formatDate, formatTime } from "../../lib/format";
 import { StatusChip } from "../../ui/primitives";
 import { prepQuantityLabel } from "../kitchen/prepQuantityLabel";
 import { CulinaryEntityLink } from "../kitchen/CulinaryEntityLink";
+import { prepMadeSoFarLabel, prepTimeLabel } from "../kitchen/prepTiming";
+import {
+  prepTaskDependencyLabel,
+  prepTaskDependencySummary,
+  type PrepTaskDependencyLink,
+} from "../production/PrepTaskDependencies";
 
 type PrepTask = {
   _id: string;
@@ -9,10 +14,12 @@ type PrepTask = {
   eventDishId: string;
   eventId: string;
   dishId?: string | null;
+  dishTaskId?: string | null;
   componentId?: string | null;
   name?: string;
   status: string;
   quantity: number;
+  completedQuantity?: number | null;
   unit: string;
   station?: string | null;
   dueAt?: number | null;
@@ -29,6 +36,10 @@ type EventDish = {
 type Props = {
   tasks: PrepTask[];
   allTasks: PrepTask[];
+  /** Every prep task the reader can see: other cooks' finished work and the
+   * tasks this work waits on. */
+  everyTask?: PrepTask[];
+  dependencies?: PrepTaskDependencyLink[];
   dishes?: { _id: string; name: string }[];
   eventDishes?: EventDish[];
   events?: { _id: string; title: string }[];
@@ -45,12 +56,15 @@ type Props = {
 export function MyDayPrepList({
   tasks,
   allTasks,
+  everyTask,
+  dependencies,
   dishes,
   eventDishes,
   events,
   busy,
   perform,
 }: Props) {
+  const known = everyTask ?? allTasks;
   const groups = new Map<string, PrepTask[]>();
   for (const task of tasks) {
     const key = JSON.stringify([task.eventId, task.eventDishId || task._id]);
@@ -119,6 +133,14 @@ export function MyDayPrepList({
             <ul className="my-day-prep-rows">
               {rows.map((task) => {
                 const key = `task:${task._id}`;
+                const dependency = prepTaskDependencySummary(
+                  task._id,
+                  known,
+                  dependencies ?? [],
+                );
+                const waiting =
+                  task.status === "claimed" && dependency.isBlocked;
+                const made = prepMadeSoFarLabel(task, known);
                 const next =
                   task.status === "pending"
                     ? { label: "Claim", command: "task-claim" }
@@ -136,13 +158,20 @@ export function MyDayPrepList({
                       <p className="my-day-prep-task-meta">
                         <strong>
                           {prepQuantityLabel(task.quantity, task.unit)}{" "}
-                          {task.unit}
+                          {task.unit} to make
                         </strong>
+                        {made ? `  |  ${made}` : ""}
                         {task.station ? `  |  ${task.station}` : ""}
-                        {task.dueAt != null
-                          ? `  |  Due ${formatDate(task.dueAt)} ${formatTime(task.dueAt)}`
-                          : "  |  No due time"}
+                        {`  |  ${prepTimeLabel(task.dueAt)}`}
                       </p>
+                      {dependency.total > 0 && (
+                        <p
+                          id={`my-day-prep-dependencies-${task._id}`}
+                          className="my-day-prep-note"
+                        >
+                          {prepTaskDependencyLabel(dependency)}
+                        </p>
+                      )}
                       {task.specialInstructions && (
                         <p className="my-day-prep-note">
                           {task.specialInstructions}
@@ -169,7 +198,12 @@ export function MyDayPrepList({
                       {next && (
                         <button
                           className="btn btn-ghost btn-sm"
-                          disabled={busy != null}
+                          disabled={busy != null || waiting}
+                          aria-describedby={
+                            dependency.total > 0
+                              ? `my-day-prep-dependencies-${task._id}`
+                              : undefined
+                          }
                           aria-label={`${next.label}: ${task.name || "prep task"}`}
                           onClick={() =>
                             perform(key, next.command, next.label, {

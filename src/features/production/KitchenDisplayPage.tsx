@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useListEvent,
+  useListPerson,
   useListPrepTask,
   useListPrepTaskDependency,
   useListProductionBatch,
@@ -26,6 +27,11 @@ import {
   type PrepTaskDependencySummary,
 } from "./PrepTaskDependencies";
 import { prepQuantityLabel } from "../kitchen/prepQuantityLabel";
+import { NO_PREP_TIME, prepMadeSoFarLabel } from "../kitchen/prepTiming";
+import {
+  KitchenDisplayTaskFacts,
+  type KitchenDisplayTaskFactsProps,
+} from "./KitchenDisplayTaskFacts";
 import "./KitchenDisplayPage.css";
 
 const policy = new ProductionLifecyclePolicy();
@@ -54,6 +60,7 @@ type BoardItem = {
   dueAt: number | null;
   plannedYield?: number;
   dependency?: PrepTaskDependencySummary;
+  facts?: Omit<KitchenDisplayTaskFactsProps, "taskId" | "title" | "status">;
 };
 
 function urgencyRank(item: BoardItem, now: number): number {
@@ -63,7 +70,7 @@ function urgencyRank(item: BoardItem, now: number): number {
 }
 
 function dueLabel(dueAt: number | null, now: number): string {
-  if (dueAt == null) return "No due time";
+  if (dueAt == null) return NO_PREP_TIME;
   const minutes = Math.round((dueAt - now) / 60000);
   if (minutes < 0) return `${Math.abs(minutes)}m overdue`;
   if (minutes < 60) return `Due in ${minutes}m`;
@@ -81,6 +88,7 @@ export function KitchenDisplayPage() {
   const batches = useListProductionBatch();
   const events = useListEvent();
   const components = useListComponent();
+  const people = useListPerson();
   const claim = usePrepTaskClaim();
   const start = usePrepTaskStart();
   const complete = usePrepTaskComplete();
@@ -106,6 +114,14 @@ export function KitchenDisplayPage() {
     (id && events?.find((event) => event._id === id)?.title) || "House";
   const componentName = (id: string) =>
     components?.find((component) => component._id === id)?.name ?? "Recipe";
+  const personName = (id: string | null | undefined) => {
+    if (!id) return null;
+    const person = people?.find((row) => row._id === id);
+    const name = person
+      ? `${person.givenName ?? ""} ${person.familyName ?? ""}`.trim()
+      : "";
+    return name || "Claimed";
+  };
 
   const items: BoardItem[] = [
     ...(tasks ?? [])
@@ -127,12 +143,18 @@ export function KitchenDisplayPage() {
           id: task._id,
           version: task.version,
           title: task.name?.trim() || "Prep task",
-          detail: `${prepQuantityLabel(task.quantity, String(task.unit))} ${task.unit}`,
+          detail: `${prepQuantityLabel(task.quantity, String(task.unit))} ${task.unit} to make`,
           station: task.station?.trim() || null,
           eventId: task.eventId,
           status: optimistic.statusOf(task._id, String(task.status)),
           dueAt: task.dueAt ?? null,
           dependency,
+          facts: {
+            owner: personName(task.assignedToId),
+            made: prepMadeSoFarLabel(task, tasks ?? []),
+            blockReason: task.blockReason ?? null,
+            componentId: task.componentId ?? null,
+          },
         };
       }),
     ...(batches ?? [])
@@ -317,6 +339,14 @@ export function KitchenDisplayPage() {
                   {item.detail} · {eventName(item.eventId)}
                   {item.station ? ` · ${item.station}` : ""}
                 </p>
+                {item.facts ? (
+                  <KitchenDisplayTaskFacts
+                    taskId={item.id}
+                    title={item.title}
+                    status={item.status}
+                    {...item.facts}
+                  />
+                ) : null}
                 {item.kind === "task" &&
                 item.dependency &&
                 item.dependency.total > 0 ? (

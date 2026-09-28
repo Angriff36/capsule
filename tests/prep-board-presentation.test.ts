@@ -32,6 +32,7 @@ vi.mock("../src/lib/manifest-convex-react", () => ({
   useCreateQualityCheck: () => manifest.command,
   useCreatePrepTaskComment: () => manifest.command,
   usePrepTaskCancel: () => manifest.command,
+  usePrepTaskDependencyDropLink: () => manifest.command,
   usePrepTaskClaim: () => manifest.command,
   usePrepTaskComplete: () => manifest.command,
   usePrepTaskMarkBlocked: () => manifest.command,

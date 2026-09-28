@@ -14,6 +14,7 @@ import {
   useListPackListItem,
   useListPerson,
   useListPrepTask,
+  useListPrepTaskDependency,
   useListShift,
   useListTimeRecord,
   useListWeeklyScheduleNotice,
@@ -103,6 +104,11 @@ export function MyDayPage() {
     offlineScope,
   );
   const tasks = useCachedRead("prepTasks", useListPrepTask(), offlineScope);
+  const prepLinks = useCachedRead(
+    "prepTaskDependencies",
+    useListPrepTaskDependency(),
+    offlineScope,
+  );
   const dishes = useCachedRead("prepDishes", useListDish(), offlineScope);
   const eventDishes = useCachedRead(
     "prepEventDishes",
@@ -745,6 +751,8 @@ export function MyDayPage() {
                   <MyDayPrepList
                     tasks={myTasks}
                     allTasks={myRelevantTasks}
+                    everyTask={tasks ?? []}
+                    dependencies={prepLinks ?? []}
                     dishes={dishes}
                     eventDishes={eventDishes}
                     events={events}
