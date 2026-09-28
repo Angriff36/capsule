@@ -761,6 +761,7 @@ export function ComponentDetailPage() {
         heading="Per-portion nutrition"
         portionLabel={`per portion · serves ${servesPerYield}`}
         totals={componentNutrition.perPortion}
+        coverage={componentNutrition.coverage}
         coverageNote={nutritionCoverageNote}
         loading={ingredients === undefined || lines === undefined}
       />

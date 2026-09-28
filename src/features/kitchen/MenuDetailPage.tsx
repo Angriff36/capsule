@@ -584,6 +584,7 @@ export function MenuDetailPage() {
         totals={
           menuNutrition.componentCount > 0 ? menuNutrition.perGuest : null
         }
+        coverage={menuNutrition.coverage}
         coverageNote={menuNutritionNote}
         loading={nutritionLoading}
       />

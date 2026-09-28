@@ -1399,6 +1399,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
         totals={
           nutrition.totals.componentCount > 0 ? nutrition.totals.perGuest : null
         }
+        coverage={nutrition.totals.coverage}
         coverageNote={nutrition.coverageNote}
         loading={nutrition.loading}
       />

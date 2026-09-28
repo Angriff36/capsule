@@ -17,22 +17,13 @@ const COUNT_UNITS = new Set([
   "bottle",
 ]);
 
-const TYPICAL_BOTTLE_ML = 750;
-const USDA_BASIS_GRAMS = 100;
-
 export type CatalogUnitGramHints = {
   servingGramsPerEach?: number;
   gramsPerMl?: number;
   foodName?: string;
 };
 
-export type CatalogGramBasis =
-  | "mass"
-  | "volume"
-  | "serving"
-  | "bottle_typical"
-  | "household_cup"
-  | "usda_basis";
+export type CatalogGramBasis = "mass" | "volume" | "serving";
 
 export type CatalogGramResolution = {
   grams: number;
@@ -46,6 +37,10 @@ export class CatalogUnitGrams {
     hints: CatalogUnitGramHints = {},
   ): number | undefined {
     return CatalogUnitGrams.resolveDetailed(unit, hints)?.grams;
+  }
+
+  static isCountUnit(unit: string): boolean {
+    return COUNT_UNITS.has(unit);
   }
 
   static resolveDetailed(
@@ -63,21 +58,13 @@ export class CatalogUnitGrams {
 
     if (!COUNT_UNITS.has(unit)) return undefined;
 
+    // A count unit (each, bottle, portion...) needs a recorded weight per piece.
+    // Never stand in a cup, a typical bottle, or a 100 g reference amount: that
+    // would show a volume or a guess as the weight of one piece.
     if (hints.servingGramsPerEach != null && hints.servingGramsPerEach > 0) {
       return { grams: hints.servingGramsPerEach, basis: "serving" };
     }
-
-    const density = CatalogUnitGrams.density(hints);
-    if (unit === "bottle") {
-      return { grams: TYPICAL_BOTTLE_ML * density, basis: "bottle_typical" };
-    }
-
-    const cupMl = VolumeMilliliters.millilitersFor("cup");
-    if (hints.gramsPerMl != null && hints.gramsPerMl > 0 && cupMl != null) {
-      return { grams: cupMl * hints.gramsPerMl, basis: "household_cup" };
-    }
-
-    return { grams: USDA_BASIS_GRAMS, basis: "usda_basis" };
+    return undefined;
   }
 
   private static density(hints: CatalogUnitGramHints): number {
