@@ -1,5 +1,6 @@
 export const WORKFORCE_SECTIONS = [
   { key: "roster", label: "Roster", path: "/staff/roster" },
+  { key: "tasks", label: "Tasks", path: "/staff/tasks" },
   { key: "swaps", label: "Shift swaps", path: "/staff/swaps" },
   { key: "time", label: "Time & availability", path: "/staff/time" },
   { key: "time-off", label: "Time off", path: "/staff/time-off" },

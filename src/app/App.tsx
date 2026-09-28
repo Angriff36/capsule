@@ -134,6 +134,11 @@ const RosterPage = lazy(() =>
     default: module.RosterPage,
   })),
 );
+const TaskAssignmentsPage = lazy(() =>
+  import("../features/workforce/TaskAssignmentsPage").then((module) => ({
+    default: module.TaskAssignmentsPage,
+  })),
+);
 const ShiftSwapRequestsPage = lazy(() =>
   import("../features/workforce/ShiftSwapRequestsPage").then((module) => ({
     default: module.ShiftSwapRequestsPage,
@@ -861,6 +866,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <RosterPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/staff/tasks"
+              element={
+                <SupplyRoute>
+                  <TaskAssignmentsPage />
                 </SupplyRoute>
               }
             />
