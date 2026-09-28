@@ -23,6 +23,7 @@ import { readiness, fieldLabel } from "../../../lib/eventPacket/reconcile";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { FailureBanner } from "../FailureBanner";
 import { WORKBOOK_REVIEW_PARAM } from "../eventRoutes";
+import { FinalLockPanel } from "./FinalLockQuestions";
 
 function valueText(value: unknown) {
   return Array.isArray(value)
@@ -306,6 +307,7 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
         local review. Live TPP, Nowsta, rentals and document checks remain open
         until verified.
       </p>
+      <FinalLockPanel eventId={eventId} />
       <button
         className="btn-link mt-3"
         onClick={() => setExpanded(!expanded)}
