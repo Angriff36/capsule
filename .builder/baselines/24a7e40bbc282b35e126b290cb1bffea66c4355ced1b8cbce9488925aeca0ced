@@ -2631,6 +2631,8 @@ export const ProposalSchema = z.object({
   eventId: z.string().uuid().nullable().optional(),
   pendingEventId: z.string().uuid().nullable().optional(),
   acceptedRevisionId: z.string().uuid().nullable().optional(),
+  acceptanceSource: z.string().nullable().optional(),
+  acceptanceEvidence: z.string().nullable().optional(),
   proposalNumber: z.string().nullable().optional(),
   title: z.string().default(""),
   eventDate: z.coerce.date().nullable().optional(),
@@ -8487,6 +8489,14 @@ export type ProposalMarkViewedParams = z.infer<typeof ProposalMarkViewedParamsSc
 export const ProposalReassignClientParamsSchema = z.object({});
 
 export type ProposalReassignClientParams = z.infer<typeof ProposalReassignClientParamsSchema>;
+
+// Command: recordHistoricalAcceptance on Proposal
+export const ProposalRecordHistoricalAcceptanceParamsSchema = z.object({
+  source: z.string(),
+  evidence: z.string(),
+});
+
+export type ProposalRecordHistoricalAcceptanceParams = z.infer<typeof ProposalRecordHistoricalAcceptanceParamsSchema>;
 
 // Command: refreshFromEvent on Proposal
 export const ProposalRefreshFromEventParamsSchema = z.object({

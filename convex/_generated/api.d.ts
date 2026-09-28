@@ -136,6 +136,7 @@ import type * as lib_proposalEventCreation from "../lib/proposalEventCreation.js
 import type * as lib_proposalFollowTotals from "../lib/proposalFollowTotals.js";
 import type * as lib_proposalGenerate from "../lib/proposalGenerate.js";
 import type * as lib_proposalGenerateSources from "../lib/proposalGenerateSources.js";
+import type * as lib_proposalHistoricalAcceptance from "../lib/proposalHistoricalAcceptance.js";
 import type * as lib_proposalPricing from "../lib/proposalPricing.js";
 import type * as lib_proposalReconciliation from "../lib/proposalReconciliation.js";
 import type * as lib_proposalRevision from "../lib/proposalRevision.js";
@@ -342,6 +343,7 @@ declare const fullApi: ApiFromModules<{
   "lib/proposalFollowTotals": typeof lib_proposalFollowTotals;
   "lib/proposalGenerate": typeof lib_proposalGenerate;
   "lib/proposalGenerateSources": typeof lib_proposalGenerateSources;
+  "lib/proposalHistoricalAcceptance": typeof lib_proposalHistoricalAcceptance;
   "lib/proposalPricing": typeof lib_proposalPricing;
   "lib/proposalReconciliation": typeof lib_proposalReconciliation;
   "lib/proposalRevision": typeof lib_proposalRevision;

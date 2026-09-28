@@ -45,6 +45,11 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   // explicit null. ABSENT (not null) marks a pre-change record. `accepted` is
   // a terminal status, so a later revision can never re-label an acceptance.
   property acceptedRevisionId: uuid?
+  // AC-098: an acceptance that happened before Capsule (an imported event).
+  // Where it came from and what shows the client agreed. Null = accepted in
+  // Capsule. Never a signature: no SignatureRequest is made for it.
+  property acceptanceSource: string?
+  property acceptanceEvidence: string?
   property unique proposalNumber: string?
   property required searchable title: string = ""
   property eventDate: datetime?
@@ -309,6 +314,29 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // AC-098: label an acceptance that happened before Capsule. The only caller
+  // is convex/lib/proposalHistoricalAcceptance.ts, which builds the proposal
+  // from the imported event, sends it (revision captured) and accepts it under
+  // the staff member's own sign-in in the same transaction first. A server-only
+  // step, so nobody can relabel an acceptance signed in Capsule. Set once.
+  private command recordHistoricalAcceptance(source: string, evidence: string) {
+    guard self.status == "accepted"
+    guard self.deletedAt == null
+    guard self.acceptanceSource == null
+    guard self.acceptedRevisionId != null
+    constraint historicalSource: length(trim(source)) > 0 "Say where the acceptance came from, for example the old booking system."
+    constraint historicalEvidence: length(trim(evidence)) > 0 "Say what shows the client agreed, for example the old invoice number or the signed paper."
+    mutate acceptanceSource = source
+    mutate acceptanceEvidence = evidence
+    emit ProposalHistoricalAcceptanceRecorded {
+      proposalId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      source: source
+      evidence: evidence
+    }
+  }
+
   // Book a proposal into its Event (issue #141; draft linking issue #391).
   // Signature acceptance and "accept now, create the event after" both leave
   // accepted proposals unlinked, and a quote-conversion retry saves a draft
@@ -514,6 +542,14 @@ event ProposalAccepted: "proposal.accepted" {
   // Non-null only when an Event was linked at accept time — keys the menu
   // selection → EventDish cascade (sales/proposal-dish-selection.manifest).
   dishSelectionProposalId: string?
+}
+
+event ProposalHistoricalAcceptanceRecorded: "proposal.historical_acceptance_recorded" {
+  proposalId: string
+  tenantId: string
+  clientId: string
+  source: string
+  evidence: string
 }
 
 event ProposalEventLinkStaged: "proposal.event_link_staged" {

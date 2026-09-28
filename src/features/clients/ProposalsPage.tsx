@@ -39,6 +39,10 @@ import {
 import { ProposalSignatureRevokeAction } from "../sales/ProposalSignatureRevokeAction";
 import { ProposalChangeAction } from "./ProposalChangeAction";
 import { ProposalChangeLabel } from "./ProposalChangeLabel";
+import {
+  HistoricalAcceptanceLabel,
+  RecordAcceptedBeforeCapsule,
+} from "./ProposalHistoricalAcceptance";
 import { ProposalCreateForm } from "./ProposalCreateForm";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
 import { ProposalReadinessNotice } from "./ProposalReadinessNotice";
@@ -497,6 +501,19 @@ export function ProposalsPage() {
               Build from event
             </button>
           ) : null}
+          {fromEvent ? (
+            <RecordAcceptedBeforeCapsule
+              event={fromEvent}
+              prompt={prompt}
+              busy={busy}
+              run={run}
+              onNotice={setNotice}
+              onOpen={(proposalId) => {
+                setShowDraft(false);
+                setSearchParams({ proposal: proposalId });
+              }}
+            />
+          ) : null}
           <button
             className={fromEvent ? "btn btn-ghost" : "btn btn-primary"}
             type="button"
@@ -576,6 +593,10 @@ export function ProposalsPage() {
                         </Link>
                         <ProposalChangeLabel
                           replacesProposalId={row.replacesProposalId}
+                        />
+                        <HistoricalAcceptanceLabel
+                          source={row.acceptanceSource}
+                          evidence={row.acceptanceEvidence}
                         />
                       </td>
                       <td>{clientDisplayName(row.clientId, clients)}</td>

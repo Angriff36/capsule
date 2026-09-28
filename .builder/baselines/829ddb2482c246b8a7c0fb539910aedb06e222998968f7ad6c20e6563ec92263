@@ -2397,6 +2397,8 @@ export default defineSchema({
     eventId: v.optional(v.union(v.id("events"), v.null())),
     pendingEventId: v.optional(v.union(v.id("events"), v.null())),
     acceptedRevisionId: v.optional(v.union(v.id("proposalRevisions"), v.null())),
+    acceptanceSource: v.optional(v.union(v.string(), v.null())),
+    acceptanceEvidence: v.optional(v.union(v.string(), v.null())),
     proposalNumber: v.optional(v.union(v.string(), v.null())),
     title: v.string(),
     eventDate: v.optional(v.union(v.number(), v.null())),
