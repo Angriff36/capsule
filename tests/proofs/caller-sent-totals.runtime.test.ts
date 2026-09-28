@@ -10,10 +10,13 @@
  *   payment.
  * - Proposal.followEventHeadcount: a person may run it, but only to the
  *   event's count and only with the central calc's money for its lines.
+ * - IntegrationConnection: the provider account id, charges/payouts and
+ *   sync health come only from the server recording the provider's answer.
  */
 import { convexTest } from "convex-test";
 import { beforeAll, describe, expect, it } from "vitest";
-import { api } from "../../convex/_generated/api";
+import { api, internal } from "../../convex/_generated/api";
+import type { Id } from "../../convex/_generated/dataModel";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
@@ -307,6 +310,95 @@ describe("runtime proof: callers cannot set totals the server works out (AC-372)
       guestCount: 60,
       subtotal: 2000,
       total: 2050,
+    });
+  });
+
+  it("only the provider's own answer sets a connection's account, capabilities and health", async () => {
+    const proof = harness();
+    const tenantId = "tenant-totals-provider";
+    const owner = proof.asRole({
+      subject: `owner-${tenantId}`,
+      role: "owner",
+      tenantId,
+    });
+    const created = (await proof.executeCommand(
+      owner,
+      M.IntegrationConnection_createViaAuthorize,
+      { provider: "stripe", displayName: "Stripe" },
+    )) as { docId: string };
+    const connectionId = created.docId as Id<"integrationConnections">;
+    const read = () =>
+      owner.run(async (ctx) => ctx.db.get(connectionId)) as Promise<{
+        status: string;
+        externalAccountId?: string | null;
+        chargesEnabled: boolean;
+        lastErrorMessage?: string | null;
+      }>;
+
+    // An owner calling the provider-result steps by hand is refused.
+    for (const [step, args] of [
+      [
+        M.IntegrationConnection_linkAccount,
+        { externalAccountId: "acct_other" },
+      ],
+      [
+        M.IntegrationConnection_markConnected,
+        {
+          externalAccountId: "acct_other",
+          chargesEnabled: true,
+          payoutsEnabled: true,
+        },
+      ],
+      [M.IntegrationConnection_recordSyncSuccess, {}],
+      [M.IntegrationConnection_recordFailure, { reason: "made up" }],
+    ] as const) {
+      await expect(
+        proof.executeCommand(owner, step, {
+          docId: connectionId,
+          ...args,
+        } as never),
+      ).rejects.toThrow(/can't be started by hand/);
+    }
+    expect(await read()).toMatchObject({
+      status: "pending",
+      chargesEnabled: false,
+    });
+    expect((await read()).externalAccountId ?? null).toBeNull();
+
+    // Another workspace's server path cannot touch this connection.
+    await expect(
+      owner.mutation(internal.stripeConnect.recordStripeAnswer, {
+        tenantId: "tenant-totals-provider-other",
+        connectionId,
+        answer: { kind: "account", externalAccountId: "acct_other" },
+      }),
+    ).rejects.toThrow();
+    expect((await read()).externalAccountId ?? null).toBeNull();
+
+    // Stripe's own answer, recorded by the server, does update it.
+    const answer = (value: unknown) =>
+      owner.mutation(internal.stripeConnect.recordStripeAnswer, {
+        tenantId,
+        connectionId,
+        answer: value as never,
+      });
+    await answer({ kind: "account", externalAccountId: "acct_real" });
+    await answer({
+      kind: "connected",
+      externalAccountId: "acct_real",
+      displayName: "Real Caterer",
+      chargesEnabled: true,
+      payoutsEnabled: false,
+    });
+    expect(await read()).toMatchObject({
+      status: "connected",
+      externalAccountId: "acct_real",
+      chargesEnabled: true,
+    });
+    await answer({ kind: "failed", reason: "Stripe is down" });
+    expect(await read()).toMatchObject({
+      status: "error",
+      lastErrorMessage: "Stripe is down",
     });
   });
 });

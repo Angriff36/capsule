@@ -333,9 +333,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.IngredientPriceObservation_createViaRecord, { "ingredientId": "ingredientId-ingredient-price-observation-2", "vendorId": "vendorId-ingredient-price-observation-2", "vendorOrderId": "vendorOrderId-ingredient-price-observation-2", "vendorOrderLineId": "vendorOrderLineId-ingredient-price-observation-2", "receiptQuantity": 2, "cumulativeReceivedQuantity": 2, "unit": "demo-unit-2", "unitPrice": 2 } as any);
   // IntegrationConnection → api.mutations.IntegrationConnection_createViaAuthorize
   rowsAttempted += 1;
-  await client.mutation(api.mutations.IntegrationConnection_createViaAuthorize, { "provider": "demo-provider-1", "externalAccountId": "externalAccountId-integration-connection-1", "displayName": "IntegrationConnection 1", "scopes": "demo-scopes-1", "credentialRef": "demo-credentialRef-1" } as any);
+  await client.mutation(api.mutations.IntegrationConnection_createViaAuthorize, { "provider": "demo-provider-1", "displayName": "IntegrationConnection 1", "credentialRef": "demo-credentialRef-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.IntegrationConnection_createViaAuthorize, { "provider": "demo-provider-2", "externalAccountId": "externalAccountId-integration-connection-2", "displayName": "IntegrationConnection 2", "scopes": "demo-scopes-2", "credentialRef": "demo-credentialRef-2" } as any);
+  await client.mutation(api.mutations.IntegrationConnection_createViaAuthorize, { "provider": "demo-provider-2", "displayName": "IntegrationConnection 2", "credentialRef": "demo-credentialRef-2" } as any);
   // Interview → api.mutations.Interview_createViaSchedule
   rowsAttempted += 1;
   await client.mutation(api.mutations.Interview_createViaSchedule, { "candidateId": "candidateId-interview-1", "scheduledFor": 1767268800000, "interviewerPersonId": "interviewerPersonId-interview-1", "sourceSystem": "demo-sourceSystem-1", "externalInterviewId": "externalInterviewId-interview-1", "rawSourceData": "demo-rawSourceData-1" } as any);

@@ -6852,9 +6852,7 @@ export type IngredientPriceObservationRecordParams = z.infer<typeof IngredientPr
 // Command: authorize on IntegrationConnection
 export const IntegrationConnectionAuthorizeParamsSchema = z.object({
   provider: z.enum(["stripe", "quickbooks", "google_calendar", "email", "sms", "nowsta", "instagram", "facebook", "tiktok"]),
-  externalAccountId: z.string().optional(),
   displayName: z.string().optional(),
-  scopes: z.string().optional(),
   credentialRef: z.string().optional(),
 });
 
@@ -6866,6 +6864,13 @@ export const IntegrationConnectionDisconnectParamsSchema = z.object({
 });
 
 export type IntegrationConnectionDisconnectParams = z.infer<typeof IntegrationConnectionDisconnectParamsSchema>;
+
+// Command: linkAccount on IntegrationConnection
+export const IntegrationConnectionLinkAccountParamsSchema = z.object({
+  externalAccountId: z.string(),
+});
+
+export type IntegrationConnectionLinkAccountParams = z.infer<typeof IntegrationConnectionLinkAccountParamsSchema>;
 
 // Command: markConnected on IntegrationConnection
 export const IntegrationConnectionMarkConnectedParamsSchema = z.object({

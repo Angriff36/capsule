@@ -324,6 +324,7 @@ import {
   IngredientUpdateDetailsParamsSchema,
   IntegrationConnectionAuthorizeParamsSchema,
   IntegrationConnectionDisconnectParamsSchema,
+  IntegrationConnectionLinkAccountParamsSchema,
   IntegrationConnectionMarkConnectedParamsSchema,
   IntegrationConnectionReauthorizeParamsSchema,
   IntegrationConnectionRecordFailureParamsSchema,
@@ -5260,6 +5261,16 @@ export function useIntegrationConnectionDisconnect() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = IntegrationConnectionDisconnectParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for IntegrationConnection.linkAccount. */
+export function useIntegrationConnectionLinkAccount() {
+  const mutate = useMutation(api.mutations.IntegrationConnection_linkAccount);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IntegrationConnectionLinkAccountParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11400,4 +11411,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1212 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1213 as const;
