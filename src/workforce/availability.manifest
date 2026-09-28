@@ -38,7 +38,9 @@ entity TimeOffRequest mixin TenantScoped, SoftDeletable {
   transition status from "approved" to []
   transition status from "denied" to []
 
-  default policy timeOffRequestRead read: roleAllows(user.role, "workforceManageAccess") or (user.id != null and self.requesterAuthSubjectId == user.id) or self.requesterAuthSubjectId == null "Staff may see their own time-off requests; workforce managers may review all requests"
+  // A request made for someone with no sign-in stays private too (its reason
+  // can be medical); the linked person always sees their own requests.
+  default policy timeOffRequestRead read: roleAllows(user.role, "workforceManageAccess") or (user.id != null and self.requesterAuthSubjectId != null and self.requesterAuthSubjectId == user.id) or (user.personId != null and self.personId == user.personId) "Staff may see their own time-off requests; workforce managers may review all requests"
   default policy timeOffRequestWrite write: roleAllows(user.role, "workforceManageAccess") or (user.id != null and (self.requesterAuthSubjectId == null or self.requesterAuthSubjectId == user.id)) "Staff may submit their own time-off requests; workforce managers may review them"
   default policy timeOffRequestExecute execute: roleAllows(user.role, "workforceManageAccess") or (user.id != null and (self.requesterAuthSubjectId == null or self.requesterAuthSubjectId == user.id)) "Staff may submit their own time-off requests; workforce managers may review them"
 

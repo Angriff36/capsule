@@ -53244,7 +53244,7 @@ async function __runTimeOffRequestApprove(ctx: MutationCtx, { docId, responseNot
     if (!__storedDoc) throw new Error("TimeOffRequest not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("TimeOffRequest not found");
     const doc = await __decryptDoc(ctx, "TimeOffRequest", ["reason","responseNote"], __storedDoc) as Record<string, any>;
-    if (!(((checkRole(user, "workforceManageAccess") || ((user.id != null) && (doc.requesterAuthSubjectId === user.id))) || (doc.requesterAuthSubjectId == null)))) throw new Error("Staff may see their own time-off requests; workforce managers may review all requests");
+    if (!(((checkRole(user, "workforceManageAccess") || (((user.id != null) && (doc.requesterAuthSubjectId != null)) && (doc.requesterAuthSubjectId === user.id))) || ((user.personId != null) && (doc.personId === user.personId))))) throw new Error("Staff may see their own time-off requests; workforce managers may review all requests");
     if (!((checkRole(user, "workforceManageAccess") || ((user.id != null) && ((doc.requesterAuthSubjectId == null) || (doc.requesterAuthSubjectId === user.id)))))) throw new Error("Staff may submit their own time-off requests; workforce managers may review them");
     if (!((checkRole(user, "workforceManageAccess") || ((user.id != null) && ((doc.requesterAuthSubjectId == null) || (doc.requesterAuthSubjectId === user.id)))))) throw new Error("Staff may submit their own time-off requests; workforce managers may review them");
     if (!((doc.status === "pending"))) throw new Error("Guard 0 failed");
@@ -53314,7 +53314,7 @@ async function __runTimeOffRequestDecline(ctx: MutationCtx, { docId, responseNot
     if (!__storedDoc) throw new Error("TimeOffRequest not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("TimeOffRequest not found");
     const doc = await __decryptDoc(ctx, "TimeOffRequest", ["reason","responseNote"], __storedDoc) as Record<string, any>;
-    if (!(((checkRole(user, "workforceManageAccess") || ((user.id != null) && (doc.requesterAuthSubjectId === user.id))) || (doc.requesterAuthSubjectId == null)))) throw new Error("Staff may see their own time-off requests; workforce managers may review all requests");
+    if (!(((checkRole(user, "workforceManageAccess") || (((user.id != null) && (doc.requesterAuthSubjectId != null)) && (doc.requesterAuthSubjectId === user.id))) || ((user.personId != null) && (doc.personId === user.personId))))) throw new Error("Staff may see their own time-off requests; workforce managers may review all requests");
     if (!((checkRole(user, "workforceManageAccess") || ((user.id != null) && ((doc.requesterAuthSubjectId == null) || (doc.requesterAuthSubjectId === user.id)))))) throw new Error("Staff may submit their own time-off requests; workforce managers may review them");
     if (!((checkRole(user, "workforceManageAccess") || ((user.id != null) && ((doc.requesterAuthSubjectId == null) || (doc.requesterAuthSubjectId === user.id)))))) throw new Error("Staff may submit their own time-off requests; workforce managers may review them");
     if (!((doc.status === "pending"))) throw new Error("Guard 0 failed");
@@ -53386,7 +53386,7 @@ async function __runTimeOffRequestSubmit(ctx: MutationCtx, { docId, personId, st
     const doc = await __decryptDoc(ctx, "TimeOffRequest", ["reason","responseNote"], __storedDoc) as Record<string, any>;
     const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, doc.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).person = __rel_person;
-    if (!(((checkRole(user, "workforceManageAccess") || ((user.id != null) && (doc.requesterAuthSubjectId === user.id))) || (doc.requesterAuthSubjectId == null)))) throw new Error("Staff may see their own time-off requests; workforce managers may review all requests");
+    if (!(((checkRole(user, "workforceManageAccess") || (((user.id != null) && (doc.requesterAuthSubjectId != null)) && (doc.requesterAuthSubjectId === user.id))) || ((user.personId != null) && (doc.personId === user.personId))))) throw new Error("Staff may see their own time-off requests; workforce managers may review all requests");
     if (!((checkRole(user, "workforceManageAccess") || ((user.id != null) && ((doc.requesterAuthSubjectId == null) || (doc.requesterAuthSubjectId === user.id)))))) throw new Error("Staff may submit their own time-off requests; workforce managers may review them");
     if (!((checkRole(user, "workforceManageAccess") || ((user.id != null) && ((doc.requesterAuthSubjectId == null) || (doc.requesterAuthSubjectId === user.id)))))) throw new Error("Staff may submit their own time-off requests; workforce managers may review them");
     if (!((doc.submittedAt == null))) throw new Error("Guard 0 failed");
@@ -53476,7 +53476,7 @@ export const TimeOffRequest_createViaSubmit = mutation({
       startsAt: args.startsAt
     };
     const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(((checkRole(user, "workforceManageAccess") || ((user.id != null) && (__draft.requesterAuthSubjectId === user.id))) || (__draft.requesterAuthSubjectId == null)))) throw new Error("Staff may see their own time-off requests; workforce managers may review all requests");
+    if (!(((checkRole(user, "workforceManageAccess") || (((user.id != null) && (__draft.requesterAuthSubjectId != null)) && (__draft.requesterAuthSubjectId === user.id))) || ((user.personId != null) && (__draft.personId === user.personId))))) throw new Error("Staff may see their own time-off requests; workforce managers may review all requests");
     if (!((checkRole(user, "workforceManageAccess") || ((user.id != null) && ((__draft.requesterAuthSubjectId == null) || (__draft.requesterAuthSubjectId === user.id)))))) throw new Error("Staff may submit their own time-off requests; workforce managers may review them");
     if (!((checkRole(user, "workforceManageAccess") || ((user.id != null) && ((__draft.requesterAuthSubjectId == null) || (__draft.requesterAuthSubjectId === user.id)))))) throw new Error("Staff may submit their own time-off requests; workforce managers may review them");
     if (!((__draft.submittedAt == null))) throw new Error("Guard 0 failed");

@@ -47,6 +47,7 @@ import { deleteBlobIfOrphan } from "./blobs";
 import { queueRouteRefresh } from "./routeFollowUp";
 import { queueTimingRecalculation } from "./timingFollowUp";
 import { handleTravelLegEvent } from "./travelLegEvents";
+import { assertSignInUnclaimed } from "./personAuthPick";
 
 /** Runs after declared reactions, inside the originating command transaction. */
 export async function handleManifestEvent(
@@ -62,6 +63,10 @@ export async function handleManifestEvent(
     await ctx.scheduler.runAfter(0, internal.schedulePushSend.deliver, {
       noticeId: event.entityId as Id<"weeklyScheduleNotices">,
     });
+    return;
+  }
+  if (event.entity === "Person" && (event.type === "PersonHired" || event.type === "PersonAccountLinked")) {
+    await assertSignInUnclaimed(ctx, event.entityId as Id<"people">);
     return;
   }
   if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedCoverageChangeRequested") {

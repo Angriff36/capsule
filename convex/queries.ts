@@ -13939,7 +13939,7 @@ export const listTimeOffRequest = query({
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "TimeOffRequest", ["reason","responseNote"], row)));
     const __visibleRows: any[] = [];
     for (const __row of __plainRows) {
-      if (!__allowsRead("timeOffRequestRead", "TimeOffRequest", () => ((checkRole(user, "workforceManageAccess") || ((user.id != null) && (__row.requesterAuthSubjectId === user.id))) || (__row.requesterAuthSubjectId == null)))) continue;
+      if (!__allowsRead("timeOffRequestRead", "TimeOffRequest", () => ((checkRole(user, "workforceManageAccess") || (((user.id != null) && (__row.requesterAuthSubjectId != null)) && (__row.requesterAuthSubjectId === user.id))) || ((user.personId != null) && (__row.personId === user.personId))))) continue;
       __visibleRows.push(__row);
     }
     return __visibleRows;
@@ -13958,7 +13958,7 @@ export const getTimeOffRequest = query({
     const __rawDoc = doc;
     if (!__rawDoc) return __rawDoc;
     const __doc = await __decryptDoc(ctx, "TimeOffRequest", ["reason","responseNote"], __rawDoc);
-    if (!__allowsRead("timeOffRequestRead", "TimeOffRequest", () => ((checkRole(user, "workforceManageAccess") || ((user.id != null) && (__doc.requesterAuthSubjectId === user.id))) || (__doc.requesterAuthSubjectId == null)))) return null;
+    if (!__allowsRead("timeOffRequestRead", "TimeOffRequest", () => ((checkRole(user, "workforceManageAccess") || (((user.id != null) && (__doc.requesterAuthSubjectId != null)) && (__doc.requesterAuthSubjectId === user.id))) || ((user.personId != null) && (__doc.personId === user.personId))))) return null;
     return __doc;
   },
 });
@@ -13975,7 +13975,7 @@ export const listTimeOffRequestByTenantId = query({
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "TimeOffRequest", ["reason","responseNote"], row)));
     const __visibleRows: any[] = [];
     for (const __row of __plainRows) {
-      if (!__allowsRead("timeOffRequestRead", "TimeOffRequest", () => ((checkRole(user, "workforceManageAccess") || ((user.id != null) && (__row.requesterAuthSubjectId === user.id))) || (__row.requesterAuthSubjectId == null)))) continue;
+      if (!__allowsRead("timeOffRequestRead", "TimeOffRequest", () => ((checkRole(user, "workforceManageAccess") || (((user.id != null) && (__row.requesterAuthSubjectId != null)) && (__row.requesterAuthSubjectId === user.id))) || ((user.personId != null) && (__row.personId === user.personId))))) continue;
       __visibleRows.push(__row);
     }
     return __visibleRows;
@@ -13995,7 +13995,7 @@ export const listTimeOffRequestByPersonId = query({
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "TimeOffRequest", ["reason","responseNote"], row)));
     const __visibleRows: any[] = [];
     for (const __row of __plainRows) {
-      if (!__allowsRead("timeOffRequestRead", "TimeOffRequest", () => ((checkRole(user, "workforceManageAccess") || ((user.id != null) && (__row.requesterAuthSubjectId === user.id))) || (__row.requesterAuthSubjectId == null)))) continue;
+      if (!__allowsRead("timeOffRequestRead", "TimeOffRequest", () => ((checkRole(user, "workforceManageAccess") || (((user.id != null) && (__row.requesterAuthSubjectId != null)) && (__row.requesterAuthSubjectId === user.id))) || ((user.personId != null) && (__row.personId === user.personId))))) continue;
       __visibleRows.push(__row);
     }
     return __visibleRows;
@@ -14014,7 +14014,7 @@ export const listTimeOffRequestByTenantIdAndPersonIdAndStatusAndEndsAt = query({
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "TimeOffRequest", ["reason","responseNote"], row)));
     const __visibleRows: any[] = [];
     for (const __row of __plainRows) {
-      if (!__allowsRead("timeOffRequestRead", "TimeOffRequest", () => ((checkRole(user, "workforceManageAccess") || ((user.id != null) && (__row.requesterAuthSubjectId === user.id))) || (__row.requesterAuthSubjectId == null)))) continue;
+      if (!__allowsRead("timeOffRequestRead", "TimeOffRequest", () => ((checkRole(user, "workforceManageAccess") || (((user.id != null) && (__row.requesterAuthSubjectId != null)) && (__row.requesterAuthSubjectId === user.id))) || ((user.personId != null) && (__row.personId === user.personId))))) continue;
       __visibleRows.push(__row);
     }
     return __visibleRows;
