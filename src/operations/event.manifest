@@ -1660,6 +1660,12 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.startsAt != null
     guard self.endsAt != null
     guard self.expectedHeadcount > 0
+    // AC-227 (decided 2026-09-28, issue #397): the kitchen, staff and pack
+    // lists cannot be planned without a name, a place and a service style.
+    // Only this office step checks them; later stages show warnings only.
+    constraint lockTitle: length(trim(self.title)) > 0 "Give this event a name before you lock it for sales."
+    constraint lockVenue: self.venueId != null or (self.venueName != null and length(trim(self.venueName)) > 0) "Pick a venue before you lock this event for sales."
+    constraint lockServiceStyle: self.serviceStyleId != null or (self.serviceStyleName != null and length(trim(self.serviceStyleName)) > 0) "Pick a service style before you lock this event for sales."
     mutate stage = "sales_lock"
     mutate salesLockedAt = now()
     emit EventSalesLocked {

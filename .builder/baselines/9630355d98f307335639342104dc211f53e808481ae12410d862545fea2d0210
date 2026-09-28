@@ -13893,6 +13893,9 @@ async function __runEventLockForSales(ctx: MutationCtx, { docId, version }: any,
     if (!((doc.startsAt != null))) throw new Error("Guard 5 failed");
     if (!((doc.endsAt != null))) throw new Error("Guard 6 failed");
     if (!((doc.expectedHeadcount > 0))) throw new Error("Guard 7 failed");
+    if (!((((doc.title).trim()).length > 0))) throw new Error("Give this event a name before you lock it for sales.");
+    if (!(((doc.venueId != null) || ((doc.venueName != null) && (((doc.venueName).trim()).length > 0))))) throw new Error("Pick a venue before you lock this event for sales.");
+    if (!(((doc.serviceStyleId != null) || ((doc.serviceStyleName != null) && (((doc.serviceStyleName).trim()).length > 0))))) throw new Error("Pick a service style before you lock this event for sales.");
     {
       const __cur = doc.stage;
       if (__cur !== undefined) {

@@ -58,6 +58,17 @@ async function walkToExecuting(w: World) {
       version: pack.version,
     } as never);
   }
+  // Sales lock needs a venue and a service style (AC-227); this proof is
+  // about substitution, so seed the two names straight onto the row.
+  await w.owner.run((ctx) =>
+    ctx.db.patch(
+      w.eventId as never,
+      {
+        venueName: "Proof Hall",
+        serviceStyleName: "Plated",
+      } as never,
+    ),
+  );
   await w.proof.executeCommand(w.sales, M.Event_lockForSales, {
     docId: w.eventId,
   } as never);

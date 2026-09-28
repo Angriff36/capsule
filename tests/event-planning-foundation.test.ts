@@ -67,6 +67,14 @@ describe("Event planning foundation", () => {
     expect(
       classifyCommandFailure("Event end must be after its start").category,
     ).toBe("validation");
+    // AC-227: the sales-lock refusal names the missing detail.
+    const lockRefusal = classifyCommandFailure(
+      "Pick a venue before you lock this event for sales.",
+    );
+    expect(lockRefusal.category).toBe("validation");
+    expect(lockRefusal.detail).toBe(
+      "Pick a venue before you lock this event for sales.",
+    );
     expect(classifyCommandFailure("Guard 2 failed").category).toBe(
       "guard_blocked",
     );

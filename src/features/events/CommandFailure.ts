@@ -217,7 +217,7 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
     };
   }
   if (
-    /required|must be|cannot be|between|after its start|two characters|Invalid argument|ArgumentValidation|does not match the schema|before parsing|Reading the selected file|Select a |Headcount|Budget and quoted/i.test(
+    /required|must be|cannot be|between|after its start|two characters|Invalid argument|ArgumentValidation|does not match the schema|before parsing|Reading the selected file|Select a |Pick a |Give this |Headcount|Budget and quoted/i.test(
       detail,
     )
   ) {
