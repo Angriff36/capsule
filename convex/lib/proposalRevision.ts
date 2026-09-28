@@ -60,6 +60,8 @@ export interface ProposalRevisionSnapshot {
     notes: string | null;
     terms: string | null;
     visibleSections: string[];
+    // AC-259: staff section order; [] = standard order (and older revisions).
+    sectionOrder: string[];
     status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded";
     draftedAt: number | null;
     sentAt: number | null;
@@ -362,6 +364,9 @@ export async function buildProposalRevisionSnapshot(
       notes: proposal.notes ?? null,
       terms: proposal.terms ?? null,
       visibleSections: (proposal.visibleSections ?? []).filter(
+        (section): section is string => typeof section === "string",
+      ),
+      sectionOrder: (proposal.sectionOrder ?? []).filter(
         (section): section is string => typeof section === "string",
       ),
       status: proposal.status,

@@ -205,4 +205,74 @@ describe("published proposal PDF projection", () => {
       expect(rendered, expected).toContain(expected);
     }
   });
+
+  // AC-259 / AC-096: staff reorder sections on the template; the PDF follows
+  // the saved order, and a proposal with no saved order keeps its layout.
+  it("prints sections in the saved order and keeps the standard order without one", () => {
+    const build = (sectionOrder?: string[]) =>
+      JSON.stringify(
+        (
+          buildProposalPdf({
+            clientName: "Client",
+            branding: {
+              displayName: "Capsule Catering",
+              address: "",
+              primaryColor: "#243B31",
+              accentColor: "#B7791F",
+            },
+            proposal: {
+              ...live,
+              sectionOrder,
+              dishSelections: [{ dishName: "Roasted carrots" }],
+              pricingLines: [
+                { description: "Buffet", pricingBasis: "flat", unitPrice: 999 },
+              ],
+              terms: "Deposit holds the date",
+            },
+          }) as any
+        ).internal.pages,
+      );
+    const at = (rendered: string, text: string) => {
+      const index = rendered.indexOf(text);
+      expect(index, text).toBeGreaterThan(-1);
+      return index;
+    };
+    const standard = build();
+    expect(at(standard, "PROPOSED MENU")).toBeLessThan(at(standard, "TERMS"));
+    expect(at(standard, "PRICING BREAKDOWN")).toBeLessThan(
+      at(standard, "TERMS"),
+    );
+    expect(build([])).toBe(standard);
+
+    const moved = build(["terms", "pricing_summary", "menu_sections"]);
+    expect(at(moved, "TERMS")).toBeLessThan(at(moved, "PRICING BREAKDOWN"));
+    expect(at(moved, "PRICING BREAKDOWN")).toBeLessThan(at(moved, "ESTIMATE"));
+    expect(at(moved, "ESTIMATE")).toBeLessThan(at(moved, "PROPOSED MENU"));
+    // Sections staff did not place still print, after the placed ones.
+    expect(at(moved, "PROPOSED MENU")).toBeLessThan(at(moved, "TIMELINE"));
+  });
+
+  it("carries the frozen section order into the PDF record", () => {
+    const result = projectProposalPdf(live, "Client", {
+      snapshot: JSON.stringify({
+        proposal: {
+          title: "Frozen title",
+          guestCount: 10,
+          subtotal: 100,
+          taxAmount: 0,
+          discountAmount: 0,
+          total: 100,
+          visibleSections: [],
+          sectionOrder: ["terms", "menu_sections"],
+        },
+        client: { name: "Frozen client" },
+        venue: null,
+        dishSelections: [],
+        lineItems: [],
+        enhancements: [],
+        timeline: [],
+      }),
+    });
+    expect(result.proposal.sectionOrder).toEqual(["terms", "menu_sections"]);
+  });
 });

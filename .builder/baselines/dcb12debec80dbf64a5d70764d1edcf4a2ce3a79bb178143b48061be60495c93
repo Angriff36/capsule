@@ -2647,6 +2647,7 @@ export const ProposalSchema = z.object({
   notes: z.string().nullable().optional(),
   terms: z.string().nullable().optional(),
   visibleSections: z.array(z.string()).nullable().optional(),
+  sectionOrder: z.array(z.string()).nullable().optional(),
   status: z.enum(["draft", "sent", "viewed", "accepted", "declined", "expired", "superseded"]).default("draft"),
   draftedAt: z.coerce.date().nullable().optional(),
   sentAt: z.coerce.date().nullable().optional(),
@@ -2753,6 +2754,7 @@ export const ProposalTemplateSchema = z.object({
   name: z.string().default(""),
   description: z.string().nullable().optional(),
   visibleSections: z.array(z.string()).optional().default([]),
+  sectionOrder: z.array(z.string()).optional().default([]),
   defaultTerms: z.string().nullable().optional(),
   defaultNotes: z.string().nullable().optional(),
   defaultTaxRate: z.number().nullable().optional(),
@@ -8451,6 +8453,7 @@ export const ProposalDraftParamsSchema = z.object({
   visibleSections: z.array(z.string()).optional(),
   eventId: z.string().min(1).optional(),
   replacesProposalId: z.string().min(1).optional(),
+  sectionOrder: z.array(z.string()).optional(),
 });
 
 export type ProposalDraftParams = z.infer<typeof ProposalDraftParamsSchema>;
@@ -8640,6 +8643,7 @@ export const ProposalTemplateDefineParamsSchema = z.object({
   defaultTaxRate: z.number().optional(),
   defaultServiceChargePercent: z.number().optional(),
   validityDays: z.number().int().optional(),
+  sectionOrder: z.array(z.string()).optional(),
 });
 
 export type ProposalTemplateDefineParams = z.infer<typeof ProposalTemplateDefineParamsSchema>;
@@ -8659,6 +8663,7 @@ export const ProposalTemplateReviseParamsSchema = z.object({
   defaultTaxRate: z.number().optional(),
   defaultServiceChargePercent: z.number().optional(),
   validityDays: z.number().int().optional(),
+  sectionOrder: z.array(z.string()).optional(),
 });
 
 export type ProposalTemplateReviseParams = z.infer<typeof ProposalTemplateReviseParamsSchema>;

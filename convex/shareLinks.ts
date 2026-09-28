@@ -38,6 +38,7 @@ type SharedProposal = {
     notes: string | null;
     terms: string | null;
     visibleSections: string[];
+    sectionOrder: string[];
   };
   // §5.2 L263 "Venue logistics snapshot": the client-facing projection of the
   // frozen venue logistics (§8.2). Null when the proposal wasn't linked to a
@@ -208,6 +209,11 @@ export const getSharedProposal = query({
         terms: str(proposal.terms),
         visibleSections: Array.isArray(proposal.visibleSections)
           ? proposal.visibleSections.filter(
+              (section): section is string => typeof section === "string",
+            )
+          : [],
+        sectionOrder: Array.isArray(proposal.sectionOrder)
+          ? proposal.sectionOrder.filter(
               (section): section is string => typeof section === "string",
             )
           : [],

@@ -671,6 +671,10 @@ export function ProposalsPage() {
                                 (section): section is string =>
                                   typeof section === "string",
                               ),
+                              sectionOrder: (row.sectionOrder ?? []).filter(
+                                (section): section is string =>
+                                  typeof section === "string",
+                              ),
                               timelineItems:
                                 transformTimelineActivities(eventTimelineItems),
                               venueLogistics: event

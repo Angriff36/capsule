@@ -42,6 +42,7 @@ export const draftProposalWithLines = mutation({
     notes: v.optional(v.string()),
     terms: v.optional(v.string()),
     visibleSections: v.optional(v.array(v.string())),
+    sectionOrder: v.optional(v.array(v.string())),
     eventId: v.optional(v.id("events")),
     lines: v.array(
       v.object({
@@ -88,6 +89,7 @@ export const draftProposalWithLines = mutation({
       notes: args.notes,
       terms: args.terms,
       visibleSections: args.visibleSections,
+      sectionOrder: args.sectionOrder,
       eventId: args.eventId,
     });
     const proposalId = created.docId as Id<"proposals">;

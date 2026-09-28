@@ -41,6 +41,7 @@ it("revises, archives and reactivates the selected proposal template", async () 
     defaultTaxRate: 0.085,
     defaultServiceChargePercent: undefined,
     validityDays: undefined,
+    sectionOrder: [],
   });
   await click(button("Archive"));
   // Archive is one click — reversible via Reactivate below, so it carries
@@ -55,6 +56,38 @@ it("revises, archives and reactivates the selected proposal template", async () 
   await mount(createElement(ProposalTemplatesPage));
   await click(button("Reactivate"));
   expect(reactivate).toHaveBeenCalledExactlyOnceWith({ docId: "template-a" });
+});
+// AC-259: staff move sections on the template; the saved order follows.
+it("saves the section order staff set on a proposal template", async () => {
+  backend.values.set("useListProposalTemplate", [
+    {
+      _id: "template-b",
+      name: "Wedding",
+      status: "active",
+      visibleSections: [],
+      sectionOrder: ["pricing_summary"],
+    },
+  ]);
+  const revise = command("useProposalTemplateRevise");
+  await mount(createElement(ProposalTemplatesPage));
+  await click(button("Revise"));
+  expect(button("Move Pricing Summary up").disabled).toBe(true);
+  await click(button("Move Terms & Conditions up"));
+  await click(button("Move Terms & Conditions up"));
+  await click(button("Save changes"));
+  expect(revise.mock.calls[0]?.[0]).toMatchObject({
+    docId: "template-b",
+    sectionOrder: [
+      "pricing_summary",
+      "event_summary",
+      "menu_sections",
+      "timeline",
+      "terms",
+      "venue_logistics",
+      "enhancements",
+      "acceptance_cta",
+    ],
+  });
 });
 it("reports proposal publication and contract sent-recording as internal status changes", async () => {
   backend.values.set("useListProposal", [

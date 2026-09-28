@@ -45,8 +45,15 @@ describe("runtime proof: proposal template publication", () => {
         defaultServiceChargePercent: 0.2,
         validityDays: 21,
         visibleSections: ["pricing_summary", "terms"],
+        sectionOrder: ["terms", "pricing_summary"],
       },
     )) as { docId: string };
+    // AC-259: the template keeps the order staff put the sections in.
+    const templates = (await sales.query(
+      api.queries.listProposalTemplate,
+      {},
+    )) as any[];
+    expect(templates[0].sectionOrder).toEqual(["terms", "pricing_summary"]);
 
     await sales.mutation(
       (api.lib as any).proposalDraft.draftProposalWithLines,
@@ -62,6 +69,7 @@ describe("runtime proof: proposal template publication", () => {
         notes: "Client-facing note",
         terms: "Net 14",
         visibleSections: ["pricing_summary", "terms"],
+        sectionOrder: ["terms", "pricing_summary"],
         lines: [
           {
             description: "Dinner",
@@ -89,6 +97,7 @@ describe("runtime proof: proposal template publication", () => {
       taxAmount: 99,
       total: 1299,
       visibleSections: ["pricing_summary", "terms"],
+      sectionOrder: ["terms", "pricing_summary"],
     });
 
     await sales.mutation(
@@ -107,6 +116,7 @@ describe("runtime proof: proposal template publication", () => {
       notes: "Client-facing note",
       terms: "Net 14",
       visibleSections: ["pricing_summary", "terms"],
+      sectionOrder: ["terms", "pricing_summary"],
       subtotal: 1200,
       taxAmount: 99,
     });
@@ -122,6 +132,7 @@ describe("runtime proof: proposal template publication", () => {
       name: "Changed defaults",
       defaultTerms: "Changed later",
       visibleSections: ["event_summary"],
+      sectionOrder: ["menu_sections"],
     });
     const unchanged = JSON.parse(
       (
@@ -134,6 +145,10 @@ describe("runtime proof: proposal template publication", () => {
     expect(unchanged.proposal.visibleSections).toEqual([
       "pricing_summary",
       "terms",
+    ]);
+    expect(unchanged.proposal.sectionOrder).toEqual([
+      "terms",
+      "pricing_summary",
     ]);
 
     const link = (await proof.executeCommand(
@@ -152,6 +167,7 @@ describe("runtime proof: proposal template publication", () => {
       terms: "Net 14",
       expiresAt: Date.UTC(2026, 9, 1),
       visibleSections: ["pricing_summary", "terms"],
+      sectionOrder: ["terms", "pricing_summary"],
     });
     expect(shared?.lineItems[1]).toMatchObject({
       description: "Service charge",

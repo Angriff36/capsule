@@ -40035,7 +40035,7 @@ export const Proposal_decline = mutation({
   },
 });
 
-async function __runProposalDraft(ctx: MutationCtx, { docId, clientId, title, subtotal, taxAmount, discountAmount, total, proposalNumber, eventDate, eventEndDate, eventType, guestCount, venueName, venueAddress, expiresAt, notes, terms, visibleSections, eventId, replacesProposalId, version }: any, __creation = false) {
+async function __runProposalDraft(ctx: MutationCtx, { docId, clientId, title, subtotal, taxAmount, discountAmount, total, proposalNumber, eventDate, eventEndDate, eventType, guestCount, venueName, venueAddress, expiresAt, notes, terms, visibleSections, eventId, replacesProposalId, sectionOrder, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -40076,6 +40076,7 @@ async function __runProposalDraft(ctx: MutationCtx, { docId, clientId, title, su
       notes: notes,
       terms: terms,
       visibleSections: visibleSections,
+      sectionOrder: sectionOrder,
       eventId: eventId,
       replacesProposalId: replacesProposalId,
       draftedAt: Date.now(),
@@ -40112,6 +40113,7 @@ export const Proposal_draft = mutation({
     visibleSections: v.optional(v.array(v.string())),
     eventId: v.optional(v.string()),
     replacesProposalId: v.optional(v.string()),
+    sectionOrder: v.optional(v.array(v.string())),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -40152,6 +40154,7 @@ export const Proposal_createViaDraft = mutation({
     visibleSections: v.optional(v.array(v.string())),
     eventId: v.optional(v.string()),
     replacesProposalId: v.optional(v.string()),
+    sectionOrder: v.optional(v.array(v.string())),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -40164,7 +40167,7 @@ export const Proposal_createViaDraft = mutation({
     await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"pendingEventId","table":"events"},{"name":"acceptedRevisionId","table":"proposalRevisions"},{"name":"supersededById","table":"proposals"},{"name":"replacesProposalId","table":"proposals"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { clientId, title, subtotal, taxAmount, discountAmount, total, proposalNumber, eventDate, eventEndDate, eventType, guestCount, venueName, venueAddress, expiresAt, notes, terms, visibleSections, eventId, replacesProposalId } = args;
+    const { clientId, title, subtotal, taxAmount, discountAmount, total, proposalNumber, eventDate, eventEndDate, eventType, guestCount, venueName, venueAddress, expiresAt, notes, terms, visibleSections, eventId, replacesProposalId, sectionOrder } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       guestCount: args.guestCount !== undefined ? args.guestCount : 0,
@@ -40181,6 +40184,7 @@ export const Proposal_createViaDraft = mutation({
       notes: args.notes,
       proposalNumber: args.proposalNumber,
       replacesProposalId: args.replacesProposalId,
+      sectionOrder: args.sectionOrder,
       subtotal: args.subtotal,
       taxAmount: args.taxAmount,
       terms: args.terms,
@@ -40224,6 +40228,7 @@ export const Proposal_createViaDraft = mutation({
     doc.notes = notes;
     doc.terms = terms;
     doc.visibleSections = visibleSections;
+    doc.sectionOrder = sectionOrder;
     doc.eventId = eventId;
     doc.replacesProposalId = replacesProposalId;
     doc.draftedAt = Date.now();
@@ -41854,7 +41859,7 @@ export const ProposalTemplate_archive = mutation({
   },
 });
 
-async function __runProposalTemplateDefine(ctx: MutationCtx, { docId, name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, version }: any, __creation = false) {
+async function __runProposalTemplateDefine(ctx: MutationCtx, { docId, name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, sectionOrder, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -41877,6 +41882,7 @@ async function __runProposalTemplateDefine(ctx: MutationCtx, { docId, name, desc
       name: name,
       description: description,
       visibleSections: ((visibleSections != null) ? visibleSections : []),
+      sectionOrder: ((sectionOrder != null) ? sectionOrder : []),
       defaultTerms: defaultTerms,
       defaultNotes: defaultNotes,
       defaultTaxRate: defaultTaxRate,
@@ -41906,6 +41912,7 @@ export const ProposalTemplate_define = mutation({
     defaultTaxRate: v.optional(v.number()),
     defaultServiceChargePercent: v.optional(v.number()),
     validityDays: v.optional(v.number()),
+    sectionOrder: v.optional(v.array(v.string())),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -41934,6 +41941,7 @@ export const ProposalTemplate_createViaDefine = mutation({
     defaultTaxRate: v.optional(v.number()),
     defaultServiceChargePercent: v.optional(v.number()),
     validityDays: v.optional(v.number()),
+    sectionOrder: v.optional(v.array(v.string())),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -41945,10 +41953,11 @@ export const ProposalTemplate_createViaDefine = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays } = args;
+    const { name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, sectionOrder } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       visibleSections: args.visibleSections !== undefined ? args.visibleSections : [],
+      sectionOrder: args.sectionOrder !== undefined ? args.sectionOrder : [],
       status: "active",
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -41977,6 +41986,7 @@ export const ProposalTemplate_createViaDefine = mutation({
     doc.name = name;
     doc.description = description;
     doc.visibleSections = ((visibleSections != null) ? visibleSections : []);
+    doc.sectionOrder = ((sectionOrder != null) ? sectionOrder : []);
     doc.defaultTerms = defaultTerms;
     doc.defaultNotes = defaultNotes;
     doc.defaultTaxRate = defaultTaxRate;
@@ -42062,7 +42072,7 @@ export const ProposalTemplate_reactivate = mutation({
   },
 });
 
-async function __runProposalTemplateRevise(ctx: MutationCtx, { docId, name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, version }: any, __creation = false) {
+async function __runProposalTemplateRevise(ctx: MutationCtx, { docId, name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, sectionOrder, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -42086,6 +42096,7 @@ async function __runProposalTemplateRevise(ctx: MutationCtx, { docId, name, desc
       name: name,
       description: description,
       visibleSections: ((visibleSections != null) ? visibleSections : doc.visibleSections),
+      sectionOrder: ((sectionOrder != null) ? sectionOrder : doc.sectionOrder),
       defaultTerms: ((defaultTerms != null) ? defaultTerms : doc.defaultTerms),
       defaultNotes: ((defaultNotes != null) ? defaultNotes : doc.defaultNotes),
       defaultTaxRate: defaultTaxRate,
@@ -42115,6 +42126,7 @@ export const ProposalTemplate_revise = mutation({
     defaultTaxRate: v.optional(v.number()),
     defaultServiceChargePercent: v.optional(v.number()),
     validityDays: v.optional(v.number()),
+    sectionOrder: v.optional(v.array(v.string())),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },

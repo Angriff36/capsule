@@ -63,6 +63,9 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   property notes: string?
   property terms: string?
   property visibleSections: list<string>?
+  // PL-PROPOSAL-DRAFT (AC-259/AC-096): section order copied from the template.
+  // Null or empty = the standard order.
+  property sectionOrder: list<string>?
   property required status: ProposalStatus = "draft"
   property draftedAt: datetime?
   property sentAt: datetime?
@@ -125,7 +128,8 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     optional terms: string,
     optional visibleSections: list<string>,
     optional eventId: uuid,
-    optional replacesProposalId: uuid
+    optional replacesProposalId: uuid,
+    optional sectionOrder: list<string>
   ) {
     guard self.draftedAt == null
     guard self.status == "draft"
@@ -153,6 +157,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     mutate notes = notes
     mutate terms = terms
     mutate visibleSections = visibleSections
+    mutate sectionOrder = sectionOrder
     mutate eventId = eventId
     mutate replacesProposalId = replacesProposalId
     mutate draftedAt = now()

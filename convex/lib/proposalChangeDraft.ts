@@ -46,6 +46,7 @@ function changeDraftArgs(proposal: Doc<"proposals">) {
     notes: presentText(proposal.notes),
     terms: presentText(proposal.terms),
     visibleSections: proposal.visibleSections ?? undefined,
+    sectionOrder: proposal.sectionOrder ?? undefined,
     eventId: proposal.eventId ?? undefined,
   };
 }

@@ -81,6 +81,9 @@ export function projectProposalPdf(
         visibleSections: Array.isArray(proposal.visibleSections)
           ? proposal.visibleSections
           : [],
+        sectionOrder: Array.isArray(proposal.sectionOrder)
+          ? proposal.sectionOrder
+          : [],
         dishSelections: Array.isArray(frozen.dishSelections)
           ? frozen.dishSelections
           : [],
