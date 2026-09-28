@@ -29,7 +29,10 @@ import {
   prepareStaffNeedCoverageChange, validatePreparedStaffNeedCoverage, finishPostedStaffNeedContinuation,
   validateFilledCoverageCredentials,
 } from "./eventStaffingOperations";
-import { validateNewEventStaffing, validateScheduledShift, validateShiftWindow } from "./shiftSchedulingEvents";
+import {
+  ensureTemplateStaffNeeds, validateDescribedDemand,
+  validateNewEventStaffing, validateScheduledShift, validateShiftWindow,
+} from "./shiftSchedulingEvents";
 import {
   adoptLegacyDraftQuantity,
   reconcileCancelledPurchaseDrafts,
@@ -63,6 +66,14 @@ export async function handleManifestEvent(
     await ctx.scheduler.runAfter(0, internal.schedulePushSend.deliver, {
       noticeId: event.entityId as Id<"weeklyScheduleNotices">,
     });
+    return;
+  }
+  if (event.entity === "Event" && event.type === "EventApproved") {
+    await ensureTemplateStaffNeeds(ctx, event.entityId as Id<"events">);
+  }
+  if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedDemandDescribed") {
+    await validateDescribedDemand(ctx, event.entityId as Id<"eventStaffNeeds">);
+    await reconcileEventStaffing(ctx, event.payload.eventId as Id<"events">);
     return;
   }
   if (event.entity === "Person" && (event.type === "PersonHired" || event.type === "PersonAccountLinked")) {
@@ -180,8 +191,9 @@ export async function handleManifestEvent(
         newHeadcount: Number(event.payload.newHeadcount),
       },
     );
-    // Staffing does not scale with guest count: live staff needs keep their
-    // role, status, and window — this records the §8.2 staffing receipt only.
+    // Hand-posted staff needs do not scale with guest count; a crew
+    // template's open slots do (AC-495). Then the §8.2 staffing receipt.
+    await ensureTemplateStaffNeeds(ctx, event.entityId as Id<"events">);
     await eventHeadcountStaffingReconciliation.run(
       ctx,
       event.entityId as Id<"events">,
@@ -259,6 +271,7 @@ export async function handleManifestEvent(
     return;
   }
   if (event.entity === "Event" && event.type === "EventServiceStyleChanged") {
+    await ensureTemplateStaffNeeds(ctx, event.entityId as Id<"events">);
     // Style snapshot already written by Event.changeServiceStyle. The
     // generated pack-kit fanOut already ran. This records one §8.2 style
     // receipt and flags the issued packet stale without rewriting it.

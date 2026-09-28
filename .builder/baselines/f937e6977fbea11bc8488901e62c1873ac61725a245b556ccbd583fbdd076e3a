@@ -1400,6 +1400,16 @@ export const EventStaffNeedSchema = z.object({
   coverageStartsAt: z.coerce.date().nullable().optional(),
   coverageEndsAt: z.coerce.date().nullable().optional(),
   coverageWindowsJson: z.string().nullable().optional(),
+  skills: z.string().nullable().optional(),
+  qualificationName: z.string().nullable().optional(),
+  certificationType: z.string().nullable().optional(),
+  uniform: z.string().nullable().optional(),
+  workLocation: z.string().nullable().optional(),
+  payBasis: z.enum(["hourly", "flat_rate"]).nullable().optional(),
+  budgetHourlyRate: z.number().nullable().optional(),
+  staffingTemplateId: z.string().uuid().nullable().optional(),
+  templateLineKey: z.string().nullable().optional(),
+  templateSlot: z.number().int().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -3417,6 +3427,25 @@ export const StaffChatReadCursorSchema = z.object({
 });
 
 export type StaffChatReadCursor = z.infer<typeof StaffChatReadCursorSchema>;
+
+// Entity: StaffingTemplate
+export const StaffingTemplateSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  name: z.string().default(""),
+  serviceStyleId: z.string().uuid().nullable().optional(),
+  minGuests: z.number().int().nullable().optional(),
+  maxGuests: z.number().int().nullable().optional(),
+  lines: z.string().default("[]"),
+  status: z.enum(["active", "retired"]).default("active"),
+  definedAt: z.coerce.date().nullable().optional(),
+  retiredAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type StaffingTemplate = z.infer<typeof StaffingTemplateSchema>;
 
 // Entity: StaffMessage
 export const StaffMessageSchema = z.object({
@@ -6395,6 +6424,19 @@ export const EventStaffNeedClaimParamsSchema = z.object({
 
 export type EventStaffNeedClaimParams = z.infer<typeof EventStaffNeedClaimParamsSchema>;
 
+// Command: describeDemand on EventStaffNeed
+export const EventStaffNeedDescribeDemandParamsSchema = z.object({
+  skills: z.string().optional(),
+  qualificationName: z.string().optional(),
+  certificationType: z.string().optional(),
+  uniform: z.string().optional(),
+  workLocation: z.string().optional(),
+  payBasis: z.enum(["hourly", "flat_rate"]).optional(),
+  budgetHourlyRate: z.number().optional(),
+});
+
+export type EventStaffNeedDescribeDemandParams = z.infer<typeof EventStaffNeedDescribeDemandParamsSchema>;
+
 // Command: fill on EventStaffNeed
 export const EventStaffNeedFillParamsSchema = z.object({
   personId: z.string().min(1),
@@ -6423,6 +6465,16 @@ export const EventStaffNeedPostOpenParamsSchema = z.object({
   previousStaffNeedId: z.string().min(1).optional(),
   continuationSlot: z.number().int().optional(),
   followsEventTiming: z.boolean().optional(),
+  skills: z.string().optional(),
+  qualificationName: z.string().optional(),
+  certificationType: z.string().optional(),
+  uniform: z.string().optional(),
+  workLocation: z.string().optional(),
+  payBasis: z.enum(["hourly", "flat_rate"]).optional(),
+  budgetHourlyRate: z.number().optional(),
+  staffingTemplateId: z.string().uuid().optional(),
+  templateLineKey: z.string().optional(),
+  templateSlot: z.number().int().optional(),
 });
 
 export type EventStaffNeedPostOpenParams = z.infer<typeof EventStaffNeedPostOpenParamsSchema>;
@@ -9797,6 +9849,38 @@ export const StaffChatReadCursorTouchParamsSchema = z.object({
 });
 
 export type StaffChatReadCursorTouchParams = z.infer<typeof StaffChatReadCursorTouchParamsSchema>;
+
+// Command: define on StaffingTemplate
+export const StaffingTemplateDefineParamsSchema = z.object({
+  name: z.string(),
+  lines: z.string(),
+  serviceStyleId: z.string().min(1).optional(),
+  minGuests: z.number().int().optional(),
+  maxGuests: z.number().int().optional(),
+});
+
+export type StaffingTemplateDefineParams = z.infer<typeof StaffingTemplateDefineParamsSchema>;
+
+// Command: reactivate on StaffingTemplate
+export const StaffingTemplateReactivateParamsSchema = z.object({});
+
+export type StaffingTemplateReactivateParams = z.infer<typeof StaffingTemplateReactivateParamsSchema>;
+
+// Command: retire on StaffingTemplate
+export const StaffingTemplateRetireParamsSchema = z.object({});
+
+export type StaffingTemplateRetireParams = z.infer<typeof StaffingTemplateRetireParamsSchema>;
+
+// Command: revise on StaffingTemplate
+export const StaffingTemplateReviseParamsSchema = z.object({
+  name: z.string(),
+  lines: z.string(),
+  serviceStyleId: z.string().min(1).optional(),
+  minGuests: z.number().int().optional(),
+  maxGuests: z.number().int().optional(),
+});
+
+export type StaffingTemplateReviseParams = z.infer<typeof StaffingTemplateReviseParamsSchema>;
 
 // Command: edit on StaffMessage
 export const StaffMessageEditParamsSchema = z.object({

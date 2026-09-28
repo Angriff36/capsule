@@ -6,6 +6,7 @@ import { getAuthContext } from "./authContext";
 import { readEventTimingPlan } from "./eventTimingOperations";
 import { readEventRouteLegs } from "./eventRouteLegRead";
 import { crewWindowForLeg, type CrewLegChoice } from "../../src/lib/eventRouteLegs";
+import { qualificationMeets } from "../../src/lib/staffingTemplates";
 import { proposeShiftChange, publishedNoticeFor } from "./shiftTimingProposals";
 
 type StaffingSource = {
@@ -467,9 +468,9 @@ async function resolveCoverageCredentials(
   const certification = certifications[0];
   if (certification) {
     const records = await ctx.db.query("qualifications").withIndex("by_personId", (q) => q.eq("personId", personId)).collect();
-    requiredQualificationId = records.find((row) => row.tenantId === tenantId && row.deletedAt == null && row.status === "active" &&
-      row.name === certification.qualificationName && (row.certificationType ?? null) === certification.certificationType &&
-      (row.expiresAt == null || row.expiresAt >= (endsAt ?? Date.now())))?._id;
+    requiredQualificationId = records.find((row) => row.tenantId === tenantId &&
+      qualificationMeets(row, { name: certification.qualificationName!, certificationType: certification.certificationType },
+        endsAt, Date.now()))?._id;
     if (!requiredQualificationId) throw new ConvexError(`Replacement staff need a valid ${certification.qualificationName} certification for this coverage.`);
   }
   if (moduleId) {
@@ -504,10 +505,17 @@ export async function validateFilledCoverageCredentials(ctx: MutationCtx, id: Id
   await resolveCoverageCredentials(ctx, need.tenantId, need.filledByPersonId, end, requirements);
 }
 
+/** The certificate a need asks for itself (AC-504); carried onto its shift. */
+function ownNeedRequirement(need: Doc<"eventStaffNeeds">): CoverageRequirement[] {
+  const name = need.qualificationName?.trim();
+  return name ? [{ shiftTypeId: null, qualificationName: name,
+    certificationType: need.certificationType?.trim() || null, trainingModuleId: null }] : [];
+}
+
 async function staffingCoverageRequirements(ctx: MutationCtx, needs: Doc<"eventStaffNeeds">[], sources: readonly StaffingSource[]) {
   const ids = new Set(sources.map((source) => source.id));
   return uniqueRequirements((await Promise.all(needs.filter((need) => ids.has(need._id))
-    .map((need) => inheritedCoverageRequirements(ctx, need)))).flat());
+    .map(async (need) => [...ownNeedRequirement(need), ...await inheritedCoverageRequirements(ctx, need)]))).flat());
 }
 
 async function shiftMeetsCoverageRequirements(ctx: MutationCtx, shift: Doc<"shifts">, requirements: CoverageRequirement[]) {
@@ -520,8 +528,9 @@ async function shiftMeetsCoverageRequirements(ctx: MutationCtx, shift: Doc<"shif
   // validate active credentials and expiry through the new coverage window.
   return requirements.every((item) => (!item.shiftTypeId || shift.shiftTypeId === item.shiftTypeId) &&
     (item.qualificationName == null || (qualification?.tenantId === shift.tenantId &&
-      qualification.personId === shift.personId && qualification.name === item.qualificationName &&
-      (qualification.certificationType ?? null) === item.certificationType)) &&
+      qualification.personId === shift.personId &&
+      qualificationMeets({ ...qualification, status: "active", deletedAt: null, expiresAt: null },
+        { name: item.qualificationName, certificationType: item.certificationType }, null, 0))) &&
     (!item.trainingModuleId || (training?.tenantId === shift.tenantId && training.personId === shift.personId &&
       training.trainingModuleId === item.trainingModuleId)));
 }
@@ -607,6 +616,11 @@ async function finishStaffNeedCoverageChange(ctx: MutationCtx, id: Id<"eventStaf
       eventId: need.eventId, role: need.role, description: need.description ?? undefined, notes: need.notes ?? undefined,
       previousStaffNeedId: id, continuationSlot: slot, followsEventTiming: window.followsEventTiming,
       startsAt: window.startsAt ?? undefined, endsAt: window.endsAt ?? undefined,
+      // The replacement keeps what the work needs (AC-499).
+      skills: need.skills ?? undefined, qualificationName: need.qualificationName ?? undefined,
+      certificationType: need.certificationType ?? undefined, uniform: need.uniform ?? undefined,
+      workLocation: need.workLocation ?? undefined, payBasis: need.payBasis ?? undefined,
+      budgetHourlyRate: need.budgetHourlyRate ?? undefined,
     });
     // The posted callback fills this row and completes the remaining windows.
     return;
@@ -630,6 +644,8 @@ export async function finishPostedStaffNeedContinuation(ctx: MutationCtx, id: Id
   const historicalNeeds = await ctx.db.query("eventStaffNeeds").withIndex("by_eventId", (q) => q.eq("eventId", need.eventId)).collect();
   if (!window || row.tenantId !== need.tenantId || row.eventId !== need.eventId || row.role !== need.role ||
     (row.description ?? null) !== (need.description ?? null) || (row.notes ?? null) !== (need.notes ?? null) ||
+    (row.qualificationName ?? null) !== (need.qualificationName ?? null) ||
+    (row.certificationType ?? null) !== (need.certificationType ?? null) ||
     row.followsEventTiming !== window.followsEventTiming || !sameTime(row.startsAt, window.startsAt) || !sameTime(row.endsAt, window.endsAt) ||
     historicalNeeds.some((other) => other.tenantId === need.tenantId && other._id !== id && other.previousStaffNeedId === need._id && other.continuationSlot === slot))
     throw new ConvexError("Replacement coverage must reuse its planned role, instructions and window exactly once.");

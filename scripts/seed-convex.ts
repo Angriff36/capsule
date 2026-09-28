@@ -269,9 +269,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // EventStaffNeed has multiple initialization commands (changeCoverage, postOpen); using the selected initialization command: postOpen.
   // EventStaffNeed → api.mutations.EventStaffNeed_createViaPostOpen
   rowsAttempted += 1;
-  await client.mutation(api.mutations.EventStaffNeed_createViaPostOpen, { "eventId": "eventId-event-staff-need-1", "role": "demo-role-1", "description": "demo-description-1", "startsAt": 1767268800000, "endsAt": 1767268800000, "followsEventTiming": false, "notes": "demo-notes-1", "previousStaffNeedId": "previousStaffNeedId-event-staff-need-1", "continuationSlot": 1 } as any);
+  await client.mutation(api.mutations.EventStaffNeed_createViaPostOpen, { "eventId": "eventId-event-staff-need-1", "role": "demo-role-1", "description": "demo-description-1", "startsAt": 1767268800000, "endsAt": 1767268800000, "followsEventTiming": false, "notes": "demo-notes-1", "previousStaffNeedId": "previousStaffNeedId-event-staff-need-1", "continuationSlot": 1, "skills": "demo-skills-1", "qualificationName": "EventStaffNeed 1", "certificationType": "demo-certificationType-1", "uniform": "demo-uniform-1", "workLocation": "demo-workLocation-1", "payBasis": "demo-payBasis-1", "budgetHourlyRate": 1, "staffingTemplateId": "staffingTemplateId-event-staff-need-1", "templateLineKey": "demo-templateLineKey-1", "templateSlot": 1 } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.EventStaffNeed_createViaPostOpen, { "eventId": "eventId-event-staff-need-2", "role": "demo-role-2", "description": "demo-description-2", "startsAt": 1767355200000, "endsAt": 1767355200000, "followsEventTiming": false, "notes": "demo-notes-2", "previousStaffNeedId": "previousStaffNeedId-event-staff-need-2", "continuationSlot": 2 } as any);
+  await client.mutation(api.mutations.EventStaffNeed_createViaPostOpen, { "eventId": "eventId-event-staff-need-2", "role": "demo-role-2", "description": "demo-description-2", "startsAt": 1767355200000, "endsAt": 1767355200000, "followsEventTiming": false, "notes": "demo-notes-2", "previousStaffNeedId": "previousStaffNeedId-event-staff-need-2", "continuationSlot": 2, "skills": "demo-skills-2", "qualificationName": "EventStaffNeed 2", "certificationType": "demo-certificationType-2", "uniform": "demo-uniform-2", "workLocation": "demo-workLocation-2", "payBasis": "demo-payBasis-2", "budgetHourlyRate": 2, "staffingTemplateId": "staffingTemplateId-event-staff-need-2", "templateLineKey": "demo-templateLineKey-2", "templateSlot": 2 } as any);
   // EventTemplate → api.mutations.EventTemplate_createViaDefine
   rowsAttempted += 1;
   await client.mutation(api.mutations.EventTemplate_createViaDefine, { "name": "EventTemplate 1", "clientType": "demo-clientType-1", "eventType": "demo-eventType-1", "defaultHeadcount": 1, "menuId": "menuId-event-template-1", "defaultStaffRoles": "demo-defaultStaffRoles-1", "typicalEquipment": "demo-typicalEquipment-1", "notes": "demo-notes-1", "sourceEventId": "sourceEventId-event-template-1" } as any);
@@ -648,6 +648,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.StaffChatReadCursor_createViaOpen, { "channelKey": "demo-channelKey-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.StaffChatReadCursor_createViaOpen, { "channelKey": "demo-channelKey-2" } as any);
+  // StaffingTemplate → api.mutations.StaffingTemplate_createViaDefine
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.StaffingTemplate_createViaDefine, { "name": "StaffingTemplate 1", "serviceStyleId": "serviceStyleId-staffing-template-1", "minGuests": 1, "maxGuests": 1, "lines": "demo-lines-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.StaffingTemplate_createViaDefine, { "name": "StaffingTemplate 2", "serviceStyleId": "serviceStyleId-staffing-template-2", "minGuests": 2, "maxGuests": 2, "lines": "demo-lines-2" } as any);
   // StaffMessage has multiple initialization commands (edit, markRead, remove, send); using the selected initialization command: send.
   // StaffMessage → api.mutations.StaffMessage_createViaSend
   rowsAttempted += 1;
@@ -1488,6 +1493,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "StaffChatReadCursor",
       "createMutation": "StaffChatReadCursor_createViaOpen",
+      "rowCount": 2
+    },
+    {
+      "entity": "StaffingTemplate",
+      "createMutation": "StaffingTemplate_createViaDefine",
       "rowCount": 2
     },
     {

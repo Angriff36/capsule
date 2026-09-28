@@ -239,6 +239,7 @@ import {
   EventStaffNeedChangeCoverageParamsSchema,
   EventStaffNeedChooseTravelLegParamsSchema,
   EventStaffNeedClaimParamsSchema,
+  EventStaffNeedDescribeDemandParamsSchema,
   EventStaffNeedFillParamsSchema,
   EventStaffNeedPlanTimingParamsSchema,
   EventStaffNeedPostOpenParamsSchema,
@@ -661,6 +662,10 @@ import {
   StaffMessageMarkReadParamsSchema,
   StaffMessageRemoveParamsSchema,
   StaffMessageSendParamsSchema,
+  StaffingTemplateDefineParamsSchema,
+  StaffingTemplateReactivateParamsSchema,
+  StaffingTemplateRetireParamsSchema,
+  StaffingTemplateReviseParamsSchema,
   StationDefineParamsSchema,
   StationReinstateParamsSchema,
   StationRenameParamsSchema,
@@ -4272,6 +4277,16 @@ export function useEventStaffNeedClaim() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventStaffNeedClaimParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventStaffNeed.describeDemand. */
+export function useEventStaffNeedDescribeDemand() {
+  const mutate = useMutation(api.mutations.EventStaffNeed_describeDemand);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventStaffNeedDescribeDemandParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -9842,6 +9857,67 @@ export function useCreateStaffChatReadCursor() {
   };
 }
 
+/** Reactive list for StaffingTemplate. */
+export function useListStaffingTemplate() {
+  return useQuery(api.queries.listStaffingTemplate);
+}
+
+/** Reactive get-by-id for StaffingTemplate. Pass "skip" to suspend. */
+export function useGetStaffingTemplate(id: string | "skip") {
+  return useQuery(api.queries.getStaffingTemplate, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for StaffingTemplate.define. */
+export function useStaffingTemplateDefine() {
+  const mutate = useMutation(api.mutations.StaffingTemplate_define);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = StaffingTemplateDefineParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for StaffingTemplate.reactivate. */
+export function useStaffingTemplateReactivate() {
+  const mutate = useMutation(api.mutations.StaffingTemplate_reactivate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = StaffingTemplateReactivateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for StaffingTemplate.retire. */
+export function useStaffingTemplateRetire() {
+  const mutate = useMutation(api.mutations.StaffingTemplate_retire);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = StaffingTemplateRetireParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for StaffingTemplate.revise. */
+export function useStaffingTemplateRevise() {
+  const mutate = useMutation(api.mutations.StaffingTemplate_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = StaffingTemplateReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for StaffingTemplate.define. */
+export function useCreateStaffingTemplate() {
+  const mutate = useMutation(api.mutations.StaffingTemplate_createViaDefine);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = StaffingTemplateDefineParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for StaffMessage. */
 export function useListStaffMessage() {
   return useQuery(api.queries.listStaffMessage);
@@ -11805,4 +11881,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1251 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1259 as const;

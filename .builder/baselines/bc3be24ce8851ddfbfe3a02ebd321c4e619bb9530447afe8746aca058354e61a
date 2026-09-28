@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:0469c4ed0c814a019380a73675adacc62173c22b928bf9a8d16c336b313b24e0:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:0fa9c629f23816c9e51aa47d766814b4adc281ed73c0a26bad33ba65ec930114:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1ac59da709d8a3b74ccd932e0d295541f188978a9237df6771e866371088a8d1:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1da1f8bf3189d664c09581c8a3b7dbf07d73a173d000fe78fbc0ca8792db06bc:1e112ef70ab2634ddc76e69be97bf2cf6213bc0662e21efdb998b5fe1fecbfa5:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:425786468a2c925e4a22baf51be9695b6f09848be70c0a67ee021678166c63c5:44730f01893c2c387121f8aa1d1465975c3d70ad9d2ba6bcafc51190118cfc30:461b35052a22a3f3494612a688d5024cf608ca3f5f42e7392e2e39d0b4ae3059:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:566ac5e9f17d1ebd84e7d27e045202be6443b87416cc17b783b1cf3ca88ded6e:571c1fbbd06e6f847dc0789bb6699eef2dad5b3438eb906c97bd99975eee1572:5865118d3c2cc0441916631fed5be684f876ea34c8cc603b23d1cc192c29b379:5eede5832d56f1a6f53fff1c333df6f4f34990f8b3a29f4c007b8e1b88f8c60b:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:673eea009a24475e68b862081672cfe7f5ac7d9c5fb1cae8cd3cb4e17912765f:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:77e0d3181b4febaaa663ecdb3476b943a5aa588f20396e8243a196d12cae1e7c:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7a8de9cb59f93d64dd599f21ded09010d4de32c74d4c83100dcea9b6877fe6b0:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:946747485e83cf5d41c4c5a046fc32486ecd0f7e059812185e3b5886d06852a0:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a87caa099b219e0f859edc5be5c50d0cb367def3e8348a5e9bb406bbc8502c65:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b7a8e29fcf51b07830d4c56102194730fa51e426a43be671d6ffb18c38698087:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c4f4847c56f2947ed5512b4e3254c848c5063e0e6d9d5f2a79578b289d098114:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccd72e1626e8659c7b43fe7ac7a3f5210245e7d32107e356d0cb3df0decf6453:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:e69aaee600e0695a11cd87fca6c72ff383f0b8c2333fd92e4ab031225acb6fef:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:f7a4e5f8e94ed6c20dd10eb865c5d62a080b7e9547387be50830d7a0511564ae:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1";
+export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:0469c4ed0c814a019380a73675adacc62173c22b928bf9a8d16c336b313b24e0:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:0fa9c629f23816c9e51aa47d766814b4adc281ed73c0a26bad33ba65ec930114:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1ac59da709d8a3b74ccd932e0d295541f188978a9237df6771e866371088a8d1:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e112ef70ab2634ddc76e69be97bf2cf6213bc0662e21efdb998b5fe1fecbfa5:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:425786468a2c925e4a22baf51be9695b6f09848be70c0a67ee021678166c63c5:44730f01893c2c387121f8aa1d1465975c3d70ad9d2ba6bcafc51190118cfc30:461b35052a22a3f3494612a688d5024cf608ca3f5f42e7392e2e39d0b4ae3059:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:566ac5e9f17d1ebd84e7d27e045202be6443b87416cc17b783b1cf3ca88ded6e:571c1fbbd06e6f847dc0789bb6699eef2dad5b3438eb906c97bd99975eee1572:5865118d3c2cc0441916631fed5be684f876ea34c8cc603b23d1cc192c29b379:5eede5832d56f1a6f53fff1c333df6f4f34990f8b3a29f4c007b8e1b88f8c60b:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:673eea009a24475e68b862081672cfe7f5ac7d9c5fb1cae8cd3cb4e17912765f:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:77e0d3181b4febaaa663ecdb3476b943a5aa588f20396e8243a196d12cae1e7c:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7a8de9cb59f93d64dd599f21ded09010d4de32c74d4c83100dcea9b6877fe6b0:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:946747485e83cf5d41c4c5a046fc32486ecd0f7e059812185e3b5886d06852a0:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a87caa099b219e0f859edc5be5c50d0cb367def3e8348a5e9bb406bbc8502c65:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b7a8e29fcf51b07830d4c56102194730fa51e426a43be671d6ffb18c38698087:b8371dec149afe525f389169aedf38e3953a48946523b416345e61b2ba2a9543:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c4f4847c56f2947ed5512b4e3254c848c5063e0e6d9d5f2a79578b289d098114:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccd72e1626e8659c7b43fe7ac7a3f5210245e7d32107e356d0cb3df0decf6453:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:e69aaee600e0695a11cd87fca6c72ff383f0b8c2333fd92e4ab031225acb6fef:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:f7a4e5f8e94ed6c20dd10eb865c5d62a080b7e9547387be50830d7a0511564ae:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -69098,14 +69098,14 @@ export const EventStaffNeedApplyApprovedShiftSwapCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["personId","shiftSwapRequestId","acceptedAt"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Crew may see shared event staffing"},{"kind":"policy_denial","message":"Crew may update shared event staffing"},{"kind":"policy_denial","message":"Crew may change shared event staffing"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventStaffNeed not found"}],
   emits: ["EventStaffNeedShiftSwapApplied"],
 } as const;
 
-export type EventStaffNeedApplyApprovedShiftSwapResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number };
+export type EventStaffNeedApplyApprovedShiftSwapResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for EventStaffNeed.applyApprovedShiftSwap.
@@ -69202,14 +69202,14 @@ export const EventStaffNeedCancelCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["reason"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Crew may see shared event staffing"},{"kind":"policy_denial","message":"Crew may update shared event staffing"},{"kind":"policy_denial","message":"Crew may change shared event staffing"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Say why you're cancelling this staffing need."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventStaffNeed not found"}],
   emits: ["EventStaffNeedCancelled"],
 } as const;
 
-export type EventStaffNeedCancelResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number };
+export type EventStaffNeedCancelResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for EventStaffNeed.cancel.
@@ -69328,14 +69328,14 @@ export const EventStaffNeedChangeCoverageCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["personId","startsAt","endsAt"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Crew may see shared event staffing"},{"kind":"policy_denial","message":"Crew may update shared event staffing"},{"kind":"policy_denial","message":"Crew may change shared event staffing"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"This coverage's end has to be after its start."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventStaffNeed not found"}],
   emits: ["EventStaffNeedCoverageChangeRequested"],
 } as const;
 
-export type EventStaffNeedChangeCoverageResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number };
+export type EventStaffNeedChangeCoverageResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for EventStaffNeed.changeCoverage.
@@ -69463,14 +69463,14 @@ export const EventStaffNeedChooseTravelLegCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["rideVehicleAssignmentId","meetsAtVenue"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Crew may see shared event staffing"},{"kind":"policy_denial","message":"Crew may update shared event staffing"},{"kind":"policy_denial","message":"Crew may change shared event staffing"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Pick a truck or meeting at the venue, not both."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventStaffNeed not found"}],
   emits: ["EventStaffNeedTravelLegChosen"],
 } as const;
 
-export type EventStaffNeedChooseTravelLegResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number };
+export type EventStaffNeedChooseTravelLegResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for EventStaffNeed.chooseTravelLeg.
@@ -69562,14 +69562,14 @@ export const EventStaffNeedClaimCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["personId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Crew may see shared event staffing"},{"kind":"policy_denial","message":"Crew may update shared event staffing"},{"kind":"policy_denial","message":"Crew may change shared event staffing"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventStaffNeed not found"}],
   emits: ["EventStaffNeedClaimed"],
 } as const;
 
-export type EventStaffNeedClaimResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number };
+export type EventStaffNeedClaimResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for EventStaffNeed.claim.
@@ -69655,6 +69655,148 @@ export const EventStaffNeedClaimLifecycle = [
   }
 ] as const;
 
+// --- EventStaffNeed.describeDemand ---
+export interface EventStaffNeedDescribeDemandClientInput {
+  skills?: string;
+  qualificationName?: string;
+  certificationType?: string;
+  uniform?: string;
+  workLocation?: string;
+  /** Allowed: "hourly" | "flat_rate" */
+  payBasis?: "hourly" | "flat_rate";
+  /** Bounds: 0..∞ */
+  budgetHourlyRate?: number;
+}
+
+export const EventStaffNeedDescribeDemandCapability = {
+  capabilityId: "EventStaffNeed.describeDemand",
+  entity: "EventStaffNeed",
+  command: "describeDemand",
+  route: "/api/manifest/EventStaffNeed/commands/describeDemand",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["skills","qualificationName","certificationType","uniform","workLocation","payBasis","budgetHourlyRate"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Crew may see shared event staffing"},{"kind":"policy_denial","message":"Crew may update shared event staffing"},{"kind":"policy_denial","message":"Crew may change shared event staffing"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"The labor budget can't be negative. Use zero or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventStaffNeed not found"}],
+  emits: ["EventStaffNeedDemandDescribed"],
+} as const;
+
+export type EventStaffNeedDescribeDemandResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for EventStaffNeed.describeDemand.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventStaffNeedDescribeDemandInput(client: EventStaffNeedDescribeDemandClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventStaffNeed.describeDemand. */
+export const EventStaffNeedDescribeDemandInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
+    "readId": "EventStaffNeed.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
+    "readId": "EventStaffNeed.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EventStaffNeed.describeDemand. Not a rendered control. */
+export const EventStaffNeedDescribeDemandAction = {
+  "exposure": "human",
+  "label": "Describe demand",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "skills",
+      "label": "Skills",
+      "required": false
+    },
+    {
+      "name": "qualificationName",
+      "label": "Qualification name",
+      "required": false
+    },
+    {
+      "name": "certificationType",
+      "label": "Certification type",
+      "required": false
+    },
+    {
+      "name": "uniform",
+      "label": "Uniform",
+      "required": false
+    },
+    {
+      "name": "workLocation",
+      "label": "Work location",
+      "required": false
+    },
+    {
+      "name": "payBasis",
+      "label": "Pay basis",
+      "required": false,
+      "choices": [
+        {
+          "value": "hourly",
+          "label": "hourly"
+        },
+        {
+          "value": "flat_rate",
+          "label": "flat_rate"
+        }
+      ]
+    },
+    {
+      "name": "budgetHourlyRate",
+      "label": "Budget hourly rate",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- EventStaffNeed.fill ---
 export interface EventStaffNeedFillClientInput {
   personId: string;
@@ -69672,14 +69814,14 @@ export const EventStaffNeedFillCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["personId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Crew may see shared event staffing"},{"kind":"policy_denial","message":"Crew may update shared event staffing"},{"kind":"policy_denial","message":"Crew may change shared event staffing"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventStaffNeed not found"}],
   emits: ["EventStaffNeedFilled"],
 } as const;
 
-export type EventStaffNeedFillResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number };
+export type EventStaffNeedFillResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for EventStaffNeed.fill.
@@ -69792,14 +69934,14 @@ export const EventStaffNeedPlanTimingCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["startsAt","endsAt","followsEventTiming","synchronizeShifts"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Crew may see shared event staffing"},{"kind":"policy_denial","message":"Crew may update shared event staffing"},{"kind":"policy_denial","message":"Crew may change shared event staffing"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This shift's end has to be after its start."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventStaffNeed not found"}],
   emits: ["EventStaffNeedTimingChanged"],
 } as const;
 
-export type EventStaffNeedPlanTimingResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number };
+export type EventStaffNeedPlanTimingResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for EventStaffNeed.planTiming.
@@ -69895,6 +70037,18 @@ export interface EventStaffNeedPostOpenClientInput {
   previousStaffNeedId?: string;
   continuationSlot?: number;
   followsEventTiming?: boolean;
+  skills?: string;
+  qualificationName?: string;
+  certificationType?: string;
+  uniform?: string;
+  workLocation?: string;
+  /** Allowed: "hourly" | "flat_rate" */
+  payBasis?: "hourly" | "flat_rate";
+  /** Bounds: 0..∞ */
+  budgetHourlyRate?: number;
+  staffingTemplateId?: string;
+  templateLineKey?: string;
+  templateSlot?: number;
 }
 
 export const EventStaffNeedPostOpenCapability = {
@@ -69910,9 +70064,9 @@ export const EventStaffNeedPostOpenCapability = {
   acceptsIdempotencyKey: true,
   resultKind: "allocation",
   returnTsType: "{ docId: string }",
-  clientParameterNames: ["eventId","role","description","startsAt","endsAt","notes","previousStaffNeedId","continuationSlot","followsEventTiming"],
+  clientParameterNames: ["eventId","role","description","startsAt","endsAt","notes","previousStaffNeedId","continuationSlot","followsEventTiming","skills","qualificationName","certificationType","uniform","workLocation","payBasis","budgetHourlyRate","staffingTemplateId","templateLineKey","templateSlot"],
   serverParameterNames: [],
-  failures: [{"kind":"policy_denial","message":"Crew may see shared event staffing"},{"kind":"policy_denial","message":"Crew may update shared event staffing"},{"kind":"policy_denial","message":"Crew may change shared event staffing"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Give this staffing need a role."},{"kind":"constraint_block","message":"This staffing need's end has to be after its start."}],
+  failures: [{"kind":"policy_denial","message":"Crew may see shared event staffing"},{"kind":"policy_denial","message":"Crew may update shared event staffing"},{"kind":"policy_denial","message":"Crew may change shared event staffing"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Give this staffing need a role."},{"kind":"constraint_block","message":"This staffing need's end has to be after its start."},{"kind":"constraint_block","message":"The labor budget can't be negative. Use zero or more."}],
   emits: ["EventStaffNeedPosted"],
 } as const;
 
@@ -70022,6 +70176,66 @@ export const EventStaffNeedPostOpenAction = {
       "name": "followsEventTiming",
       "label": "Follows event timing",
       "required": false
+    },
+    {
+      "name": "skills",
+      "label": "Skills",
+      "required": false
+    },
+    {
+      "name": "qualificationName",
+      "label": "Qualification name",
+      "required": false
+    },
+    {
+      "name": "certificationType",
+      "label": "Certification type",
+      "required": false
+    },
+    {
+      "name": "uniform",
+      "label": "Uniform",
+      "required": false
+    },
+    {
+      "name": "workLocation",
+      "label": "Work location",
+      "required": false
+    },
+    {
+      "name": "payBasis",
+      "label": "Pay basis",
+      "required": false,
+      "choices": [
+        {
+          "value": "hourly",
+          "label": "hourly"
+        },
+        {
+          "value": "flat_rate",
+          "label": "flat_rate"
+        }
+      ]
+    },
+    {
+      "name": "budgetHourlyRate",
+      "label": "Budget hourly rate",
+      "required": false
+    },
+    {
+      "name": "staffingTemplateId",
+      "label": "Staffing template id",
+      "required": false
+    },
+    {
+      "name": "templateLineKey",
+      "label": "Template line key",
+      "required": false
+    },
+    {
+      "name": "templateSlot",
+      "label": "Template slot",
+      "required": false
     }
   ],
   "availableFrom": {
@@ -70059,14 +70273,14 @@ export const EventStaffNeedPrepareCoverageContinuationCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["windowsJson"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Crew may see shared event staffing"},{"kind":"policy_denial","message":"Crew may update shared event staffing"},{"kind":"policy_denial","message":"Crew may change shared event staffing"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventStaffNeed not found"}],
   emits: ["EventStaffNeedCoverageContinuationPrepared"],
 } as const;
 
-export type EventStaffNeedPrepareCoverageContinuationResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number };
+export type EventStaffNeedPrepareCoverageContinuationResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for EventStaffNeed.prepareCoverageContinuation.
@@ -70151,14 +70365,14 @@ export const EventStaffNeedReleaseClaimCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Crew may see shared event staffing"},{"kind":"policy_denial","message":"Crew may update shared event staffing"},{"kind":"policy_denial","message":"Crew may change shared event staffing"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventStaffNeed not found"}],
   emits: ["EventStaffNeedReleased"],
 } as const;
 
-export type EventStaffNeedReleaseClaimResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number };
+export type EventStaffNeedReleaseClaimResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for EventStaffNeed.releaseClaim.
@@ -134301,6 +134515,20 @@ export const ServiceStyleActivateInvalidation = [
     "queryKeyHint": "queryKeys.serviceStyleKitItem.detail(id)",
     "readId": "ServiceStyleKitItem.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StaffingTemplate",
+    "queryKeyHint": "queryKeys.staffingTemplate.lists()",
+    "readId": "StaffingTemplate.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StaffingTemplate",
+    "queryKeyHint": "queryKeys.staffingTemplate.detail(id)",
+    "readId": "StaffingTemplate.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -134418,6 +134646,20 @@ export const ServiceStyleDeactivateInvalidation = [
     "entity": "ServiceStyleKitItem",
     "queryKeyHint": "queryKeys.serviceStyleKitItem.detail(id)",
     "readId": "ServiceStyleKitItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StaffingTemplate",
+    "queryKeyHint": "queryKeys.staffingTemplate.lists()",
+    "readId": "StaffingTemplate.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StaffingTemplate",
+    "queryKeyHint": "queryKeys.staffingTemplate.detail(id)",
+    "readId": "StaffingTemplate.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -134546,6 +134788,20 @@ export const ServiceStyleRegisterInvalidation = [
     "entity": "ServiceStyleKitItem",
     "queryKeyHint": "queryKeys.serviceStyleKitItem.detail(id)",
     "readId": "ServiceStyleKitItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StaffingTemplate",
+    "queryKeyHint": "queryKeys.staffingTemplate.lists()",
+    "readId": "StaffingTemplate.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StaffingTemplate",
+    "queryKeyHint": "queryKeys.staffingTemplate.detail(id)",
+    "readId": "StaffingTemplate.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -134688,6 +134944,20 @@ export const ServiceStyleReviseDetailsInvalidation = [
     "entity": "ServiceStyleKitItem",
     "queryKeyHint": "queryKeys.serviceStyleKitItem.detail(id)",
     "readId": "ServiceStyleKitItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StaffingTemplate",
+    "queryKeyHint": "queryKeys.staffingTemplate.lists()",
+    "readId": "StaffingTemplate.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StaffingTemplate",
+    "queryKeyHint": "queryKeys.staffingTemplate.detail(id)",
+    "readId": "StaffingTemplate.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -139767,6 +140037,406 @@ export const StaffChatReadCursorTouchAction = {
       "name": "readUpTo",
       "label": "Read up to",
       "required": true
+    }
+  ]
+} as const;
+
+// --- StaffingTemplate.define ---
+export interface StaffingTemplateDefineClientInput {
+  name: string;
+  lines: string;
+  serviceStyleId?: string;
+  minGuests?: number;
+  maxGuests?: number;
+}
+
+export const StaffingTemplateDefineCapability = {
+  capabilityId: "StaffingTemplate.define",
+  entity: "StaffingTemplate",
+  command: "define",
+  route: "/api/manifest/StaffingTemplate/commands/define",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["name","lines","serviceStyleId","minGuests","maxGuests"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Workforce staff and event managers may see crew templates"},{"kind":"policy_denial","message":"Workforce managers may update crew templates"},{"kind":"policy_denial","message":"Workforce managers may change crew templates"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Give this crew template a name."},{"kind":"constraint_block","message":"The largest guest count has to be at least the smallest."}],
+  emits: ["StaffingTemplateDefined"],
+} as const;
+
+export type StaffingTemplateDefineResult = { docId: string };
+
+/**
+ * Build command input for StaffingTemplate.define.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindStaffingTemplateDefineInput(client: StaffingTemplateDefineClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful StaffingTemplate.define. */
+export const StaffingTemplateDefineInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "StaffingTemplate",
+    "queryKeyHint": "queryKeys.staffingTemplate.lists()",
+    "readId": "StaffingTemplate.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StaffingTemplate",
+    "queryKeyHint": "queryKeys.staffingTemplate.detail(id)",
+    "readId": "StaffingTemplate.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.lists()",
+    "readId": "ServiceStyle.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.detail(id)",
+    "readId": "ServiceStyle.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer StaffingTemplate.define. Not a rendered control. */
+export const StaffingTemplateDefineAction = {
+  "exposure": "human",
+  "label": "Define",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "name",
+      "label": "Name",
+      "required": true
+    },
+    {
+      "name": "lines",
+      "label": "Lines",
+      "required": true
+    },
+    {
+      "name": "serviceStyleId",
+      "label": "Service style id",
+      "required": false
+    },
+    {
+      "name": "minGuests",
+      "label": "Min guests",
+      "required": false
+    },
+    {
+      "name": "maxGuests",
+      "label": "Max guests",
+      "required": false
+    }
+  ],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "retired"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for StaffingTemplate.define. */
+export const StaffingTemplateDefineLifecycle = [
+  {
+    "property": "status",
+    "from": "retired",
+    "to": "active",
+    "proven": true
+  }
+] as const;
+
+// --- StaffingTemplate.reactivate ---
+export type StaffingTemplateReactivateClientInput = Record<string, never>;
+
+export const StaffingTemplateReactivateCapability = {
+  capabilityId: "StaffingTemplate.reactivate",
+  entity: "StaffingTemplate",
+  command: "reactivate",
+  route: "/api/manifest/StaffingTemplate/commands/reactivate",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; serviceStyleId: string | null; minGuests: number | null; maxGuests: number | null; lines: string; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Workforce staff and event managers may see crew templates"},{"kind":"policy_denial","message":"Workforce managers may update crew templates"},{"kind":"policy_denial","message":"Workforce managers may change crew templates"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"StaffingTemplate not found"}],
+  emits: ["StaffingTemplateReactivated"],
+} as const;
+
+export type StaffingTemplateReactivateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; serviceStyleId: string | null; minGuests: number | null; maxGuests: number | null; lines: string; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for StaffingTemplate.reactivate.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindStaffingTemplateReactivateInput(client: StaffingTemplateReactivateClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful StaffingTemplate.reactivate. */
+export const StaffingTemplateReactivateInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "StaffingTemplate",
+    "queryKeyHint": "queryKeys.staffingTemplate.lists()",
+    "readId": "StaffingTemplate.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StaffingTemplate",
+    "queryKeyHint": "queryKeys.staffingTemplate.detail(id)",
+    "readId": "StaffingTemplate.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.lists()",
+    "readId": "ServiceStyle.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.detail(id)",
+    "readId": "ServiceStyle.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer StaffingTemplate.reactivate. Not a rendered control. */
+export const StaffingTemplateReactivateAction = {
+  "exposure": "human",
+  "label": "Reactivate",
+  "confirm": false,
+  "fields": [],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "retired"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for StaffingTemplate.reactivate. */
+export const StaffingTemplateReactivateLifecycle = [
+  {
+    "property": "status",
+    "from": "retired",
+    "to": "active",
+    "proven": true
+  }
+] as const;
+
+// --- StaffingTemplate.retire ---
+export type StaffingTemplateRetireClientInput = Record<string, never>;
+
+export const StaffingTemplateRetireCapability = {
+  capabilityId: "StaffingTemplate.retire",
+  entity: "StaffingTemplate",
+  command: "retire",
+  route: "/api/manifest/StaffingTemplate/commands/retire",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; serviceStyleId: string | null; minGuests: number | null; maxGuests: number | null; lines: string; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Workforce staff and event managers may see crew templates"},{"kind":"policy_denial","message":"Workforce managers may update crew templates"},{"kind":"policy_denial","message":"Workforce managers may change crew templates"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"StaffingTemplate not found"}],
+  emits: ["StaffingTemplateRetired"],
+} as const;
+
+export type StaffingTemplateRetireResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; serviceStyleId: string | null; minGuests: number | null; maxGuests: number | null; lines: string; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for StaffingTemplate.retire.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindStaffingTemplateRetireInput(client: StaffingTemplateRetireClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful StaffingTemplate.retire. */
+export const StaffingTemplateRetireInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "StaffingTemplate",
+    "queryKeyHint": "queryKeys.staffingTemplate.lists()",
+    "readId": "StaffingTemplate.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StaffingTemplate",
+    "queryKeyHint": "queryKeys.staffingTemplate.detail(id)",
+    "readId": "StaffingTemplate.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.lists()",
+    "readId": "ServiceStyle.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.detail(id)",
+    "readId": "ServiceStyle.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer StaffingTemplate.retire. Not a rendered control. */
+export const StaffingTemplateRetireAction = {
+  "exposure": "human",
+  "label": "Retire",
+  "confirm": false,
+  "fields": [],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "active"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for StaffingTemplate.retire. */
+export const StaffingTemplateRetireLifecycle = [
+  {
+    "property": "status",
+    "from": "active",
+    "to": "retired",
+    "proven": true
+  }
+] as const;
+
+// --- StaffingTemplate.revise ---
+export interface StaffingTemplateReviseClientInput {
+  name: string;
+  lines: string;
+  serviceStyleId?: string;
+  minGuests?: number;
+  maxGuests?: number;
+}
+
+export const StaffingTemplateReviseCapability = {
+  capabilityId: "StaffingTemplate.revise",
+  entity: "StaffingTemplate",
+  command: "revise",
+  route: "/api/manifest/StaffingTemplate/commands/revise",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; serviceStyleId: string | null; minGuests: number | null; maxGuests: number | null; lines: string; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["name","lines","serviceStyleId","minGuests","maxGuests"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Workforce staff and event managers may see crew templates"},{"kind":"policy_denial","message":"Workforce managers may update crew templates"},{"kind":"policy_denial","message":"Workforce managers may change crew templates"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Give this crew template a name."},{"kind":"constraint_block","message":"The largest guest count has to be at least the smallest."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"StaffingTemplate not found"}],
+  emits: ["StaffingTemplateRevised"],
+} as const;
+
+export type StaffingTemplateReviseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; serviceStyleId: string | null; minGuests: number | null; maxGuests: number | null; lines: string; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for StaffingTemplate.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindStaffingTemplateReviseInput(client: StaffingTemplateReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful StaffingTemplate.revise. */
+export const StaffingTemplateReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "StaffingTemplate",
+    "queryKeyHint": "queryKeys.staffingTemplate.lists()",
+    "readId": "StaffingTemplate.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StaffingTemplate",
+    "queryKeyHint": "queryKeys.staffingTemplate.detail(id)",
+    "readId": "StaffingTemplate.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.lists()",
+    "readId": "ServiceStyle.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.detail(id)",
+    "readId": "ServiceStyle.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer StaffingTemplate.revise. Not a rendered control. */
+export const StaffingTemplateReviseAction = {
+  "exposure": "human",
+  "label": "Revise",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "name",
+      "label": "Name",
+      "required": true
+    },
+    {
+      "name": "lines",
+      "label": "Lines",
+      "required": true
+    },
+    {
+      "name": "serviceStyleId",
+      "label": "Service style id",
+      "required": false
+    },
+    {
+      "name": "minGuests",
+      "label": "Min guests",
+      "required": false
+    },
+    {
+      "name": "maxGuests",
+      "label": "Max guests",
+      "required": false
     }
   ]
 } as const;
@@ -159552,6 +160222,7 @@ export const ALL_CAPABILITY_IDS = [
   "EventStaffNeed.changeCoverage",
   "EventStaffNeed.chooseTravelLeg",
   "EventStaffNeed.claim",
+  "EventStaffNeed.describeDemand",
   "EventStaffNeed.fill",
   "EventStaffNeed.planTiming",
   "EventStaffNeed.postOpen",
@@ -159961,6 +160632,10 @@ export const ALL_CAPABILITY_IDS = [
   "SignatureRequest.revoke",
   "StaffChatReadCursor.open",
   "StaffChatReadCursor.touch",
+  "StaffingTemplate.define",
+  "StaffingTemplate.reactivate",
+  "StaffingTemplate.retire",
+  "StaffingTemplate.revise",
   "StaffMessage.edit",
   "StaffMessage.markRead",
   "StaffMessage.remove",
@@ -160791,6 +161466,10 @@ export const ALL_READ_IDS = [
   "StaffChatReadCursor.byTenantId",
   "StaffChatReadCursor.get",
   "StaffChatReadCursor.list",
+  "StaffingTemplate.byServiceStyleId",
+  "StaffingTemplate.byTenantId",
+  "StaffingTemplate.get",
+  "StaffingTemplate.list",
   "StaffMessage.byEventId",
   "StaffMessage.byRecipientPersonId",
   "StaffMessage.bySenderPersonId",
@@ -161783,29 +162462,29 @@ export type getEventPacketRevisionResult = { _id: string; _creationTime: number;
 export const listEventPacketRevisionRead = {"entity":"EventPacketRevision","readId":"EventPacketRevision.list","exportName":"listEventPacketRevision","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; eventId: string; snapshotFingerprint: string; pdfStorageId: string; snapshotStorageId: string; stage: string; createdBy: string; supersededBy: string | null; answersJson: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEventPacketRevisionResult = Array<{ _id: string; _creationTime: number; tenantId: string; eventId: string; snapshotFingerprint: string; pdfStorageId: string; snapshotStorageId: string; stage: string; createdBy: string; supersededBy: string | null; answersJson: string | null; createdAt: number; updatedAt: number }>;
 
-export const listEventStaffNeedByClaimedByPersonIdRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.byClaimedByPersonId","exportName":"listEventStaffNeedByClaimedByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"claimedByPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listEventStaffNeedByClaimedByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }>;
+export const listEventStaffNeedByClaimedByPersonIdRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.byClaimedByPersonId","exportName":"listEventStaffNeedByClaimedByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"claimedByPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventStaffNeedByClaimedByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>;
 
-export const listEventStaffNeedByCoverageReplacementPersonIdRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.byCoverageReplacementPersonId","exportName":"listEventStaffNeedByCoverageReplacementPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"coverageReplacementPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listEventStaffNeedByCoverageReplacementPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }>;
+export const listEventStaffNeedByCoverageReplacementPersonIdRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.byCoverageReplacementPersonId","exportName":"listEventStaffNeedByCoverageReplacementPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"coverageReplacementPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventStaffNeedByCoverageReplacementPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>;
 
-export const listEventStaffNeedByEventIdRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.byEventId","exportName":"listEventStaffNeedByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listEventStaffNeedByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }>;
+export const listEventStaffNeedByEventIdRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.byEventId","exportName":"listEventStaffNeedByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventStaffNeedByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>;
 
-export const listEventStaffNeedByFilledByPersonIdRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.byFilledByPersonId","exportName":"listEventStaffNeedByFilledByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"filledByPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listEventStaffNeedByFilledByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }>;
+export const listEventStaffNeedByFilledByPersonIdRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.byFilledByPersonId","exportName":"listEventStaffNeedByFilledByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"filledByPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventStaffNeedByFilledByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>;
 
-export const listEventStaffNeedByPreviousStaffNeedIdRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.byPreviousStaffNeedId","exportName":"listEventStaffNeedByPreviousStaffNeedId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"previousStaffNeedId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listEventStaffNeedByPreviousStaffNeedIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }>;
+export const listEventStaffNeedByPreviousStaffNeedIdRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.byPreviousStaffNeedId","exportName":"listEventStaffNeedByPreviousStaffNeedId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"previousStaffNeedId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventStaffNeedByPreviousStaffNeedIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>;
 
-export const listEventStaffNeedByTenantIdRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.byTenantId","exportName":"listEventStaffNeedByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listEventStaffNeedByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }>;
+export const listEventStaffNeedByTenantIdRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.byTenantId","exportName":"listEventStaffNeedByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventStaffNeedByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>;
 
-export const getEventStaffNeedRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.get","exportName":"getEventStaffNeed","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getEventStaffNeedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number } | null;
+export const getEventStaffNeedRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.get","exportName":"getEventStaffNeed","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getEventStaffNeedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number } | null;
 
-export const listEventStaffNeedRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.list","exportName":"listEventStaffNeed","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listEventStaffNeedResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; createdAt: number; updatedAt: number }>;
+export const listEventStaffNeedRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.list","exportName":"listEventStaffNeed","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventStaffNeedResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>;
 
 export const listEventTemplateByTenantIdRead = {"entity":"EventTemplate","readId":"EventTemplate.byTenantId","exportName":"listEventTemplateByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; clientType: \"company\" | \"person\"; eventType: string; defaultHeadcount: number; menuId: string | null; defaultStaffRoles: string[]; typicalEquipment: string[]; notes: string | null; sourceEventId: string | null; status: \"active\" | \"archived\"; definedAt: number | null; archivedAt: number | null; archiveReason: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEventTemplateByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; clientType: "company" | "person"; eventType: string; defaultHeadcount: number; menuId: string | null; defaultStaffRoles: string[]; typicalEquipment: string[]; notes: string | null; sourceEventId: string | null; status: "active" | "archived"; definedAt: number | null; archivedAt: number | null; archiveReason: string | null; createdAt: number; updatedAt: number }>;
@@ -163048,6 +163727,18 @@ export type getStaffChatReadCursorResult = { _id: string; _creationTime: number;
 
 export const listStaffChatReadCursorRead = {"entity":"StaffChatReadCursor","readId":"StaffChatReadCursor.list","exportName":"listStaffChatReadCursor","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; channelKey: string; authSubjectId: string; lastReadAt: number; createdAt: number; updatedAt: number }>"} as const;
 export type listStaffChatReadCursorResult = Array<{ _id: string; _creationTime: number; tenantId: string; channelKey: string; authSubjectId: string; lastReadAt: number; createdAt: number; updatedAt: number }>;
+
+export const listStaffingTemplateByServiceStyleIdRead = {"entity":"StaffingTemplate","readId":"StaffingTemplate.byServiceStyleId","exportName":"listStaffingTemplateByServiceStyleId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"serviceStyleId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; serviceStyleId: string | null; minGuests: number | null; maxGuests: number | null; lines: string; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listStaffingTemplateByServiceStyleIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; serviceStyleId: string | null; minGuests: number | null; maxGuests: number | null; lines: string; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listStaffingTemplateByTenantIdRead = {"entity":"StaffingTemplate","readId":"StaffingTemplate.byTenantId","exportName":"listStaffingTemplateByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; serviceStyleId: string | null; minGuests: number | null; maxGuests: number | null; lines: string; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listStaffingTemplateByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; serviceStyleId: string | null; minGuests: number | null; maxGuests: number | null; lines: string; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getStaffingTemplateRead = {"entity":"StaffingTemplate","readId":"StaffingTemplate.get","exportName":"getStaffingTemplate","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; serviceStyleId: string | null; minGuests: number | null; maxGuests: number | null; lines: string; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getStaffingTemplateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; serviceStyleId: string | null; minGuests: number | null; maxGuests: number | null; lines: string; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listStaffingTemplateRead = {"entity":"StaffingTemplate","readId":"StaffingTemplate.list","exportName":"listStaffingTemplate","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; serviceStyleId: string | null; minGuests: number | null; maxGuests: number | null; lines: string; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listStaffingTemplateResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; serviceStyleId: string | null; minGuests: number | null; maxGuests: number | null; lines: string; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listStaffMessageByEventIdRead = {"entity":"StaffMessage","readId":"StaffMessage.byEventId","exportName":"listStaffMessageByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; senderPersonId: string; recipientPersonId: string | null; eventId: string | null; senderAuthSubjectId: string | null; recipientAuthSubjectId: string | null; body: string; attachmentCount: number; mentionedPersonIds: string | null; editedAt: number | null; readAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listStaffMessageByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; senderPersonId: string; recipientPersonId: string | null; eventId: string | null; senderAuthSubjectId: string | null; recipientAuthSubjectId: string | null; body: string; attachmentCount: number; mentionedPersonIds: string | null; editedAt: number | null; readAt: number | null; createdAt: number; updatedAt: number }>;

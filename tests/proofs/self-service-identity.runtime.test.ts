@@ -88,7 +88,9 @@ describe("self-service acts only on your own work (AC-513)", () => {
       endsAt: S.endsAt,
     });
     const kitShift = (
-      await s.workforce.run(async (ctx) => ctx.db.query("shifts").collect())
+      (await s.workforce.run(async (ctx) =>
+        ctx.db.query("shifts").collect(),
+      )) as Doc<"shifts">[]
     ).find((row) => row.personId === kit.personId)!;
 
     // Lou acting on Kit's work: every path refused, nothing changes.
