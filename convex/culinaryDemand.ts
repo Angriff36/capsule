@@ -42,6 +42,12 @@ import {
   type RoundingScope,
   type UnresolvedItem,
 } from "./lib/culinaryModel/demand";
+import {
+  eventFoodCost,
+  type EventFoodCost,
+  type EventFoodCostInput,
+} from "./lib/culinaryModel/eventFoodCost";
+import { observationsByIngredient } from "./lib/culinaryModel/pricing";
 import { editionInUse } from "./lib/culinaryModel/recipeEdition";
 import { withUnresolvedText } from "./lib/culinaryModel/unresolvedText";
 import {
@@ -85,6 +91,10 @@ async function byTenant<
     | "dishTaskMaterials"
     | "ingredients"
     | "itemUnitMappings"
+    | "ingredientPriceObservations"
+    | "wasteRecords"
+    | "eventCloseouts"
+    | "invoices"
     | "eventDishLineOverrides"
     | "prepTasks"
     | "eventDishes"
@@ -125,6 +135,7 @@ async function loadCatalog(ctx: Ctx, tenantId: string): Promise<Catalog> {
     dishTaskMaterials,
     ingredients,
     mappings,
+    priceRows,
   ] = await Promise.all([
     byTenant(ctx, "dishes", tenantId),
     byTenant(ctx, "components", tenantId),
@@ -137,7 +148,19 @@ async function loadCatalog(ctx: Ctx, tenantId: string): Promise<Catalog> {
     byTenant(ctx, "dishTaskMaterials", tenantId),
     byTenant(ctx, "ingredients", tenantId),
     byTenant(ctx, "itemUnitMappings", tenantId),
+    byTenant(ctx, "ingredientPriceObservations", tenantId),
   ]);
+  const pricesByIngredient = observationsByIngredient(
+    priceRows.map((o) => ({
+      id: String(o._id),
+      ingredientId: String(o.ingredientId),
+      vendorId: o.vendorId ? String(o.vendorId) : null,
+      vendorOrderId: o.vendorOrderId ? String(o.vendorOrderId) : null,
+      unit: unitOf(o.unit),
+      unitPrice: Number(o.unitPrice),
+      observedAt: typeof o.observedAt === "number" ? o.observedAt : null,
+    })),
+  );
   const stepCounts = new Map<string, number>();
   const steps = await byTenant(ctx, "componentSteps", tenantId);
   for (const step of steps) {
@@ -234,6 +257,7 @@ async function loadCatalog(ctx: Ctx, tenantId: string): Promise<Catalog> {
         name: i.name,
         unit: unitOf(i.unit),
         costPerUnit: i.costPerUnit == null ? null : Number(i.costPerUnit),
+        observations: pricesByIngredient.get(String(i._id)) ?? [],
       },
     ]),
   );
@@ -725,6 +749,99 @@ export const kitchenUnresolvedReport = query({
     }
     recipes.sort((a, b) => a.name.localeCompare(b.name));
     return { events: eventRows, recipes };
+  },
+});
+
+/** Closeout read tier (financeAccess | eventManageAccess): revenue and actuals. */
+function canReadEventMoney(role: string): boolean {
+  return (
+    role === "finance_staff" ||
+    role === "manager" ||
+    role.endsWith("_manager") ||
+    role === "admin" ||
+    role === "owner" ||
+    role === "system"
+  );
+}
+
+const BILLED_INVOICE_STATUSES = new Set([
+  "sent",
+  "viewed",
+  "overdue",
+  "partial",
+  "paid",
+]);
+
+/**
+ * Event food cost: the estimate priced at the event date with its coverage,
+ * and (for money readers) the closeout actual incl. recorded waste, variance,
+ * cost per guest and food-cost % on the reporting revenue basis. Read only.
+ */
+export const eventFoodCostReport = query({
+  args: { eventId: v.id("events") },
+  handler: async (ctx, args): Promise<EventFoodCost> => {
+    const auth = await getAuthContext(ctx);
+    const tenantId = requireCulinaryReader(auth);
+    const event = await requireEvent(ctx, tenantId, args.eventId);
+    const catalog = await loadCatalog(ctx, tenantId);
+    const eventDishes = await loadEventDishes(ctx, tenantId, args.eventId);
+    // Every menu amount counts, including parts a shared batch makes: the
+    // event eats that food whichever batch cooks it.
+    const demands = eventDishes.map((ed) =>
+      expandEventDish(ed, catalog.lookups),
+    );
+    const asOf = typeof event.startsAt === "number" ? event.startsAt : null;
+    const expectedHeadcount = Number(event.expectedHeadcount ?? 0);
+    let revenue: EventFoodCostInput["revenue"] = null;
+    let actual: EventFoodCostInput["actual"] = null;
+    let recordedWasteCost = 0;
+    if (canReadEventMoney(auth.role)) {
+      const closeout = (await byTenant(ctx, "eventCloseouts", tenantId)).find(
+        (c) => String(c.eventId) === String(args.eventId),
+      );
+      const finalized = closeout?.status === "finalized";
+      const ingredientCost = Number(closeout?.actualIngredientCost ?? 0);
+      // A draft seeded with $0 is not an actual yet.
+      if (closeout && (finalized || ingredientCost > 0))
+        actual = {
+          ingredientCost,
+          actualHeadcount: Number(closeout.actualHeadcount ?? 0),
+          finalized,
+        };
+      recordedWasteCost = (await byTenant(ctx, "wasteRecords", tenantId))
+        .filter(
+          (w) =>
+            String(w.eventId ?? "") === String(args.eventId) &&
+            w.status === "recorded",
+        )
+        .reduce((sum, w) => sum + Number(w.quantity) * Number(w.unitCost), 0);
+      const billed = (await byTenant(ctx, "invoices", tenantId))
+        .filter(
+          (i) =>
+            String(i.eventId ?? "") === String(args.eventId) &&
+            BILLED_INVOICE_STATUSES.has(String(i.status)),
+        )
+        .reduce((sum, i) => sum + Number(i.total ?? 0), 0);
+      revenue =
+        finalized && Number(closeout?.actualRevenue ?? 0) > 0
+          ? { amount: Number(closeout?.actualRevenue), source: "closeout" }
+          : billed > 0
+            ? { amount: billed, source: "invoices" }
+            : Number(event.quotedPrice ?? 0) > 0
+              ? { amount: Number(event.quotedPrice), source: "quote" }
+              : null;
+    }
+    return eventFoodCost({
+      contributions: demands.flatMap((d) => d.contributions),
+      unresolvedItems: demands.reduce((n, d) => n + d.unresolved.length, 0),
+      ingredients: catalog.lookups.ingredients,
+      mappings: catalog.lookups.mappings,
+      asOf,
+      expectedHeadcount,
+      revenue,
+      actual,
+      recordedWasteCost,
+    });
   },
 });
 

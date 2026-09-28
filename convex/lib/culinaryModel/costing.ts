@@ -14,6 +14,7 @@ import {
   type QuantityBasis,
   type UnitCode,
 } from "./units";
+import { ingredientPriceAt, type PriceObservationLike } from "./pricing";
 
 export type ContentStatus = "complete" | "method_missing" | "ingredients_missing" | "both_missing";
 export type CostConfidence = "complete" | "partial" | "none";
@@ -54,12 +55,16 @@ export interface IngredientLike {
   name: string;
   unit: UnitCode;
   costPerUnit: number | null;
+  /** Dated receipt prices (pricing.ts); the newest one on or before asOf wins. */
+  observations?: readonly PriceObservationLike[];
 }
 
 export interface CostLookups {
   components: ReadonlyMap<string, ComponentLike>;
   ingredients: ReadonlyMap<string, IngredientLike>;
   mappings: readonly ItemUnitMappingLike[];
+  /** Costing date (ms), e.g. the event date; null/absent = today. */
+  asOf?: number | null;
 }
 
 export function componentContentStatus(component: Pick<ComponentLike, "instructions" | "stepCount" | "ingredientLines" | "componentLines">): ContentStatus {
@@ -77,12 +82,21 @@ export interface CostLineReport {
   known: boolean;
   cost: number | null;
   reason: string | null;
+  /** Where a known price came from; a sub-recipe line reports "recipe". */
+  priceSource?: "receipt" | "catalog" | "recipe";
+  /** Receipt date of the price used; null for an undated catalog price. */
+  priceEffectiveAt?: number | null;
+  vendorId?: string | null;
+  /** True when the cost rests on at least one undated catalog price. */
+  undated?: boolean;
 }
 
 export interface CostReport {
   confidence: CostConfidence;
   knownSubtotal: number;
   unknownLines: number;
+  /** Known lines that rest on an undated catalog price. */
+  undatedLines: number;
   totalLines: number;
   lines: CostLineReport[];
   /** Set when the walk met a recipe that contains an ancestor. */
@@ -95,7 +109,15 @@ const summarize = (lines: CostLineReport[], cycle: string[] | null): CostReport 
   const unknownLines = lines.length - known.length;
   const confidence: CostConfidence =
     lines.length === 0 || known.length === 0 ? "none" : unknownLines === 0 && !cycle ? "complete" : "partial";
-  return { confidence, knownSubtotal: Math.round(knownSubtotal * 100) / 100, unknownLines, totalLines: lines.length, lines, cycle };
+  return {
+    confidence,
+    knownSubtotal: Math.round(knownSubtotal * 100) / 100,
+    unknownLines,
+    undatedLines: known.filter((l) => l.undated).length,
+    totalLines: lines.length,
+    lines,
+    cycle,
+  };
 };
 
 /** Cost of one batch of a recipe, nested, with per-line reasons. */
@@ -113,8 +135,9 @@ export function componentBatchCost(componentId: string, lookups: CostLookups, pa
       lines.push({ lineId: line.id, label, known: false, cost: null, reason: "ingredient not found" });
       continue;
     }
-    if (ingredient.costPerUnit == null) {
-      lines.push({ lineId: line.id, label, known: false, cost: null, reason: "no catalog cost" });
+    const price = ingredientPriceAt(ingredient, ingredient.observations ?? [], lookups.asOf ?? null);
+    if (price.status === "unknown") {
+      lines.push({ lineId: line.id, label, known: false, cost: null, reason: price.reason });
       continue;
     }
     const basis = toPurchaseBasis(line.quantity, line.unit, line.quantityBasis ?? "as_purchased", lookups.mappings, {
@@ -125,7 +148,7 @@ export function componentBatchCost(componentId: string, lookups: CostLookups, pa
       lines.push({ lineId: line.id, label, known: false, cost: null, reason: basis.status });
       continue;
     }
-    const converted = convertQuantity(basis.quantity, line.unit, ingredient.unit, lookups.mappings, {
+    const converted = convertQuantity(basis.quantity, line.unit, price.unit, lookups.mappings, {
       itemKind: "ingredient",
       itemId: ingredient.id,
     });
@@ -133,8 +156,18 @@ export function componentBatchCost(componentId: string, lookups: CostLookups, pa
       lines.push({ lineId: line.id, label, known: false, cost: null, reason: converted.status });
       continue;
     }
-    const cost = converted.quantity * (line.wasteFactor ?? 1) * ingredient.costPerUnit;
-    lines.push({ lineId: line.id, label, known: true, cost: Math.round(cost * 10000) / 10000, reason: null });
+    const cost = converted.quantity * (line.wasteFactor ?? 1) * price.unitPrice;
+    lines.push({
+      lineId: line.id,
+      label,
+      known: true,
+      cost: Math.round(cost * 10000) / 10000,
+      reason: null,
+      priceSource: price.source,
+      priceEffectiveAt: price.effectiveAt,
+      vendorId: price.source === "receipt" ? price.vendorId : null,
+      undated: price.source === "catalog",
+    });
   }
   for (const line of component.componentLines) {
     const child = lookups.components.get(line.childComponentId);
@@ -162,7 +195,15 @@ export function componentBatchCost(componentId: string, lookups: CostLookups, pa
       continue;
     }
     const batches = (converted.quantity * (line.wasteFactor ?? 1)) / child.yieldQuantity;
-    lines.push({ lineId: line.id, label, known: true, cost: Math.round(childReport.knownSubtotal * batches * 10000) / 10000, reason: null });
+    lines.push({
+      lineId: line.id,
+      label,
+      known: true,
+      cost: Math.round(childReport.knownSubtotal * batches * 10000) / 10000,
+      reason: null,
+      priceSource: "recipe",
+      undated: childReport.undatedLines > 0,
+    });
   }
   return summarize(lines, cycle);
 }
@@ -231,7 +272,15 @@ export function dishPortionCost(requirements: readonly DishRequirementLike[], lo
       lines.push({ lineId: req.id, label, known: false, cost: null, reason: "yield missing" });
       continue;
     }
-    lines.push({ lineId: req.id, label, known: true, cost: Math.round(childReport.knownSubtotal * batchesPerPortion * 10000) / 10000, reason: null });
+    lines.push({
+      lineId: req.id,
+      label,
+      known: true,
+      cost: Math.round(childReport.knownSubtotal * batchesPerPortion * 10000) / 10000,
+      reason: null,
+      priceSource: "recipe",
+      undated: childReport.undatedLines > 0,
+    });
   }
   return summarize(lines, cycle);
 }
