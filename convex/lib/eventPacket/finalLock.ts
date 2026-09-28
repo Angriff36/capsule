@@ -141,6 +141,7 @@ export const overrideFinalLockAnswer = mutation({
       tenantId: auth.tenantId,
       eventId: args.eventId,
       decisionId,
+      version: 1,
       issueKey: `finallock.${args.questionKey}`,
       actor: auth.id,
       decidedAt: Date.parse(at),

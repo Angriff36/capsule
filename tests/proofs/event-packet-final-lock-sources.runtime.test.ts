@@ -73,7 +73,7 @@ const answer = (report: any, key: string) =>
 
 describe("Final Lock answers keep the payer, booked names, sign-off versions and printed words", () => {
   it("a manager's who-pays decision keeps the payer for staff and the price for managers only", async () => {
-    const { manager, staff, eventId } = await setup();
+    const { t, manager, staff, eventId } = await setup();
     const before = answer(
       await manager.query(finalLock.getFinalLock, { eventId }),
       "identity.billing",
@@ -88,14 +88,24 @@ describe("Final Lock answers keep the payer, booked names, sign-off versions and
         reason: "The bride’s aunt pays",
       }),
     ).rejects.toThrow(/0 or more/);
-    await manager.mutation(finalLock.overrideFinalLockAnswer, {
-      eventId,
-      questionKey: "identity.billing",
-      basedOn: before.basis,
-      answer: "Harbor Trust",
-      price: 4200,
-      reason: "The bride’s aunt pays 4200",
-    });
+    const { decisionId } = await manager.mutation(
+      finalLock.overrideFinalLockAnswer,
+      {
+        eventId,
+        questionKey: "identity.billing",
+        basedOn: before.basis,
+        answer: "Harbor Trust",
+        price: 4200,
+        reason: "The bride’s aunt pays 4200",
+      },
+    );
+    const saved = await t.run((ctx) =>
+      ctx.db
+        .query("eventPacketResolutions")
+        .filter((q) => q.eq(q.field("decisionId"), decisionId))
+        .unique(),
+    );
+    expect(saved?.version).toBe(1);
     const seenByManager = await manager.query(finalLock.getFinalLock, {
       eventId,
     });
