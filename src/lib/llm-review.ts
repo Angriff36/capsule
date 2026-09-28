@@ -10,9 +10,10 @@
 // active criteria from review-criteria.md. Keep this file the single source of truth
 // for the review mechanism.
 //
-// Drop-in: zero dependencies (native fetch, Node 18+). Set ANTHROPIC_API_KEY. Swap the
-// MODELS map or REVIEW_ENDPOINT to use a different provider — the API/parsing is the
-// only provider-specific part.
+// Drop-in: zero dependencies (native fetch, Node 18+). Runs on GLM 5.3 flash through
+// the Z.ai Anthropic-compatible endpoint (Ryan, 2026-09-28: "just change the key to
+// glm 5.3 flash"). Set ZAI_API_KEY. Swap the MODELS map or REVIEW_ENDPOINT to use a
+// different provider — the API/parsing is the only provider-specific part.
 
 export interface ReviewResult {
   pass: boolean;
@@ -30,11 +31,11 @@ export interface ReviewConfig {
 // fast: quick + cheap for straightforward judgments. smart: nuanced aesthetic/creative.
 // Examples are swappable — the fixture just needs a multimodal (text + vision) model.
 const MODELS: Record<Intelligence, string> = {
-  fast: "claude-haiku-4-5",
-  smart: "claude-opus-4-8",
+  fast: "glm-5.3-flash",
+  smart: "glm-5.3-flash",
 };
 
-const REVIEW_ENDPOINT = "https://api.anthropic.com/v1/messages";
+const REVIEW_ENDPOINT = "https://api.z.ai/api/anthropic/v1/messages";
 const IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".webp", ".gif"] as const;
 
 const MEDIA_TYPES: Record<string, string> = {
@@ -44,17 +45,6 @@ const MEDIA_TYPES: Record<string, string> = {
   ".webp": "image/webp",
   ".gif": "image/gif",
 };
-
-// Constrains the model to a binary verdict so callers never parse prose.
-const VERDICT_SCHEMA = {
-  type: "object",
-  properties: {
-    pass: { type: "boolean" },
-    feedback: { type: "string" }, // Concrete reason + fix when pass=false.
-  },
-  required: ["pass"],
-  additionalProperties: false,
-} as const;
 
 // --- Pure helpers (testable without a network call) ---------------------------------
 
@@ -93,7 +83,8 @@ function reviewInstruction(criteria: string): string {
     `criterion. Judge only what is observable; do not invent requirements.\n\n` +
     `Criterion: ${criteria}\n\n` +
     `Return pass=true only if the criterion is clearly met. If pass=false, put a ` +
-    `concrete, actionable reason in feedback.`
+    `concrete, actionable reason in feedback.\n\n` +
+    `Reply with only a JSON object: {"pass": boolean, "feedback": string}.`
   );
 }
 
@@ -131,11 +122,9 @@ async function buildContent(config: ReviewConfig): Promise<unknown[]> {
 export async function createReview(
   config: ReviewConfig,
 ): Promise<ReviewResult> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.ZAI_API_KEY;
   if (!apiKey) {
-    throw new Error(
-      "ANTHROPIC_API_KEY is not set — llm-review needs it to run.",
-    );
+    throw new Error("ZAI_API_KEY is not set — llm-review needs it to run.");
   }
 
   const response = await fetch(REVIEW_ENDPOINT, {
@@ -149,9 +138,6 @@ export async function createReview(
       model: pickModel(config.intelligence),
       max_tokens: 1024,
       messages: [{ role: "user", content: await buildContent(config) }],
-      output_config: {
-        format: { type: "json_schema", schema: VERDICT_SCHEMA },
-      },
     }),
   });
 
@@ -165,7 +151,9 @@ export async function createReview(
   };
   const text = message.content?.find((b) => b.type === "text")?.text;
   if (!text) throw new Error("llm-review got no text verdict from the model.");
-  return parseVerdict(text);
+  // GLM ignores structured-output requests, so the verdict can arrive wrapped in prose
+  // or a code fence: read the outermost JSON object.
+  return parseVerdict(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1));
 }
 
 // --- Active-criteria registry (review-criteria.md) ----------------------------------
