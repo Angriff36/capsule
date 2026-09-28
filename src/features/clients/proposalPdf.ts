@@ -329,8 +329,11 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
   const guestCount = Number(proposal.guestCount ?? 0);
   const perPerson =
     guestCount > 0 ? Number(proposal.subtotal ?? 0) / guestCount : null;
-  const menuItems = (proposal.dishSelections ?? []).map(
-    (item) => item.dishName,
+  // AC-260: each dish shows its customer-facing description when it has one.
+  const menuItems = (proposal.dishSelections ?? []).map((item) =>
+    item.dishDescription?.trim()
+      ? `${item.dishName} - ${item.dishDescription.trim()}`
+      : item.dishName,
   );
   const visibleMenuItems =
     menuItems.length > 0 ? menuItems : ["Menu details to be confirmed."];
