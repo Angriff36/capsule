@@ -40,6 +40,8 @@ export interface Workbook {
   generatedAt: string;
   status: "READY" | "NEEDS ATTENTION";
   sections: WorkbookSection[];
+  /** The Final Lock answers this workbook prints, stamped into the PDF. */
+  finalLockFingerprint?: string;
   completeness: {
     formPages: number;
     fieldForms: number;
@@ -54,6 +56,8 @@ export function buildWorkbook(
     generatedAt?: string;
     /** Final Lock answers this print shows, exactly as the revision stores them. */
     finalLock?: FinalLockPrintLine[];
+    /** Fingerprint of those answers; the PDF carries it in its own info. */
+    finalLockFingerprint?: string;
   } = {},
 ): Workbook {
   const sources = new Map(
@@ -691,6 +695,9 @@ export function buildWorkbook(
     generatedAt,
     status,
     sections,
+    ...(options.finalLockFingerprint
+      ? { finalLockFingerprint: options.finalLockFingerprint }
+      : {}),
     completeness: {
       formPages: pages.size,
       fieldForms: sections.filter((s) => s.id.startsWith("field.")).length,

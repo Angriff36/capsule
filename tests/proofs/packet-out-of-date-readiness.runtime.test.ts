@@ -10,7 +10,9 @@
 import { convexTest } from "convex-test";
 import { anyApi } from "convex/server";
 import { describe, expect, it } from "vitest";
+import { PDFDocument } from "pdf-lib";
 import schema from "../../convex/schema";
+import { stampFinalLock } from "../../src/lib/eventPacket/finalLock/pdfStamp";
 import { modules } from "./convex-test-modules";
 
 const packet = anyApi.lib.eventPacket.commands;
@@ -43,12 +45,19 @@ async function setup() {
   return { t, manager, eventId };
 }
 
+/** A real PDF carrying the Final Lock answers it shows, as the browser makes. */
+async function stampedPdf(finalLockFingerprint: string) {
+  const doc = await PDFDocument.create();
+  doc.addPage();
+  stampFinalLock(doc, finalLockFingerprint);
+  return doc.save();
+}
+
 async function printPacket(manager: any, eventId: string) {
   const current = await manager.query(packet.getPacket, { eventId });
   const pdf = await manager.action(packet.uploadPacketFile, {
     eventId,
-    bytes: new TextEncoder().encode("%PDF-test " + current.currentFingerprint)
-      .buffer,
+    bytes: (await stampedPdf(current.finalLockFingerprint)).buffer,
     name: "workbook.pdf",
     mimeType: "application/pdf",
     purpose: "pdf",

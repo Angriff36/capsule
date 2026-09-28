@@ -1,6 +1,7 @@
 import { jsPDF } from "jspdf";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import type { Workbook, WorkbookOverlay } from "./buildWorkbook";
+import { stampFinalLock } from "./finalLock/pdfStamp";
 import overlaysMeta from "./fixtures/event-forms-one-print.overlays.json";
 import { EVENT_FORMS_ONE_PRINT_B64 } from "./fixtures/event-forms-one-print.b64";
 export interface LayoutRecord {
@@ -336,6 +337,8 @@ export async function renderWorkbook(
     throw new Error(
       `Workbook layout failed: ${audit.violations.slice(0, 6).join("; ")}`,
     );
+  if (workbook.finalLockFingerprint)
+    stampFinalLock(merged, workbook.finalLockFingerprint);
   return { bytes: new Uint8Array(await merged.save()), audit };
 }
 function base64Bytes(b64: string): Uint8Array {

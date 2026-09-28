@@ -7,6 +7,10 @@ import {
   canonicalJson,
   fingerprintBytes,
 } from "../../src/lib/eventPacket/model";
+import { PDFDocument } from "pdf-lib";
+import { buildWorkbook } from "../../src/lib/eventPacket/buildWorkbook";
+import { renderWorkbook } from "../../src/lib/eventPacket/renderWorkbook";
+import { stampFinalLock } from "../../src/lib/eventPacket/finalLock/pdfStamp";
 import { modules } from "./convex-test-modules";
 
 const packet = api.lib.eventPacket.commands;
@@ -66,16 +70,27 @@ async function setup() {
 const answer = (report: any, key: string) =>
   report.answers.find((a: any) => a.questionKey === key);
 
+/** A small real PDF that carries a Final Lock fingerprint in its own info. */
+async function stampedPdf(fingerprint: string | null, tag: string) {
+  const doc = await PDFDocument.create();
+  doc.addPage();
+  doc.setTitle(tag);
+  if (fingerprint) stampFinalLock(doc, fingerprint);
+  return doc.save();
+}
+
 /** Upload a print the way the browser does: PDF plus snapshot with answers. */
 async function uploadPrint(
   manager: ReturnType<ReturnType<typeof convexTest>["withIdentity"]>,
   eventId: Id<"events">,
   p: any,
   tag: string,
+  pdfBytes?: Uint8Array,
 ) {
+  const bytes = pdfBytes ?? (await stampedPdf(p.finalLockFingerprint, tag));
   const pdf = await manager.action(packet.uploadPacketFile, {
     eventId,
-    bytes: new TextEncoder().encode(`%PDF-test ${tag}`).buffer,
+    bytes: bytes.slice().buffer,
     name: "workbook.pdf",
     mimeType: "application/pdf",
     purpose: "pdf",
@@ -369,7 +384,7 @@ describe("Final Lock answers from native event records", () => {
     });
     const again = await manager.mutation(
       packet.recordPacketRevision,
-      await uploadPrint(manager, eventId, current, "same"),
+      await uploadPrint(manager, eventId, older, "same"),
     );
     expect(again).toMatchObject({ id: reprint.id, reused: true });
   });
@@ -393,6 +408,7 @@ describe("Final Lock answers from native event records", () => {
       );
     // With no print yet (first loop) and with a print to reuse (second loop).
     let first: { id: string } | null = null;
+    let firstPrint: any = null;
     for (const round of ["before", "after"]) {
       const p = await read();
       const refused = [
@@ -434,6 +450,7 @@ describe("Final Lock answers from native event records", () => {
         ),
       ).rejects.toThrow(/Final Lock answers changed/);
       if (!first) {
+        firstPrint = p;
         first = await manager.mutation(
           packet.recordPacketRevision,
           await uploadPrint(manager, eventId, p, "first"),
@@ -445,10 +462,102 @@ describe("Final Lock answers from native event records", () => {
         ).toMatchObject({ id: first.id, reused: true });
       }
     }
+    // A retry that uploads the same answers again reuses the print.
     const ok = await manager.mutation(
       packet.recordPacketRevision,
-      await uploadPrint(manager, eventId, await read(), "retry"),
+      await uploadPrint(manager, eventId, firstPrint, "retry"),
     );
     expect(ok).toMatchObject({ id: first!.id, reused: true });
+  });
+
+  it("reuses an earlier print only when every printed line matches, readiness and field lines too", async () => {
+    const { manager, eventId } = await setup();
+    const p = await manager.query(packet.getPacket, { eventId });
+    const first = await manager.mutation(
+      packet.recordPacketRevision,
+      await uploadPrint(manager, eventId, p, "first"),
+    );
+    for (const key of ["readiness.dispatch", "field.arrival"]) {
+      const altered = {
+        ...p.finalLock,
+        lines: p.finalLock.lines.map((l: any) =>
+          l.questionKey === key ? { ...l, text: "Altered" } : l,
+        ),
+      };
+      expect(altered.lines.some((l: any) => l.text === "Altered")).toBe(true);
+      const files = await uploadPrint(
+        manager,
+        eventId,
+        {
+          ...p,
+          finalLock: altered,
+          finalLockFingerprint: await fingerprintBytes(
+            new TextEncoder().encode(canonicalJson(altered)),
+          ),
+        },
+        `altered-${key}`,
+      );
+      await expect(
+        manager.mutation(packet.recordPacketRevision, files),
+      ).rejects.toThrow(/Final Lock answers changed/);
+    }
+    expect(
+      await manager.mutation(
+        packet.recordPacketRevision,
+        await uploadPrint(manager, eventId, p, "same"),
+      ),
+    ).toMatchObject({ id: first.id, reused: true });
+  });
+
+  it("reads the answers from the PDF itself: a real rendered workbook passes, a mismatched PDF is refused", async () => {
+    const { manager, eventId, version } = await setup();
+    const p = await manager.query(packet.getPacket, { eventId });
+    const render = async (q: any) =>
+      (
+        await renderWorkbook(
+          buildWorkbook(q.snapshot, {
+            revision: 1,
+            generatedAt: "2026-09-28T00:00:00Z",
+            finalLock: q.finalLock.lines,
+            finalLockFingerprint: q.finalLockFingerprint,
+          }),
+        )
+      ).bytes;
+    const oldPdf = await render(p);
+    // A PDF with no answers stamped, or other answers than it names, is refused.
+    for (const bytes of [
+      await stampedPdf(null, "blank"),
+      await stampedPdf("other-answers", "other"),
+    ])
+      await expect(
+        uploadPrint(manager, eventId, p, "bad", bytes),
+      ).rejects.toThrow(/does not carry the Final Lock answers/);
+    // After a Final-Lock-only change, the older rendered PDF cannot be
+    // recorded with the new answers.
+    await manager.mutation(api.mutations.Event_updateSetupNotes, {
+      docId: eventId,
+      version: await version(),
+      rainPlan: "Tent on the lawn",
+    });
+    const fresh = await manager.query(packet.getPacket, { eventId });
+    await expect(
+      uploadPrint(manager, eventId, fresh, "stale-pdf", oldPdf),
+    ).rejects.toThrow(/does not carry the Final Lock answers/);
+    const pdfFingerprintWithOld = await uploadPrint(
+      manager,
+      eventId,
+      p,
+      "old",
+      oldPdf,
+    );
+    await expect(
+      manager.mutation(packet.recordPacketRevision, pdfFingerprintWithOld),
+    ).rejects.toThrow(/Final Lock answers changed/);
+    // The real rendered workbook of the current answers is recorded.
+    const ok = await manager.mutation(
+      packet.recordPacketRevision,
+      await uploadPrint(manager, eventId, fresh, "real", await render(fresh)),
+    );
+    expect(ok.reused).toBe(false);
   });
 });

@@ -730,16 +730,27 @@ describe("Final Lock answer engine", () => {
       type: "text",
       text: "White",
     });
-    // A change that opens a question is Needs review, and still marks the section.
+    // A change after the print that opens a question keeps the print Stale
+    // (it must be reprinted) and still marks the section.
     const more = allConfirmed(input());
     more.event.expectedHeadcount = 120;
     const review2 = run(more, { printed });
-    expect(review2.outcome).toBe("needs_review");
+    expect(review2.outcome).toBe("stale");
     expect(review2.staleQuestions.sort()).toEqual([
       "identity.guest_count",
       "menu.servings",
     ]);
     expect(review2.staleSections.sort()).toEqual(["contacts", "menu"]);
+    // A printed setup answer that is later removed: Stale, not Needs review.
+    const printedLinen = allConfirmed(input());
+    printedLinen.event.text.linenColorTables = "Ivory";
+    const printed2 = printedAt(run(printedLinen), "rev-2");
+    const removed = allConfirmed(input());
+    removed.event.text.linenColorTables = null;
+    const gone = run(removed, { printed: printed2 });
+    expect(get(gone.answers, "setup.linen_tables").result).toBe("unresolved");
+    expect(gone.staleQuestions).toContain("setup.linen_tables");
+    expect(gone.outcome).toBe("stale");
   });
 
   it("a policy version bump marks affected future answers stale deterministically", () => {
@@ -1034,12 +1045,12 @@ describe("Final Lock answer engine", () => {
       [
         "coffee menu line",
         (i) => (i.dishes.at(-1)!.version = 2),
-        ["dessert.plan"],
+        ["dessert.plan", "food.appetizer_placement"],
       ],
       [
         "coffee dish record",
         (i) => (i.dishes.at(-1)!.dish!.version = 2),
-        ["dessert.plan"],
+        ["dessert.plan", "food.appetizer_placement"],
       ],
       [
         "proposal dish record",
@@ -1137,5 +1148,49 @@ describe("Final Lock answer engine", () => {
     expect(get(run(noSale).answers, "bussing.plan").missing).toEqual([
       "The event says full bussing, but the accepted contract does not sell it.",
     ]);
+    // "No full bussing" is read as a no, never as full bussing.
+    const line = (id: string, text: string) => ({
+      id,
+      version: 1,
+      table: "proposalLineItems",
+      text,
+      related: [],
+    });
+    const notFull = input();
+    notFull.event.text.bussing = null;
+    notFull.proposal = {
+      id: "prop-3",
+      version: 1,
+      lines: [line("l-nf", "No full bussing")],
+    };
+    expect(get(run(notFull).answers, "bussing.plan")).toMatchObject({
+      result: "answered",
+      rule: "bussing.plan.contract-says",
+      value: { type: "record", fields: { afterDinner: true, full: false } },
+    });
+    const eventNotFull = input();
+    eventNotFull.event.text.bussing = "No full bussing";
+    expect(get(run(eventNotFull).answers, "bussing.plan").value).toEqual({
+      type: "record",
+      fields: { afterDinner: true, full: false },
+    });
+    // Contract lines that disagree are named, and the question stays open.
+    for (const against of ["No full bussing", "No bussing"]) {
+      const both = input();
+      both.event.text.bussing = null;
+      both.proposal = {
+        id: "prop-4",
+        version: 1,
+        lines: [
+          line("l-full", "Full bussing including glassware"),
+          line("l-against", against),
+        ],
+      };
+      const open = get(run(both).answers, "bussing.plan");
+      expect(open.result).toBe("unresolved");
+      expect(open.rule).toBe("bussing.plan.contract-lines-agree");
+      expect(open.missing[0]).toContain('"Full bussing including glassware"');
+      expect(open.missing[0]).toContain(`"${against}"`);
+    }
   });
 });

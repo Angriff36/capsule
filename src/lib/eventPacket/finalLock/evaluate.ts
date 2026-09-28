@@ -257,15 +257,15 @@ export function evaluateFinalLock(
     ),
   ];
 
+  // Stale comes first: a printed packet whose answers changed (even to an
+  // open question) must be reprinted before anyone works from it.
   // Needs review: an office question or office-side readiness is open.
   // Field work pending: only packing, signatures and day-of forms remain.
   const outcome: FinalLockOutcome =
-    officeUnresolved || readinessOfficeOpen
-      ? "needs_review"
-      : answersStale ||
-          staleQuestions.length ||
-          input.packet.latestRevisionStale
-        ? "stale"
+    answersStale || staleQuestions.length || input.packet.latestRevisionStale
+      ? "stale"
+      : officeUnresolved || readinessOfficeOpen
+        ? "needs_review"
         : readinessOpen ||
             answers.some((a) => a.fieldWork && !a.fieldWork.confirmedAt)
           ? "field_work_pending"

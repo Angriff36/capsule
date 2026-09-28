@@ -1,5 +1,6 @@
 import {
   answered,
+  dishSources,
   notApplicable,
   proposalSources,
   said,
@@ -257,10 +258,13 @@ export function roomServiceAnswers(
   // Food service.
   const stationary = said(text.stationaryApps);
   const passed = said(text.passedApps);
+  // Every menu line is read for an appetizer course, so each line and its
+  // dish record is a source of this answer.
   const appSources = [
     ...ev("stationaryApps"),
     ...ev("passedApps"),
     ...ev("appetizerTableSetup"),
+    ...input.dishes.flatMap((d) => dishSources(d, "course")),
   ];
   const appDishes = input.dishes.some((d) =>
     /appetizer|hors/i.test(d.course ?? ""),

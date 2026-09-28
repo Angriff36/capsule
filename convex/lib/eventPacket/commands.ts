@@ -25,6 +25,7 @@ import {
   finalLockPrint,
   officePrint,
 } from "../../../src/lib/eventPacket/finalLock/evaluate";
+import { readFinalLockStamp } from "../../../src/lib/eventPacket/finalLock/pdfStamp";
 import { parsePacketSnapshot } from "../../../src/lib/eventPacket/packetContract";
 import { resolveIssue } from "../../../src/lib/eventPacket/resolveIssue";
 import {
@@ -145,6 +146,12 @@ async function storedOfficeFingerprint(row: { answersJson?: string | null }) {
   if (!row.answersJson) return null;
   const { revisionId: _revision, ...print } = JSON.parse(row.answersJson);
   return print.lines ? printFingerprint(officePrint(print)) : null;
+}
+/** Everything a stored revision printed, as canonical JSON; null for old rows. */
+function storedPrintJson(row: { answersJson?: string | null }) {
+  if (!row.answersJson) return null;
+  const { revisionId: _revision, ...print } = JSON.parse(row.answersJson);
+  return print.lines ? canonicalJson(print) : null;
 }
 /** The Final Lock answers a print shows now, with the packet they read. */
 async function currentFinalLockPrint(
@@ -304,6 +311,19 @@ async function registerPacketBytes(
     new TextDecoder().decode(bytes.slice(0, 5)) !== "%PDF-"
   )
     throw new Error("Expected a PDF file");
+  // The answers a PDF shows are read from its own bytes, never taken on
+  // the caller's word.
+  const pdfFinalLock =
+    args.purpose === "pdf" ? await readFinalLockStamp(bytes) : null;
+  if (
+    args.purpose === "pdf" &&
+    (!pdfFinalLock ||
+      (args.finalLockFingerprint !== undefined &&
+        args.finalLockFingerprint !== pdfFinalLock))
+  )
+    throw new Error(
+      "This PDF does not carry the Final Lock answers it shows; prepare the workbook again",
+    );
   return ctx.runMutation(internal.lib.eventPacket.commands.registerFile, {
     eventId: args.eventId,
     fingerprint,
@@ -313,9 +333,7 @@ async function registerPacketBytes(
     byteSize: bytes.byteLength,
     purpose: args.purpose,
     ...(snapshotFingerprint ? { snapshotFingerprint } : {}),
-    ...(args.purpose === "pdf" && args.finalLockFingerprint
-      ? { finalLockFingerprint: args.finalLockFingerprint }
-      : {}),
+    ...(pdfFinalLock ? { finalLockFingerprint: pdfFinalLock } : {}),
     ...(finalLockJson ? { finalLockJson } : {}),
   });
 }
@@ -752,12 +770,14 @@ export const recordPacketRevision = mutation({
     // The office answers printed must be the current ones.
     if ((await printFingerprint(officePrint(uploaded))) !== lock.officeFingerprint)
       throw answersChanged;
-    // Reuse only a print of this packet that also showed these answers.
+    // Reuse only a print of this packet that showed exactly these answers,
+    // readiness and field lines too.
+    const uploadedJson = canonicalJson(uploaded);
     let existing = null;
     for (const r of current.revisionRows)
       if (
         r.snapshotFingerprint === args.inputFingerprint &&
-        (await storedOfficeFingerprint(r)) === lock.officeFingerprint
+        storedPrintJson(r) === uploadedJson
       )
         existing = r;
     // A new print must show every answer as it is now.
