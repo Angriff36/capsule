@@ -66,6 +66,11 @@ role manager extends staff {
   // (checkRole("importAccess") was unsatisfiable) and the reconcile queue +
   // source provenance are invisible. See docs §6.1/§6.4.
   allow importAccess
+  // Leadership-assigned todos: any manager (and every *_manager / admin /
+  // owner / system that extends manager) can create and reassign tasks.
+  // Staff self-assign / self-complete via the per-row guard in the Task
+  // command, not through this policy. See src/workforce/task.manifest.
+  allow taskWrite
 }
 
 role kitchen_manager extends manager {

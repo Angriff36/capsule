@@ -1,0 +1,139 @@
+// Workforce — leadership-assigned todos for any Person.
+//
+// A Task is an ad-hoc, event-decorrelated to-do. Anyone with leadership
+// (admin / owner / any *_manager, via the `taskWrite` capability granted
+// on the manager role) can create one and assign it. The assignee can
+// also self-assign (creating a reminder for themselves) — the per-row
+// guard in the authored seam accepts the assignee or leadership, not the
+// policy. Storage is durable; soft-deleted rows are filtered from reads
+// but kept for audit.
+//
+// The clock-out warning in MyDayPage consumes the
+// `openAndDueTodayForPerson` query (in convex/tasks.ts) to block-then-
+// confirm clock-out when the assignee still has open work due today.
+
+use "../foundation/base.manifest"
+
+enum TaskStatus {
+  pending
+  in_progress
+  completed
+  cancelled
+}
+
+entity Task mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // Required: a task with no assignee is meaningless and would make
+  // clock-out warnings ambiguous.
+  property required indexed assignedToId: uuid
+  // Set once at creation. Self-assigned tasks have createdById ===
+  // assignedToId. Both ids index independently so the assignee list and
+  // the "tasks I assigned to others" list stay separate.
+  property required indexed createdById: uuid
+  property required searchable title: string
+  property description: string?
+  property required indexed dueAt: datetime
+  property required status: TaskStatus = "pending"
+  property completedAt: datetime?
+  property cancelledAt: datetime?
+  property cancellationReason: string?
+
+  belongsTo assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
+  belongsTo createdBy: Person fields [tenantId, createdById] references [tenantId, id]
+
+  constraint taskTitleNonempty: length(trim(self.title)) > 0 "Task title is required"
+  constraint taskCompletedHasTimestamp: self.status != "completed" or self.completedAt != null "Completed tasks must record completedAt"
+  constraint taskCancelledHasTimestamp: self.status != "cancelled" or self.cancelledAt != null "Cancelled tasks must record cancelledAt"
+
+  transition status from "pending" to ["in_progress", "completed", "cancelled"]
+  transition status from "in_progress" to ["pending", "completed", "cancelled"]
+  transition status from "completed" to []
+  transition status from "cancelled" to ["pending"]
+
+  // Read policy: leadership sees all, the assignee sees their own, the
+  // creator sees what they assigned to others. Anyone else is denied
+  // without going through the authored seam.
+  default policy taskRead read:
+    user.role == "admin" or user.role == "owner" or self.assignedToId == user.personId or self.createdById == user.personId
+    "Leadership, the assignee, and the creator may see this task"
+  default policy taskWrite write:
+    roleAllows(user.role, "taskWrite") or self.assignedToId == user.personId
+    "Leadership can write any task; the assignee can write their own"
+  default policy taskExecute execute:
+    roleAllows(user.role, "taskWrite") or self.assignedToId == user.personId
+    "Leadership can execute any task; the assignee can execute their own"
+
+  // Governed creation. Either leadership (via the policy) OR the actor is
+  // creating a self-reminder. The "is this for me?" check is enforced here
+  // because the policy itself is role-only.
+  command create(
+    assignedToId: uuid,
+    title: string,
+    description: string?,
+    dueAt: datetime
+  ) {
+    guard roleAllows(user.role, "taskWrite") or assignedToId == user.personId
+      "Leadership can create tasks for anyone; staff can only self-assign"
+    guard length(trim(title)) > 0 "Task title is required"
+    mutate assignedToId = assignedToId
+    mutate title = title
+    mutate description = description
+    mutate dueAt = dueAt
+    mutate status = "pending"
+  }
+
+  command update(
+    title: string?,
+    description: string?,
+    dueAt: datetime?,
+    reassignToId: uuid?
+  ) {
+    guard roleAllows(user.role, "taskWrite") or self.assignedToId == user.personId
+      "Leadership can edit any task; the assignee can edit their own"
+    guard self.deletedAt == null "Cannot edit a deleted task"
+    mutate title = title
+    mutate description = description
+    mutate dueAt = dueAt
+    mutate assignedToId = reassignToId
+  }
+
+  command start() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "taskWrite") or self.assignedToId == user.personId
+    guard self.status == "pending" "Only pending tasks can be started"
+    mutate status = "in_progress"
+  }
+
+  command complete() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "taskWrite") or self.assignedToId == user.personId
+    guard self.status == "pending" or self.status == "in_progress" "Already finished or cancelled"
+    mutate status = "completed"
+    mutate completedAt = now()
+  }
+
+  command cancel(reason: string?) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "taskWrite") or self.assignedToId == user.personId or self.createdById == user.personId
+      "Leadership, the assignee, or the creator can cancel"
+    guard self.status != "completed" "Completed tasks cannot be cancelled"
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate cancellationReason = reason
+  }
+
+  command reopen() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "taskWrite") or self.assignedToId == user.personId or self.createdById == user.personId
+      "Leadership, the assignee, or the creator can reopen"
+    guard self.status == "cancelled" "Only cancelled tasks can be reopened"
+    mutate status = "pending"
+    mutate cancelledAt = null
+    mutate cancellationReason = null
+  }
+
+  store Task in durable
+}
