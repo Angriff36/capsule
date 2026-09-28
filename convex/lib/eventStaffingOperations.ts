@@ -4,6 +4,7 @@ import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { getAuthContext } from "./authContext";
 import { readEventTimingPlan } from "./eventTimingOperations";
+import { proposeShiftChange, publishedNoticeFor } from "./shiftTimingProposals";
 
 type StaffingSource = {
   id: string;
@@ -717,7 +718,16 @@ export async function reconcileEventStaffing(ctx: MutationCtx, eventId: Id<"even
       requirements.push(...existingRequirements);
       if (current && await shiftMeetsCoverageRequirements(ctx, current, requirements)) {
         used.add(current._id);
-        if (!sameTime(current.startsAt, interval.startsAt) || !sameTime(current.endsAt, interval.endsAt) ||
+        const moves = !sameTime(current.startsAt, interval.startsAt) || !sameTime(current.endsAt, interval.endsAt);
+        // A published shift was already told to the person: propose the new
+        // time for a manager to send, never move it silently (spec §8.4).
+        const notice = moves ? await publishedNoticeFor(ctx, current) : null;
+        if (notice) {
+          await proposeShiftChange(ctx, current, notice, {
+            startsAt: interval.startsAt, endsAt: interval.endsAt,
+            sourceIds: ids, role: sourceRoles(interval.sources),
+          });
+        } else if (moves ||
           JSON.stringify(current.eventStaffingSourceIds ?? []) !== JSON.stringify(ids) || current.role !== sourceRoles(interval.sources)) {
           await ctx.runMutation(api.mutations.Shift_planEventTiming, {
             docId: current._id, version: current.version, startsAt: interval.startsAt,
@@ -746,7 +756,13 @@ export async function reconcileEventStaffing(ctx: MutationCtx, eventId: Id<"even
         shift.eventStaffingSourceIds?.includes(source.id));
       if (incomplete.length) {
         // Keep the same planning record, but remove obsolete calculated dates.
-        if (shift.startsAt != null || shift.endsAt != null || shift.scheduledAt != null) {
+        const notice = await publishedNoticeFor(ctx, shift);
+        if (notice) {
+          await proposeShiftChange(ctx, shift, notice, {
+            startsAt: null, endsAt: null,
+            sourceIds: sourceIds(incomplete), role: sourceRoles(incomplete),
+          });
+        } else if (shift.startsAt != null || shift.endsAt != null || shift.scheduledAt != null) {
           await ctx.runMutation(api.mutations.Shift_planEventTiming, {
             docId: shift._id, version: shift.version, eventStaffingSourceIds: sourceIds(incomplete), role: sourceRoles(incomplete),
           });
