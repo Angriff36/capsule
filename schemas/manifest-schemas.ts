@@ -1057,6 +1057,8 @@ export const EventAssignmentSchema = z.object({
   startsAt: z.coerce.date().nullable().optional(),
   endsAt: z.coerce.date().nullable().optional(),
   followsEventTiming: z.boolean().nullable().optional(),
+  rideVehicleAssignmentId: z.string().uuid().nullable().optional(),
+  meetsAtVenue: z.boolean().nullable().optional(),
   notes: z.string().nullable().optional(),
   status: z.enum(["assigned", "confirmed", "checked_in", "checked_out", "no_show", "unassigned"]).default("assigned"),
   assignedAt: z.coerce.date().nullable().optional(),
@@ -1373,6 +1375,8 @@ export const EventStaffNeedSchema = z.object({
   startsAt: z.coerce.date().nullable().optional(),
   endsAt: z.coerce.date().nullable().optional(),
   followsEventTiming: z.boolean().nullable().optional(),
+  rideVehicleAssignmentId: z.string().uuid().nullable().optional(),
+  meetsAtVenue: z.boolean().nullable().optional(),
   status: z.enum(["open", "claimed", "filled", "cancelled"]).default("open"),
   claimedByPersonId: z.string().uuid().nullable().optional(),
   filledByPersonId: z.string().uuid().nullable().optional(),
@@ -1485,6 +1489,10 @@ export const EventVehicleAssignmentSchema = z.object({
   assignedAt: z.coerce.date().nullable().optional(),
   preloadedAt: z.coerce.date().nullable().optional(),
   releasedAt: z.coerce.date().nullable().optional(),
+  vendorName: z.string().nullable().optional(),
+  arriveBeforeServeMinutes: z.number().nullable().optional(),
+  loadMinutes: z.number().nullable().optional(),
+  leaveAfterMinutes: z.number().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -5892,6 +5900,14 @@ export const EventAssignmentCheckOutParamsSchema = z.object({});
 
 export type EventAssignmentCheckOutParams = z.infer<typeof EventAssignmentCheckOutParamsSchema>;
 
+// Command: chooseTravelLeg on EventAssignment
+export const EventAssignmentChooseTravelLegParamsSchema = z.object({
+  rideVehicleAssignmentId: z.string().uuid().optional(),
+  meetsAtVenue: z.boolean().optional(),
+});
+
+export type EventAssignmentChooseTravelLegParams = z.infer<typeof EventAssignmentChooseTravelLegParamsSchema>;
+
 // Command: confirm on EventAssignment
 export const EventAssignmentConfirmParamsSchema = z.object({});
 
@@ -6259,6 +6275,14 @@ export const EventStaffNeedChangeCoverageParamsSchema = z.object({
 
 export type EventStaffNeedChangeCoverageParams = z.infer<typeof EventStaffNeedChangeCoverageParamsSchema>;
 
+// Command: chooseTravelLeg on EventStaffNeed
+export const EventStaffNeedChooseTravelLegParamsSchema = z.object({
+  rideVehicleAssignmentId: z.string().uuid().optional(),
+  meetsAtVenue: z.boolean().optional(),
+});
+
+export type EventStaffNeedChooseTravelLegParams = z.infer<typeof EventStaffNeedChooseTravelLegParamsSchema>;
+
 // Command: claim on EventStaffNeed
 export const EventStaffNeedClaimParamsSchema = z.object({
   personId: z.string().min(1),
@@ -6439,6 +6463,7 @@ export const EventVehicleAssignmentAssignParamsSchema = z.object({
   driverId: z.string().min(1).optional(),
   notes: z.string().optional(),
   preloaded: z.boolean().optional(),
+  vendorName: z.string().optional(),
 });
 
 export type EventVehicleAssignmentAssignParams = z.infer<typeof EventVehicleAssignmentAssignParamsSchema>;
@@ -6452,6 +6477,15 @@ export type EventVehicleAssignmentClearPreloadedParams = z.infer<typeof EventVeh
 export const EventVehicleAssignmentMarkPreloadedParamsSchema = z.object({});
 
 export type EventVehicleAssignmentMarkPreloadedParams = z.infer<typeof EventVehicleAssignmentMarkPreloadedParamsSchema>;
+
+// Command: planLeg on EventVehicleAssignment
+export const EventVehicleAssignmentPlanLegParamsSchema = z.object({
+  arriveBeforeServeMinutes: z.number().optional(),
+  loadMinutes: z.number().optional(),
+  leaveAfterMinutes: z.number().optional(),
+});
+
+export type EventVehicleAssignmentPlanLegParams = z.infer<typeof EventVehicleAssignmentPlanLegParamsSchema>;
 
 // Command: release on EventVehicleAssignment
 export const EventVehicleAssignmentReleaseParamsSchema = z.object({});

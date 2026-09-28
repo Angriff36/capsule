@@ -44,6 +44,7 @@ import { recordAcceptedProposalRevision } from "./proposalAcceptanceRevision";
 import { deleteBlobIfOrphan } from "./blobs";
 import { queueRouteRefresh } from "./routeFollowUp";
 import { queueTimingRecalculation } from "./timingFollowUp";
+import { handleTravelLegEvent } from "./travelLegEvents";
 
 /** Runs after declared reactions, inside the originating command transaction. */
 export async function handleManifestEvent(
@@ -52,6 +53,7 @@ export async function handleManifestEvent(
 ): Promise<void> {
   await queueRouteRefresh(ctx, event);
   await queueTimingRecalculation(ctx, event);
+  if (await handleTravelLegEvent(ctx, event)) return;
   if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedCoverageChangeRequested") {
     await prepareStaffNeedCoverageChange(ctx, event.entityId as Id<"eventStaffNeeds">);
     return;

@@ -292,9 +292,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // EventVehicleAssignment has multiple initialization commands (assign, release); using the selected initialization command: assign.
   // EventVehicleAssignment → api.mutations.EventVehicleAssignment_createViaAssign
   rowsAttempted += 1;
-  await client.mutation(api.mutations.EventVehicleAssignment_createViaAssign, { "eventId": "eventId-event-vehicle-assignment-1", "vehicleId": "vehicleId-event-vehicle-assignment-1", "trailerId": "trailerId-event-vehicle-assignment-1", "driverId": "driverId-event-vehicle-assignment-1", "notes": "demo-notes-1" } as any);
+  await client.mutation(api.mutations.EventVehicleAssignment_createViaAssign, { "eventId": "eventId-event-vehicle-assignment-1", "vehicleId": "vehicleId-event-vehicle-assignment-1", "trailerId": "trailerId-event-vehicle-assignment-1", "driverId": "driverId-event-vehicle-assignment-1", "notes": "demo-notes-1", "vendorName": "EventVehicleAssignment 1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.EventVehicleAssignment_createViaAssign, { "eventId": "eventId-event-vehicle-assignment-2", "vehicleId": "vehicleId-event-vehicle-assignment-2", "trailerId": "trailerId-event-vehicle-assignment-2", "driverId": "driverId-event-vehicle-assignment-2", "notes": "demo-notes-2" } as any);
+  await client.mutation(api.mutations.EventVehicleAssignment_createViaAssign, { "eventId": "eventId-event-vehicle-assignment-2", "vehicleId": "vehicleId-event-vehicle-assignment-2", "trailerId": "trailerId-event-vehicle-assignment-2", "driverId": "driverId-event-vehicle-assignment-2", "notes": "demo-notes-2", "vendorName": "EventVehicleAssignment 2" } as any);
   // ExternalRecordLink has multiple initialization commands (discard, link, unlinkExternalRecord, updateCapsuleId); using the selected initialization command: link.
   // ExternalRecordLink → api.mutations.ExternalRecordLink_createViaLink
   rowsAttempted += 1;

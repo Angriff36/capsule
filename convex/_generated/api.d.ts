@@ -37,6 +37,7 @@ import type * as equipmentCheckout from "../equipmentCheckout.js";
 import type * as eventCreateCatalog from "../eventCreateCatalog.js";
 import type * as eventDayBriefing from "../eventDayBriefing.js";
 import type * as eventReadiness from "../eventReadiness.js";
+import type * as eventRouteLegs from "../eventRouteLegs.js";
 import type * as eventRoutes from "../eventRoutes.js";
 import type * as eventTimingRules from "../eventTimingRules.js";
 import type * as fileStorage from "../fileStorage.js";
@@ -89,6 +90,7 @@ import type * as lib_eventPacket_finalLock from "../lib/eventPacket/finalLock.js
 import type * as lib_eventPacket_finalLockInput from "../lib/eventPacket/finalLockInput.js";
 import type * as lib_eventPacket_reconcileNative from "../lib/eventPacket/reconcileNative.js";
 import type * as lib_eventReadinessProjection from "../lib/eventReadinessProjection.js";
+import type * as lib_eventRouteLegRead from "../lib/eventRouteLegRead.js";
 import type * as lib_eventStaffingOperations from "../lib/eventStaffingOperations.js";
 import type * as lib_eventTimingOperations from "../lib/eventTimingOperations.js";
 import type * as lib_eventTimingPolicy from "../lib/eventTimingPolicy.js";
@@ -174,6 +176,7 @@ import type * as lib_teamChatRead from "../lib/teamChatRead.js";
 import type * as lib_teamChatScan from "../lib/teamChatScan.js";
 import type * as lib_tenantSystemCommandRunner from "../lib/tenantSystemCommandRunner.js";
 import type * as lib_timingFollowUp from "../lib/timingFollowUp.js";
+import type * as lib_travelLegEvents from "../lib/travelLegEvents.js";
 import type * as lib_twilio from "../lib/twilio.js";
 import type * as lib_typicalKitchenDensity from "../lib/typicalKitchenDensity.js";
 import type * as lib_usdaCountPortionGrams from "../lib/usdaCountPortionGrams.js";
@@ -258,6 +261,7 @@ declare const fullApi: ApiFromModules<{
   eventCreateCatalog: typeof eventCreateCatalog;
   eventDayBriefing: typeof eventDayBriefing;
   eventReadiness: typeof eventReadiness;
+  eventRouteLegs: typeof eventRouteLegs;
   eventRoutes: typeof eventRoutes;
   eventTimingRules: typeof eventTimingRules;
   fileStorage: typeof fileStorage;
@@ -310,6 +314,7 @@ declare const fullApi: ApiFromModules<{
   "lib/eventPacket/finalLockInput": typeof lib_eventPacket_finalLockInput;
   "lib/eventPacket/reconcileNative": typeof lib_eventPacket_reconcileNative;
   "lib/eventReadinessProjection": typeof lib_eventReadinessProjection;
+  "lib/eventRouteLegRead": typeof lib_eventRouteLegRead;
   "lib/eventStaffingOperations": typeof lib_eventStaffingOperations;
   "lib/eventTimingOperations": typeof lib_eventTimingOperations;
   "lib/eventTimingPolicy": typeof lib_eventTimingPolicy;
@@ -395,6 +400,7 @@ declare const fullApi: ApiFromModules<{
   "lib/teamChatScan": typeof lib_teamChatScan;
   "lib/tenantSystemCommandRunner": typeof lib_tenantSystemCommandRunner;
   "lib/timingFollowUp": typeof lib_timingFollowUp;
+  "lib/travelLegEvents": typeof lib_travelLegEvents;
   "lib/twilio": typeof lib_twilio;
   "lib/typicalKitchenDensity": typeof lib_typicalKitchenDensity;
   "lib/usdaCountPortionGrams": typeof lib_usdaCountPortionGrams;

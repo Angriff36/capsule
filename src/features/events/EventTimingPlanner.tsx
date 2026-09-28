@@ -10,6 +10,7 @@ import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
 import { EventDriveTimePanel } from "./EventDriveTimePanel";
+import { EventRouteLegsPanel } from "./EventRouteLegsPanel";
 import { EventTimingRulesPanel } from "./EventTimingRulesPanel";
 import {
   durationFields,
@@ -368,6 +369,10 @@ export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
               );
             })}
           </ul>
+          <EventRouteLegsPanel
+            eventId={eventId}
+            canChange={plan.event.timingCanRecalculate}
+          />
         </>
       )}
     </section>

@@ -162,6 +162,7 @@ import {
   EventAssignmentAssignParamsSchema,
   EventAssignmentCheckInParamsSchema,
   EventAssignmentCheckOutParamsSchema,
+  EventAssignmentChooseTravelLegParamsSchema,
   EventAssignmentConfirmParamsSchema,
   EventAssignmentMarkNoShowParamsSchema,
   EventAssignmentPlanTimingParamsSchema,
@@ -233,6 +234,7 @@ import {
   EventStaffNeedApplyApprovedShiftSwapParamsSchema,
   EventStaffNeedCancelParamsSchema,
   EventStaffNeedChangeCoverageParamsSchema,
+  EventStaffNeedChooseTravelLegParamsSchema,
   EventStaffNeedClaimParamsSchema,
   EventStaffNeedFillParamsSchema,
   EventStaffNeedPlanTimingParamsSchema,
@@ -264,6 +266,7 @@ import {
   EventVehicleAssignmentAssignParamsSchema,
   EventVehicleAssignmentClearPreloadedParamsSchema,
   EventVehicleAssignmentMarkPreloadedParamsSchema,
+  EventVehicleAssignmentPlanLegParamsSchema,
   EventVehicleAssignmentReleaseParamsSchema,
   ExternalRecordLinkDecideParamsSchema,
   ExternalRecordLinkDiscardParamsSchema,
@@ -3543,6 +3546,16 @@ export function useEventAssignmentCheckOut() {
   };
 }
 
+/** Mutation hook for EventAssignment.chooseTravelLeg. */
+export function useEventAssignmentChooseTravelLeg() {
+  const mutate = useMutation(api.mutations.EventAssignment_chooseTravelLeg);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventAssignmentChooseTravelLegParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for EventAssignment.confirm. */
 export function useEventAssignmentConfirm() {
   const mutate = useMutation(api.mutations.EventAssignment_confirm);
@@ -4201,6 +4214,16 @@ export function useEventStaffNeedChangeCoverage() {
   };
 }
 
+/** Mutation hook for EventStaffNeed.chooseTravelLeg. */
+export function useEventStaffNeedChooseTravelLeg() {
+  const mutate = useMutation(api.mutations.EventStaffNeed_chooseTravelLeg);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventStaffNeedChooseTravelLegParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for EventStaffNeed.claim. */
 export function useEventStaffNeedClaim() {
   const mutate = useMutation(api.mutations.EventStaffNeed_claim);
@@ -4501,6 +4524,16 @@ export function useEventVehicleAssignmentMarkPreloaded() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventVehicleAssignmentMarkPreloadedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventVehicleAssignment.planLeg. */
+export function useEventVehicleAssignmentPlanLeg() {
+  const mutate = useMutation(api.mutations.EventVehicleAssignment_planLeg);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventVehicleAssignmentPlanLegParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11619,4 +11652,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1233 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1236 as const;

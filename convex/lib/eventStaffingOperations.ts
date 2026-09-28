@@ -4,6 +4,8 @@ import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { getAuthContext } from "./authContext";
 import { readEventTimingPlan } from "./eventTimingOperations";
+import { readEventRouteLegs } from "./eventRouteLegRead";
+import { crewWindowForLeg, type CrewLegChoice } from "../../src/lib/eventRouteLegs";
 import { proposeShiftChange, publishedNoticeFor } from "./shiftTimingProposals";
 
 type StaffingSource = {
@@ -71,7 +73,11 @@ function storedStaffingSources(rows: Awaited<ReturnType<typeof readStaffingRows>
   ];
 }
 
-async function readCrewWindow(ctx: MutationCtx, eventId: Id<"events">) {
+/**
+ * The window of the run this person travels with (PL-ROUTE-LEGS): a truck on
+ * the event, straight to the venue, or (no choice) the main crew timeline.
+ */
+async function readCrewWindow(ctx: MutationCtx, eventId: Id<"events">, choice?: CrewLegChoice) {
   const timing = await readEventTimingPlan(ctx, eventId);
   const crewTime = (key: "staff_on" | "staff_off") => {
     const milestone = timing.milestones.find((row) => row.key === key)!;
@@ -79,7 +85,12 @@ async function readCrewWindow(ctx: MutationCtx, eventId: Id<"events">) {
     return time(milestone.row && (milestone.manual || milestone.performed)
       ? milestone.row.startsAt : milestone.startsAt);
   };
-  return { startsAt: crewTime("staff_on"), endsAt: crewTime("staff_off") };
+  const main = { startsAt: crewTime("staff_on"), endsAt: crewTime("staff_off") };
+  if (!choice?.rideVehicleAssignmentId && choice?.meetsAtVenue !== true) return main;
+  const legs = await readEventRouteLegs(ctx, eventId, timing.event.tenantId);
+  if (!legs) return main;
+  const { startsAt, endsAt } = crewWindowForLeg(legs, choice, main);
+  return { startsAt, endsAt };
 }
 
 function shiftPreservesWork(shift: Doc<"shifts">, workedShiftIds: Set<string>) {
@@ -142,7 +153,7 @@ export async function validateEventStaffingTiming(
     shift.startedAt != null || shift.completedAt != null || shift.noShowAt != null))
     throw new ConvexError("Recorded work keeps its staffing window.");
   if (row.followsEventTiming === true) {
-    const crew = await readCrewWindow(ctx, row.eventId);
+    const crew = await readCrewWindow(ctx, row.eventId, row);
     if (!sameTime(row.startsAt, crew.startsAt) || !sameTime(row.endsAt, crew.endsAt) ||
       linked.some((shift) => shift.eventStaffingManagedAt == null))
       throw new ConvexError("Calculated staffing must match the event crew timeline.");
@@ -489,7 +500,7 @@ export async function validateFilledCoverageCredentials(ctx: MutationCtx, id: Id
   const need = await ctx.db.get(id);
   if (!need?.filledByPersonId || !need.previousStaffNeedId) return;
   const requirements = await inheritedCoverageRequirements(ctx, need);
-  const end = followsTiming(need) ? (await readCrewWindow(ctx, need.eventId)).endsAt : time(need.endsAt);
+  const end = followsTiming(need) ? (await readCrewWindow(ctx, need.eventId, need)).endsAt : time(need.endsAt);
   await resolveCoverageCredentials(ctx, need.tenantId, need.filledByPersonId, end, requirements);
 }
 
@@ -653,7 +664,10 @@ export async function reconcileEventStaffing(ctx: MutationCtx, eventId: Id<"even
     return;
   }
 
-  const { startsAt: crewStartsAt, endsAt: crewEndsAt } = await readCrewWindow(ctx, eventId);
+  const crewWindow = await readCrewWindow(ctx, eventId);
+  const windowFor = (row: CrewLegChoice) =>
+    row.rideVehicleAssignmentId || row.meetsAtVenue === true
+      ? readCrewWindow(ctx, eventId, row) : crewWindow;
   const preservedIds = preservedStaffingSourceIds({
     assignments: local(assignments), needs: local(needs), shifts: local(shifts), records: local(records),
   });
@@ -663,8 +677,9 @@ export async function reconcileEventStaffing(ctx: MutationCtx, eventId: Id<"even
     const performed = row.checkedInAt != null || row.checkedOutAt != null || row.noShowAt != null ||
       preservedIds.has(row._id);
     const followsEventTiming = followsTiming(row);
-    const startsAt = followsEventTiming && !performed ? crewStartsAt : time(row.startsAt);
-    const endsAt = followsEventTiming && !performed ? crewEndsAt : time(row.endsAt);
+    const crew = followsEventTiming && !performed ? await windowFor(row) : null;
+    const startsAt = crew ? crew.startsAt : time(row.startsAt);
+    const endsAt = crew ? crew.endsAt : time(row.endsAt);
     if (followsEventTiming && !performed && (!sameTime(row.startsAt, startsAt) ||
       !sameTime(row.endsAt, endsAt) || row.followsEventTiming !== true)) {
       await ctx.runMutation(api.mutations.EventAssignment_planTiming, {
@@ -679,8 +694,9 @@ export async function reconcileEventStaffing(ctx: MutationCtx, eventId: Id<"even
     if (row.status === "cancelled") continue;
     const followsEventTiming = followsTiming(row);
     const performed = preservedIds.has(row._id);
-    const startsAt = followsEventTiming && !performed ? crewStartsAt : time(row.startsAt);
-    const endsAt = followsEventTiming && !performed ? crewEndsAt : time(row.endsAt);
+    const crew = followsEventTiming && !performed ? await windowFor(row) : null;
+    const startsAt = crew ? crew.startsAt : time(row.startsAt);
+    const endsAt = crew ? crew.endsAt : time(row.endsAt);
     if (followsEventTiming && !performed && (!sameTime(row.startsAt, startsAt) ||
       !sameTime(row.endsAt, endsAt) || row.followsEventTiming !== true)) {
       await ctx.runMutation(api.mutations.EventStaffNeed_planTiming, {
