@@ -35,6 +35,8 @@ import { PurchasingCommandForm } from "./PurchasingCommandForm";
 import { PurchasingQueueSplit } from "./PurchasingQueueSplit";
 import { purchasingStockContext } from "./purchasingStockContext";
 import { SeasonalDemandForecast } from "./SeasonalDemandForecast";
+import { SentOrderSurplusPanel } from "./SentOrderSurplusPanel";
+import { sentOrderSurplus } from "./sentOrderSurplus";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
@@ -512,6 +514,12 @@ export function PurchasingPage() {
           </div>
         )}
       </section>
+
+      <SentOrderSurplusPanel
+        rows={sentOrderSurplus({ needs: needs ?? [], orders: orders ?? [] })}
+        eventName={eventName}
+        ingredientName={ingredientName}
+      />
 
       <PurchasingQueueSplit
         needsLoading={

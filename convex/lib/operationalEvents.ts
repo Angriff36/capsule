@@ -33,6 +33,7 @@ import { validateScheduledShift, validateShiftWindow } from "./shiftSchedulingEv
 import {
   adoptLegacyDraftQuantity,
   reconcileCancelledPurchaseDrafts,
+  retireCoveredZeroLine,
   retireUnusedAutomaticDraft,
 } from "./purchasingEvents";
 import { moveEventPurchasingWeek } from "./purchasingReschedule";
@@ -376,6 +377,7 @@ export async function handleManifestEvent(
       event.entityId as Id<"vendorOrderLines">,
       event.eventId,
     );
+    await retireCoveredZeroLine(ctx, event.entityId as Id<"vendorOrderLines">);
     return;
   }
   if (

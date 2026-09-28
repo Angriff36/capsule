@@ -6,12 +6,17 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { api } from "../../convex/_generated/api";
 import {
+  sentOrderSurplus,
+  type SurplusNeed,
+} from "../../src/features/inventory/sentOrderSurplus";
+import {
   approvedEvent,
   drafts,
   harness,
   lineFor,
   linesOf,
   linkedEventIds,
+  liveRows,
   orders,
   readRow,
   rolesFor,
@@ -123,5 +128,78 @@ describe("runtime proof: demand after the order is sent (AC-474)", () => {
     expect(await readRow<LineRow>(roles.procurement, sentLine!._id)).toEqual(
       sentLineBefore,
     );
+
+    // Falling back below the sent amount: the delta draft has nothing left
+    // to buy and goes away; the sent order is still untouched.
+    await events(M.Event_changeHeadcount, {
+      docId: eventId,
+      version: await versionOf(roles.events, eventId),
+      newHeadcount: 30,
+    });
+    expect(await drafts(roles.procurement, tenantId)).toHaveLength(0);
+    expect(await readRow<LineRow>(roles.procurement, sentLine!._id)).toEqual(
+      sentLineBefore,
+    );
+  });
+
+  // BE-10.5: less demand after sending shows the buyer the extra; the sent
+  // order is still not rewritten and no draft appears.
+  it("demand falling after submission leaves the sent order alone and shows the extra to the buyer", async () => {
+    const proof = harness();
+    const tenantId = "tenant-ac474-post-submit-drop";
+    const roles = rolesFor(proof, tenantId);
+    const buyer = runner(proof, roles.procurement);
+    const events = runner(proof, roles.events);
+    const catalog = await seedCatalog(proof, tenantId, [
+      { name: "Chickpeas", perServing: 0.1 },
+    ]);
+    const [chickpeasId] = catalog.ingredientIds as [string];
+    const eventId = await approvedEvent(proof, tenantId, {
+      title: "AC-474 smaller party",
+      headcount: 40,
+      dishIds: catalog.dishIds,
+    });
+    const [draft] = await drafts(roles.procurement, tenantId);
+    const line = await lineFor(
+      roles.procurement,
+      tenantId,
+      draft!._id,
+      chickpeasId,
+    );
+    await buyer(M.VendorOrder_submit, {
+      docId: draft!._id,
+      version: draft!.version,
+    });
+    const sentLine = await readRow<LineRow>(roles.procurement, line!._id);
+
+    await events(M.Event_changeHeadcount, {
+      docId: eventId,
+      version: await versionOf(roles.events, eventId),
+      newHeadcount: 30,
+    });
+
+    expect(await readRow<LineRow>(roles.procurement, line!._id)).toEqual(
+      sentLine,
+    );
+    // No empty "PO" draft with a zero line appears for the buyer.
+    expect(await drafts(roles.procurement, tenantId)).toHaveLength(0);
+    const surplus = sentOrderSurplus({
+      needs: await liveRows<SurplusNeed & { tenantId: string }>(
+        roles.procurement,
+        "purchaseNeeds",
+        tenantId,
+      ),
+      orders: await orders(roles.procurement, tenantId),
+    });
+    expect(surplus).toHaveLength(1);
+    expect(surplus[0]).toMatchObject({
+      eventId,
+      ingredientId: chickpeasId,
+      vendorOrderId: draft!._id,
+      orderedFor: 4,
+      nowNeeded: 3,
+      extra: 1,
+      eventCancelled: false,
+    });
   });
 });
