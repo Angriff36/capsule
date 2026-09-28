@@ -98,7 +98,7 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     guard self.driverId != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.driverId == user.id or roleAllows(user.role, "logisticsManageAccess")
+    guard (user.personId != null and self.driverId == user.personId) or roleAllows(user.role, "logisticsManageAccess")
     compute previousStatus = self.status
     mutate status = "in_transit"
     mutate departedAt = now()
@@ -119,7 +119,7 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     guard self.departedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.driverId == user.id or roleAllows(user.role, "logisticsManageAccess")
+    guard (user.personId != null and self.driverId == user.personId) or roleAllows(user.role, "logisticsManageAccess")
     compute previousStatus = self.status
     mutate status = "delivered"
     mutate deliveredAt = now()

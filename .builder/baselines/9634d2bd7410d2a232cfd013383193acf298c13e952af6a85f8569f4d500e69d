@@ -1224,7 +1224,7 @@ async function __runAvailabilityWindowDeclare(ctx: MutationCtx, { docId, personI
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
+    if (!((((user.personId != null) && (personId === user.personId)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     if (!((personId === doc.personId))) throw new Error("This availability is for a different person. Pick the person already on this availability.");
     if (!((endsAt > startsAt))) throw new Error("This availability ends before it starts. Pick an end that's later than the start.");
     if (version !== undefined && (doc as any).version !== version) {
@@ -1314,7 +1314,7 @@ export const AvailabilityWindow_createViaDeclare = mutation({
     if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
+    if (!((((user.personId != null) && (personId === user.personId)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     if (!((personId === __draft.personId))) throw new Error("This availability is for a different person. Pick the person already on this availability.");
     if (!((endsAt > startsAt))) throw new Error("This availability ends before it starts. Pick an end that's later than the start.");
     const doc: Record<string, any> = {
@@ -1355,7 +1355,7 @@ async function __runAvailabilityWindowWithdraw(ctx: MutationCtx, { docId, versio
     if (!((doc.declaredAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((doc.personId === user.personId) || ((user.personId == null) && (doc.personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
+    if (!((((user.personId != null) && (doc.personId === user.personId)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -8259,7 +8259,7 @@ async function __runDeliveryConfirmDelivery(ctx: MutationCtx, { docId, version }
     if (!((doc.departedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!(((doc.driverId === user.id) || checkRole(user, "logisticsManageAccess")))) throw new Error("Guard 4 failed");
+    if (!((((user.personId != null) && (doc.driverId === user.personId)) || checkRole(user, "logisticsManageAccess")))) throw new Error("Guard 4 failed");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -8621,7 +8621,7 @@ async function __runDeliveryStartTransit(ctx: MutationCtx, { docId, version }: a
     if (!((doc.driverId != null))) throw new Error("Guard 2 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 3 failed");
     if (!((user.id != null))) throw new Error("Guard 4 failed");
-    if (!(((doc.driverId === user.id) || checkRole(user, "logisticsManageAccess")))) throw new Error("Guard 5 failed");
+    if (!((((user.personId != null) && (doc.driverId === user.personId)) || checkRole(user, "logisticsManageAccess")))) throw new Error("Guard 5 failed");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -15445,7 +15445,7 @@ async function __runEventAssignmentCheckIn(ctx: MutationCtx, { docId, version }:
     if (!((doc.assignedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((doc.personId === user.personId) || ((user.personId == null) && (doc.personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
+    if (!((((user.personId != null) && (doc.personId === user.personId)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -15513,7 +15513,7 @@ async function __runEventAssignmentCheckOut(ctx: MutationCtx, { docId, version }
     if (!((doc.checkedInAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((doc.personId === user.personId) || ((user.personId == null) && (doc.personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
+    if (!((((user.personId != null) && (doc.personId === user.personId)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -15581,7 +15581,7 @@ async function __runEventAssignmentConfirm(ctx: MutationCtx, { docId, version }:
     if (!((doc.assignedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((doc.personId === user.personId) || ((user.personId == null) && (doc.personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
+    if (!((((user.personId != null) && (doc.personId === user.personId)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -19525,7 +19525,7 @@ async function __runEventStaffNeedClaim(ctx: MutationCtx, { docId, personId, ver
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may see shared event staffing");
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
-    if (!(((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")) || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 0 failed");
+    if (!(((((user.personId != null) && (personId === user.personId)) || checkRole(user, "workforceManageAccess")) || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 0 failed");
     if (!((doc.status === "open"))) throw new Error("Guard 1 failed");
     if (!((doc.postedAt != null))) throw new Error("Guard 2 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 3 failed");
@@ -19924,7 +19924,7 @@ async function __runEventStaffNeedReleaseClaim(ctx: MutationCtx, { docId, versio
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may see shared event staffing");
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
-    if (!(((((doc.claimedByPersonId === user.personId) || ((user.personId == null) && (doc.claimedByPersonId === user.id))) || checkRole(user, "workforceManageAccess")) || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 0 failed");
+    if (!(((((user.personId != null) && (doc.claimedByPersonId === user.personId)) || checkRole(user, "workforceManageAccess")) || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 0 failed");
     if (!((doc.status === "claimed"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     {
@@ -37895,7 +37895,7 @@ async function __runPrepTaskRelease(ctx: MutationCtx, { docId, version }: any, _
     if (!((doc.status === "claimed"))) throw new Error("Guard 0 failed");
     if (!((doc.claimedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((doc.assignedToId === user.id) || checkRole(user, "kitchenLeadAccess")))) throw new Error("Guard 3 failed");
+    if (!((((user.personId != null) && (doc.assignedToId === user.personId)) || checkRole(user, "kitchenLeadAccess")))) throw new Error("Guard 3 failed");
     const previousStatus = doc.status;
     const previousAssignee = doc.assignedToId;
     {
@@ -43920,7 +43920,7 @@ async function __runRecurringAvailabilityDeclare(ctx: MutationCtx, { docId, pers
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
+    if (!((((user.personId != null) && (personId === user.personId)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     if (!((personId === doc.personId))) throw new Error("This availability is for a different person. Pick the person already on this availability.");
     if (!(((dayOfWeek >= 0) && (dayOfWeek <= 6)))) throw new Error("Pick a day 0 through 6, Sunday through Saturday.");
     if (!((((startMinute >= 0) && (endMinute <= 1440)) && (endMinute > startMinute)))) throw new Error("Pick a start and end time within the day, with the end after the start.");
@@ -44011,7 +44011,7 @@ export const RecurringAvailability_createViaDeclare = mutation({
     if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
+    if (!((((user.personId != null) && (personId === user.personId)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     if (!((personId === __draft.personId))) throw new Error("This availability is for a different person. Pick the person already on this availability.");
     if (!(((dayOfWeek >= 0) && (dayOfWeek <= 6)))) throw new Error("Pick a day 0 through 6, Sunday through Saturday.");
     if (!((((startMinute >= 0) && (endMinute <= 1440)) && (endMinute > startMinute)))) throw new Error("Pick a start and end time within the day, with the end after the start.");
@@ -44053,7 +44053,7 @@ async function __runRecurringAvailabilityWithdraw(ctx: MutationCtx, { docId, ver
     if (!((doc.declaredAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((doc.personId === user.personId) || ((user.personId == null) && (doc.personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
+    if (!((((user.personId != null) && (doc.personId === user.personId)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -46776,7 +46776,7 @@ async function __runShiftComplete(ctx: MutationCtx, { docId, version }: any, __c
     if (!((doc.startedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((doc.personId === user.personId) || ((user.personId == null) && (doc.personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
+    if (!((((user.personId != null) && (doc.personId === user.personId)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -47433,7 +47433,7 @@ async function __runShiftStart(ctx: MutationCtx, { docId, version }: any, __crea
     if (!((doc.scheduledAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((doc.personId === user.personId) || ((user.personId == null) && (doc.personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
+    if (!((((user.personId != null) && (doc.personId === user.personId)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -51305,7 +51305,7 @@ async function __runTimeRecordClockIn(ctx: MutationCtx, { docId, personId, shift
     if (!((doc.status === "open"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
+    if (!((((user.personId != null) && (personId === user.personId)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 5 failed");
     if (!((personId === doc.personId))) throw new Error("This clock-in is for a different person. Pick the person already on this time entry.");
     if (!((((shiftId == null) || (doc.shiftId == null)) || (shiftId === doc.shiftId)))) throw new Error("This clock-in is for a different shift. Leave the shift blank or pick the one already on this time entry.");
@@ -51395,7 +51395,7 @@ export const TimeRecord_createViaClockIn = mutation({
     if (!((__draft.status === "open"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
+    if (!((((user.personId != null) && (personId === user.personId)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 5 failed");
     if (!((personId === __draft.personId))) throw new Error("This clock-in is for a different person. Pick the person already on this time entry.");
     if (!((((shiftId == null) || (__draft.shiftId == null)) || (shiftId === __draft.shiftId)))) throw new Error("This clock-in is for a different shift. Leave the shift blank or pick the one already on this time entry.");
@@ -51438,7 +51438,7 @@ async function __runTimeRecordClockOut(ctx: MutationCtx, { docId, breakMinutes, 
     if (!((doc.clockOutAt == null))) throw new Error("Guard 2 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 3 failed");
     if (!((user.id != null))) throw new Error("Guard 4 failed");
-    if (!((((doc.personId === user.personId) || ((user.personId == null) && (doc.personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 5 failed");
+    if (!((((user.personId != null) && (doc.personId === user.personId)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 5 failed");
     if (!(((breakMinutes == null) || (breakMinutes >= 0)))) throw new Error("Break minutes can't be negative. Use zero or more.");
     {
       const __cur = doc.status;

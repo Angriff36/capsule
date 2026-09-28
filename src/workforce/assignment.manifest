@@ -142,7 +142,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     guard self.assignedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
+    guard (user.personId != null and self.personId == user.personId) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "confirmed"
     mutate confirmedAt = now()
@@ -162,7 +162,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     guard self.assignedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
+    guard (user.personId != null and self.personId == user.personId) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "checked_in"
     mutate checkedInAt = now()
@@ -182,7 +182,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     guard self.checkedInAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
+    guard (user.personId != null and self.personId == user.personId) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "checked_out"
     mutate checkedOutAt = now()
@@ -346,7 +346,7 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
 
   command claim(personId: uuid) {
     // Staff volunteer themselves; managers may claim on a crew member's behalf.
-    guard personId == user.personId or (user.personId == null and personId == user.id) or roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
+    guard (user.personId != null and personId == user.personId) or roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
     guard self.status == "open"
     guard self.postedAt != null
     guard self.deletedAt == null
@@ -400,7 +400,7 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
   }
 
   command releaseClaim() {
-    guard self.claimedByPersonId == user.personId or (user.personId == null and self.claimedByPersonId == user.id) or roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
+    guard (user.personId != null and self.claimedByPersonId == user.personId) or roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
     guard self.status == "claimed"
     guard self.deletedAt == null
     mutate claimedByPersonId = null

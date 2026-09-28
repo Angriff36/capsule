@@ -198,7 +198,7 @@ entity AvailabilityWindow mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard user.id != null
-    guard personId == user.personId or (user.personId == null and personId == user.id) or roleAllows(user.role, "workforceManageAccess")
+    guard (user.personId != null and personId == user.personId) or roleAllows(user.role, "workforceManageAccess")
     constraint declarePersonMatch: personId == self.personId "This availability is for a different person. Pick the person already on this availability."
     constraint declareDates: endsAt > startsAt "This availability ends before it starts. Pick an end that's later than the start."
     mutate personId = personId
@@ -223,7 +223,7 @@ entity AvailabilityWindow mixin TenantScoped, SoftDeletable {
     guard self.declaredAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
+    guard (user.personId != null and self.personId == user.personId) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "withdrawn"
     mutate withdrawnAt = now()
@@ -303,7 +303,7 @@ entity RecurringAvailability mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard user.id != null
-    guard personId == user.personId or (user.personId == null and personId == user.id) or roleAllows(user.role, "workforceManageAccess")
+    guard (user.personId != null and personId == user.personId) or roleAllows(user.role, "workforceManageAccess")
     constraint declarePersonMatch: personId == self.personId "This availability is for a different person. Pick the person already on this availability."
     constraint declareDayOfWeek: dayOfWeek >= 0 and dayOfWeek <= 6 "Pick a day 0 through 6, Sunday through Saturday."
     constraint declareMinutes: startMinute >= 0 and endMinute <= 1440 and endMinute > startMinute "Pick a start and end time within the day, with the end after the start."
@@ -329,7 +329,7 @@ entity RecurringAvailability mixin TenantScoped, SoftDeletable {
     guard self.declaredAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
+    guard (user.personId != null and self.personId == user.personId) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "withdrawn"
     mutate withdrawnAt = now()

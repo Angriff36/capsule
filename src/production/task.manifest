@@ -439,7 +439,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "claimed"
     guard self.claimedAt != null
     guard self.deletedAt == null
-    guard self.assignedToId == user.id or roleAllows(user.role, "kitchenLeadAccess")
+    guard (user.personId != null and self.assignedToId == user.personId) or roleAllows(user.role, "kitchenLeadAccess")
     compute previousStatus = self.status
     compute previousAssignee = self.assignedToId
     mutate assignedToId = null

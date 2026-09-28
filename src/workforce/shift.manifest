@@ -207,7 +207,7 @@ entity Shift mixin TenantScoped, SoftDeletable {
     guard self.scheduledAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
+    guard (user.personId != null and self.personId == user.personId) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "started"
     mutate startedAt = now()
@@ -228,7 +228,7 @@ entity Shift mixin TenantScoped, SoftDeletable {
     guard self.startedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
+    guard (user.personId != null and self.personId == user.personId) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "completed"
     mutate completedAt = now()
