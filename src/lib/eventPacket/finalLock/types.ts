@@ -152,6 +152,8 @@ export interface FinalLockInput {
     notes: string | null;
     /** The dish record the line names (its name can come from there). */
     dish: NativeRow | null;
+    /** Cost of one portion from its recipe, when every line's cost is known. */
+    portionCost: number | null;
   })[];
   timeline: (NativeRow & {
     name: string;

@@ -118,6 +118,7 @@ function input(): FinalLockInput {
       followsEventHeadcount: true,
       notes: null,
       dish: { id: `dish-record-${i}`, version: 1 },
+      portionCost: null as number | null,
     })),
     timeline: [],
     vehicles: [
@@ -736,6 +737,61 @@ describe("Final Lock answer engine", () => {
     ]);
   });
 
+  it("validates buffet arrangement standard and records deliberate exceptions", () => {
+    // Three hot items in order: one table holds two, so a second table or chafer rotation.
+    const std = get(run(input()).answers, "buffet.arrangement");
+    expect(std.result).toBe("answered");
+    expect(std.value).toMatchObject({
+      fields: { tables: "Two tables for the hot items, or rotate chafers" },
+    });
+    expect(std.sources).toContainEqual({
+      table: "dishes",
+      id: "dish-record-3",
+      version: 1,
+    });
+
+    // Two proteins: the less expensive goes first, when both costs are known.
+    const i = input();
+    i.dishes.push({
+      ...i.dishes[3]!,
+      id: "dish-beef",
+      name: "Beef Brisket",
+      dish: { id: "dish-record-beef", version: 1 },
+    });
+    i.event.text.buffetHotPlates = "Green Beans, Beef Brisket, Chicken Marsala";
+    const unknownCost = get(run(i).answers, "buffet.arrangement");
+    expect(unknownCost.result).toBe("answered");
+    i.dishes.find((d) => d.id === "dish-beef")!.portionCost = 6.4;
+    i.dishes.find((d) => d.name === "Chicken Marsala")!.portionCost = 3.1;
+    const pricey = get(run(i).answers, "buffet.arrangement");
+    expect(pricey.result).toBe("unresolved");
+    expect(pricey.missing).toEqual([
+      "Chicken Marsala costs less than Beef Brisket: put the less expensive protein first.",
+    ]);
+
+    // A deliberate exception is a recorded manager decision, not a silent fix.
+    const decided = get(
+      run(i, {
+        overrides: [
+          {
+            questionKey: "buffet.arrangement",
+            basedOn: pricey.basis,
+            value: { type: "text", text: "Brisket first" },
+            reason: "Brisket is the feature of the night",
+            actor: "user-manager",
+            at: "2026-10-09T12:00:00Z",
+          },
+        ],
+      }).answers,
+      "buffet.arrangement",
+    );
+    expect(decided.result).toBe("answered");
+    expect(decided.override?.reason).toBe(
+      "Brisket is the feature of the night",
+    );
+    expect(decided.value).toEqual({ type: "text", text: "Brisket first" });
+  });
+
   it("shows trucks and equipment and treats missing capacity as an exception", () => {
     expect(get(run(input()).answers, "vehicles.assigned").value).toEqual({
       type: "list",
@@ -1151,6 +1207,7 @@ describe("Final Lock answer engine", () => {
         followsEventHeadcount: true,
         notes: null,
         dish: { id: "dish-record-coffee", version: 1 },
+        portionCost: null,
       });
       i.proposal = {
         id: "prop-1",

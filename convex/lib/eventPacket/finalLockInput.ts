@@ -2,6 +2,7 @@ import type { QueryCtx, MutationCtx } from "../../_generated/server";
 import type { Id } from "../../_generated/dataModel";
 import { decrypt } from "../encryption";
 import { overlappingReservationQuantity } from "../equipmentReservationAvailability";
+import { dishPortionCosts } from "./dishCosts";
 import { eventRows, readCurrentPacket } from "./reconcileNative";
 import type { FinalLockInput } from "../../../src/lib/eventPacket/finalLock/types";
 import type {
@@ -109,8 +110,25 @@ export async function readFinalLockInput(
           : null,
       notes: str(line.specialInstructions),
       dish: dish ? { id: String(dish._id), version: version(dish) } : null,
+      portionCost: null as number | null,
     });
   }
+  // Cost of one portion of each hot buffet dish (less expensive goes first).
+  const hotPlates = new Set(
+    (str(event.buffetHotPlates) ?? "")
+      .split(",")
+      .map((p) => p.trim().toLowerCase())
+      .filter(Boolean),
+  );
+  const costs = await dishPortionCosts(
+    ctx,
+    tenantId,
+    dishes
+      .filter((d) => d.dish && hotPlates.has(d.name.trim().toLowerCase()))
+      .map((d) => d.dish!.id),
+  );
+  for (const d of dishes)
+    d.portionCost = d.dish ? (costs.get(d.dish.id) ?? null) : null;
 
   const timeline = (
     await eventRows(ctx, "eventTimelineActivities", tenantId, eventId)

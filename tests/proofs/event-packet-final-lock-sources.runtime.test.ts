@@ -348,6 +348,65 @@ describe("Final Lock answers keep the payer, booked names, sign-off versions and
     );
   });
 
+  it("the buffet order reads each hot dish's recipe cost: the less expensive protein goes first", async () => {
+    const { t, manager, eventId } = await setup();
+    await t.run(async (ctx) => {
+      const dishWith = async (name: string, costPerPound: number) => {
+        const ingredientId = await ctx.db.insert("ingredients", {
+          tenantId: "tenant-a",
+          name: `${name} meat`,
+          unit: "pound",
+          costPerUnit: costPerPound,
+          status: "active",
+          version: 1,
+        });
+        const dishId = await ctx.db.insert("dishes", {
+          tenantId: "tenant-a",
+          name,
+          course: "Entree",
+          portionSize: 1,
+          portionUnit: "each",
+          status: "active",
+          version: 1,
+        } as any);
+        await ctx.db.insert("dishIngredients", {
+          tenantId: "tenant-a",
+          dishId,
+          ingredientId,
+          quantity: 0.5,
+          unit: "pound",
+          sortOrder: 0,
+          addedAt: Date.now(),
+          version: 1,
+        } as any);
+        await ctx.db.insert("eventDishes", {
+          tenantId: "tenant-a",
+          eventId,
+          dishId,
+          quantityServings: 100,
+          course: "Entree",
+          addedAt: Date.now(),
+          version: 1,
+        });
+      };
+      await dishWith("Beef Brisket", 9);
+      await dishWith("Chicken Marsala", 4);
+      await ctx.db.patch(eventId, {
+        buffetHotPlates: "Beef Brisket, Chicken Marsala",
+        buffetColdPlates: "Caesar Salad, Rolls and Butter",
+      } as any);
+    });
+    const report = await manager.query(finalLock.getFinalLock, { eventId });
+    const buffet = answer(report, "buffet.arrangement");
+    expect(buffet.result).toBe("unresolved");
+    expect(buffet.missing).toContain(
+      "Chicken Marsala costs less than Beef Brisket: put the less expensive protein first.",
+    );
+    expect(
+      buffet.sources.filter((s: any) => s.table === "dishes"),
+    ).toHaveLength(2);
+  });
+
   it("the stored printed words are exactly the words drawn in the PDF, names with accents and curly quotes included", async () => {
     const { manager, eventId } = await setup();
     const report = await manager.query(finalLock.getFinalLock, { eventId });
