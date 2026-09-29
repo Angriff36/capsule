@@ -813,9 +813,23 @@ describe("Final Lock answer engine", () => {
       endsAt: null,
       item: { id: "equipment-chafers", version: 1 },
     });
+    i.equipment.push({
+      id: "res-2",
+      version: 1,
+      name: "Hot box warmer",
+      category: null,
+      rented: false,
+      quantity: 1,
+      status: "reserved",
+      shortBy: 0,
+      outOfService: true,
+      endsAt: null,
+      item: { id: "equipment-warmer", version: 1 },
+    });
     expect(get(run(i).answers, "vehicles.assigned").missing).toEqual([
       "Box truck is out of service.",
       "Chafers is short by 2.",
+      "Hot box warmer is marked out of service.",
     ]);
     const none = input();
     none.vehicles = [];

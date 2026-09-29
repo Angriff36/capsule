@@ -49,6 +49,9 @@ export function operationsAnswers(
     ...input.equipment
       .filter((e) => e.shortBy > 0)
       .map((e) => `${e.name} is short by ${e.shortBy}.`),
+    ...input.equipment
+      .filter((e) => e.outOfService && e.status === "reserved")
+      .map((e) => `${e.name} is marked out of service.`),
   ];
   out["vehicles.assigned"] = problems.length
     ? unresolved(

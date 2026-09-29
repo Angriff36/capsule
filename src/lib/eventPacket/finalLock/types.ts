@@ -183,6 +183,8 @@ export interface FinalLockInput {
     quantity: number;
     status: string;
     shortBy: number;
+    /** A held item marked out of service since it was booked. */
+    outOfService?: boolean;
     /** When the reservation ends: a rented line's return window. */
     endsAt: number | null;
     /** The equipment record its name, category and ownership come from. */

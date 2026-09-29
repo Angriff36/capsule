@@ -232,6 +232,7 @@ export async function readFinalLockInput(
         tenantId,
         startsAt: row.startsAt,
         endsAt: row.endsAt,
+        now: Date.now(),
       });
       shortBy = Math.max(0, booked - item.quantity);
     }
@@ -244,6 +245,7 @@ export async function readFinalLockInput(
       quantity: row.quantity,
       status: row.status,
       shortBy,
+      outOfService: item?.condition === "out_of_service",
       endsAt: row.endsAt ?? null,
       item: item ? { id: String(item._id), version: version(item) } : null,
     });
