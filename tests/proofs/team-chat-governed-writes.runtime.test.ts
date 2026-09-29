@@ -55,10 +55,13 @@ async function addStaff(
 const as = (h: Harness, subject: string) =>
   h.proof.asRole({ subject, role: "kitchen_staff", tenantId: TENANT });
 
-async function table<T extends "chatNotifyPreferences" | "staffChatReadCursors" | "attachments" | "staffMessages">(
-  { t }: Harness,
-  name: T,
-) {
+async function table<
+  T extends
+    | "chatNotifyPreferences"
+    | "staffChatReadCursors"
+    | "attachments"
+    | "staffMessages",
+>({ t }: Harness, name: T) {
   return await t.run(async (ctx) => ctx.db.query(name).collect());
 }
 
@@ -83,7 +86,9 @@ describe("chat notification preference", () => {
     expect(rows[0]).toMatchObject({ ownerId: "cook", enabled: false });
     expect(await cook.query(api.chatNotifyPreference.mine, {})).toBe(false);
     expect(
-      (await eventTypes(h)).filter((type) => type === "ChatNotifyPreferenceSet"),
+      (await eventTypes(h)).filter(
+        (type) => type === "ChatNotifyPreferenceSet",
+      ),
     ).toHaveLength(2);
   });
 

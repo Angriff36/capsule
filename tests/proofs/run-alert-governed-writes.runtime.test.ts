@@ -104,14 +104,15 @@ describe("run-of-show alert switch", () => {
       }),
     ]);
     expect(await events(h, "RunAlertsEnabled")).toHaveLength(2);
-    expect((await events(h, "RunAlertsDisabled")).map((row) => row.payload))
-      .toEqual([
-        {
-          runAlertSettingId: settings[0]!._id,
-          tenantId: TENANT,
-          actorId: "manager-1",
-        },
-      ]);
+    expect(
+      (await events(h, "RunAlertsDisabled")).map((row) => row.payload),
+    ).toEqual([
+      {
+        runAlertSettingId: settings[0]!._id,
+        tenantId: TENANT,
+        actorId: "manager-1",
+      },
+    ]);
   });
 
   it("a legacy enabled tenant keeps its loop until the switch is next used", async () => {
@@ -129,10 +130,9 @@ describe("run-of-show alert switch", () => {
       tenantId: TENANT,
     });
     expect(await mayScan(h, legacyGeneration)).toBe(false);
-    const generation = await h.t.mutation(
-      internal.runOfShowAlerts.claimLoop,
-      { tenantId: TENANT },
-    );
+    const generation = await h.t.mutation(internal.runOfShowAlerts.claimLoop, {
+      tenantId: TENANT,
+    });
     expect(await mayScan(h, generation!)).toBe(true);
     expect(await mayScan(h, legacyGeneration)).toBe(false);
   });
@@ -299,7 +299,9 @@ describe("run-of-show sent-alert ledger", () => {
     });
 
     expect(
-      await h.t.run(async (ctx) => ctx.db.query("runAlertDeliveries").collect()),
+      await h.t.run(async (ctx) =>
+        ctx.db.query("runAlertDeliveries").collect(),
+      ),
     ).toEqual([]);
   });
 });

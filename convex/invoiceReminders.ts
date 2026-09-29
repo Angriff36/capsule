@@ -336,35 +336,33 @@ export const loadDeliveryContext = internalQuery({
       linkRows,
       attemptRows,
     ] = await Promise.all([
-        ctx.db.get(invoice.clientId),
-        ctx.db
-          .query("clientContacts")
-          .withIndex("by_clientId", (q) => q.eq("clientId", invoice.clientId))
-          .collect(),
-        ctx.db
-          .query("organizations")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
-          .collect(),
-        ctx.db
-          .query("manifestEvents")
-          .withIndex("by_entityId", (q) =>
-            q.eq("entityId", String(invoice._id)),
-          )
-          .collect(),
-        invoice.eventId ? ctx.db.get(invoice.eventId) : Promise.resolve(null),
-        ctx.db
-          .query("invoiceReminderSchedules")
-          .withIndex("by_invoiceId", (q) => q.eq("invoiceId", invoice._id))
-          .collect(),
-        ctx.db
-          .query("invoicePaymentLinks")
-          .withIndex("by_invoiceId", (q) => q.eq("invoiceId", invoice._id))
-          .collect(),
-        ctx.db
-          .query("invoiceReminderAttempts")
-          .withIndex("by_invoiceId", (q) => q.eq("invoiceId", invoice._id))
-          .collect(),
-      ]);
+      ctx.db.get(invoice.clientId),
+      ctx.db
+        .query("clientContacts")
+        .withIndex("by_clientId", (q) => q.eq("clientId", invoice.clientId))
+        .collect(),
+      ctx.db
+        .query("organizations")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
+        .collect(),
+      ctx.db
+        .query("manifestEvents")
+        .withIndex("by_entityId", (q) => q.eq("entityId", String(invoice._id)))
+        .collect(),
+      invoice.eventId ? ctx.db.get(invoice.eventId) : Promise.resolve(null),
+      ctx.db
+        .query("invoiceReminderSchedules")
+        .withIndex("by_invoiceId", (q) => q.eq("invoiceId", invoice._id))
+        .collect(),
+      ctx.db
+        .query("invoicePaymentLinks")
+        .withIndex("by_invoiceId", (q) => q.eq("invoiceId", invoice._id))
+        .collect(),
+      ctx.db
+        .query("invoiceReminderAttempts")
+        .withIndex("by_invoiceId", (q) => q.eq("invoiceId", invoice._id))
+        .collect(),
+    ]);
 
     const eligibleContacts = contacts.filter(
       (contact) =>

@@ -59,7 +59,10 @@ function as(h: Harness, tenantId: string, subject: string) {
   return h.proof.asRole({ subject, role: "kitchen_staff", tenantId });
 }
 
-const keys = (tag: string) => ({ p256dh: `p256dh-${tag}`, auth: `auth-${tag}` });
+const keys = (tag: string) => ({
+  p256dh: `p256dh-${tag}`,
+  auth: `auth-${tag}`,
+});
 
 async function rows({ t }: Harness) {
   return await t.run(async (ctx) =>
@@ -139,7 +142,10 @@ describe("push devices change only through PushSubscription commands", () => {
     const removed = await events(h, "PushSubscriptionRemoved");
     expect(removed.map((row) => row.payload)).toEqual([
       { pushSubscriptionId: cookRow.subscriptionId, tenantId: TENANT },
-      { pushSubscriptionId: outsiderRow.subscriptionId, tenantId: OTHER_TENANT },
+      {
+        pushSubscriptionId: outsiderRow.subscriptionId,
+        tenantId: OTHER_TENANT,
+      },
     ]);
 
     // The cook signs in on it again: their own row comes back, the server's goes.
@@ -243,7 +249,10 @@ describe("push devices change only through PushSubscription commands", () => {
 
     const all = await rows(h);
     expect(all).toHaveLength(1);
-    expect(all[0]).toMatchObject({ authSubjectId: "cook", p256dh: "p256dh-cook" });
+    expect(all[0]).toMatchObject({
+      authSubjectId: "cook",
+      p256dh: "p256dh-cook",
+    });
     expect(all[0]!.deletedAt ?? null).toBeNull();
   });
 

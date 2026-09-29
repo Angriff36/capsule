@@ -126,7 +126,12 @@ function latestConfigEnabled(
 interface ConfigView {
   enabled: boolean;
   currentChainId: string | null;
-  lastScan: { at: number; sent: number; failed: number; error: string | null } | null;
+  lastScan: {
+    at: number;
+    sent: number;
+    failed: number;
+    error: string | null;
+  } | null;
 }
 
 /** The tenant's live SmsAlertSetting row, if one was ever written. */
@@ -156,7 +161,12 @@ async function loadLegacyRows(ctx: QueryCtx, tenantId: string) {
  */
 function configView(
   setting: Doc<"smsAlertSettings"> | null,
-  legacyRows: Array<{ entity: string; type: string; createdAt: number; payload: unknown }>,
+  legacyRows: Array<{
+    entity: string;
+    type: string;
+    createdAt: number;
+    payload: unknown;
+  }>,
 ): ConfigView {
   const configRows = legacyRows.filter((row) => row.entity === CONFIG_ENTITY);
   let legacyChainId: string | null = null;
@@ -182,9 +192,7 @@ function configView(
     enabled: hasSwitch
       ? setting?.enabled === true
       : latestConfigEnabled(configRows),
-    currentChainId: hasSwitch
-      ? (setting?.chainId ?? null)
-      : legacyChainId,
+    currentChainId: hasSwitch ? (setting?.chainId ?? null) : legacyChainId,
     lastScan:
       setting?.lastScanAt != null
         ? {

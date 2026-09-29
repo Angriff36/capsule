@@ -93,7 +93,9 @@ describe("TPP report favorites", () => {
       initialized: boolean;
       reportIds: string[];
     };
-    expect([...mine.reportIds].sort()).toEqual([...TPP_DEFAULT_FAVORITES].sort());
+    expect([...mine.reportIds].sort()).toEqual(
+      [...TPP_DEFAULT_FAVORITES].sort(),
+    );
 
     const rows = await h.t.run(async (ctx) =>
       ctx.db.query("tppReportFavorites").collect(),
@@ -102,9 +104,9 @@ describe("TPP report favorites", () => {
     expect(rows).toHaveLength(TPP_DEFAULT_FAVORITES.length + 1);
     expect(rows.every((row) => row.deletedAt == null)).toBe(true);
     const types = await eventTypes(h);
-    expect(types.filter((type) => type === "TppReportUnfavorited")).toHaveLength(
-      1,
-    );
+    expect(
+      types.filter((type) => type === "TppReportUnfavorited"),
+    ).toHaveLength(1);
     expect(types.filter((type) => type === "TppReportFavorited")).toHaveLength(
       TPP_DEFAULT_FAVORITES.length + 2,
     );

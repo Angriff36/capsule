@@ -271,10 +271,14 @@ describe("accepted revision link (AC-413 / AC-434)", () => {
     // The now-public generated follow-up cannot relabel the committed
     // acceptance: its pending marker never survives the accept transaction.
     await expect(
-      proof.executeCommand(owner, api.mutations.Proposal_recordAcceptedRevision, {
-        docId: proposalId,
-        acceptedRevisionId: revision2?._id,
-      }),
+      proof.executeCommand(
+        owner,
+        api.mutations.Proposal_recordAcceptedRevision,
+        {
+          docId: proposalId,
+          acceptedRevisionId: revision2?._id,
+        },
+      ),
     ).rejects.toThrow(/Guard/);
 
     // The stored reference and the event-side label still name revision 1 —
@@ -762,10 +766,14 @@ describe("accepted revision link (AC-413 / AC-434)", () => {
     const later = await captureLaterRevision(proof, owner, proposalId, 1);
     expect(later).toBeTruthy();
     await expect(
-      proof.executeCommand(owner, api.mutations.Proposal_recordAcceptedRevision, {
-        docId: proposalId,
-        acceptedRevisionId: later?._id,
-      }),
+      proof.executeCommand(
+        owner,
+        api.mutations.Proposal_recordAcceptedRevision,
+        {
+          docId: proposalId,
+          acceptedRevisionId: later?._id,
+        },
+      ),
     ).rejects.toThrow(/Guard/);
     expect(await acceptedRevisionIdOf(owner, proposalId)).toBeNull();
     const bookingAfter = (await owner.query(
