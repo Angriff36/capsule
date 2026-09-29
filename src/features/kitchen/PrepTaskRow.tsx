@@ -91,24 +91,25 @@ export function PrepTaskRow({
   return (
     <li className="border-b border-line last:border-b-0">
       <div className="flex min-h-[60px] items-center gap-3.5 px-4 py-2.5">
-        <input
-          id={id}
-          type="checkbox"
-          className="size-7 shrink-0 cursor-pointer accent-ok disabled:cursor-not-allowed aria-disabled:cursor-default"
-          checked={checked}
-          disabled={inert}
-          aria-disabled={disabled || undefined}
-          aria-label={`Done: ${title}, ${amount}`}
-          aria-describedby={note ? `${id}-note` : undefined}
-          onChange={(event) => {
-            if (event.target.checked && !disabled) onComplete?.();
-            // There is no reopen command; a ticked box stays ticked.
-          }}
-        />
-        <label
-          htmlFor={id}
-          className={`flex min-w-0 flex-1 items-center gap-3 ${disabled ? "" : "cursor-pointer"}`}
-        >
+        {/* Only the box ticks: completing has no undo, so a stray tap on the
+            task name must not finish it. The 44px wrapper is the hit area. */}
+        <span className="-m-2 flex size-11 shrink-0 items-center justify-center">
+          <input
+            id={id}
+            type="checkbox"
+            className="size-7 shrink-0 cursor-pointer accent-ok disabled:cursor-not-allowed aria-disabled:cursor-default"
+            checked={checked}
+            disabled={inert}
+            aria-disabled={disabled || undefined}
+            aria-label={`Done: ${title}, ${amount}`}
+            aria-describedby={note ? `${id}-note` : undefined}
+            onChange={(event) => {
+              if (event.target.checked && !disabled) onComplete?.();
+              // There is no reopen command; a ticked box stays ticked.
+            }}
+          />
+        </span>
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <span className="min-w-0 flex-1">
             <span
               className={`block text-base font-semibold break-words ${checked ? "text-ink-3 line-through" : "text-ink"}`}
@@ -140,7 +141,7 @@ export function PrepTaskRow({
               No time
             </span>
           )}
-        </label>
+        </div>
       </div>
       {children ? (
         <div className="flex min-w-0 flex-wrap items-center gap-2 pr-4 pb-3 pl-[58px]">
