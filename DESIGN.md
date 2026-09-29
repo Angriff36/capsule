@@ -175,14 +175,24 @@ components:
     rounded: "{rounded.xs}"
     height: 32px
     padding: 0 10px
+  # status-chip and result-notice: owner pick 2026-09-29 (component picker).
   status-chip:
-    backgroundColor: "{colors.success}"
-    textColor: "{colors.on-brand}"
-    typography: "{typography.micro}"
-    rounded: "{rounded.pill}"
-    height: 30px
-    padding: 0 15px
-    variants: solid semantic fill — success, warning, danger, brand
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.ink}"
+    borderColor: "{colors.line}"
+    typography: "{typography.body}"
+    rounded: "{rounded.sm}"
+    height: 26px
+    padding: 0 10px 0 8px
+    icon: 14px leading icon in the tone color — mute, info, warn, ok, danger, brand
+  result-notice:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.ink}"
+    borderColor: "{colors.line}"
+    rounded: "{rounded.md}"
+    minHeight: 44px
+    padding: 8px 12px
+    variants: success = neutral box with ok icon; failure = danger border, icon, and text on danger-soft
   meta-chip:
     backgroundColor: "{colors.inset}"
     textColor: "{colors.ink-2}"
@@ -418,7 +428,7 @@ The serif creates identity; Archivo carries controls and dense information; IBM 
 | Label           | Archivo         |    14px |    700 |        1.40 |         0.04em | `fact-pair` labels, uppercase.           |
 | Eyebrow         | Archivo         |    14px |    700 |        1.40 |         0.09em | `section-rule` labels, uppercase.        |
 | Mono Data       | IBM Plex Mono   |    15px |    500 |        1.40 |         0.02em | Times, money, counts, and relative time. |
-| Micro           | Archivo         |    13px |    600 |        1.40 |         0.06em | Chip text, uppercase.                    |
+| Micro           | Archivo         |    13px |    600 |        1.40 |         0.06em | ~~Chip text,~~ Micro labels, uppercase. (chip text is 13px sentence case since 2026-09-29) |
 
 **Floors.** Body never falls below 15px and supporting metadata never below 13px. Uppercase is a deliberate device for labels, chips, and buttons — it is never a way to make text small. There is no type role under 13px.
 
@@ -479,7 +489,7 @@ Heavy drop shadows, glass panels, glow, and layered floating cards are not part 
 | `md`     |   10px | Menus and compact grouped panels           |
 | `ledger` |   14px | Attention and authored empty-state regions |
 | `sheet`  |   22px | Primary route sheet                        |
-| `pill`   | 9999px | Status chips, tags, icon-nav active state  |
+| `pill`   | 9999px | ~~Status chips,~~ tags, icon-nav active state (status chips use `sm` since 2026-09-29) |
 
 ### Image Treatment
 
@@ -535,7 +545,25 @@ Small uppercase Archivo link in brand green, often paired with a directional arr
 
 ### **`status-chip`**
 
-30px pill with a **solid** semantic fill and white uppercase text at 13px, tracked 0.06em. Reserved for real lifecycle state and severity — delivered, ready, blocked, critical, high. Its weight is the point: a solid chip is a claim about state, so it must be earned.
+~~30px pill with a **solid** semantic fill and white uppercase text at 13px, tracked 0.06em. Reserved for real lifecycle state and severity — delivered, ready, blocked, critical, high. Its weight is the point: a solid chip is a claim about state, so it must be earned.~~
+
+> **Updated 2026-09-29 (owner pick, component picker variant D):** 26px outline
+> chip with 6px corners, panel fill, a fine `line` border, and ink sentence-case
+> text at 13px. The state lives in a 14px leading icon drawn in the tone color:
+> dashed circle (mute), arrow (info, in motion), triangle (warn, needs you),
+> check (ok, done), cross (danger), dot or lock (brand; lock for sales lock).
+> Color never carries state alone. Code: `.chip` plus one `chip-tone-*` class
+> in `src/styles/app.css`; `StatusChip` picks the tone. `.chip-state-*` is the
+> older spelling and renders the same chip.
+
+### **`result-notice`**
+
+> **Added 2026-09-29 (owner pick, component picker variant B, with C for
+> failures):** the message after a command runs (`ui/action-result`). Success
+> is a neutral panel box with a 1px `line` border, ink text, and an ok check
+> icon. A failure blocks work, so its border, icon, and text take the danger
+> color on `danger-soft`. 44px minimum height, 8px corners, dismiss button on
+> the right.
 
 ### **`meta-chip`**
 

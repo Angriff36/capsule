@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { XIcon } from "../icons";
+import { CheckCircleIcon, XCircleIcon, XIcon } from "../icons";
 import { ActionResultStore, type ActionResult } from "./ActionResultStore";
 
 /**
@@ -16,25 +16,37 @@ export function ActionResultHost() {
   if (!result) return null;
 
   const ok = result.kind === "ok";
+  // DESIGN.md result notice (owner pick 2026-09-29): success is a neutral box
+  // whose icon carries the state; a failure blocks work, so its border, icon,
+  // and text all take the danger color.
+  const Icon = ok ? CheckCircleIcon : XCircleIcon;
   return (
-    <div
-      className={`shrink-0 border-b px-4 py-2 ${
-        ok ? "border-ok/30 bg-ok-soft" : "border-danger/30 bg-danger-soft"
-      }`}
-    >
-      <div className="flex items-start gap-3">
+    <div className="shrink-0 px-4 pt-3">
+      <div
+        className={`flex min-h-11 items-center gap-2.5 rounded-md border px-3 py-2 ${
+          ok
+            ? "border-line bg-panel text-ink"
+            : "border-danger bg-danger-soft text-danger"
+        }`}
+      >
+        <Icon
+          width={16}
+          height={16}
+          aria-hidden="true"
+          className={`shrink-0 ${ok ? "text-ok" : ""}`}
+        />
         <output
           aria-live={ok ? "polite" : "assertive"}
-          className={`min-w-0 flex-1 text-base leading-snug ${
-            ok ? "text-ok" : "text-danger"
-          }`}
+          className="min-w-0 flex-1 text-base leading-snug"
           role={ok ? "status" : "alert"}
         >
           {result.message}
         </output>
         <button
           type="button"
-          className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xs text-ink-3 hover:bg-panel hover:text-ink"
+          className={`-my-1 -mr-1.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xs hover:bg-inset ${
+            ok ? "text-ink-3 hover:text-ink" : "text-danger"
+          }`}
           onClick={() => ActionResultStore.shared.dismiss()}
           aria-label="Dismiss result"
         >

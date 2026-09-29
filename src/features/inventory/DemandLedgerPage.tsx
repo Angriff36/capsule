@@ -346,7 +346,7 @@ export function DemandLedgerPage() {
                           if (!anomaly) return null;
                           return (
                             <span
-                              className="chip ml-2 border-warn/40 bg-warn-soft text-warn"
+                              className="chip ml-2 chip-tone-warn"
                               data-testid="demand-anomaly-flag"
                               title={`Historical avg ${anomaly.expectedQuantity.toFixed(
                                 2,

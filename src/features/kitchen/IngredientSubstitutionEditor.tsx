@@ -121,8 +121,8 @@ export function IngredientSubstitutionEditor({
                   <span
                     className={
                       newAllergens.length
-                        ? "chip border-warn/30 bg-warn-soft text-warn"
-                        : "chip border-ok/30 bg-ok-soft text-ok"
+                        ? "chip chip-tone-warn"
+                        : "chip chip-tone-ok"
                     }
                   >
                     {newAllergens.length

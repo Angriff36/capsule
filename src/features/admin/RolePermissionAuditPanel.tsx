@@ -152,7 +152,7 @@ export function RolePermissionAuditView({
                         </span>
                       </td>
                       <td className="border-b border-line px-3 py-3">
-                        <span className="chip border-line-2 bg-inset text-ink-2">
+                        <span className="chip chip-tone-mute">
                           {member.roleLabel}
                         </span>
                         <code className="mt-1.5 block text-2xs text-ink-3">
@@ -189,7 +189,7 @@ export function RolePermissionAuditView({
                       <td className="border-b border-line px-3 py-3">
                         {member.hasElevatedAccess ? (
                           <div>
-                            <span className="chip border-warn/30 bg-warn-soft text-warn">
+                            <span className="chip chip-tone-warn">
                               Elevated access
                             </span>
                             <p className="mt-1.5 max-w-xs text-2xs leading-relaxed text-ink-3">
@@ -197,7 +197,7 @@ export function RolePermissionAuditView({
                             </p>
                           </div>
                         ) : (
-                          <span className="chip border-ok/30 bg-ok-soft text-ok">
+                          <span className="chip chip-tone-ok">
                             Standard access
                           </span>
                         )}

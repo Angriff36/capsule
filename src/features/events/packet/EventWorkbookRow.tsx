@@ -55,11 +55,7 @@ export function EventWorkbookRow({ row }: { row: PacketWorkbookSummary }) {
         </div>
         <div className="flex items-center gap-3 max-md:mt-1">
           <span
-            className={`chip ${
-              row.ready
-                ? "border-ok/30 bg-ok-soft text-ok"
-                : "border-warn/30 bg-warn-soft text-warn"
-            }`}
+            className={`chip ${row.ready ? "chip-tone-ok" : "chip-tone-warn"}`}
           >
             {row.ready
               ? "Ready"
@@ -102,8 +98,8 @@ export function EventWorkbookRow({ row }: { row: PacketWorkbookSummary }) {
                 <span
                   className={`chip ${
                     issue.severity === "blocking"
-                      ? "border-danger/30 bg-danger-soft text-danger"
-                      : "border-warn/30 bg-warn-soft text-warn"
+                      ? "chip-tone-danger"
+                      : "chip-tone-warn"
                   }`}
                 >
                   {issue.severity}

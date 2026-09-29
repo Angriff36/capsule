@@ -181,7 +181,7 @@ function PersonRoleCell({
 }>) {
   if (!canEdit) {
     return (
-      <span className="chip border-line-2 bg-inset text-ink-2">
+      <span className="chip chip-tone-mute">
         {PersonRoleDirectory.label(person.role)}
       </span>
     );

@@ -5,16 +5,16 @@ import { ChevronDownIcon } from "./icons";
 import { useDismissibleMenu } from "./useDismissibleMenu";
 
 const STAGE_CHIP: Record<EventStage, string> = {
-  quote: "border-line-2 bg-mute-soft text-ink-2",
-  planning: "border-line-2 bg-mute-soft text-ink-2",
-  pending_approval: "border-warn/30 bg-warn-soft text-warn",
-  approved: "border-ok/30 bg-ok-soft text-ok",
-  sales_lock: "border-brand/30 bg-brand-soft text-brand",
-  executing: "border-info/30 bg-info-soft text-info",
-  final: "border-info/30 bg-info-soft text-info",
-  completed: "border-info/30 bg-info-soft text-info",
-  cancelled: "border-danger/30 bg-danger-soft text-danger",
-  closed_out: "border-line-2 bg-inset text-ink-3",
+  quote: "chip-tone-mute",
+  planning: "chip-tone-mute",
+  pending_approval: "chip-tone-warn",
+  approved: "chip-tone-ok",
+  sales_lock: "chip-tone-brand chip-icon-lock",
+  executing: "chip-tone-info",
+  final: "chip-tone-info",
+  completed: "chip-tone-info",
+  cancelled: "chip-tone-danger",
+  closed_out: "chip-tone-mute",
 };
 
 export function StatusChip({
@@ -33,7 +33,7 @@ export function StatusChip({
     color ??
     (STAGE_CHIP as Record<string, string>)[status] ??
     statusChipClass(status) ??
-    "border-line-2 bg-inset text-ink-2";
+    "chip-tone-mute";
   return (
     <span className={`chip ${cls}`}>
       {children ?? label ?? known ?? formatStatusLabel(status)}

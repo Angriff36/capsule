@@ -290,22 +290,16 @@ export function AnnouncementsPage() {
                       <span className="text-base font-semibold text-ink">
                         {row.title}
                       </span>
-                      <span className="chip border-line-2 bg-inset text-ink-2">
+                      <span className="chip chip-tone-mute">
                         {FRIENDLY_CATEGORY[String(row.category)] ??
                           String(row.category)}
                       </span>
                       {removed ? (
-                        <span className="chip border-line-2 bg-inset text-ink-3">
-                          Removed
-                        </span>
+                        <span className="chip chip-tone-mute">Removed</span>
                       ) : expired ? (
-                        <span className="chip border-line-2 bg-inset text-ink-3">
-                          Expired
-                        </span>
+                        <span className="chip chip-tone-mute">Expired</span>
                       ) : (
-                        <span className="chip border-ok/30 bg-ok-soft text-ok">
-                          Active
-                        </span>
+                        <span className="chip chip-tone-ok">Active</span>
                       )}
                     </p>
                     <p className="mt-1 text-sm leading-relaxed whitespace-pre-wrap text-ink-2">

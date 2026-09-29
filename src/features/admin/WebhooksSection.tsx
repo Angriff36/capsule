@@ -275,17 +275,12 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
                     </div>
                     <div className="mt-2 flex flex-wrap gap-1">
                       {endpoint.eventLabels.map((name) => (
-                        <span
-                          key={name}
-                          className="chip border-line-2 bg-inset text-ink-2"
-                        >
+                        <span key={name} className="chip chip-tone-mute">
                           {name}
                         </span>
                       ))}
                       {endpoint.hasSecret ? (
-                        <span className="chip border-ok/30 bg-ok-soft text-ok">
-                          Signed
-                        </span>
+                        <span className="chip chip-tone-ok">Signed</span>
                       ) : null}
                     </div>
                     <p className="mt-2 text-xs text-ink-3">

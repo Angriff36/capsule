@@ -272,7 +272,7 @@ export function ClientsPage() {
       ) : null}
       {dataLoaded && duplicateCandidates.length > 0 ? (
         <div className="flex items-center gap-2 text-sm text-ink-2">
-          <span className="chip border-warn/30 bg-warn-soft text-warn">
+          <span className="chip chip-tone-warn">
             {duplicateCandidates.length} possible duplicate
             {duplicateCandidates.length === 1 ? "" : "s"}
           </span>
