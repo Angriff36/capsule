@@ -218,6 +218,22 @@ export function EventStaffingCoverageView({
                           ? ` · ${formatTime(entry.startsAt)}`
                           : ""}
                       </p>
+                      {coveredNeeds.some((need) => need.qualificationName) ? (
+                        <p
+                          className="text-xs text-ink-2"
+                          data-testid="event-staffing-roster-requirement"
+                        >
+                          {coveredNeeds
+                            .flatMap((need) =>
+                              need.qualificationName
+                                ? [
+                                    `${need.qualificationName} certificate on file`,
+                                  ]
+                                : [],
+                            )
+                            .join(" · ")}
+                        </p>
+                      ) : null}
                     </td>
                     <td className="block px-3 py-2 md:table-cell align-top font-mono text-xs whitespace-nowrap text-ink-2">
                       <span className="mr-2 font-sans md:hidden">Shift:</span>
