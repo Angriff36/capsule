@@ -13,21 +13,28 @@ import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
  * `SignatureRequest_complete` command is unreachable from the acceptance page —
  * this seam performs the completion itself.
  *
- * The proposal acceptance is NOT re-implemented here. After the seam's own
+ * ~~The proposal acceptance is NOT re-implemented here. After the seam's own
  * token/revision/proposal validations pass, the acceptance runs through the
  * SAME generated `Proposal_accept` command the operator path uses, via the
- * established tenant-system runner (convex/lib/tenantSystemCommandRunner.ts,
- * as purchasingReschedule/invoiceNumbering do). The runner is pinned to the
- * VALIDATED `request.tenantId` — never caller input — and substitutes only the
- * identity: the command keeps its sales role policy, the tenant's capability
- * kill-switch, its status/expiry guards, the ProposalAccepted ledger row, the
- * accepted-revision recording (convex/lib/proposalAcceptanceRevision.ts) and
- * the ProposalDishSelection → EventDish.confirmFromProposal menu cascade —
- * issue #390 (AC-414/AC-435). It all runs in the CURRENT transaction, so a
- * downstream rejection (a linked event that fails the generated tenant
- * relation check, a disabled sales capability) rolls the signature completion
- * back with the acceptance: signature and acceptance commit together or not
- * at all.
+ * established tenant-system runner …~~
+ * 2026-09-29: neither the completion nor the acceptance is written here.
+ * After the seam's own token/revision/proposal validations pass (all reads),
+ * it runs the generated `SignatureRequest_completeInternal` command through
+ * the established tenant-system runner
+ * (convex/lib/tenantSystemCommandRunner.ts). That command records the
+ * completion and emits SignatureCompleted; the declared
+ * `on SignatureCompleted run Proposal.accept` reaction then runs the SAME
+ * `Proposal.accept` the operator path uses. The runner is pinned to the
+ * VALIDATED `request.tenantId` — never caller input — and substitutes only
+ * the identity: the commands keep their sales role policy, the tenant's
+ * capability kill-switch, their status/expiry guards, the ProposalAccepted
+ * ledger row, the accepted-revision recording
+ * (convex/lib/proposalAcceptanceRevision.ts) and the ProposalDishSelection →
+ * EventDish.confirmFromProposal menu cascade — issue #390 (AC-414/AC-435).
+ * It all runs in the CURRENT transaction, so a downstream rejection (a linked
+ * event that fails the generated tenant relation check, a disabled sales
+ * capability) rolls the signature completion back with the acceptance:
+ * signature and acceptance commit together or not at all.
  */
 
 type PendingSignatureView = {
@@ -156,15 +163,15 @@ export const getPendingSignatureRequest = query({
 
 /**
  * Complete a signature request and accept its proposal, token-authorized.
- * Same status/expiry guards as the generated command. The completion patch +
- * SignatureCompleted event are the seam's own writes; the acceptance itself is
- * the canonical generated `Proposal_accept`, run as the tenant's system role
- * (see header) so it executes the identical policy, ledger row, accepted
- * revision and menu cascade as operator acceptance. One transaction end to
- * end: signature completion and acceptance commit or roll back together. A
- * proposal that can no longer be accepted (declined/expired/superseded) rolls
- * the whole thing back; an already-accepted proposal is treated as success
- * (idempotent re-click) and keeps its original accepted revision.
+ * The seam validates the token, revision and proposal (reads only), then the
+ * generated `SignatureRequest.completeInternal` command, run as the tenant's
+ * system role, records the completion and emits SignatureCompleted, whose
+ * declared reaction runs the canonical `Proposal.accept` (see header). One
+ * transaction end to end: signature completion and acceptance commit or roll
+ * back together. A proposal that can no longer be accepted
+ * (declined/expired/superseded) refuses before any write; an already-accepted
+ * proposal still records the signature, runs no second acceptance and keeps
+ * its original accepted revision.
  */
 export const completeSignature = mutation({
   args: {
@@ -198,112 +205,91 @@ export const completeSignature = mutation({
     }
 
     const now = Date.now();
-    const signedArtifactReference = `internal:click-accept:${now}`;
-
-    await ctx.db.patch(request._id, {
-      status: "completed",
-      completedAt: now,
-      signedArtifactReference,
-      signerIpAddress: signerIpAddress ?? null,
-      signerUserAgent: signerUserAgent ?? null,
-      updatedAt: now,
-      version: (request.version ?? 0) + 1,
-    });
-    await ctx.db.insert("manifestEvents", {
-      type: "SignatureCompleted",
-      entity: "SignatureRequest",
-      entityId: request._id,
-      payload: {
-        signatureRequestId: request._id,
-        tenantId: request.tenantId,
-        proposalRevisionId: request.proposalRevisionId,
-        proposalId: request.proposalId ?? null,
-        recipientEmail: request.recipientEmail,
-        recipientName: request.recipientName,
-        signedAt: now,
-        signedArtifactReference,
-      },
-      createdAt: now,
-    });
-
-    {
-      // The revision is what the signer saw — it is the authoritative binding.
-      // A caller-supplied request.proposalId naming a different proposal than
-      // the displayed revision's would accept B while showing A (sol review
-      // 2026-07-28), so the accept target derives from the revision itself.
-      const revision = await ctx.db.get(request.proposalRevisionId);
-      // Same captured check as the pending view: an uncaptured revision is
-      // mutable evidence, and acceptedRevisionId must never point at a row a
-      // later capture could rewrite. The throw rolls back the completion
-      // patch and SignatureCompleted insert above in the same transaction.
-      if (
-        !revision ||
-        revision.deletedAt != null ||
-        revision.capturedAt == null ||
-        revision.tenantId !== request.tenantId
-      ) {
-        throw new ConvexError(
-          "The proposal for this acceptance link is unavailable. Please contact us.",
-        );
-      }
-      if (
-        request.proposalId &&
-        String(request.proposalId) !== String(revision.proposalId)
-      ) {
-        throw new ConvexError(
-          "This acceptance link is inconsistent. Please contact us for a new one.",
-        );
-      }
-      const proposal: Doc<"proposals"> | null = await ctx.db.get(
-        revision.proposalId,
+    // The revision is what the signer saw — it is the authoritative binding.
+    // A caller-supplied request.proposalId naming a different proposal than
+    // the displayed revision's would accept B while showing A (sol review
+    // 2026-07-28), so the accept target derives from the revision itself.
+    const revision = await ctx.db.get(request.proposalRevisionId);
+    // Same captured check as the pending view: an uncaptured revision is
+    // mutable evidence, and acceptedRevisionId must never point at a row a
+    // later capture could rewrite. Every refusal here happens before any
+    // write.
+    if (
+      !revision ||
+      revision.deletedAt != null ||
+      revision.capturedAt == null ||
+      revision.tenantId !== request.tenantId
+    ) {
+      throw new ConvexError(
+        "The proposal for this acceptance link is unavailable. Please contact us.",
       );
-      if (
-        !proposal ||
-        proposal.deletedAt != null ||
-        proposal.tenantId !== request.tenantId
-      ) {
-        throw new ConvexError(
-          "The proposal for this acceptance link is unavailable. Please contact us.",
-        );
-      }
-      if (proposal.status === "accepted") {
-        return { ok: true };
-      }
-      if (proposal.status !== "sent" && proposal.status !== "viewed") {
-        throw new ConvexError(
-          "This proposal can no longer be accepted. Please contact us for an updated proposal.",
-        );
-      }
-      if (proposal.expiresAt != null && proposal.expiresAt <= now) {
-        throw new ConvexError(
-          "This proposal has expired. Please contact us for an updated proposal.",
-        );
-      }
-
-      // Canonical acceptance (#390, AC-414/AC-435): the generated command, not
-      // a re-implementation. Every validation above has already proven this
-      // tenant, revision and proposal, so the runner's tenant pin is the
-      // validated request.tenantId — never caller input — and the command's
-      // own guards (status, expiry, sales policy, capability kill-switch),
-      // ProposalAccepted ledger row, accepted-revision recording and the
-      // ProposalDishSelection → EventDish.confirmFromProposal menu cascade
-      // run exactly as operator acceptance. No catch: a downstream rejection
-      // throws out of this mutation, rolling the completion patch and
-      // SignatureCompleted insert back in the same transaction. The command
-      // derives the target and the ledger payload from the proposal row
-      // itself; acceptedRevisionId carries the signer's revision (AC-413) and
-      // proposalAcceptanceRevision re-validates it inside the command's own
-      // event handling.
-      const sales = TenantSystemCommandRunner.forTenant(
-        ctx,
-        request.tenantId,
-      ).context;
-      await sales.runMutation(api.mutations.Proposal_accept, {
-        docId: proposal._id,
-        acceptedRevisionId: revision._id,
-        version: proposal.version,
-      });
     }
+    if (
+      request.proposalId &&
+      String(request.proposalId) !== String(revision.proposalId)
+    ) {
+      throw new ConvexError(
+        "This acceptance link is inconsistent. Please contact us for a new one.",
+      );
+    }
+    const proposal: Doc<"proposals"> | null = await ctx.db.get(
+      revision.proposalId,
+    );
+    if (
+      !proposal ||
+      proposal.deletedAt != null ||
+      proposal.tenantId !== request.tenantId
+    ) {
+      throw new ConvexError(
+        "The proposal for this acceptance link is unavailable. Please contact us.",
+      );
+    }
+    // An already-accepted proposal (the operator or another request got there
+    // first) still records this signature, but runs no second acceptance and
+    // keeps its original accepted revision.
+    const alreadyAccepted = proposal.status === "accepted";
+    if (
+      !alreadyAccepted &&
+      proposal.status !== "sent" &&
+      proposal.status !== "viewed"
+    ) {
+      throw new ConvexError(
+        "This proposal can no longer be accepted. Please contact us for an updated proposal.",
+      );
+    }
+    if (
+      !alreadyAccepted &&
+      proposal.expiresAt != null &&
+      proposal.expiresAt <= now
+    ) {
+      throw new ConvexError(
+        "This proposal has expired. Please contact us for an updated proposal.",
+      );
+    }
+
+    // Canonical completion + acceptance (#390, AC-414/AC-435): the generated
+    // SignatureRequest.completeInternal command, run as the tenant's system
+    // role pinned to the validated request.tenantId — never caller input. It
+    // emits SignatureCompleted, and the declared `on SignatureCompleted run
+    // Proposal.accept` reaction accepts the validated proposal inline with
+    // the signer's revision (AC-413), so the command's own guards (status,
+    // expiry, sales policy, capability kill-switch), ProposalAccepted ledger
+    // row, accepted-revision recording and the ProposalDishSelection →
+    // EventDish.confirmFromProposal menu cascade run exactly as operator
+    // acceptance. No catch: a downstream rejection throws out of this
+    // mutation and nothing commits.
+    const system = TenantSystemCommandRunner.forTenant(
+      ctx,
+      request.tenantId,
+    ).context;
+    await system.runMutation(api.mutations.SignatureRequest_completeInternal, {
+      docId: request._id,
+      version: request.version,
+      signedArtifactReference: `internal:click-accept:${now}`,
+      ...(signerIpAddress !== undefined ? { signerIpAddress } : {}),
+      ...(signerUserAgent !== undefined ? { signerUserAgent } : {}),
+      ...(alreadyAccepted ? {} : { acceptProposalId: proposal._id }),
+    });
 
     return { ok: true };
   },
