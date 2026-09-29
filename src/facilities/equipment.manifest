@@ -236,9 +236,15 @@ event EquipmentReactivated: "equipment.reactivated" {
 
 // One reservation per equipment catalog line and event window. Quantity keeps
 // pooled assets (linens, chairs) practical while single tagged assets naturally
-// reserve one at a time. Creation is owned by the authored Convex seam because
+// reserve one at a time. ~~Creation is owned by the authored Convex seam because
 // the current Convex projection cannot hydrate hasMany overlap guards during a
-// generated create command; every later lifecycle change remains generated.
+// generated create command; every later lifecycle change remains generated.~~
+// 2026-09-29: creation is the generated EquipmentReservation_createViaReserve.
+// The authored seam (convex/equipmentCheckout.ts) keeps the operator-readable
+// pre-checks and calls it. The pooled-quantity availability check (a window
+// overlap, which an aggregate cannot express) runs inside the command
+// transaction on EquipmentReserved / EquipmentReservationRescheduled
+// (convex/lib/operationalEvents.ts), so a direct call cannot overbook either.
 entity EquipmentReservation mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -272,6 +278,64 @@ entity EquipmentReservation mixin TenantScoped, SoftDeletable {
   default policy equipmentReservationRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventManageAccess") "Inventory or logistics staff may see equipment handoffs, or event managers stand down a cancelled event"
   default policy equipmentReservationWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventManageAccess") "Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event"
   default policy equipmentReservationExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventManageAccess") "Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event"
+
+  // Same audience as the reserve seam (inventory or logistics); event managers
+  // hold the entity policies only to stand down a cancelled event.
+  command reserve(
+    equipmentId: string,
+    eventId: string,
+    startsAt: datetime,
+    endsAt: datetime,
+    quantity: int
+  ) {
+    guard self.reservedAt == null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess")
+    constraint reserveWindow: endsAt > startsAt "Return time must be after checkout time."
+    constraint reserveQuantity: quantity > 0 "Reserved quantity must be a positive whole number."
+    constraint reserveEquipmentActive: count(Equipment where id == equipmentId, status == "active") > 0 "Only active equipment can be reserved."
+    constraint reserveEventPresent: count(Event where id == eventId) > 0 "Event is unavailable in this workspace."
+    mutate equipmentId = equipmentId
+    mutate eventId = eventId
+    mutate startsAt = startsAt
+    mutate endsAt = endsAt
+    mutate quantity = quantity
+    mutate status = "reserved"
+    mutate reservedAt = now()
+    emit EquipmentReserved {
+      equipmentReservationId: self.id
+      equipmentId: equipmentId
+      eventId: eventId
+      tenantId: self.tenantId
+      startsAt: startsAt
+      endsAt: endsAt
+      quantity: quantity
+    }
+  }
+
+  // Rental reconciliation for Event.reschedule (convex/lib/rentalReconciliation.ts)
+  // moves a reserved hold onto the new event window. Only that consequence path
+  // runs it (through the tenant system runner); operators cancel and re-reserve.
+  command moveWindow(startsAt: datetime, endsAt: datetime) {
+    guard self.status == "reserved"
+    guard self.deletedAt == null
+    guard user.role == "system"
+    constraint moveWindowDates: endsAt > startsAt "Return time must be after checkout time."
+    compute previousStartsAt = self.startsAt
+    compute previousEndsAt = self.endsAt
+    mutate startsAt = startsAt
+    mutate endsAt = endsAt
+    emit EquipmentReservationRescheduled {
+      equipmentReservationId: self.id
+      equipmentId: self.equipmentId
+      eventId: self.eventId
+      tenantId: self.tenantId
+      previousStartsAt: previousStartsAt
+      previousEndsAt: previousEndsAt
+      startsAt: startsAt
+      endsAt: endsAt
+    }
+  }
 
   command checkOut(condition: EquipmentCondition, optional note: string) {
     guard self.status == "reserved"
@@ -334,6 +398,17 @@ event EquipmentReserved: "equipment.reserved" {
   startsAt: datetime
   endsAt: datetime
   quantity: int
+}
+
+event EquipmentReservationRescheduled: "equipment.reservation_rescheduled" {
+  equipmentReservationId: string
+  equipmentId: string
+  eventId: string
+  tenantId: string
+  previousStartsAt: datetime?
+  previousEndsAt: datetime?
+  startsAt: datetime
+  endsAt: datetime
 }
 
 event EquipmentCheckedOut: "equipment.checked_out" {

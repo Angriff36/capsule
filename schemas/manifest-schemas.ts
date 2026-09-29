@@ -4906,6 +4906,20 @@ export const CutoverDecisionSetTppReadOnlyParamsSchema = z.object({
 
 export type CutoverDecisionSetTppReadOnlyParams = z.infer<typeof CutoverDecisionSetTppReadOnlyParamsSchema>;
 
+// Command: assignDriver on Delivery
+export const DeliveryAssignDriverParamsSchema = z.object({
+  driverId: z.string().min(1),
+});
+
+export type DeliveryAssignDriverParams = z.infer<typeof DeliveryAssignDriverParamsSchema>;
+
+// Command: assignVehicle on Delivery
+export const DeliveryAssignVehicleParamsSchema = z.object({
+  vehicleId: z.string().min(1),
+});
+
+export type DeliveryAssignVehicleParams = z.infer<typeof DeliveryAssignVehicleParamsSchema>;
+
 // Command: cancel on Delivery
 export const DeliveryCancelParamsSchema = z.object({
   reason: z.string(),
@@ -4947,6 +4961,16 @@ export type DeliveryStandDownWithEventParams = z.infer<typeof DeliveryStandDownW
 export const DeliveryStartTransitParamsSchema = z.object({});
 
 export type DeliveryStartTransitParams = z.infer<typeof DeliveryStartTransitParamsSchema>;
+
+// Command: unassignDriver on Delivery
+export const DeliveryUnassignDriverParamsSchema = z.object({});
+
+export type DeliveryUnassignDriverParams = z.infer<typeof DeliveryUnassignDriverParamsSchema>;
+
+// Command: unassignVehicle on Delivery
+export const DeliveryUnassignVehicleParamsSchema = z.object({});
+
+export type DeliveryUnassignVehicleParams = z.infer<typeof DeliveryUnassignVehicleParamsSchema>;
 
 // Command: classifyAllergens on Dish
 export const DishClassifyAllergensParamsSchema = z.object({
@@ -5356,6 +5380,25 @@ export const EquipmentReservationMarkReturnedParamsSchema = z.object({
 
 export type EquipmentReservationMarkReturnedParams = z.infer<typeof EquipmentReservationMarkReturnedParamsSchema>;
 
+// Command: moveWindow on EquipmentReservation
+export const EquipmentReservationMoveWindowParamsSchema = z.object({
+  startsAt: z.coerce.date(),
+  endsAt: z.coerce.date(),
+});
+
+export type EquipmentReservationMoveWindowParams = z.infer<typeof EquipmentReservationMoveWindowParamsSchema>;
+
+// Command: reserve on EquipmentReservation
+export const EquipmentReservationReserveParamsSchema = z.object({
+  equipmentId: z.string(),
+  eventId: z.string(),
+  startsAt: z.coerce.date(),
+  endsAt: z.coerce.date(),
+  quantity: z.number().int(),
+});
+
+export type EquipmentReservationReserveParams = z.infer<typeof EquipmentReservationReserveParamsSchema>;
+
 // Command: record on EquipmentServiceEntry
 export const EquipmentServiceEntryRecordParamsSchema = z.object({
   maintenanceTaskId: z.string().min(1),
@@ -5368,6 +5411,15 @@ export const EquipmentServiceEntryRecordParamsSchema = z.object({
 });
 
 export type EquipmentServiceEntryRecordParams = z.infer<typeof EquipmentServiceEntryRecordParamsSchema>;
+
+// Command: advanceRecurrence on Event
+export const EventAdvanceRecurrenceParamsSchema = z.object({
+  seriesId: z.string(),
+  generatedCount: z.number().int(),
+  nextStartsAt: z.coerce.date().optional(),
+});
+
+export type EventAdvanceRecurrenceParams = z.infer<typeof EventAdvanceRecurrenceParamsSchema>;
 
 // Command: approve on Event
 export const EventApproveParamsSchema = z.object({});
@@ -5584,6 +5636,9 @@ export const EventPlanEngagementParamsSchema = z.object({
   assignedToId: z.string().min(1).optional(),
   ownerName: z.string().optional(),
   referralSourceId: z.string().min(1).optional(),
+  recurrenceTemplateEventId: z.string().min(1).optional(),
+  recurrenceSeriesId: z.string().optional(),
+  recurrenceSequence: z.number().int().optional(),
 });
 
 export type EventPlanEngagementParams = z.infer<typeof EventPlanEngagementParamsSchema>;

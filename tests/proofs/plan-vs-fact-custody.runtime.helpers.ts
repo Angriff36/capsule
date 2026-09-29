@@ -108,7 +108,7 @@ export async function seedCheckedOutHold(
   })) as { equipmentReservationId: string };
   await runner(proof, inventory)(api.mutations.EquipmentReservation_checkOut, {
     docId: res.equipmentReservationId,
-    version: 0,
+    version: 1, // createViaReserve starts a reservation at version 1
     condition: "good",
   });
   return {

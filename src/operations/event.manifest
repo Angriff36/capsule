@@ -854,11 +854,20 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional operationalRequirements: string,
     optional assignedToId: uuid,
     optional ownerName: string,
-    optional referralSourceId: uuid
+    optional referralSourceId: uuid,
+    optional recurrenceTemplateEventId: uuid,
+    optional recurrenceSeriesId: string,
+    optional recurrenceSequence: int
   ) {
     guard self.stage == "planning"
     guard self.plannedAt == null
     guard self.deletedAt == null
+    // Recurring occurrences are planned only by the series materializer
+    // (convex/recurringEvents.ts, tenant system runner), which also keeps one
+    // occurrence per sequence. The template read is a point read by id.
+    constraint planRecurrenceBySchedule: recurrenceTemplateEventId == null or user.role == "system" "Recurring event instances are created by the recurrence schedule."
+    constraint planRecurrenceLinkComplete: (recurrenceTemplateEventId == null and recurrenceSeriesId == null and recurrenceSequence == null) or (recurrenceTemplateEventId != null and recurrenceSeriesId != null and recurrenceSequence != null and recurrenceSequence >= 2) "Recurring event instances need their source event, series and a sequence of two or more."
+    constraint planRecurrenceSeriesActive: recurrenceTemplateEventId == null or count(Event where id == recurrenceTemplateEventId, recurrenceSeriesId == recurrenceSeriesId, recurrenceActive == true) > 0 "This recurring series is no longer active."
     constraint planTitle: length(trim(title)) > 0 "Give this event a title."
     constraint planType: length(trim(eventType)) > 0 "Pick an event type."
     constraint planDates: endsAt > startsAt "Event end must be after its start"
@@ -893,6 +902,9 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate assignedToId = assignedToId
     mutate ownerName = ownerName
     mutate referralSourceId = referralSourceId
+    mutate recurrenceTemplateEventId = recurrenceTemplateEventId != null ? recurrenceTemplateEventId : self.recurrenceTemplateEventId
+    mutate recurrenceSeriesId = recurrenceSeriesId != null ? recurrenceSeriesId : self.recurrenceSeriesId
+    mutate recurrenceSequence = recurrenceSequence != null ? recurrenceSequence : self.recurrenceSequence
     mutate stage = "planning"
     mutate plannedAt = now()
     emit EventPlanned {
@@ -905,6 +917,9 @@ entity Event mixin TenantScoped, SoftDeletable {
       startsAt: startsAt
       endsAt: endsAt
       expectedHeadcount: expectedHeadcount
+      recurrenceTemplateEventId: recurrenceTemplateEventId
+      recurrenceSeriesId: recurrenceSeriesId
+      recurrenceSequence: recurrenceSequence
     }
   }
 
@@ -1157,6 +1172,28 @@ entity Event mixin TenantScoped, SoftDeletable {
       endCondition: endCondition
       recurrenceEndsAt: recurrenceEndsAt
       occurrenceLimit: occurrenceLimit
+      nextStartsAt: nextStartsAt
+    }
+  }
+
+  // The series materializer (convex/recurringEvents.ts, tenant system runner)
+  // records how far it has planned the series. A null nextStartsAt means the
+  // series is complete.
+  command advanceRecurrence(seriesId: string, generatedCount: int, optional nextStartsAt: datetime) {
+    guard self.deletedAt == null
+    guard self.recurrenceActive == true
+    guard self.recurrenceSeriesId == seriesId
+    guard user.role == "system"
+    constraint advanceRecurrenceCount: generatedCount >= 1 "The recurring count can't be below one. Use one or more."
+    mutate recurrenceGeneratedCount = generatedCount
+    mutate recurrenceNextStartsAt = nextStartsAt
+    mutate recurrenceActive = nextStartsAt != null
+    mutate recurrenceCompletedAt = nextStartsAt != null ? null : now()
+    emit EventRecurrenceAdvanced {
+      eventId: self.id
+      tenantId: self.tenantId
+      seriesId: seriesId
+      generatedCount: generatedCount
       nextStartsAt: nextStartsAt
     }
   }
@@ -2265,6 +2302,9 @@ event EventPlanned: "event.planned" {
   startsAt: datetime
   endsAt: datetime
   expectedHeadcount: number
+  recurrenceTemplateEventId: string?
+  recurrenceSeriesId: string?
+  recurrenceSequence: int?
 }
 
 event EventScheduleChanged: "event.schedule_changed" {
@@ -2289,6 +2329,14 @@ event EventRecurrenceConfigured: "event.recurrence_configured" {
   recurrenceEndsAt: datetime?
   occurrenceLimit: int?
   nextStartsAt: datetime
+}
+
+event EventRecurrenceAdvanced: "event.recurrence_advanced" {
+  eventId: string
+  tenantId: string
+  seriesId: string
+  generatedCount: int
+  nextStartsAt: datetime?
 }
 
 event EventRecurrenceStopped: "event.recurrence_stopped" {

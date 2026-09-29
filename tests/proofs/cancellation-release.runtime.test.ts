@@ -207,7 +207,7 @@ describe("runtime proof: Event.cancel releases future holds and keeps performed 
 
     await run(proof, inventory, M.EquipmentReservation_checkOut, {
       docId: seeded.reservationId,
-      version: 0,
+      version: 1, // createViaReserve starts a reservation at version 1
       condition: "good",
     });
     await run(proof, workforce, M.EventAssignment_checkIn, {

@@ -1,4 +1,5 @@
 import { ConvexError, v } from "convex/values";
+import { api } from "./_generated/api";
 import { mutation } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
 
@@ -23,8 +24,12 @@ const DELIVERY_ROLES = new Set([
  * Authored driver-assignment seam for Delivery.
  *
  * Manifest owns the entity, lifecycle, policies, events, and generated client
- * bindings. Driver assignment after auto-schedule needs a direct patch seam
- * because the schedule reaction does not set driverId.
+ * bindings. ~~Driver assignment after auto-schedule needs a direct patch seam
+ * because the schedule reaction does not set driverId.~~
+ * 2026-09-29: the write is the generated Delivery.assignDriver /
+ * unassignDriver command (caller auth, same transaction), which emits
+ * DeliveryDriverAssigned / DeliveryDriverUnassigned. This seam keeps the
+ * operator-readable pre-checks and the no-op unassign of an empty slot.
  */
 export const assign = mutation({
   args: {
@@ -71,23 +76,10 @@ export const assign = mutation({
       );
     }
 
-    const now = Date.now();
-    await ctx.db.patch(args.deliveryId, {
+    await ctx.runMutation(api.mutations.Delivery_assignDriver, {
+      docId: args.deliveryId,
       driverId: args.driverId,
-      updatedAt: now,
-      version: (delivery.version ?? 0) + 1,
-    });
-    await ctx.db.insert("manifestEvents", {
-      type: "DeliveryDriverAssigned",
-      entity: "Delivery",
-      entityId: args.deliveryId,
-      payload: {
-        deliveryId: args.deliveryId,
-        tenantId,
-        driverId: args.driverId,
-        eventId: delivery.eventId,
-      },
-      createdAt: now,
+      version: delivery.version,
     });
 
     return { deliveryId: args.deliveryId, driverId: args.driverId };
@@ -131,23 +123,9 @@ export const unassign = mutation({
       return { deliveryId: args.deliveryId, driverId: null };
     }
 
-    const now = Date.now();
-    await ctx.db.patch(args.deliveryId, {
-      driverId: null,
-      updatedAt: now,
-      version: (delivery.version ?? 0) + 1,
-    });
-    await ctx.db.insert("manifestEvents", {
-      type: "DeliveryDriverUnassigned",
-      entity: "Delivery",
-      entityId: args.deliveryId,
-      payload: {
-        deliveryId: args.deliveryId,
-        tenantId,
-        driverId,
-        eventId: delivery.eventId,
-      },
-      createdAt: now,
+    await ctx.runMutation(api.mutations.Delivery_unassignDriver, {
+      docId: args.deliveryId,
+      version: delivery.version,
     });
 
     return { deliveryId: args.deliveryId, driverId: null };

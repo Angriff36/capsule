@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "11d01fbd4c68f896916782a923d864799c09fefe7f23c3a67af6204ef1d3b9fa:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21c70b2b10030f5a9acdb868c2e229c0b48fd6f86e2a44f85040058ab7634e25:272a31932843884c7ac3eabb6161bd3cebde6879b8bea18fc25043fa9be4455f:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2aea5aa1d00f0d86457cb177ee29c76e1c1dc22e7f73bad7f8b1074575cbc31d:2c42c97da3b397baa523b8f7ae11ed10f988cb9ea37f6b158ecb4404f5bcab62:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:2f58e48aa70e7c4414f51af8aea7f9768e378ea26daa75b659dba78dab856030:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:327f55f7fc3badfa91db612d8da5b7a890ed54daf3398ab067c48dd29bcb6f52:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:3946e202e3a047c69528d06bc1371d5100bdc27d68d2644d8882da7bcfa1d23c:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:4021a43427a72d2daffe25a117f282ffc343ff11dd02010652045485f3bf2816:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:45b3d018cb8479a590061dabb5a6bf03edb434440cc64cd88487eb3f799fe2d6:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4ac247395613e10f80cd1bb39b0bcc11a98d99cac60463154d9c42e7b5967258:501487754e20a846402d574851966950378082990b46261a0318113100bcdca5:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:57041b3fe080152b717e2ab15050bc93d3830b1d8027e5dc5114d687ad3c6be3:5b1a6e044cc0addd7bf6bc5f82a1f15994e33d01cccd75bb4dec4971b38b039b:5b5d08c3ea56e43ddf1f2623cdc1888b7bfafc1cbf6ee4a6d49ae42e68c73c95:5fd882905c48e953a76af92b6db9cb606a0b0a9f9949c49f5ce6ca71c0d808ff:673eea009a24475e68b862081672cfe7f5ac7d9c5fb1cae8cd3cb4e17912765f:6a640d8f2f2791605a5c80bebcb59661c51018393b66d37fffa014400b7e99d4:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:6de6b132498fdb76faa9830c1ff3845816532ec79baea94836775d320903dc1f:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:78e2341ac6b83ff5eb43c7fbfc824766ef6c9f5ebb61590eb8cf7ca8270d8b9d:792131c7b95d7c0b140fb2dbbf6a4b7e3ab487a4dc26f65a3d4374fa9c0e6e6b:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7a8de9cb59f93d64dd599f21ded09010d4de32c74d4c83100dcea9b6877fe6b0:7d5c0741e3a26447773948cfe2d758cd1e210e2f37c9f39c272ca443b716a309:7dd6076ce8b39c99fb91e01b05b04c5e8d3c44f535cbcb26f27320918d21294d:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bc38accf30dad64f89fc62a930fea2e6de166c7ddcfbc5f509f57cdb9c41fb5:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:92c0c66864b3c226093e8f9f95ccbee7c79f353d8a59123003095641b38789d4:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:9e98bdeac2b20c1da7c8565bc0e68b67db011509c47c3c512b9e1c9f7be516c4:a04c9aa12c21c3811997769713ecd392ab9d47a8d216dbc42e666cabac135d05:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a363078ede0b73c3c2f7a5c6ddb5c2f0d9de214832687609020e7078b66a8cb3:a37b67df92f218d6b1fbafe7932f858f12fd11a6e1063c82b43664b1146a9fb0:a8b60c0f996f5391bb792849f2044c2e973b34d15938963afad73f7e6a9706a4:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:afbd0cf1305dff953db623162ca2ab2170e7cc3d4f7a62739a8a2653d8ec8941:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b15baf1a6241169d8eb947ae3850e26305e5d419875211954210152c3b42fcd5:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b4bcd360de08b84126452b6c53b801c7f84f1dea757f2c10c53d47f50d8b1182:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bee0f6341a01acf156773a21505eca5e20a25fdb7d1dc6c09c37720a1c2ef899:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c4f4847c56f2947ed5512b4e3254c848c5063e0e6d9d5f2a79578b289d098114:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:ca49afde92432ac008856285d940bc605b8cabecbacbf706b4cf42ac74ccce1f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d3b087f64aae628f5786c8a1cfee107ad396828d18d7e6b77b972f6a3f0f95c7:d4d9def716300b65106042da9a2f7dc8b2b1636bbd3b07ecd3e8614053a9ca73:d9ef376b473936bad5512b64a8aea50c92505d6b1a159615719328cdd79c1c1d:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dc6fcf0fd92b72ae0e511408e5e16b5a5f8007426762380770abc419eebf836f:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e610c980855414eb0532fa1a84908500dbfa3ae1d3b8aec60a88b82418fcaacb:e89da7c29b83df66466e7b996b1780a39c690560afa9a5e5f23c698003827e40:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:ee33cad2c146aefd4f3f8a4e9158f888bc228824dbd5d6e425414009f6aa8ba5:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f49c5ef7603c706a89514343223fe24d6e1496af83095a7796cb93e7336aaea4:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdaa81c70b2f571c3b10af2b3ad5acac7f74ebf613964b09e49516d7d1809937:fe7be8fbd9564de4521178c9c6f4a329db717fbd9f5499c0f5f61c18efa07f19";
+export const WIRING_CONTRACT_HASH = "11d01fbd4c68f896916782a923d864799c09fefe7f23c3a67af6204ef1d3b9fa:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21c70b2b10030f5a9acdb868c2e229c0b48fd6f86e2a44f85040058ab7634e25:272a31932843884c7ac3eabb6161bd3cebde6879b8bea18fc25043fa9be4455f:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2aea5aa1d00f0d86457cb177ee29c76e1c1dc22e7f73bad7f8b1074575cbc31d:2c42c97da3b397baa523b8f7ae11ed10f988cb9ea37f6b158ecb4404f5bcab62:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:2f58e48aa70e7c4414f51af8aea7f9768e378ea26daa75b659dba78dab856030:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:327f55f7fc3badfa91db612d8da5b7a890ed54daf3398ab067c48dd29bcb6f52:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:353a3991489aafe1d337e52672908e0eea8521d946ab792ce54227e7b6e7f1dd:3946e202e3a047c69528d06bc1371d5100bdc27d68d2644d8882da7bcfa1d23c:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:4021a43427a72d2daffe25a117f282ffc343ff11dd02010652045485f3bf2816:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:45b3d018cb8479a590061dabb5a6bf03edb434440cc64cd88487eb3f799fe2d6:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4ac247395613e10f80cd1bb39b0bcc11a98d99cac60463154d9c42e7b5967258:501487754e20a846402d574851966950378082990b46261a0318113100bcdca5:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:57041b3fe080152b717e2ab15050bc93d3830b1d8027e5dc5114d687ad3c6be3:5b1a6e044cc0addd7bf6bc5f82a1f15994e33d01cccd75bb4dec4971b38b039b:5b5d08c3ea56e43ddf1f2623cdc1888b7bfafc1cbf6ee4a6d49ae42e68c73c95:5fd882905c48e953a76af92b6db9cb606a0b0a9f9949c49f5ce6ca71c0d808ff:6a640d8f2f2791605a5c80bebcb59661c51018393b66d37fffa014400b7e99d4:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:78e2341ac6b83ff5eb43c7fbfc824766ef6c9f5ebb61590eb8cf7ca8270d8b9d:792131c7b95d7c0b140fb2dbbf6a4b7e3ab487a4dc26f65a3d4374fa9c0e6e6b:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7a8de9cb59f93d64dd599f21ded09010d4de32c74d4c83100dcea9b6877fe6b0:7d5c0741e3a26447773948cfe2d758cd1e210e2f37c9f39c272ca443b716a309:7dd6076ce8b39c99fb91e01b05b04c5e8d3c44f535cbcb26f27320918d21294d:7fd8ed51d32b011977a2e27258cc6c003895e596d0456d876ce044d6e5069e4f:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bc38accf30dad64f89fc62a930fea2e6de166c7ddcfbc5f509f57cdb9c41fb5:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:92c0c66864b3c226093e8f9f95ccbee7c79f353d8a59123003095641b38789d4:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:9e98bdeac2b20c1da7c8565bc0e68b67db011509c47c3c512b9e1c9f7be516c4:a04c9aa12c21c3811997769713ecd392ab9d47a8d216dbc42e666cabac135d05:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a363078ede0b73c3c2f7a5c6ddb5c2f0d9de214832687609020e7078b66a8cb3:a37b67df92f218d6b1fbafe7932f858f12fd11a6e1063c82b43664b1146a9fb0:a8b60c0f996f5391bb792849f2044c2e973b34d15938963afad73f7e6a9706a4:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:afbd0cf1305dff953db623162ca2ab2170e7cc3d4f7a62739a8a2653d8ec8941:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b15baf1a6241169d8eb947ae3850e26305e5d419875211954210152c3b42fcd5:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bb1b349fb092708208d054b5ac620ccd7d41bb0eed9034545db82fe3247f4dfc:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bee0f6341a01acf156773a21505eca5e20a25fdb7d1dc6c09c37720a1c2ef899:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c4f4847c56f2947ed5512b4e3254c848c5063e0e6d9d5f2a79578b289d098114:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:ca49afde92432ac008856285d940bc605b8cabecbacbf706b4cf42ac74ccce1f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d3b087f64aae628f5786c8a1cfee107ad396828d18d7e6b77b972f6a3f0f95c7:d4d9def716300b65106042da9a2f7dc8b2b1636bbd3b07ecd3e8614053a9ca73:d9ef376b473936bad5512b64a8aea50c92505d6b1a159615719328cdd79c1c1d:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dc6fcf0fd92b72ae0e511408e5e16b5a5f8007426762380770abc419eebf836f:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e610c980855414eb0532fa1a84908500dbfa3ae1d3b8aec60a88b82418fcaacb:e89da7c29b83df66466e7b996b1780a39c690560afa9a5e5f23c698003827e40:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:ee33cad2c146aefd4f3f8a4e9158f888bc228824dbd5d6e425414009f6aa8ba5:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f49c5ef7603c706a89514343223fe24d6e1496af83095a7796cb93e7336aaea4:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdaa81c70b2f571c3b10af2b3ad5acac7f74ebf613964b09e49516d7d1809937:fe7be8fbd9564de4521178c9c6f4a329db717fbd9f5499c0f5f61c18efa07f19";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -14854,6 +14854,278 @@ export const CutoverDecisionSetTppReadOnlyAction = {
   ]
 } as const;
 
+// --- Delivery.assignDriver ---
+export interface DeliveryAssignDriverClientInput {
+  driverId: string;
+}
+
+export const DeliveryAssignDriverCapability = {
+  capabilityId: "Delivery.assignDriver",
+  entity: "Delivery",
+  command: "assignDriver",
+  route: "/api/manifest/Delivery/commands/assignDriver",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; eventId: string; driverId: string | null; vehicleId: string | null; destination: string; windowStartsAt: number | null; windowEndsAt: number | null; notes: string | null; status: \"scheduled\" | \"in_transit\" | \"delivered\" | \"failed\" | \"cancelled\"; scheduledAt: number | null; departedAt: number | null; deliveredAt: number | null; failedAt: number | null; failureReason: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["driverId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Logistics staff and managers may see deliveries"},{"kind":"policy_denial","message":"Logistics staff and managers may update deliveries"},{"kind":"policy_denial","message":"Logistics staff and managers may change deliveries"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Pick an active person in this workspace as the driver."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Delivery not found"}],
+  emits: ["DeliveryDriverAssigned"],
+} as const;
+
+export type DeliveryAssignDriverResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; eventId: string; driverId: string | null; vehicleId: string | null; destination: string; windowStartsAt: number | null; windowEndsAt: number | null; notes: string | null; status: "scheduled" | "in_transit" | "delivered" | "failed" | "cancelled"; scheduledAt: number | null; departedAt: number | null; deliveredAt: number | null; failedAt: number | null; failureReason: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Delivery.assignDriver.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDeliveryAssignDriverInput(client: DeliveryAssignDriverClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Delivery.assignDriver. */
+export const DeliveryAssignDriverInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Delivery",
+    "queryKeyHint": "queryKeys.delivery.lists()",
+    "readId": "Delivery.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Delivery",
+    "queryKeyHint": "queryKeys.delivery.detail(id)",
+    "readId": "Delivery.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Incident",
+    "queryKeyHint": "queryKeys.incident.lists()",
+    "readId": "Incident.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Incident",
+    "queryKeyHint": "queryKeys.incident.detail(id)",
+    "readId": "Incident.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.lists()",
+    "readId": "PackList.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.detail(id)",
+    "readId": "PackList.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Vehicle",
+    "queryKeyHint": "queryKeys.vehicle.lists()",
+    "readId": "Vehicle.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Vehicle",
+    "queryKeyHint": "queryKeys.vehicle.detail(id)",
+    "readId": "Vehicle.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Delivery.assignDriver. Not a rendered control. */
+export const DeliveryAssignDriverAction = {
+  "exposure": "human",
+  "label": "Assign driver",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "driverId",
+      "label": "Driver id",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- Delivery.assignVehicle ---
+export interface DeliveryAssignVehicleClientInput {
+  vehicleId: string;
+}
+
+export const DeliveryAssignVehicleCapability = {
+  capabilityId: "Delivery.assignVehicle",
+  entity: "Delivery",
+  command: "assignVehicle",
+  route: "/api/manifest/Delivery/commands/assignVehicle",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; eventId: string; driverId: string | null; vehicleId: string | null; destination: string; windowStartsAt: number | null; windowEndsAt: number | null; notes: string | null; status: \"scheduled\" | \"in_transit\" | \"delivered\" | \"failed\" | \"cancelled\"; scheduledAt: number | null; departedAt: number | null; deliveredAt: number | null; failedAt: number | null; failureReason: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["vehicleId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Logistics staff and managers may see deliveries"},{"kind":"policy_denial","message":"Logistics staff and managers may update deliveries"},{"kind":"policy_denial","message":"Logistics staff and managers may change deliveries"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Pick a vehicle in this workspace that is not retired."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Delivery not found"}],
+  emits: ["DeliveryVehicleAssigned"],
+} as const;
+
+export type DeliveryAssignVehicleResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; eventId: string; driverId: string | null; vehicleId: string | null; destination: string; windowStartsAt: number | null; windowEndsAt: number | null; notes: string | null; status: "scheduled" | "in_transit" | "delivered" | "failed" | "cancelled"; scheduledAt: number | null; departedAt: number | null; deliveredAt: number | null; failedAt: number | null; failureReason: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Delivery.assignVehicle.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDeliveryAssignVehicleInput(client: DeliveryAssignVehicleClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Delivery.assignVehicle. */
+export const DeliveryAssignVehicleInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Delivery",
+    "queryKeyHint": "queryKeys.delivery.lists()",
+    "readId": "Delivery.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Delivery",
+    "queryKeyHint": "queryKeys.delivery.detail(id)",
+    "readId": "Delivery.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Incident",
+    "queryKeyHint": "queryKeys.incident.lists()",
+    "readId": "Incident.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Incident",
+    "queryKeyHint": "queryKeys.incident.detail(id)",
+    "readId": "Incident.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.lists()",
+    "readId": "PackList.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.detail(id)",
+    "readId": "PackList.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Vehicle",
+    "queryKeyHint": "queryKeys.vehicle.lists()",
+    "readId": "Vehicle.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Vehicle",
+    "queryKeyHint": "queryKeys.vehicle.detail(id)",
+    "readId": "Vehicle.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Delivery.assignVehicle. Not a rendered control. */
+export const DeliveryAssignVehicleAction = {
+  "exposure": "human",
+  "label": "Assign vehicle",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "vehicleId",
+      "label": "Vehicle id",
+      "required": true
+    }
+  ]
+} as const;
+
 // --- Delivery.cancel ---
 export interface DeliveryCancelClientInput {
   reason: string;
@@ -15784,6 +16056,262 @@ export const DeliveryStartTransitLifecycle = [
     "proven": true
   }
 ] as const;
+
+// --- Delivery.unassignDriver ---
+export type DeliveryUnassignDriverClientInput = Record<string, never>;
+
+export const DeliveryUnassignDriverCapability = {
+  capabilityId: "Delivery.unassignDriver",
+  entity: "Delivery",
+  command: "unassignDriver",
+  route: "/api/manifest/Delivery/commands/unassignDriver",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; eventId: string; driverId: string | null; vehicleId: string | null; destination: string; windowStartsAt: number | null; windowEndsAt: number | null; notes: string | null; status: \"scheduled\" | \"in_transit\" | \"delivered\" | \"failed\" | \"cancelled\"; scheduledAt: number | null; departedAt: number | null; deliveredAt: number | null; failedAt: number | null; failureReason: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Logistics staff and managers may see deliveries"},{"kind":"policy_denial","message":"Logistics staff and managers may update deliveries"},{"kind":"policy_denial","message":"Logistics staff and managers may change deliveries"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Delivery not found"}],
+  emits: ["DeliveryDriverUnassigned"],
+} as const;
+
+export type DeliveryUnassignDriverResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; eventId: string; driverId: string | null; vehicleId: string | null; destination: string; windowStartsAt: number | null; windowEndsAt: number | null; notes: string | null; status: "scheduled" | "in_transit" | "delivered" | "failed" | "cancelled"; scheduledAt: number | null; departedAt: number | null; deliveredAt: number | null; failedAt: number | null; failureReason: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Delivery.unassignDriver.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDeliveryUnassignDriverInput(client: DeliveryUnassignDriverClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Delivery.unassignDriver. */
+export const DeliveryUnassignDriverInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Delivery",
+    "queryKeyHint": "queryKeys.delivery.lists()",
+    "readId": "Delivery.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Delivery",
+    "queryKeyHint": "queryKeys.delivery.detail(id)",
+    "readId": "Delivery.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Incident",
+    "queryKeyHint": "queryKeys.incident.lists()",
+    "readId": "Incident.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Incident",
+    "queryKeyHint": "queryKeys.incident.detail(id)",
+    "readId": "Incident.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.lists()",
+    "readId": "PackList.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.detail(id)",
+    "readId": "PackList.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Vehicle",
+    "queryKeyHint": "queryKeys.vehicle.lists()",
+    "readId": "Vehicle.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Vehicle",
+    "queryKeyHint": "queryKeys.vehicle.detail(id)",
+    "readId": "Vehicle.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Delivery.unassignDriver. Not a rendered control. */
+export const DeliveryUnassignDriverAction = {
+  "exposure": "human",
+  "label": "Unassign driver",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- Delivery.unassignVehicle ---
+export type DeliveryUnassignVehicleClientInput = Record<string, never>;
+
+export const DeliveryUnassignVehicleCapability = {
+  capabilityId: "Delivery.unassignVehicle",
+  entity: "Delivery",
+  command: "unassignVehicle",
+  route: "/api/manifest/Delivery/commands/unassignVehicle",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; eventId: string; driverId: string | null; vehicleId: string | null; destination: string; windowStartsAt: number | null; windowEndsAt: number | null; notes: string | null; status: \"scheduled\" | \"in_transit\" | \"delivered\" | \"failed\" | \"cancelled\"; scheduledAt: number | null; departedAt: number | null; deliveredAt: number | null; failedAt: number | null; failureReason: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Logistics staff and managers may see deliveries"},{"kind":"policy_denial","message":"Logistics staff and managers may update deliveries"},{"kind":"policy_denial","message":"Logistics staff and managers may change deliveries"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Delivery not found"}],
+  emits: ["DeliveryVehicleUnassigned"],
+} as const;
+
+export type DeliveryUnassignVehicleResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; eventId: string; driverId: string | null; vehicleId: string | null; destination: string; windowStartsAt: number | null; windowEndsAt: number | null; notes: string | null; status: "scheduled" | "in_transit" | "delivered" | "failed" | "cancelled"; scheduledAt: number | null; departedAt: number | null; deliveredAt: number | null; failedAt: number | null; failureReason: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Delivery.unassignVehicle.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDeliveryUnassignVehicleInput(client: DeliveryUnassignVehicleClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Delivery.unassignVehicle. */
+export const DeliveryUnassignVehicleInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Delivery",
+    "queryKeyHint": "queryKeys.delivery.lists()",
+    "readId": "Delivery.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Delivery",
+    "queryKeyHint": "queryKeys.delivery.detail(id)",
+    "readId": "Delivery.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Incident",
+    "queryKeyHint": "queryKeys.incident.lists()",
+    "readId": "Incident.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Incident",
+    "queryKeyHint": "queryKeys.incident.detail(id)",
+    "readId": "Incident.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.lists()",
+    "readId": "PackList.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.detail(id)",
+    "readId": "PackList.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Vehicle",
+    "queryKeyHint": "queryKeys.vehicle.lists()",
+    "readId": "Vehicle.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Vehicle",
+    "queryKeyHint": "queryKeys.vehicle.detail(id)",
+    "readId": "Vehicle.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Delivery.unassignVehicle. Not a rendered control. */
+export const DeliveryUnassignVehicleAction = {
+  "exposure": "human",
+  "label": "Unassign vehicle",
+  "confirm": false,
+  "fields": []
+} as const;
 
 // --- Dish.classifyAllergens ---
 export interface DishClassifyAllergensClientInput {
@@ -24504,6 +25032,229 @@ export const EquipmentReservationMarkReturnedLifecycle = [
   }
 ] as const;
 
+// --- EquipmentReservation.moveWindow ---
+export interface EquipmentReservationMoveWindowClientInput {
+  /** Must not be "". */
+  startsAt: string & { readonly __nonEmpty?: true };
+  /** Must not be "". */
+  endsAt: string & { readonly __nonEmpty?: true };
+}
+
+export const EquipmentReservationMoveWindowCapability = {
+  capabilityId: "EquipmentReservation.moveWindow",
+  entity: "EquipmentReservation",
+  command: "moveWindow",
+  route: "/api/manifest/EquipmentReservation/commands/moveWindow",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: ["startsAt","endsAt"],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["startsAt","endsAt"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment handoffs, or event managers stand down a cancelled event"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Return time must be after checkout time."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EquipmentReservation not found"}],
+  emits: ["EquipmentReservationRescheduled"],
+} as const;
+
+export type EquipmentReservationMoveWindowResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for EquipmentReservation.moveWindow.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEquipmentReservationMoveWindowInput(client: EquipmentReservationMoveWindowClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EquipmentReservation.moveWindow. */
+export const EquipmentReservationMoveWindowInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EquipmentReservation",
+    "queryKeyHint": "queryKeys.equipmentReservation.lists()",
+    "readId": "EquipmentReservation.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentReservation",
+    "queryKeyHint": "queryKeys.equipmentReservation.detail(id)",
+    "readId": "EquipmentReservation.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.lists()",
+    "readId": "Equipment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.detail(id)",
+    "readId": "Equipment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EquipmentReservation.moveWindow. Not a rendered control. */
+export const EquipmentReservationMoveWindowAction = {
+  "exposure": "human",
+  "label": "Move window",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "startsAt",
+      "label": "Starts at",
+      "required": true
+    },
+    {
+      "name": "endsAt",
+      "label": "Ends at",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- EquipmentReservation.reserve ---
+export interface EquipmentReservationReserveClientInput {
+  equipmentId: string;
+  eventId: string;
+  /** Must not be "". */
+  startsAt: string & { readonly __nonEmpty?: true };
+  /** Must not be "". */
+  endsAt: string & { readonly __nonEmpty?: true };
+  /** Bounds: 1..∞ */
+  quantity: number;
+}
+
+export const EquipmentReservationReserveCapability = {
+  capabilityId: "EquipmentReservation.reserve",
+  entity: "EquipmentReservation",
+  command: "reserve",
+  route: "/api/manifest/EquipmentReservation/commands/reserve",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: ["startsAt","endsAt"],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["equipmentId","eventId","startsAt","endsAt","quantity"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment handoffs, or event managers stand down a cancelled event"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Return time must be after checkout time."},{"kind":"constraint_block","message":"Reserved quantity must be a positive whole number."},{"kind":"constraint_block","message":"Only active equipment can be reserved."},{"kind":"constraint_block","message":"Event is unavailable in this workspace."}],
+  emits: ["EquipmentReserved"],
+} as const;
+
+export type EquipmentReservationReserveResult = { docId: string };
+
+/**
+ * Build command input for EquipmentReservation.reserve.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEquipmentReservationReserveInput(client: EquipmentReservationReserveClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EquipmentReservation.reserve. */
+export const EquipmentReservationReserveInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EquipmentReservation",
+    "queryKeyHint": "queryKeys.equipmentReservation.lists()",
+    "readId": "EquipmentReservation.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentReservation",
+    "queryKeyHint": "queryKeys.equipmentReservation.detail(id)",
+    "readId": "EquipmentReservation.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.lists()",
+    "readId": "Equipment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.detail(id)",
+    "readId": "Equipment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EquipmentReservation.reserve. Not a rendered control. */
+export const EquipmentReservationReserveAction = {
+  "exposure": "human",
+  "label": "Reserve",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "equipmentId",
+      "label": "Equipment id",
+      "required": true
+    },
+    {
+      "name": "eventId",
+      "label": "Event id",
+      "required": true
+    },
+    {
+      "name": "startsAt",
+      "label": "Starts at",
+      "required": true
+    },
+    {
+      "name": "endsAt",
+      "label": "Ends at",
+      "required": true
+    },
+    {
+      "name": "quantity",
+      "label": "Quantity",
+      "required": true
+    }
+  ]
+} as const;
+
 // --- EquipmentServiceEntry.record ---
 export interface EquipmentServiceEntryRecordClientInput {
   maintenanceTaskId: string;
@@ -24632,6 +25383,855 @@ export const EquipmentServiceEntryRecordAction = {
     {
       "name": "notes",
       "label": "Notes",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- Event.advanceRecurrence ---
+export interface EventAdvanceRecurrenceClientInput {
+  seriesId: string;
+  /** Bounds: 1..∞ */
+  generatedCount: number;
+  nextStartsAt?: string;
+}
+
+export const EventAdvanceRecurrenceCapability = {
+  capabilityId: "Event.advanceRecurrence",
+  entity: "Event",
+  command: "advanceRecurrence",
+  route: "/api/manifest/Event/commands/advanceRecurrence",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: ["nextStartsAt"],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string | null; clientName: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; serviceStyleId: string | null; serviceStyleName: string | null; occasionId: string | null; occasionName: string | null; referralSourceId: string | null; venueId: string | null; assignedToId: string | null; ownerName: string | null; title: string; eventNumber: string | null; eventType: string; startsAt: number | null; endsAt: number | null; serviceStartsAt: number | null; timingSetupMinutes: number | null; timingLoadMinutes: number | null; timingOutboundTravelMinutes: number | null; timingCleanupMinutes: number | null; timingReturnTravelMinutes: number | null; timingUnloadMinutes: number | null; timingConfiguredAt: number | null; purchasingWeekStart: number | null; venueName: string | null; venueAddress: string | null; venueCapacity: number | null; expectedHeadcount: number | null; primaryContactName: string | null; primaryContactEmail: string | null; primaryContactPhone: string | null; accessibilityNeeds: string[]; serviceRequirements: string | null; operationalRequirements: string | null; budgetAmount: number | null; quotedPrice: number | null; stage: \"quote\" | \"planning\" | \"pending_approval\" | \"approved\" | \"sales_lock\" | \"executing\" | \"final\" | \"completed\" | \"cancelled\" | \"closed_out\"; importDraftJson: string | null; importSourceKey: string | null; draftCapturedAt: number | null; plannedAt: number | null; approvedAt: number | null; executionStartedAt: number | null; completedAt: number | null; cancelledAt: number | null; closedOutAt: number | null; salesLockedAt: number | null; finalizedAt: number | null; cancellationReason: string | null; archivedAt: number | null; archiveReason: string | null; recurrenceFrequency: \"weekly\" | \"monthly\" | \"annually\" | null; recurrenceEndCondition: \"on_date\" | \"after_occurrences\" | null; recurrenceEndsAt: number | null; recurrenceOccurrenceLimit: number | null; recurrenceAnchorStartsAt: number | null; recurrenceNextStartsAt: number | null; recurrenceGeneratedCount: number | null; recurrenceSeriesId: string | null; recurrenceActive: boolean | null; recurrenceConfiguredAt: number | null; recurrenceStoppedAt: number | null; recurrenceCompletedAt: number | null; recurrenceTemplateEventId: string | null; recurrenceSequence: number | null; barService: string | null; cocktailHourFood: string | null; dessertService: string | null; bussing: string | null; placeSettings: string | null; passedApps: string | null; stationaryApps: string | null; beveragesOnMenu: string | null; tablesideWater: string | null; mangiaDisposables: string | null; eventRentals: string | null; scullery: string | null; powerOnsite: string | null; waterOnsite: string | null; buffetColdPlates: string | null; buffetHotPlates: string | null; linenColorTables: string | null; linenColorBaskets: string | null; servingwareKit: string | null; decorKit: string | null; rainPlan: string | null; setupDiagram: string | null; servingwareSource: string | null; takeRentalsWithUs: string | null; leaveRentalsOnsite: string | null; guestTableSetup: string | null; buffetTableSetup: string | null; appetizerTableSetup: string | null; beverageTableSetup: string | null; beverageDispensers: string | null; buffetService: string | null; binderBuiltAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["seriesId","generatedCount","nextStartsAt"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see shared event plans and operational context"},{"kind":"policy_denial","message":"Event and sales staff may update events"},{"kind":"policy_denial","message":"Event and sales staff may change events"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"The recurring count can't be below one. Use one or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Event not found"}],
+  emits: ["EventRecurrenceAdvanced"],
+} as const;
+
+export type EventAdvanceRecurrenceResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string | null; clientName: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; serviceStyleId: string | null; serviceStyleName: string | null; occasionId: string | null; occasionName: string | null; referralSourceId: string | null; venueId: string | null; assignedToId: string | null; ownerName: string | null; title: string; eventNumber: string | null; eventType: string; startsAt: number | null; endsAt: number | null; serviceStartsAt: number | null; timingSetupMinutes: number | null; timingLoadMinutes: number | null; timingOutboundTravelMinutes: number | null; timingCleanupMinutes: number | null; timingReturnTravelMinutes: number | null; timingUnloadMinutes: number | null; timingConfiguredAt: number | null; purchasingWeekStart: number | null; venueName: string | null; venueAddress: string | null; venueCapacity: number | null; expectedHeadcount: number | null; primaryContactName: string | null; primaryContactEmail: string | null; primaryContactPhone: string | null; accessibilityNeeds: string[]; serviceRequirements: string | null; operationalRequirements: string | null; budgetAmount: number | null; quotedPrice: number | null; stage: "quote" | "planning" | "pending_approval" | "approved" | "sales_lock" | "executing" | "final" | "completed" | "cancelled" | "closed_out"; importDraftJson: string | null; importSourceKey: string | null; draftCapturedAt: number | null; plannedAt: number | null; approvedAt: number | null; executionStartedAt: number | null; completedAt: number | null; cancelledAt: number | null; closedOutAt: number | null; salesLockedAt: number | null; finalizedAt: number | null; cancellationReason: string | null; archivedAt: number | null; archiveReason: string | null; recurrenceFrequency: "weekly" | "monthly" | "annually" | null; recurrenceEndCondition: "on_date" | "after_occurrences" | null; recurrenceEndsAt: number | null; recurrenceOccurrenceLimit: number | null; recurrenceAnchorStartsAt: number | null; recurrenceNextStartsAt: number | null; recurrenceGeneratedCount: number | null; recurrenceSeriesId: string | null; recurrenceActive: boolean | null; recurrenceConfiguredAt: number | null; recurrenceStoppedAt: number | null; recurrenceCompletedAt: number | null; recurrenceTemplateEventId: string | null; recurrenceSequence: number | null; barService: string | null; cocktailHourFood: string | null; dessertService: string | null; bussing: string | null; placeSettings: string | null; passedApps: string | null; stationaryApps: string | null; beveragesOnMenu: string | null; tablesideWater: string | null; mangiaDisposables: string | null; eventRentals: string | null; scullery: string | null; powerOnsite: string | null; waterOnsite: string | null; buffetColdPlates: string | null; buffetHotPlates: string | null; linenColorTables: string | null; linenColorBaskets: string | null; servingwareKit: string | null; decorKit: string | null; rainPlan: string | null; setupDiagram: string | null; servingwareSource: string | null; takeRentalsWithUs: string | null; leaveRentalsOnsite: string | null; guestTableSetup: string | null; buffetTableSetup: string | null; appetizerTableSetup: string | null; beverageTableSetup: string | null; beverageDispensers: string | null; buffetService: string | null; binderBuiltAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Event.advanceRecurrence.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventAdvanceRecurrenceInput(client: EventAdvanceRecurrenceClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Event.advanceRecurrence. */
+export const EventAdvanceRecurrenceInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientCommunication",
+    "queryKeyHint": "queryKeys.clientCommunication.lists()",
+    "readId": "ClientCommunication.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientCommunication",
+    "queryKeyHint": "queryKeys.clientCommunication.detail(id)",
+    "readId": "ClientCommunication.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientPortalLink",
+    "queryKeyHint": "queryKeys.clientPortalLink.lists()",
+    "readId": "ClientPortalLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientPortalLink",
+    "queryKeyHint": "queryKeys.clientPortalLink.detail(id)",
+    "readId": "ClientPortalLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Contract",
+    "queryKeyHint": "queryKeys.contract.lists()",
+    "readId": "Contract.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Contract",
+    "queryKeyHint": "queryKeys.contract.detail(id)",
+    "readId": "Contract.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CorrectiveAction",
+    "queryKeyHint": "queryKeys.correctiveAction.lists()",
+    "readId": "CorrectiveAction.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CorrectiveAction",
+    "queryKeyHint": "queryKeys.correctiveAction.detail(id)",
+    "readId": "CorrectiveAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CreditMemo",
+    "queryKeyHint": "queryKeys.creditMemo.lists()",
+    "readId": "CreditMemo.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CreditMemo",
+    "queryKeyHint": "queryKeys.creditMemo.detail(id)",
+    "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Delivery",
+    "queryKeyHint": "queryKeys.delivery.lists()",
+    "readId": "Delivery.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Delivery",
+    "queryKeyHint": "queryKeys.delivery.detail(id)",
+    "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentReservation",
+    "queryKeyHint": "queryKeys.equipmentReservation.lists()",
+    "readId": "EquipmentReservation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentReservation",
+    "queryKeyHint": "queryKeys.equipmentReservation.detail(id)",
+    "readId": "EquipmentReservation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventAllergenCheck",
+    "queryKeyHint": "queryKeys.eventAllergenCheck.lists()",
+    "readId": "EventAllergenCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventAllergenCheck",
+    "queryKeyHint": "queryKeys.eventAllergenCheck.detail(id)",
+    "readId": "EventAllergenCheck.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventAssignment",
+    "queryKeyHint": "queryKeys.eventAssignment.lists()",
+    "readId": "EventAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventAssignment",
+    "queryKeyHint": "queryKeys.eventAssignment.detail(id)",
+    "readId": "EventAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventCloseout",
+    "queryKeyHint": "queryKeys.eventCloseout.lists()",
+    "readId": "EventCloseout.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventCloseout",
+    "queryKeyHint": "queryKeys.eventCloseout.detail(id)",
+    "readId": "EventCloseout.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.lists()",
+    "readId": "EventDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.detail(id)",
+    "readId": "EventDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventDishComponentSeed",
+    "queryKeyHint": "queryKeys.eventDishComponentSeed.lists()",
+    "readId": "EventDishComponentSeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDishComponentSeed",
+    "queryKeyHint": "queryKeys.eventDishComponentSeed.detail(id)",
+    "readId": "EventDishComponentSeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventDishLineOverride",
+    "queryKeyHint": "queryKeys.eventDishLineOverride.lists()",
+    "readId": "EventDishLineOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDishLineOverride",
+    "queryKeyHint": "queryKeys.eventDishLineOverride.detail(id)",
+    "readId": "EventDishLineOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventGuest",
+    "queryKeyHint": "queryKeys.eventGuest.lists()",
+    "readId": "EventGuest.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventGuest",
+    "queryKeyHint": "queryKeys.eventGuest.detail(id)",
+    "readId": "EventGuest.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventIngredientContribution",
+    "queryKeyHint": "queryKeys.eventIngredientContribution.lists()",
+    "readId": "EventIngredientContribution.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventIngredientContribution",
+    "queryKeyHint": "queryKeys.eventIngredientContribution.detail(id)",
+    "readId": "EventIngredientContribution.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventLayoutSection",
+    "queryKeyHint": "queryKeys.eventLayoutSection.lists()",
+    "readId": "EventLayoutSection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventLayoutSection",
+    "queryKeyHint": "queryKeys.eventLayoutSection.detail(id)",
+    "readId": "EventLayoutSection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventPacketArtifact",
+    "queryKeyHint": "queryKeys.eventPacketArtifact.lists()",
+    "readId": "EventPacketArtifact.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPacketArtifact",
+    "queryKeyHint": "queryKeys.eventPacketArtifact.detail(id)",
+    "readId": "EventPacketArtifact.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventPacketIssue",
+    "queryKeyHint": "queryKeys.eventPacketIssue.lists()",
+    "readId": "EventPacketIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPacketIssue",
+    "queryKeyHint": "queryKeys.eventPacketIssue.detail(id)",
+    "readId": "EventPacketIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventPacketResolution",
+    "queryKeyHint": "queryKeys.eventPacketResolution.lists()",
+    "readId": "EventPacketResolution.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPacketResolution",
+    "queryKeyHint": "queryKeys.eventPacketResolution.detail(id)",
+    "readId": "EventPacketResolution.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventPacketRevision",
+    "queryKeyHint": "queryKeys.eventPacketRevision.lists()",
+    "readId": "EventPacketRevision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPacketRevision",
+    "queryKeyHint": "queryKeys.eventPacketRevision.detail(id)",
+    "readId": "EventPacketRevision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
+    "readId": "EventStaffNeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
+    "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTimelineActivity",
+    "queryKeyHint": "queryKeys.eventTimelineActivity.lists()",
+    "readId": "EventTimelineActivity.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTimelineActivity",
+    "queryKeyHint": "queryKeys.eventTimelineActivity.detail(id)",
+    "readId": "EventTimelineActivity.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTimelineComment",
+    "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
+    "readId": "EventTimelineComment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTimelineComment",
+    "queryKeyHint": "queryKeys.eventTimelineComment.detail(id)",
+    "readId": "EventTimelineComment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Incident",
+    "queryKeyHint": "queryKeys.incident.lists()",
+    "readId": "Incident.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Incident",
+    "queryKeyHint": "queryKeys.incident.detail(id)",
+    "readId": "Incident.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "IngredientDemand",
+    "queryKeyHint": "queryKeys.ingredientDemand.lists()",
+    "readId": "IngredientDemand.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IngredientDemand",
+    "queryKeyHint": "queryKeys.ingredientDemand.detail(id)",
+    "readId": "IngredientDemand.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InventoryLot",
+    "queryKeyHint": "queryKeys.inventoryLot.lists()",
+    "readId": "InventoryLot.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InventoryLot",
+    "queryKeyHint": "queryKeys.inventoryLot.detail(id)",
+    "readId": "InventoryLot.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InventoryReservation",
+    "queryKeyHint": "queryKeys.inventoryReservation.lists()",
+    "readId": "InventoryReservation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InventoryReservation",
+    "queryKeyHint": "queryKeys.inventoryReservation.detail(id)",
+    "readId": "InventoryReservation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.lists()",
+    "readId": "Invoice.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.detail(id)",
+    "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Occasion",
+    "queryKeyHint": "queryKeys.occasion.lists()",
+    "readId": "Occasion.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Occasion",
+    "queryKeyHint": "queryKeys.occasion.detail(id)",
+    "readId": "Occasion.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.lists()",
+    "readId": "PackList.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.detail(id)",
+    "readId": "PackList.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Payment",
+    "queryKeyHint": "queryKeys.payment.lists()",
+    "readId": "Payment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Payment",
+    "queryKeyHint": "queryKeys.payment.detail(id)",
+    "readId": "Payment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PayrollInput",
+    "queryKeyHint": "queryKeys.payrollInput.lists()",
+    "readId": "PayrollInput.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollInput",
+    "queryKeyHint": "queryKeys.payrollInput.detail(id)",
+    "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PerformanceReview",
+    "queryKeyHint": "queryKeys.performanceReview.lists()",
+    "readId": "PerformanceReview.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PerformanceReview",
+    "queryKeyHint": "queryKeys.performanceReview.detail(id)",
+    "readId": "PerformanceReview.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.lists()",
+    "readId": "PrepTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.detail(id)",
+    "readId": "PrepTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PrepTaskComment",
+    "queryKeyHint": "queryKeys.prepTaskComment.lists()",
+    "readId": "PrepTaskComment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PrepTaskComment",
+    "queryKeyHint": "queryKeys.prepTaskComment.detail(id)",
+    "readId": "PrepTaskComment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.lists()",
+    "readId": "ProductionBatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.detail(id)",
+    "readId": "ProductionBatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatchAllocation",
+    "queryKeyHint": "queryKeys.productionBatchAllocation.lists()",
+    "readId": "ProductionBatchAllocation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatchAllocation",
+    "queryKeyHint": "queryKeys.productionBatchAllocation.detail(id)",
+    "readId": "ProductionBatchAllocation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PurchaseNeed",
+    "queryKeyHint": "queryKeys.purchaseNeed.lists()",
+    "readId": "PurchaseNeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PurchaseNeed",
+    "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
+    "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "QuoteSubmission",
+    "queryKeyHint": "queryKeys.quoteSubmission.lists()",
+    "readId": "QuoteSubmission.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "QuoteSubmission",
+    "queryKeyHint": "queryKeys.quoteSubmission.detail(id)",
+    "readId": "QuoteSubmission.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReferralSource",
+    "queryKeyHint": "queryKeys.referralSource.lists()",
+    "readId": "ReferralSource.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReferralSource",
+    "queryKeyHint": "queryKeys.referralSource.detail(id)",
+    "readId": "ReferralSource.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "RevenueAttribution",
+    "queryKeyHint": "queryKeys.revenueAttribution.lists()",
+    "readId": "RevenueAttribution.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RevenueAttribution",
+    "queryKeyHint": "queryKeys.revenueAttribution.detail(id)",
+    "readId": "RevenueAttribution.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReviewFlag",
+    "queryKeyHint": "queryKeys.reviewFlag.lists()",
+    "readId": "ReviewFlag.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReviewFlag",
+    "queryKeyHint": "queryKeys.reviewFlag.detail(id)",
+    "readId": "ReviewFlag.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.lists()",
+    "readId": "ServiceStyle.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.detail(id)",
+    "readId": "ServiceStyle.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Shift",
+    "queryKeyHint": "queryKeys.shift.lists()",
+    "readId": "Shift.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Shift",
+    "queryKeyHint": "queryKeys.shift.detail(id)",
+    "readId": "Shift.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StaffMessage",
+    "queryKeyHint": "queryKeys.staffMessage.lists()",
+    "readId": "StaffMessage.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StaffMessage",
+    "queryKeyHint": "queryKeys.staffMessage.detail(id)",
+    "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TimeRecord",
+    "queryKeyHint": "queryKeys.timeRecord.lists()",
+    "readId": "TimeRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TimeRecord",
+    "queryKeyHint": "queryKeys.timeRecord.detail(id)",
+    "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.lists()",
+    "readId": "VendorOrder.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.detail(id)",
+    "readId": "VendorOrder.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Venue",
+    "queryKeyHint": "queryKeys.venue.lists()",
+    "readId": "Venue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Venue",
+    "queryKeyHint": "queryKeys.venue.detail(id)",
+    "readId": "Venue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VenueNote",
+    "queryKeyHint": "queryKeys.venueNote.lists()",
+    "readId": "VenueNote.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VenueNote",
+    "queryKeyHint": "queryKeys.venueNote.detail(id)",
+    "readId": "VenueNote.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "WasteRecord",
+    "queryKeyHint": "queryKeys.wasteRecord.lists()",
+    "readId": "WasteRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "WasteRecord",
+    "queryKeyHint": "queryKeys.wasteRecord.detail(id)",
+    "readId": "WasteRecord.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Event.advanceRecurrence. Not a rendered control. */
+export const EventAdvanceRecurrenceAction = {
+  "exposure": "human",
+  "label": "Advance recurrence",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "seriesId",
+      "label": "Series id",
+      "required": true
+    },
+    {
+      "name": "generatedCount",
+      "label": "Generated count",
+      "required": true
+    },
+    {
+      "name": "nextStartsAt",
+      "label": "Next starts at",
       "required": false
     }
   ]
@@ -44308,6 +45908,10 @@ export interface EventPlanEngagementClientInput {
   assignedToId?: string;
   ownerName?: string;
   referralSourceId?: string;
+  recurrenceTemplateEventId?: string;
+  recurrenceSeriesId?: string;
+  /** Bounds: 2..∞ */
+  recurrenceSequence?: number;
 }
 
 export const EventPlanEngagementCapability = {
@@ -44323,9 +45927,9 @@ export const EventPlanEngagementCapability = {
   acceptsIdempotencyKey: true,
   resultKind: "allocation",
   returnTsType: "{ docId: string }",
-  clientParameterNames: ["clientId","title","eventType","startsAt","endsAt","expectedHeadcount","primaryContactName","budgetAmount","quotedPrice","clientName","serviceStyleId","serviceStyleName","occasionId","occasionName","venueId","venueName","venueAddress","venueCapacity","primaryContactEmail","primaryContactPhone","accessibilityNeeds","serviceRequirements","operationalRequirements","assignedToId","ownerName","referralSourceId"],
+  clientParameterNames: ["clientId","title","eventType","startsAt","endsAt","expectedHeadcount","primaryContactName","budgetAmount","quotedPrice","clientName","serviceStyleId","serviceStyleName","occasionId","occasionName","venueId","venueName","venueAddress","venueCapacity","primaryContactEmail","primaryContactPhone","accessibilityNeeds","serviceRequirements","operationalRequirements","assignedToId","ownerName","referralSourceId","recurrenceTemplateEventId","recurrenceSeriesId","recurrenceSequence"],
   serverParameterNames: [],
-  failures: [{"kind":"policy_denial","message":"Staff may see shared event plans and operational context"},{"kind":"policy_denial","message":"Event and sales staff may update events"},{"kind":"policy_denial","message":"Event and sales staff may change events"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Give this event a title."},{"kind":"constraint_block","message":"Pick an event type."},{"kind":"constraint_block","message":"Event end must be after its start"},{"kind":"constraint_block","message":"Headcount must be between 1 and 100000"},{"kind":"constraint_block","message":"Venue capacity can't be negative. Use zero or more."},{"kind":"constraint_block","message":"Give this event a primary contact name."},{"kind":"constraint_block","message":"This event's pricing can't be negative. Use zero or more."}],
+  failures: [{"kind":"policy_denial","message":"Staff may see shared event plans and operational context"},{"kind":"policy_denial","message":"Event and sales staff may update events"},{"kind":"policy_denial","message":"Event and sales staff may change events"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Recurring event instances are created by the recurrence schedule."},{"kind":"constraint_block","message":"Recurring event instances need their source event, series and a sequence of two or more."},{"kind":"constraint_block","message":"This recurring series is no longer active."},{"kind":"constraint_block","message":"Give this event a title."},{"kind":"constraint_block","message":"Pick an event type."},{"kind":"constraint_block","message":"Event end must be after its start"},{"kind":"constraint_block","message":"Headcount must be between 1 and 100000"},{"kind":"constraint_block","message":"Venue capacity can't be negative. Use zero or more."},{"kind":"constraint_block","message":"Give this event a primary contact name."},{"kind":"constraint_block","message":"This event's pricing can't be negative. Use zero or more."}],
   emits: ["EventPlanned"],
 } as const;
 
@@ -45261,6 +46865,21 @@ export const EventPlanEngagementAction = {
     {
       "name": "referralSourceId",
       "label": "Referral source id",
+      "required": false
+    },
+    {
+      "name": "recurrenceTemplateEventId",
+      "label": "Recurrence template event id",
+      "required": false
+    },
+    {
+      "name": "recurrenceSeriesId",
+      "label": "Recurrence series id",
+      "required": false
+    },
+    {
+      "name": "recurrenceSequence",
+      "label": "Recurrence sequence",
       "required": false
     }
   ],
@@ -149351,12 +150970,16 @@ export const ALL_CAPABILITY_IDS = [
   "CutoverDecision.recordApprovals",
   "CutoverDecision.rollback",
   "CutoverDecision.setTppReadOnly",
+  "Delivery.assignDriver",
+  "Delivery.assignVehicle",
   "Delivery.cancel",
   "Delivery.confirmDelivery",
   "Delivery.markFailed",
   "Delivery.schedule",
   "Delivery.standDownWithEvent",
   "Delivery.startTransit",
+  "Delivery.unassignDriver",
+  "Delivery.unassignVehicle",
   "Dish.classifyAllergens",
   "Dish.classifyKind",
   "Dish.clearPrimaryImage",
@@ -149402,7 +151025,10 @@ export const ALL_CAPABILITY_IDS = [
   "EquipmentReservation.cancel",
   "EquipmentReservation.checkOut",
   "EquipmentReservation.markReturned",
+  "EquipmentReservation.moveWindow",
+  "EquipmentReservation.reserve",
   "EquipmentServiceEntry.record",
+  "Event.advanceRecurrence",
   "Event.approve",
   "Event.archive",
   "Event.assignOwner",

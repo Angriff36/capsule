@@ -4,17 +4,23 @@
  * sitting on the old window move to the new start/end exactly once, while
  * checked-out / returned / cancelled holds stay on their original window as
  * custody history. This NEVER writes a status, custody, or identity field.
+ * 2026-09-29: a hold moves through the generated EquipmentReservation.moveWindow
+ * command, run by the tenant system runner (a consequence of a reschedule the
+ * caller was already allowed to make; event staff do not hold the equipment
+ * policies), so it emits EquipmentReservationRescheduled.
  * One eventReconciliation receipt per input shape; a replay of the same
  * schedule writes no row diff and no second receipt.
  */
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
-import { availableEquipmentQuantity } from "./equipmentReservationAvailability";
+import { api } from "../_generated/api";
+import { equipmentQuantityAvailable } from "./equipmentReservationGuard";
 import { eventReconciliationReceipt } from "./reconciliationReceipt";
 import type {
   ReconciliationReceiptOutput,
   TimingWindow,
 } from "./reconciliationReceipt";
+import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
 
 /** Which ledger command triggered this reconcile — recorded on the receipt. */
 export type RentalReconcileTrigger = {
@@ -143,22 +149,23 @@ export class EventRentalReconciliation {
   ): Promise<boolean> {
     const equipment = await ctx.db.get(row.equipmentId);
     if (!equipment || equipment.deletedAt != null) return false;
-    const others = (await ctx.db
-      .query("equipmentReservations")
-      .withIndex("by_equipmentId", (q) => q.eq("equipmentId", row.equipmentId))
-      .collect()) as ReservationRow[];
-    const available = availableEquipmentQuantity(
-      equipment.quantity,
-      others.filter((other) => other._id !== row._id),
-      { tenantId: event.tenantId, startsAt, endsAt },
-    );
-    if (row.quantity > available) return false;
-    // Window only: status, custody fields, and identity stay as they are.
-    await ctx.db.patch(row._id, {
+    const available = await equipmentQuantityAvailable(ctx, {
+      equipment,
+      tenantId: event.tenantId,
       startsAt,
       endsAt,
-      updatedAt: Date.now(),
-      version: row.version + 1,
+      excludeReservationId: row._id,
+    });
+    if (row.quantity > available) return false;
+    // Window only: status, custody fields, and identity stay as they are.
+    await TenantSystemCommandRunner.forTenant(
+      ctx,
+      event.tenantId,
+    ).context.runMutation(api.mutations.EquipmentReservation_moveWindow, {
+      docId: row._id,
+      version: row.version,
+      startsAt,
+      endsAt,
     });
     return true;
   }
