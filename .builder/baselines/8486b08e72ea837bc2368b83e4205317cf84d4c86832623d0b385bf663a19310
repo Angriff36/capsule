@@ -191,6 +191,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.Equipment_createViaRegister, { "name": "Equipment 1", "assetTag": "demo-assetTag-1", "category": "demo-category-1", "ownership": "demo-ownership-1", "quantity": 1, "purchaseValue": 1, "condition": "demo-condition-1", "homeLocation": "demo-homeLocation-1", "trackingMode": "demo-trackingMode-1", "serialNumber": "demo-serialNumber-1", "description": "demo-description-1", "countUnit": "demo-countUnit-1", "replacementCost": 1, "customerPrice": 1, "vendorId": "vendorId-equipment-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.Equipment_createViaRegister, { "name": "Equipment 2", "assetTag": "demo-assetTag-2", "category": "demo-category-2", "ownership": "demo-ownership-2", "quantity": 2, "purchaseValue": 2, "condition": "demo-condition-2", "homeLocation": "demo-homeLocation-2", "trackingMode": "demo-trackingMode-2", "serialNumber": "demo-serialNumber-2", "description": "demo-description-2", "countUnit": "demo-countUnit-2", "replacementCost": 2, "customerPrice": 2, "vendorId": "vendorId-equipment-2" } as any);
+  // EquipmentIssue → api.mutations.EquipmentIssue_createViaRaise
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EquipmentIssue_createViaRaise, { "equipmentId": "equipmentId-equipment-issue-1", "eventId": "eventId-equipment-issue-1", "equipmentReservationId": "equipmentReservationId-equipment-issue-1", "rentalOrderLineId": "rentalOrderLineId-equipment-issue-1", "kind": "demo-kind-1", "severity": "demo-severity-1", "quantity": 1, "holdsUnits": false, "description": "demo-description-1", "dueAt": 1767268800000, "ownerName": "EquipmentIssue 1", "vendorId": "vendorId-equipment-issue-1", "cost": 1, "payer": "demo-payer-1", "chargeAmount": 1, "notes": "demo-notes-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EquipmentIssue_createViaRaise, { "equipmentId": "equipmentId-equipment-issue-2", "eventId": "eventId-equipment-issue-2", "equipmentReservationId": "equipmentReservationId-equipment-issue-2", "rentalOrderLineId": "rentalOrderLineId-equipment-issue-2", "kind": "demo-kind-2", "severity": "demo-severity-2", "quantity": 2, "holdsUnits": false, "description": "demo-description-2", "dueAt": 1767355200000, "ownerName": "EquipmentIssue 2", "vendorId": "vendorId-equipment-issue-2", "cost": 2, "payer": "demo-payer-2", "chargeAmount": 2, "notes": "demo-notes-2" } as any);
   // EquipmentMaintenanceTask → api.mutations.EquipmentMaintenanceTask_createViaSchedule
   rowsAttempted += 1;
   await client.mutation(api.mutations.EquipmentMaintenanceTask_createViaSchedule, { "equipmentId": "equipmentId-equipment-maintenance-task-1", "taskName": "EquipmentMaintenanceTask 1", "intervalDays": 1, "nextDueAt": 1767268800000, "instructions": "demo-instructions-1" } as any);
@@ -1038,6 +1043,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "Equipment",
       "createMutation": "Equipment_createViaRegister",
+      "rowCount": 2
+    },
+    {
+      "entity": "EquipmentIssue",
+      "createMutation": "EquipmentIssue_createViaRaise",
       "rowCount": 2
     },
     {

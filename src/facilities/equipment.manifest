@@ -391,6 +391,15 @@ entity EquipmentReservation mixin TenantScoped, SoftDeletable {
   property returnNote: string?
   // How many of the held units did not come back (lost or left at the site).
   property missingQuantity: int?
+  // PL-RETURNS: units back but broken, or back but needing a wash. Each opens
+  // an EquipmentIssue that keeps those units out of use until it is resolved.
+  property damagedQuantity: int?
+  property cleaningQuantity: int?
+  property returnCheckedById: uuid?
+  // CF-11.4: a manager booked out-of-service equipment on purpose, and why.
+  // Set by the reserve seam (convex/equipmentCheckout.ts) only.
+  property overrideReason: string?
+  property overrideApprovedById: uuid?
   property cancelledAt: datetime?
   property cancellationReason: string?
 
@@ -410,7 +419,7 @@ entity EquipmentReservation mixin TenantScoped, SoftDeletable {
   command checkOut(condition: EquipmentCondition, optional note: string) {
     guard self.status == "reserved"
     guard self.deletedAt == null
-    constraint checkoutEquipmentServiceable: self.equipment != null and self.equipment.condition != "out_of_service" "This equipment is marked out of service, so it can't be checked out. Pick other equipment."
+    constraint checkoutEquipmentServiceable: self.equipment != null and (self.equipment.condition != "out_of_service" or self.overrideReason != null) "This equipment is marked out of service, so it can't be checked out. Pick other equipment, or ask a manager to book it anyway with a reason."
     mutate status = "checked_out"
     mutate checkoutCondition = condition
     mutate checkoutNote = note
@@ -425,15 +434,22 @@ entity EquipmentReservation mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command markReturned(condition: EquipmentCondition, optional note: string, optional missingQuantity: int) {
+  command markReturned(condition: EquipmentCondition, optional note: string, optional missingQuantity: int, optional damagedQuantity: int, optional cleaningQuantity: int) {
     guard self.status == "checked_out"
     guard self.deletedAt == null
     constraint returnMissingAmount: missingQuantity == null or (missingQuantity >= 0 and missingQuantity <= self.quantity) "The missing amount has to be between zero and the amount that went out."
+    constraint returnDamagedAmount: (damagedQuantity == null or damagedQuantity >= 0) and (cleaningQuantity == null or cleaningQuantity >= 0) "Broken and needs-cleaning amounts can't be negative. Use zero or more."
+    constraint returnCountsFit: (missingQuantity != null ? missingQuantity : 0) + (damagedQuantity != null ? damagedQuantity : 0) + (cleaningQuantity != null ? cleaningQuantity : 0) <= self.quantity "Missing, broken and needs-cleaning together can't be more than the amount that went out."
     compute missing = missingQuantity != null ? missingQuantity : 0
+    compute damaged = damagedQuantity != null ? damagedQuantity : 0
+    compute dirty = cleaningQuantity != null ? cleaningQuantity : 0
     mutate status = "returned"
     mutate returnCondition = condition
     mutate returnNote = note
     mutate missingQuantity = missing
+    mutate damagedQuantity = damaged
+    mutate cleaningQuantity = dirty
+    mutate returnCheckedById = user.personId
     mutate returnedAt = now()
     emit EquipmentReturned {
       equipmentReservationId: self.id
@@ -443,6 +459,8 @@ entity EquipmentReservation mixin TenantScoped, SoftDeletable {
       condition: condition
       note: note
       missingQuantity: missing
+      damagedQuantity: damaged
+      cleaningQuantity: dirty
     }
   }
 
@@ -491,6 +509,8 @@ event EquipmentReturned: "equipment.returned" {
   condition: EquipmentCondition
   note: string?
   missingQuantity: int
+  damagedQuantity: int
+  cleaningQuantity: int
 }
 
 event EquipmentReservationCancelled: "equipment.reservation_cancelled" {

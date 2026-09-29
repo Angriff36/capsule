@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:0469c4ed0c814a019380a73675adacc62173c22b928bf9a8d16c336b313b24e0:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:08bb88a7c05a5b43c5205d47f3798300158c1557de678f7d3a802b815ac66d6c:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:0fa9c629f23816c9e51aa47d766814b4adc281ed73c0a26bad33ba65ec930114:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e112ef70ab2634ddc76e69be97bf2cf6213bc0662e21efdb998b5fe1fecbfa5:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2b1d0ec8d7f3b25f4980f6db642a77bc15276b01b7e0276e224c04e5e95cf2c8:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:425786468a2c925e4a22baf51be9695b6f09848be70c0a67ee021678166c63c5:44730f01893c2c387121f8aa1d1465975c3d70ad9d2ba6bcafc51190118cfc30:461b35052a22a3f3494612a688d5024cf608ca3f5f42e7392e2e39d0b4ae3059:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:493a6e387d93dc73ab30f1e335b014ebe877fb3cfd7bb286f12f252364e161c0:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:571c1fbbd06e6f847dc0789bb6699eef2dad5b3438eb906c97bd99975eee1572:5865118d3c2cc0441916631fed5be684f876ea34c8cc603b23d1cc192c29b379:5eede5832d56f1a6f53fff1c333df6f4f34990f8b3a29f4c007b8e1b88f8c60b:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:7415002d8159c0ba4115b6acb3521ed8812576cbec4e836bc0876863a92784d1:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:946747485e83cf5d41c4c5a046fc32486ecd0f7e059812185e3b5886d06852a0:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a87caa099b219e0f859edc5be5c50d0cb367def3e8348a5e9bb406bbc8502c65:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b7a8e29fcf51b07830d4c56102194730fa51e426a43be671d6ffb18c38698087:b8371dec149afe525f389169aedf38e3953a48946523b416345e61b2ba2a9543:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bdd1b012f7d07994cf68f2b2a7d503e54200daa4b80053709945fc32f95c6374:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccd72e1626e8659c7b43fe7ac7a3f5210245e7d32107e356d0cb3df0decf6453:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e525f86638654821e0fa3123bad1b8075162ae70d0ca58589d9c8680ce48c976:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:e69aaee600e0695a11cd87fca6c72ff383f0b8c2333fd92e4ab031225acb6fef:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:f7a4e5f8e94ed6c20dd10eb865c5d62a080b7e9547387be50830d7a0511564ae:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1";
+export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:0469c4ed0c814a019380a73675adacc62173c22b928bf9a8d16c336b313b24e0:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:0fa9c629f23816c9e51aa47d766814b4adc281ed73c0a26bad33ba65ec930114:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e112ef70ab2634ddc76e69be97bf2cf6213bc0662e21efdb998b5fe1fecbfa5:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2b1d0ec8d7f3b25f4980f6db642a77bc15276b01b7e0276e224c04e5e95cf2c8:2c468f48d7a3ce63653f4405dceb1be68d9eca69e901b1f5f3a2604ffee230d0:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:36c354afbbf973ec7c71d0536da3888b8c039ebb2ef64af1825bc74e3d4b2f4e:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:425786468a2c925e4a22baf51be9695b6f09848be70c0a67ee021678166c63c5:44730f01893c2c387121f8aa1d1465975c3d70ad9d2ba6bcafc51190118cfc30:461b35052a22a3f3494612a688d5024cf608ca3f5f42e7392e2e39d0b4ae3059:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:493a6e387d93dc73ab30f1e335b014ebe877fb3cfd7bb286f12f252364e161c0:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:571c1fbbd06e6f847dc0789bb6699eef2dad5b3438eb906c97bd99975eee1572:5865118d3c2cc0441916631fed5be684f876ea34c8cc603b23d1cc192c29b379:5eede5832d56f1a6f53fff1c333df6f4f34990f8b3a29f4c007b8e1b88f8c60b:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:7415002d8159c0ba4115b6acb3521ed8812576cbec4e836bc0876863a92784d1:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:946747485e83cf5d41c4c5a046fc32486ecd0f7e059812185e3b5886d06852a0:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a87caa099b219e0f859edc5be5c50d0cb367def3e8348a5e9bb406bbc8502c65:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b7a8e29fcf51b07830d4c56102194730fa51e426a43be671d6ffb18c38698087:b8371dec149afe525f389169aedf38e3953a48946523b416345e61b2ba2a9543:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bdd1b012f7d07994cf68f2b2a7d503e54200daa4b80053709945fc32f95c6374:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccd72e1626e8659c7b43fe7ac7a3f5210245e7d32107e356d0cb3df0decf6453:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e525f86638654821e0fa3123bad1b8075162ae70d0ca58589d9c8680ce48c976:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:e69aaee600e0695a11cd87fca6c72ff383f0b8c2333fd92e4ab031225acb6fef:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:f7a4e5f8e94ed6c20dd10eb865c5d62a080b7e9547387be50830d7a0511564ae:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -23919,6 +23919,20 @@ export const EquipmentClearPrimaryImageInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentMaintenanceTask",
     "queryKeyHint": "queryKeys.equipmentMaintenanceTask.lists()",
     "readId": "EquipmentMaintenanceTask.list",
@@ -24058,6 +24072,20 @@ export const EquipmentReactivateInvalidation = [
     "queryKeyHint": "queryKeys.equipment.detail(id)",
     "readId": "Equipment.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -24219,6 +24247,20 @@ export const EquipmentRecountInvalidation = [
     "queryKeyHint": "queryKeys.equipment.detail(id)",
     "readId": "Equipment.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -24390,6 +24432,20 @@ export const EquipmentRegisterInvalidation = [
     "queryKeyHint": "queryKeys.equipment.detail(id)",
     "readId": "Equipment.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -24655,6 +24711,20 @@ export const EquipmentRetireInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentMaintenanceTask",
     "queryKeyHint": "queryKeys.equipmentMaintenanceTask.lists()",
     "readId": "EquipmentMaintenanceTask.list",
@@ -24835,6 +24905,20 @@ export const EquipmentReviseDetailsInvalidation = [
     "queryKeyHint": "queryKeys.equipment.detail(id)",
     "readId": "Equipment.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -25069,6 +25153,20 @@ export const EquipmentSetPrimaryImageInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentMaintenanceTask",
     "queryKeyHint": "queryKeys.equipmentMaintenanceTask.lists()",
     "readId": "EquipmentMaintenanceTask.list",
@@ -25222,6 +25320,20 @@ export const EquipmentTransferInvalidation = [
     "queryKeyHint": "queryKeys.equipment.detail(id)",
     "readId": "Equipment.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -25379,6 +25491,20 @@ export const EquipmentUpdateConditionInvalidation = [
     "queryKeyHint": "queryKeys.equipment.detail(id)",
     "readId": "Equipment.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -25560,6 +25686,20 @@ export const EquipmentWriteOffMissingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentMaintenanceTask",
     "queryKeyHint": "queryKeys.equipmentMaintenanceTask.lists()",
     "readId": "EquipmentMaintenanceTask.list",
@@ -25657,6 +25797,623 @@ export const EquipmentWriteOffMissingAction = {
     }
   ]
 } as const;
+
+// --- EquipmentIssue.raise ---
+export interface EquipmentIssueRaiseClientInput {
+  /** Allowed: "damaged" | "missing" | "cleaning" | "repair" | "late_return" | "vendor_return" */
+  kind: "damaged" | "missing" | "cleaning" | "repair" | "late_return" | "vendor_return";
+  description: string;
+  equipmentId?: string;
+  eventId?: string;
+  equipmentReservationId?: string;
+  rentalOrderLineId?: string;
+  /** Bounds: 1..∞ */
+  quantity?: number;
+  /** Allowed: "low" | "medium" | "high" */
+  severity?: "low" | "medium" | "high";
+  holdsUnits?: boolean;
+  dueAt?: string;
+  ownerName?: string;
+  vendorId?: string;
+  /** Bounds: 0..∞ */
+  cost?: number;
+  /** Allowed: "undecided" | "company" | "client" | "vendor" */
+  payer?: "undecided" | "company" | "client" | "vendor";
+  /** Bounds: 0..∞ */
+  chargeAmount?: number;
+  notes?: string;
+}
+
+export const EquipmentIssueRaiseCapability = {
+  capabilityId: "EquipmentIssue.raise",
+  entity: "EquipmentIssue",
+  command: "raise",
+  route: "/api/manifest/EquipmentIssue/commands/raise",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: ["dueAt"],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["kind","description","equipmentId","eventId","equipmentReservationId","rentalOrderLineId","quantity","severity","holdsUnits","dueAt","ownerName","vendorId","cost","payer","chargeAmount","notes"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Inventory, logistics, event or finance staff may see equipment problems"},{"kind":"policy_denial","message":"Inventory, logistics, event or finance staff may update equipment problems"},{"kind":"policy_denial","message":"Inventory, logistics, event or finance staff may change equipment problems"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Say what is wrong."},{"kind":"constraint_block","message":"Pick the equipment this is about."},{"kind":"constraint_block","message":"That equipment isn't in your list. Pick one of your items."},{"kind":"constraint_block","message":"That event isn't in your list. Pick one of your events."},{"kind":"constraint_block","message":"That vendor isn't in your vendor list. Pick one of your vendors."},{"kind":"constraint_block","message":"An equipment problem has to cover at least 1."},{"kind":"constraint_block","message":"Cost and charge can't be negative. Use zero or more."}],
+  emits: ["EquipmentIssueRaised"],
+} as const;
+
+export type EquipmentIssueRaiseResult = { docId: string };
+
+/**
+ * Build command input for EquipmentIssue.raise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEquipmentIssueRaiseInput(client: EquipmentIssueRaiseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EquipmentIssue.raise. */
+export const EquipmentIssueRaiseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.lists()",
+    "readId": "Equipment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.detail(id)",
+    "readId": "Equipment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Vendor",
+    "queryKeyHint": "queryKeys.vendor.lists()",
+    "readId": "Vendor.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Vendor",
+    "queryKeyHint": "queryKeys.vendor.detail(id)",
+    "readId": "Vendor.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EquipmentIssue.raise. Not a rendered control. */
+export const EquipmentIssueRaiseAction = {
+  "exposure": "human",
+  "label": "Raise",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "kind",
+      "label": "Kind",
+      "required": true,
+      "choices": [
+        {
+          "value": "damaged",
+          "label": "damaged"
+        },
+        {
+          "value": "missing",
+          "label": "missing"
+        },
+        {
+          "value": "cleaning",
+          "label": "cleaning"
+        },
+        {
+          "value": "repair",
+          "label": "repair"
+        },
+        {
+          "value": "late_return",
+          "label": "late_return"
+        },
+        {
+          "value": "vendor_return",
+          "label": "vendor_return"
+        }
+      ]
+    },
+    {
+      "name": "description",
+      "label": "Description",
+      "required": true
+    },
+    {
+      "name": "equipmentId",
+      "label": "Equipment id",
+      "required": false
+    },
+    {
+      "name": "eventId",
+      "label": "Event id",
+      "required": false
+    },
+    {
+      "name": "equipmentReservationId",
+      "label": "Equipment reservation id",
+      "required": false
+    },
+    {
+      "name": "rentalOrderLineId",
+      "label": "Rental order line id",
+      "required": false
+    },
+    {
+      "name": "quantity",
+      "label": "Quantity",
+      "required": false
+    },
+    {
+      "name": "severity",
+      "label": "Severity",
+      "required": false,
+      "choices": [
+        {
+          "value": "low",
+          "label": "low"
+        },
+        {
+          "value": "medium",
+          "label": "medium"
+        },
+        {
+          "value": "high",
+          "label": "high"
+        }
+      ]
+    },
+    {
+      "name": "holdsUnits",
+      "label": "Holds units",
+      "required": false
+    },
+    {
+      "name": "dueAt",
+      "label": "Due at",
+      "required": false
+    },
+    {
+      "name": "ownerName",
+      "label": "Owner name",
+      "required": false
+    },
+    {
+      "name": "vendorId",
+      "label": "Vendor id",
+      "required": false
+    },
+    {
+      "name": "cost",
+      "label": "Cost",
+      "required": false
+    },
+    {
+      "name": "payer",
+      "label": "Payer",
+      "required": false,
+      "choices": [
+        {
+          "value": "undecided",
+          "label": "undecided"
+        },
+        {
+          "value": "company",
+          "label": "company"
+        },
+        {
+          "value": "client",
+          "label": "client"
+        },
+        {
+          "value": "vendor",
+          "label": "vendor"
+        }
+      ]
+    },
+    {
+      "name": "chargeAmount",
+      "label": "Charge amount",
+      "required": false
+    },
+    {
+      "name": "notes",
+      "label": "Notes",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- EquipmentIssue.revise ---
+export interface EquipmentIssueReviseClientInput {
+  /** Allowed: "low" | "medium" | "high" */
+  severity?: "low" | "medium" | "high";
+  holdsUnits?: boolean;
+  dueAt?: string;
+  ownerName?: string;
+  vendorId?: string;
+  /** Bounds: 0..∞ */
+  cost?: number;
+  /** Allowed: "undecided" | "company" | "client" | "vendor" */
+  payer?: "undecided" | "company" | "client" | "vendor";
+  /** Bounds: 0..∞ */
+  chargeAmount?: number;
+  notes?: string;
+}
+
+export const EquipmentIssueReviseCapability = {
+  capabilityId: "EquipmentIssue.revise",
+  entity: "EquipmentIssue",
+  command: "revise",
+  route: "/api/manifest/EquipmentIssue/commands/revise",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: ["dueAt"],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: \"damaged\" | \"missing\" | \"cleaning\" | \"repair\" | \"late_return\" | \"vendor_return\"; severity: \"low\" | \"medium\" | \"high\"; quantity: number; holdsUnits: boolean; description: string; status: \"open\" | \"resolved\"; raisedAt: number | null; raisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: \"undecided\" | \"company\" | \"client\" | \"vendor\"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; settledById: string | null; resolution: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["severity","holdsUnits","dueAt","ownerName","vendorId","cost","payer","chargeAmount","notes"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Inventory, logistics, event or finance staff may see equipment problems"},{"kind":"policy_denial","message":"Inventory, logistics, event or finance staff may update equipment problems"},{"kind":"policy_denial","message":"Inventory, logistics, event or finance staff may change equipment problems"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This problem is already sorted out. Open a new one if something else is wrong."},{"kind":"constraint_block","message":"Cost and charge can't be negative. Use zero or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EquipmentIssue not found"}],
+  emits: ["EquipmentIssueRevised"],
+} as const;
+
+export type EquipmentIssueReviseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: "damaged" | "missing" | "cleaning" | "repair" | "late_return" | "vendor_return"; severity: "low" | "medium" | "high"; quantity: number; holdsUnits: boolean; description: string; status: "open" | "resolved"; raisedAt: number | null; raisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: "undecided" | "company" | "client" | "vendor"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; settledById: string | null; resolution: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for EquipmentIssue.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEquipmentIssueReviseInput(client: EquipmentIssueReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EquipmentIssue.revise. */
+export const EquipmentIssueReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.lists()",
+    "readId": "Equipment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.detail(id)",
+    "readId": "Equipment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Vendor",
+    "queryKeyHint": "queryKeys.vendor.lists()",
+    "readId": "Vendor.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Vendor",
+    "queryKeyHint": "queryKeys.vendor.detail(id)",
+    "readId": "Vendor.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EquipmentIssue.revise. Not a rendered control. */
+export const EquipmentIssueReviseAction = {
+  "exposure": "human",
+  "label": "Revise",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "severity",
+      "label": "Severity",
+      "required": false,
+      "choices": [
+        {
+          "value": "low",
+          "label": "low"
+        },
+        {
+          "value": "medium",
+          "label": "medium"
+        },
+        {
+          "value": "high",
+          "label": "high"
+        }
+      ]
+    },
+    {
+      "name": "holdsUnits",
+      "label": "Holds units",
+      "required": false
+    },
+    {
+      "name": "dueAt",
+      "label": "Due at",
+      "required": false
+    },
+    {
+      "name": "ownerName",
+      "label": "Owner name",
+      "required": false
+    },
+    {
+      "name": "vendorId",
+      "label": "Vendor id",
+      "required": false
+    },
+    {
+      "name": "cost",
+      "label": "Cost",
+      "required": false
+    },
+    {
+      "name": "payer",
+      "label": "Payer",
+      "required": false,
+      "choices": [
+        {
+          "value": "undecided",
+          "label": "undecided"
+        },
+        {
+          "value": "company",
+          "label": "company"
+        },
+        {
+          "value": "client",
+          "label": "client"
+        },
+        {
+          "value": "vendor",
+          "label": "vendor"
+        }
+      ]
+    },
+    {
+      "name": "chargeAmount",
+      "label": "Charge amount",
+      "required": false
+    },
+    {
+      "name": "notes",
+      "label": "Notes",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- EquipmentIssue.settle ---
+export interface EquipmentIssueSettleClientInput {
+  resolution: string;
+  /** Bounds: 0..∞ */
+  cost?: number;
+  /** Allowed: "undecided" | "company" | "client" | "vendor" */
+  payer?: "undecided" | "company" | "client" | "vendor";
+  /** Bounds: 0..∞ */
+  chargeAmount?: number;
+}
+
+export const EquipmentIssueSettleCapability = {
+  capabilityId: "EquipmentIssue.settle",
+  entity: "EquipmentIssue",
+  command: "settle",
+  route: "/api/manifest/EquipmentIssue/commands/settle",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: \"damaged\" | \"missing\" | \"cleaning\" | \"repair\" | \"late_return\" | \"vendor_return\"; severity: \"low\" | \"medium\" | \"high\"; quantity: number; holdsUnits: boolean; description: string; status: \"open\" | \"resolved\"; raisedAt: number | null; raisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: \"undecided\" | \"company\" | \"client\" | \"vendor\"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; settledById: string | null; resolution: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["resolution","cost","payer","chargeAmount"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Inventory, logistics, event or finance staff may see equipment problems"},{"kind":"policy_denial","message":"Inventory, logistics, event or finance staff may update equipment problems"},{"kind":"policy_denial","message":"Inventory, logistics, event or finance staff may change equipment problems"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This problem is already sorted out."},{"kind":"constraint_block","message":"Say how it was sorted out."},{"kind":"constraint_block","message":"Cost and charge can't be negative. Use zero or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EquipmentIssue not found"}],
+  emits: ["EquipmentIssueResolved"],
+} as const;
+
+export type EquipmentIssueSettleResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: "damaged" | "missing" | "cleaning" | "repair" | "late_return" | "vendor_return"; severity: "low" | "medium" | "high"; quantity: number; holdsUnits: boolean; description: string; status: "open" | "resolved"; raisedAt: number | null; raisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: "undecided" | "company" | "client" | "vendor"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; settledById: string | null; resolution: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for EquipmentIssue.settle.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEquipmentIssueSettleInput(client: EquipmentIssueSettleClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EquipmentIssue.settle. */
+export const EquipmentIssueSettleInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.lists()",
+    "readId": "Equipment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.detail(id)",
+    "readId": "Equipment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Vendor",
+    "queryKeyHint": "queryKeys.vendor.lists()",
+    "readId": "Vendor.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Vendor",
+    "queryKeyHint": "queryKeys.vendor.detail(id)",
+    "readId": "Vendor.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EquipmentIssue.settle. Not a rendered control. */
+export const EquipmentIssueSettleAction = {
+  "exposure": "human",
+  "label": "Settle",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "resolution",
+      "label": "Resolution",
+      "required": true
+    },
+    {
+      "name": "cost",
+      "label": "Cost",
+      "required": false
+    },
+    {
+      "name": "payer",
+      "label": "Payer",
+      "required": false,
+      "choices": [
+        {
+          "value": "undecided",
+          "label": "undecided"
+        },
+        {
+          "value": "company",
+          "label": "company"
+        },
+        {
+          "value": "client",
+          "label": "client"
+        },
+        {
+          "value": "vendor",
+          "label": "vendor"
+        }
+      ]
+    },
+    {
+      "name": "chargeAmount",
+      "label": "Charge amount",
+      "required": false
+    }
+  ],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "open"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for EquipmentIssue.settle. */
+export const EquipmentIssueSettleLifecycle = [
+  {
+    "property": "status",
+    "from": "open",
+    "to": "resolved",
+    "proven": true
+  }
+] as const;
 
 // --- EquipmentMaintenanceTask.applyService ---
 export interface EquipmentMaintenanceTaskApplyServiceClientInput {
@@ -26160,14 +26917,14 @@ export const EquipmentReservationCancelCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; missingQuantity: number | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; missingQuantity: number | null; damagedQuantity: number | null; cleaningQuantity: number | null; returnCheckedById: string | null; overrideReason: string | null; overrideApprovedById: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["reason"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment handoffs, or event managers stand down a cancelled event"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EquipmentReservation not found"}],
   emits: ["EquipmentReservationCancelled"],
 } as const;
 
-export type EquipmentReservationCancelResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; missingQuantity: number | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number };
+export type EquipmentReservationCancelResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; missingQuantity: number | null; damagedQuantity: number | null; cleaningQuantity: number | null; returnCheckedById: string | null; overrideReason: string | null; overrideApprovedById: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for EquipmentReservation.cancel.
@@ -26272,14 +27029,14 @@ export const EquipmentReservationCheckOutCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; missingQuantity: number | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; missingQuantity: number | null; damagedQuantity: number | null; cleaningQuantity: number | null; returnCheckedById: string | null; overrideReason: string | null; overrideApprovedById: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["condition","note"],
   serverParameterNames: [],
-  failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment handoffs, or event managers stand down a cancelled event"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This equipment is marked out of service, so it can't be checked out. Pick other equipment."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EquipmentReservation not found"}],
+  failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment handoffs, or event managers stand down a cancelled event"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This equipment is marked out of service, so it can't be checked out. Pick other equipment, or ask a manager to book it anyway with a reason."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EquipmentReservation not found"}],
   emits: ["EquipmentCheckedOut"],
 } as const;
 
-export type EquipmentReservationCheckOutResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; missingQuantity: number | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number };
+export type EquipmentReservationCheckOutResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; missingQuantity: number | null; damagedQuantity: number | null; cleaningQuantity: number | null; returnCheckedById: string | null; overrideReason: string | null; overrideApprovedById: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for EquipmentReservation.checkOut.
@@ -26399,6 +27156,10 @@ export interface EquipmentReservationMarkReturnedClientInput {
   note?: string;
   /** Bounds: 0..∞ */
   missingQuantity?: number;
+  /** Bounds: 0..∞ */
+  damagedQuantity?: number;
+  /** Bounds: 0..∞ */
+  cleaningQuantity?: number;
 }
 
 export const EquipmentReservationMarkReturnedCapability = {
@@ -26413,14 +27174,14 @@ export const EquipmentReservationMarkReturnedCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; missingQuantity: number | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }",
-  clientParameterNames: ["condition","note","missingQuantity"],
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; missingQuantity: number | null; damagedQuantity: number | null; cleaningQuantity: number | null; returnCheckedById: string | null; overrideReason: string | null; overrideApprovedById: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["condition","note","missingQuantity","damagedQuantity","cleaningQuantity"],
   serverParameterNames: [],
-  failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment handoffs, or event managers stand down a cancelled event"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"The missing amount has to be between zero and the amount that went out."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EquipmentReservation not found"}],
+  failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment handoffs, or event managers stand down a cancelled event"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"The missing amount has to be between zero and the amount that went out."},{"kind":"constraint_block","message":"Broken and needs-cleaning amounts can't be negative. Use zero or more."},{"kind":"constraint_block","message":"Missing, broken and needs-cleaning together can't be more than the amount that went out."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EquipmentReservation not found"}],
   emits: ["EquipmentReturned"],
 } as const;
 
-export type EquipmentReservationMarkReturnedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; missingQuantity: number | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number };
+export type EquipmentReservationMarkReturnedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; missingQuantity: number | null; damagedQuantity: number | null; cleaningQuantity: number | null; returnCheckedById: string | null; overrideReason: string | null; overrideApprovedById: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for EquipmentReservation.markReturned.
@@ -26517,6 +27278,16 @@ export const EquipmentReservationMarkReturnedAction = {
     {
       "name": "missingQuantity",
       "label": "Missing quantity",
+      "required": false
+    },
+    {
+      "name": "damagedQuantity",
+      "label": "Damaged quantity",
+      "required": false
+    },
+    {
+      "name": "cleaningQuantity",
+      "label": "Cleaning quantity",
       "required": false
     }
   ],
@@ -26835,6 +27606,20 @@ export const EventApplyRouteTravelInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -27714,6 +28499,20 @@ export const EventApplyTimingPolicyInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -28605,6 +29404,20 @@ export const EventApproveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -29479,6 +30292,20 @@ export const EventArchiveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -30340,6 +31167,20 @@ export const EventAssignOwnerInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -31207,6 +32048,20 @@ export const EventBeginExecutionInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -32081,6 +32936,20 @@ export const EventCancelInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -33029,6 +33898,20 @@ export const EventCaptureDraftInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -34013,6 +34896,20 @@ export const EventChangeHeadcountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -34876,6 +35773,20 @@ export const EventChangePricingInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -35747,6 +36658,20 @@ export const EventChangePrimaryContactInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -36627,6 +37552,20 @@ export const EventChangeRequirementsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -37502,6 +38441,20 @@ export const EventChangeServiceStyleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -38371,6 +39324,20 @@ export const EventChangeVenueInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -39254,6 +40221,20 @@ export const EventChooseOperatingLocationInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -40116,6 +41097,20 @@ export const EventClearBinderBuiltInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -40968,6 +41963,20 @@ export const EventCloseOutInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -41840,6 +42849,20 @@ export const EventCompleteInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -42723,6 +43746,20 @@ export const EventConfigureRecurrenceInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -43654,6 +44691,20 @@ export const EventConfigureTimingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -44556,6 +45607,20 @@ export const EventConfirmSalesLockInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -45434,6 +46499,20 @@ export const EventCorrectCommercialInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -46302,6 +47381,20 @@ export const EventFinalizeEventInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -47182,6 +48275,20 @@ export const EventLinkExternalChannelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -48050,6 +49157,20 @@ export const EventLockForSalesInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -48926,6 +50047,20 @@ export const EventMarkBinderBuiltInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -49778,6 +50913,20 @@ export const EventNormalizePurchasingWeekInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -50667,6 +51816,20 @@ export const EventPlanEngagementInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -51681,6 +52844,20 @@ export const EventReactivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -52533,6 +53710,20 @@ export const EventReassignClientInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -53394,6 +54585,20 @@ export const EventRescheduleInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -54263,6 +55468,20 @@ export const EventReturnToPlanningInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -55154,6 +56373,20 @@ export const EventSetEventNumberInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -56015,6 +57248,20 @@ export const EventStageClientMergeInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -56886,6 +58133,20 @@ export const EventStopRecurrenceInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -57738,6 +58999,20 @@ export const EventSubmitForApprovalInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -58614,6 +59889,20 @@ export const EventUnlinkExternalChannelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -59483,6 +60772,20 @@ export const EventUpdateDaySheetInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -60448,6 +61751,20 @@ export const EventUpdateImportDraftInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -61439,6 +62756,20 @@ export const EventUpdateSetupNotesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -62351,6 +63682,20 @@ export const EventUpdateTaskBreakdownInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentReservation",
     "queryKeyHint": "queryKeys.equipmentReservation.lists()",
     "readId": "EquipmentReservation.list",
@@ -63252,6 +64597,20 @@ export const EventUseCompanyTimingRuleInvalidation = [
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.detail(id)",
     "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -155366,6 +156725,20 @@ export const VendorOnboardInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "IngredientPriceObservation",
     "queryKeyHint": "queryKeys.ingredientPriceObservation.lists()",
     "readId": "IngredientPriceObservation.list",
@@ -155615,6 +156988,20 @@ export const VendorReinstateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "IngredientPriceObservation",
     "queryKeyHint": "queryKeys.ingredientPriceObservation.lists()",
     "readId": "IngredientPriceObservation.list",
@@ -155827,6 +157214,20 @@ export const VendorSuspendInvalidation = [
     "entity": "Equipment",
     "queryKeyHint": "queryKeys.equipment.detail(id)",
     "readId": "Equipment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -156049,6 +157450,20 @@ export const VendorTerminateInvalidation = [
     "entity": "Equipment",
     "queryKeyHint": "queryKeys.equipment.detail(id)",
     "readId": "Equipment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -156288,6 +157703,20 @@ export const VendorUpdateDetailsInvalidation = [
     "entity": "Equipment",
     "queryKeyHint": "queryKeys.equipment.detail(id)",
     "readId": "Equipment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
     "label": "related entity detail"
   },
   {
@@ -168794,6 +170223,9 @@ export const ALL_CAPABILITY_IDS = [
   "Equipment.transfer",
   "Equipment.updateCondition",
   "Equipment.writeOffMissing",
+  "EquipmentIssue.raise",
+  "EquipmentIssue.revise",
+  "EquipmentIssue.settle",
   "EquipmentMaintenanceTask.applyService",
   "EquipmentMaintenanceTask.schedule",
   "EquipmentPart.attach",
@@ -169643,6 +171075,12 @@ export const ALL_READ_IDS = [
   "Equipment.byVendorId",
   "Equipment.get",
   "Equipment.list",
+  "EquipmentIssue.byEquipmentId",
+  "EquipmentIssue.byEventId",
+  "EquipmentIssue.byTenantId",
+  "EquipmentIssue.byVendorId",
+  "EquipmentIssue.get",
+  "EquipmentIssue.list",
   "EquipmentMaintenanceTask.byEquipmentId",
   "EquipmentMaintenanceTask.byTenantId",
   "EquipmentMaintenanceTask.get",
@@ -170883,6 +172321,24 @@ export type getEquipmentResult = { _id: string; _creationTime: number; tenantId:
 export const listEquipmentRead = {"entity":"Equipment","readId":"Equipment.list","exportName":"listEquipment","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEquipmentResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>;
 
+export const listEquipmentIssueByEquipmentIdRead = {"entity":"EquipmentIssue","readId":"EquipmentIssue.byEquipmentId","exportName":"listEquipmentIssueByEquipmentId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"equipmentId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: \"damaged\" | \"missing\" | \"cleaning\" | \"repair\" | \"late_return\" | \"vendor_return\"; severity: \"low\" | \"medium\" | \"high\"; quantity: number; holdsUnits: boolean; description: string; status: \"open\" | \"resolved\"; raisedAt: number | null; raisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: \"undecided\" | \"company\" | \"client\" | \"vendor\"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; settledById: string | null; resolution: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEquipmentIssueByEquipmentIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: "damaged" | "missing" | "cleaning" | "repair" | "late_return" | "vendor_return"; severity: "low" | "medium" | "high"; quantity: number; holdsUnits: boolean; description: string; status: "open" | "resolved"; raisedAt: number | null; raisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: "undecided" | "company" | "client" | "vendor"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; settledById: string | null; resolution: string | null; createdAt: number; updatedAt: number }>;
+
+export const listEquipmentIssueByEventIdRead = {"entity":"EquipmentIssue","readId":"EquipmentIssue.byEventId","exportName":"listEquipmentIssueByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: \"damaged\" | \"missing\" | \"cleaning\" | \"repair\" | \"late_return\" | \"vendor_return\"; severity: \"low\" | \"medium\" | \"high\"; quantity: number; holdsUnits: boolean; description: string; status: \"open\" | \"resolved\"; raisedAt: number | null; raisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: \"undecided\" | \"company\" | \"client\" | \"vendor\"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; settledById: string | null; resolution: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEquipmentIssueByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: "damaged" | "missing" | "cleaning" | "repair" | "late_return" | "vendor_return"; severity: "low" | "medium" | "high"; quantity: number; holdsUnits: boolean; description: string; status: "open" | "resolved"; raisedAt: number | null; raisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: "undecided" | "company" | "client" | "vendor"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; settledById: string | null; resolution: string | null; createdAt: number; updatedAt: number }>;
+
+export const listEquipmentIssueByTenantIdRead = {"entity":"EquipmentIssue","readId":"EquipmentIssue.byTenantId","exportName":"listEquipmentIssueByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: \"damaged\" | \"missing\" | \"cleaning\" | \"repair\" | \"late_return\" | \"vendor_return\"; severity: \"low\" | \"medium\" | \"high\"; quantity: number; holdsUnits: boolean; description: string; status: \"open\" | \"resolved\"; raisedAt: number | null; raisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: \"undecided\" | \"company\" | \"client\" | \"vendor\"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; settledById: string | null; resolution: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEquipmentIssueByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: "damaged" | "missing" | "cleaning" | "repair" | "late_return" | "vendor_return"; severity: "low" | "medium" | "high"; quantity: number; holdsUnits: boolean; description: string; status: "open" | "resolved"; raisedAt: number | null; raisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: "undecided" | "company" | "client" | "vendor"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; settledById: string | null; resolution: string | null; createdAt: number; updatedAt: number }>;
+
+export const listEquipmentIssueByVendorIdRead = {"entity":"EquipmentIssue","readId":"EquipmentIssue.byVendorId","exportName":"listEquipmentIssueByVendorId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"vendorId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: \"damaged\" | \"missing\" | \"cleaning\" | \"repair\" | \"late_return\" | \"vendor_return\"; severity: \"low\" | \"medium\" | \"high\"; quantity: number; holdsUnits: boolean; description: string; status: \"open\" | \"resolved\"; raisedAt: number | null; raisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: \"undecided\" | \"company\" | \"client\" | \"vendor\"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; settledById: string | null; resolution: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEquipmentIssueByVendorIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: "damaged" | "missing" | "cleaning" | "repair" | "late_return" | "vendor_return"; severity: "low" | "medium" | "high"; quantity: number; holdsUnits: boolean; description: string; status: "open" | "resolved"; raisedAt: number | null; raisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: "undecided" | "company" | "client" | "vendor"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; settledById: string | null; resolution: string | null; createdAt: number; updatedAt: number }>;
+
+export const getEquipmentIssueRead = {"entity":"EquipmentIssue","readId":"EquipmentIssue.get","exportName":"getEquipmentIssue","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: \"damaged\" | \"missing\" | \"cleaning\" | \"repair\" | \"late_return\" | \"vendor_return\"; severity: \"low\" | \"medium\" | \"high\"; quantity: number; holdsUnits: boolean; description: string; status: \"open\" | \"resolved\"; raisedAt: number | null; raisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: \"undecided\" | \"company\" | \"client\" | \"vendor\"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; settledById: string | null; resolution: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getEquipmentIssueResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: "damaged" | "missing" | "cleaning" | "repair" | "late_return" | "vendor_return"; severity: "low" | "medium" | "high"; quantity: number; holdsUnits: boolean; description: string; status: "open" | "resolved"; raisedAt: number | null; raisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: "undecided" | "company" | "client" | "vendor"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; settledById: string | null; resolution: string | null; createdAt: number; updatedAt: number } | null;
+
+export const listEquipmentIssueRead = {"entity":"EquipmentIssue","readId":"EquipmentIssue.list","exportName":"listEquipmentIssue","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: \"damaged\" | \"missing\" | \"cleaning\" | \"repair\" | \"late_return\" | \"vendor_return\"; severity: \"low\" | \"medium\" | \"high\"; quantity: number; holdsUnits: boolean; description: string; status: \"open\" | \"resolved\"; raisedAt: number | null; raisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: \"undecided\" | \"company\" | \"client\" | \"vendor\"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; settledById: string | null; resolution: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEquipmentIssueResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: "damaged" | "missing" | "cleaning" | "repair" | "late_return" | "vendor_return"; severity: "low" | "medium" | "high"; quantity: number; holdsUnits: boolean; description: string; status: "open" | "resolved"; raisedAt: number | null; raisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: "undecided" | "company" | "client" | "vendor"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; settledById: string | null; resolution: string | null; createdAt: number; updatedAt: number }>;
+
 export const listEquipmentMaintenanceTaskByEquipmentIdRead = {"entity":"EquipmentMaintenanceTask","readId":"EquipmentMaintenanceTask.byEquipmentId","exportName":"listEquipmentMaintenanceTaskByEquipmentId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"equipmentId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; taskName: string; intervalDays: number; nextDueAt: number | null; instructions: string | null; scheduledAt: number | null; lastServicedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEquipmentMaintenanceTaskByEquipmentIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; taskName: string; intervalDays: number; nextDueAt: number | null; instructions: string | null; scheduledAt: number | null; lastServicedAt: number | null; createdAt: number; updatedAt: number }>;
 
@@ -170910,20 +172366,20 @@ export type getEquipmentPartResult = { _id: string; _creationTime: number; tenan
 export const listEquipmentPartRead = {"entity":"EquipmentPart","readId":"EquipmentPart.list","exportName":"listEquipmentPart","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; partEquipmentId: string; role: \"part\" | \"accessory\"; quantity: number; attachedAt: number | null; removedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEquipmentPartResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; partEquipmentId: string; role: "part" | "accessory"; quantity: number; attachedAt: number | null; removedAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listEquipmentReservationByEquipmentIdRead = {"entity":"EquipmentReservation","readId":"EquipmentReservation.byEquipmentId","exportName":"listEquipmentReservationByEquipmentId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"equipmentId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; missingQuantity: number | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listEquipmentReservationByEquipmentIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; missingQuantity: number | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }>;
+export const listEquipmentReservationByEquipmentIdRead = {"entity":"EquipmentReservation","readId":"EquipmentReservation.byEquipmentId","exportName":"listEquipmentReservationByEquipmentId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"equipmentId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; missingQuantity: number | null; damagedQuantity: number | null; cleaningQuantity: number | null; returnCheckedById: string | null; overrideReason: string | null; overrideApprovedById: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEquipmentReservationByEquipmentIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; missingQuantity: number | null; damagedQuantity: number | null; cleaningQuantity: number | null; returnCheckedById: string | null; overrideReason: string | null; overrideApprovedById: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }>;
 
-export const listEquipmentReservationByEventIdRead = {"entity":"EquipmentReservation","readId":"EquipmentReservation.byEventId","exportName":"listEquipmentReservationByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; missingQuantity: number | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listEquipmentReservationByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; missingQuantity: number | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }>;
+export const listEquipmentReservationByEventIdRead = {"entity":"EquipmentReservation","readId":"EquipmentReservation.byEventId","exportName":"listEquipmentReservationByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; missingQuantity: number | null; damagedQuantity: number | null; cleaningQuantity: number | null; returnCheckedById: string | null; overrideReason: string | null; overrideApprovedById: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEquipmentReservationByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; missingQuantity: number | null; damagedQuantity: number | null; cleaningQuantity: number | null; returnCheckedById: string | null; overrideReason: string | null; overrideApprovedById: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }>;
 
-export const listEquipmentReservationByTenantIdRead = {"entity":"EquipmentReservation","readId":"EquipmentReservation.byTenantId","exportName":"listEquipmentReservationByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; missingQuantity: number | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listEquipmentReservationByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; missingQuantity: number | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }>;
+export const listEquipmentReservationByTenantIdRead = {"entity":"EquipmentReservation","readId":"EquipmentReservation.byTenantId","exportName":"listEquipmentReservationByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; missingQuantity: number | null; damagedQuantity: number | null; cleaningQuantity: number | null; returnCheckedById: string | null; overrideReason: string | null; overrideApprovedById: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEquipmentReservationByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; missingQuantity: number | null; damagedQuantity: number | null; cleaningQuantity: number | null; returnCheckedById: string | null; overrideReason: string | null; overrideApprovedById: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }>;
 
-export const getEquipmentReservationRead = {"entity":"EquipmentReservation","readId":"EquipmentReservation.get","exportName":"getEquipmentReservation","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; missingQuantity: number | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getEquipmentReservationResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; missingQuantity: number | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number } | null;
+export const getEquipmentReservationRead = {"entity":"EquipmentReservation","readId":"EquipmentReservation.get","exportName":"getEquipmentReservation","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; missingQuantity: number | null; damagedQuantity: number | null; cleaningQuantity: number | null; returnCheckedById: string | null; overrideReason: string | null; overrideApprovedById: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getEquipmentReservationResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; missingQuantity: number | null; damagedQuantity: number | null; cleaningQuantity: number | null; returnCheckedById: string | null; overrideReason: string | null; overrideApprovedById: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number } | null;
 
-export const listEquipmentReservationRead = {"entity":"EquipmentReservation","readId":"EquipmentReservation.list","exportName":"listEquipmentReservation","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; missingQuantity: number | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listEquipmentReservationResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; missingQuantity: number | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }>;
+export const listEquipmentReservationRead = {"entity":"EquipmentReservation","readId":"EquipmentReservation.list","exportName":"listEquipmentReservation","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: \"reserved\" | \"checked_out\" | \"returned\" | \"cancelled\"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\" | null; returnNote: string | null; missingQuantity: number | null; damagedQuantity: number | null; cleaningQuantity: number | null; returnCheckedById: string | null; overrideReason: string | null; overrideApprovedById: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEquipmentReservationResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string; eventId: string; startsAt: number | null; endsAt: number | null; quantity: number; status: "reserved" | "checked_out" | "returned" | "cancelled"; reservedAt: number | null; checkedOutAt: number | null; checkoutCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; checkoutNote: string | null; returnedAt: number | null; returnCondition: "excellent" | "good" | "fair" | "poor" | "out_of_service" | null; returnNote: string | null; missingQuantity: number | null; damagedQuantity: number | null; cleaningQuantity: number | null; returnCheckedById: string | null; overrideReason: string | null; overrideApprovedById: string | null; cancelledAt: number | null; cancellationReason: string | null; createdAt: number; updatedAt: number }>;
 
 export const listEquipmentServiceEntryByEquipmentIdRead = {"entity":"EquipmentServiceEntry","readId":"EquipmentServiceEntry.byEquipmentId","exportName":"listEquipmentServiceEntryByEquipmentId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"equipmentId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; maintenanceTaskId: string; equipmentId: string; technician: string; cost: number; notes: string | null; completedAt: number | null; nextDueAt: number | null; loggedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEquipmentServiceEntryByEquipmentIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; maintenanceTaskId: string; equipmentId: string; technician: string; cost: number; notes: string | null; completedAt: number | null; nextDueAt: number | null; loggedAt: number | null; createdAt: number; updatedAt: number }>;

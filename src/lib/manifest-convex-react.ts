@@ -143,6 +143,9 @@ import {
   EmailNotificationSubscriptionConfigureParamsSchema,
   EmailNotificationSubscriptionUpdateSubscriptionsParamsSchema,
   EquipmentClearPrimaryImageParamsSchema,
+  EquipmentIssueRaiseParamsSchema,
+  EquipmentIssueReviseParamsSchema,
+  EquipmentIssueSettleParamsSchema,
   EquipmentMaintenanceTaskApplyServiceParamsSchema,
   EquipmentMaintenanceTaskScheduleParamsSchema,
   EquipmentPartAttachParamsSchema,
@@ -3018,6 +3021,57 @@ export function useCreateEquipment() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = EquipmentRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for EquipmentIssue. */
+export function useListEquipmentIssue() {
+  return useQuery(api.queries.listEquipmentIssue);
+}
+
+/** Reactive get-by-id for EquipmentIssue. Pass "skip" to suspend. */
+export function useGetEquipmentIssue(id: string | "skip") {
+  return useQuery(api.queries.getEquipmentIssue, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for EquipmentIssue.raise. */
+export function useEquipmentIssueRaise() {
+  const mutate = useMutation(api.mutations.EquipmentIssue_raise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EquipmentIssueRaiseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EquipmentIssue.revise. */
+export function useEquipmentIssueRevise() {
+  const mutate = useMutation(api.mutations.EquipmentIssue_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EquipmentIssueReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EquipmentIssue.settle. */
+export function useEquipmentIssueSettle() {
+  const mutate = useMutation(api.mutations.EquipmentIssue_settle);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EquipmentIssueSettleParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for EquipmentIssue.raise. */
+export function useCreateEquipmentIssue() {
+  const mutate = useMutation(api.mutations.EquipmentIssue_createViaRaise);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = EquipmentIssueRaiseParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -12360,4 +12414,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1308 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1314 as const;

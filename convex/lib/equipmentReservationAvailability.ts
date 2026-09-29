@@ -77,6 +77,32 @@ export function availableEquipmentQuantity(
   );
 }
 
+export type EquipmentIssueHold = {
+  tenantId: string;
+  deletedAt?: number | null;
+  status: string;
+  holdsUnits: boolean;
+  quantity: number;
+};
+
+/** PL-RETURNS: units kept out of use by open problems (broken, being
+ * cleaned, in repair) until someone marks the problem sorted out. They are
+ * out for every date, not only one window. */
+export function unitsOutOfUse(
+  issues: readonly EquipmentIssueHold[],
+  tenantId: string,
+): number {
+  return issues
+    .filter(
+      (issue) =>
+        issue.tenantId === tenantId &&
+        issue.deletedAt == null &&
+        issue.status === "open" &&
+        issue.holdsUnits,
+    )
+    .reduce((sum, issue) => sum + Number(issue.quantity), 0);
+}
+
 /** Why a catalog line cannot be booked at all, whatever the count. */
 export type EquipmentBlock = "out_of_service" | "retired" | null;
 

@@ -7,9 +7,12 @@ import {
   availableEquipmentQuantity,
   equipmentBlock,
   equipmentConflicts,
+  unitsOutOfUse,
   type EquipmentConflict,
 } from "./lib/equipmentReservationAvailability";
 import { reconcileEventPackRules } from "./lib/packRuleReconciliation";
+import { eventCancellationObligations } from "./lib/eventCancellation";
+import { summarizeEquipmentProblems } from "./lib/equipmentReturns";
 
 const day = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -55,6 +58,15 @@ const EQUIPMENT_ROLES = new Set([
   "system",
 ]);
 
+/** CF-11.4: who may book out-of-service equipment on purpose, with a reason. */
+const OVERRIDE_ROLES = new Set([
+  "inventory_manager",
+  "logistics_manager",
+  "admin",
+  "owner",
+  "system",
+]);
+
 /**
  * Authored atomic creation seam for EquipmentReservation.
  *
@@ -70,6 +82,8 @@ export const reserve = mutation({
     startsAt: v.number(),
     endsAt: v.number(),
     quantity: v.number(),
+    /** A manager books out-of-service or in-repair units anyway, and why. */
+    overrideReason: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const auth = await getAuthContext(ctx);
@@ -77,6 +91,12 @@ export const reserve = mutation({
     if (!EQUIPMENT_ROLES.has(auth.role)) {
       throw new ConvexError(
         "Inventory or logistics access is required to reserve equipment.",
+      );
+    }
+    const overrideReason = args.overrideReason?.trim() || null;
+    if (overrideReason && !OVERRIDE_ROLES.has(auth.role)) {
+      throw new ConvexError(
+        "Only an inventory or logistics manager can book equipment that is out of use. Ask a manager, or pick other equipment.",
       );
     }
     if (
@@ -109,9 +129,9 @@ export const reserve = mutation({
     }
     // CF-11.4: out-of-service equipment is never newly booked. The way back is
     // to mark it in service again once it is fixed (Equipment.updateCondition).
-    if (block === "out_of_service") {
+    if (block === "out_of_service" && !overrideReason) {
       throw new ConvexError(
-        `${equipment.name} is marked out of service, so it can't be booked. Pick other equipment, rent one, or mark it back in service once it is fixed.`,
+        `${equipment.name} is marked out of service, so it can't be booked. Pick other equipment, rent one, mark it back in service once it is fixed, or have a manager book it anyway with a reason.`,
       );
     }
     if (!event || event.tenantId !== tenantId || event.deletedAt != null) {
@@ -119,20 +139,31 @@ export const reserve = mutation({
     }
 
     const now = Date.now();
-    const reservations = await ctx.db
-      .query("equipmentReservations")
-      .withIndex("by_equipmentId", (query) =>
-        query.eq("equipmentId", args.equipmentId),
-      )
-      .collect();
+    const [reservations, issues] = await Promise.all([
+      ctx.db
+        .query("equipmentReservations")
+        .withIndex("by_equipmentId", (query) =>
+          query.eq("equipmentId", args.equipmentId),
+        )
+        .collect(),
+      ctx.db
+        .query("equipmentIssues")
+        .withIndex("by_equipmentId", (query) =>
+          query.eq("equipmentId", args.equipmentId),
+        )
+        .collect(),
+    ]);
     const window = {
       tenantId,
       startsAt: args.startsAt,
       endsAt: args.endsAt,
       now,
     };
+    // PL-RETURNS: broken, dirty or in-repair units are not free to book. A
+    // manager's override puts them back in reach; other events' holds never.
+    const outOfUse = overrideReason ? 0 : unitsOutOfUse(issues, tenantId);
     const availableQuantity = availableEquipmentQuantity(
-      equipment.quantity,
+      equipment.quantity - outOfUse,
       reservations,
       window,
     );
@@ -149,6 +180,9 @@ export const reserve = mutation({
         [
           `${equipment.name} has ${Math.max(availableQuantity, 0)} free for that time and you asked for ${args.quantity}.`,
           held.length > 0 ? `Already booked: ${held.join("; ")}.` : null,
+          outOfUse > 0
+            ? `${outOfUse} out of use (broken, being cleaned or in repair).`
+            : null,
           place ? `Kept at ${place}.` : null,
           "Pick other equipment, move one from another place, rent it from a vendor, or reduce the amount.",
         ]
@@ -168,6 +202,12 @@ export const reserve = mutation({
         quantity: args.quantity,
         status: "reserved",
         reservedAt: now,
+        ...(overrideReason
+          ? {
+              overrideReason,
+              ...(auth.personId ? { overrideApprovedById: auth.personId } : {}),
+            }
+          : {}),
         createdAt: now,
         updatedAt: now,
         version: 0,
@@ -185,6 +225,7 @@ export const reserve = mutation({
         startsAt: args.startsAt,
         endsAt: args.endsAt,
         quantity: args.quantity,
+        ...(overrideReason ? { overrideReason } : {}),
       },
       createdAt: now,
     });
@@ -223,13 +264,17 @@ export const equipmentAvailability = query({
     ) {
       return [];
     }
-    const [equipment, reservations] = await Promise.all([
+    const [equipment, reservations, issues] = await Promise.all([
       ctx.db
         .query("equipments")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
         .collect(),
       ctx.db
         .query("equipmentReservations")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .collect(),
+      ctx.db
+        .query("equipmentIssues")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
         .collect(),
     ]);
@@ -264,6 +309,10 @@ export const equipmentAvailability = query({
       const holds = byItem.get(String(item._id)) ?? [];
       const conflicts = equipmentConflicts(holds, window);
       const held = conflicts.reduce((sum, row) => sum + row.quantity, 0);
+      const outOfUse = unitsOutOfUse(
+        issues.filter((issue) => issue.equipmentId === item._id),
+        tenantId,
+      );
       out.push({
         equipmentId: item._id,
         name: item.name,
@@ -272,7 +321,8 @@ export const equipmentAvailability = query({
         condition: item.condition,
         location: item.currentLocation ?? item.homeLocation ?? null,
         quantity: item.quantity,
-        free: Math.max(0, item.quantity - held),
+        free: Math.max(0, item.quantity - outOfUse - held),
+        outOfUse,
         blocked: equipmentBlock(item),
         conflicts: await Promise.all(
           conflicts.map(async (row) => ({
@@ -287,6 +337,134 @@ export const equipmentAvailability = query({
       });
     }
     return out.sort((a, b) => a.name.localeCompare(b.name));
+  },
+});
+
+function canReadEquipmentExceptions(role: string): boolean {
+  return (
+    EQUIPMENT_ROLES.has(role) ||
+    role === "event_manager" ||
+    role === "finance_staff" ||
+    role === "manager" ||
+    role.endsWith("_manager")
+  );
+}
+
+/**
+ * PL-RETURNS (spec §13.3, AC-551): an event's equipment problems for the
+ * closeout and the bill - broken, missing, dirty, late and short vendor
+ * returns - with who pays and the money each side owes. Late returns are read
+ * from the return times, not stored. A cancelled event also lists what it
+ * still owes (a truck that went out, gear still out, open vendor rentals).
+ */
+export const eventEquipmentExceptions = query({
+  args: { eventId: v.id("events") },
+  handler: async (ctx, args) => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || !canReadEquipmentExceptions(auth.role)) return null;
+    const tenantId = auth.tenantId;
+    const event = await ctx.db.get(args.eventId);
+    if (!event || event.tenantId !== tenantId || event.deletedAt != null)
+      return null;
+    const eventId = String(args.eventId);
+    const [issues, holds, rentals] = await Promise.all([
+      ctx.db
+        .query("equipmentIssues")
+        .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+        .collect(),
+      ctx.db
+        .query("equipmentReservations")
+        .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+        .collect(),
+      ctx.db
+        .query("rentalOrderLines")
+        .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+        .collect(),
+    ]);
+    const names = new Map<string, string>();
+    const nameOf = async (equipmentId: string | null | undefined) => {
+      if (!equipmentId) return null;
+      if (!names.has(equipmentId)) {
+        const row = await ctx.db.get(equipmentId as Id<"equipments">);
+        names.set(
+          equipmentId,
+          row && row.tenantId === tenantId ? row.name : "Equipment",
+        );
+      }
+      return names.get(equipmentId)!;
+    };
+    const problems = [];
+    for (const issue of issues) {
+      if (issue.tenantId !== tenantId || issue.deletedAt != null) continue;
+      problems.push({
+        issueId: issue._id,
+        version: issue.version,
+        kind: issue.kind,
+        description: issue.description,
+        equipmentName: await nameOf(issue.equipmentId),
+        quantity: issue.quantity,
+        holdsUnits: issue.holdsUnits,
+        status: issue.status,
+        payer: issue.payer,
+        cost: issue.cost ?? null,
+        chargeAmount: issue.chargeAmount ?? null,
+        resolution: issue.resolution ?? null,
+      });
+    }
+    const late = [];
+    for (const hold of holds) {
+      if (hold.tenantId !== tenantId || hold.deletedAt != null) continue;
+      const due = hold.endsAt ?? null;
+      const back = hold.returnedAt ?? null;
+      const now = Date.now();
+      if (due == null) continue;
+      if (hold.status === "returned" && back != null && back > due) {
+        late.push({
+          recordId: String(hold._id),
+          name: (await nameOf(hold.equipmentId)) ?? "Equipment",
+          quantity: hold.quantity,
+          dueAt: due,
+          returnedAt: back,
+          stillOut: false,
+          fromVendor: false,
+        });
+      } else if (hold.status === "checked_out" && now > due) {
+        late.push({
+          recordId: String(hold._id),
+          name: (await nameOf(hold.equipmentId)) ?? "Equipment",
+          quantity: hold.quantity,
+          dueAt: due,
+          returnedAt: null,
+          stillOut: true,
+          fromVendor: false,
+        });
+      }
+    }
+    for (const line of rentals) {
+      if (line.tenantId !== tenantId || line.deletedAt != null) continue;
+      const due = line.pickupAt ?? null;
+      if (due == null || line.returnedAt == null || line.returnedAt <= due)
+        continue;
+      late.push({
+        recordId: String(line._id),
+        name: line.description,
+        quantity: line.returnedQuantity ?? line.quantity,
+        dueAt: due,
+        returnedAt: line.returnedAt,
+        stillOut: false,
+        fromVendor: true,
+      });
+    }
+    const obligations =
+      event.stage === "cancelled"
+        ? await eventCancellationObligations(ctx, tenantId, args.eventId)
+        : [];
+    return {
+      problems,
+      late,
+      obligations,
+      totals: summarizeEquipmentProblems(problems),
+    };
   },
 });
 

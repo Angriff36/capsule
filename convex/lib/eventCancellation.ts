@@ -1,6 +1,6 @@
 import { api } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
-import type { MutationCtx } from "../_generated/server";
+import type { MutationCtx, QueryCtx } from "../_generated/server";
 import { getAuthContext, requireTenant } from "./authContext";
 
 /** Stop unfinished logistics and unpaid billing; preserve performed and paid facts. */
@@ -104,6 +104,74 @@ export async function standDownEventEquipmentReservations(
       reason: event.cancellationReason ?? "Event cancelled",
     });
   }
+}
+
+export type CancellationObligation = {
+  code: "pack_list_sent" | "equipment_still_out" | "vendor_rental_open";
+  recordId: string;
+  label: string;
+};
+
+/**
+ * PR10-07 / AC-137: what a cancelled event still owes after the stand-down.
+ * Nothing here is cancelled for the office: a truck that already left, gear
+ * that is still out, and a vendor rental that was asked for, confirmed or
+ * delivered are real things someone must bring back or call about.
+ */
+export async function eventCancellationObligations(
+  ctx: QueryCtx,
+  tenantId: string,
+  eventId: Id<"events">,
+): Promise<CancellationObligation[]> {
+  const [packs, holds, rentals] = await Promise.all([
+    ctx.db
+      .query("packLists")
+      .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+      .collect(),
+    ctx.db
+      .query("equipmentReservations")
+      .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+      .collect(),
+    ctx.db
+      .query("rentalOrderLines")
+      .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+      .collect(),
+  ]);
+  const out: CancellationObligation[] = [];
+  for (const pack of packs) {
+    if (pack.tenantId !== tenantId || pack.deletedAt != null) continue;
+    if (pack.status !== "dispatched") continue;
+    out.push({
+      code: "pack_list_sent",
+      recordId: String(pack._id),
+      label: `${pack.name} already went out. Bring it back and check it in.`,
+    });
+  }
+  for (const hold of holds) {
+    if (hold.tenantId !== tenantId || hold.deletedAt != null) continue;
+    if (hold.status !== "checked_out") continue;
+    const equipment = await ctx.db.get(hold.equipmentId as Id<"equipments">);
+    const name =
+      equipment && equipment.tenantId === tenantId ? equipment.name : "Equipment";
+    out.push({
+      code: "equipment_still_out",
+      recordId: String(hold._id),
+      label: `${hold.quantity} ${name} still out. Do the return check when it is back.`,
+    });
+  }
+  for (const line of rentals) {
+    if (line.tenantId !== tenantId || line.deletedAt != null) continue;
+    if (!["requested", "confirmed", "delivered"].includes(line.status)) continue;
+    out.push({
+      code: "vendor_rental_open",
+      recordId: String(line._id),
+      label:
+        line.status === "delivered"
+          ? `${line.quantity} ${line.description} from the rental company is here. Send it back and enter the count.`
+          : `${line.quantity} ${line.description} is ${line.status} with the rental company. Call them to cancel, then mark it cancelled.`,
+    });
+  }
+  return out;
 }
 
 /** Cancelling an event releases assigned crew; performed attendance stays. */

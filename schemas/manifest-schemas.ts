@@ -818,6 +818,39 @@ export const EquipmentComputedSchema = EquipmentSchema.extend({
 export type Equipment = z.infer<typeof EquipmentSchema>;
 export type EquipmentWithComputed = z.infer<typeof EquipmentComputedSchema>;
 
+// Entity: EquipmentIssue
+export const EquipmentIssueSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  equipmentId: z.string().uuid().nullable().optional(),
+  eventId: z.string().uuid().nullable().optional(),
+  equipmentReservationId: z.string().uuid().nullable().optional(),
+  rentalOrderLineId: z.string().uuid().nullable().optional(),
+  kind: z.enum(["damaged", "missing", "cleaning", "repair", "late_return", "vendor_return"]).default("repair"),
+  severity: z.enum(["low", "medium", "high"]).default("medium"),
+  quantity: z.number().int().min(1).default(1),
+  holdsUnits: z.boolean().default(false),
+  description: z.string().default(""),
+  status: z.enum(["open", "resolved"]).default("open"),
+  raisedAt: z.coerce.date().nullable().optional(),
+  raisedById: z.string().uuid().nullable().optional(),
+  dueAt: z.coerce.date().nullable().optional(),
+  ownerName: z.string().nullable().optional(),
+  vendorId: z.string().uuid().nullable().optional(),
+  cost: z.number().nullable().optional(),
+  payer: z.enum(["undecided", "company", "client", "vendor"]).default("undecided"),
+  chargeAmount: z.number().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  resolvedAt: z.coerce.date().nullable().optional(),
+  settledById: z.string().uuid().nullable().optional(),
+  resolution: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EquipmentIssue = z.infer<typeof EquipmentIssueSchema>;
+
 // Entity: EquipmentMaintenanceTask
 export const EquipmentMaintenanceTaskSchema = z.object({
   id: z.string().uuid(),
@@ -872,6 +905,11 @@ export const EquipmentReservationSchema = z.object({
   returnCondition: z.enum(["excellent", "good", "fair", "poor", "out_of_service"]).nullable().optional(),
   returnNote: z.string().nullable().optional(),
   missingQuantity: z.number().int().nullable().optional(),
+  damagedQuantity: z.number().int().nullable().optional(),
+  cleaningQuantity: z.number().int().nullable().optional(),
+  returnCheckedById: z.string().uuid().nullable().optional(),
+  overrideReason: z.string().nullable().optional(),
+  overrideApprovedById: z.string().uuid().nullable().optional(),
   cancelledAt: z.coerce.date().nullable().optional(),
   cancellationReason: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -5747,6 +5785,53 @@ export const EquipmentWriteOffMissingParamsSchema = z.object({
 
 export type EquipmentWriteOffMissingParams = z.infer<typeof EquipmentWriteOffMissingParamsSchema>;
 
+// Command: raise on EquipmentIssue
+export const EquipmentIssueRaiseParamsSchema = z.object({
+  kind: z.enum(["damaged", "missing", "cleaning", "repair", "late_return", "vendor_return"]),
+  description: z.string(),
+  equipmentId: z.string().min(1).optional(),
+  eventId: z.string().min(1).optional(),
+  equipmentReservationId: z.string().uuid().optional(),
+  rentalOrderLineId: z.string().uuid().optional(),
+  quantity: z.number().int().optional(),
+  severity: z.enum(["low", "medium", "high"]).optional(),
+  holdsUnits: z.boolean().optional(),
+  dueAt: z.coerce.date().optional(),
+  ownerName: z.string().optional(),
+  vendorId: z.string().min(1).optional(),
+  cost: z.number().optional(),
+  payer: z.enum(["undecided", "company", "client", "vendor"]).optional(),
+  chargeAmount: z.number().optional(),
+  notes: z.string().optional(),
+});
+
+export type EquipmentIssueRaiseParams = z.infer<typeof EquipmentIssueRaiseParamsSchema>;
+
+// Command: revise on EquipmentIssue
+export const EquipmentIssueReviseParamsSchema = z.object({
+  severity: z.enum(["low", "medium", "high"]).optional(),
+  holdsUnits: z.boolean().optional(),
+  dueAt: z.coerce.date().optional(),
+  ownerName: z.string().optional(),
+  vendorId: z.string().min(1).optional(),
+  cost: z.number().optional(),
+  payer: z.enum(["undecided", "company", "client", "vendor"]).optional(),
+  chargeAmount: z.number().optional(),
+  notes: z.string().optional(),
+});
+
+export type EquipmentIssueReviseParams = z.infer<typeof EquipmentIssueReviseParamsSchema>;
+
+// Command: settle on EquipmentIssue
+export const EquipmentIssueSettleParamsSchema = z.object({
+  resolution: z.string(),
+  cost: z.number().optional(),
+  payer: z.enum(["undecided", "company", "client", "vendor"]).optional(),
+  chargeAmount: z.number().optional(),
+});
+
+export type EquipmentIssueSettleParams = z.infer<typeof EquipmentIssueSettleParamsSchema>;
+
 // Command: applyService on EquipmentMaintenanceTask
 export const EquipmentMaintenanceTaskApplyServiceParamsSchema = z.object({
   completedAt: z.coerce.date(),
@@ -5808,6 +5893,8 @@ export const EquipmentReservationMarkReturnedParamsSchema = z.object({
   condition: z.enum(["excellent", "good", "fair", "poor", "out_of_service"]),
   note: z.string().optional(),
   missingQuantity: z.number().int().optional(),
+  damagedQuantity: z.number().int().optional(),
+  cleaningQuantity: z.number().int().optional(),
 });
 
 export type EquipmentReservationMarkReturnedParams = z.infer<typeof EquipmentReservationMarkReturnedParamsSchema>;

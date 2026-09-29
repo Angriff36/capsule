@@ -14,6 +14,9 @@ import {
   packFactEventId, reconcileEventPackRules, validatePackLoadAssignment, validatePackReadiness,
 } from "./packRuleReconciliation";
 import { eventDemandReconciliation } from "./demandReconciliation";
+import {
+  checkOutDispatchedEquipment, raiseReturnIssues, raiseVendorReturnIssue,
+} from "./equipmentReturns";
 import { eventPrepReconciliation } from "./prepReconciliation";
 import { eventHeadcountStaffingReconciliation } from "./headcountStaffingReconciliation";
 import { eventProposalReconciliation } from "./proposalReconciliation";
@@ -73,6 +76,19 @@ export async function handleManifestEvent(
   }
   if (event.entity === "PackList" && event.type === "PackListPacked") {
     await validatePackReadiness(ctx, event.entityId as Id<"packLists">);
+    return;
+  }
+  // PL-RETURNS: the truck leaving, the return check and the vendor return.
+  if (event.entity === "PackList" && event.type === "PackListDispatched") {
+    await checkOutDispatchedEquipment(ctx, event.entityId as Id<"packLists">);
+    return;
+  }
+  if (event.entity === "EquipmentReservation" && event.type === "EquipmentReturned") {
+    await raiseReturnIssues(ctx, event.entityId as Id<"equipmentReservations">);
+    return;
+  }
+  if (event.entity === "RentalOrderLine" && event.type === "RentalOrderLineReturned") {
+    await raiseVendorReturnIssue(ctx, event.entityId as Id<"rentalOrderLines">);
     return;
   }
   if (await handleTravelLegEvent(ctx, event)) return;
