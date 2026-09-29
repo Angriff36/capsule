@@ -175,14 +175,24 @@ components:
     rounded: "{rounded.xs}"
     height: 32px
     padding: 0 10px
+  # status-chip and result-notice: owner pick 2026-09-29 (component picker).
   status-chip:
-    backgroundColor: "{colors.success}"
-    textColor: "{colors.on-brand}"
-    typography: "{typography.micro}"
-    rounded: "{rounded.pill}"
-    height: 30px
-    padding: 0 15px
-    variants: solid semantic fill — success, warning, danger, brand
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.ink}"
+    borderColor: "{colors.line}"
+    typography: "{typography.body}"
+    rounded: "{rounded.sm}"
+    height: 26px
+    padding: 0 10px 0 8px
+    icon: 14px leading icon in the tone color — mute, info, warn, ok, danger, brand
+  result-notice:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.ink}"
+    borderColor: "{colors.line}"
+    rounded: "{rounded.md}"
+    minHeight: 44px
+    padding: 8px 12px
+    variants: success = neutral box with ok icon; failure = danger border, icon, and text on danger-soft
   meta-chip:
     backgroundColor: "{colors.inset}"
     textColor: "{colors.ink-2}"
@@ -307,6 +317,34 @@ map onto the app tokens. Phones use the same page (Ryan, 2026-09-24: "obviously 
 updated"): one tile per row, a 2x2 count strip, and a sideways-scrolling
 group switcher. This is a scoped exception. Do not add it to `design-contract-exceptions.json`.
 
+## Component picker decisions (owner, 2026-09-29)
+
+Ryan chose these in the component picker (Storybook stories carry the live
+reference; section specs below are updated where they conflict):
+
+- **Page header** — editorial masthead (`PageHeader`): uppercase eyebrow with
+  the state word in accent, large bold title, optional fact pairs on a 1.5px
+  ink rule, actions under it. `size="compact"` only in narrow shells (My Day).
+- **Event stage rail** — numbered steps on a connector line with the open
+  check count under the current step, and a gate list of the checks before
+  the next stage. Every open check links to where it is fixed. Checks come
+  from the event lifecycle and readiness data only
+  (`src/features/events/dashboard/eventStageGate.ts`).
+- **Ledger table** — see `ledger-table`.
+- **Kitchen prep task** — checklist rows (`PrepTaskRow`): 28px checkbox with a
+  44px hit area, bold task and amount, muted dish and station line, mono due
+  time that turns danger when late. Only the checkbox completes a task; there
+  is no reopen.
+- **Empty state** — left-aligned title, hint, and an optional numbered list of
+  the real steps that fill the view, done steps checked.
+- **Stat tiles** — `StatCard` is a panel tile with a mono value and, when the
+  page has a real series, a sparkline drawn to the data's range. No tinted
+  fills; tone colors only the line.
+- **Action prompt** — Origin UI alert dialog on native `<dialog>`: centered
+  modal, icon circle, title, description, reason field, Cancel + Confirm.
+  Focus starts on the first field, else Cancel.
+- **Status chip / result notice / ledger table** — see their sections.
+
 ## Overview
 
 CapsuleX is the operating system for organizations that plan, produce, staff, deliver, and execute catered events. It should feel like a beautifully maintained service book rather than a generic administration dashboard. The application sits inside a pale botanical frame. Its working surfaces are warm white, its primary ink is a deep culinary green, and its hierarchy comes from editorial serif type, fine rules, measured negative space, and dense operational lists.
@@ -418,7 +456,7 @@ The serif creates identity; Archivo carries controls and dense information; IBM 
 | Label           | Archivo         |    14px |    700 |        1.40 |         0.04em | `fact-pair` labels, uppercase.           |
 | Eyebrow         | Archivo         |    14px |    700 |        1.40 |         0.09em | `section-rule` labels, uppercase.        |
 | Mono Data       | IBM Plex Mono   |    15px |    500 |        1.40 |         0.02em | Times, money, counts, and relative time. |
-| Micro           | Archivo         |    13px |    600 |        1.40 |         0.06em | Chip text, uppercase.                    |
+| Micro           | Archivo         |    13px |    600 |        1.40 |         0.06em | ~~Chip text,~~ Micro labels, uppercase. (chip text is 13px sentence case since 2026-09-29) |
 
 **Floors.** Body never falls below 15px and supporting metadata never below 13px. Uppercase is a deliberate device for labels, chips, and buttons — it is never a way to make text small. There is no type role under 13px.
 
@@ -479,7 +517,7 @@ Heavy drop shadows, glass panels, glow, and layered floating cards are not part 
 | `md`     |   10px | Menus and compact grouped panels           |
 | `ledger` |   14px | Attention and authored empty-state regions |
 | `sheet`  |   22px | Primary route sheet                        |
-| `pill`   | 9999px | Status chips, tags, icon-nav active state  |
+| `pill`   | 9999px | ~~Status chips,~~ tags, icon-nav active state (status chips use `sm` since 2026-09-29) |
 
 ### Image Treatment
 
@@ -535,7 +573,34 @@ Small uppercase Archivo link in brand green, often paired with a directional arr
 
 ### **`status-chip`**
 
-30px pill with a **solid** semantic fill and white uppercase text at 13px, tracked 0.06em. Reserved for real lifecycle state and severity — delivered, ready, blocked, critical, high. Its weight is the point: a solid chip is a claim about state, so it must be earned.
+~~30px pill with a **solid** semantic fill and white uppercase text at 13px, tracked 0.06em. Reserved for real lifecycle state and severity — delivered, ready, blocked, critical, high. Its weight is the point: a solid chip is a claim about state, so it must be earned.~~
+
+> **Updated 2026-09-29 (owner pick, component picker variant D):** 26px outline
+> chip with 6px corners, panel fill, a fine `line` border, and ink sentence-case
+> text at 13px. The state lives in a 14px leading icon drawn in the tone color:
+> dashed circle (mute), arrow (info, in motion), triangle (warn, needs you),
+> check (ok, done), cross (danger), dot or lock (brand; lock for sales lock).
+> Color never carries state alone. Code: `.chip` plus one `chip-tone-*` class
+> in `src/styles/app.css`; `StatusChip` picks the tone. `.chip-state-*` is the
+> older spelling and renders the same chip.
+
+### **`result-notice`**
+
+> **Added 2026-09-29 (owner pick, component picker variant B, with C for
+> failures):** the message after a command runs (`ui/action-result`). Success
+> is a neutral panel box with a 1px `line` border, ink text, and an ok check
+> icon. A failure blocks work, so its border, icon, and text take the danger
+> color on `danger-soft`. 44px minimum height, 8px corners, dismiss button on
+> the right.
+
+### **`ledger-table`**
+
+> **Added 2026-09-29 (owner pick, component picker variant A):** working
+> tables have no header fill. The header row is an uppercase 13px bold label
+> in `ink-3`, tracked 0.04em, over a 1.5px `ink` rule; body rows are 40px with
+> a fine `line` rule between them and an `inset` hover; figures are tabular
+> and right-aligned in IBM Plex Mono. Code: `.th` / `.td`, and `.data-table` /
+> `.supply-table` on the table element.
 
 ### **`meta-chip`**
 
@@ -548,6 +613,8 @@ Pale-sage inset region for exceptions and open decisions. It uses a serif headin
 ### **`outlook-strip`**
 
 Rule-led metrics beneath the primary focal point. Values use display or mono rhythm; labels stay small and quiet. It replaces generic equal-weight KPI cards and must preserve truthful zeros.
+
+> **Note 2026-09-29:** dashboards that show KPI tiles use `StatCard` (panel tile with an optional real-data sparkline, owner pick). The outlook strip stays the pattern under an overview page's focal point.
 
 ### **`service-list`**
 

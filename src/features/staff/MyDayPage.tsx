@@ -426,6 +426,13 @@ export function MyDayPage() {
         (b.dueAt ?? Number.MAX_SAFE_INTEGER),
     );
 
+  // A Done saved offline shows ticked until the queue sends it.
+  const queuedCompleteIds = new Set(
+    pending
+      .filter((action) => action.runKey === "task-complete")
+      .map((action) => String(action.args.docId)),
+  );
+
   const packingLists = (packLists ?? []).filter(
     (list) =>
       list.deletedAt == null &&
@@ -889,6 +896,8 @@ export function MyDayPage() {
                     eventDishes={eventDishes}
                     events={events}
                     busy={busy}
+                    now={now}
+                    queuedCompleteIds={queuedCompleteIds}
                     perform={perform}
                   />
                 )}

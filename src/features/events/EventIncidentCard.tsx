@@ -13,10 +13,10 @@ import { StatusChip } from "../../ui/primitives";
 export type IncidentActionKind = "resolve" | "dismiss" | "closeCorrective";
 
 const SEVERITY_CHIP: Record<string, string> = {
-  low: "border-info/30 bg-info-soft text-info",
-  medium: "border-warn/30 bg-warn-soft text-warn",
-  high: "border-danger/30 bg-danger-soft text-danger",
-  critical: "border-danger bg-danger text-on-brand",
+  low: "chip-tone-info",
+  medium: "chip-tone-warn",
+  high: "chip-tone-danger",
+  critical: "chip-tone-danger border-danger",
 };
 
 const CATEGORY_ICON: Record<
@@ -78,13 +78,13 @@ export function EventIncidentCard({
                 {formatStatusLabel(category)}
               </h3>
               <span
-                className={`chip ${SEVERITY_CHIP[severity] ?? "border-line-2 bg-inset text-ink-2"}`}
+                className={`chip ${SEVERITY_CHIP[severity] ?? "chip-tone-mute"}`}
               >
                 {formatStatusLabel(severity)} severity
               </span>
               <StatusChip status={incident.status} />
               {locked ? (
-                <span className="chip border-warn/30 bg-warn-soft text-warn">
+                <span className="chip chip-tone-warn">
                   Locked — corrective action open
                 </span>
               ) : null}

@@ -1,7 +1,6 @@
-import { StatusChip } from "../../ui/primitives";
-import { prepQuantityLabel } from "../kitchen/prepQuantityLabel";
 import { CulinaryEntityLink } from "../kitchen/CulinaryEntityLink";
-import { prepMadeSoFarLabel, prepTimeLabel } from "../kitchen/prepTiming";
+import { PrepTaskRow } from "../kitchen/PrepTaskRow";
+import { prepMadeSoFarLabel } from "../kitchen/prepTiming";
 import {
   prepTaskDependencyLabel,
   prepTaskDependencySummary,
@@ -44,6 +43,10 @@ type Props = {
   eventDishes?: EventDish[];
   events?: { _id: string; title: string }[];
   busy: string | null;
+  /** Clock for the late flag; My Day ticks it every 30 seconds. */
+  now: number;
+  /** Tasks whose Done is saved on this device, waiting to send. */
+  queuedCompleteIds: ReadonlySet<string>;
   perform: (
     key: string,
     command: string,
@@ -62,6 +65,8 @@ export function MyDayPrepList({
   eventDishes,
   events,
   busy,
+  now,
+  queuedCompleteIds,
   perform,
 }: Props) {
   const known = everyTask ?? allTasks;
@@ -141,107 +146,123 @@ export function MyDayPrepList({
                 const waiting =
                   task.status === "claimed" && dependency.isBlocked;
                 const made = prepMadeSoFarLabel(task, known);
+                const stepsDishId = task.componentId
+                  ? null
+                  : (entry?.dishId ?? task.dishId ?? null);
+                const title = task.name?.trim() || "Prep task";
+                // Claim and Start stay one tap away; Done is the checkbox.
                 const next =
                   task.status === "pending"
                     ? { label: "Claim", command: "task-claim" }
                     : task.status === "claimed"
                       ? { label: "Start", command: "task-start" }
-                      : task.status === "in_progress"
-                        ? { label: "Done", command: "task-complete" }
-                        : null;
+                      : null;
+                const secondary =
+                  next != null ||
+                  task.status === "claimed" ||
+                  Boolean(task.specialInstructions) ||
+                  dependency.total > 0 ||
+                  Boolean(task.componentId) ||
+                  Boolean(stepsDishId);
                 return (
-                  <li className="my-day-prep-row" key={task._id}>
-                    <div className="my-day-prep-instruction">
-                      <p className="my-day-prep-task-name">
-                        {task.name?.trim() || "Prep task"}
-                      </p>
-                      <p className="my-day-prep-task-meta">
-                        <strong>
-                          {prepQuantityLabel(task.quantity, task.unit)}{" "}
-                          {task.unit} to make
-                        </strong>
-                        {made ? `  |  ${made}` : ""}
-                        {task.station ? `  |  ${task.station}` : ""}
-                        {`  |  ${prepTimeLabel(task.dueAt)}`}
-                      </p>
-                      {dependency.total > 0 && (
-                        <p
-                          id={`my-day-prep-dependencies-${task._id}`}
-                          className="my-day-prep-note"
-                        >
-                          {prepTaskDependencyLabel(dependency)}
-                        </p>
-                      )}
-                      {task.specialInstructions && (
-                        <p className="my-day-prep-note">
-                          {task.specialInstructions}
-                        </p>
-                      )}
-                      {task.componentId ? (
-                        <CulinaryEntityLink
-                          kind="component"
-                          id={task.componentId}
-                          prepTaskId={task._id}
-                          className="inline-flex min-h-11 items-center text-base text-accent underline underline-offset-2"
-                        >
-                          Recipe: {task.name?.trim() || "Prep task"}
-                        </CulinaryEntityLink>
-                      ) : (entry?.dishId ?? task.dishId) ? (
-                        <CulinaryEntityLink
-                          kind="dish"
-                          id={(entry?.dishId ?? task.dishId)!}
-                          className="inline-flex min-h-11 items-center text-base text-accent underline underline-offset-2"
-                        >
-                          Steps for {dish?.name ?? "this dish"}
-                        </CulinaryEntityLink>
-                      ) : null}
-                      {task.status === "blocked" && (
-                        <p className="my-day-prep-note">
-                          Blocked: {task.blockReason || "See kitchen lead"}
-                        </p>
-                      )}
-                    </div>
-                    <div className="my-day-prep-row-actions">
-                      <StatusChip status={task.status} />
-                      {next && (
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          disabled={busy != null || waiting}
-                          aria-describedby={
-                            dependency.total > 0
-                              ? `my-day-prep-dependencies-${task._id}`
-                              : undefined
-                          }
-                          aria-label={`${next.label}: ${task.name || "prep task"}`}
-                          onClick={() =>
-                            perform(key, next.command, next.label, {
-                              docId: task._id,
-                              version: task.version,
-                            })
-                          }
-                        >
-                          {busy === key ? "Working..." : next.label}
-                        </button>
-                      )}
-                      {task.status === "claimed" && (
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          disabled={busy != null}
-                          aria-label={`Release: ${task.name || "prep task"}`}
-                          onClick={() =>
-                            perform(
-                              `${key}:release`,
-                              "task-release",
-                              "Release task",
-                              { docId: task._id, version: task.version },
-                            )
-                          }
-                        >
-                          Release
-                        </button>
-                      )}
-                    </div>
-                  </li>
+                  <PrepTaskRow
+                    key={task._id}
+                    name={title}
+                    quantity={task.quantity}
+                    unit={task.unit}
+                    context={
+                      [dish?.name, made].filter(Boolean).join(" · ") || null
+                    }
+                    station={task.station}
+                    dueAt={task.dueAt}
+                    status={task.status}
+                    blockReason={task.blockReason}
+                    now={now}
+                    working={busy === `${key}:complete`}
+                    locked={busy != null}
+                    queued={queuedCompleteIds.has(task._id)}
+                    onComplete={() =>
+                      perform(`${key}:complete`, "task-complete", "Done", {
+                        docId: task._id,
+                        version: task.version,
+                      })
+                    }
+                  >
+                    {secondary ? (
+                      <>
+                        {dependency.total > 0 && (
+                          <p
+                            id={`my-day-prep-dependencies-${task._id}`}
+                            className="my-day-prep-note w-full"
+                          >
+                            {prepTaskDependencyLabel(dependency)}
+                          </p>
+                        )}
+                        {task.specialInstructions && (
+                          <p className="my-day-prep-note w-full">
+                            {task.specialInstructions}
+                          </p>
+                        )}
+                        {next && (
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-sm my-day-prep-action"
+                            disabled={busy != null || waiting}
+                            aria-describedby={
+                              dependency.total > 0
+                                ? `my-day-prep-dependencies-${task._id}`
+                                : undefined
+                            }
+                            aria-label={`${next.label}: ${title}`}
+                            onClick={() =>
+                              perform(key, next.command, next.label, {
+                                docId: task._id,
+                                version: task.version,
+                              })
+                            }
+                          >
+                            {busy === key ? "Working..." : next.label}
+                          </button>
+                        )}
+                        {task.status === "claimed" && (
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-sm my-day-prep-action"
+                            disabled={busy != null}
+                            aria-label={`Release: ${title}`}
+                            onClick={() =>
+                              perform(
+                                `${key}:release`,
+                                "task-release",
+                                "Release task",
+                                { docId: task._id, version: task.version },
+                              )
+                            }
+                          >
+                            Release
+                          </button>
+                        )}
+                        {task.componentId ? (
+                          <CulinaryEntityLink
+                            kind="component"
+                            id={task.componentId}
+                            prepTaskId={task._id}
+                            className="inline-flex min-h-11 items-center text-base text-accent underline underline-offset-2"
+                          >
+                            Recipe: {title}
+                          </CulinaryEntityLink>
+                        ) : stepsDishId ? (
+                          <CulinaryEntityLink
+                            kind="dish"
+                            id={stepsDishId}
+                            className="inline-flex min-h-11 items-center text-base text-accent underline underline-offset-2"
+                          >
+                            Steps for {dish?.name ?? "this dish"}
+                          </CulinaryEntityLink>
+                        ) : null}
+                      </>
+                    ) : null}
+                  </PrepTaskRow>
                 );
               })}
             </ul>

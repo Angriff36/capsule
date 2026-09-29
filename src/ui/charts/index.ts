@@ -6,7 +6,8 @@
  */
 
 export { StatCard } from "./StatCard";
-export type { StatCardProps, StatCardData } from "./StatCard";
+export type { StatCardProps, StatCardData, StatCardTrend } from "./StatCard";
+export { Sparkline, trendFromSeries, monthKeyLabel } from "./Sparkline";
 
 export { LineChart } from "./LineChart";
 export type { LineChartProps, LineChartSeries } from "./LineChart";

@@ -11,6 +11,7 @@ import {
   type DashboardGridSize,
 } from "@/ui/charts/DashboardGrid";
 import { StatCard } from "@/ui/charts/StatCard";
+import { monthKeyLabel, trendFromSeries } from "@/ui/charts/Sparkline";
 import { BarChart } from "@/ui/charts/BarChart";
 import { LineChart } from "@/ui/charts/LineChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
@@ -363,6 +364,11 @@ export function AvgEventValueGrowthDashboardPage() {
           ]}
           tone="brand"
           isLive
+          trend={trendFromSeries(
+            monthlyTrendData,
+            (row) => row.avgEventValue,
+            (row) => monthKeyLabel(row.month),
+          )}
         />
       ),
     },
@@ -429,6 +435,11 @@ export function AvgEventValueGrowthDashboardPage() {
           }}
           tone="accent"
           isLive
+          trend={trendFromSeries(
+            monthlyTrendData,
+            (row) => row.revenuePerHead,
+            (row) => monthKeyLabel(row.month),
+          )}
         />
       ),
     },

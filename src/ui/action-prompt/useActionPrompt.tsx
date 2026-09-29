@@ -2,7 +2,6 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -71,7 +70,6 @@ export function useActionPrompt(busy = false): {
   const controller = useMemo(() => new ActionPromptController(), []);
   const [pending, setPending] = useState(controller.getPending());
   const [notice, setNotice] = useState<string | null>(null);
-  const hostRef = useRef<HTMLDivElement>(null);
 
   const announceDismissed = useCallback(() => {
     setNotice(DISMISSED_NOTICE);
@@ -98,26 +96,21 @@ export function useActionPrompt(busy = false): {
     return () => window.clearTimeout(timer);
   }, [notice]);
 
-  // Scroll the prompt into view when it appears
-  useEffect(() => {
-    if (pending && hostRef.current) {
-      hostRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }
-  }, [pending]);
-
   const host = (
-    <div ref={hostRef} aria-live="polite" aria-atomic="true">
-      {notice ? (
-        <p
-          className="mt-3 rounded-sm border border-line bg-inset px-3 py-2 text-sm text-ink-2"
-          role="status"
-        >
-          {notice}
-        </p>
-      ) : null}
+    // The prompt renders as a modal <dialog> (top layer), so the host no
+    // longer scrolls itself into view. The dialog sits outside the live
+    // region: role="alertdialog" announces itself.
+    <div>
+      <div aria-live="polite" aria-atomic="true">
+        {notice ? (
+          <p
+            className="mt-3 rounded-sm border border-line bg-inset px-3 py-2 text-sm text-ink-2"
+            role="status"
+          >
+            {notice}
+          </p>
+        ) : null}
+      </div>
       {pending ? (
         <ActionPromptPanel
           request={pending.request}

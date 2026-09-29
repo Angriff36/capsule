@@ -307,7 +307,7 @@ export function ClientCommunicationPanelView({
                     aria-hidden="true"
                   />
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span className="chip border-brand/20 bg-sage/55 text-brand">
+                    <span className="chip chip-tone-brand">
                       {mediumLabel(String(communication.medium))}
                     </span>
                     <time className="font-mono text-2xs text-ink-3">
