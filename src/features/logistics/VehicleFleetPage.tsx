@@ -9,6 +9,7 @@ import {
   useTrailerUpdateOperationalStatus,
   useTrailerUpdateRegistration,
   useVehicleReviseDetails,
+  useVehicleSetTowCapacity,
   useVehicleUpdateInsurance,
   useVehicleUpdateOperationalStatus,
   useVehicleUpdateRegistration,
@@ -40,6 +41,7 @@ type VehicleRow = {
   registration: string;
   ownership: VehicleOwnership;
   payloadCapacityKg: number;
+  towCapacityKg?: number | null;
   operationalStatus: OperationalStatus;
   statusNote?: string | null;
   deletedAt?: number | null;
@@ -149,6 +151,7 @@ export function VehicleFleetPage() {
   const createVehicle = useCreateVehicle();
   const createTrailer = useCreateTrailer();
   const reviseVehicle = useVehicleReviseDetails();
+  const setTowCapacity = useVehicleSetTowCapacity();
   const reviseTrailer = useTrailerReviseDetails();
   const updateVehicleStatus = useVehicleUpdateOperationalStatus();
   const updateTrailerStatus = useTrailerUpdateOperationalStatus();
@@ -222,6 +225,15 @@ export function VehicleFleetPage() {
             version: editingVehicle.version,
             ...details,
           });
+          const towText = String(data.get("towCapacityKg") ?? "").trim();
+          const tow = towText === "" ? null : Number(towText);
+          if (tow !== (editingVehicle.towCapacityKg ?? null)) {
+            await setTowCapacity({
+              docId: editingVehicle._id,
+              version: editingVehicle.version + 1,
+              towCapacityKg: tow ?? undefined,
+            });
+          }
           setNotice(`${details.registration} updated.`);
         } else {
           await createVehicle({
@@ -537,6 +549,13 @@ export function VehicleFleetPage() {
                       </td>
                       <td className="supply-number">
                         {vehicle.payloadCapacityKg.toLocaleString()} kg
+                        {vehicle.towCapacityKg === 0 ? (
+                          <small>No trailer</small>
+                        ) : vehicle.towCapacityKg != null ? (
+                          <small>
+                            Tows {vehicle.towCapacityKg.toLocaleString()} kg
+                          </small>
+                        ) : null}
                       </td>
                       <td>
                         <StatusChip status={vehicle.operationalStatus} />
@@ -828,6 +847,21 @@ function VehicleForm({
             required
           />
         </label>
+        {vehicle ? (
+          <label className="field-label">
+            Can tow (kg)
+            <input
+              name="towCapacityKg"
+              className="input"
+              type="number"
+              min={0}
+              step={1}
+              defaultValue={vehicle.towCapacityKg ?? ""}
+              placeholder="Not recorded"
+            />
+            <small>0 = cannot pull a trailer. Empty = not recorded.</small>
+          </label>
+        ) : null}
         {!vehicle ? (
           <>
             <label className="field-label">

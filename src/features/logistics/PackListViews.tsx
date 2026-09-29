@@ -12,6 +12,76 @@ import {
 
 type Row = PackListItemRow & { loadAssignmentId?: string | null };
 
+/** What the server says about each line's truck (PL-DELIVERY, AC-535). */
+export type PackTransport = {
+  lines: Array<{
+    lineId: string;
+    legId: string | null;
+    trip: number | null;
+    loadingZone: string | null;
+    loadStartAt: number | null;
+    departAt: number | null;
+    holdWarning: string | null;
+  }>;
+  rigLoads: Array<{
+    id: string;
+    loadKg: number;
+    capacityKg: number;
+    message: string | null;
+    unweighed: string[];
+  }>;
+};
+
+const clock = (at: number | null) =>
+  at == null
+    ? "not known yet"
+    : new Date(at).toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit",
+      });
+
+function RigSummary({
+  rigId,
+  lines,
+  transport,
+}: {
+  rigId: string;
+  lines: Row[];
+  transport: PackTransport;
+}) {
+  const facts = transport.lines.filter((line) => line.legId === rigId);
+  const first = facts[0];
+  const load = transport.rigLoads.find((rig) => rig.id === rigId);
+  const ids = new Set(lines.map((line) => String(line._id)));
+  const warnings = facts.filter(
+    (fact) => fact.holdWarning && ids.has(fact.lineId),
+  );
+  return (
+    <div className="text-base text-ink-2">
+      {first && (
+        <p>
+          {first.trip != null && `Trip ${first.trip} · `}
+          {first.loadingZone ? `Loads at ${first.loadingZone} · ` : ""}
+          Loading {clock(first.loadStartAt)} · Leaves {clock(first.departAt)}
+        </p>
+      )}
+      {load && (
+        <p className={load.message ? "text-danger" : undefined}>
+          {load.message ?? `Carries ${load.loadKg} of ${load.capacityKg} kg.`}
+          {load.unweighed.length > 0 &&
+            ` ${load.unweighed.length} without a weight.`}
+        </p>
+      )}
+      {warnings.map((fact) => (
+        <p key={fact.lineId} role="alert" className="text-danger">
+          {lines.find((line) => String(line._id) === fact.lineId)?.description}:{" "}
+          {fact.holdWarning}
+        </p>
+      ))}
+    </div>
+  );
+}
+
 /** The pack list in one of its working views. Every view shows the same
  * rows and runs the same line actions, so a count saved in one view is the
  * count in all of them. */
@@ -20,12 +90,14 @@ export function PackListViews({
   onViewChange,
   rigs,
   items,
+  transport,
   ...table
 }: Omit<PackListItemTableProps, "items"> & {
   view: PackViewKind;
   onViewChange: (view: PackViewKind) => void;
   rigs: PackRig[];
   items: Row[];
+  transport?: PackTransport | null;
 }) {
   const groups = packView(view, items, {
     dishName: (id) => table.dishName(id),
@@ -64,13 +136,25 @@ export function PackListViews({
             <h3 className="font-medium text-ink">
               {group.label} · {group.lines.length}
             </h3>
+            {view === "load" && transport && group.key.startsWith("rig:") && (
+              <RigSummary
+                rigId={group.key.slice(4)}
+                lines={group.lines}
+                transport={transport}
+              />
+            )}
             <PackListItemTable
               {...table}
               items={group.lines}
               selectableCount={group.lines.filter(table.canSelectItem).length}
               extraActions={
-                view === "load" && rigs.length > 1 && table.canEditLines
-                  ? () => [{ key: "truck", label: "Truck" }]
+                view === "load" && table.canEditLines
+                  ? () => [
+                      ...(rigs.length > 1
+                        ? [{ key: "truck", label: "Truck" }]
+                        : []),
+                      { key: "weight", label: "Weight" },
+                    ]
                   : undefined
               }
             />

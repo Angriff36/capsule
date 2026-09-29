@@ -3,16 +3,26 @@ import type { Id } from "../../lib/api";
 import {
   useCreateEventVehicleAssignment,
   useEventVehicleAssignmentPlanLeg,
+  useEventVehicleAssignmentSetLoadingZone,
 } from "../../lib/manifest-convex-react";
-import { useEventRouteLegs } from "../../lib/useEventRouteLegs";
+import {
+  useEventRouteLegs,
+  useEventTransport,
+} from "../../lib/useEventRouteLegs";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
 import { timeLabel } from "./EventTimingPlannerDraft";
+import { EventRunStops } from "./EventRunStops";
 
 type Data = NonNullable<ReturnType<typeof useEventRouteLegs>>;
 type Leg = Data["legs"][number];
 type Run = Data["runs"][number];
-type RunDraft = { arrive: string; load: string; leaveAfter: string };
+type RunDraft = {
+  arrive: string;
+  load: string;
+  leaveAfter: string;
+  zone: string;
+};
 
 const text = (value: number | null) => (value == null ? "" : String(value));
 const minutes = (value: string) =>
@@ -51,7 +61,9 @@ export function EventRouteLegsPanel({
   canChange: boolean;
 }) {
   const data = useEventRouteLegs(eventId);
+  const transport = useEventTransport(eventId);
   const planLeg = useEventVehicleAssignmentPlanLeg();
+  const setLoadingZone = useEventVehicleAssignmentSetLoadingZone();
   const addRun = useCreateEventVehicleAssignment();
   const [editing, setEditing] = useState<{ run: Run; draft: RunDraft } | null>(
     null,
@@ -78,16 +90,23 @@ export function EventRouteLegsPanel({
     e.preventDefault();
     if (!editing) return;
     const { run: row, draft } = editing;
+    const zone = draft.zone.trim();
     if (
-      await run(() =>
-        planLeg({
+      await run(async () => {
+        await planLeg({
           docId: row.id,
           version: row.version,
           arriveBeforeServeMinutes: minutes(draft.arrive),
           loadMinutes: minutes(draft.load),
           leaveAfterMinutes: minutes(draft.leaveAfter),
-        }),
-      )
+        });
+        if (zone !== (row.loadingZone ?? ""))
+          await setLoadingZone({
+            docId: row.id,
+            version: row.version + 1,
+            loadingZone: zone || undefined,
+          });
+      })
     )
       setEditing(null);
   };
@@ -137,6 +156,11 @@ export function EventRouteLegsPanel({
                       <li key={line}>{line}</li>
                     ))}
                   </ul>
+                  <EventRunStops
+                    legId={leg.id}
+                    transport={transport ?? undefined}
+                    loadingZone={own?.loadingZone ?? null}
+                  />
                 </div>
                 {canChange && own && !open && (
                   <button
@@ -150,6 +174,7 @@ export function EventRouteLegsPanel({
                           arrive: text(own.arriveBeforeServeMinutes),
                           load: text(own.loadMinutes),
                           leaveAfter: text(own.leaveAfterMinutes),
+                          zone: own.loadingZone ?? "",
                         },
                       })
                     }
@@ -190,6 +215,22 @@ export function EventRouteLegsPanel({
                       />
                     </label>
                   ))}
+                  {leg.kind === "rig" && (
+                    <label className="field-label">
+                      <span>Loads at</span>
+                      <input
+                        className="input min-h-10 w-full"
+                        value={editing.draft.zone}
+                        placeholder="For example: Dock 2"
+                        onChange={(e) =>
+                          setEditing({
+                            ...editing,
+                            draft: { ...editing.draft, zone: e.target.value },
+                          })
+                        }
+                      />
+                    </label>
+                  )}
                   <p className="text-sm text-ink-2 sm:col-span-3">
                     Leave a box empty to use the main crew’s time. Fill in
                     “Leaves after arriving” for a drop run, so the truck can

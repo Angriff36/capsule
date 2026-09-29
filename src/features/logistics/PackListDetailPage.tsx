@@ -14,6 +14,7 @@ import {
   usePackListItemAdjustQuantity,
   usePackListItemAnnotate,
   usePackListItemAssignLoad,
+  usePackListItemSetUnitWeight,
   usePackListItemExclude,
   usePackListItemRemove,
   usePackListItemRestoreExcluded,
@@ -48,6 +49,7 @@ import { PackListItemForm } from "./PackListItemForm";
 import { PackListViews } from "./PackListViews";
 import type { PackViewKind } from "./packViews";
 import { usePackRigs } from "./usePackRigs";
+import { useEventTransport } from "../../lib/useEventRouteLegs";
 import { PackListKitAssistBar } from "./PackListKitAssistBar";
 import { PACK_LIST_UNITS } from "./packListUnits";
 import { useActionNotice } from "../../ui/action-result";
@@ -100,6 +102,7 @@ export function PackListDetailPage() {
   const annotateItem = usePackListItemAnnotate();
   const excludeItem = usePackListItemExclude();
   const assignLoad = usePackListItemAssignLoad();
+  const setUnitWeight = usePackListItemSetUnitWeight();
   const restoreExcluded = usePackListItemRestoreExcluded();
   const refreshPackRules = useRefreshPackRules();
   const removeItem = usePackListItemRemove();
@@ -124,6 +127,7 @@ export function PackListDetailPage() {
   );
   const [view, setView] = useState<PackViewKind>("all");
   const rigs = usePackRigs(packList ? packList.eventId : null);
+  const transport = useEventTransport(packList ? packList.eventId : null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [failureItemId, setFailureItemId] = useState<string | null>(null);
@@ -553,6 +557,35 @@ export function PackListDetailPage() {
       });
       return;
     }
+    if (key === "weight") {
+      const current = (item as { unitWeightKg?: number | null }).unitWeightKg;
+      const values = await prompt.askFields({
+        title: "How heavy is one?",
+        description:
+          "Weight of one unit in kg, so a truck is not loaded past what it can carry. Leave it empty if you do not know.",
+        confirmLabel: "Save weight",
+        fields: [
+          {
+            name: "kg",
+            label: "Weight of one (kg)",
+            inputType: "number",
+            required: false,
+            defaultValue: current == null ? "" : String(current),
+          },
+        ],
+      });
+      if (!values) return;
+      const kg = values.kg?.trim() ?? "";
+      void run(`${item._id}:weight`, async () => {
+        await setUnitWeight({
+          docId: item._id,
+          version: item.version,
+          unitWeightKg: kg === "" ? undefined : Number(kg),
+        });
+        setNotice(kg === "" ? "Weight cleared." : "Weight saved.");
+      });
+      return;
+    }
     if (key === "putBack") {
       void run(`${item._id}:putBack`, async () => {
         await restoreExcluded({ docId: item._id, version: item.version });
@@ -915,6 +948,7 @@ export function PackListDetailPage() {
           view={view}
           onViewChange={setView}
           rigs={rigs}
+          transport={transport}
           loading={
             items === undefined || events === undefined || dishes === undefined
           }
