@@ -198,6 +198,7 @@ const LINK_TABLE: Record<string, string> = {
   lastImportRunId: "importRuns",
   lastSeenImportRunId: "importRuns",
   leadPersonId: "people",
+  loadAssignmentId: "eventVehicleAssignments",
   loadRuleId: "@outside",
   locationId: "storageLocations",
   locationIds: "storageLocations",
