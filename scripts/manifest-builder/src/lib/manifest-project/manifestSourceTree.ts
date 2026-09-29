@@ -87,14 +87,16 @@ export class ManifestSourceTree {
     const files: string[] = [];
     for (const entry of entries) {
       const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name;
-      // .loop-worktrees = Capsule agent worktrees (gitignored). Including them
-      // feeds duplicate .manifest graphs into compile and false "circular" errors.
+      // .loop-worktrees = Capsule agent worktrees (gitignored), .claude = Claude
+      // Code agent worktrees (.claude/worktrees). Including them feeds duplicate
+      // .manifest graphs into compile and false "circular" errors.
       if (
         entry.name === "node_modules" ||
         entry.name === ".git" ||
         entry.name === ".artifacts" ||
         entry.name === "scripts" ||
         entry.name === ".loop-worktrees" ||
+        entry.name === ".claude" ||
         entry.name === "fixtures" ||
         entry.name === "docs" ||
         entry.name === "generated"
