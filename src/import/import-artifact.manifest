@@ -52,6 +52,13 @@ entity ImportArtifact mixin TenantScoped, SoftDeletable {
   property required totalRowCount: int = 0
   property required rowOutcomeCounts: string = "{}"
 
+  // When register ran (2026-09-29). Rows registered before this field
+  // existed carry createdAt instead; the post-registration commands accept
+  // either marker. A legacy crash-window draft completed by the instance
+  // form of register gets registeredAt but no createdAt (createdAt is
+  // readonly to commands).
+  property registeredAt: datetime?
+
   // References
   ref importRun: ImportRun fields [tenantId, importRunId] references [tenantId, id]
 
@@ -67,6 +74,16 @@ entity ImportArtifact mixin TenantScoped, SoftDeletable {
   default policy importArtifactExecute execute: roleAllows(user.role, "importAccess") "Staff may change imported files"
 
   // register - Inventory one workbook of an archive into a durable row.
+  // Creation command (2026-09-29): stamping `registeredAt` under the
+  // `registeredAt == null` guard makes register the allocating command, so
+  // ImportArtifact_createViaRegister creates the row, stamps it and emits
+  // ImportArtifactRegistered in ONE transaction. archiveInventory used to
+  // raw-insert a blank draft, register it in creation mode and raw-stamp the
+  // timestamps in three transactions; a crash between them left a draft with
+  // no createdAt. The instance form now only completes such a legacy draft:
+  // the version guard admits a row no command has ever written (the draft
+  // was inserted at version 0; the creation draft has no version yet) and
+  // refuses every registered row, legacy or new.
   command register(
     importRunId: string,
     name: string,
@@ -77,7 +94,8 @@ entity ImportArtifact mixin TenantScoped, SoftDeletable {
     optional provenance: string
   ) {
     guard self.deletedAt == null
-    guard self.createdAt == null
+    guard self.registeredAt == null
+    guard (self.version != null ? self.version : 0) == 0
     constraint registerImportRunPresent: length(trim(importRunId)) > 0 "Say which import this file belongs to."
     constraint registerNamePresent: length(trim(name)) > 0 "Give this file a name."
     constraint registerByteSizeNonNegative: byteSize >= 0 "This file's size can't be negative. Use zero or more."
@@ -94,6 +112,7 @@ entity ImportArtifact mixin TenantScoped, SoftDeletable {
     mutate provenance = provenance != null ? provenance : "{}"
     mutate disposition = "pending"
     mutate parseStatus = "pending"
+    mutate registeredAt = now()
     emit ImportArtifactRegistered {
       importArtifactId: self.id
       tenantId: self.tenantId
@@ -115,7 +134,7 @@ entity ImportArtifact mixin TenantScoped, SoftDeletable {
     optional rowOutcomeCounts: string
   ) {
     guard self.deletedAt == null
-    guard self.createdAt != null
+    guard self.registeredAt != null or self.createdAt != null
     constraint classifyNotPending: disposition != "pending" "Pick what this file turned out to be. It can't stay set to pending."
     constraint classifyTotalRowCountNonNegative: totalRowCount == null or totalRowCount >= 0 "This file's total row count can't be negative. Use zero or more."
     constraint classifyRowOutcomeCountsPresent: rowOutcomeCounts == null or length(trim(rowOutcomeCounts)) > 0 "If you give row counts for this file, they can't be blank."
@@ -143,7 +162,7 @@ entity ImportArtifact mixin TenantScoped, SoftDeletable {
     optional provenance: string
   ) {
     guard self.deletedAt == null
-    guard self.createdAt != null
+    guard self.registeredAt != null or self.createdAt != null
     constraint recordParseNotPending: parseStatus != "pending" "Say if reading this file worked or failed. It can't stay pending."
     constraint recordParseProvenancePresent: provenance == null or length(trim(provenance)) > 0 "If you give origin details for this file, they can't be blank."
     mutate parseStatus = parseStatus

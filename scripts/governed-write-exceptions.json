@@ -17,6 +17,10 @@
       "reason": "Idempotency receipts for authored multi-row materialization transactions; they record that a batch of generated commands already ran and carry no domain state. Storage-only IR entity (materializationReceiptSeamOnly).",
       "files": ["convex/lib/materializationReceipt.ts"]
     },
+    "externalRecordLinks": {
+      "reason": "One-time data migration only (importCommit.backfillLinkKeys, 2026-09-29): stamps the derived linkKey index key — a pure function of the row's own identity fields, no domain meaning, no event — on link rows written before findLink/upsertLink read the by_linkKey index. It stays while a deployment may still hold unstamped rows; delete it (and this entry) once every deployment has run it. Every other link write goes through generated ExternalRecordLink commands.",
+      "files": ["convex/importCommit.ts"]
+    },
     "eventPacketIssues": {
       "reason": "Derived cache: issues are recomputed deterministically from the current event packet snapshot on every packet write. No human input and no domain transition.",
       "files": ["convex/lib/eventPacket/reconcileNative.ts"]

@@ -7,6 +7,15 @@
 // recorded here; a person approves per group on /kitchen/cleanup; apply runs
 // the existing generated commands in one transaction per batch and never
 // deletes a Dish row — it retires it and points its link at the new record.
+//
+// Link writes (2026-09-29) go through generated ExternalRecordLink commands
+// run by the tenant system runner. ExternalRecordLink's policies need
+// importAccess, which kitchen_staff and kitchen_lead do not hold, yet this
+// seam deliberately lets every kitchen role (requireKitchenAccess) run the
+// cleanup. The link bookkeeping is a consequence of the reclassification the
+// seam already authorized, so it runs as the tenant's system identity; the
+// person who decided is passed explicitly (decidedByUserId). The Dish,
+// Component and DishTask commands apply runs still use the caller's own auth.
 
 import { v } from "convex/values";
 import { api } from "./_generated/api";
@@ -19,6 +28,7 @@ import {
 } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
 import { requireKitchenAccess } from "./lib/kitchenAccessGate";
+import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 import { buildLinkKey } from "./lib/culinaryModel/importMapping";
 import {
   CAPSULE_ENTITY_FOR_KIND,
@@ -234,7 +244,7 @@ export const recordSuggestions = mutation({
   args: { suggestions: v.array(suggestionValidator) },
   handler: async (ctx, args) => {
     const { tenantId } = await authorize(ctx);
-    const now = Date.now();
+    const system = TenantSystemCommandRunner.forTenant(ctx, tenantId).context;
     let inserted = 0;
     let refreshed = 0;
     let kept = 0;
@@ -266,39 +276,36 @@ export const recordSuggestions = mutation({
           kept += 1;
           continue;
         }
-        await ctx.db.patch(existing._id, {
-          capsuleEntity: CAPSULE_ENTITY_FOR_KIND[
-            s.kind
-          ] as Link["capsuleEntity"],
-          metadata: metadataJson,
-          suggestedBy: s.source,
-          updatedAt: now,
-          version: existing.version + 1,
-        });
+        await system.runMutation(
+          api.mutations.ExternalRecordLink_refreshSuggestion,
+          {
+            docId: existing._id,
+            version: existing.version,
+            capsuleEntity: CAPSULE_ENTITY_FOR_KIND[s.kind],
+            metadata: metadataJson,
+            suggestedBy: s.source,
+          },
+        );
         refreshed += 1;
         continue;
       }
-      await ctx.db.insert("externalRecordLinks", {
-        tenantId,
-        sourceSystem: SOURCE_SYSTEM as Link["sourceSystem"],
+      await system.runMutation(api.mutations.ExternalRecordLink_createViaLink, {
+        sourceSystem: SOURCE_SYSTEM,
         recordType: MENU_RECORD_TYPE,
         externalId,
-        sourceAccount: undefined,
         role: RECLASSIFY_ROLE,
         ordinal: 0,
         linkKey,
-        capsuleEntity: CAPSULE_ENTITY_FOR_KIND[s.kind] as Link["capsuleEntity"],
+        capsuleEntity: CAPSULE_ENTITY_FOR_KIND[s.kind],
         // The dish the suggestion is about; apply moves this to the new record.
         capsuleId: String(dish._id),
         decision: "suggested",
         suggestedBy: s.source,
         metadata: metadataJson,
         verified: false,
+        // A suggestion is not an import conflict: keep it out of the
+        // reconcile queue, exactly as the raw insert did.
         conflictStatus: "resolved",
-        deletedAt: null,
-        createdAt: now,
-        updatedAt: now,
-        version: 0,
       });
       inserted += 1;
     }
@@ -425,7 +432,7 @@ export const decide = mutation({
   },
   handler: async (ctx, args) => {
     const { auth, tenantId } = await authorize(ctx);
-    const now = Date.now();
+    const system = TenantSystemCommandRunner.forTenant(ctx, tenantId).context;
     let changed = 0;
     for (const linkId of args.linkIds) {
       const link = await ctx.db.get(linkId);
@@ -439,28 +446,33 @@ export const decide = mutation({
         continue;
       }
       const meta = parseMetadata(link);
-      const patch: Partial<Link> = {
-        decision: args.decision,
-        decidedByUserId: auth.id,
-        decidedAt: now,
-        updatedAt: now,
-        version: link.version + 1,
-      };
+      let override: { capsuleEntity: string; metadata: string } | null = null;
       if (args.kind && meta && args.kind !== meta.kind) {
-        patch.metadata = JSON.stringify({
-          ...meta,
-          kind: args.kind,
-          source: `person:${auth.id}`,
-          confidence: 1,
-          ready: true,
-          category:
-            args.kind === "placeholder" ? PLACEHOLDER_CATEGORY : meta.category,
-        } satisfies SuggestionMetadata);
-        patch.capsuleEntity = CAPSULE_ENTITY_FOR_KIND[
-          args.kind
-        ] as Link["capsuleEntity"];
+        override = {
+          metadata: JSON.stringify({
+            ...meta,
+            kind: args.kind,
+            source: `person:${auth.id}`,
+            confidence: 1,
+            ready: true,
+            category:
+              args.kind === "placeholder"
+                ? PLACEHOLDER_CATEGORY
+                : meta.category,
+          } satisfies SuggestionMetadata),
+          capsuleEntity: CAPSULE_ENTITY_FOR_KIND[args.kind],
+        };
       }
-      await ctx.db.patch(linkId, patch);
+      await system.runMutation(
+        api.mutations.ExternalRecordLink_decideReclassification,
+        {
+          docId: linkId,
+          version: link.version,
+          decision: args.decision,
+          decidedByUserId: auth.id,
+          ...(override ?? {}),
+        },
+      );
       changed += 1;
     }
     return { changed };
@@ -795,7 +807,7 @@ export const apply = mutation({
     if (receipt) return receipt;
 
     const outcomes: ApplyOutcome[] = [];
-    const now = Date.now();
+    const system = TenantSystemCommandRunner.forTenant(ctx, tenantId).context;
     for (const linkId of args.linkIds) {
       const link = await ctx.db.get(linkId);
       if (
@@ -811,15 +823,16 @@ export const apply = mutation({
       const dishId = link.capsuleId as Id<"dishes">;
       try {
         const result = await applyOne(ctx, tenantId, link, meta);
-        await ctx.db.patch(linkId, {
-          capsuleEntity: result.capsuleEntity as Link["capsuleEntity"],
-          capsuleId: result.capsuleId,
-          appliedAt: now,
-          appliedValues: result.outcome,
-          resolutionNote: `dish:${dishId}`,
-          updatedAt: now,
-          version: link.version + 1,
-        });
+        await system.runMutation(
+          api.mutations.ExternalRecordLink_recordReclassified,
+          {
+            docId: linkId,
+            capsuleEntity: result.capsuleEntity,
+            capsuleId: result.capsuleId,
+            appliedValues: result.outcome,
+            resolutionNote: `dish:${dishId}`,
+          },
+        );
         outcomes.push({
           linkId,
           dishId,
@@ -828,11 +841,13 @@ export const apply = mutation({
         });
       } catch (cause) {
         const error = cause instanceof Error ? cause.message : String(cause);
-        await ctx.db.patch(linkId, {
-          resolutionNote: `dish:${dishId} failed: ${error.slice(0, 300)}`,
-          updatedAt: now,
-          version: link.version + 1,
-        });
+        await system.runMutation(
+          api.mutations.ExternalRecordLink_recordReclassifyFailure,
+          {
+            docId: linkId,
+            resolutionNote: `dish:${dishId} failed: ${error.slice(0, 300)}`,
+          },
+        );
         outcomes.push({
           linkId,
           dishId,

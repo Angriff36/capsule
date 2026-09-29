@@ -1396,6 +1396,7 @@ export default defineSchema({
     parseStatus: v.union(v.literal("pending"), v.literal("parsed"), v.literal("failed")),
     totalRowCount: v.number(),
     rowOutcomeCounts: v.string(),
+    registeredAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),

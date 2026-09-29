@@ -32,8 +32,10 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   timestamps
   versionProperty version: number
 
-  property required sourceSystem: ImportSourceSystem = "tpp_legacy"
-  property required datasetType: ImportDatasetType = "events"
+  // No placeholder defaults (2026-09-29): start sets both, which makes it the
+  // allocating command (ImportRun_createViaStart). Every stored run has both.
+  property required sourceSystem: ImportSourceSystem
+  property required datasetType: ImportDatasetType
   property required status: ImportRunStatus = "started"
   property startTime: datetime?
   property endTime: datetime?
@@ -101,6 +103,14 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   default policy importRunWrite write: roleAllows(user.role, "importAccess") "Staff may update imports"
   default policy importRunExecute execute: roleAllows(user.role, "importAccess") "Staff may change imports"
 
+  // Creation command (2026-09-29): sourceSystem and datasetType carry no
+  // placeholder default, so start — which sets both from its params — is the
+  // allocating command, and ImportRun_createViaStart creates the run, stamps
+  // the timestamps and emits ImportRunStarted in one transaction
+  // (convex/importCoordinator.ts startImport used to raw-insert the row). The
+  // archive/disposition/commit fields start at the values startImport
+  // stamped. The instance form refuses every existing run: all of them were
+  // created with a startTime.
   command start(
     sourceSystem: ImportSourceSystem,
     datasetType: ImportDatasetType,
@@ -108,6 +118,7 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     optional checksum: string
   ) {
     guard self.deletedAt == null
+    guard self.startTime == null
     guard self.status == "started"
     constraint startActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     mutate sourceSystem = sourceSystem
@@ -116,6 +127,13 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     mutate checksum = checksum
     mutate startTime = now()
     mutate status = "started"
+    mutate recordCounts = "{}"
+    mutate archiveWorkbookCount = 0
+    mutate indexWorkbookCount = 0
+    mutate discrepancyExplained = false
+    mutate dispositionCounts = "{}"
+    mutate unaccountedRecordCount = 0
+    mutate commitCheckpoint = "{}"
     emit ImportRunStarted {
       importRunId: self.id
       tenantId: self.tenantId
