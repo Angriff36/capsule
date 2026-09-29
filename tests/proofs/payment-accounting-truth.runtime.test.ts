@@ -234,6 +234,61 @@ describe("payment accounting truth (PL-ACCOUNTING)", () => {
     ]);
   });
 
+  it("a credit note moves value to another invoice without rewriting cash received (AC-088)", async () => {
+    const proof = harness();
+    const tenantId = "tenant-acct-credit";
+    const finance = financeOf(proof, tenantId);
+    const source = await sentInvoice(proof, finance, tenantId, 500, "A-7");
+    await pay(proof, finance, source, 500);
+    const target = (await proof.executeCommand(
+      finance,
+      api.mutations.Invoice_createViaIssue,
+      {
+        clientId: source.clientId,
+        invoiceNumber: "A-8",
+        subtotal: 300,
+        taxAmount: 0,
+        discountAmount: 0,
+        total: 300,
+      },
+    )) as { docId: string };
+    await proof.executeCommand(finance, api.mutations.Invoice_send, {
+      docId: target.docId,
+    });
+
+    const memo = (await proof.executeCommand(
+      finance,
+      api.mutations.CreditMemo_createViaIssue,
+      {
+        sourceInvoiceId: source.invoiceId,
+        clientId: source.clientId,
+        creditMemoNumber: "CM-1",
+        amount: 100,
+        reason: "Ten fewer guests",
+        disposition: "apply_to_balance",
+        targetInvoiceId: target.docId,
+      },
+    )) as { docId: string };
+
+    expect(await read(finance, source.invoiceId)).toMatchObject({
+      status: "paid",
+      amountPaid: 500,
+      creditMemoAmount: 100,
+    });
+    expect(await read(finance, target.docId)).toMatchObject({
+      status: "partial",
+      amountPaid: 0,
+      amountCredited: 100,
+      amountDue: 200,
+    });
+    expect(await read(finance, memo.docId)).toMatchObject({
+      status: "applied",
+      amount: 100,
+      remainingAmount: 0,
+      reason: "Ten fewer guests",
+    });
+  });
+
   it("a full refund puts the paid money back on the invoice", async () => {
     const proof = harness();
     const tenantId = "tenant-acct-refund";
