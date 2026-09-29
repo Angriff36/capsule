@@ -38,7 +38,7 @@ export const CAPABILITY_UI_SURFACES: Readonly<
   "DishComponent.attach": null,
   "DishTask.add": {
     hooks: ["useCreateDishTask"],
-    surfaces: ["src/features/kitchen/DishDetailPage.tsx"],
+    surfaces: ["src/features/kitchen/DishPrepTasksPanel.tsx"],
   },
   "Menu.draft": {
     hooks: ["useCreateMenu"],
@@ -46,30 +46,22 @@ export const CAPABILITY_UI_SURFACES: Readonly<
   },
   "PrepTask.open": {
     hooks: ["useCreatePrepTask"],
-    surfaces: [
-      "src/features/production/PrepBoardPage.tsx",
-      "src/features/kitchen/KitchenDashboardPage.tsx",
-      "src/features/events/EventMenuTab.tsx",
-    ],
+    surfaces: ["src/features/production/PrepBoardPage.tsx"],
   },
   "PrepTask.assign": {
     hooks: ["usePrepTaskAssign"],
     surfaces: ["src/features/kitchen/KitchenDashboardPage.tsx"],
   },
-  "PrepTask.refreshGenerated": {
-    hooks: ["usePrepTaskRefreshGenerated"],
-    surfaces: [
-      "src/features/production/PrepBoardPage.tsx",
-      "src/features/kitchen/KitchenDashboardPage.tsx",
-      "src/features/events/EventMenuTab.tsx",
-    ],
-  },
+  // No feature file calls usePrepTaskRefreshGenerated (2026-09-29); the
+  // command is reachable only through the agent/HTTP command route.
+  "PrepTask.refreshGenerated": null,
   "IngredientDemand.calculate": {
     hooks: ["useCreateIngredientDemand"],
     surfaces: ["src/features/inventory/DemandLedgerPage.tsx"],
   },
   "IngredientDemand.confirm": {
-    hooks: ["useIngredientDemandConfirm"],
+    // Issuing event stock confirms the demand (convex/lib/operationalTransactions.ts).
+    hooks: ["useIssueEventStock"],
     surfaces: ["src/features/events/EventInventoryPanel.tsx"],
   },
   "IngredientDemand.recalculate": null,
