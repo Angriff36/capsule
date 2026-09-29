@@ -22,7 +22,7 @@ export type CatalogTableRow = {
 };
 
 export type CatalogRowAction =
-  "recount" | "condition" | "retire" | "reactivate";
+  "recount" | "condition" | "move" | "retire" | "reactivate";
 
 /** The equipment register table: what it is, where it lives, what it is worth. */
 export function EquipmentCatalogTable<Row extends CatalogTableRow>({
@@ -146,6 +146,13 @@ export function EquipmentCatalogTable<Row extends CatalogTableRow>({
                         onClick={() => onAction(item, "condition")}
                       >
                         Condition
+                      </button>
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        disabled={busy}
+                        onClick={() => onAction(item, "move")}
+                      >
+                        Move
                       </button>
                       <button
                         className="btn btn-ghost btn-sm"

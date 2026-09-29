@@ -5,6 +5,7 @@ import {
   useEquipmentRecount,
   useEquipmentRetire,
   useEquipmentReviseDetails,
+  useEquipmentTransfer,
   useEquipmentUpdateCondition,
   useListEquipment,
 } from "../../lib/manifest-convex-react";
@@ -36,6 +37,7 @@ export function EquipmentCatalogPage() {
   const updateCondition = useEquipmentUpdateCondition();
   const recount = useEquipmentRecount();
   const retire = useEquipmentRetire();
+  const transfer = useEquipmentTransfer();
   const reactivate = useEquipmentReactivate();
   const reviseDetails = useEquipmentReviseDetails();
   const [showForm, setShowForm] = useState(false);
@@ -158,6 +160,29 @@ export function EquipmentCatalogPage() {
         await updateCondition({
           ...base,
           condition: condition as (typeof CONDITIONS)[number],
+        });
+      }
+      if (key === "move") {
+        const values = await prompt.askFields({
+          title: "Move equipment",
+          description: `Where is ${item.name} going? The move is kept in its history.`,
+          fields: [
+            {
+              name: "toLocation",
+              label: "New place",
+              defaultValue: "",
+              required: true,
+            },
+            { name: "note", label: "Note (optional)", defaultValue: "" },
+          ],
+          confirmLabel: "Move it",
+        });
+        const toLocation = values?.toLocation?.trim();
+        if (!toLocation) return;
+        await transfer({
+          ...base,
+          toLocation,
+          note: values?.note?.trim() || undefined,
         });
       }
       if (key === "retire") {

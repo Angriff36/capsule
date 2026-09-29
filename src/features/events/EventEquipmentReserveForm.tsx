@@ -1,7 +1,9 @@
-import type { FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { localDateTime } from "./eventDetailFormHelpers";
+import { EventEquipmentAvailabilityNote } from "./EventEquipmentAvailabilityNote";
+import type { ItemAvailability } from "./equipmentAvailabilityView";
 
 export type ReservableEquipment = {
   readonly _id: string;
@@ -19,6 +21,8 @@ type Props = {
   readonly busy: string | null;
   readonly onSubmit: (formEvent: FormEvent<HTMLFormElement>) => void;
   readonly onDismiss: () => void;
+  /** Free counts and holds for this event's time (PL-ASSET-AVAILABILITY). */
+  readonly availability?: readonly ItemAvailability[];
 };
 
 /** "Lock a load window": pick an item, quantity, and the checkout/return times. */
@@ -31,8 +35,14 @@ export function EventEquipmentReserveForm({
   busy,
   onSubmit,
   onDismiss,
+  availability,
 }: Props) {
   const selected = equipment.find((item) => item._id === selectedEquipmentId);
+  const [wanted, setWanted] = useState(1);
+  const freeById = new Map(
+    (availability ?? []).map((row) => [row.equipmentId, row]),
+  );
+  const selectedAvailability = freeById.get(selectedEquipmentId);
   return (
     <form
       className="card grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-4"
@@ -53,13 +63,28 @@ export function EventEquipmentReserveForm({
           onChange={(event) => onSelectEquipment(event.target.value)}
         >
           <option value="">Choose equipment</option>
-          {equipment.map((item) => (
-            <option key={item._id} value={item._id}>
-              {item.name} · {item.assetTag} · {item.quantity} available in
-              catalog
-            </option>
-          ))}
+          {equipment.map((item) => {
+            const free = freeById.get(item._id);
+            return (
+              <option key={item._id} value={item._id}>
+                {item.name} · {item.assetTag} ·{" "}
+                {free == null
+                  ? `${item.quantity} in the catalog`
+                  : free.blocked === "out_of_service"
+                    ? "out of service"
+                    : `${free.free} of ${item.quantity} free`}
+              </option>
+            );
+          })}
         </select>
+        {selectedAvailability ? (
+          <EventEquipmentAvailabilityNote
+            item={selectedAvailability}
+            all={availability ?? []}
+            wanted={wanted}
+            onPick={onSelectEquipment}
+          />
+        ) : null}
         {equipment.length === 0 ? (
           <span className="field-hint" data-testid="equipment-empty-catalog">
             Nothing in the equipment catalog yet, so this list is empty. Open{" "}
@@ -98,7 +123,8 @@ export function EventEquipmentReserveForm({
           className="input"
           min={1}
           max={selected?.quantity ?? undefined}
-          defaultValue={1}
+          value={wanted}
+          onChange={(event) => setWanted(Number(event.target.value) || 0)}
           required
         />
       </label>

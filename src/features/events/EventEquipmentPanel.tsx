@@ -9,7 +9,10 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
-import { useReserveEquipment } from "../facilities/equipmentCheckout";
+import {
+  useEquipmentAvailability,
+  useReserveEquipment,
+} from "../facilities/equipmentCheckout";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import "./EventEquipmentPanel.css";
 import { useActionNotice } from "../../ui/action-result";
@@ -77,8 +80,14 @@ export function EventEquipmentPanel({
   const returnedCount = eventReservations.filter(
     (row) => row.status === "returned",
   ).length;
-  const defaultStart = startsAt ?? Date.now();
+  const [now] = useState(() => Date.now());
+  const defaultStart = startsAt ?? now;
   const defaultEnd = endsAt ?? defaultStart + 4 * 60 * 60 * 1000;
+  const availability = useEquipmentAvailability(
+    eventId,
+    defaultStart,
+    defaultEnd,
+  );
 
   const sheetRows: EquipmentSheetRow[] = eventReservations.map(
     (reservation) => {
@@ -189,7 +198,11 @@ export function EventEquipmentPanel({
         note: checklistDraft.note.trim() || undefined,
       };
       if (mode === "checkout") await checkOut(args);
-      else await markReturned(args);
+      else
+        await markReturned({
+          ...args,
+          missingQuantity: checklistDraft.missing ?? 0,
+        });
       setChecklistDraft(null);
       setNotice(
         mode === "checkout"
@@ -311,6 +324,10 @@ export function EventEquipmentPanel({
                 busy={busy}
                 onSubmit={submitReservation}
                 onDismiss={() => setShowReserveForm(false)}
+                availability={availability?.map((row) => ({
+                  ...row,
+                  equipmentId: String(row.equipmentId),
+                }))}
               />
             ) : (
               <button

@@ -20,6 +20,8 @@ export type ChecklistDraft = {
   mode: ChecklistMode;
   condition: EquipmentCondition;
   note: string;
+  /** Return check only: how many did not come back. */
+  missing?: number;
 };
 
 /** One reservation, already joined to its catalog item by the panel. */
@@ -219,6 +221,29 @@ export function EventEquipmentSheet({
                             }
                           />
                         </label>
+                        {draft.mode === "return" ? (
+                          <label className="field-label">
+                            How many did not come back
+                            <input
+                              type="number"
+                              className="input"
+                              min={0}
+                              max={row.quantity}
+                              value={draft.missing ?? 0}
+                              onChange={(changeEvent) =>
+                                onDraftChange({
+                                  ...draft,
+                                  missing:
+                                    Number(changeEvent.target.value) || 0,
+                                })
+                              }
+                            />
+                            <span className="field-hint">
+                              Lost units come off the equipment count so they
+                              are not booked again.
+                            </span>
+                          </label>
+                        ) : null}
                         <div className="equipment-inspection__actions">
                           <button
                             type="button"

@@ -151,7 +151,8 @@ async function availabilityIssues(
     event?.endsAt ?? proposal.eventEndDate ?? (startsAt != null ? startsAt + DAY_MS : null);
   for (const line of lines) {
     const lineId = [String(line._id)];
-    if (line.menuDishId && (await resolveCatalogPrice(ctx, line.menuDishId, proposal.tenantId)) == null) {
+    const menuDishId = line.menuDishId ? ctx.db.normalizeId("menuDishes", line.menuDishId) : null;
+    if (line.menuDishId && (!menuDishId || (await resolveCatalogPrice(ctx, menuDishId, proposal.tenantId)) == null)) {
       issues.push({
         code: "menu_item_unavailable",
         message: `"${line.description}" is no longer on a published menu. Pick another dish or remove the menu link.`,
@@ -159,7 +160,8 @@ async function availabilityIssues(
       });
     }
     if (!line.equipmentId) continue;
-    const item = await ctx.db.get(line.equipmentId);
+    const equipmentId = ctx.db.normalizeId("equipments", line.equipmentId);
+    const item = equipmentId ? await ctx.db.get(equipmentId) : null;
     if (!item || item.tenantId !== proposal.tenantId || item.deletedAt != null || item.status !== "active") {
       issues.push({
         code: "rental_unavailable",
