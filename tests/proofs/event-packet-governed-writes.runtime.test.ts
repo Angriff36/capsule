@@ -457,9 +457,13 @@ describe("authorization and invariants on the now-public commands", () => {
         decisionJson: "{}",
       },
     );
-    expect((await t.run((ctx) => ctx.db.get(docId)))!.actor).toBe(
-      "packet-manager",
-    );
+    expect(
+      (
+        (await t.run((ctx) => ctx.db.get(docId))) as {
+          actor?: string;
+        } | null
+      )?.actor,
+    ).toBe("packet-manager");
     // Every manageAccess role the seam accepted still may, e.g. kitchen_manager;
     // retrying the same decision id is refused rather than duplicated.
     const kitchenManager = t.withIdentity({

@@ -644,7 +644,12 @@ export const recordPacketRevision = mutation({
     pdfStorageId: v.id("_storage"),
     snapshotStorageId: v.id("_storage"),
   },
-  handler: async (ctx, args) => {
+  // Annotated: this handler calls api.mutations.*, so an inferred return type
+  // is circular through the generated `api` and collapses it to `any`.
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{ id: string; fingerprint: string; reused: boolean }> => {
     const auth = await authorize(ctx, args.eventId);
     const current = await readCurrentPacket(ctx, auth.tenantId, args.eventId);
     if (args.inputFingerprint !== current.currentFingerprint)
@@ -689,7 +694,7 @@ export const recordPacketRevision = mutation({
       throw new Error(
         "Print files must be owned by this event and contain the exact current snapshot",
       );
-    const { docId: id } = await ctx.runMutation(
+    const { docId: id }: { docId: string } = await ctx.runMutation(
       api.mutations.EventPacketRevision_createViaCapture,
       {
         eventId: args.eventId,
