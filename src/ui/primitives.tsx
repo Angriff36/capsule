@@ -41,25 +41,85 @@ export function StatusChip({
   );
 }
 
+export type PageHeaderFact = { label: string; value: ReactNode };
+
+/**
+ * Page header — "Editorial masthead" (owner pick 2026-09-29, component picker
+ * variant B): uppercase eyebrow, a large tight DM Sans title, then an optional
+ * row of facts on a strong ink rule, with the actions under it. Wrap the state
+ * word of an eyebrow in <b> to set it in accent.
+ *
+ * `size="compact"` is the one-line working bar for cramped frames (narrow
+ * phone-first shells, sheets, sidebars): smaller title, actions beside it.
+ */
 export function PageHeader({
   title,
   lead,
   actions,
+  eyebrow,
+  facts,
+  size = "default",
 }: {
   title: ReactNode;
   lead?: ReactNode;
   actions?: ReactNode;
+  eyebrow?: ReactNode;
+  facts?: PageHeaderFact[];
+  size?: "default" | "compact";
 }) {
+  const eyebrowLine = eyebrow ? (
+    <p className="text-sm font-bold tracking-[0.09em] text-ink-3 uppercase [&_b]:font-bold [&_b]:text-accent">
+      {eyebrow}
+    </p>
+  ) : null;
+
+  if (size === "compact") {
+    return (
+      <header className="page-header flex flex-wrap items-end justify-between gap-x-4 gap-y-2 border-b border-line pb-3">
+        <div className="min-w-0">
+          {eyebrowLine}
+          <h1 className="font-display text-2xl leading-tight font-bold tracking-tight text-balance text-ink">
+            {title}
+          </h1>
+          {lead ? <p className="mt-0.5 text-sm text-ink-2">{lead}</p> : null}
+        </div>
+        {actions ? (
+          <div className="flex flex-wrap items-center gap-2">{actions}</div>
+        ) : null}
+      </header>
+    );
+  }
+
+  const shownFacts = facts?.filter((fact) => fact.value != null) ?? [];
   return (
-    <header className="page-header flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-line pb-3">
-      <div className="min-w-0">
-        <h1 className="font-display text-3xl leading-none tracking-tight text-ink">
-          {title}
-        </h1>
-        {lead ? <p className="mt-0.5 text-sm text-ink-2">{lead}</p> : null}
-      </div>
+    <header className="page-header min-w-0">
+      {eyebrowLine}
+      <h1
+        className={`font-display text-4xl leading-[0.95] font-bold tracking-[-0.045em] text-balance break-words text-ink lg:text-5xl ${eyebrow ? "mt-2.5" : ""}`}
+      >
+        {title}
+      </h1>
+      {lead ? (
+        <p className="mt-3 max-w-[72ch] text-base text-ink-2">{lead}</p>
+      ) : null}
+      {shownFacts.length > 0 ? (
+        <dl className="mt-5 grid grid-cols-2 gap-x-7 gap-y-3.5 border-t-[1.5px] border-ink pt-3 sm:flex sm:flex-wrap">
+          {shownFacts.map((fact) => (
+            <div key={fact.label} className="min-w-0">
+              <dt className="text-sm font-bold tracking-[0.04em] text-ink-3 uppercase">
+                {fact.label}
+              </dt>
+              <dd className="mt-0.5 text-base break-words text-ink tabular-nums">
+                {fact.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      ) : (
+        <div aria-hidden="true" className="mt-5 border-t-[1.5px] border-ink" />
+      )}
       {actions ? (
-        <div className="flex flex-wrap items-center gap-2">{actions}</div>
+        <div className="mt-4 flex flex-wrap items-center gap-2">{actions}</div>
       ) : null}
     </header>
   );

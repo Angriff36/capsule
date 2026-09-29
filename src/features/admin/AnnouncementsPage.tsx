@@ -171,9 +171,7 @@ export function AnnouncementsPage() {
       <PageHeader
         title="Announcements"
         lead="Post pinned banners (new policy, safety reminder, upcoming training) that every member sees until they expire or are dismissed."
-        actions={
-          <span className="text-sm text-ink-3">{activeCount} active</span>
-        }
+        facts={[{ label: "Active", value: activeCount }]}
       />
       <AdminWorkspaceNav />
       {!canManage ? (
