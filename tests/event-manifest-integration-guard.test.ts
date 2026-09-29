@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
-  inspectEventManifestIntegration,
-  inspectEventSource,
-} from "../scripts/check-event-manifest-integration";
+  inspectManifestIntegration,
+  inspectManifestSource,
+} from "../scripts/check-manifest-integration";
+
+const inspectEventManifestIntegration = () =>
+  inspectManifestIntegration("event");
+const inspectEventSource = (file: string, source: string) =>
+  inspectManifestSource("event", file, source);
 
 describe("Event Manifest integration guard", () => {
   it("keeps the current authored Event integration on approved generated surfaces", () => {

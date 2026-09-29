@@ -15,7 +15,9 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   timestamps
   versionProperty version: number
 
-  property required eventId: uuid
+  // Moving a dish between events is remove + addToEvent on a new row
+  // (domain-gating-restraint.md rule 5); the row's event never changes.
+  property readonly required eventId: uuid
   property required dishId: uuid
   // Printed name at add / confirm time. A later catalog Dish rename
   // must not rewrite this Event line. dishId stays the live catalog link.

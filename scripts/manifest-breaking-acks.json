@@ -1,0 +1,1661 @@
+{
+  "version": 1,
+  "acknowledged": [
+    {
+      "path": "approveReview.parameters.actorId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "attach.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Command name shared by several entities; the diff pairs different entities' commands. No command moved."
+    },
+    {
+      "path": "attach.parameters.batchMultiplier",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "attach.parameters.componentId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "attach.parameters.dishId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "attach.parameters.equipmentId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "attach.parameters.partEquipmentId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "attach.parameters.quantity",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "attach.parameters.role",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "attach.parameters.role",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "attach.parameters.sortOrder",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "attach.parameters.yieldQuantity",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "authorize.parameters.externalAccountId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "authorize.parameters.scopes",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "beginReview.parameters.actorId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "capture.parameters.capturedByName",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "clockIn.parameters.accuracyMeters",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "clockIn.parameters.latitude",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "clockIn.parameters.longitude",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "clockIn.parameters.timeZone",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "clockOut.parameters.paidBreakMinutes",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "commit.parameters.actorId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "Component.recipeIdentityFingerprint",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ComponentImport.duplicateOfComponentId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ComponentImport.duplicateOutcome",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ComponentImportLine.matchedComponentId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "configureTiming.parameters.loadOverrideReason",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "configureTiming.parameters.setupOverrideReason",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "confirmDelivery.parameters.note",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "confirmDelivery.parameters.receivedByName",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "correct.parameters.paidBreakMinutes",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "correct.parameters.reason",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "correct.parameters.timeZone",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "decide.parameters.decidedByUserId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "Delivery.deliveredByPersonId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Delivery.deliveryNote",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Delivery.departedByPersonId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Delivery.receivedByName",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "DeliveryConfirmed.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: event carries the new server-owned who-did-it / quantity fields; subscribers are in-repo reactions updated in the same batch."
+    },
+    {
+      "path": "detach.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Command name shared by several entities; the diff pairs different entities' commands. No command moved."
+    },
+    {
+      "path": "detach.parameters.reason",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "Equipment.countUnit",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Equipment.customerPrice",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Equipment.description",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Equipment.primaryImageFileName",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Equipment.primaryImageStorageId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Equipment.replacementCost",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Equipment.serialNumber",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Equipment.trackingMode",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Equipment.vendorId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EquipmentReservation.cleaningQuantity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EquipmentReservation.damagedQuantity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EquipmentReservation.missingQuantity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EquipmentReservation.overrideApprovedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EquipmentReservation.overrideReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EquipmentReservation.returnCheckedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EquipmentReturned.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: event carries the new server-owned who-did-it / quantity fields; subscribers are in-repo reactions updated in the same batch."
+    },
+    {
+      "path": "establish.parameters.establishedByPersonId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "Event.externalChannelId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.externalChannelName",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.externalChannelUrl",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.handwashing",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.operatingLocationId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.tentAndFlooring",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.timingBriefingMinutes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.timingLoadNeedsReview",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.timingLoadOverrideAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.timingLoadOverrideByPersonId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.timingLoadOverrideReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.timingLoadRuleId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.timingLoadSource",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.timingSafetyBufferMinutes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.timingSetupOverrideAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.timingSetupOverrideByPersonId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.timingSetupOverrideReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.timingSetupSource",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Event.timingSuggestedLoadMinutes",
+      "category": "computed-property-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-TIMING: suggested load/setup minutes now come from the timing rules engine, not an Event computed field."
+    },
+    {
+      "path": "Event.timingSuggestedSetupMinutes",
+      "category": "computed-property-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-TIMING: suggested load/setup minutes now come from the timing rules engine, not an Event computed field."
+    },
+    {
+      "path": "Event.venueSurface",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventAssignment.declinedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventAssignment.declineReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventAssignment.meetsAtVenue",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventAssignment.overrideReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventAssignment.rideVehicleAssignmentId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventAssignmentAssigned.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: event carries the new server-owned who-did-it / quantity fields; subscribers are in-repo reactions updated in the same batch."
+    },
+    {
+      "path": "EventPacketResolution.version",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventPacketRevision.answersJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventPacketRevision.sectionsJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventStaffNeed.budgetHourlyRate",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventStaffNeed.certificationType",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventStaffNeed.meetsAtVenue",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventStaffNeed.payBasis",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventStaffNeed.qualificationName",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventStaffNeed.rideVehicleAssignmentId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventStaffNeed.skills",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventStaffNeed.staffingTemplateId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventStaffNeed.templateLineKey",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventStaffNeed.templateSlot",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventStaffNeed.uniform",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventStaffNeed.workLocation",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventVehicleAssignment.arriveBeforeServeMinutes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventVehicleAssignment.leaveAfterMinutes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventVehicleAssignment.loadingZone",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventVehicleAssignment.loadMinutes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventVehicleAssignment.preloadedByPersonId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "EventVehicleAssignment.vendorName",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "explainArchiveDiscrepancy.parameters.actorId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "followEventPrice.parameters.total",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "hire.parameters.staffingVendor",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "Incident.reportedByPersonId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "IngredientDemand.unitReviewReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "InventoryLot.deliveryReference",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "InventoryReservation.returnedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "InventoryReservation.returnedQuantity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "InventoryReservation.returnReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Invoice.proposalId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Invoice.proposalRevisionId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "InvoiceIssued.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: event carries the new server-owned who-did-it / quantity fields; subscribers are in-repo reactions updated in the same batch."
+    },
+    {
+      "path": "issue.parameters.proposalId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "issue.parameters.proposalRevisionId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "markFailed.parameters.actorId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "markReturned.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Command name shared by several entities; the diff pairs different entities' commands. No command moved."
+    },
+    {
+      "path": "markReturned.parameters.condition",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "markReturned.parameters.returnedQuantity",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "Menu.availableFrom",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Menu.availableUntil",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "MenuDish.scheduledPriceEffectiveAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "MenuDish.scheduledSellingPrice",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Organization.routeRefreshHours",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Organization.routeSafetyBufferMinutes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Organization.routeTrafficPolicy",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Organization.timingBriefingMinutes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Organization.timingFullServiceSetupMinutes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Organization.timingLimitedServiceSetupMinutes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Organization.timingLoadBaselineMinutes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Organization.timingLoadRulesJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackList.dispatchDestination",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackList.dispatchedByPersonId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackList.loadedByPersonId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListDispatched.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: event carries the new server-owned who-did-it / quantity fields; subscribers are in-repo reactions updated in the same batch."
+    },
+    {
+      "path": "PackListItem.category",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.coveredBy",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.excludedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.excludedByPersonId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.exclusionReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.generatedQuantity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.generationKey",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.loadAssignmentId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.missingByPersonId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.ownership",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.packListTemplateId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.replacementDescription",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.requiredCapability",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.retiredAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.returnNote",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.returnRequired",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.sentInsteadByPersonId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.sourcesJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.templateLineKey",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.templateVersion",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListItem.unitWeightKg",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PackListLoaded.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: event carries the new server-owned who-did-it / quantity fields; subscribers are in-repo reactions updated in the same batch."
+    },
+    {
+      "path": "PayrollInput.sourceTimeRecordIds",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "PayrollInputPrepared.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: event carries the new server-owned who-did-it / quantity fields; subscribers are in-repo reactions updated in the same batch."
+    },
+    {
+      "path": "Person.approvedWorkLocations",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Person.preferredRoles",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Person.schedulingHoldReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Person.staffingVendor",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "plan.parameters.makeUpForBatchId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "post.parameters.authorName",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "post.parameters.authorPersonId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "postOpen.parameters.budgetHourlyRate",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "postOpen.parameters.certificationType",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "postOpen.parameters.payBasis",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "postOpen.parameters.qualificationName",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "postOpen.parameters.skills",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "postOpen.parameters.staffingTemplateId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "postOpen.parameters.templateLineKey",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "postOpen.parameters.templateSlot",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "postOpen.parameters.uniform",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "postOpen.parameters.workLocation",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "prepare.parameters.sourceTimeRecordIds",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "ProductionBatch.cancelledById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ProductionBatch.completedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ProductionBatch.makeUpForBatchId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ProductionBatch.shortfallQuantity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ProductionBatch.shortfallResolution",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ProductionBatch.shortfallResolvedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ProductionBatch.startedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ProductionBatch.wasteQuantity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ProductionBatch.wasteReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ProductionBatch.yieldCorrectedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ProductionBatch.yieldCorrectedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ProductionBatch.yieldCorrectionReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ProductionBatchCompleted.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: event carries the new server-owned who-did-it / quantity fields; subscribers are in-repo reactions updated in the same batch."
+    },
+    {
+      "path": "ProductionBatchPlanned.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: event carries the new server-owned who-did-it / quantity fields; subscribers are in-repo reactions updated in the same batch."
+    },
+    {
+      "path": "Proposal.acceptanceEvidence",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Proposal.acceptanceSource",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Proposal.generationJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Proposal.sectionOrder",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ProposalLineItem.equipmentId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "ProposalTemplate.sectionOrder",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "QuoteSubmission.consentNotice",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "QuoteSubmission.estimateJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "QuoteSubmission.howHeardText",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "QuoteSubmission.landingPage",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "QuoteSubmission.marketingConsent",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "QuoteSubmission.menuId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "QuoteSubmission.referralSourceId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "QuoteSubmission.referrer",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "QuoteSubmission.selectionsJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "QuoteSubmission.submissionKey",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "QuoteSubmission.utmCampaign",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "QuoteSubmission.utmMedium",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "QuoteSubmission.utmSource",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "recordCommitCheckpoint.parameters.actorId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "recordDispositionSummary.parameters.actorId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "recordParse.parameters.actorId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "recordReceipt.parameters.deliveryReference",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "resolveConflict.parameters.resolvedByUserId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "revert.parameters.actorId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "reviseDetails.parameters.revisedByPersonId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "reviseLine.parameters.equipmentId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "ServiceStyleKitItem.sparePercent",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "setEnabled.parameters.updatedBy",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "stage.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Command name shared by several entities; the diff pairs different entities' commands. No command moved."
+    },
+    {
+      "path": "stage.parameters.asOfAt",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.catalogQuantity",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.componentId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.countState",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.importId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "stage.parameters.importRunId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.ingredientId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.issues",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.itemName",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.kind",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.locationId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.locationName",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.note",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.parsedIngredientName",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "stage.parameters.parsedQuantity",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "stage.parameters.parsedUnit",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "stage.parameters.preparationNote",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "stage.parameters.quantity",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.sourceFile",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.sourceLine",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "stage.parameters.sourceOrder",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "stage.parameters.sourceRow",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.sourceSystem",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.sourceUnit",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "stage.parameters.unit",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "TimeRecord.approvedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "TimeRecord.approvedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "TimeRecord.clockInAccuracyMeters",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "TimeRecord.clockInLatitude",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "TimeRecord.clockInLongitude",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "TimeRecord.correctedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "TimeRecord.correctionReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "TimeRecord.paidBreakMinutes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "TimeRecord.timeZone",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "TimeRecordClockedOut.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: event carries the new server-owned who-did-it / quantity fields; subscribers are in-repo reactions updated in the same batch."
+    },
+    {
+      "path": "TimeRecordCorrected.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: event carries the new server-owned who-did-it / quantity fields; subscribers are in-repo reactions updated in the same batch."
+    },
+    {
+      "path": "unlinkExternalRecord.parameters.unlinkedByUserId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "updateSetupNotes.parameters.handwashing",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "updateSetupNotes.parameters.tentAndFlooring",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "updateSetupNotes.parameters.venueSurface",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new command input from a plan capability (PL-*); callers are the app's own screens and seams, updated in the same batch."
+    },
+    {
+      "path": "updateTotals.parameters.subtotal",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "validate.parameters.actorId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "Vehicle.towCapacityKg",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "VendorOrderLineReceived.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: event carries the new server-owned who-did-it / quantity fields; subscribers are in-repo reactions updated in the same batch."
+    },
+    {
+      "path": "Venue.timeZone",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "verifyLink.parameters.verifiedByUserId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-AUTH: who-did-it names and caller-sent totals are now set by the server from the signed-in person / stored lines, so the command no longer takes them."
+    },
+    {
+      "path": "WasteRecord.recordedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "WasteRecord.voidedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "WeeklyScheduleNotice.changedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "WeeklyScheduleNotice.previousShiftSummary",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    }
+  ]
+}

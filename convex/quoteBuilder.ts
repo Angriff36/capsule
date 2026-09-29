@@ -7,6 +7,7 @@ import {
   query,
 } from "./_generated/server";
 import { Doc, Id } from "./_generated/dataModel";
+import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 import {
   quotePickValidator,
   resolveQuoteSelections,
@@ -185,13 +186,25 @@ function isValidTimestamp(ms: number): boolean {
 }
 
 // Bounded field lengths for the public form. The /quote action is anonymous and
-// reachable by anyone, so cap payload size to prevent trivial storage/CPU abuse
-// (a true per-caller rate limit needs a counter table and is a documented
-// follow-up). Trim+cap is the proportionate guard for a catering lead form.
+// reachable by anyone, so cap payload size to prevent trivial storage/CPU abuse.
+// Submission volume is capped by the generated QuoteSubmission.create
+// rateLimit (src/sales/quote-submission.manifest).
 const MAX_SHORT = 200;
 const MAX_LONG = 4000;
 function bounded(value: string | undefined, max = MAX_SHORT): string {
   return (value ?? "").trim().slice(0, max);
+}
+
+/**
+ * Rate-limit actor for a public submitter: SHA-256 of the normalized email,
+ * so the bucket table never stores the address itself.
+ */
+export async function quoteSubmitterKey(email: string): Promise<string> {
+  const bytes = new TextEncoder().encode(email.trim().toLowerCase());
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+  let hex = "";
+  for (const byte of digest) hex += byte.toString(16).padStart(2, "0");
+  return `quote:${hex}`;
 }
 
 /**
@@ -203,12 +216,12 @@ function bounded(value: string | undefined, max = MAX_SHORT): string {
  * generated `QuoteSubmission_create` enforces the `salesAccess` write policy on
  * every command — so it throws for an anonymous caller before insert.
  *
- * This internal mutation runs with SYSTEM privileges (no auth context), so it
- * can read the active organization directly, dedupe, and insert the
- * QuoteSubmission capture record with an explicit tenantId. It is reachable
- * ONLY from submitQuote (internal mutations are never exposed to clients),
- * which has already validated the input — so this seam is not an open write
- * surface.
+ * This internal mutation reads the active organization directly and dedupes,
+ * then captures the row through the generated `QuoteSubmission.create` run as
+ * that tenant's system role — so the command's constraints, QuoteSubmitted
+ * event and public-form rateLimit all apply. It is reachable ONLY from
+ * submitQuote (internal mutations are never exposed to clients), which has
+ * already validated the input — so this seam is not an open write surface.
  *
  * Downstream sales records (Lead/Event/Proposal) are intentionally NOT created
  * here: they are auth-gated for good reason. An authenticated operator converts
@@ -302,10 +315,13 @@ export const ingressQuoteSubmission = internalMutation({
     // repeat submit is a no-op (submit-once). Dismissed rows still count — the
     // raw capture is retained, and a repeat submit of a dismissed key must not
     // mint a second row. Failed rows retain their IDs for staff to retry.
+    // Point read on (tenantId, dedupKey): cost does not grow with the
+    // tenant's submission history, so rejected floods stay cheap too.
     const candidates = await ctx.db
       .query("quoteSubmissions")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .filter((q) => q.eq(q.field("dedupKey"), dedupKey))
+      .withIndex("by_tenantId_and_dedupKey", (q) =>
+        q.eq("tenantId", tenantId).eq("dedupKey", dedupKey),
+      )
       .collect();
     // A repeat of the same form visit (double tap, lost response) carries the
     // same submission key, even if a field was changed in between.
@@ -345,47 +361,53 @@ export const ingressQuoteSubmission = internalMutation({
     });
     const hasPicks = selections.menu != null || selections.lines.length > 0;
 
-    const now = Date.now();
-    const submissionId = await ctx.db.insert("quoteSubmissions", {
-      tenantId,
-      dedupKey,
-      status: "pending",
-      submittedAt: now,
-      clientName,
-      email,
-      phone: args.phone.trim() || null,
-      eventDate: args.eventDate,
-      eventEndTime: args.eventEndTime || null,
-      guestCount: args.guestCount,
-      serviceStyleId: args.serviceStyleId ?? null,
-      occasionId: args.occasionId ?? null,
-      menuId: args.menuId ?? null,
-      selectionsJson: hasPicks ? JSON.stringify(selections) : null,
-      estimateJson: hasPicks
-        ? JSON.stringify(buildQuoteEstimate(selections, args.guestCount))
-        : null,
-      submissionKey: submissionKey || null,
-      referralSourceId: args.referralSourceId ?? null,
-      howHeardText: args.howHeardText.trim() || null,
-      utmSource: args.utmSource.trim() || null,
-      utmMedium: args.utmMedium.trim() || null,
-      utmCampaign: args.utmCampaign.trim() || null,
-      referrer: args.referrer.trim() || null,
-      landingPage: args.landingPage.trim() || null,
-      consentNotice: QUOTE_PRIVACY_NOTICE,
-      marketingConsent: args.marketingConsent,
-      // Free-text answers from the empty-catalog fallback inputs (A5): stored
-      // as text because no catalog row exists to reference.
-      serviceStyleText: args.serviceStyleText.trim() || null,
-      occasionText: args.occasionText.trim() || null,
-      venueName: args.venueName.trim() || null,
-      venueAddress: args.venueAddress.trim() || null,
-      menuPreferences: args.menuPreferences.trim() || null,
-      dietaryRestrictions: args.dietaryRestrictions.trim() || null,
-      notes: args.notes.trim() || null,
-      consentGrantedAt: now,
-      version: 1,
-    });
+    // Blank optional answers are stored as null, not as empty strings.
+    const text = (value: string) => value.trim() || null;
+    // The command's per-user rateLimit keys on this actor: one bucket per
+    // submitter, so a flood from one address never blocks other inquiries.
+    const system = TenantSystemCommandRunner.forTenant(ctx, tenantId, {
+      actorKey: await quoteSubmitterKey(email),
+    }).context;
+    const created = (await system.runMutation(
+      api.mutations.QuoteSubmission_create,
+      {
+        deletedAt: null,
+        dedupKey,
+        clientName,
+        email,
+        phone: text(args.phone),
+        eventDate: args.eventDate,
+        eventEndTime: args.eventEndTime || null,
+        guestCount: args.guestCount,
+        serviceStyleId: args.serviceStyleId ?? null,
+        occasionId: args.occasionId ?? null,
+        menuId: args.menuId ?? null,
+        selectionsJson: hasPicks ? JSON.stringify(selections) : null,
+        estimateJson: hasPicks
+          ? JSON.stringify(buildQuoteEstimate(selections, args.guestCount))
+          : null,
+        submissionKey: submissionKey || null,
+        referralSourceId: args.referralSourceId ?? null,
+        howHeardText: text(args.howHeardText),
+        utmSource: text(args.utmSource),
+        utmMedium: text(args.utmMedium),
+        utmCampaign: text(args.utmCampaign),
+        referrer: text(args.referrer),
+        landingPage: text(args.landingPage),
+        consentNotice: QUOTE_PRIVACY_NOTICE,
+        marketingConsent: args.marketingConsent,
+        // Free-text answers from the empty-catalog fallback inputs (A5): stored
+        // as text because no catalog row exists to reference.
+        serviceStyleText: text(args.serviceStyleText),
+        occasionText: text(args.occasionText),
+        venueName: text(args.venueName),
+        venueAddress: text(args.venueAddress),
+        menuPreferences: text(args.menuPreferences),
+        dietaryRestrictions: text(args.dietaryRestrictions),
+        notes: text(args.notes),
+      },
+    )) as { _id: Id<"quoteSubmissions"> };
+    const submissionId = created._id;
 
     return { submissionId, isDuplicate: false, status: "pending" };
   },

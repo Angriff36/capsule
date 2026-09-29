@@ -59,6 +59,7 @@ export function EventDayPage() {
       clientContacts: [...briefing.clientContacts]
         .filter((row) => String(row.status) !== "removed")
         .sort((a, b) => Number(b.isPrimary ?? 0) - Number(a.isPrimary ?? 0)),
+      contactAccess: briefing.contactAccess,
       packLists: briefing.packLists,
       packListItems: briefing.packListItems,
       dishes: briefing.dishes,

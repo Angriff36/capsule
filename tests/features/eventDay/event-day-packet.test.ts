@@ -102,3 +102,23 @@ describe("Event Day and the workbook checklist", () => {
     expect(deriveEventDay(input).ringLabel).toBe("Needs review");
   });
 });
+
+describe("Event Day contacts section when numbers are withheld", () => {
+  it("does not report a missing phone for a viewer the numbers are withheld from", () => {
+    const withheld = completeInput();
+    withheld.event = { ...withheld.event, primaryContactPhone: null };
+    withheld.contactAccess = "withheld";
+    const contacts = deriveEventDay(withheld).sections.find(
+      (row) => row.key === "contacts",
+    )!;
+    expect(contacts.status).toBe("ready");
+    expect(contacts.caption).toBe("Numbers with event staff");
+
+    const missing = completeInput();
+    missing.event = { ...missing.event, primaryContactPhone: null };
+    const gap = deriveEventDay(missing).sections.find(
+      (row) => row.key === "contacts",
+    )!;
+    expect(gap.status).toBe("review");
+  });
+});

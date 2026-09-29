@@ -488,6 +488,11 @@ export function ContactsSheet({ data }: { data: EventDayDetailData }) {
     return <Empty>No contacts on file.</Empty>;
   return (
     <div>
+      {data.contactAccess === "withheld" ? (
+        <p className="evd-kicker">
+          Phone numbers are shared with event staff and this event's crew.
+        </p>
+      ) : null}
       {named ? (
         <>
           <p className="evd-kicker">Event contact</p>

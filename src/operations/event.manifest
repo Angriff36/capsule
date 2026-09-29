@@ -684,8 +684,11 @@ entity Event mixin TenantScoped, SoftDeletable {
   property venueCapacity: int?
   property expectedHeadcount: int?
   property encrypted primaryContactName: string?
-  property encrypted primaryContactEmail: string?
-  property encrypted primaryContactPhone: string?
+  // Client contact PII: every staff role reads events, but only event/sales
+  // staff work with the client; others see a masked value (day-of sheets
+  // read the raw number through convex/eventDayBriefing.ts).
+  property encrypted masked(email) primaryContactEmail: string? unmask when roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess")
+  property encrypted masked(phone) primaryContactPhone: string? unmask when roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess")
   property accessibilityNeeds: list<string> = []
   property serviceRequirements: string?
   property operationalRequirements: string?
@@ -1376,6 +1379,9 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
     constraint serviceStyleReferenceInput: length(trim(serviceStyleId)) > 0 "Pick a service style for this event."
+    // The target must be one of this tenant's live, active styles (tenant and
+    // soft-delete scoping come with the read).
+    constraint serviceStyleActive: count(ServiceStyle where id == serviceStyleId, status == "active") > 0 "Pick a service style that is still offered."
     mutate serviceStyleId = serviceStyleId
     mutate serviceStyleName = serviceStyleName != null ? serviceStyleName : self.serviceStyleName
     emit EventServiceStyleChanged {
