@@ -31,6 +31,9 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
   property statusNote: string?
   property registeredAt: datetime?
   property statusChangedAt: datetime?
+  // How much a hitched trailer and its load may weigh (PL-DELIVERY). Empty =
+  // not recorded, no check. 0 = this truck cannot pull a trailer.
+  property towCapacityKg: int?
 
   // Compliance: registration certificate and insurance policy. Optional at
   // register time so existing workflows keep working; expiry dates drive the
@@ -45,6 +48,7 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
   computed registrationCurrent: boolean = self.registrationExpiresAt != null and self.registrationExpiresAt > now()
   computed insuranceCurrent: boolean = self.insuranceExpiresAt != null and self.insuranceExpiresAt > now()
 
+  constraint vehicleTowNotNegative: self.towCapacityKg == null or self.towCapacityKg >= 0 "Towing limit cannot be negative."
   constraint vehicleCapacityPositive: self.payloadCapacityKg > 0 "This vehicle's payload capacity has to be more than zero."
   constraint registeredVehicleComplete: self.registeredAt == null or (length(trim(self.make)) > 0 and length(trim(self.model)) > 0 and length(trim(self.registration)) > 0) "Give this vehicle a make, model, and registration before you register it."
 
@@ -123,6 +127,19 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
       registration: registration
       ownership: ownership
       payloadCapacityKg: payloadCapacityKg
+    }
+  }
+
+  // Empty clears it (not recorded); 0 means no trailer.
+  command setTowCapacity(optional towCapacityKg: int) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    constraint setTowNotNegative: towCapacityKg == null or towCapacityKg >= 0 "Towing limit cannot be negative."
+    mutate towCapacityKg = towCapacityKg
+    emit VehicleTowCapacitySet {
+      vehicleId: self.id
+      tenantId: self.tenantId
+      towCapacityKg: towCapacityKg
     }
   }
 
@@ -208,6 +225,12 @@ event VehicleDetailsRevised: "vehicle.details_revised" {
   registration: string
   ownership: VehicleOwnership
   payloadCapacityKg: int
+}
+
+event VehicleTowCapacitySet: "vehicle.tow_capacity_set" {
+  vehicleId: string
+  tenantId: string
+  towCapacityKg: int?
 }
 
 event VehicleOperationalStatusUpdated: "vehicle.operational_status_updated" {

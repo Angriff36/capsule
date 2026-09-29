@@ -44,6 +44,12 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
   // A drop run leaves this long after arriving; the truck can then do a
   // second trip (another row for the same truck).
   property leaveAfterMinutes: float?
+  // Where this rig is loaded at the kitchen ("dock 2", "back lot"). Shown on
+  // every pack line that rides on it (PL-DELIVERY).
+  property loadingZone: string?
+  // Staff profile that said the load is in the vehicle. Missing when that
+  // account is not linked to a profile.
+  property preloadedByPersonId: uuid?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo vehicle: Vehicle fields [tenantId, vehicleId] references [tenantId, id]
@@ -68,7 +74,11 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     optional driverId: uuid,
     optional notes: string,
     optional preloaded: boolean,
-    optional vendorName: string
+    optional vendorName: string,
+    optional arriveBeforeServeMinutes: float,
+    optional loadMinutes: float,
+    optional leaveAfterMinutes: float,
+    optional loadingZone: string
   ) {
     guard self.assignedAt == null
     guard self.deletedAt == null
@@ -79,6 +89,11 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     guard trailerId == null or self.trailer != null
     guard driverId == null or self.driver != null
     constraint assignHasRig: vehicleId != null or trailerId != null or (vendorName != null and length(trim(vendorName)) > 0) "Select a vehicle or a trailer, or name the vendor"
+    // A second trip on the same truck is booked with its own times, so the
+    // booking check sees the real window (PL-DELIVERY).
+    constraint assignArriveNotNegative: arriveBeforeServeMinutes == null or arriveBeforeServeMinutes >= 0 "Arrival before serve cannot be negative"
+    constraint assignLoadNotNegative: loadMinutes == null or loadMinutes >= 0 "Load time cannot be negative"
+    constraint assignLeaveAfterPositive: leaveAfterMinutes == null or leaveAfterMinutes > 0 "Time on site before leaving has to be more than zero"
     mutate eventId = eventId
     mutate activeEventId = eventId
     mutate vehicleId = vehicleId
@@ -86,7 +101,12 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     mutate driverId = driverId
     mutate vendorName = vendorName
     mutate notes = notes
+    mutate arriveBeforeServeMinutes = arriveBeforeServeMinutes
+    mutate loadMinutes = loadMinutes
+    mutate leaveAfterMinutes = leaveAfterMinutes
+    mutate loadingZone = loadingZone
     mutate preloadedAt = preloaded == true ? now() : null
+    mutate preloadedByPersonId = preloaded == true ? user.personId : null
     mutate assignedAt = now()
     emit EventVehicleAssigned {
       eventVehicleAssignmentId: self.id
@@ -104,6 +124,7 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     guard self.releasedAt == null
     guard self.deletedAt == null
     mutate preloadedAt = now()
+    mutate preloadedByPersonId = user.personId
     emit EventVehiclePreloaded {
       eventVehicleAssignmentId: self.id
       tenantId: self.tenantId
@@ -115,6 +136,7 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     guard self.preloadedAt != null
     guard self.deletedAt == null
     mutate preloadedAt = null
+    mutate preloadedByPersonId = null
     emit EventVehiclePreloadCleared {
       eventVehicleAssignmentId: self.id
       tenantId: self.tenantId
@@ -138,6 +160,19 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     mutate loadMinutes = loadMinutes
     mutate leaveAfterMinutes = leaveAfterMinutes
     emit EventVehicleLegPlanned {
+      eventVehicleAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  // Where this rig loads at the kitchen. Empty clears it.
+  command setLoadingZone(optional loadingZone: string) {
+    guard self.assignedAt != null
+    guard self.releasedAt == null
+    guard self.deletedAt == null
+    mutate loadingZone = loadingZone != null and length(trim(loadingZone)) > 0 ? loadingZone : null
+    emit EventVehicleLoadingZoneSet {
       eventVehicleAssignmentId: self.id
       tenantId: self.tenantId
       eventId: self.eventId
@@ -185,6 +220,12 @@ event EventVehiclePreloadCleared: "event_vehicle.preload_cleared" {
 }
 
 event EventVehicleLegPlanned: "event_vehicle.leg_planned" {
+  eventVehicleAssignmentId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventVehicleLoadingZoneSet: "event_vehicle.loading_zone_set" {
   eventVehicleAssignmentId: string
   tenantId: string
   eventId: string

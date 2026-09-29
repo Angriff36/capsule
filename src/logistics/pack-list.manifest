@@ -49,6 +49,11 @@ entity PackList mixin TenantScoped, SoftDeletable {
   property packedAt: datetime?
   property loadedAt: datetime?
   property dispatchedAt: datetime?
+  // Who said it is loaded and who sent it out, and where it went (PL-DELIVERY,
+  // AC-135). Missing person = that account is not linked to a staff profile.
+  property loadedByPersonId: uuid?
+  property dispatchedByPersonId: uuid?
+  property dispatchDestination: string?
   property cancelledAt: datetime?
   property cancellationReason: string?
   // Event Tracker call-out: the packer is stuck and needs a hand. Shown as
@@ -218,6 +223,7 @@ entity PackList mixin TenantScoped, SoftDeletable {
     compute previousStatus = self.status
     mutate status = "loaded"
     mutate loadedAt = now()
+    mutate loadedByPersonId = user.personId
     emit PackListLoaded {
       packListId: self.id
       tenantId: self.tenantId
@@ -226,6 +232,7 @@ entity PackList mixin TenantScoped, SoftDeletable {
       previousStatus: previousStatus
       status: "loaded"
       loadedAt: self.loadedAt
+      loadedByPersonId: user.personId
     }
   }
 
@@ -234,9 +241,12 @@ entity PackList mixin TenantScoped, SoftDeletable {
     guard self.loadedAt != null
     guard self.deletedAt == null
     compute previousStatus = self.status
+    compute destination = self.event != null and self.event.venueAddress != null and length(trim(self.event.venueAddress)) > 0 ? self.event.venueAddress : (self.event != null and self.event.venueName != null and length(trim(self.event.venueName)) > 0 ? self.event.venueName : "Event site")
     mutate status = "dispatched"
     mutate activeEventId = null
     mutate dispatchedAt = now()
+    mutate dispatchedByPersonId = user.personId
+    mutate dispatchDestination = destination
     emit PackListDispatched {
       packListId: self.id
       tenantId: self.tenantId
@@ -245,6 +255,8 @@ entity PackList mixin TenantScoped, SoftDeletable {
       previousStatus: previousStatus
       status: "dispatched"
       dispatchedAt: self.dispatchedAt
+      dispatchedByPersonId: user.personId
+      destination: destination
     }
   }
 
@@ -359,6 +371,9 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   // truck-load view). Empty = not placed; with one truck on the event it
   // rides on that one.
   property loadAssignmentId: uuid?
+  // About how heavy one unit is, so a truck is not loaded past what it can
+  // carry (PL-DELIVERY). Empty = not known; not counted.
+  property unitWeightKg: float?
   property required requiredQuantity: decimal(12, 4) = 0
   property required packedQuantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
@@ -842,6 +857,21 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Weight of one unit. Empty clears it. The seam checks the truck it rides on
+  // can still carry the load.
+  command setUnitWeight(optional unitWeightKg: float) {
+    guard self.deletedAt == null
+    guard self.packList != null and self.packList.status != "cancelled"
+    constraint unitWeightNotNegative: unitWeightKg == null or unitWeightKg >= 0 "Weight cannot be negative."
+    mutate unitWeightKg = unitWeightKg
+    emit PackListItemWeightSet {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      unitWeightKg: unitWeightKg
+    }
+  }
+
   command restoreExcluded() {
     guard self.deletedAt == null and self.excludedAt != null
     guard self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
@@ -898,6 +928,7 @@ event PackListLoaded: "pack_list.loaded" {
   previousStatus: PackListStatus
   status: PackListStatus
   loadedAt: datetime?
+  loadedByPersonId: string?
 }
 
 event PackListDispatched: "pack_list.dispatched" {
@@ -908,6 +939,8 @@ event PackListDispatched: "pack_list.dispatched" {
   previousStatus: PackListStatus
   status: PackListStatus
   dispatchedAt: datetime?
+  dispatchedByPersonId: string?
+  destination: string?
 }
 
 event PackListCancelled: "pack_list.cancelled" {
@@ -1006,6 +1039,13 @@ event PackListItemLoadAssigned: "pack_list_item.load_assigned" {
   tenantId: string
   packListId: string
   loadAssignmentId: string?
+}
+
+event PackListItemWeightSet: "pack_list_item.weight_set" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  unitWeightKg: float?
 }
 
 event PackListItemExcluded: "pack_list_item.excluded" {

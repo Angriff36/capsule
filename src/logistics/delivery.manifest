@@ -32,6 +32,13 @@ entity Delivery mixin TenantScoped, SoftDeletable {
   property failureReason: string?
   property cancelledAt: datetime?
   property cancellationReason: string?
+  // Who drove off and who handed it over, and who at the venue took it
+  // (PL-DELIVERY, AC-135). Missing person = that account is not linked to a
+  // staff profile.
+  property departedByPersonId: uuid?
+  property deliveredByPersonId: uuid?
+  property receivedByName: string?
+  property deliveryNote: string?
 
   belongsTo packList: PackList fields [tenantId, packListId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
@@ -102,6 +109,7 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     compute previousStatus = self.status
     mutate status = "in_transit"
     mutate departedAt = now()
+    mutate departedByPersonId = user.personId
     emit DeliveryTransitStarted {
       deliveryId: self.id
       tenantId: self.tenantId
@@ -114,7 +122,8 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command confirmDelivery() {
+  // receivedByName: the person at the venue who took the delivery (optional).
+  command confirmDelivery(optional receivedByName: string, optional note: string) {
     guard self.status == "in_transit"
     guard self.departedAt != null
     guard self.deletedAt == null
@@ -123,6 +132,9 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     compute previousStatus = self.status
     mutate status = "delivered"
     mutate deliveredAt = now()
+    mutate deliveredByPersonId = user.personId
+    mutate receivedByName = receivedByName != null and length(trim(receivedByName)) > 0 ? trim(receivedByName) : null
+    mutate deliveryNote = note != null and length(trim(note)) > 0 ? trim(note) : null
     emit DeliveryConfirmed {
       deliveryId: self.id
       tenantId: self.tenantId
@@ -132,6 +144,8 @@ entity Delivery mixin TenantScoped, SoftDeletable {
       previousStatus: previousStatus
       status: "delivered"
       deliveredAt: self.deliveredAt
+      deliveredByPersonId: user.personId
+      receivedByName: receivedByName
     }
   }
 
@@ -236,6 +250,8 @@ event DeliveryConfirmed: "delivery.confirmed" {
   previousStatus: DeliveryStatus
   status: DeliveryStatus
   deliveredAt: datetime?
+  deliveredByPersonId: string?
+  receivedByName: string?
 }
 
 event DeliveryFailed: "delivery.failed" {

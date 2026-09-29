@@ -584,6 +584,10 @@ export const DeliverySchema = z.object({
   failureReason: z.string().nullable().optional(),
   cancelledAt: z.coerce.date().nullable().optional(),
   cancellationReason: z.string().nullable().optional(),
+  departedByPersonId: z.string().uuid().nullable().optional(),
+  deliveredByPersonId: z.string().uuid().nullable().optional(),
+  receivedByName: z.string().nullable().optional(),
+  deliveryNote: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1575,6 +1579,8 @@ export const EventVehicleAssignmentSchema = z.object({
   arriveBeforeServeMinutes: z.number().nullable().optional(),
   loadMinutes: z.number().nullable().optional(),
   leaveAfterMinutes: z.number().nullable().optional(),
+  loadingZone: z.string().nullable().optional(),
+  preloadedByPersonId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1749,6 +1755,7 @@ export const IncidentSchema = z.object({
   resolution: z.string().nullable().optional(),
   dismissalReason: z.string().nullable().optional(),
   reportedById: z.string().nullable().optional(),
+  reportedByPersonId: z.string().uuid().nullable().optional(),
   status: z.enum(["open", "investigating", "resolved", "dismissed"]).default("open"),
   correctiveActionRequired: z.boolean().nullable().optional(),
   reportedAt: z.coerce.date().nullable().optional(),
@@ -2436,6 +2443,9 @@ export const PackListSchema = z.object({
   packedAt: z.coerce.date().nullable().optional(),
   loadedAt: z.coerce.date().nullable().optional(),
   dispatchedAt: z.coerce.date().nullable().optional(),
+  loadedByPersonId: z.string().uuid().nullable().optional(),
+  dispatchedByPersonId: z.string().uuid().nullable().optional(),
+  dispatchDestination: z.string().nullable().optional(),
   cancelledAt: z.coerce.date().nullable().optional(),
   cancellationReason: z.string().nullable().optional(),
   assistanceRequestedAt: z.coerce.date().nullable().optional(),
@@ -2481,6 +2491,7 @@ export const PackListItemSchema = z.object({
   replacementDescription: z.string().nullable().optional(),
   coveredBy: z.enum(["equivalent", "client", "vendor"]).nullable().optional(),
   loadAssignmentId: z.string().uuid().nullable().optional(),
+  unitWeightKg: z.number().nullable().optional(),
   requiredQuantity: z.number().default(0),
   packedQuantity: z.number().min(0).default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
@@ -3989,6 +4000,7 @@ export const VehicleSchema = z.object({
   statusNote: z.string().nullable().optional(),
   registeredAt: z.coerce.date().nullable().optional(),
   statusChangedAt: z.coerce.date().nullable().optional(),
+  towCapacityKg: z.number().int().nullable().optional(),
   registrationNumber: z.string().nullable().optional(),
   registrationExpiresAt: z.coerce.date().nullable().optional(),
   insuranceProvider: z.string().nullable().optional(),
@@ -5342,7 +5354,10 @@ export const DeliveryCancelParamsSchema = z.object({
 export type DeliveryCancelParams = z.infer<typeof DeliveryCancelParamsSchema>;
 
 // Command: confirmDelivery on Delivery
-export const DeliveryConfirmDeliveryParamsSchema = z.object({});
+export const DeliveryConfirmDeliveryParamsSchema = z.object({
+  receivedByName: z.string().optional(),
+  note: z.string().optional(),
+});
 
 export type DeliveryConfirmDeliveryParams = z.infer<typeof DeliveryConfirmDeliveryParamsSchema>;
 
@@ -6953,6 +6968,10 @@ export const EventVehicleAssignmentAssignParamsSchema = z.object({
   notes: z.string().optional(),
   preloaded: z.boolean().optional(),
   vendorName: z.string().optional(),
+  arriveBeforeServeMinutes: z.number().optional(),
+  loadMinutes: z.number().optional(),
+  leaveAfterMinutes: z.number().optional(),
+  loadingZone: z.string().optional(),
 });
 
 export type EventVehicleAssignmentAssignParams = z.infer<typeof EventVehicleAssignmentAssignParamsSchema>;
@@ -6980,6 +6999,13 @@ export type EventVehicleAssignmentPlanLegParams = z.infer<typeof EventVehicleAss
 export const EventVehicleAssignmentReleaseParamsSchema = z.object({});
 
 export type EventVehicleAssignmentReleaseParams = z.infer<typeof EventVehicleAssignmentReleaseParamsSchema>;
+
+// Command: setLoadingZone on EventVehicleAssignment
+export const EventVehicleAssignmentSetLoadingZoneParamsSchema = z.object({
+  loadingZone: z.string().optional(),
+});
+
+export type EventVehicleAssignmentSetLoadingZoneParams = z.infer<typeof EventVehicleAssignmentSetLoadingZoneParamsSchema>;
 
 // Command: decide on ExternalRecordLink
 export const ExternalRecordLinkDecideParamsSchema = z.object({
@@ -8623,6 +8649,13 @@ export const PackListItemSetResponsibilityParamsSchema = z.object({
 });
 
 export type PackListItemSetResponsibilityParams = z.infer<typeof PackListItemSetResponsibilityParamsSchema>;
+
+// Command: setUnitWeight on PackListItem
+export const PackListItemSetUnitWeightParamsSchema = z.object({
+  unitWeightKg: z.number().optional(),
+});
+
+export type PackListItemSetUnitWeightParams = z.infer<typeof PackListItemSetUnitWeightParamsSchema>;
 
 // Command: syncContainerServings on PackListItem
 export const PackListItemSyncContainerServingsParamsSchema = z.object({
@@ -10849,6 +10882,13 @@ export const VehicleReviseDetailsParamsSchema = z.object({
 });
 
 export type VehicleReviseDetailsParams = z.infer<typeof VehicleReviseDetailsParamsSchema>;
+
+// Command: setTowCapacity on Vehicle
+export const VehicleSetTowCapacityParamsSchema = z.object({
+  towCapacityKg: z.number().int().optional(),
+});
+
+export type VehicleSetTowCapacityParams = z.infer<typeof VehicleSetTowCapacityParamsSchema>;
 
 // Command: updateInsurance on Vehicle
 export const VehicleUpdateInsuranceParamsSchema = z.object({

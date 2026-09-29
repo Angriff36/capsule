@@ -282,6 +282,7 @@ import {
   EventVehicleAssignmentMarkPreloadedParamsSchema,
   EventVehicleAssignmentPlanLegParamsSchema,
   EventVehicleAssignmentReleaseParamsSchema,
+  EventVehicleAssignmentSetLoadingZoneParamsSchema,
   ExternalRecordLinkDecideParamsSchema,
   ExternalRecordLinkDiscardParamsSchema,
   ExternalRecordLinkLinkParamsSchema,
@@ -468,6 +469,7 @@ import {
   PackListItemRestoreExcludedParamsSchema,
   PackListItemRestoreImportedAssociationParamsSchema,
   PackListItemSetResponsibilityParamsSchema,
+  PackListItemSetUnitWeightParamsSchema,
   PackListItemSyncContainerServingsParamsSchema,
   PackListItemSyncKitGuestsParamsSchema,
   PackListMarkLoadedParamsSchema,
@@ -746,6 +748,7 @@ import {
   VehicleRegisterParamsSchema,
   VehicleReviseDetailsParamsSchema,
   VehicleServiceEntryRecordParamsSchema,
+  VehicleSetTowCapacityParamsSchema,
   VehicleUpdateInsuranceParamsSchema,
   VehicleUpdateOperationalStatusParamsSchema,
   VehicleUpdateRegistrationParamsSchema,
@@ -4784,6 +4787,16 @@ export function useEventVehicleAssignmentRelease() {
   };
 }
 
+/** Mutation hook for EventVehicleAssignment.setLoadingZone. */
+export function useEventVehicleAssignmentSetLoadingZone() {
+  const mutate = useMutation(api.mutations.EventVehicleAssignment_setLoadingZone);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventVehicleAssignmentSetLoadingZoneParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Governed creation hook for EventVehicleAssignment.assign. */
 export function useCreateEventVehicleAssignment() {
   const mutate = useMutation(api.mutations.EventVehicleAssignment_createViaAssign);
@@ -7347,6 +7360,16 @@ export function usePackListItemSetResponsibility() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = PackListItemSetResponsibilityParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PackListItem.setUnitWeight. */
+export function usePackListItemSetUnitWeight() {
+  const mutate = useMutation(api.mutations.PackListItem_setUnitWeight);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackListItemSetUnitWeightParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11174,6 +11197,16 @@ export function useVehicleReviseDetails() {
   };
 }
 
+/** Mutation hook for Vehicle.setTowCapacity. */
+export function useVehicleSetTowCapacity() {
+  const mutate = useMutation(api.mutations.Vehicle_setTowCapacity);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VehicleSetTowCapacityParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Vehicle.updateInsurance. */
 export function useVehicleUpdateInsurance() {
   const mutate = useMutation(api.mutations.Vehicle_updateInsurance);
@@ -12414,4 +12447,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1314 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1317 as const;

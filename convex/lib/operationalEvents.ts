@@ -57,6 +57,7 @@ import { deleteBlobIfOrphan } from "./blobs";
 import { queueRouteRefresh } from "./routeFollowUp";
 import { queueTimingRecalculation } from "./timingFollowUp";
 import { handleTravelLegEvent } from "./travelLegEvents";
+import { validateEventVehicleAssignment, validateRigLoadForLine } from "./eventRouteLegRead";
 import { assertSignInUnclaimed } from "./personAuthPick";
 import { assertHireNotDuplicate } from "../personEmail";
 
@@ -72,7 +73,18 @@ export async function handleManifestEvent(
   if (packEventId) await reconcileEventPackRules(ctx, packEventId);
   if (event.entity === "PackListItem" && event.type === "PackListItemLoadAssigned") {
     await validatePackLoadAssignment(ctx, event.entityId as Id<"packListItems">);
+    await validateRigLoadForLine(ctx, event.entityId as Id<"packListItems">);
     return;
+  }
+  // PL-DELIVERY: a truck is booked only when it can go and is free; a load
+  // never goes past what the truck can carry.
+  if (event.entity === "PackListItem" && event.type === "PackListItemWeightSet") {
+    await validateRigLoadForLine(ctx, event.entityId as Id<"packListItems">);
+    return;
+  }
+  if (event.entity === "EventVehicleAssignment" &&
+    (event.type === "EventVehicleAssigned" || event.type === "EventVehicleLegPlanned")) {
+    await validateEventVehicleAssignment(ctx, event.entityId as Id<"eventVehicleAssignments">);
   }
   if (event.entity === "PackList" && event.type === "PackListPacked") {
     await validatePackReadiness(ctx, event.entityId as Id<"packLists">);
