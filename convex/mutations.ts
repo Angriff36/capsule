@@ -12266,7 +12266,7 @@ async function __runEquipmentIssueRaise(ctx: MutationCtx, { docId, kind, descrip
       notes: notes,
       status: "open",
       raisedAt: Date.now(),
-      raisedById: user.personId,
+      issueRaisedById: user.personId,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -12406,7 +12406,7 @@ export const EquipmentIssue_createViaRaise = mutation({
     doc.notes = notes;
     doc.status = "open";
     doc.raisedAt = Date.now();
-    doc.raisedById = user.personId;
+    doc.issueRaisedById = user.personId;
     const docId = await ctx.db.insert("equipmentIssues", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, equipmentIssueId: docId, tenantId: doc.tenantId, equipmentId: equipmentId, eventId: eventId, kind: kind, quantity: ((quantity != null) ? quantity : 1), holdsUnits: ((holdsUnits != null) ? holdsUnits : false), _subject: { entity: "EquipmentIssue", command: "raise", id: docId } };
     const __manifestEvent0 = { type: "EquipmentIssueRaised", entity: "EquipmentIssue", entityId: docId, payload: { equipmentIssueId: docId, tenantId: doc.tenantId, equipmentId: equipmentId, eventId: eventId, kind: kind, quantity: ((quantity != null) ? quantity : 1), holdsUnits: ((holdsUnits != null) ? holdsUnits : false) }, createdAt: Date.now() };
@@ -12524,7 +12524,7 @@ async function __runEquipmentIssueSettle(ctx: MutationCtx, { docId, resolution, 
       payer: ((payer != null) ? payer : doc.payer),
       chargeAmount: ((chargeAmount != null) ? chargeAmount : doc.chargeAmount),
       resolvedAt: Date.now(),
-      settledById: user.personId,
+      issueSettledById: user.personId,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);

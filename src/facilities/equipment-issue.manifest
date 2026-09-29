@@ -59,7 +59,7 @@ entity EquipmentIssue mixin TenantScoped, SoftDeletable {
   property required searchable description: string = ""
   property required status: EquipmentIssueStatus = "open"
   property raisedAt: datetime?
-  property raisedById: uuid?
+  property issueRaisedById: uuid?
   property dueAt: datetime?
   // Who is dealing with it: a staff name, or the repair vendor below.
   property ownerName: string?
@@ -71,7 +71,7 @@ entity EquipmentIssue mixin TenantScoped, SoftDeletable {
   property chargeAmount: money(12, 2)?
   property notes: string?
   property resolvedAt: datetime?
-  property settledById: uuid?
+  property issueSettledById: uuid?
   property resolution: string?
 
   belongsTo equipment: Equipment fields [tenantId, equipmentId] references [tenantId, id]
@@ -133,7 +133,7 @@ entity EquipmentIssue mixin TenantScoped, SoftDeletable {
     mutate notes = notes
     mutate status = "open"
     mutate raisedAt = now()
-    mutate raisedById = user.personId
+    mutate issueRaisedById = user.personId
     emit EquipmentIssueRaised {
       equipmentIssueId: self.id
       tenantId: self.tenantId
@@ -192,7 +192,7 @@ entity EquipmentIssue mixin TenantScoped, SoftDeletable {
     mutate payer = payer != null ? payer : self.payer
     mutate chargeAmount = chargeAmount != null ? chargeAmount : self.chargeAmount
     mutate resolvedAt = now()
-    mutate settledById = user.personId
+    mutate issueSettledById = user.personId
     emit EquipmentIssueResolved {
       equipmentIssueId: self.id
       tenantId: self.tenantId

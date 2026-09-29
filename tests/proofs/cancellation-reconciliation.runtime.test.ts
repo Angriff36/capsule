@@ -105,8 +105,11 @@ describe("runtime proof: single cancellation reconciliation per cancel (AC-390 s
     expect(receipt.preservedCount).toBe(2);
     expect(receipt.createdCount).toBe(0);
     expect(receipt.retiredCount).toBe(0);
-    expect(receipt.exceptionCount).toBe(0);
-    expect(receipt.unresolved).toEqual([]);
+    // PL-RETURNS (AC-137): the checked-out hold stays as a duty to bring back.
+    expect(receipt.exceptionCount).toBe(1);
+    expect(receipt.unresolved).toEqual([
+      { code: "equipment_still_out", recordIds: [seeded.checkedOutId] },
+    ]);
     expect(receipt.checkpoint.state).toBe("complete");
   });
 
