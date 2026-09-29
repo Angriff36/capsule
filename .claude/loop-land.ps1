@@ -48,6 +48,17 @@ function Discard($h, $file) {
   Remove-Item $file -Force
 }
 
+function Release($h, $reviewer) {
+  # Approved -> production, from a private clean copy so the running loop cannot disturb it.
+  # A failed release leaves _release-pending; a landed control-plane repair retries it.
+  $pending = Join-Path $root '.loop-worktrees\_release-pending'
+  $rel = (& 'C:\Program Files\Gitinash.exe' -lc "cd /c/Projects/capsule && bash scripts/release-clean.sh --reviewer $reviewer" 2>&1) -join "`n"
+  $rel | Add-Content $log
+  $result = ([regex]::Matches($rel, '(?m)^RESULT: .*$') | Select-Object -Last 1).Value
+  if ($result -like 'RESULT: PASS*') { Remove-Item $pending -Force -ErrorAction SilentlyContinue; Record $h 'RELEASED' "production: $result" }
+  else { Set-Content $pending $reviewer; Record $h 'RELEASE-FAIL' "production release did not pass: $(if ($result) { $result } else { ($rel -split "`n" | Select-Object -Last 3) -join ' | ' }) - see loop-land.log" }
+}
+
 function Review($wt, $target, $base = 'origin/main', $extra = '') {
   $prompt = @"
 You are the independent reviewer for an automated fix. In this directory run ``git diff $base HEAD --stat`` and then ``git diff $base HEAD`` (everything this change adds) (skip the bodies of .builder/, convex/_generated/, src/generated/ and schemas/ - only confirm those were regenerated, not hand-edited). Fix target: $target
@@ -156,6 +167,8 @@ foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
     Remove-Item (Join-Path $root ".loop-worktrees\_patches\$($h.runId).patch") -Force -ErrorAction SilentlyContinue
     Discard $h $file.FullName
     git -C $root pull --no-rebase --quiet origin dev *> $null   # the live loop files take the repair
+    $pending = Join-Path $root '.loop-worktrees\_release-pending'
+    if (Test-Path $pending) { Release $h ((Get-Content $pending -Raw).Trim()) }   # the approved batch that could not go live
     continue
   }
   # The day's batch passed: close the review; the next one opens 24 hours from now.
@@ -163,10 +176,5 @@ foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
   Set-Content (Join-Path $root '.loop-worktrees\_last-review') (Get-Date -Format s)
   Discard $h $file.FullName
   git -C $root pull --no-rebase --quiet origin dev *> $null   # best effort; never forced
-  # Approved -> production, from a private clean copy so the running loop cannot disturb it.
-  $rel = (& 'C:\Program Files\Git\bin\bash.exe' -lc "cd /c/Projects/capsule && bash scripts/release-clean.sh --reviewer $($r.reviewer)" 2>&1) -join "`n"
-  $rel | Add-Content $log
-  $result = ([regex]::Matches($rel, '(?m)^RESULT: .*$') | Select-Object -Last 1).Value
-  if ($result -like 'RESULT: PASS*') { Record $h 'RELEASED' "production: $result" }
-  else { Record $h 'RELEASE-FAIL' "production release did not pass: $(if ($result) { $result } else { ($rel -split "`n" | Select-Object -Last 3) -join ' | ' }) - see loop-land.log" }
+  Release $h $r.reviewer
 }

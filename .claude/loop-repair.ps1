@@ -41,14 +41,15 @@ Set-Field 'lastInput' $sig; Save
 
 $handoff = Join-Path $root ".loop-worktrees\_handoff\$runId.json"
 New-Item -ItemType Directory -Force (Join-Path $root '.loop-worktrees\_patches') | Out-Null
-"[$(Get-Date -Format s)] control-plane repair $runId start: $($b.reason)" | Add-Content (Join-Path $root '.claude\loop-tick.log')
+# Output goes to stdout only: loop-tick.cmd already appends it to loop-tick.log and holds that file open.
+"[$(Get-Date -Format s)] control-plane repair $runId start: $($b.reason)"
 $env:LOOP_REPAIR = '1'
 ((Get-Content (Join-Path $root '.claude\loop-repair-prompt.txt') -Raw) + "`nYour run id: $runId`n") |
-  claude -p --model claude-opus-5-5 --settings (Join-Path $root '.claude\loop-repair-settings.json') *>> (Join-Path $root '.claude\loop-tick.log')
+  claude -p --model claude-opus-5-5 --settings (Join-Path $root '.claude\loop-repair-settings.json') 2>&1 | Out-Host
 $ok = $LASTEXITCODE -eq 0
 $env:LOOP_REPAIR = $null
 
-if (Test-Path $handoff) { & (Join-Path $root '.claude\loop-land.ps1') *>> (Join-Path $root '.claude\loop-tick.log'); exit 0 }
+if (Test-Path $handoff) { & (Join-Path $root '.claude\loop-land.ps1') 2>&1 | Out-Host; exit 0 }
 $b = Get-Content $bf -Raw -ErrorAction SilentlyContinue | ConvertFrom-Json -ErrorAction SilentlyContinue
 if (-not $b) { exit 0 }
 if ($b.status -eq 'needs-owner') { if (-not $b.ownerRecorded) { Set-Field 'ownerRecorded' $true; Save; Note 'NEEDS-OWNER' "$($b.reason) - Ryan must: $($b.owner_step)" }; exit 0 }
