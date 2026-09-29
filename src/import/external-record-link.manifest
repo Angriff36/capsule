@@ -167,14 +167,20 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     optional linkKey: string,
     optional decision: LinkDecision,
     optional suggestedBy: string,
-    optional sourceVersion: string
+    optional sourceVersion: string,
+    optional conflictStatus: ConflictStatus,
+    optional resolutionNote: string
   ) {
     // No `self.createdAt == null` guard: timestamps fill createdAt into the
     // draft before guards run, so that guard failed on every create (#371).
     guard self.deletedAt == null
     constraint linkSourceSystemPresent: sourceSystem != null "Pick a source system for this match."
     constraint linkExternalIdPresent: length(trim(externalId)) > 0 "Give this match an external ID."
-    constraint linkCapsuleIdPresent: length(trim(capsuleId)) > 0 "Give this match a Capsule ID."
+    // A link that is explicitly a pending conflict may have no Capsule record
+    // yet (import commit: an event whose client was never imported, a
+    // payment awaiting a reconciliation match). Every other link needs one.
+    constraint linkCapsuleIdPresent: length(trim(capsuleId)) > 0 or conflictStatus == "pending_conflict" "Give this match a Capsule ID."
+    constraint linkNotSuperseded: conflictStatus == null or conflictStatus != "superseded" "A new match can't start out replaced. Pick resolved or pending."
     constraint linkVerifiedRequiresUser: verified == null or verified == false or (verifiedByUserId != null and length(trim(verifiedByUserId)) > 0) "This match can't be marked verified without picking who verified it."
     constraint linkDatesOrdered: effectiveStartDate == null or effectiveEndDate == null or effectiveStartDate <= effectiveEndDate "This match's start date has to be on or before its end date."
     mutate sourceSystem = sourceSystem
@@ -190,7 +196,15 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     mutate effectiveEndDate = effectiveEndDate
     mutate rawSourceData = rawSourceData
     mutate metadata = metadata
-    mutate conflictStatus = "pending_conflict"
+    // Omitted → "pending_conflict" (the reconcile queue), as before
+    // 2026-09-29. Import commit and catalog reclassification pass "resolved"
+    // for links that need no reconciling.
+    mutate conflictStatus = conflictStatus != null ? conflictStatus : "pending_conflict"
+    mutate resolutionNote = resolutionNote
+    // Stored as an explicit null, not absent: import lookups
+    // (importCommit.findLink/linksForRun) and the cutover gate match
+    // deletedAt == null exactly, which an absent field does not satisfy.
+    mutate deletedAt = null
     mutate sourceAccount = sourceAccount
     mutate role = role
     mutate ordinal = ordinal != null ? ordinal : 0
@@ -340,9 +354,11 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
   }
 
   // retire - Mark a link as superseded (no longer active)
+  // No `createdAt != null` guard (2026-09-29): importCommit.revertImportRun
+  // retires every live link of the run through here, including links written
+  // before the timestamps existed, which a re-import relinked to the run.
   command retire(optional effectiveEndDate: datetime) {
     guard self.deletedAt == null
-    guard self.createdAt != null
     mutate effectiveEndDate = effectiveEndDate != null ? effectiveEndDate : now()
     mutate conflictStatus = "superseded"
     mutate verified = false
@@ -364,6 +380,137 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
       externalRecordLinkId: self.id
       tenantId: self.tenantId
       reason: reason
+    }
+  }
+
+  // relink - A repeat import commit saw this external record again
+  // (importCommit.upsertLink, 2026-09-29). Points the link at the Capsule
+  // record the commit produced, records the run and raw source row, and sets
+  // the reconcile state. A superseded link (its run was reverted) becomes
+  // active again. No `createdAt != null` guard: links written before the
+  // timestamps existed are re-imported through here too.
+  command relink(
+    capsuleEntity: CapsuleEntityType,
+    capsuleId: string,
+    sourceImportRunId: string,
+    rawSourceData: string,
+    conflictStatus: ConflictStatus,
+    optional resolutionNote: string
+  ) {
+    guard self.deletedAt == null
+    constraint relinkCapsuleIdPresent: length(trim(capsuleId)) > 0 or conflictStatus == "pending_conflict" "Give this match a Capsule ID."
+    constraint relinkNotSuperseded: conflictStatus != "superseded" "A re-imported match can't be marked replaced. Pick resolved or pending."
+    constraint relinkRunPresent: length(trim(sourceImportRunId)) > 0 "Say which import saw this record."
+    mutate capsuleEntity = capsuleEntity
+    mutate capsuleId = capsuleId
+    mutate sourceImportRunId = sourceImportRunId
+    mutate rawSourceData = rawSourceData
+    mutate conflictStatus = conflictStatus
+    mutate resolutionNote = resolutionNote != null ? resolutionNote : self.resolutionNote
+    emit ExternalRecordRelinked {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+      capsuleEntity: capsuleEntity
+      capsuleId: capsuleId
+      sourceImportRunId: sourceImportRunId
+      conflictStatus: conflictStatus
+    }
+  }
+
+  // Catalog reclassification (convex/catalogReclassification.ts, 2026-09-29).
+  // These commands only touch role "reclassify" suggestion links. The seam
+  // authorizes the reclassification itself (kitchen access) and runs them
+  // through the tenant system runner, so the person who decided is passed
+  // explicitly.
+
+  // refreshSuggestion - The off-line planner re-ran; replace the suggestion
+  // on a link nobody has decided or applied yet.
+  command refreshSuggestion(capsuleEntity: CapsuleEntityType, metadata: string, suggestedBy: string) {
+    guard self.deletedAt == null
+    guard self.role == "reclassify"
+    guard self.decision == "suggested"
+    guard self.appliedAt == null
+    constraint refreshSuggestionMetadataPresent: length(trim(metadata)) > 0 "This suggestion needs its details."
+    constraint refreshSuggestionSourcePresent: length(trim(suggestedBy)) > 0 "Say where this suggestion came from."
+    mutate capsuleEntity = capsuleEntity
+    mutate metadata = metadata
+    mutate suggestedBy = suggestedBy
+    emit ExternalRecordSuggestionRefreshed {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+      capsuleEntity: capsuleEntity
+      suggestedBy: suggestedBy
+    }
+  }
+
+  // decideReclassification - A person approves or rejects a suggestion,
+  // optionally overriding its kind (capsuleEntity + metadata). Unlike
+  // `decide`, it does not verify or resolve the link: an approved
+  // reclassification is a cleanup decision, not an import identity.
+  command decideReclassification(
+    decision: LinkDecision,
+    decidedByUserId: string,
+    optional capsuleEntity: CapsuleEntityType,
+    optional metadata: string
+  ) {
+    guard self.deletedAt == null
+    guard self.role == "reclassify"
+    guard self.appliedAt == null
+    constraint decideReclassificationUserPresent: length(trim(decidedByUserId)) > 0 "Pick who decided this."
+    constraint decideReclassificationNotSuggested: decision != "suggested" "Approve or reject this suggestion."
+    mutate decision = decision
+    mutate decidedByUserId = decidedByUserId
+    mutate decidedAt = now()
+    mutate capsuleEntity = capsuleEntity != null ? capsuleEntity : self.capsuleEntity
+    mutate metadata = metadata != null ? metadata : self.metadata
+    emit ExternalRecordReclassificationDecided {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+      decision: decision
+      decidedByUserId: decidedByUserId
+      capsuleEntity: capsuleEntity != null ? capsuleEntity : self.capsuleEntity
+    }
+  }
+
+  // recordReclassified - Apply ran for an approved suggestion; the link now
+  // points at the record the dish became. resolutionNote keeps "dish:<id>".
+  command recordReclassified(
+    capsuleEntity: CapsuleEntityType,
+    capsuleId: string,
+    appliedValues: string,
+    resolutionNote: string
+  ) {
+    guard self.deletedAt == null
+    guard self.role == "reclassify"
+    guard self.decision == "approved"
+    guard self.appliedAt == null
+    constraint recordReclassifiedCapsuleIdPresent: length(trim(capsuleId)) > 0 "Give this match a Capsule ID."
+    mutate capsuleEntity = capsuleEntity
+    mutate capsuleId = capsuleId
+    mutate appliedAt = now()
+    mutate appliedValues = appliedValues
+    mutate resolutionNote = resolutionNote
+    emit ExternalRecordReclassified {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+      capsuleEntity: capsuleEntity
+      capsuleId: capsuleId
+      appliedValues: appliedValues
+    }
+  }
+
+  // recordReclassifyFailure - Apply failed for this suggestion; the note says
+  // why and the row stays approved so a later apply can retry it.
+  command recordReclassifyFailure(resolutionNote: string) {
+    guard self.deletedAt == null
+    guard self.role == "reclassify"
+    guard self.appliedAt == null
+    constraint recordReclassifyFailureNotePresent: length(trim(resolutionNote)) > 0 "Say why this change failed."
+    mutate resolutionNote = resolutionNote
+    emit ExternalRecordReclassifyFailed {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+      resolutionNote: resolutionNote
     }
   }
 
@@ -500,6 +647,44 @@ event ExternalRecordDiscarded: "external_record_link.discarded" {
   externalRecordLinkId: string
   tenantId: string
   reason: string
+}
+
+event ExternalRecordRelinked: "external_record_link.relinked" {
+  externalRecordLinkId: string
+  tenantId: string
+  capsuleEntity: CapsuleEntityType
+  capsuleId: string
+  sourceImportRunId: string
+  conflictStatus: ConflictStatus
+}
+
+event ExternalRecordSuggestionRefreshed: "external_record_link.suggestion_refreshed" {
+  externalRecordLinkId: string
+  tenantId: string
+  capsuleEntity: CapsuleEntityType
+  suggestedBy: string
+}
+
+event ExternalRecordReclassificationDecided: "external_record_link.reclassification_decided" {
+  externalRecordLinkId: string
+  tenantId: string
+  decision: LinkDecision
+  decidedByUserId: string
+  capsuleEntity: CapsuleEntityType
+}
+
+event ExternalRecordReclassified: "external_record_link.reclassified" {
+  externalRecordLinkId: string
+  tenantId: string
+  capsuleEntity: CapsuleEntityType
+  capsuleId: string
+  appliedValues: string
+}
+
+event ExternalRecordReclassifyFailed: "external_record_link.reclassify_failed" {
+  externalRecordLinkId: string
+  tenantId: string
+  resolutionNote: string
 }
 
 // Revision-2 culinary model (2026-09-14). One field-level disagreement between

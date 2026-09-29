@@ -152,7 +152,7 @@ export const inventoryArchive = action({
       id: Id<"importArtifacts">;
       name: string;
       checksum: string | null;
-      createdAt: number | null;
+      registered: boolean;
     }>;
     const existingByName = new Map(existingRows.map((row) => [row.name, row]));
 
@@ -255,30 +255,18 @@ export const inventoryArchive = action({
         indexed: indexSet.has(name) ? "in_both" : "archive_only",
       });
 
-      const registerArtifact = async (docId: Id<"importArtifacts">) => {
-        await ctx.runMutation(api.mutations.ImportArtifact_register, {
-          docId,
-          importRunId: args.importRunId,
-          name,
-          byteSize: content.length,
-          entryCount,
-          checksum,
-          provenance,
-        });
-        // The register command completes creation but leaves the timestamps
-        // unset (creation mode guards createdAt == null); stamp them so the
-        // post-creation commands (recordParse, classify) accept the row.
-        await ctx.runMutation(
-          internal.archiveInventoryStore.stampArtifactCreated,
-          {
-            artifactId: docId,
-          },
-        );
+      const registerFields = {
+        importRunId: args.importRunId,
+        name,
+        byteSize: content.length,
+        entryCount,
+        checksum,
+        provenance,
       };
 
       const prior = existingByName.get(name);
       if (prior) {
-        if (prior.createdAt != null) {
+        if (prior.registered) {
           skipped += 1;
           currentChecksums.set(name, checksum);
           workbooks.push({
@@ -289,13 +277,18 @@ export const inventoryArchive = action({
           });
           continue;
         }
-        // Crash-window repair (review R2-14): the draft was allocated — and
-        // possibly registered — but the action died before the stamp, and a
-        // plain name-skip would leave the row unusable forever (every
-        // artifact command guards createdAt != null). Register guards
-        // creation mode on exactly that state, so re-running it on the SAME
-        // docId completes the row with this archive's real bytes.
-        await registerArtifact(prior.id);
+        // Crash-window repair (review R2-14): a legacy draft from the old
+        // allocate → register → stamp sequence, which died before the stamp.
+        // A plain name-skip would leave the row unusable forever (every
+        // artifact command needs it registered). The instance form of
+        // register admits exactly such a never-written draft and marks it
+        // registered, completing the SAME docId with this archive's bytes.
+        // (2026-09-29: new rows are created in one transaction, so only
+        // drafts written before then can need this.)
+        await ctx.runMutation(api.mutations.ImportArtifact_register, {
+          docId: prior.id,
+          ...registerFields,
+        });
         repaired += 1;
         currentChecksums.set(name, checksum);
         workbooks.push({
@@ -307,11 +300,10 @@ export const inventoryArchive = action({
         continue;
       }
 
-      const docId = (await ctx.runMutation(
-        internal.archiveInventoryStore.allocateArtifactDraft,
-        { tenantId: auth.tenantId, importRunId: args.importRunId, name },
-      )) as Id<"importArtifacts">;
-      await registerArtifact(docId);
+      await ctx.runMutation(
+        api.mutations.ImportArtifact_createViaRegister,
+        registerFields,
+      );
       registered += 1;
       currentChecksums.set(name, checksum);
       workbooks.push({ name, checksum, byteSize: content.length, entryCount });

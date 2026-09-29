@@ -3,8 +3,9 @@
  *
  * Why this exists: the generated `ImportRun_commit` / `ImportRun_revert` commands
  * (convex/mutations.ts, do-not-edit) only flip the run's status + emit an audit
- * event — they write ZERO business data. The orphaned `importCoordinator.ts`
- * `commitImport`/`revertImport` carry explicit TODOs. So an operator clicking
+ * event — they write ZERO business data. ~~The orphaned `importCoordinator.ts`
+ * `commitImport`/`revertImport` carry explicit TODOs.~~ (2026-09-29: those
+ * uncalled functions were deleted from importCoordinator.ts.) So an operator clicking
  * "Complete Commit" got a green "Completed" run with no records imported (silent
  * false-success), and §5.3's "imported TPP Event uses the same create-proposal
  * command" had no imported events to act on.
@@ -313,46 +314,41 @@ export const upsertLink = internalMutation({
       )
       .first();
 
-    const now = Date.now();
+    // Governed writes (2026-09-29), same transaction, caller auth: the
+    // commit/revert actions pass the operator's identity through, and every
+    // canImport role holds importAccess (the ExternalRecordLink policy).
     if (existing) {
-      await ctx.db.patch(existing._id, {
-        capsuleEntity:
-          args.capsuleEntity as Doc<"externalRecordLinks">["capsuleEntity"],
+      await ctx.runMutation(api.mutations.ExternalRecordLink_relink, {
+        docId: existing._id,
+        version: existing.version,
+        capsuleEntity: args.capsuleEntity,
         capsuleId: args.capsuleId,
         sourceImportRunId: args.sourceImportRunId,
         rawSourceData: args.rawSourceData,
         conflictStatus: args.conflictStatus,
-        resolutionNote: args.resolutionNote ?? existing.resolutionNote,
-        updatedAt: now,
-        version: existing.version + 1,
+        resolutionNote: args.resolutionNote,
       });
       return existing._id;
     }
 
-    return await ctx.db.insert("externalRecordLinks", {
-      tenantId: args.tenantId,
-      sourceSystem:
-        args.sourceSystem as Doc<"externalRecordLinks">["sourceSystem"],
-      recordType: args.recordType,
-      externalId: args.externalId,
-      linkKey,
-      capsuleEntity:
-        args.capsuleEntity as Doc<"externalRecordLinks">["capsuleEntity"],
-      capsuleId: args.capsuleId,
-      verified: false,
-      sourceImportRunId: args.sourceImportRunId,
-      rawSourceData: args.rawSourceData,
-      conflictStatus: args.conflictStatus,
-      resolutionNote: args.resolutionNote,
-      // SoftDeletable shape: generated creates stamp deletedAt: null, and
-      // findLink/linksForRun filter q.eq(deletedAt, null) — an insert without
-      // the key leaves it undefined and every cross-dataset findLink
-      // (events→contact, payments→event, pack_list→event) silently misses.
-      deletedAt: null,
-      createdAt: now,
-      updatedAt: now,
-      version: 0,
-    });
+    // ExternalRecordLink_createViaLink stores deletedAt as an explicit null,
+    // which findLink/linksForRun match on (an absent field would not).
+    const created = (await ctx.runMutation(
+      api.mutations.ExternalRecordLink_createViaLink,
+      {
+        sourceSystem: args.sourceSystem,
+        recordType: args.recordType,
+        externalId: args.externalId,
+        linkKey,
+        capsuleEntity: args.capsuleEntity,
+        capsuleId: args.capsuleId,
+        sourceImportRunId: args.sourceImportRunId,
+        rawSourceData: args.rawSourceData,
+        conflictStatus: args.conflictStatus,
+        resolutionNote: args.resolutionNote,
+      },
+    )) as { docId: Id<"externalRecordLinks"> };
+    return created.docId;
   },
 });
 
@@ -364,6 +360,12 @@ export const upsertLink = internalMutation({
  * before the next import:
  *   bunx convex run importCommit:backfillLinkKeys '{}'
  * Rows that already carry a linkKey are untouched, so a re-run is a no-op.
+ *
+ * Governed-writes exception (2026-09-29, scripts/governed-write-exceptions.json):
+ * a one-time data migration that stamps a derived index key — a pure
+ * function of the row's own identity fields — with no domain meaning and no
+ * event. It stays while deployments that predate linkKey may still hold
+ * unstamped rows; delete it once every deployment has run it.
  */
 export const backfillLinkKeys = internalMutation({
   args: {
@@ -378,6 +380,7 @@ export const backfillLinkKeys = internalMutation({
     let patched = 0;
     for (const link of page.page) {
       if (link.linkKey) continue;
+      // raw-write: externalRecordLinks
       await ctx.db.patch(link._id, {
         linkKey: buildLinkKey({
           sourceSystem: link.sourceSystem,
@@ -400,18 +403,18 @@ export const backfillLinkKeys = internalMutation({
   },
 });
 
-/** Mark a link superseded (revert). */
+/**
+ * Mark a link superseded (revert) through ExternalRecordLink_retire, which
+ * sets exactly these fields (superseded, effectiveEndDate, verified false,
+ * lastVerifiedAt) and emits ExternalRecordRetired. Caller auth.
+ */
 export const supersedeLink = internalMutation({
   args: { linkId: v.id("externalRecordLinks"), version: v.number() },
   handler: async (ctx, args): Promise<void> => {
-    const now = Date.now();
-    await ctx.db.patch(args.linkId, {
-      conflictStatus: "superseded",
-      effectiveEndDate: now,
-      verified: false,
-      lastVerifiedAt: now,
-      updatedAt: now,
-      version: args.version + 1,
+    await ctx.runMutation(api.mutations.ExternalRecordLink_retire, {
+      docId: args.linkId,
+      version: args.version,
+      effectiveEndDate: Date.now(),
     });
   },
 });

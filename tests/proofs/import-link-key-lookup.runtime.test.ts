@@ -7,6 +7,8 @@
  * look up `by_linkKey` with the key from `buildLinkKey` and keep the tenant
  * check. Rows written before linkKey existed become reachable through the
  * one-time `backfillLinkKeys` migration, not through a scan fallback.
+ * Since 2026-09-29 upsertLink writes through generated commands with the
+ * caller's auth, so these proofs call it as an importing manager.
  */
 import { convexTest } from "convex-test";
 import { describe, expect, it, vi } from "vitest";
@@ -36,6 +38,19 @@ const canonicalKey = (externalId: string) =>
 
 function setup(): TestConvex {
   return convexTest(schema, modules);
+}
+
+/**
+ * upsertLink writes through the generated ExternalRecordLink commands under
+ * the caller's auth (2026-09-29), so it runs as the importing manager — in
+ * production the commit action passes the operator's identity through.
+ */
+function importer(t: TestConvex, tenantId: string) {
+  return t.withIdentity({
+    subject: `proof-importer-${tenantId}`,
+    tenantId,
+    role: "manager",
+  });
 }
 
 async function seedRun(
@@ -106,7 +121,7 @@ describe("importCommit link lookup by canonical linkKey", () => {
   it("finds an existing link by its canonical key", async () => {
     const t = setup();
     const runId = await seedRun(t, "tenant-a");
-    const id = await t.mutation(
+    const id = await importer(t, "tenant-a").mutation(
       internal.importCommit.upsertLink,
       upsertArgs("tenant-a", runId),
     );
@@ -122,7 +137,7 @@ describe("importCommit link lookup by canonical linkKey", () => {
   it("a new link upserts exactly once", async () => {
     const t = setup();
     const runId = await seedRun(t, "tenant-a");
-    await t.mutation(
+    await importer(t, "tenant-a").mutation(
       internal.importCommit.upsertLink,
       upsertArgs("tenant-a", runId),
     );
@@ -135,11 +150,11 @@ describe("importCommit link lookup by canonical linkKey", () => {
   it("a repeated upsert updates the same row instead of duplicating", async () => {
     const t = setup();
     const runId = await seedRun(t, "tenant-a");
-    const first = await t.mutation(
+    const first = await importer(t, "tenant-a").mutation(
       internal.importCommit.upsertLink,
       upsertArgs("tenant-a", runId, "venue-doc-1"),
     );
-    const second = await t.mutation(
+    const second = await importer(t, "tenant-a").mutation(
       internal.importCommit.upsertLink,
       upsertArgs("tenant-a", runId, "venue-doc-2"),
     );
@@ -148,14 +163,16 @@ describe("importCommit link lookup by canonical linkKey", () => {
     const rows = await linkRows(t);
     expect(rows).toHaveLength(1);
     expect(rows[0].capsuleId).toBe("venue-doc-2");
-    expect(rows[0].version).toBe(1);
+    // Generated creates start at version 1 (the old raw insert used 0); the
+    // relink is one more write.
+    expect(rows[0].version).toBe(2);
   });
 
   it("keeps tenants isolated when they share an external identity", async () => {
     const t = setup();
     const runA = await seedRun(t, "tenant-a");
     const runB = await seedRun(t, "tenant-b");
-    const linkA = await t.mutation(
+    const linkA = await importer(t, "tenant-a").mutation(
       internal.importCommit.upsertLink,
       upsertArgs("tenant-a", runA, "venue-a"),
     );
@@ -167,7 +184,7 @@ describe("importCommit link lookup by canonical linkKey", () => {
       }),
     ).toBeNull();
 
-    const linkB = await t.mutation(
+    const linkB = await importer(t, "tenant-b").mutation(
       internal.importCommit.upsertLink,
       upsertArgs("tenant-b", runB, "venue-b"),
     );
@@ -220,7 +237,7 @@ describe("importCommit link lookup by canonical linkKey", () => {
     expect(foundOne?._id).toBe(legacyOne);
 
     // Re-importing a backfilled identity patches the legacy row.
-    const patched = await t.mutation(
+    const patched = await importer(t, "tenant-a").mutation(
       internal.importCommit.upsertLink,
       upsertArgs("tenant-a", runId, "venue-new", "V-OLD-2"),
     );

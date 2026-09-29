@@ -1536,6 +1536,7 @@ export const ImportArtifactSchema = z.object({
   parseStatus: z.enum(["pending", "parsed", "failed"]).default("pending"),
   totalRowCount: z.number().int().default(0),
   rowOutcomeCounts: z.string().default("{}"),
+  registeredAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1592,8 +1593,8 @@ export const ImportRunSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
-  sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync"]).default("tpp_legacy"),
-  datasetType: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "pack_list"]).default("events"),
+  sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync"]),
+  datasetType: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "pack_list"]),
   status: z.enum(["started", "parsing", "validating", "reviewing", "committing", "completed", "failed", "reverted"]).default("started"),
   startTime: z.coerce.date().nullable().optional(),
   endTime: z.coerce.date().nullable().optional(),
@@ -6336,6 +6337,16 @@ export const ExternalRecordLinkDecideParamsSchema = z.object({
 
 export type ExternalRecordLinkDecideParams = z.infer<typeof ExternalRecordLinkDecideParamsSchema>;
 
+// Command: decideReclassification on ExternalRecordLink
+export const ExternalRecordLinkDecideReclassificationParamsSchema = z.object({
+  decision: z.enum(["suggested", "approved", "rejected"]),
+  decidedByUserId: z.string(),
+  capsuleEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task"]).optional(),
+  metadata: z.string().optional(),
+});
+
+export type ExternalRecordLinkDecideReclassificationParams = z.infer<typeof ExternalRecordLinkDecideReclassificationParamsSchema>;
+
 // Command: discard on ExternalRecordLink
 export const ExternalRecordLinkDiscardParamsSchema = z.object({
   reason: z.string(),
@@ -6364,6 +6375,8 @@ export const ExternalRecordLinkLinkParamsSchema = z.object({
   decision: z.enum(["suggested", "approved", "rejected"]).optional(),
   suggestedBy: z.string().optional(),
   sourceVersion: z.string().optional(),
+  conflictStatus: z.enum(["resolved", "pending_conflict", "superseded"]).optional(),
+  resolutionNote: z.string().optional(),
 });
 
 export type ExternalRecordLinkLinkParams = z.infer<typeof ExternalRecordLinkLinkParamsSchema>;
@@ -6385,6 +6398,44 @@ export const ExternalRecordLinkRecordAppliedParamsSchema = z.object({
 });
 
 export type ExternalRecordLinkRecordAppliedParams = z.infer<typeof ExternalRecordLinkRecordAppliedParamsSchema>;
+
+// Command: recordReclassified on ExternalRecordLink
+export const ExternalRecordLinkRecordReclassifiedParamsSchema = z.object({
+  capsuleEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task"]),
+  capsuleId: z.string(),
+  appliedValues: z.string(),
+  resolutionNote: z.string(),
+});
+
+export type ExternalRecordLinkRecordReclassifiedParams = z.infer<typeof ExternalRecordLinkRecordReclassifiedParamsSchema>;
+
+// Command: recordReclassifyFailure on ExternalRecordLink
+export const ExternalRecordLinkRecordReclassifyFailureParamsSchema = z.object({
+  resolutionNote: z.string(),
+});
+
+export type ExternalRecordLinkRecordReclassifyFailureParams = z.infer<typeof ExternalRecordLinkRecordReclassifyFailureParamsSchema>;
+
+// Command: refreshSuggestion on ExternalRecordLink
+export const ExternalRecordLinkRefreshSuggestionParamsSchema = z.object({
+  capsuleEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task"]),
+  metadata: z.string(),
+  suggestedBy: z.string(),
+});
+
+export type ExternalRecordLinkRefreshSuggestionParams = z.infer<typeof ExternalRecordLinkRefreshSuggestionParamsSchema>;
+
+// Command: relink on ExternalRecordLink
+export const ExternalRecordLinkRelinkParamsSchema = z.object({
+  capsuleEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task"]),
+  capsuleId: z.string(),
+  sourceImportRunId: z.string(),
+  rawSourceData: z.string(),
+  conflictStatus: z.enum(["resolved", "pending_conflict", "superseded"]),
+  resolutionNote: z.string().optional(),
+});
+
+export type ExternalRecordLinkRelinkParams = z.infer<typeof ExternalRecordLinkRelinkParamsSchema>;
 
 // Command: resolveConflict on ExternalRecordLink
 export const ExternalRecordLinkResolveConflictParamsSchema = z.object({

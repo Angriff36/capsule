@@ -260,10 +260,15 @@ import {
   EventVehicleAssignmentMarkPreloadedParamsSchema,
   EventVehicleAssignmentReleaseParamsSchema,
   ExternalRecordLinkDecideParamsSchema,
+  ExternalRecordLinkDecideReclassificationParamsSchema,
   ExternalRecordLinkDiscardParamsSchema,
   ExternalRecordLinkLinkParamsSchema,
   ExternalRecordLinkObserveParamsSchema,
   ExternalRecordLinkRecordAppliedParamsSchema,
+  ExternalRecordLinkRecordReclassifiedParamsSchema,
+  ExternalRecordLinkRecordReclassifyFailureParamsSchema,
+  ExternalRecordLinkRefreshSuggestionParamsSchema,
+  ExternalRecordLinkRelinkParamsSchema,
   ExternalRecordLinkResolveConflictParamsSchema,
   ExternalRecordLinkRetireParamsSchema,
   ExternalRecordLinkUnlinkExternalRecordParamsSchema,
@@ -4468,6 +4473,16 @@ export function useExternalRecordLinkDecide() {
   };
 }
 
+/** Mutation hook for ExternalRecordLink.decideReclassification. */
+export function useExternalRecordLinkDecideReclassification() {
+  const mutate = useMutation(api.mutations.ExternalRecordLink_decideReclassification);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ExternalRecordLinkDecideReclassificationParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for ExternalRecordLink.discard. */
 export function useExternalRecordLinkDiscard() {
   const mutate = useMutation(api.mutations.ExternalRecordLink_discard);
@@ -4504,6 +4519,46 @@ export function useExternalRecordLinkRecordApplied() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ExternalRecordLinkRecordAppliedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ExternalRecordLink.recordReclassified. */
+export function useExternalRecordLinkRecordReclassified() {
+  const mutate = useMutation(api.mutations.ExternalRecordLink_recordReclassified);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ExternalRecordLinkRecordReclassifiedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ExternalRecordLink.recordReclassifyFailure. */
+export function useExternalRecordLinkRecordReclassifyFailure() {
+  const mutate = useMutation(api.mutations.ExternalRecordLink_recordReclassifyFailure);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ExternalRecordLinkRecordReclassifyFailureParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ExternalRecordLink.refreshSuggestion. */
+export function useExternalRecordLinkRefreshSuggestion() {
+  const mutate = useMutation(api.mutations.ExternalRecordLink_refreshSuggestion);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ExternalRecordLinkRefreshSuggestionParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ExternalRecordLink.relink. */
+export function useExternalRecordLinkRelink() {
+  const mutate = useMutation(api.mutations.ExternalRecordLink_relink);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ExternalRecordLinkRelinkParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -4606,6 +4661,17 @@ export function useImportArtifactRegister() {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ImportArtifactRegisterParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for ImportArtifact.register. */
+export function useCreateImportArtifact() {
+  const mutate = useMutation(api.mutations.ImportArtifact_createViaRegister);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = ImportArtifactRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
 }
 
@@ -4847,6 +4913,17 @@ export function useImportRunValidate() {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ImportRunValidateParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for ImportRun.start. */
+export function useCreateImportRun() {
+  const mutate = useMutation(api.mutations.ImportRun_createViaStart);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = ImportRunStartParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
 }
 
@@ -11400,4 +11477,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1212 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1219 as const;

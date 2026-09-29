@@ -7,65 +7,24 @@
  * file can stay Node-only.
  */
 import { v } from "convex/values";
-import { internalMutation, internalQuery } from "./_generated/server";
+import { internalQuery } from "./_generated/server";
+
+// ~~allocateArtifactDraft / stampArtifactCreated~~ (removed 2026-09-29): the
+// inventory action used to raw-insert a blank draft, register it in creation
+// mode and raw-stamp its timestamps in three transactions. It now creates
+// each row with the generated ImportArtifact_createViaRegister, which
+// creates, stamps and emits ImportArtifactRegistered in one transaction, so
+// no new crash-window drafts can exist. Legacy drafts are completed by the
+// instance form of ImportArtifact_register (see inventoryArchive).
 
 /**
- * Allocate one blank ImportArtifact draft for the register command. The
- * draft carries the workbook NAME from allocation on: a crash between this
- * insert and the governed register leaves a findable, completable row
- * instead of an anonymous blank — the retry repairs it by re-running
- * register in creation mode on the same docId (see inventoryArchive).
- */
-export const allocateArtifactDraft = internalMutation({
-  args: {
-    tenantId: v.string(),
-    importRunId: v.id("importRuns"),
-    name: v.string(),
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db.insert("importArtifacts", {
-      tenantId: args.tenantId,
-      importRunId: args.importRunId,
-      name: args.name,
-      byteSize: 0,
-      entryCount: 0,
-      provenance: "{}",
-      disposition: "pending",
-      parseStatus: "pending",
-      totalRowCount: 0,
-      rowOutcomeCounts: "{}",
-      version: 0,
-    });
-  },
-});
-
-/** Stamp createdAt/updatedAt on a registered artifact.
- *
- * The docId-contract register command guards `createdAt == null` (creation
- * mode) and does not itself stamp the timestamps-mixin fields, so a
- * registered artifact would stay timestamp-less and every command guarding
- * `createdAt != null` (recordParse, classify) would refuse it. This is the
- * same authored-stamp idiom startImport uses for import runs.
- */
-export const stampArtifactCreated = internalMutation({
-  args: { artifactId: v.id("importArtifacts") },
-  handler: async (ctx, args) => {
-    const doc = await ctx.db.get(args.artifactId);
-    if (!doc || doc.createdAt != null) return;
-    const now = Date.now();
-    await ctx.db.patch(args.artifactId, {
-      createdAt: now,
-      updatedAt: now,
-    });
-  },
-});
-
-/**
- * Existing live artifact rows (id, name, checksum, createdAt) for a run —
- * the re-run skip/repair set. createdAt == null marks a draft the inventory
- * action died before finishing; the retry completes that row instead of
- * skipping the name forever. checksum lets the caller prove the rows belong
- * to the archive it is holding before treating them as same-run state.
+ * Existing live artifact rows (id, name, checksum, registered) for a run —
+ * the re-run skip/repair set. A row that is not registered (no registeredAt
+ * and no createdAt) is a legacy draft the old three-step inventory died
+ * before finishing; the retry completes that row instead of skipping the
+ * name forever. Rows registered before registeredAt existed carry createdAt
+ * (2026-09-29). checksum lets the caller prove the rows belong to the
+ * archive it is holding before treating them as same-run state.
  */
 export const listArtifactRows = internalQuery({
   args: { importRunId: v.id("importRuns") },
@@ -80,7 +39,7 @@ export const listArtifactRows = internalQuery({
         id: row._id,
         name: row.name,
         checksum: row.checksum ?? null,
-        createdAt: row.createdAt ?? null,
+        registered: row.registeredAt != null || row.createdAt != null,
       }));
   },
 });
