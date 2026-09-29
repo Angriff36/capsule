@@ -1169,6 +1169,7 @@ export default defineSchema({
     metadataJson: v.optional(v.union(v.string(), v.null())),
     observationsJson: v.optional(v.union(v.string(), v.null())),
     contextJson: v.optional(v.union(v.string(), v.null())),
+    registeredAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
   })
@@ -1196,6 +1197,7 @@ export default defineSchema({
     decidedAt: v.optional(v.number()),
     decisionJson: v.optional(v.string()),
     verificationJson: v.optional(v.union(v.string(), v.null())),
+    recordedAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
   })
@@ -1210,6 +1212,7 @@ export default defineSchema({
     stage: v.optional(v.string()),
     createdBy: v.optional(v.string()),
     supersededBy: v.optional(v.union(v.string(), v.null())),
+    printedAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
   })

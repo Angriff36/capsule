@@ -1,6 +1,17 @@
 // Private evidence and audit records, not another Event aggregate.
-// The authored eventPacket transaction seam checks manager capability, tenant,
-// byte ownership and native-domain commands before writing these records.
+// ~~The authored eventPacket transaction seam checks manager capability, tenant,
+// byte ownership and native-domain commands before writing these records.~~
+// 2026-09-29: artifacts, decisions and prints now change only through the
+// commands below, so each change leaves an emitted event. Managers
+// (manageAccess, the same roles the seam accepts) run them. The authored seam
+// (convex/lib/eventPacket/commands.ts) still fingerprints the uploaded bytes,
+// validates decisions against the current packet and runs the native Event
+// commands before it calls these. The commands hold the invariants they can
+// check themselves: the event exists in this tenant, one file per
+// event/fingerprint/purpose, stored bytes are claimed once, a print links only
+// this event's own PDF and snapshot files, and the actor is the signed-in user.
+// EventPacketIssue stays a derived cache written by the seam
+// (scripts/governed-write-exceptions.json).
 
 entity EventPacketArtifact mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
@@ -17,11 +28,88 @@ entity EventPacketArtifact mixin TenantScoped, SoftDeletable {
   property metadataJson: string?
   property observationsJson: string?
   property contextJson: string?
+  // Set by register(). Files registered before 2026-09-29 have no value.
+  property registeredAt: datetime?
   constraint packetArtifactSize: self.byteSize >= 0 "This file's size can't be negative. Use zero or more."
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
-  default policy packetArtifactRead read: roleAllows(user.role, "eventPacketSeamOnly") "The original packet files stay behind the scenes"
-  default policy packetArtifactWrite write: roleAllows(user.role, "eventPacketSeamOnly") "The event packet keeps the source files"
-  default policy packetArtifactExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Staff cannot change packet files"
+  default policy packetArtifactRead read: roleAllows(user.role, "manageAccess") "Only managers can see the original packet files"
+  default policy packetArtifactWrite write: roleAllows(user.role, "manageAccess") "Only managers can change the event packet files"
+  default policy packetArtifactExecute execute: roleAllows(user.role, "manageAccess") "Only managers can change the event packet files"
+
+  // Called by the packet upload seam after it fingerprints the exact bytes.
+  command register(
+    eventId: uuid,
+    fingerprint: string,
+    storageId: string,
+    purpose: string,
+    name: string,
+    mimeType: string,
+    byteSize: int,
+    optional contextJson: string
+  ) {
+    guard self.uploadedBy == null
+    guard self.registeredAt == null
+    constraint packetFilePurpose: purpose == "source" or purpose == "pdf" or purpose == "snapshot" "A packet file is a source, a PDF or a snapshot."
+    constraint packetFileFingerprint: length(trim(fingerprint)) > 0 "A packet file needs the fingerprint of its bytes."
+    constraint packetFileStorage: length(trim(storageId)) > 0 "A packet file needs its stored bytes."
+    constraint packetFileSize: byteSize >= 0 "This file's size can't be negative. Use zero or more."
+    constraint packetFileEvent: count(Event where id == eventId) > 0 "Choose an event in this organization."
+    constraint packetFileOnce: count(EventPacketArtifact where eventId == eventId, fingerprint == fingerprint, purpose == purpose) == 0 "This file is already in the event packet."
+    constraint packetFileBytesOnce: count(EventPacketArtifact where storageId == storageId) == 0 "These stored bytes already belong to a packet file."
+    mutate eventId = eventId
+    mutate fingerprint = fingerprint
+    mutate storageId = storageId
+    mutate purpose = purpose
+    mutate name = name
+    mutate mimeType = mimeType
+    mutate byteSize = byteSize
+    mutate contextJson = contextJson
+    mutate uploadedBy = user.id
+    mutate registeredAt = now()
+    emit EventPacketFileRegistered {
+      artifactId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      fingerprint: fingerprint
+      purpose: purpose
+      name: name
+      mimeType: mimeType
+      byteSize: byteSize
+      uploadedBy: user.id
+    }
+  }
+
+  // A newer upload with the same name and kind replaces this imported source.
+  command deactivate(contextJson: string) {
+    guard self.deletedAt == null
+    guard self.purpose == "source"
+    guard self.metadataJson != null
+    mutate contextJson = contextJson
+    emit EventPacketSourceDeactivated {
+      artifactId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      fingerprint: self.fingerprint
+      name: self.name
+    }
+  }
+
+  // The source's parsed evidence, stored after the seam checks invoice and ownership.
+  command recordEvidence(metadataJson: string, observationsJson: string, contextJson: string) {
+    guard self.deletedAt == null
+    guard self.purpose == "source"
+    mutate metadataJson = metadataJson
+    mutate observationsJson = observationsJson
+    mutate contextJson = contextJson
+    emit EventPacketEvidenceImported {
+      artifactId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      fingerprint: self.fingerprint
+      name: self.name
+    }
+  }
+
   store EventPacketArtifact in durable
 }
 
@@ -51,11 +139,48 @@ entity EventPacketResolution mixin TenantScoped {
   property decidedAt: datetime
   property decisionJson: string
   property verificationJson: string?
+  // Set by record(). Decisions recorded before 2026-09-29 have no value.
+  property recordedAt: datetime?
   constraint packetDecisionActor: length(trim(self.actor)) > 0 "A decision needs its authenticated actor"
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
-  default policy packetResolutionRead read: roleAllows(user.role, "eventPacketSeamOnly") "Private approvals remain behind manager review"
-  default policy packetResolutionWrite write: roleAllows(user.role, "eventPacketSeamOnly") "The event packet keeps the packet decisions"
-  default policy packetResolutionExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Staff cannot change packet decisions"
+  default policy packetResolutionRead read: roleAllows(user.role, "manageAccess") "Private approvals remain behind manager review"
+  default policy packetResolutionWrite write: roleAllows(user.role, "manageAccess") "Only managers can decide event packet issues"
+  default policy packetResolutionExecute execute: roleAllows(user.role, "manageAccess") "Only managers can decide event packet issues"
+
+  // A manager's decision on one packet issue. The actor is always the signed-in user.
+  command record(
+    eventId: uuid,
+    decisionId: string,
+    issueKey: string,
+    decidedAt: datetime,
+    decisionJson: string,
+    optional verificationJson: string
+  ) {
+    guard self.actor == null
+    guard self.recordedAt == null
+    constraint packetDecisionId: length(trim(decisionId)) > 0 "A decision needs its id."
+    constraint packetDecisionIssue: length(trim(issueKey)) > 0 "A decision needs the issue it settles."
+    constraint packetDecisionEvent: count(Event where id == eventId) > 0 "Choose an event in this organization."
+    constraint packetDecisionOnce: count(EventPacketResolution where eventId == eventId, decisionId == decisionId) == 0 "This decision is already recorded."
+    mutate eventId = eventId
+    mutate decisionId = decisionId
+    mutate issueKey = issueKey
+    mutate actor = user.id
+    mutate decidedAt = decidedAt
+    mutate decisionJson = decisionJson
+    mutate verificationJson = verificationJson
+    mutate recordedAt = now()
+    emit EventPacketIssueResolved {
+      resolutionId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      decisionId: decisionId
+      issueKey: issueKey
+      actor: user.id
+      decidedAt: decidedAt
+    }
+  }
+
   store EventPacketResolution in durable
 }
 
@@ -70,10 +195,130 @@ entity EventPacketRevision mixin TenantScoped {
   property stage: string
   property createdBy: string
   property supersededBy: string?
+  // Set by capture(). Prints captured before 2026-09-29 have no value.
+  property printedAt: datetime?
   constraint packetRevisionFingerprint: length(trim(self.snapshotFingerprint)) > 0 "A print needs its exact input fingerprint"
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
-  default policy packetRevisionRead read: roleAllows(user.role, "eventPacketSeamOnly") "PDF and source snapshots need scoped manager access"
-  default policy packetRevisionWrite write: roleAllows(user.role, "eventPacketSeamOnly") "The event packet keeps the packet prints"
-  default policy packetRevisionExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Staff cannot change packet prints"
+  default policy packetRevisionRead read: roleAllows(user.role, "manageAccess") "PDF and source snapshots need scoped manager access"
+  default policy packetRevisionWrite write: roleAllows(user.role, "manageAccess") "Only managers can print the event packet"
+  default policy packetRevisionExecute execute: roleAllows(user.role, "manageAccess") "Only managers can print the event packet"
+
+  // One print of the exact current packet. Its PDF and snapshot must be this event's own files.
+  command capture(
+    eventId: uuid,
+    snapshotFingerprint: string,
+    pdfStorageId: string,
+    snapshotStorageId: string,
+    stage: string
+  ) {
+    guard self.createdBy == null
+    guard self.printedAt == null
+    constraint printFingerprint: length(trim(snapshotFingerprint)) > 0 "A print needs its exact input fingerprint"
+    constraint printEvent: count(Event where id == eventId) > 0 "Choose an event in this organization."
+    constraint printOnce: count(EventPacketRevision where eventId == eventId, snapshotFingerprint == snapshotFingerprint) == 0 "This packet version is already printed."
+    constraint printPdfOwned: count(EventPacketArtifact where eventId == eventId, storageId == pdfStorageId, purpose == "pdf") > 0 "Print files must belong to this event."
+    constraint printSnapshotOwned: count(EventPacketArtifact where eventId == eventId, storageId == snapshotStorageId, purpose == "snapshot") > 0 "Print files must belong to this event."
+    mutate eventId = eventId
+    mutate snapshotFingerprint = snapshotFingerprint
+    mutate pdfStorageId = pdfStorageId
+    mutate snapshotStorageId = snapshotStorageId
+    mutate stage = stage
+    mutate createdBy = user.id
+    mutate printedAt = now()
+    emit EventPacketPrinted {
+      revisionId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      snapshotFingerprint: snapshotFingerprint
+      stage: stage
+      createdBy: user.id
+    }
+  }
+
+  // A newer (or reused) print of this event replaces this one.
+  command supersede(by: string) {
+    guard self.snapshotFingerprint != null
+    constraint supersedeOther: by != self.id "A print can't replace itself."
+    constraint supersedeSameEvent: count(EventPacketRevision where id == by, eventId == self.eventId) > 0 "Only another print of this event can replace it."
+    mutate supersededBy = by
+    emit EventPacketRevisionSuperseded {
+      revisionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      supersededBy: by
+    }
+  }
+
+  // Printing an unchanged packet again makes its earlier print current again.
+  command reinstate() {
+    guard self.supersededBy != null
+    mutate supersededBy = null
+    emit EventPacketRevisionReinstated {
+      revisionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
   store EventPacketRevision in durable
+}
+
+event EventPacketFileRegistered: "event_packet.file_registered" {
+  artifactId: string
+  tenantId: string
+  eventId: string
+  fingerprint: string
+  purpose: string
+  name: string
+  mimeType: string
+  byteSize: int
+  uploadedBy: string
+}
+
+event EventPacketSourceDeactivated: "event_packet.source_deactivated" {
+  artifactId: string
+  tenantId: string
+  eventId: string
+  fingerprint: string
+  name: string
+}
+
+event EventPacketEvidenceImported: "event_packet.evidence_imported" {
+  artifactId: string
+  tenantId: string
+  eventId: string
+  fingerprint: string
+  name: string
+}
+
+event EventPacketIssueResolved: "event_packet.issue_resolved" {
+  resolutionId: string
+  tenantId: string
+  eventId: string
+  decisionId: string
+  issueKey: string
+  actor: string
+  decidedAt: datetime
+}
+
+event EventPacketPrinted: "event_packet.printed" {
+  revisionId: string
+  tenantId: string
+  eventId: string
+  snapshotFingerprint: string
+  stage: string
+  createdBy: string
+}
+
+event EventPacketRevisionSuperseded: "event_packet.revision_superseded" {
+  revisionId: string
+  tenantId: string
+  eventId: string
+  supersededBy: string
+}
+
+event EventPacketRevisionReinstated: "event_packet.revision_reinstated" {
+  revisionId: string
+  tenantId: string
+  eventId: string
 }

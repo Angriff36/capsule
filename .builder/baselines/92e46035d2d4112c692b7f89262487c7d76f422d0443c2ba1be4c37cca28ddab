@@ -220,6 +220,13 @@ import {
   EventLockForSalesParamsSchema,
   EventMarkBinderBuiltParamsSchema,
   EventNormalizePurchasingWeekParamsSchema,
+  EventPacketArtifactDeactivateParamsSchema,
+  EventPacketArtifactRecordEvidenceParamsSchema,
+  EventPacketArtifactRegisterParamsSchema,
+  EventPacketResolutionRecordParamsSchema,
+  EventPacketRevisionCaptureParamsSchema,
+  EventPacketRevisionReinstateParamsSchema,
+  EventPacketRevisionSupersedeParamsSchema,
   EventPlanEngagementParamsSchema,
   EventReactivateParamsSchema,
   EventReassignClientParamsSchema,
@@ -4053,6 +4060,47 @@ export function useGetEventPacketArtifact(id: string | "skip") {
   return useQuery(api.queries.getEventPacketArtifact, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for EventPacketArtifact.deactivate. */
+export function useEventPacketArtifactDeactivate() {
+  const mutate = useMutation(api.mutations.EventPacketArtifact_deactivate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketArtifactDeactivateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventPacketArtifact.recordEvidence. */
+export function useEventPacketArtifactRecordEvidence() {
+  const mutate = useMutation(api.mutations.EventPacketArtifact_recordEvidence);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketArtifactRecordEvidenceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventPacketArtifact.register. */
+export function useEventPacketArtifactRegister() {
+  const mutate = useMutation(api.mutations.EventPacketArtifact_register);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketArtifactRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for EventPacketArtifact.register. */
+export function useCreateEventPacketArtifact() {
+  const mutate = useMutation(api.mutations.EventPacketArtifact_createViaRegister);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketArtifactRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for EventPacketIssue. */
 export function useListEventPacketIssue() {
   return useQuery(api.queries.listEventPacketIssue);
@@ -4073,6 +4121,27 @@ export function useGetEventPacketResolution(id: string | "skip") {
   return useQuery(api.queries.getEventPacketResolution, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for EventPacketResolution.record. */
+export function useEventPacketResolutionRecord() {
+  const mutate = useMutation(api.mutations.EventPacketResolution_record);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketResolutionRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for EventPacketResolution.record. */
+export function useCreateEventPacketResolution() {
+  const mutate = useMutation(api.mutations.EventPacketResolution_createViaRecord);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketResolutionRecordParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for EventPacketRevision. */
 export function useListEventPacketRevision() {
   return useQuery(api.queries.listEventPacketRevision);
@@ -4081,6 +4150,47 @@ export function useListEventPacketRevision() {
 /** Reactive get-by-id for EventPacketRevision. Pass "skip" to suspend. */
 export function useGetEventPacketRevision(id: string | "skip") {
   return useQuery(api.queries.getEventPacketRevision, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for EventPacketRevision.capture. */
+export function useEventPacketRevisionCapture() {
+  const mutate = useMutation(api.mutations.EventPacketRevision_capture);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketRevisionCaptureParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventPacketRevision.reinstate. */
+export function useEventPacketRevisionReinstate() {
+  const mutate = useMutation(api.mutations.EventPacketRevision_reinstate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketRevisionReinstateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventPacketRevision.supersede. */
+export function useEventPacketRevisionSupersede() {
+  const mutate = useMutation(api.mutations.EventPacketRevision_supersede);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketRevisionSupersedeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for EventPacketRevision.capture. */
+export function useCreateEventPacketRevision() {
+  const mutate = useMutation(api.mutations.EventPacketRevision_createViaCapture);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketRevisionCaptureParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
 }
 
 /** Reactive list for EventStaffNeed. */
@@ -11400,4 +11510,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1212 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1222 as const;

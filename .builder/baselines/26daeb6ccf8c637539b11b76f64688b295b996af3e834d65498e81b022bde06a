@@ -6031,7 +6031,7 @@ export const listEventPacketArtifact = query({
   handler: async (ctx) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packetArtifactRead", "EventPacketArtifact", () => checkRole(user, "eventPacketSeamOnly"))) return [];
+    if (!__allowsRead("packetArtifactRead", "EventPacketArtifact", () => checkRole(user, "manageAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("eventPacketArtifacts").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
@@ -6045,7 +6045,7 @@ export const getEventPacketArtifact = query({
   handler: async (ctx, { id }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packetArtifactRead", "EventPacketArtifact", () => checkRole(user, "eventPacketSeamOnly"))) return null;
+    if (!__allowsRead("packetArtifactRead", "EventPacketArtifact", () => checkRole(user, "manageAccess"))) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (doc && (doc as any).tenantId !== __tenant) return null;
@@ -6062,7 +6062,7 @@ export const listEventPacketArtifactByTenantId = query({
   handler: async (ctx, { tenantId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packetArtifactRead", "EventPacketArtifact", () => checkRole(user, "eventPacketSeamOnly"))) return [];
+    if (!__allowsRead("packetArtifactRead", "EventPacketArtifact", () => checkRole(user, "manageAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("eventPacketArtifacts").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
@@ -6077,7 +6077,7 @@ export const listEventPacketArtifactByEventId = query({
   handler: async (ctx, { eventId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packetArtifactRead", "EventPacketArtifact", () => checkRole(user, "eventPacketSeamOnly"))) return [];
+    if (!__allowsRead("packetArtifactRead", "EventPacketArtifact", () => checkRole(user, "manageAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("eventPacketArtifacts").withIndex("by_eventId", (q) => q.eq("eventId", eventId)).collect();
@@ -6093,7 +6093,7 @@ export const listEventPacketArtifactByFingerprint = query({
   handler: async (ctx, { fingerprint }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packetArtifactRead", "EventPacketArtifact", () => checkRole(user, "eventPacketSeamOnly"))) return [];
+    if (!__allowsRead("packetArtifactRead", "EventPacketArtifact", () => checkRole(user, "manageAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("eventPacketArtifacts").withIndex("by_fingerprint", (q) => q.eq("fingerprint", fingerprint)).collect();
@@ -6109,7 +6109,7 @@ export const listEventPacketArtifactByStorageId = query({
   handler: async (ctx, { storageId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packetArtifactRead", "EventPacketArtifact", () => checkRole(user, "eventPacketSeamOnly"))) return [];
+    if (!__allowsRead("packetArtifactRead", "EventPacketArtifact", () => checkRole(user, "manageAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("eventPacketArtifacts").withIndex("by_storageId", (q) => q.eq("storageId", storageId)).collect();
@@ -6187,7 +6187,7 @@ export const listEventPacketResolution = query({
   handler: async (ctx) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packetResolutionRead", "EventPacketResolution", () => checkRole(user, "eventPacketSeamOnly"))) return [];
+    if (!__allowsRead("packetResolutionRead", "EventPacketResolution", () => checkRole(user, "manageAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("eventPacketResolutions").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     const __plainRows = rows;
@@ -6200,7 +6200,7 @@ export const getEventPacketResolution = query({
   handler: async (ctx, { id }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packetResolutionRead", "EventPacketResolution", () => checkRole(user, "eventPacketSeamOnly"))) return null;
+    if (!__allowsRead("packetResolutionRead", "EventPacketResolution", () => checkRole(user, "manageAccess"))) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (doc && (doc as any).tenantId !== __tenant) return null;
@@ -6216,7 +6216,7 @@ export const listEventPacketResolutionByTenantId = query({
   handler: async (ctx, { tenantId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packetResolutionRead", "EventPacketResolution", () => checkRole(user, "eventPacketSeamOnly"))) return [];
+    if (!__allowsRead("packetResolutionRead", "EventPacketResolution", () => checkRole(user, "manageAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("eventPacketResolutions").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
@@ -6230,7 +6230,7 @@ export const listEventPacketResolutionByEventId = query({
   handler: async (ctx, { eventId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packetResolutionRead", "EventPacketResolution", () => checkRole(user, "eventPacketSeamOnly"))) return [];
+    if (!__allowsRead("packetResolutionRead", "EventPacketResolution", () => checkRole(user, "manageAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("eventPacketResolutions").withIndex("by_eventId", (q) => q.eq("eventId", eventId)).collect();
@@ -6245,7 +6245,7 @@ export const listEventPacketRevision = query({
   handler: async (ctx) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packetRevisionRead", "EventPacketRevision", () => checkRole(user, "eventPacketSeamOnly"))) return [];
+    if (!__allowsRead("packetRevisionRead", "EventPacketRevision", () => checkRole(user, "manageAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("eventPacketRevisions").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     const __plainRows = rows;
@@ -6258,7 +6258,7 @@ export const getEventPacketRevision = query({
   handler: async (ctx, { id }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packetRevisionRead", "EventPacketRevision", () => checkRole(user, "eventPacketSeamOnly"))) return null;
+    if (!__allowsRead("packetRevisionRead", "EventPacketRevision", () => checkRole(user, "manageAccess"))) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (doc && (doc as any).tenantId !== __tenant) return null;
@@ -6274,7 +6274,7 @@ export const listEventPacketRevisionByTenantId = query({
   handler: async (ctx, { tenantId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packetRevisionRead", "EventPacketRevision", () => checkRole(user, "eventPacketSeamOnly"))) return [];
+    if (!__allowsRead("packetRevisionRead", "EventPacketRevision", () => checkRole(user, "manageAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("eventPacketRevisions").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
@@ -6288,7 +6288,7 @@ export const listEventPacketRevisionByEventId = query({
   handler: async (ctx, { eventId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packetRevisionRead", "EventPacketRevision", () => checkRole(user, "eventPacketSeamOnly"))) return [];
+    if (!__allowsRead("packetRevisionRead", "EventPacketRevision", () => checkRole(user, "manageAccess"))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("eventPacketRevisions").withIndex("by_eventId", (q) => q.eq("eventId", eventId)).collect();

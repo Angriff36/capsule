@@ -1288,6 +1288,7 @@ export const EventPacketArtifactSchema = z.object({
   metadataJson: z.string().nullable().optional(),
   observationsJson: z.string().nullable().optional(),
   contextJson: z.string().nullable().optional(),
+  registeredAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1319,6 +1320,7 @@ export const EventPacketResolutionSchema = z.object({
   decidedAt: z.coerce.date().optional(),
   decisionJson: z.string().optional(),
   verificationJson: z.string().nullable().optional(),
+  recordedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1336,6 +1338,7 @@ export const EventPacketRevisionSchema = z.object({
   stage: z.string().optional(),
   createdBy: z.string().optional(),
   supersededBy: z.string().nullable().optional(),
+  printedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -6101,6 +6104,71 @@ export const EventLayoutSectionUpdateParamsSchema = z.object({
 });
 
 export type EventLayoutSectionUpdateParams = z.infer<typeof EventLayoutSectionUpdateParamsSchema>;
+
+// Command: deactivate on EventPacketArtifact
+export const EventPacketArtifactDeactivateParamsSchema = z.object({
+  contextJson: z.string(),
+});
+
+export type EventPacketArtifactDeactivateParams = z.infer<typeof EventPacketArtifactDeactivateParamsSchema>;
+
+// Command: recordEvidence on EventPacketArtifact
+export const EventPacketArtifactRecordEvidenceParamsSchema = z.object({
+  metadataJson: z.string(),
+  observationsJson: z.string(),
+  contextJson: z.string(),
+});
+
+export type EventPacketArtifactRecordEvidenceParams = z.infer<typeof EventPacketArtifactRecordEvidenceParamsSchema>;
+
+// Command: register on EventPacketArtifact
+export const EventPacketArtifactRegisterParamsSchema = z.object({
+  eventId: z.string().min(1),
+  fingerprint: z.string(),
+  storageId: z.string(),
+  purpose: z.string(),
+  name: z.string(),
+  mimeType: z.string(),
+  byteSize: z.number().int(),
+  contextJson: z.string().optional(),
+});
+
+export type EventPacketArtifactRegisterParams = z.infer<typeof EventPacketArtifactRegisterParamsSchema>;
+
+// Command: record on EventPacketResolution
+export const EventPacketResolutionRecordParamsSchema = z.object({
+  eventId: z.string().min(1),
+  decisionId: z.string(),
+  issueKey: z.string(),
+  decidedAt: z.coerce.date(),
+  decisionJson: z.string(),
+  verificationJson: z.string().optional(),
+});
+
+export type EventPacketResolutionRecordParams = z.infer<typeof EventPacketResolutionRecordParamsSchema>;
+
+// Command: capture on EventPacketRevision
+export const EventPacketRevisionCaptureParamsSchema = z.object({
+  eventId: z.string().min(1),
+  snapshotFingerprint: z.string(),
+  pdfStorageId: z.string(),
+  snapshotStorageId: z.string(),
+  stage: z.string(),
+});
+
+export type EventPacketRevisionCaptureParams = z.infer<typeof EventPacketRevisionCaptureParamsSchema>;
+
+// Command: reinstate on EventPacketRevision
+export const EventPacketRevisionReinstateParamsSchema = z.object({});
+
+export type EventPacketRevisionReinstateParams = z.infer<typeof EventPacketRevisionReinstateParamsSchema>;
+
+// Command: supersede on EventPacketRevision
+export const EventPacketRevisionSupersedeParamsSchema = z.object({
+  by: z.string(),
+});
+
+export type EventPacketRevisionSupersedeParams = z.infer<typeof EventPacketRevisionSupersedeParamsSchema>;
 
 // Command: applyApprovedShiftSwap on EventStaffNeed
 export const EventStaffNeedApplyApprovedShiftSwapParamsSchema = z.object({
