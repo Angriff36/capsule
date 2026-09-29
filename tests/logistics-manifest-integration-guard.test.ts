@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
-  inspectLogisticsManifestIntegration,
-  inspectLogisticsSource,
-} from "../scripts/check-logistics-manifest-integration";
+  inspectManifestIntegration,
+  inspectManifestSource,
+} from "../scripts/check-manifest-integration";
+
+const inspectLogisticsManifestIntegration = () =>
+  inspectManifestIntegration("logistics");
+const inspectLogisticsSource = (file: string, source: string) =>
+  inspectManifestSource("logistics", file, source);
 
 describe("Logistics Manifest integration guard", () => {
   it("keeps current authored logistics integration on approved generated surfaces", () => {

@@ -41,7 +41,8 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
   timestamps
   versionProperty version: number
 
-  property required proposalId: uuid
+  // A line belongs to the proposal it was added to (addLine); lines never move.
+  property readonly required proposalId: uuid
   property required description: string = ""
   property required pricingBasis: PricingBasis = "flat"
   // Sell price the client sees. For `percentage` this is a percent 0-100.
