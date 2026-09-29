@@ -22,6 +22,7 @@ import {
   type PackRentalInput,
   type PackRuleInput,
 } from "../../src/lib/packRules";
+import { unresolvedReasons } from "../../src/lib/packReadiness";
 import { api } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
@@ -36,6 +37,10 @@ const PACK_WRITE_ROLES = new Set([
   "event_manager", "inventory_manager", "logistics_manager",
   "workforce_manager", "finance_manager", "admin", "owner", "system",
 ]);
+
+export function canWritePackLists(role: string): boolean {
+  return PACK_WRITE_ROLES.has(role);
+}
 
 const LIVE_LIST = new Set(["draft", "packing", "packed", "loaded"]);
 
@@ -295,21 +300,6 @@ export function packFactEventId(event: {
   return typeof id === "string" && id.length > 0 ? (id as Id<"events">) : null;
 }
 
-/** Why a line keeps the list from being packed, or null when it is fine. */
-export function unresolvedReason(row: Pick<Doc<"packListItems">,
-  "description" | "status" | "sentInstead" | "excludedAt" | "replacementDescription" |
-  "coveredBy" | "requiredCapability" | "deletedAt" | "retiredAt">): string | null {
-  if (row.deletedAt != null || row.retiredAt != null) return null;
-  const covered = (row.replacementDescription ?? "").trim().length > 0 || row.coveredBy != null;
-  if (row.excludedAt != null)
-    return row.requiredCapability === true && !covered
-      ? `"${row.description}" was left off but it is a must-have. Say what stands in for it or who brings it.`
-      : null;
-  if (row.status === "missing" && (row.sentInstead ?? "").trim().length === 0)
-    return `"${row.description}" is marked missing. Record what went instead, or leave it off with a reason.`;
-  return null;
-}
-
 /** PackList.markPacked callback: refuse while a missing or must-have line
  * has nothing covering it (AC-527/AC-539). Names every such line. */
 export async function validatePackReadiness(
@@ -320,10 +310,7 @@ export async function validatePackReadiness(
   if (!list) return;
   const items = await ctx.db.query("packListItems")
     .withIndex("by_packListId", (q) => q.eq("packListId", packListId)).collect();
-  const reasons = items
-    .filter((row) => row.tenantId === list.tenantId)
-    .map(unresolvedReason)
-    .filter((reason): reason is string => reason != null);
+  const reasons = unresolvedReasons(items.filter((row) => row.tenantId === list.tenantId));
   if (reasons.length === 0) return;
   throw new ConvexError(`This pack list can't be marked packed yet. ${reasons.join(" ")}`);
 }

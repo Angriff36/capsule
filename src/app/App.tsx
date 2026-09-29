@@ -215,6 +215,11 @@ const PackListDetailPage = lazy(() =>
     default: module.PackListDetailPage,
   })),
 );
+const PackRulesPage = lazy(() =>
+  import("../features/logistics/PackRulesPage").then((module) => ({
+    default: module.PackRulesPage,
+  })),
+);
 const ServiceStyleKitsPage = lazy(() =>
   import("../features/logistics/ServiceStyleKitsPage").then((module) => ({
     default: module.ServiceStyleKitsPage,
@@ -1054,6 +1059,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <ServiceStyleKitsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/logistics/pack-rules"
+              element={
+                <SupplyRoute>
+                  <PackRulesPage />
                 </SupplyRoute>
               }
             />

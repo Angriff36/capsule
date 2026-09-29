@@ -7,6 +7,7 @@ export interface KitLine {
   description: string;
   baseQuantity: number;
   guestsPerUnit?: number | null;
+  sparePercent?: number | null;
   unit: string;
   note?: string | null;
   sortOrder?: number | null;
@@ -17,7 +18,8 @@ export interface KitLine {
 function quantityRule(line: KitLine): string {
   const base = `${line.baseQuantity} ${line.unit}`;
   if (line.guestsPerUnit == null) return base;
-  const scaled = `1 per ${line.guestsPerUnit} guests`;
+  const spare = line.sparePercent ? ` +${line.sparePercent}% spare` : "";
+  const scaled = `1 per ${line.guestsPerUnit} guests${spare}`;
   return line.baseQuantity > 0 ? `${base} + ${scaled}` : scaled;
 }
 

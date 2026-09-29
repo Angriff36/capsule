@@ -13,7 +13,9 @@ import {
   usePackListDispatch,
   usePackListItemAdjustQuantity,
   usePackListItemAnnotate,
+  usePackListItemExclude,
   usePackListItemRemove,
+  usePackListItemRestoreExcluded,
   usePackListApplyServiceStyleKit,
   usePackListRequestAssistance,
   usePackListResolveAssistance,
@@ -46,7 +48,16 @@ import { PackListItemTable } from "./PackListItemTable";
 import { PackListKitAssistBar } from "./PackListKitAssistBar";
 import { PACK_LIST_UNITS } from "./packListUnits";
 import { useActionNotice } from "../../ui/action-result";
-import { useApplyPackTemplate } from "../../lib/safeMaterialization";
+import {
+  useApplyPackTemplate,
+  useRefreshPackRules,
+} from "../../lib/safeMaterialization";
+import { PackReadinessNotice } from "./PackReadinessNotice";
+import { PackTemplatePreview } from "./PackTemplatePreview";
+import {
+  parseTemplateLines,
+  previewTemplateApplication,
+} from "../../lib/packTemplateLines";
 import {
   beginPendingOperation,
   confirmPendingOperation,
@@ -55,8 +66,13 @@ import {
 const policy = new LogisticsLifecyclePolicy();
 
 // Generated list hooks return `any`; this summary type keeps template handling checked.
+type TemplateId = NonNullable<
+  Parameters<ReturnType<typeof useApplyPackTemplate>>[0]["packListTemplateId"]
+>;
+
 type TemplateSummary = {
-  _id: string;
+  _id: TemplateId;
+  version: number;
   name: string;
   items: string;
   status: string;
@@ -79,6 +95,9 @@ export function PackListDetailPage() {
   const templates = useListPackListTemplate();
   const adjustQuantity = usePackListItemAdjustQuantity();
   const annotateItem = usePackListItemAnnotate();
+  const excludeItem = usePackListItemExclude();
+  const restoreExcluded = usePackListItemRestoreExcluded();
+  const refreshPackRules = useRefreshPackRules();
   const removeItem = usePackListItemRemove();
   const applyKit = usePackListApplyServiceStyleKit();
   const requestAssistance = usePackListRequestAssistance();
@@ -96,6 +115,9 @@ export function PackListDetailPage() {
   const cancel = usePackListCancel();
   const [showAdd, setShowAdd] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [previewTemplateId, setPreviewTemplateId] = useState<string | null>(
+    null,
+  );
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [failureItemId, setFailureItemId] = useState<string | null>(null);
@@ -111,6 +133,7 @@ export function PackListDetailPage() {
   const selectableItems = (items ?? []).filter(
     (item) =>
       item.deletedAt == null &&
+      item.retiredAt == null &&
       item.packListId === packListId &&
       itemBulkable(item),
   );
@@ -149,8 +172,13 @@ export function PackListDetailPage() {
     );
   }
 
+  // A generated line nothing asks for any more stays in the data (it comes
+  // back if its source does) but not on the sheet.
   const listItems = (items ?? []).filter(
-    (item) => item.deletedAt == null && item.packListId === packList._id,
+    (item) =>
+      item.deletedAt == null &&
+      item.packListId === packList._id &&
+      item.retiredAt == null,
   );
   const eventTitle =
     events?.find((event) => event._id === packList.eventId)?.title ??
@@ -227,41 +255,8 @@ export function PackListDetailPage() {
     String(packList.status) !== "dispatched" &&
     String(packList.status) !== "cancelled";
 
-  const parseTemplateItems = (
-    raw: string | null | undefined,
-  ): { description: string; requiredQuantity: number; unit: string }[] => {
-    if (!raw) return [];
-    try {
-      const parsed = JSON.parse(raw) as unknown;
-      if (!Array.isArray(parsed)) return [];
-      return parsed
-        .filter(
-          (
-            it,
-          ): it is {
-            description: string;
-            requiredQuantity: number;
-            unit: string;
-          } =>
-            typeof it === "object" &&
-            it !== null &&
-            typeof (it as { description: unknown }).description === "string" &&
-            typeof (it as { requiredQuantity: unknown }).requiredQuantity ===
-              "number",
-        )
-        .map((it) => ({
-          description: it.description,
-          requiredQuantity: it.requiredQuantity,
-          unit: PACK_LIST_UNITS.includes(
-            it.unit as (typeof PACK_LIST_UNITS)[number],
-          )
-            ? it.unit
-            : "each",
-        }));
-    } catch {
-      return [];
-    }
-  };
+  const parseTemplateItems = (raw: string | null | undefined) =>
+    parseTemplateLines(raw, PACK_LIST_UNITS);
 
   // A template "matches" the event when every dimension it scopes is satisfied
   // (null dimension = unconstrained). Used only to badge suggestions; the
@@ -281,17 +276,30 @@ export function PackListDetailPage() {
     return styleOk && occasionOk && minOk && maxOk;
   };
 
+  const templatePreviewRows = (template: TemplateSummary) =>
+    previewTemplateApplication({
+      templateId: template._id,
+      templateVersion: template.version,
+      lines: parseTemplateItems(template.items),
+      listLines: listItems,
+    });
+
   const generateFromTemplate = (template: TemplateSummary) => {
     void run(`generate:${template._id}`, async () => {
-      const lines = parseTemplateItems(template.items).filter(
-        (it) => it.description.trim() !== "" && it.requiredQuantity > 0,
+      const lines = parseTemplateItems(template.items).map(
+        ({ description, requiredQuantity, unit }) => ({
+          description,
+          requiredQuantity,
+          unit,
+        }),
       );
       if (lines.length === 0) {
         throw new Error("This template has no valid items to generate.");
       }
-      const scope = `pack-template:${packList._id}:${template._id}`;
+      const scope = `pack-template:${packList._id}:${template._id}:${template.version}`;
       const pending = beginPendingOperation(scope, {
         packListId: packList._id,
+        packListTemplateId: template._id,
         items: lines,
       });
       const result = await applyPackTemplate({
@@ -299,6 +307,7 @@ export function PackListDetailPage() {
         operationKey: pending.key,
       });
       confirmPendingOperation(scope);
+      setPreviewTemplateId(null);
       setShowTemplates(false);
       setNotice(
         result.recovered
@@ -463,6 +472,53 @@ export function PackListDetailPage() {
           note: values.note?.trim() || undefined,
         });
         setNotice("Note saved.");
+      });
+      return;
+    }
+    if (key === "leaveOff") {
+      const values = await prompt.askFields({
+        title: "Leave this off the truck",
+        description:
+          "The line stays on the list with your reason. For a must-have item, say what stands in for it or who brings it, or the list can't be marked packed.",
+        confirmLabel: "Leave off",
+        fields: [
+          { name: "reason", label: "Why", inputType: "text", required: true },
+          {
+            name: "replacement",
+            label: "Stand-in (optional)",
+            inputType: "text",
+            required: false,
+          },
+          {
+            name: "coveredBy",
+            label: "Who covers it",
+            required: false,
+            options: [
+              { value: "", label: "Nobody" },
+              { value: "equivalent", label: "Something else does the job" },
+              { value: "client", label: "The client brings it" },
+              { value: "vendor", label: "A vendor brings it" },
+            ],
+          },
+        ],
+      });
+      if (!values) return;
+      void run(`${item._id}:leaveOff`, async () => {
+        await excludeItem({
+          docId: item._id,
+          version: item.version,
+          reason: values.reason?.trim() ?? "",
+          replacementDescription: values.replacement?.trim() || undefined,
+          coveredBy: values.coveredBy || undefined,
+        });
+        setNotice("Left off. The reason stays on the list.");
+      });
+      return;
+    }
+    if (key === "putBack") {
+      void run(`${item._id}:putBack`, async () => {
+        await restoreExcluded({ docId: item._id, version: item.version });
+        setNotice("Back on the list.");
       });
       return;
     }
@@ -643,6 +699,23 @@ export function PackListDetailPage() {
               </button>
             </>
           ) : null}
+          {listIsLive ? (
+            <button
+              className="btn btn-ghost"
+              type="button"
+              disabled={busy != null}
+              onClick={() =>
+                void run("list:refresh", async () => {
+                  await refreshPackRules({ packListId: packList._id });
+                  setNotice(
+                    "Pack lines now match the event and the pack rules. Amounts you set by hand stay.",
+                  );
+                })
+              }
+            >
+              {busy === "list:refresh" ? "Working…" : "Update from the event"}
+            </button>
+          ) : null}
         </div>
       </header>
       <LogisticsWorkspaceNav />
@@ -653,6 +726,7 @@ export function PackListDetailPage() {
         </p>
       ) : null}
       {host}
+      {listIsLive ? <PackReadinessNotice lines={listItems} /> : null}
       {listIsLive ? (
         <PackListKitAssistBar
           serviceStyleName={serviceStyle?.name ?? null}
@@ -764,12 +838,25 @@ export function PackListDetailPage() {
                       type="button"
                       className="btn btn-primary btn-sm"
                       disabled={busy != null}
-                      onClick={() => generateFromTemplate(template)}
+                      onClick={() =>
+                        setPreviewTemplateId((current) =>
+                          current === template._id ? null : template._id,
+                        )
+                      }
                     >
-                      {busy === `generate:${template._id}`
-                        ? "Generating…"
-                        : "Generate"}
+                      Generate
                     </button>
+                    {previewTemplateId === template._id ? (
+                      <div className="w-full">
+                        <PackTemplatePreview
+                          templateName={template.name}
+                          rows={templatePreviewRows(template)}
+                          busy={busy === `generate:${template._id}`}
+                          onApply={() => generateFromTemplate(template)}
+                          onCancel={() => setPreviewTemplateId(null)}
+                        />
+                      </div>
+                    ) : null}
                   </li>
                 );
               })}

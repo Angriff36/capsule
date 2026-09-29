@@ -10,7 +10,7 @@ import {
   readMaterializationReceipt,
   writeMaterializationReceipt,
 } from "./materializationReceipt";
-import { reconcileEventPackRules } from "./packRuleReconciliation";
+import { canWritePackLists, reconcileEventPackRules } from "./packRuleReconciliation";
 
 const DRAFTABLE_EVENT_STAGES = new Set(["planning", "quote", "sales_lock"]);
 const LOGISTICS_ROLES = new Set([
@@ -148,7 +148,9 @@ export const refreshPackRules = mutation({
   handler: async (ctx, args): Promise<{ refreshed: boolean }> => {
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
-    requireRole(auth, "logisticsAccess");
+    // The same people who may change pack lines may refresh them.
+    if (!canWritePackLists(auth.role))
+      throw new ConvexError("Kitchen, logistics, event or sales staff, or a manager, can update a pack list.");
     const list = await ownedLive(ctx, args.packListId, tenantId, "PackList");
     await reconcileEventPackRules(ctx, list.eventId as Id<"events">);
     return { refreshed: true };

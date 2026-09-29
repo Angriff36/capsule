@@ -345,6 +345,17 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: ["Build a template once; new pack lists start from it."],
   },
   {
+    prefix: "/logistics/pack-rules",
+    title: "Pack rules",
+    purpose:
+      "What an event puts on its pack list: a dish's tools, what a dish note asks for, napkins per guest, flooring for a grass venue, the bar kit.",
+    steps: [
+      "Pick when the rule applies, the item, and how many. Use spare % for napkins and cups.",
+      "Mark must-haves: leaving one off a list then needs a stand-in or someone who brings it.",
+      "On a pack list, open Why under a line to see which rules and facts set its amount.",
+    ],
+  },
+  {
     prefix: "/logistics/style-kits",
     title: "Service style kits",
     purpose:

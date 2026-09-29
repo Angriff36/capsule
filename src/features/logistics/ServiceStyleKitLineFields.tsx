@@ -4,6 +4,7 @@ export interface KitLineDraft {
   description: string;
   baseQuantity: string;
   guestsPerUnit: string;
+  sparePercent: string;
   unit: string;
   note: string;
 }
@@ -12,6 +13,7 @@ export const EMPTY_KIT_LINE_DRAFT: KitLineDraft = {
   description: "",
   baseQuantity: "1",
   guestsPerUnit: "",
+  sparePercent: "",
   unit: "each",
   note: "",
 };
@@ -63,6 +65,19 @@ export function ServiceStyleKitLineFields({
           placeholder="e.g. 25"
           disabled={disabled}
           onChange={(e) => onChange({ guestsPerUnit: e.target.value })}
+        />
+      </label>
+      <label className="field-label">
+        <span>Spare % on the guest part (optional)</span>
+        <input
+          className="input"
+          type="number"
+          min={0}
+          step={1}
+          value={draft.sparePercent}
+          placeholder="e.g. 10"
+          disabled={disabled}
+          onChange={(e) => onChange({ sparePercent: e.target.value })}
         />
       </label>
       <label className="field-label">

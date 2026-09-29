@@ -5,8 +5,10 @@ import {
   packingItemDescription,
   packingAssociationMissing,
 } from "../../lib/packingDisplay";
+import { PackLineWhy } from "./PackLineWhy";
+import type { PackLineFacts } from "./packLineExplanation";
 
-interface PackListItemRow {
+interface PackListItemRow extends PackLineFacts {
   _id: string;
   description: string;
   note?: string | null;
@@ -144,6 +146,7 @@ export function PackListItemTable({
                     Sent instead: {item.sentInstead}
                   </small>
                 ) : null}
+                <PackLineWhy line={item} />
                 {failedItem?.id === item._id ? (
                   <small className="block text-danger" role="alert">
                     {failedItem.message}
@@ -204,6 +207,18 @@ export function PackListItemTable({
                         onClick={() => onInvokeItem(item, "note")}
                       >
                         {item.note ? "Edit note" : "Note"}
+                      </button>
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        disabled={busy != null}
+                        onClick={() =>
+                          onInvokeItem(
+                            item,
+                            item.excludedAt != null ? "putBack" : "leaveOff",
+                          )
+                        }
+                      >
+                        {item.excludedAt != null ? "Put back" : "Leave off"}
                       </button>
                       <button
                         className="btn btn-ghost btn-sm"
