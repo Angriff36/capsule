@@ -485,6 +485,9 @@ import {
   PaymentStageClientMergeParamsSchema,
   PaymentUpdateProviderTransactionIdsParamsSchema,
   PaymentVerifyReconciliationParamsSchema,
+  PayrollExportRecordAcknowledgeParamsSchema,
+  PayrollExportRecordRecordParamsSchema,
+  PayrollExportRecordRejectParamsSchema,
   PayrollInputFinalizeParamsSchema,
   PayrollInputMarkVoidedParamsSchema,
   PayrollInputPrepareParamsSchema,
@@ -7443,6 +7446,57 @@ export function useCreatePaymentMethod() {
   };
 }
 
+/** Reactive list for PayrollExportRecord. */
+export function useListPayrollExportRecord() {
+  return useQuery(api.queries.listPayrollExportRecord);
+}
+
+/** Reactive get-by-id for PayrollExportRecord. Pass "skip" to suspend. */
+export function useGetPayrollExportRecord(id: string | "skip") {
+  return useQuery(api.queries.getPayrollExportRecord, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for PayrollExportRecord.acknowledge. */
+export function usePayrollExportRecordAcknowledge() {
+  const mutate = useMutation(api.mutations.PayrollExportRecord_acknowledge);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PayrollExportRecordAcknowledgeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PayrollExportRecord.record. */
+export function usePayrollExportRecordRecord() {
+  const mutate = useMutation(api.mutations.PayrollExportRecord_record);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PayrollExportRecordRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PayrollExportRecord.reject. */
+export function usePayrollExportRecordReject() {
+  const mutate = useMutation(api.mutations.PayrollExportRecord_reject);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PayrollExportRecordRejectParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for PayrollExportRecord.record. */
+export function useCreatePayrollExportRecord() {
+  const mutate = useMutation(api.mutations.PayrollExportRecord_createViaRecord);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = PayrollExportRecordRecordParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for PayrollInput. */
 export function useListPayrollInput() {
   return useQuery(api.queries.listPayrollInput);
@@ -11979,4 +12033,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1269 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1275 as const;

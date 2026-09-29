@@ -22,6 +22,8 @@ export type EventLaborSummary = LaborSummaryBase & {
   scheduledMinutes: number;
   scheduledCost: number;
   scheduledShiftCount: number;
+  unpricedScheduledMinutes: number;
+  varianceCost: number;
 };
 
 export type PersonPeriodLaborSummary = LaborSummaryBase & {
@@ -31,6 +33,8 @@ export type PersonPeriodLaborSummary = LaborSummaryBase & {
   approvedMinutes: number;
   approvedOvertimeMinutes: number;
   approvedCount: number;
+  /** The approved entries in the total; the payroll input names them. */
+  approvedTimeRecordIds: string[];
   waitingApprovalCount: number;
 };
 

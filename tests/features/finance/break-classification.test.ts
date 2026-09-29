@@ -72,6 +72,7 @@ describe("break classification", () => {
       overtimeMinutes: 0,
       approvedCount: 1,
       waitingApprovalCount: 1,
+      approvedIds: [],
     });
     const document = buildPayrollExport({
       processor: "gusto",

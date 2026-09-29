@@ -163,6 +163,38 @@ export async function validateTimeRecordClockIn(
     );
 }
 
+/**
+ * PL-PAYROLL (AC-627): a payroll input made from time entries names them,
+ * and each one must be this person's approved entry in this workspace and
+ * not already in another live payroll input - so approved time is paid once.
+ */
+export async function validatePayrollInputSources(
+  ctx: MutationCtx,
+  inputId: Id<"payrollInputs">,
+): Promise<void> {
+  const input = await ctx.db.get(inputId);
+  const ids = input?.sourceTimeRecordIds ?? [];
+  if (!input || ids.length === 0) return;
+  for (const id of ids) {
+    const record = await ctx.db.get(id as Id<"timeRecords">).catch(() => null);
+    if (!record || record.tenantId !== input.tenantId || record.deletedAt != null ||
+      record.personId !== input.personId || record.approvedAt == null)
+      throw new ConvexError(
+        "One of these time entries is not an approved entry for this person. Refresh and try again.",
+      );
+  }
+  const others = await ctx.db.query("payrollInputs")
+    .withIndex("by_personId", (q) => q.eq("personId", input.personId)).collect();
+  const taken = others.find((row) => row._id !== inputId &&
+    row.tenantId === input.tenantId && row.deletedAt == null &&
+    row.status !== "voided" &&
+    (row.sourceTimeRecordIds ?? []).some((id: string) => ids.includes(id)));
+  if (taken)
+    throw new ConvexError(
+      `Some of ${await personName(ctx, input.personId as Id<"people">)}'s time is already in another payroll input. Void that one first, or leave these entries out.`,
+    );
+}
+
 /** Taking or being given a spot takes the person off its waiting list. */
 export async function placeFromWaitlist(
   ctx: MutationCtx,

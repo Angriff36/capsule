@@ -86,6 +86,39 @@ export type PayrollExportReceipt = {
   status: string;
 };
 
+const localDate = (at: number) => {
+  const date = new Date(at);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+};
+
+/**
+ * Whether an approved entry has gone to payroll: the latest receipt the
+ * provider did not reject for this person and a period holding its day.
+ */
+export function payrollInclusionLabel(
+  record: PayTimeRecord,
+  receipts: readonly PayrollExportReceipt[],
+): string | null {
+  if (!isApprovedTime(record)) return null;
+  const day = localDate(num(record.clockInAt));
+  const sent = receipts
+    .filter((receipt) => {
+      const [personId, start, end] = receipt.periodKey.split("|");
+      return (
+        personId === String(record.personId) &&
+        receipt.status !== "rejected" &&
+        !!start &&
+        !!end &&
+        start <= day &&
+        day <= end
+      );
+    })
+    .sort((a, b) => b.revision - a.revision)[0];
+  return sent
+    ? `Sent to payroll (revision ${sent.revision}${sent.status === "acknowledged" ? ", accepted" : ""})`
+    : "Not sent to payroll yet";
+}
+
 export type PayrollRevisionPlan = {
   personId: string;
   periodKey: string;

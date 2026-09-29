@@ -26,6 +26,7 @@ import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import type { Doc } from "./_generated/dataModel";
+import { plannedVsActualLabor } from "../src/features/finance/laborCost";
 import {
   approvedPayroll,
   attendanceAlerts as findAttendanceAlerts,
@@ -79,6 +80,10 @@ type EventLaborSummary = LaborSummary & {
   scheduledMinutes: number;
   scheduledCost: number;
   scheduledShiftCount: number;
+  /** Scheduled minutes of people with no rate (not priced). */
+  unpricedScheduledMinutes: number;
+  /** Clocked cost minus scheduled cost (priced minutes). */
+  varianceCost: number;
 };
 
 function personName(person: Doc<"people"> | undefined, id: string): string {
@@ -160,8 +165,6 @@ async function tenantTimeRecords(
     .withIndex("by_tenantId", (q: any) => q.eq("tenantId", tenantId))
     .collect();
 }
-
-const SCHEDULED_SHIFT_STATUSES = new Set(["scheduled", "started", "completed"]);
 
 /**
  * PL-TIME (AC-509): late clock-ins, people not in yet, no-shows, entries
@@ -246,34 +249,26 @@ export const eventLaborSummary = query({
     // Scheduled-labor forecast: committed shifts × person rates. This is the
     // pre-event labor picture (the worksheet's "Scheduled Cost") — clocked
     // time replaces it as reality once people punch in.
-    let scheduledMinutes = 0;
-    let scheduledCost = 0;
-    let scheduledShiftCount = 0;
-    for (const shift of shifts) {
-      if (
-        shift.deletedAt != null ||
-        String(shift.eventId ?? "") !== eventId ||
-        !SCHEDULED_SHIFT_STATUSES.has(String(shift.status)) ||
-        shift.startsAt == null ||
-        shift.endsAt == null ||
-        shift.endsAt <= shift.startsAt
-      ) {
-        continue;
-      }
-      const minutes = (shift.endsAt - shift.startsAt) / 60_000;
-      scheduledMinutes += minutes;
-      scheduledShiftCount += 1;
-      const rate = people.get(String(shift.personId))?.hourlyRate;
-      if (typeof rate === "number" && Number.isFinite(rate) && rate >= 0) {
-        scheduledCost += (minutes / 60) * rate;
-      }
-    }
+    // Same rule as src/features/finance/laborCost (AC-510).
+    const labor = plannedVsActualLabor({
+      eventId,
+      shifts,
+      records: matching,
+      people: new Map(
+        [...people.entries()].map(([id, person]) => [
+          id,
+          { name: personName(person, id), hourlyRate: person.hourlyRate },
+        ]),
+      ),
+    });
 
     return {
       ...summarize(matching, people),
-      scheduledMinutes: Math.round(scheduledMinutes),
-      scheduledCost: Math.round((scheduledCost + Number.EPSILON) * 100) / 100,
-      scheduledShiftCount,
+      scheduledMinutes: labor.plannedMinutes,
+      scheduledCost: labor.plannedCost,
+      scheduledShiftCount: labor.plannedShiftCount,
+      unpricedScheduledMinutes: labor.unpricedPlannedMinutes,
+      varianceCost: labor.varianceCost,
     };
   },
 });
@@ -300,6 +295,7 @@ export const personPeriodLaborSummary = query({
         approvedOvertimeMinutes: number;
         approvedCount: number;
         waitingApprovalCount: number;
+        approvedTimeRecordIds: string[];
       })
     | null
   > => {
@@ -346,6 +342,7 @@ export const personPeriodLaborSummary = query({
       approvedMinutes: approved.approvedMinutes,
       approvedOvertimeMinutes: approved.overtimeMinutes,
       approvedCount: approved.approvedCount,
+      approvedTimeRecordIds: approved.approvedIds,
       waitingApprovalCount: approved.waitingApprovalCount,
     };
   },

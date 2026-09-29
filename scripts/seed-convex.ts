@@ -464,11 +464,16 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.PaymentMethod_createViaRegister, { "clientId": "clientId-payment-method-1", "methodType": "demo-methodType-1", "provider": "demo-provider-1", "lastFour": "demo-lastFour-1", "isDefault": false, "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.PaymentMethod_createViaRegister, { "clientId": "clientId-payment-method-2", "methodType": "demo-methodType-2", "provider": "demo-provider-2", "lastFour": "demo-lastFour-2", "isDefault": false, "notes": "demo-notes-2" } as any);
+  // PayrollExportRecord → api.mutations.PayrollExportRecord_createViaRecord
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PayrollExportRecord_createViaRecord, { "personId": "personId-payroll-export-record-1", "periodKey": "demo-periodKey-1", "periodStart": "demo-periodStart-1", "periodEnd": "demo-periodEnd-1", "processor": "demo-processor-1", "revision": 1, "regularMinutes": 1, "overtimeMinutes": 1, "totalMinutes": 1, "previousTotalMinutes": 1, "deltaMinutes": 1 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PayrollExportRecord_createViaRecord, { "personId": "personId-payroll-export-record-2", "periodKey": "demo-periodKey-2", "periodStart": "demo-periodStart-2", "periodEnd": "demo-periodEnd-2", "processor": "demo-processor-2", "revision": 2, "regularMinutes": 2, "overtimeMinutes": 2, "totalMinutes": 2, "previousTotalMinutes": 2, "deltaMinutes": 2 } as any);
   // PayrollInput → api.mutations.PayrollInput_createViaPrepare
   rowsAttempted += 1;
-  await client.mutation(api.mutations.PayrollInput_createViaPrepare, { "personId": "personId-payroll-input-1", "periodStart": 1767268800000, "periodEnd": 1767268800000, "eventId": "eventId-payroll-input-1", "shiftId": "shiftId-payroll-input-1", "regularMinutes": 1, "overtimeMinutes": 1, "totalMinutes": 1, "hourlyRate": 1, "overtimeRate": 1, "grossAmount": 1, "notes": "demo-notes-1" } as any);
+  await client.mutation(api.mutations.PayrollInput_createViaPrepare, { "personId": "personId-payroll-input-1", "periodStart": 1767268800000, "periodEnd": 1767268800000, "eventId": "eventId-payroll-input-1", "shiftId": "shiftId-payroll-input-1", "regularMinutes": 1, "overtimeMinutes": 1, "totalMinutes": 1, "hourlyRate": 1, "overtimeRate": 1, "grossAmount": 1, "notes": "demo-notes-1", "sourceTimeRecordIds": "demo-sourceTimeRecordIds-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.PayrollInput_createViaPrepare, { "personId": "personId-payroll-input-2", "periodStart": 1767355200000, "periodEnd": 1767355200000, "eventId": "eventId-payroll-input-2", "shiftId": "shiftId-payroll-input-2", "regularMinutes": 2, "overtimeMinutes": 2, "totalMinutes": 2, "hourlyRate": 2, "overtimeRate": 2, "grossAmount": 2, "notes": "demo-notes-2" } as any);
+  await client.mutation(api.mutations.PayrollInput_createViaPrepare, { "personId": "personId-payroll-input-2", "periodStart": 1767355200000, "periodEnd": 1767355200000, "eventId": "eventId-payroll-input-2", "shiftId": "shiftId-payroll-input-2", "regularMinutes": 2, "overtimeMinutes": 2, "totalMinutes": 2, "hourlyRate": 2, "overtimeRate": 2, "grossAmount": 2, "notes": "demo-notes-2", "sourceTimeRecordIds": "demo-sourceTimeRecordIds-2" } as any);
   // PerformanceReview → api.mutations.PerformanceReview_createViaRecord
   rowsAttempted += 1;
   await client.mutation(api.mutations.PerformanceReview_createViaRecord, { "personId": "personId-performance-review-1", "reviewerId": "reviewerId-performance-review-1", "eventId": "eventId-performance-review-1", "reviewDate": 1767268800000, "reliabilityRating": 1, "qualityRating": 1, "teamworkRating": 1, "notes": "demo-notes-1" } as any);
@@ -1318,6 +1323,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "PaymentMethod",
       "createMutation": "PaymentMethod_createViaRegister",
+      "rowCount": 2
+    },
+    {
+      "entity": "PayrollExportRecord",
+      "createMutation": "PayrollExportRecord_createViaRecord",
       "rowCount": 2
     },
     {

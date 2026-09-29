@@ -77,6 +77,8 @@ export type ApprovedPayroll = {
   overtimeMinutes: number;
   approvedCount: number;
   waitingApprovalCount: number;
+  /** The approved entries counted, so a payroll input can name them. */
+  approvedIds: string[];
 };
 
 /**
@@ -120,6 +122,9 @@ export function approvedPayroll(
     overtimeMinutes: round(overtimeMinutes),
     approvedCount: approved.length,
     waitingApprovalCount: inWindow.length - approved.length,
+    approvedIds: approved
+      .map((record) => (record._id == null ? "" : String(record._id)))
+      .filter(Boolean),
   };
 }
 

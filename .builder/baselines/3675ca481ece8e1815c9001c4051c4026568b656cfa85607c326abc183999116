@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:0469c4ed0c814a019380a73675adacc62173c22b928bf9a8d16c336b313b24e0:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:0fa9c629f23816c9e51aa47d766814b4adc281ed73c0a26bad33ba65ec930114:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e112ef70ab2634ddc76e69be97bf2cf6213bc0662e21efdb998b5fe1fecbfa5:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:425786468a2c925e4a22baf51be9695b6f09848be70c0a67ee021678166c63c5:44730f01893c2c387121f8aa1d1465975c3d70ad9d2ba6bcafc51190118cfc30:461b35052a22a3f3494612a688d5024cf608ca3f5f42e7392e2e39d0b4ae3059:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:493a6e387d93dc73ab30f1e335b014ebe877fb3cfd7bb286f12f252364e161c0:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:571c1fbbd06e6f847dc0789bb6699eef2dad5b3438eb906c97bd99975eee1572:5865118d3c2cc0441916631fed5be684f876ea34c8cc603b23d1cc192c29b379:5eede5832d56f1a6f53fff1c333df6f4f34990f8b3a29f4c007b8e1b88f8c60b:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:673eea009a24475e68b862081672cfe7f5ac7d9c5fb1cae8cd3cb4e17912765f:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:77e0d3181b4febaaa663ecdb3476b943a5aa588f20396e8243a196d12cae1e7c:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7a8de9cb59f93d64dd599f21ded09010d4de32c74d4c83100dcea9b6877fe6b0:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:946747485e83cf5d41c4c5a046fc32486ecd0f7e059812185e3b5886d06852a0:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a87caa099b219e0f859edc5be5c50d0cb367def3e8348a5e9bb406bbc8502c65:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b7a8e29fcf51b07830d4c56102194730fa51e426a43be671d6ffb18c38698087:b8371dec149afe525f389169aedf38e3953a48946523b416345e61b2ba2a9543:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c4f4847c56f2947ed5512b4e3254c848c5063e0e6d9d5f2a79578b289d098114:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccd72e1626e8659c7b43fe7ac7a3f5210245e7d32107e356d0cb3df0decf6453:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:e69aaee600e0695a11cd87fca6c72ff383f0b8c2333fd92e4ab031225acb6fef:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:f7a4e5f8e94ed6c20dd10eb865c5d62a080b7e9547387be50830d7a0511564ae:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1";
+export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:0469c4ed0c814a019380a73675adacc62173c22b928bf9a8d16c336b313b24e0:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:0fa9c629f23816c9e51aa47d766814b4adc281ed73c0a26bad33ba65ec930114:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e112ef70ab2634ddc76e69be97bf2cf6213bc0662e21efdb998b5fe1fecbfa5:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:425786468a2c925e4a22baf51be9695b6f09848be70c0a67ee021678166c63c5:44730f01893c2c387121f8aa1d1465975c3d70ad9d2ba6bcafc51190118cfc30:461b35052a22a3f3494612a688d5024cf608ca3f5f42e7392e2e39d0b4ae3059:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:493a6e387d93dc73ab30f1e335b014ebe877fb3cfd7bb286f12f252364e161c0:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:571c1fbbd06e6f847dc0789bb6699eef2dad5b3438eb906c97bd99975eee1572:5865118d3c2cc0441916631fed5be684f876ea34c8cc603b23d1cc192c29b379:5eede5832d56f1a6f53fff1c333df6f4f34990f8b3a29f4c007b8e1b88f8c60b:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:673eea009a24475e68b862081672cfe7f5ac7d9c5fb1cae8cd3cb4e17912765f:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:77e0d3181b4febaaa663ecdb3476b943a5aa588f20396e8243a196d12cae1e7c:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7a8de9cb59f93d64dd599f21ded09010d4de32c74d4c83100dcea9b6877fe6b0:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:946747485e83cf5d41c4c5a046fc32486ecd0f7e059812185e3b5886d06852a0:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a87caa099b219e0f859edc5be5c50d0cb367def3e8348a5e9bb406bbc8502c65:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b7a8e29fcf51b07830d4c56102194730fa51e426a43be671d6ffb18c38698087:b8371dec149afe525f389169aedf38e3953a48946523b416345e61b2ba2a9543:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccd72e1626e8659c7b43fe7ac7a3f5210245e7d32107e356d0cb3df0decf6453:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:e69aaee600e0695a11cd87fca6c72ff383f0b8c2333fd92e4ab031225acb6fef:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:f7a4e5f8e94ed6c20dd10eb865c5d62a080b7e9547387be50830d7a0511564ae:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -105871,6 +105871,348 @@ export const PaymentMethodStageClientMergeAction = {
   ]
 } as const;
 
+// --- PayrollExportRecord.acknowledge ---
+export interface PayrollExportRecordAcknowledgeClientInput {
+  providerReference?: string;
+}
+
+export const PayrollExportRecordAcknowledgeCapability = {
+  capabilityId: "PayrollExportRecord.acknowledge",
+  entity: "PayrollExportRecord",
+  command: "acknowledge",
+  route: "/api/manifest/PayrollExportRecord/commands/acknowledge",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodKey: string; periodStart: string; periodEnd: string; processor: string; revision: number; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; previousTotalMinutes: number | null; deltaMinutes: number; status: \"exported\" | \"acknowledged\" | \"rejected\"; exportedAt: number | null; exportedById: string | null; acknowledgedAt: number | null; providerReference: string | null; rejectedAt: number | null; rejectionReason: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["providerReference"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Finance and staffing managers may see payroll export receipts"},{"kind":"policy_denial","message":"Finance managers may update payroll export receipts"},{"kind":"policy_denial","message":"Finance managers may change payroll export receipts"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PayrollExportRecord not found"}],
+  emits: ["PayrollExportAcknowledged"],
+} as const;
+
+export type PayrollExportRecordAcknowledgeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodKey: string; periodStart: string; periodEnd: string; processor: string; revision: number; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; previousTotalMinutes: number | null; deltaMinutes: number; status: "exported" | "acknowledged" | "rejected"; exportedAt: number | null; exportedById: string | null; acknowledgedAt: number | null; providerReference: string | null; rejectedAt: number | null; rejectionReason: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PayrollExportRecord.acknowledge.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPayrollExportRecordAcknowledgeInput(client: PayrollExportRecordAcknowledgeClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PayrollExportRecord.acknowledge. */
+export const PayrollExportRecordAcknowledgeInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PayrollExportRecord.acknowledge. Not a rendered control. */
+export const PayrollExportRecordAcknowledgeAction = {
+  "exposure": "human",
+  "label": "Acknowledge",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "providerReference",
+      "label": "Provider reference",
+      "required": false
+    }
+  ],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "exported"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for PayrollExportRecord.acknowledge. */
+export const PayrollExportRecordAcknowledgeLifecycle = [
+  {
+    "property": "status",
+    "from": "exported",
+    "to": "acknowledged",
+    "proven": true
+  }
+] as const;
+
+// --- PayrollExportRecord.record ---
+export interface PayrollExportRecordRecordClientInput {
+  personId: string;
+  periodKey: string;
+  periodStart: string;
+  periodEnd: string;
+  processor: string;
+  /** Bounds: 1..∞ */
+  revision: number;
+  /** Bounds: 0..∞ */
+  regularMinutes: number;
+  /** Bounds: 0..∞ */
+  overtimeMinutes: number;
+  totalMinutes: number;
+  deltaMinutes: number;
+  previousTotalMinutes?: number;
+}
+
+export const PayrollExportRecordRecordCapability = {
+  capabilityId: "PayrollExportRecord.record",
+  entity: "PayrollExportRecord",
+  command: "record",
+  route: "/api/manifest/PayrollExportRecord/commands/record",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["personId","periodKey","periodStart","periodEnd","processor","revision","regularMinutes","overtimeMinutes","totalMinutes","deltaMinutes","previousTotalMinutes"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Finance and staffing managers may see payroll export receipts"},{"kind":"policy_denial","message":"Finance managers may update payroll export receipts"},{"kind":"policy_denial","message":"Finance managers may change payroll export receipts"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This receipt is for a different person."},{"kind":"constraint_block","message":"The export revision starts at 1."},{"kind":"constraint_block","message":"The sent minutes can't be negative, and total has to equal regular plus overtime."}],
+  emits: ["PayrollExportRecorded"],
+} as const;
+
+export type PayrollExportRecordRecordResult = { docId: string };
+
+/**
+ * Build command input for PayrollExportRecord.record.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPayrollExportRecordRecordInput(client: PayrollExportRecordRecordClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PayrollExportRecord.record. */
+export const PayrollExportRecordRecordInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PayrollExportRecord.record. Not a rendered control. */
+export const PayrollExportRecordRecordAction = {
+  "exposure": "human",
+  "label": "Record",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "personId",
+      "label": "Person id",
+      "required": true
+    },
+    {
+      "name": "periodKey",
+      "label": "Period key",
+      "required": true
+    },
+    {
+      "name": "periodStart",
+      "label": "Period start",
+      "required": true
+    },
+    {
+      "name": "periodEnd",
+      "label": "Period end",
+      "required": true
+    },
+    {
+      "name": "processor",
+      "label": "Processor",
+      "required": true
+    },
+    {
+      "name": "revision",
+      "label": "Revision",
+      "required": true
+    },
+    {
+      "name": "regularMinutes",
+      "label": "Regular minutes",
+      "required": true
+    },
+    {
+      "name": "overtimeMinutes",
+      "label": "Overtime minutes",
+      "required": true
+    },
+    {
+      "name": "totalMinutes",
+      "label": "Total minutes",
+      "required": true
+    },
+    {
+      "name": "deltaMinutes",
+      "label": "Delta minutes",
+      "required": true
+    },
+    {
+      "name": "previousTotalMinutes",
+      "label": "Previous total minutes",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- PayrollExportRecord.reject ---
+export interface PayrollExportRecordRejectClientInput {
+  reason: string;
+}
+
+export const PayrollExportRecordRejectCapability = {
+  capabilityId: "PayrollExportRecord.reject",
+  entity: "PayrollExportRecord",
+  command: "reject",
+  route: "/api/manifest/PayrollExportRecord/commands/reject",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodKey: string; periodStart: string; periodEnd: string; processor: string; revision: number; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; previousTotalMinutes: number | null; deltaMinutes: number; status: \"exported\" | \"acknowledged\" | \"rejected\"; exportedAt: number | null; exportedById: string | null; acknowledgedAt: number | null; providerReference: string | null; rejectedAt: number | null; rejectionReason: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Finance and staffing managers may see payroll export receipts"},{"kind":"policy_denial","message":"Finance managers may update payroll export receipts"},{"kind":"policy_denial","message":"Finance managers may change payroll export receipts"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Say why the payroll provider turned this down."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PayrollExportRecord not found"}],
+  emits: ["PayrollExportRejected"],
+} as const;
+
+export type PayrollExportRecordRejectResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodKey: string; periodStart: string; periodEnd: string; processor: string; revision: number; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; previousTotalMinutes: number | null; deltaMinutes: number; status: "exported" | "acknowledged" | "rejected"; exportedAt: number | null; exportedById: string | null; acknowledgedAt: number | null; providerReference: string | null; rejectedAt: number | null; rejectionReason: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PayrollExportRecord.reject.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPayrollExportRecordRejectInput(client: PayrollExportRecordRejectClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PayrollExportRecord.reject. */
+export const PayrollExportRecordRejectInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PayrollExportRecord.reject. Not a rendered control. */
+export const PayrollExportRecordRejectAction = {
+  "exposure": "human",
+  "label": "Reject",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "reason",
+      "label": "Reason",
+      "required": true
+    }
+  ],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "acknowledged",
+      "exported"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for PayrollExportRecord.reject. */
+export const PayrollExportRecordRejectLifecycle = [
+  {
+    "property": "status",
+    "from": "exported",
+    "to": "rejected",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "acknowledged",
+    "to": "rejected",
+    "proven": true
+  }
+] as const;
+
 // --- PayrollInput.finalize ---
 export type PayrollInputFinalizeClientInput = Record<string, never>;
 
@@ -105886,14 +106228,14 @@ export const PayrollInputFinalizeCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Finance managers may see payroll inputs"},{"kind":"policy_denial","message":"Finance managers may update payroll inputs"},{"kind":"policy_denial","message":"Finance managers may change payroll inputs"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PayrollInput not found"}],
   emits: ["PayrollInputFinalized"],
 } as const;
 
-export type PayrollInputFinalizeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number };
+export type PayrollInputFinalizeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PayrollInput.finalize.
@@ -106004,14 +106346,14 @@ export const PayrollInputMarkVoidedCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number }",
   clientParameterNames: ["reason"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Finance managers may see payroll inputs"},{"kind":"policy_denial","message":"Finance managers may update payroll inputs"},{"kind":"policy_denial","message":"Finance managers may change payroll inputs"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Say why you're voiding this payroll input."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PayrollInput not found"}],
   emits: ["PayrollInputVoided"],
 } as const;
 
-export type PayrollInputMarkVoidedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number };
+export type PayrollInputMarkVoidedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PayrollInput.markVoided.
@@ -106147,6 +106489,7 @@ export interface PayrollInputPrepareClientInput {
   /** Bounds: 0..∞ */
   grossAmount?: number;
   notes?: string;
+  sourceTimeRecordIds?: string[];
 }
 
 export const PayrollInputPrepareCapability = {
@@ -106162,7 +106505,7 @@ export const PayrollInputPrepareCapability = {
   acceptsIdempotencyKey: true,
   resultKind: "allocation",
   returnTsType: "{ docId: string }",
-  clientParameterNames: ["personId","periodStart","periodEnd","regularMinutes","overtimeMinutes","totalMinutes","eventId","shiftId","hourlyRate","overtimeRate","grossAmount","notes"],
+  clientParameterNames: ["personId","periodStart","periodEnd","regularMinutes","overtimeMinutes","totalMinutes","eventId","shiftId","hourlyRate","overtimeRate","grossAmount","notes","sourceTimeRecordIds"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Finance managers may see payroll inputs"},{"kind":"policy_denial","message":"Finance managers may update payroll inputs"},{"kind":"policy_denial","message":"Finance managers may change payroll inputs"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"This payroll input is for a different person. Pick the person already on this payroll input."},{"kind":"constraint_block","message":"This payroll input is for a different event. Pick the event already on this payroll input."},{"kind":"constraint_block","message":"This payroll input is for a different shift. Pick the shift already on this payroll input."},{"kind":"constraint_block","message":"This payroll input's period has to end on or after it starts."},{"kind":"constraint_block","message":"This payroll input's minutes can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This payroll input's total minutes has to equal regular plus overtime minutes."},{"kind":"constraint_block","message":"This payroll input's rate and amount fields can't be negative. Use zero or more."}],
   emits: ["PayrollInputPrepared"],
@@ -106302,6 +106645,11 @@ export const PayrollInputPrepareAction = {
     {
       "name": "notes",
       "label": "Notes",
+      "required": false
+    },
+    {
+      "name": "sourceTimeRecordIds",
+      "label": "Source time record ids",
       "required": false
     }
   ],
@@ -106694,6 +107042,20 @@ export const PersonAssignRoleInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
     "label": "related entity detail"
   },
   {
@@ -107334,6 +107696,20 @@ export const PersonChangeAddressInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.lists()",
     "readId": "PayrollInput.list",
@@ -107896,6 +108272,20 @@ export const PersonCorrectEmailInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.lists()",
     "readId": "PayrollInput.list",
@@ -108436,6 +108826,20 @@ export const PersonCorrectIdentityInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
     "label": "related entity detail"
   },
   {
@@ -108986,6 +109390,20 @@ export const PersonDeactivateInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
     "label": "related entity detail"
   },
   {
@@ -109548,6 +109966,20 @@ export const PersonHireInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
     "label": "related entity detail"
   },
   {
@@ -110242,6 +110674,20 @@ export const PersonLinkAccountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.lists()",
     "readId": "PayrollInput.list",
@@ -110778,6 +111224,20 @@ export const PersonReactivateInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
     "label": "related entity detail"
   },
   {
@@ -111334,6 +111794,20 @@ export const PersonSetEmployeeNumberInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.lists()",
     "readId": "PayrollInput.list",
@@ -111873,6 +112347,20 @@ export const PersonSetPayRateInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
     "label": "related entity detail"
   },
   {
@@ -112419,6 +112907,20 @@ export const PersonSetSchedulingHoldInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.lists()",
     "readId": "PayrollInput.list",
@@ -112961,6 +113463,20 @@ export const PersonSetSmsAlertsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.lists()",
     "readId": "PayrollInput.list",
@@ -113499,6 +114015,20 @@ export const PersonSetStaffingVendorInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
     "label": "related entity detail"
   },
   {
@@ -114046,6 +114576,20 @@ export const PersonSetWorkPreferencesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.lists()",
     "readId": "PayrollInput.list",
@@ -114589,6 +115133,20 @@ export const PersonTerminateInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
     "label": "related entity detail"
   },
   {
@@ -115152,6 +115710,20 @@ export const PersonUnlinkAccountInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.lists()",
+    "readId": "PayrollExportRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PayrollExportRecord",
+    "queryKeyHint": "queryKeys.payrollExportRecord.detail(id)",
+    "readId": "PayrollExportRecord.get",
     "label": "related entity detail"
   },
   {
@@ -162889,6 +163461,9 @@ export const ALL_CAPABILITY_IDS = [
   "PaymentMethod.register",
   "PaymentMethod.remove",
   "PaymentMethod.stageClientMerge",
+  "PayrollExportRecord.acknowledge",
+  "PayrollExportRecord.record",
+  "PayrollExportRecord.reject",
   "PayrollInput.finalize",
   "PayrollInput.markVoided",
   "PayrollInput.prepare",
@@ -163693,6 +164268,10 @@ export const ALL_READ_IDS = [
   "PaymentMethod.byTenantId",
   "PaymentMethod.get",
   "PaymentMethod.list",
+  "PayrollExportRecord.byPersonId",
+  "PayrollExportRecord.byTenantId",
+  "PayrollExportRecord.get",
+  "PayrollExportRecord.list",
   "PayrollInput.byEventId",
   "PayrollInput.byPersonId",
   "PayrollInput.byShiftId",
@@ -165540,23 +166119,35 @@ export type getPaymentMethodResult = { _id: string; _creationTime: number; tenan
 export const listPaymentMethodRead = {"entity":"PaymentMethod","readId":"PaymentMethod.list","exportName":"listPaymentMethod","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; methodType: \"card\" | \"check\" | \"cash\" | \"ach\" | \"other\"; provider: string | null; lastFour: string | null; isDefault: boolean; status: \"active\" | \"expired\" | \"invalid\" | \"fraudulent\" | \"removed\"; registeredAt: number | null; expiredAt: number | null; invalidatedAt: number | null; removedAt: number | null; notes: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listPaymentMethodResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; methodType: "card" | "check" | "cash" | "ach" | "other"; provider: string | null; lastFour: string | null; isDefault: boolean; status: "active" | "expired" | "invalid" | "fraudulent" | "removed"; registeredAt: number | null; expiredAt: number | null; invalidatedAt: number | null; removedAt: number | null; notes: string | null; createdAt: number; updatedAt: number }>;
 
-export const listPayrollInputByEventIdRead = {"entity":"PayrollInput","readId":"PayrollInput.byEventId","exportName":"listPayrollInputByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPayrollInputByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number }>;
+export const listPayrollExportRecordByPersonIdRead = {"entity":"PayrollExportRecord","readId":"PayrollExportRecord.byPersonId","exportName":"listPayrollExportRecordByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"personId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodKey: string; periodStart: string; periodEnd: string; processor: string; revision: number; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; previousTotalMinutes: number | null; deltaMinutes: number; status: \"exported\" | \"acknowledged\" | \"rejected\"; exportedAt: number | null; exportedById: string | null; acknowledgedAt: number | null; providerReference: string | null; rejectedAt: number | null; rejectionReason: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPayrollExportRecordByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodKey: string; periodStart: string; periodEnd: string; processor: string; revision: number; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; previousTotalMinutes: number | null; deltaMinutes: number; status: "exported" | "acknowledged" | "rejected"; exportedAt: number | null; exportedById: string | null; acknowledgedAt: number | null; providerReference: string | null; rejectedAt: number | null; rejectionReason: string | null; createdAt: number; updatedAt: number }>;
 
-export const listPayrollInputByPersonIdRead = {"entity":"PayrollInput","readId":"PayrollInput.byPersonId","exportName":"listPayrollInputByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"personId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPayrollInputByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number }>;
+export const listPayrollExportRecordByTenantIdRead = {"entity":"PayrollExportRecord","readId":"PayrollExportRecord.byTenantId","exportName":"listPayrollExportRecordByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodKey: string; periodStart: string; periodEnd: string; processor: string; revision: number; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; previousTotalMinutes: number | null; deltaMinutes: number; status: \"exported\" | \"acknowledged\" | \"rejected\"; exportedAt: number | null; exportedById: string | null; acknowledgedAt: number | null; providerReference: string | null; rejectedAt: number | null; rejectionReason: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPayrollExportRecordByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodKey: string; periodStart: string; periodEnd: string; processor: string; revision: number; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; previousTotalMinutes: number | null; deltaMinutes: number; status: "exported" | "acknowledged" | "rejected"; exportedAt: number | null; exportedById: string | null; acknowledgedAt: number | null; providerReference: string | null; rejectedAt: number | null; rejectionReason: string | null; createdAt: number; updatedAt: number }>;
 
-export const listPayrollInputByShiftIdRead = {"entity":"PayrollInput","readId":"PayrollInput.byShiftId","exportName":"listPayrollInputByShiftId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"shiftId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPayrollInputByShiftIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number }>;
+export const getPayrollExportRecordRead = {"entity":"PayrollExportRecord","readId":"PayrollExportRecord.get","exportName":"getPayrollExportRecord","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodKey: string; periodStart: string; periodEnd: string; processor: string; revision: number; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; previousTotalMinutes: number | null; deltaMinutes: number; status: \"exported\" | \"acknowledged\" | \"rejected\"; exportedAt: number | null; exportedById: string | null; acknowledgedAt: number | null; providerReference: string | null; rejectedAt: number | null; rejectionReason: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getPayrollExportRecordResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodKey: string; periodStart: string; periodEnd: string; processor: string; revision: number; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; previousTotalMinutes: number | null; deltaMinutes: number; status: "exported" | "acknowledged" | "rejected"; exportedAt: number | null; exportedById: string | null; acknowledgedAt: number | null; providerReference: string | null; rejectedAt: number | null; rejectionReason: string | null; createdAt: number; updatedAt: number } | null;
 
-export const listPayrollInputByTenantIdRead = {"entity":"PayrollInput","readId":"PayrollInput.byTenantId","exportName":"listPayrollInputByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPayrollInputByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number }>;
+export const listPayrollExportRecordRead = {"entity":"PayrollExportRecord","readId":"PayrollExportRecord.list","exportName":"listPayrollExportRecord","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodKey: string; periodStart: string; periodEnd: string; processor: string; revision: number; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; previousTotalMinutes: number | null; deltaMinutes: number; status: \"exported\" | \"acknowledged\" | \"rejected\"; exportedAt: number | null; exportedById: string | null; acknowledgedAt: number | null; providerReference: string | null; rejectedAt: number | null; rejectionReason: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPayrollExportRecordResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodKey: string; periodStart: string; periodEnd: string; processor: string; revision: number; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; previousTotalMinutes: number | null; deltaMinutes: number; status: "exported" | "acknowledged" | "rejected"; exportedAt: number | null; exportedById: string | null; acknowledgedAt: number | null; providerReference: string | null; rejectedAt: number | null; rejectionReason: string | null; createdAt: number; updatedAt: number }>;
 
-export const getPayrollInputRead = {"entity":"PayrollInput","readId":"PayrollInput.get","exportName":"getPayrollInput","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getPayrollInputResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number } | null;
+export const listPayrollInputByEventIdRead = {"entity":"PayrollInput","readId":"PayrollInput.byEventId","exportName":"listPayrollInputByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number }>"} as const;
+export type listPayrollInputByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number }>;
 
-export const listPayrollInputRead = {"entity":"PayrollInput","readId":"PayrollInput.list","exportName":"listPayrollInput","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPayrollInputResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number }>;
+export const listPayrollInputByPersonIdRead = {"entity":"PayrollInput","readId":"PayrollInput.byPersonId","exportName":"listPayrollInputByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"personId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number }>"} as const;
+export type listPayrollInputByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number }>;
+
+export const listPayrollInputByShiftIdRead = {"entity":"PayrollInput","readId":"PayrollInput.byShiftId","exportName":"listPayrollInputByShiftId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"shiftId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number }>"} as const;
+export type listPayrollInputByShiftIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number }>;
+
+export const listPayrollInputByTenantIdRead = {"entity":"PayrollInput","readId":"PayrollInput.byTenantId","exportName":"listPayrollInputByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number }>"} as const;
+export type listPayrollInputByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number }>;
+
+export const getPayrollInputRead = {"entity":"PayrollInput","readId":"PayrollInput.get","exportName":"getPayrollInput","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number } | null"} as const;
+export type getPayrollInputResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number } | null;
+
+export const listPayrollInputRead = {"entity":"PayrollInput","readId":"PayrollInput.list","exportName":"listPayrollInput","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number }>"} as const;
+export type listPayrollInputResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number }>;
 
 export const listPerformanceReviewByEventIdRead = {"entity":"PerformanceReview","readId":"PerformanceReview.byEventId","exportName":"listPerformanceReviewByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; reviewerId: string; eventId: string | null; reviewDate: number | null; reliabilityRating: number; qualityRating: number; teamworkRating: number; notes: string | null; recordedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listPerformanceReviewByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; reviewerId: string; eventId: string | null; reviewDate: number | null; reliabilityRating: number; qualityRating: number; teamworkRating: number; notes: string | null; recordedAt: number | null; createdAt: number; updatedAt: number }>;

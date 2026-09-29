@@ -5,6 +5,7 @@ import {
   useCreateTimeRecord,
   useListAvailabilityWindow,
   useListEvent,
+  useListPayrollExportRecord,
   useListPerson,
   useListShift,
   useListTimeRecord,
@@ -13,6 +14,7 @@ import {
   useTimeRecordCorrect,
 } from "../../lib/manifest-convex-react";
 import { TimeAttentionPanel } from "./TimeAttentionPanel";
+import { payrollInclusionLabel } from "../finance/payrollReconcile";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import {
@@ -186,6 +188,7 @@ export function TimeSheetBreakCell({
 export function TimeSheetReview({
   row,
   personName,
+  payroll,
 }: {
   row: {
     status?: unknown;
@@ -194,6 +197,8 @@ export function TimeSheetReview({
     correctedById?: string | null;
   };
   personName: (id: string) => string;
+  /** Sent to payroll or not (approved entries only). */
+  payroll?: string | null;
 }) {
   const finished = ["closed", "corrected"].includes(String(row.status));
   return (
@@ -203,6 +208,11 @@ export function TimeSheetReview({
           className={`block ${row.approvedAt ? "text-ink-3" : "text-warn"}`}
         >
           {row.approvedAt ? "Approved for payroll" : "Waiting for approval"}
+        </small>
+      ) : null}
+      {payroll ? (
+        <small className="block text-ink-3" data-testid="payroll-inclusion">
+          {payroll}
         </small>
       ) : null}
       {row.correctionReason ? (
@@ -215,6 +225,22 @@ export function TimeSheetReview({
       ) : null}
     </>
   );
+}
+
+/** Where the clock-in came from: the phone's time zone and location. */
+export function punchEvidenceLabel(row: {
+  timeZone?: string | null;
+  clockInLatitude?: number | null;
+  clockInLongitude?: number | null;
+  clockInAccuracyMeters?: number | null;
+}): string | null {
+  const parts: string[] = [];
+  if (row.clockInLatitude != null && row.clockInLongitude != null)
+    parts.push(
+      `Phone location ${row.clockInLatitude.toFixed(4)}, ${row.clockInLongitude.toFixed(4)}${row.clockInAccuracyMeters != null ? ` (±${Math.round(row.clockInAccuracyMeters)} m)` : ""}`,
+    );
+  if (row.timeZone) parts.push(row.timeZone.replace(/_/g, " "));
+  return parts.length ? parts.join(" · ") : null;
 }
 
 /** Under the hours: the planned shift and how the recorded time compares. */
@@ -252,6 +278,8 @@ export function PlannedVsRecorded({
 
 export function TimeSheetPage() {
   const records = useListTimeRecord();
+  const receipts = useListPayrollExportRecord();
+  const liveReceipts = (receipts ?? []).filter((row) => row.deletedAt == null);
   const windows = useListAvailabilityWindow();
   const people = useListPerson();
   const events = useListEvent();
@@ -653,6 +681,14 @@ export function TimeSheetPage() {
                       {row.clockInAt
                         ? `${formatDate(row.clockInAt)} ${formatTime(row.clockInAt)}`
                         : "—"}
+                      {punchEvidenceLabel(row) ? (
+                        <small
+                          className="block text-ink-3"
+                          data-testid="punch-evidence"
+                        >
+                          {punchEvidenceLabel(row)}
+                        </small>
+                      ) : null}
                     </td>
                     <td>
                       {row.clockOutAt
@@ -688,7 +724,11 @@ export function TimeSheetPage() {
                     </td>
                     <td>
                       <TimeSheetRecordState row={row} />
-                      <TimeSheetReview row={row} personName={personName} />
+                      <TimeSheetReview
+                        row={row}
+                        personName={personName}
+                        payroll={payrollInclusionLabel(row, liveReceipts)}
+                      />
                     </td>
                     <td>
                       <div className="supply-row-actions">

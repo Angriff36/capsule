@@ -150,6 +150,12 @@ export function PayrollPrepareForm({
           />
         </label>
       </div>
+      {/* The approved entries this input is made from (paid once). */}
+      <input
+        type="hidden"
+        name="sourceTimeRecordIds"
+        value={JSON.stringify(clocked?.approvedTimeRecordIds ?? [])}
+      />
       <div className="supply-form-grid">
         <label className="field-label">
           Regular minutes

@@ -5,6 +5,18 @@ const minutes = (value: FormDataEntryValue | null) => {
   return Number.isFinite(amount) ? Math.trunc(amount) : Number.NaN;
 };
 
+/** Approved time entry ids the form carries as JSON; bad input reads as none. */
+const sourceIds = (value: FormDataEntryValue | null): string[] => {
+  try {
+    const parsed: unknown = JSON.parse(String(value ?? "[]"));
+    return Array.isArray(parsed)
+      ? parsed.filter((id): id is string => typeof id === "string" && !!id)
+      : [];
+  } catch {
+    return [];
+  }
+};
+
 /**
  * Builds a PayrollInput.prepare payload from the prepare form.
  *
@@ -43,7 +55,9 @@ export class PayrollPreparePayloadBuilder {
     // Rates/grossAmount are private encrypted money in source; Convex schema
     // still projects them as number while encryption stores ciphertext — omit
     // until Manifest projects encrypted money storage correctly (issue #76).
+    const sourceTimeRecordIds = sourceIds(data.get("sourceTimeRecordIds"));
     return {
+      ...(sourceTimeRecordIds.length > 0 ? { sourceTimeRecordIds } : {}),
       personId,
       periodStart,
       periodEnd: periodEndExclusive - 1,

@@ -2506,6 +2506,35 @@ export const PaymentMethodSchema = z.object({
 
 export type PaymentMethod = z.infer<typeof PaymentMethodSchema>;
 
+// Entity: PayrollExportRecord
+export const PayrollExportRecordSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  personId: z.string().uuid(),
+  periodKey: z.string().default(""),
+  periodStart: z.string().default(""),
+  periodEnd: z.string().default(""),
+  processor: z.string().default(""),
+  revision: z.number().int().default(1),
+  regularMinutes: z.number().int().default(0),
+  overtimeMinutes: z.number().int().default(0),
+  totalMinutes: z.number().int().default(0),
+  previousTotalMinutes: z.number().int().nullable().optional(),
+  deltaMinutes: z.number().int().default(0),
+  status: z.enum(["exported", "acknowledged", "rejected"]).default("exported"),
+  exportedAt: z.coerce.date().nullable().optional(),
+  exportedById: z.string().uuid().nullable().optional(),
+  acknowledgedAt: z.coerce.date().nullable().optional(),
+  providerReference: z.string().nullable().optional(),
+  rejectedAt: z.coerce.date().nullable().optional(),
+  rejectionReason: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type PayrollExportRecord = z.infer<typeof PayrollExportRecordSchema>;
+
 // Entity: PayrollInput
 export const PayrollInputSchema = z.object({
   id: z.string().uuid(),
@@ -2528,6 +2557,7 @@ export const PayrollInputSchema = z.object({
   finalizedAt: z.coerce.date().nullable().optional(),
   voidedAt: z.coerce.date().nullable().optional(),
   voidReason: z.string().nullable().optional(),
+  sourceTimeRecordIds: z.array(z.string()).optional().default([]),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -8452,6 +8482,37 @@ export const PaymentMethodStageClientMergeParamsSchema = z.object({
 
 export type PaymentMethodStageClientMergeParams = z.infer<typeof PaymentMethodStageClientMergeParamsSchema>;
 
+// Command: acknowledge on PayrollExportRecord
+export const PayrollExportRecordAcknowledgeParamsSchema = z.object({
+  providerReference: z.string().optional(),
+});
+
+export type PayrollExportRecordAcknowledgeParams = z.infer<typeof PayrollExportRecordAcknowledgeParamsSchema>;
+
+// Command: record on PayrollExportRecord
+export const PayrollExportRecordRecordParamsSchema = z.object({
+  personId: z.string().min(1),
+  periodKey: z.string(),
+  periodStart: z.string(),
+  periodEnd: z.string(),
+  processor: z.string(),
+  revision: z.number(),
+  regularMinutes: z.number(),
+  overtimeMinutes: z.number(),
+  totalMinutes: z.number(),
+  deltaMinutes: z.number(),
+  previousTotalMinutes: z.number().optional(),
+});
+
+export type PayrollExportRecordRecordParams = z.infer<typeof PayrollExportRecordRecordParamsSchema>;
+
+// Command: reject on PayrollExportRecord
+export const PayrollExportRecordRejectParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type PayrollExportRecordRejectParams = z.infer<typeof PayrollExportRecordRejectParamsSchema>;
+
 // Command: finalize on PayrollInput
 export const PayrollInputFinalizeParamsSchema = z.object({});
 
@@ -8478,6 +8539,7 @@ export const PayrollInputPrepareParamsSchema = z.object({
   overtimeRate: z.number().optional(),
   grossAmount: z.number().optional(),
   notes: z.string().optional(),
+  sourceTimeRecordIds: z.array(z.string()).optional(),
 });
 
 export type PayrollInputPrepareParams = z.infer<typeof PayrollInputPrepareParamsSchema>;

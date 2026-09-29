@@ -1,6 +1,12 @@
 import { formatCountNoun } from "../../lib/format";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { PersonEmployeeNumberField } from "../admin/PersonEmployeeNumberField";
+import type { PayrollRevisionPlan } from "./payrollReconcile";
+import {
+  PayrollPlanNote,
+  PayrollReceiptsList,
+  usePayrollReceipts,
+} from "./PayrollReceipts";
 import {
   PAYROLL_PROCESSORS,
   payrollCsvDownloadAllowed,
@@ -58,7 +64,9 @@ export function PayrollExportPanel({
   const missingNumberNames = (document?.rows ?? [])
     .filter((row) => row.missingEmployeeNumber)
     .map((row) => row.employeeName);
-  const downloadDisabled = loading || !payrollCsvDownloadAllowed(document);
+  const receipts = usePayrollReceipts(document);
+  const downloadDisabled =
+    loading || receipts.loading || !payrollCsvDownloadAllowed(document);
 
   const downloadExport = () => {
     if (!payrollCsvDownloadAllowed(document) || !document) return;
@@ -70,9 +78,18 @@ export function PayrollExportPanel({
     link.download = document.filename;
     link.click();
     window.setTimeout(() => URL.revokeObjectURL(url), 0);
-    onNotice(
-      `${document.rows.length} payroll row${document.rows.length === 1 ? "" : "s"} exported for ${PAYROLL_PROCESSORS.find((item) => item.value === processor)?.label ?? processor}.`,
-    );
+    const label =
+      PAYROLL_PROCESSORS.find((item) => item.value === processor)?.label ??
+      processor;
+    // Keep a receipt per person whose hours changed since the last send.
+    receipts
+      .recordSend()
+      .then((written) =>
+        onNotice(
+          `${document.rows.length} payroll row${document.rows.length === 1 ? "" : "s"} exported for ${label}. ${written === 0 ? "Nothing changed since the last send." : `${written} receipt${written === 1 ? "" : "s"} saved.`}`,
+        ),
+      )
+      .catch(onFailure);
   };
 
   return (
@@ -154,6 +171,18 @@ export function PayrollExportPanel({
           estimatedGross={estimatedGross}
           onNotice={onNotice}
           onFailure={onFailure}
+          plans={receipts.plans}
+        />
+      ) : null}
+      {document ? (
+        <PayrollReceiptsList
+          document={document}
+          receipts={receipts.receipts}
+          personName={(personId) =>
+            document.rows.find((row) => row.personId === personId)
+              ?.employeeName ?? "Someone with no approved hours now"
+          }
+          onFailure={onFailure}
         />
       ) : null}
     </section>
@@ -167,6 +196,7 @@ function PayrollExportPreview({
   estimatedGross,
   onNotice,
   onFailure,
+  plans,
 }: {
   document: PayrollExportDocument;
   missingNumberNames: readonly string[];
@@ -174,6 +204,7 @@ function PayrollExportPreview({
   estimatedGross: (personId: string, totalHours: number) => number | null;
   onNotice: (message: string) => void;
   onFailure: (error: unknown) => void;
+  plans: readonly PayrollRevisionPlan[];
 }) {
   return (
     <>
@@ -250,6 +281,11 @@ function PayrollExportPreview({
                       ) : (
                         <small>{row.employeeId}</small>
                       )}
+                      <PayrollPlanNote
+                        plan={plans.find(
+                          (plan) => plan.personId === row.personId,
+                        )}
+                      />
                     </td>
                     <td>{row.regularHours.toFixed(2)} h</td>
                     <td>{row.overtimeHours.toFixed(2)} h</td>
