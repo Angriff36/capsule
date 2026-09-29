@@ -130,9 +130,17 @@ foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
   # so amending the tip rewrote a pushed commit and every approval ended in COLLISION.
   git -C $wt commit --allow-empty --quiet -m "[loop] Reviewed: $($h.runId)" --trailer "Reviewed-by: $($r.reviewer) APPROVE" --trailer 'Landed-by: loop-land.ps1'
   $env:LOOP_LANDER = '1'
-  git -C $wt push --quiet origin HEAD:dev *>> $log
+  $pushOut = (git -C $wt push --quiet origin HEAD:dev 2>&1) -join "`n"
   $pushed = $LASTEXITCODE -eq 0
+  $pushOut | Add-Content $log
   $env:LOOP_LANDER = $null
+  if (-not $pushed -and $pushOut -match 'non-fast-forward|fetch first') {
+    # Dev moved while the reviewer worked. Drop the review commit and KEEP the hand-off:
+    # the next run merges the new dev and reviews again, with no maker round in between.
+    git -C $wt reset --quiet --hard HEAD~1
+    Record $h 'COLLISION' "approved, but dev moved during the review - merging the new dev and reviewing again next run: $wt"
+    continue
+  }
   if (-not $pushed) { Record $h 'COLLISION' "push to dev refused (dev moved again or the regen check blocked it) - see loop-land.log; worktree kept, merge origin/dev and hand off again: $wt"; Keep $file.FullName; continue }
 
   $sha = git -C $wt rev-parse --short HEAD
