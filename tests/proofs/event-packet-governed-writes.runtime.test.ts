@@ -489,7 +489,7 @@ describe("authorization and invariants on the now-public commands", () => {
         decidedAt: 2,
         decisionJson: "{}",
       }),
-    ).rejects.toThrow(/already recorded/);
+    ).rejects.toThrow(/already saved/);
     // A print must link this event's own PDF and snapshot files.
     await expect(
       manager.mutation(commands.EventPacketRevision_createViaCapture, {
