@@ -7,9 +7,20 @@ import {
   internalMutation,
   internalQuery,
   query,
+  type QueryCtx,
 } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
-import { decrypt, encrypt } from "./lib/encryption";
+import { decrypt } from "./lib/encryption";
+import {
+  OAuthConnectionStore,
+  connectionFromRow,
+  findConnectionRow,
+  lastSyncFromRow,
+  latestLedgerRow,
+  latestLedgerRowsByKey,
+  loadSyncRecords,
+  type OAuthConnection,
+} from "./lib/oauthConnectionStore";
 import {
   buildGoogleAuthorizationUrl,
   buildGoogleCalendarEvent,
@@ -26,8 +37,20 @@ import {
   type GoogleOAuthConfig,
 } from "./lib/googleCalendar";
 
+// Connection and per-event sync state live on IntegrationConnection (provider
+// google_calendar) and IntegrationSyncRecord (record type "event"), written by
+// generated commands (convex/lib/oauthConnectionStore.ts). The two names below
+// are the pseudo-entities of the manifestEvents ledger rows written before
+// 2026-09-29; those rows are only read, for tenants not yet moved over.
+const PROVIDER = "google_calendar" as const;
+const EVENT_RECORD = "event";
 const CONNECTION_ENTITY = "GoogleCalendarConnection";
 const CALENDAR_EVENT_ENTITY = "GoogleCalendarEvent";
+const LEDGER_LIFECYCLE = new Set([
+  "GoogleCalendarConnected",
+  "GoogleCalendarDisconnected",
+]);
+const LEDGER_RECONCILED = new Set(["GoogleCalendarReconciled"]);
 const CALENDAR_ID = "primary";
 const SYNC_INTERVAL_MS = 60_000;
 const RETRY_INTERVAL_MS = 15 * 60_000;
@@ -39,18 +62,8 @@ const CALENDAR_ELIGIBLE_STAGES = new Set([
   "closed_out",
 ]);
 
-interface EncryptedRefreshToken {
-  ciphertext: string;
-  keyId: string;
-}
-
-interface ConnectionPayload {
-  tenantId: string;
-  connectionId: string;
+interface ConnectionPayload extends OAuthConnection {
   calendarId: string;
-  connectedAt: number;
-  connectedBy: string;
-  refreshToken: EncryptedRefreshToken;
 }
 
 interface EventSyncState {
@@ -67,6 +80,8 @@ interface ReconciliationContext {
   connection: ConnectionPayload;
   events: Doc<"events">[];
   syncStates: EventSyncState[];
+  /** Ledger states still to copy into IntegrationSyncRecord (first run only). */
+  ledgerStates: EventSyncState[];
 }
 
 interface ReconciliationResult {
@@ -145,7 +160,8 @@ function numberValue(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
-function parseConnection(payload: unknown): ConnectionPayload | null {
+/** A legacy ledger `GoogleCalendarConnected` payload. */
+function parseLedgerConnection(payload: unknown): ConnectionPayload | null {
   const value = asRecord(payload);
   const token = asRecord(value.refreshToken);
   const tenantId = stringValue(value.tenantId);
@@ -169,10 +185,13 @@ function parseConnection(payload: unknown): ConnectionPayload | null {
   return {
     tenantId,
     connectionId,
+    externalAccountId: calendarId,
     calendarId,
     connectedAt,
     connectedBy,
     refreshToken: { ciphertext, keyId },
+    source: "ledger",
+    ledgerImported: false,
   };
 }
 
@@ -203,25 +222,64 @@ function parseSyncState(payload: unknown): EventSyncState | null {
   };
 }
 
-function latestActiveConnection(
-  rows: Array<{
-    type: string;
-    entity: string;
-    payload: unknown;
-    createdAt: number;
-  }>,
-): ConnectionPayload | null {
-  const latest = rows
-    .filter(
-      (row) =>
-        row.entity === CONNECTION_ENTITY &&
-        (row.type === "GoogleCalendarConnected" ||
-          row.type === "GoogleCalendarDisconnected"),
-    )
-    .sort((left, right) => right.createdAt - left.createdAt)[0];
-  return latest?.type === "GoogleCalendarConnected"
-    ? parseConnection(latest.payload)
-    : null;
+/**
+ * The tenant's active connection: the IntegrationConnection row once it
+ * exists (it then supersedes the ledger), otherwise the newest ledger
+ * connect/disconnect row, exactly as before.
+ */
+async function activeConnection(
+  db: QueryCtx["db"],
+  tenantId: string,
+): Promise<{
+  connection: ConnectionPayload | null;
+  row: Doc<"integrationConnections"> | null;
+}> {
+  const row = await findConnectionRow(db, tenantId, PROVIDER);
+  if (row) {
+    const connection = connectionFromRow(row);
+    return {
+      row,
+      connection: connection
+        ? { ...connection, calendarId: connection.externalAccountId }
+        : null,
+    };
+  }
+  const latest = await latestLedgerRow(
+    db,
+    tenantId,
+    CONNECTION_ENTITY,
+    LEDGER_LIFECYCLE,
+  );
+  return {
+    row: null,
+    connection:
+      latest?.type === "GoogleCalendarConnected"
+        ? parseLedgerConnection(latest.payload)
+        : null,
+  };
+}
+
+function syncStateFromRecord(
+  record: Doc<"integrationSyncRecords">,
+): EventSyncState | null {
+  if (record.recordType !== EVENT_RECORD) return null;
+  if (
+    record.status !== "synced" &&
+    record.status !== "deleted" &&
+    record.status !== "failed"
+  ) {
+    return null;
+  }
+  if (!record.externalId || record.lastSyncedAt == null) return null;
+  return {
+    eventId: record.sourceId,
+    connectionId: record.engagementId ?? "",
+    googleEventId: record.externalId,
+    signature: record.contentSignature ?? null,
+    status: record.status,
+    syncedAt: record.lastSyncedAt,
+    error: record.lastError ?? null,
+  };
 }
 
 export const getConnectionStatus = query({
@@ -229,19 +287,52 @@ export const getConnectionStatus = query({
   handler: async (ctx) => {
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
-    const rows = await ctx.db
-      .query("manifestEvents")
-      .withIndex("by_entityId", (q) => q.eq("entityId", tenantId))
-      .collect();
-    const connection = latestActiveConnection(rows);
-    const lastSync = rows
-      .filter(
-        (row) =>
-          row.entity === CONNECTION_ENTITY &&
-          row.type === "GoogleCalendarReconciled",
-      )
-      .sort((left, right) => right.createdAt - left.createdAt)[0];
-    const sync = asRecord(lastSync?.payload);
+    const { connection, row } = await activeConnection(ctx.db, tenantId);
+    let lastSync: {
+      at: number;
+      status: string;
+      createdOrUpdated: number;
+      deleted: number;
+      skipped: number;
+      failed: number;
+      error: string | null;
+    } | null = null;
+    if (row) {
+      const entitySync = lastSyncFromRow(row);
+      lastSync =
+        entitySync == null
+          ? null
+          : {
+              at: entitySync.at,
+              status: entitySync.status,
+              createdOrUpdated:
+                numberValue(entitySync.summary.createdOrUpdated) ?? 0,
+              deleted: numberValue(entitySync.summary.deleted) ?? 0,
+              skipped: numberValue(entitySync.summary.skipped) ?? 0,
+              failed: entitySync.failed,
+              error: entitySync.error,
+            };
+    } else {
+      const ledgerSync = await latestLedgerRow(
+        ctx.db,
+        tenantId,
+        CONNECTION_ENTITY,
+        LEDGER_RECONCILED,
+      );
+      const sync = asRecord(ledgerSync?.payload);
+      lastSync =
+        ledgerSync == null
+          ? null
+          : {
+              at: ledgerSync.createdAt,
+              status: stringValue(sync.status) ?? "unknown",
+              createdOrUpdated: numberValue(sync.createdOrUpdated) ?? 0,
+              deleted: numberValue(sync.deleted) ?? 0,
+              skipped: numberValue(sync.skipped) ?? 0,
+              failed: numberValue(sync.failed) ?? 0,
+              error: stringValue(sync.error),
+            };
+    }
     return {
       connected: connection != null,
       calendarId: connection?.calendarId ?? null,
@@ -249,18 +340,7 @@ export const getConnectionStatus = query({
       providerConfigured: providerConfigured(),
       redirectUri: process.env.GOOGLE_CALENDAR_REDIRECT_URI?.trim() ?? null,
       canManage: canManage(auth.role),
-      lastSync:
-        lastSync == null
-          ? null
-          : {
-              at: lastSync.createdAt,
-              status: stringValue(sync.status) ?? "unknown",
-              createdOrUpdated: numberValue(sync.createdOrUpdated) ?? 0,
-              deleted: numberValue(sync.deleted) ?? 0,
-              skipped: numberValue(sync.skipped) ?? 0,
-              failed: numberValue(sync.failed) ?? 0,
-              error: stringValue(sync.error),
-            },
+      lastSync,
     };
   },
 });
@@ -319,19 +399,16 @@ export const completeConnection = action({
           "Google did not grant offline access. Remove CapsuleX from your Google account permissions, then connect again.",
         );
       }
-      const encrypted = await encrypt(tokens.refreshToken, {
-        ctx,
-        entity: CONNECTION_ENTITY,
-        property: "refreshToken",
-      });
       const connectionId = crypto.randomUUID();
+      // The generated command seals the token (IntegrationConnection
+      // oauthRefreshToken is `encrypted`).
       await ctx.runMutation(internal.googleCalendar.recordConnection, {
         tenantId,
         connectionId,
         calendarId: CALENDAR_ID,
         connectedAt: Date.now(),
         connectedBy: auth.id,
-        refreshToken: encrypted,
+        refreshToken: tokens.refreshToken,
       });
       await ctx.scheduler.runAfter(0, internal.googleCalendar.reconcileTenant, {
         tenantId,
@@ -370,8 +447,7 @@ export const disconnect = action({
     }
     await ctx.runMutation(internal.googleCalendar.recordDisconnection, {
       tenantId,
-      disconnectedAt: Date.now(),
-      disconnectedBy: auth.id,
+      calendarId: connection?.calendarId ?? null,
     });
     return { disconnected: true };
   },
@@ -401,49 +477,59 @@ export const syncNow = action({
 export const loadActiveConnection = internalQuery({
   args: { tenantId: v.string() },
   handler: async (ctx, args): Promise<ConnectionPayload | null> => {
-    const rows = await ctx.db
-      .query("manifestEvents")
-      .withIndex("by_entityId", (q) => q.eq("entityId", args.tenantId))
-      .collect();
-    return latestActiveConnection(rows);
+    return (await activeConnection(ctx.db, args.tenantId)).connection;
   },
 });
 
 export const loadReconciliationContext = internalQuery({
   args: { tenantId: v.string(), connectionId: v.string() },
   handler: async (ctx, args): Promise<ReconciliationContext | null> => {
-    const connectionRows = await ctx.db
-      .query("manifestEvents")
-      .withIndex("by_entityId", (q) => q.eq("entityId", args.tenantId))
-      .collect();
-    const connection = latestActiveConnection(connectionRows);
+    const { connection } = await activeConnection(ctx.db, args.tenantId);
     if (!connection || connection.connectionId !== args.connectionId) {
       return null;
     }
-    const [events, syncRows] = await Promise.all([
+    const [events, records] = await Promise.all([
       ctx.db
         .query("events")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
         .collect(),
-      ctx.db
-        .query("manifestEvents")
-        .withIndex("by_entity", (q) => q.eq("entity", CALENDAR_EVENT_ENTITY))
-        .collect(),
+      loadSyncRecords(ctx.db, args.tenantId, PROVIDER),
     ]);
-    const latestByEvent = new Map<string, EventSyncState>();
-    for (const row of syncRows.sort(
-      (left, right) => right.createdAt - left.createdAt,
-    )) {
-      const payload = asRecord(row.payload);
-      if (payload.tenantId !== args.tenantId) continue;
-      const state = parseSyncState(row.payload);
-      if (state && !latestByEvent.has(state.eventId)) {
-        latestByEvent.set(state.eventId, state);
+    const syncStates: EventSyncState[] = [];
+    const tracked = new Set<string>();
+    for (const record of records) {
+      const state = syncStateFromRecord(record);
+      if (state) {
+        syncStates.push(state);
+        tracked.add(state.eventId);
       }
     }
-    return { connection, events, syncStates: [...latestByEvent.values()] };
+    // Until this tenant's ledger history is copied over (first reconcile),
+    // events without a row take their state from the newest ledger row
+    // (same keys as before: entityId = Capsule event id, tenant in payload).
+    const ledgerStates: EventSyncState[] = [];
+    if (!connection.ledgerImported) {
+      const ledgerRows = await latestLedgerRowsByKey(
+        ctx.db,
+        args.tenantId,
+        CALENDAR_EVENT_ENTITY,
+        (row) => stringValue(asRecord(row.payload).eventId),
+      );
+      for (const row of ledgerRows) {
+        const state = parseSyncState(row.payload);
+        if (state && !tracked.has(state.eventId)) {
+          ledgerStates.push(state);
+          syncStates.push(state);
+        }
+      }
+    }
+    return { connection, events, syncStates, ledgerStates };
   },
 });
+
+// Every write below goes through a generated command as the tenant's system
+// identity (convex/lib/oauthConnectionStore.ts). Callers: completeConnection
+// and disconnect (after requireManager) and the scheduled reconcileTenant.
 
 export const recordConnection = internalMutation({
   args: {
@@ -452,15 +538,19 @@ export const recordConnection = internalMutation({
     calendarId: v.string(),
     connectedAt: v.number(),
     connectedBy: v.string(),
-    refreshToken: v.object({ ciphertext: v.string(), keyId: v.string() }),
+    /** Plaintext; IntegrationConnection seals it. */
+    refreshToken: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
-      type: "GoogleCalendarConnected",
-      entity: CONNECTION_ENTITY,
-      entityId: args.tenantId,
-      payload: args,
-      createdAt: args.connectedAt,
+    await new OAuthConnectionStore(ctx, args.tenantId, PROVIDER).grant({
+      tenantId: args.tenantId,
+      provider: PROVIDER,
+      engagementId: args.connectionId,
+      externalAccountId: args.calendarId,
+      displayName: "Google Calendar",
+      refreshToken: args.refreshToken,
+      connectedById: args.connectedBy,
+      grantedAt: args.connectedAt,
     });
   },
 });
@@ -468,48 +558,102 @@ export const recordConnection = internalMutation({
 export const recordDisconnection = internalMutation({
   args: {
     tenantId: v.string(),
-    disconnectedAt: v.number(),
-    disconnectedBy: v.string(),
+    calendarId: v.union(v.string(), v.null()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
-      type: "GoogleCalendarDisconnected",
-      entity: CONNECTION_ENTITY,
-      entityId: args.tenantId,
-      payload: args,
-      createdAt: args.disconnectedAt,
+    const { connection, row } = await activeConnection(ctx.db, args.tenantId);
+    // Never connected at all: nothing to record.
+    if (!row && !connection) return;
+    await new OAuthConnectionStore(ctx, args.tenantId, PROVIDER).disconnect(
+      args.calendarId,
+      "Google Calendar",
+    );
+  },
+});
+
+const syncStateArgs = {
+  eventId: v.string(),
+  connectionId: v.string(),
+  googleEventId: v.string(),
+  signature: v.union(v.string(), v.null()),
+  status: v.union(
+    v.literal("synced"),
+    v.literal("deleted"),
+    v.literal("failed"),
+  ),
+  syncedAt: v.number(),
+  error: v.union(v.string(), v.null()),
+};
+
+export const recordEventSync = internalMutation({
+  args: { tenantId: v.string(), ...syncStateArgs },
+  handler: async (ctx, args) => {
+    await new OAuthConnectionStore(ctx, args.tenantId, PROVIDER).recordSync({
+      tenantId: args.tenantId,
+      provider: PROVIDER,
+      recordType: EVENT_RECORD,
+      sourceId: args.eventId,
+      externalId: args.googleEventId,
+      engagementId: args.connectionId,
+      status: args.status,
+      contentSignature: args.signature,
+      syncedAt: args.syncedAt,
+      error: args.error,
     });
   },
 });
 
-export const recordEventSync = internalMutation({
+/**
+ * First reconcile of a tenant still on the ledger: move the connection to
+ * IntegrationConnection (keeping its connection id, so running chains carry
+ * on) and copy the per-event ledger state into IntegrationSyncRecord rows.
+ * Also runs once for a row connected after 2026-09-29 (ledger history of an
+ * earlier connection is copied so its calendar events can still be removed).
+ */
+export const adoptLedgerState = internalMutation({
   args: {
     tenantId: v.string(),
-    eventId: v.string(),
-    connectionId: v.string(),
-    googleEventId: v.string(),
-    signature: v.union(v.string(), v.null()),
-    status: v.union(
-      v.literal("synced"),
-      v.literal("deleted"),
-      v.literal("failed"),
+    connection: v.union(
+      v.null(),
+      v.object({
+        connectionId: v.string(),
+        calendarId: v.string(),
+        connectedAt: v.number(),
+        connectedBy: v.string(),
+        refreshToken: v.string(),
+      }),
     ),
-    syncedAt: v.number(),
-    error: v.union(v.string(), v.null()),
+    states: v.array(v.object(syncStateArgs)),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
-      type:
-        args.status === "synced"
-          ? "GoogleCalendarEventSynced"
-          : args.status === "deleted"
-            ? "GoogleCalendarEventDeleted"
-            : "GoogleCalendarEventSyncFailed",
-      entity: CALENDAR_EVENT_ENTITY,
-      entityId: args.eventId,
-      payload: args,
-      createdAt: args.syncedAt,
-    });
+    const store = new OAuthConnectionStore(ctx, args.tenantId, PROVIDER);
+    if (args.connection && !(await store.row())) {
+      await store.grant({
+        tenantId: args.tenantId,
+        provider: PROVIDER,
+        engagementId: args.connection.connectionId,
+        externalAccountId: args.connection.calendarId,
+        displayName: "Google Calendar",
+        refreshToken: args.connection.refreshToken,
+        connectedById: args.connection.connectedBy,
+        grantedAt: args.connection.connectedAt,
+      });
+    }
+    for (const state of args.states) {
+      await store.importLedgerSync({
+        tenantId: args.tenantId,
+        provider: PROVIDER,
+        recordType: EVENT_RECORD,
+        sourceId: state.eventId,
+        externalId: state.googleEventId,
+        engagementId: state.connectionId,
+        status: state.status,
+        contentSignature: state.signature,
+        syncedAt: state.syncedAt,
+        error: state.error,
+      });
+    }
+    await store.markLedgerImported();
   },
 });
 
@@ -526,12 +670,20 @@ export const recordReconciliation = internalMutation({
     reconciledAt: v.number(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
-      type: "GoogleCalendarReconciled",
-      entity: CONNECTION_ENTITY,
-      entityId: args.tenantId,
-      payload: args,
-      createdAt: args.reconciledAt,
+    await new OAuthConnectionStore(
+      ctx,
+      args.tenantId,
+      PROVIDER,
+    ).recordReconciliation({
+      engagementId: args.connectionId,
+      outcome: args.status,
+      failed: args.failed,
+      error: args.error,
+      summary: {
+        createdOrUpdated: args.createdOrUpdated,
+        deleted: args.deleted,
+        skipped: args.skipped,
+      },
     });
   },
 });
@@ -564,6 +716,22 @@ export const reconcileTenant = internalAction({
         context.connection.refreshToken.keyId,
         { ctx, entity: CONNECTION_ENTITY, property: "refreshToken" },
       );
+      if (!context.connection.ledgerImported) {
+        await ctx.runMutation(internal.googleCalendar.adoptLedgerState, {
+          tenantId: args.tenantId,
+          connection:
+            context.connection.source === "ledger"
+              ? {
+                  connectionId: context.connection.connectionId,
+                  calendarId: context.connection.calendarId,
+                  connectedAt: context.connection.connectedAt,
+                  connectedBy: context.connection.connectedBy,
+                  refreshToken,
+                }
+              : null,
+          states: context.ledgerStates,
+        });
+      }
       accessToken = (
         await refreshGoogleAccessToken(providerEnvironment(), refreshToken)
       ).accessToken;

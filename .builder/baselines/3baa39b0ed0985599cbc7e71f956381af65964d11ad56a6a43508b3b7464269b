@@ -325,9 +325,15 @@ import {
   IntegrationConnectionAuthorizeParamsSchema,
   IntegrationConnectionDisconnectParamsSchema,
   IntegrationConnectionMarkConnectedParamsSchema,
+  IntegrationConnectionMarkLedgerImportedParamsSchema,
   IntegrationConnectionReauthorizeParamsSchema,
   IntegrationConnectionRecordFailureParamsSchema,
+  IntegrationConnectionRecordOAuthGrantParamsSchema,
+  IntegrationConnectionRecordReconciliationParamsSchema,
   IntegrationConnectionRecordSyncSuccessParamsSchema,
+  IntegrationConnectionRotateOAuthCredentialParamsSchema,
+  IntegrationSyncRecordRecordOutcomeParamsSchema,
+  IntegrationSyncRecordTrackParamsSchema,
   InterviewRecordOutcomeParamsSchema,
   InterviewScheduleParamsSchema,
   InventoryItemAdjustQuantityParamsSchema,
@@ -407,6 +413,10 @@ import {
   OrganizationSetBrandLogoParamsSchema,
   OrganizationSetDefaultCurrencyParamsSchema,
   OrganizationSuspendParamsSchema,
+  OutboundWebhookDeliveryRecordParamsSchema,
+  OutboundWebhookEndpointRecordDeliveredParamsSchema,
+  OutboundWebhookEndpointRegisterParamsSchema,
+  OutboundWebhookEndpointRemoveParamsSchema,
   PackListAcknowledgePackingRequirementParamsSchema,
   PackListApplyServiceStyleKitParamsSchema,
   PackListCancelParamsSchema,
@@ -5274,6 +5284,16 @@ export function useIntegrationConnectionMarkConnected() {
   };
 }
 
+/** Mutation hook for IntegrationConnection.markLedgerImported. */
+export function useIntegrationConnectionMarkLedgerImported() {
+  const mutate = useMutation(api.mutations.IntegrationConnection_markLedgerImported);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IntegrationConnectionMarkLedgerImportedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for IntegrationConnection.reauthorize. */
 export function useIntegrationConnectionReauthorize() {
   const mutate = useMutation(api.mutations.IntegrationConnection_reauthorize);
@@ -5294,6 +5314,26 @@ export function useIntegrationConnectionRecordFailure() {
   };
 }
 
+/** Mutation hook for IntegrationConnection.recordOAuthGrant. */
+export function useIntegrationConnectionRecordOAuthGrant() {
+  const mutate = useMutation(api.mutations.IntegrationConnection_recordOAuthGrant);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IntegrationConnectionRecordOAuthGrantParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for IntegrationConnection.recordReconciliation. */
+export function useIntegrationConnectionRecordReconciliation() {
+  const mutate = useMutation(api.mutations.IntegrationConnection_recordReconciliation);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IntegrationConnectionRecordReconciliationParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for IntegrationConnection.recordSyncSuccess. */
 export function useIntegrationConnectionRecordSyncSuccess() {
   const mutate = useMutation(api.mutations.IntegrationConnection_recordSyncSuccess);
@@ -5304,12 +5344,63 @@ export function useIntegrationConnectionRecordSyncSuccess() {
   };
 }
 
+/** Mutation hook for IntegrationConnection.rotateOAuthCredential. */
+export function useIntegrationConnectionRotateOAuthCredential() {
+  const mutate = useMutation(api.mutations.IntegrationConnection_rotateOAuthCredential);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IntegrationConnectionRotateOAuthCredentialParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Governed creation hook for IntegrationConnection.authorize. */
 export function useCreateIntegrationConnection() {
   const mutate = useMutation(api.mutations.IntegrationConnection_createViaAuthorize);
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = IntegrationConnectionAuthorizeParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for IntegrationSyncRecord. */
+export function useListIntegrationSyncRecord() {
+  return useQuery(api.queries.listIntegrationSyncRecord);
+}
+
+/** Reactive get-by-id for IntegrationSyncRecord. Pass "skip" to suspend. */
+export function useGetIntegrationSyncRecord(id: string | "skip") {
+  return useQuery(api.queries.getIntegrationSyncRecord, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for IntegrationSyncRecord.recordOutcome. */
+export function useIntegrationSyncRecordRecordOutcome() {
+  const mutate = useMutation(api.mutations.IntegrationSyncRecord_recordOutcome);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IntegrationSyncRecordRecordOutcomeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for IntegrationSyncRecord.track. */
+export function useIntegrationSyncRecordTrack() {
+  const mutate = useMutation(api.mutations.IntegrationSyncRecord_track);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IntegrationSyncRecordTrackParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for IntegrationSyncRecord.track. */
+export function useCreateIntegrationSyncRecord() {
+  const mutate = useMutation(api.mutations.IntegrationSyncRecord_createViaTrack);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = IntegrationSyncRecordTrackParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -6466,6 +6557,88 @@ export function useCreateOrganizationCapabilitySetting() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = OrganizationCapabilitySettingRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for OutboundWebhookDelivery. */
+export function useListOutboundWebhookDelivery() {
+  return useQuery(api.queries.listOutboundWebhookDelivery);
+}
+
+/** Reactive get-by-id for OutboundWebhookDelivery. Pass "skip" to suspend. */
+export function useGetOutboundWebhookDelivery(id: string | "skip") {
+  return useQuery(api.queries.getOutboundWebhookDelivery, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for OutboundWebhookDelivery.record. */
+export function useOutboundWebhookDeliveryRecord() {
+  const mutate = useMutation(api.mutations.OutboundWebhookDelivery_record);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OutboundWebhookDeliveryRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for OutboundWebhookDelivery.record. */
+export function useCreateOutboundWebhookDelivery() {
+  const mutate = useMutation(api.mutations.OutboundWebhookDelivery_createViaRecord);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = OutboundWebhookDeliveryRecordParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for OutboundWebhookEndpoint. */
+export function useListOutboundWebhookEndpoint() {
+  return useQuery(api.queries.listOutboundWebhookEndpoint);
+}
+
+/** Reactive get-by-id for OutboundWebhookEndpoint. Pass "skip" to suspend. */
+export function useGetOutboundWebhookEndpoint(id: string | "skip") {
+  return useQuery(api.queries.getOutboundWebhookEndpoint, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for OutboundWebhookEndpoint.recordDelivered. */
+export function useOutboundWebhookEndpointRecordDelivered() {
+  const mutate = useMutation(api.mutations.OutboundWebhookEndpoint_recordDelivered);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OutboundWebhookEndpointRecordDeliveredParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for OutboundWebhookEndpoint.register. */
+export function useOutboundWebhookEndpointRegister() {
+  const mutate = useMutation(api.mutations.OutboundWebhookEndpoint_register);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OutboundWebhookEndpointRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for OutboundWebhookEndpoint.remove. */
+export function useOutboundWebhookEndpointRemove() {
+  const mutate = useMutation(api.mutations.OutboundWebhookEndpoint_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OutboundWebhookEndpointRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for OutboundWebhookEndpoint.register. */
+export function useCreateOutboundWebhookEndpoint() {
+  const mutate = useMutation(api.mutations.OutboundWebhookEndpoint_createViaRegister);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = OutboundWebhookEndpointRegisterParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -11298,6 +11471,16 @@ export function useCreateWasteRecord() {
   };
 }
 
+/** Reactive list for WebhookDispatchState. */
+export function useListWebhookDispatchState() {
+  return useQuery(api.queries.listWebhookDispatchState);
+}
+
+/** Reactive get-by-id for WebhookDispatchState. Pass "skip" to suspend. */
+export function useGetWebhookDispatchState(id: string | "skip") {
+  return useQuery(api.queries.getWebhookDispatchState, id === "skip" ? "skip" : { id: id as any });
+}
+
 /** Reactive list for WeeklyPurchasingConfig. */
 export function useListWeeklyPurchasingConfig() {
   return useQuery(api.queries.listWeeklyPurchasingConfig);
@@ -11400,4 +11583,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1212 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1233 as const;

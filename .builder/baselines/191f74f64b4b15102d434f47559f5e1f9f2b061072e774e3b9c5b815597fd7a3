@@ -1764,6 +1764,15 @@ export const IntegrationConnectionSchema = z.object({
   chargesEnabled: z.boolean().default(false),
   payoutsEnabled: z.boolean().default(false),
   connectedAt: z.coerce.date().nullable().optional(),
+  oauthRefreshToken: z.string().nullable().optional(),
+  engagementId: z.string().nullable().optional(),
+  connectedById: z.string().nullable().optional(),
+  grantedAt: z.coerce.date().nullable().optional(),
+  lastSyncAt: z.coerce.date().nullable().optional(),
+  lastSyncStatus: z.string().nullable().optional(),
+  lastSyncFailedCount: z.number().int().nullable().optional(),
+  lastSyncSummary: z.string().nullable().optional(),
+  ledgerImportedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1776,6 +1785,26 @@ export const IntegrationConnectionComputedSchema = IntegrationConnectionSchema.e
 
 export type IntegrationConnection = z.infer<typeof IntegrationConnectionSchema>;
 export type IntegrationConnectionWithComputed = z.infer<typeof IntegrationConnectionComputedSchema>;
+
+// Entity: IntegrationSyncRecord
+export const IntegrationSyncRecordSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  syncKey: z.string().nullable().optional(),
+  provider: z.enum(["stripe", "quickbooks", "google_calendar", "email", "sms", "nowsta", "instagram", "facebook", "tiktok"]).default("google_calendar"),
+  recordType: z.string().default("event"),
+  sourceId: z.string(),
+  externalId: z.string().nullable().optional(),
+  engagementId: z.string().nullable().optional(),
+  status: z.enum(["synced", "deleted", "failed", "linked"]).default("synced"),
+  contentSignature: z.string().nullable().optional(),
+  lastSyncedAt: z.coerce.date().nullable().optional(),
+  lastError: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type IntegrationSyncRecord = z.infer<typeof IntegrationSyncRecordSchema>;
 
 // Entity: Interview
 export const InterviewSchema = z.object({
@@ -2219,6 +2248,48 @@ export const OrganizationCapabilitySettingSchema = z.object({
 });
 
 export type OrganizationCapabilitySetting = z.infer<typeof OrganizationCapabilitySettingSchema>;
+
+// Entity: OutboundWebhookDelivery
+export const OutboundWebhookDeliverySchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  attemptId: z.string().nullable().optional(),
+  deliveryKey: z.string().nullable().optional(),
+  endpointKey: z.string(),
+  sourceEventId: z.string(),
+  eventType: z.string(),
+  status: z.enum(["succeeded", "failed"]).default("failed"),
+  attempt: z.number().int().default(1),
+  httpStatus: z.number().int().nullable().optional(),
+  error: z.string().nullable().optional(),
+  occurredAt: z.coerce.date().nullable().optional(),
+  deliveredAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type OutboundWebhookDelivery = z.infer<typeof OutboundWebhookDeliverySchema>;
+
+// Entity: OutboundWebhookEndpoint
+export const OutboundWebhookEndpointSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  endpointKey: z.string().nullable().optional(),
+  url: z.string().default(""),
+  label: z.string().default(""),
+  events: z.array(z.string()),
+  signingSecret: z.string().nullable().optional(),
+  hasSigningSecret: z.boolean().default(false),
+  status: z.enum(["active", "removed"]).default("active"),
+  registeredAt: z.coerce.date().nullable().optional(),
+  registeredById: z.string().nullable().optional(),
+  removedAt: z.coerce.date().nullable().optional(),
+  deliveredThrough: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type OutboundWebhookEndpoint = z.infer<typeof OutboundWebhookEndpointSchema>;
 
 // Entity: PackList
 export const PackListSchema = z.object({
@@ -4051,6 +4122,19 @@ export const WasteRecordComputedSchema = WasteRecordSchema.extend({
 
 export type WasteRecord = z.infer<typeof WasteRecordSchema>;
 export type WasteRecordWithComputed = z.infer<typeof WasteRecordComputedSchema>;
+
+// Entity: WebhookDispatchState
+export const WebhookDispatchStateSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  chainId: z.string().nullable().optional(),
+  lastTickAt: z.coerce.date().nullable().optional(),
+  legacyImportedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type WebhookDispatchState = z.infer<typeof WebhookDispatchStateSchema>;
 
 // Entity: WeeklyPurchasingConfig
 export const WeeklyPurchasingConfigSchema = z.object({
@@ -6903,6 +6987,11 @@ export const IntegrationConnectionMarkConnectedParamsSchema = z.object({
 
 export type IntegrationConnectionMarkConnectedParams = z.infer<typeof IntegrationConnectionMarkConnectedParamsSchema>;
 
+// Command: markLedgerImported on IntegrationConnection
+export const IntegrationConnectionMarkLedgerImportedParamsSchema = z.object({});
+
+export type IntegrationConnectionMarkLedgerImportedParams = z.infer<typeof IntegrationConnectionMarkLedgerImportedParamsSchema>;
+
 // Command: reauthorize on IntegrationConnection
 export const IntegrationConnectionReauthorizeParamsSchema = z.object({});
 
@@ -6915,10 +7004,67 @@ export const IntegrationConnectionRecordFailureParamsSchema = z.object({
 
 export type IntegrationConnectionRecordFailureParams = z.infer<typeof IntegrationConnectionRecordFailureParamsSchema>;
 
+// Command: recordOAuthGrant on IntegrationConnection
+export const IntegrationConnectionRecordOAuthGrantParamsSchema = z.object({
+  engagementId: z.string(),
+  externalAccountId: z.string(),
+  refreshToken: z.string(),
+  connectedById: z.string(),
+  grantedAt: z.coerce.date(),
+});
+
+export type IntegrationConnectionRecordOAuthGrantParams = z.infer<typeof IntegrationConnectionRecordOAuthGrantParamsSchema>;
+
+// Command: recordReconciliation on IntegrationConnection
+export const IntegrationConnectionRecordReconciliationParamsSchema = z.object({
+  engagementId: z.string(),
+  outcome: z.string(),
+  failedCount: z.number().int(),
+  summary: z.string(),
+  error: z.string().optional(),
+});
+
+export type IntegrationConnectionRecordReconciliationParams = z.infer<typeof IntegrationConnectionRecordReconciliationParamsSchema>;
+
 // Command: recordSyncSuccess on IntegrationConnection
 export const IntegrationConnectionRecordSyncSuccessParamsSchema = z.object({});
 
 export type IntegrationConnectionRecordSyncSuccessParams = z.infer<typeof IntegrationConnectionRecordSyncSuccessParamsSchema>;
+
+// Command: rotateOAuthCredential on IntegrationConnection
+export const IntegrationConnectionRotateOAuthCredentialParamsSchema = z.object({
+  engagementId: z.string(),
+  refreshToken: z.string(),
+});
+
+export type IntegrationConnectionRotateOAuthCredentialParams = z.infer<typeof IntegrationConnectionRotateOAuthCredentialParamsSchema>;
+
+// Command: recordOutcome on IntegrationSyncRecord
+export const IntegrationSyncRecordRecordOutcomeParamsSchema = z.object({
+  externalId: z.string().optional(),
+  engagementId: z.string().optional(),
+  status: z.enum(["synced", "deleted", "failed", "linked"]),
+  contentSignature: z.string().optional(),
+  syncedAt: z.coerce.date(),
+  error: z.string().optional(),
+});
+
+export type IntegrationSyncRecordRecordOutcomeParams = z.infer<typeof IntegrationSyncRecordRecordOutcomeParamsSchema>;
+
+// Command: track on IntegrationSyncRecord
+export const IntegrationSyncRecordTrackParamsSchema = z.object({
+  provider: z.enum(["stripe", "quickbooks", "google_calendar", "email", "sms", "nowsta", "instagram", "facebook", "tiktok"]),
+  recordType: z.string(),
+  sourceId: z.string(),
+  externalId: z.string().optional(),
+  engagementId: z.string().optional(),
+  status: z.enum(["synced", "deleted", "failed", "linked"]),
+  contentSignature: z.string().optional(),
+  syncedAt: z.coerce.date(),
+  error: z.string().optional(),
+});
+
+export type IntegrationSyncRecordTrackParams = z.infer<typeof IntegrationSyncRecordTrackParamsSchema>;
 
 // Command: recordOutcome on Interview
 export const InterviewRecordOutcomeParamsSchema = z.object({
@@ -7593,6 +7739,48 @@ export const OrganizationCapabilitySettingSetEnabledParamsSchema = z.object({
 });
 
 export type OrganizationCapabilitySettingSetEnabledParams = z.infer<typeof OrganizationCapabilitySettingSetEnabledParamsSchema>;
+
+// Command: record on OutboundWebhookDelivery
+export const OutboundWebhookDeliveryRecordParamsSchema = z.object({
+  newAttemptId: z.string(),
+  endpointKey: z.string(),
+  sourceEventId: z.string(),
+  eventType: z.string(),
+  status: z.enum(["succeeded", "failed"]),
+  attempt: z.number().int(),
+  httpStatus: z.number().int().optional(),
+  error: z.string().optional(),
+  occurredAt: z.coerce.date(),
+  deliveredAt: z.coerce.date(),
+});
+
+export type OutboundWebhookDeliveryRecordParams = z.infer<typeof OutboundWebhookDeliveryRecordParamsSchema>;
+
+// Command: recordDelivered on OutboundWebhookEndpoint
+export const OutboundWebhookEndpointRecordDeliveredParamsSchema = z.object({
+  occurredAt: z.coerce.date(),
+});
+
+export type OutboundWebhookEndpointRecordDeliveredParams = z.infer<typeof OutboundWebhookEndpointRecordDeliveredParamsSchema>;
+
+// Command: register on OutboundWebhookEndpoint
+export const OutboundWebhookEndpointRegisterParamsSchema = z.object({
+  newEndpointKey: z.string(),
+  url: z.string(),
+  label: z.string(),
+  events: z.array(z.string()),
+  signingSecret: z.string().optional(),
+  registeredById: z.string(),
+  registeredAt: z.coerce.date(),
+  deliveredThrough: z.coerce.date().optional(),
+});
+
+export type OutboundWebhookEndpointRegisterParams = z.infer<typeof OutboundWebhookEndpointRegisterParamsSchema>;
+
+// Command: remove on OutboundWebhookEndpoint
+export const OutboundWebhookEndpointRemoveParamsSchema = z.object({});
+
+export type OutboundWebhookEndpointRemoveParams = z.infer<typeof OutboundWebhookEndpointRemoveParamsSchema>;
 
 // Command: acknowledgePackingRequirement on PackList
 export const PackListAcknowledgePackingRequirementParamsSchema = z.object({

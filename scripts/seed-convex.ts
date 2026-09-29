@@ -331,11 +331,17 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.IngredientPriceObservation_createViaRecord, { "ingredientId": "ingredientId-ingredient-price-observation-1", "vendorId": "vendorId-ingredient-price-observation-1", "vendorOrderId": "vendorOrderId-ingredient-price-observation-1", "vendorOrderLineId": "vendorOrderLineId-ingredient-price-observation-1", "receiptQuantity": 1, "cumulativeReceivedQuantity": 1, "unit": "demo-unit-1", "unitPrice": 1 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.IngredientPriceObservation_createViaRecord, { "ingredientId": "ingredientId-ingredient-price-observation-2", "vendorId": "vendorId-ingredient-price-observation-2", "vendorOrderId": "vendorOrderId-ingredient-price-observation-2", "vendorOrderLineId": "vendorOrderLineId-ingredient-price-observation-2", "receiptQuantity": 2, "cumulativeReceivedQuantity": 2, "unit": "demo-unit-2", "unitPrice": 2 } as any);
+  // IntegrationConnection has multiple initialization commands (authorize, markLedgerImported); using the selected initialization command: authorize.
   // IntegrationConnection → api.mutations.IntegrationConnection_createViaAuthorize
   rowsAttempted += 1;
   await client.mutation(api.mutations.IntegrationConnection_createViaAuthorize, { "provider": "demo-provider-1", "externalAccountId": "externalAccountId-integration-connection-1", "displayName": "IntegrationConnection 1", "scopes": "demo-scopes-1", "credentialRef": "demo-credentialRef-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.IntegrationConnection_createViaAuthorize, { "provider": "demo-provider-2", "externalAccountId": "externalAccountId-integration-connection-2", "displayName": "IntegrationConnection 2", "scopes": "demo-scopes-2", "credentialRef": "demo-credentialRef-2" } as any);
+  // IntegrationSyncRecord → api.mutations.IntegrationSyncRecord_createViaTrack
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.IntegrationSyncRecord_createViaTrack, { "provider": "demo-provider-1", "recordType": "demo-recordType-1", "sourceId": "sourceId-integration-sync-record-1", "externalId": "externalId-integration-sync-record-1", "engagementId": "engagementId-integration-sync-record-1", "status": "demo-status-1", "contentSignature": "demo-contentSignature-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.IntegrationSyncRecord_createViaTrack, { "provider": "demo-provider-2", "recordType": "demo-recordType-2", "sourceId": "sourceId-integration-sync-record-2", "externalId": "externalId-integration-sync-record-2", "engagementId": "engagementId-integration-sync-record-2", "status": "demo-status-2", "contentSignature": "demo-contentSignature-2" } as any);
   // Interview → api.mutations.Interview_createViaSchedule
   rowsAttempted += 1;
   await client.mutation(api.mutations.Interview_createViaSchedule, { "candidateId": "candidateId-interview-1", "scheduledFor": 1767268800000, "interviewerPersonId": "interviewerPersonId-interview-1", "sourceSystem": "demo-sourceSystem-1", "externalInterviewId": "externalInterviewId-interview-1", "rawSourceData": "demo-rawSourceData-1" } as any);
@@ -428,6 +434,16 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.OrganizationCapabilitySetting_createViaRegister, { "capability": "demo-capability-1", "enabled": false, "updatedBy": "demo-updatedBy-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.OrganizationCapabilitySetting_createViaRegister, { "capability": "demo-capability-2", "enabled": false, "updatedBy": "demo-updatedBy-2" } as any);
+  // OutboundWebhookDelivery → api.mutations.OutboundWebhookDelivery_createViaRecord
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.OutboundWebhookDelivery_createViaRecord, { "endpointKey": "demo-endpointKey-1", "sourceEventId": "sourceEventId-outbound-webhook-delivery-1", "eventType": "demo-eventType-1", "status": "demo-status-1", "attempt": 1, "httpStatus": 1, "error": "demo-error-1", "occurredAt": 1767268800000, "deliveredAt": 1767268800000 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.OutboundWebhookDelivery_createViaRecord, { "endpointKey": "demo-endpointKey-2", "sourceEventId": "sourceEventId-outbound-webhook-delivery-2", "eventType": "demo-eventType-2", "status": "demo-status-2", "attempt": 2, "httpStatus": 2, "error": "demo-error-2", "occurredAt": 1767355200000, "deliveredAt": 1767355200000 } as any);
+  // OutboundWebhookEndpoint → api.mutations.OutboundWebhookEndpoint_createViaRegister
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.OutboundWebhookEndpoint_createViaRegister, { "url": "demo-url-1", "label": "demo-label-1", "events": "demo-events-1", "signingSecret": "demo-signingSecret-1", "registeredAt": 1767268800000, "registeredById": "registeredById-outbound-webhook-endpoint-1", "deliveredThrough": 1767268800000 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.OutboundWebhookEndpoint_createViaRegister, { "url": "demo-url-2", "label": "demo-label-2", "events": "demo-events-2", "signingSecret": "demo-signingSecret-2", "registeredAt": 1767355200000, "registeredById": "registeredById-outbound-webhook-endpoint-2", "deliveredThrough": 1767355200000 } as any);
   // PackList → api.mutations.PackList_createViaOpen
   rowsAttempted += 1;
   await client.mutation(api.mutations.PackList_createViaOpen, { "eventId": "eventId-pack-list-1", "name": "PackList 1", "purpose": "demo-purpose-1", "notes": "demo-notes-1" } as any);
@@ -807,6 +823,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.WasteRecord_createViaRecord, { "ingredientId": "ingredientId-waste-record-1", "locationId": "locationId-waste-record-1", "eventId": "eventId-waste-record-1", "inventoryItemId": "inventoryItemId-waste-record-1", "quantity": 1, "unit": "demo-unit-1", "reason": "demo-reason-1", "unitCost": 1, "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.WasteRecord_createViaRecord, { "ingredientId": "ingredientId-waste-record-2", "locationId": "locationId-waste-record-2", "eventId": "eventId-waste-record-2", "inventoryItemId": "inventoryItemId-waste-record-2", "quantity": 2, "unit": "demo-unit-2", "reason": "demo-reason-2", "unitCost": 2, "notes": "demo-notes-2" } as any);
+  // skip WebhookDispatchState: no creation command in IR (2 rows unused)
   // WeeklyPurchasingConfig → api.mutations.WeeklyPurchasingConfig_createViaConfigure
   rowsAttempted += 1;
   await client.mutation(api.mutations.WeeklyPurchasingConfig_createViaConfigure, { "defaultVendorId": "defaultVendorId-weekly-purchasing-config-1" } as any);
@@ -1171,6 +1188,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "IntegrationSyncRecord",
+      "createMutation": "IntegrationSyncRecord_createViaTrack",
+      "rowCount": 2
+    },
+    {
       "entity": "Interview",
       "createMutation": "Interview_createViaSchedule",
       "rowCount": 2
@@ -1263,6 +1285,16 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "OrganizationCapabilitySetting",
       "createMutation": "OrganizationCapabilitySetting_createViaRegister",
+      "rowCount": 2
+    },
+    {
+      "entity": "OutboundWebhookDelivery",
+      "createMutation": "OutboundWebhookDelivery_createViaRecord",
+      "rowCount": 2
+    },
+    {
+      "entity": "OutboundWebhookEndpoint",
+      "createMutation": "OutboundWebhookEndpoint_createViaRegister",
       "rowCount": 2
     },
     {
@@ -1633,6 +1665,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "WasteRecord",
       "createMutation": "WasteRecord_createViaRecord",
+      "rowCount": 2
+    },
+    {
+      "entity": "WebhookDispatchState",
+      "createMutation": null,
       "rowCount": 2
     },
     {

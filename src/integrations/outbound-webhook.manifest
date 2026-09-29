@@ -1,0 +1,222 @@
+// Outbound webhooks — endpoints operators register, the delivery attempts made
+// to them, and the dispatcher's scheduler bookkeeping. Created 2026-09-29.
+//
+// Delivery itself is an authored Convex worker (convex/webhookIntegrations.ts):
+// Manifest `webhook` is inbound only (docs/generation/2026-07-17-command-api-surface-boundary.md).
+// The worker reads endpoints and attempts from these entities and writes them
+// only through the commands below, run as the tenant's system identity after
+// the worker's own checks (who may configure webhooks, the endpoint limit,
+// the URL rules). That is why every command is system-only.
+//
+// Named Outbound* so their emitted events never mix with the rows written by
+// hand before 2026-09-29 under the pseudo-entities WebhookEndpoint /
+// WebhookDelivery / WebhookDispatchTick. Endpoints and recent attempts from
+// those rows are still read (and endpoints copied here on the next dispatch
+// tick) so tenants keep their configuration; nothing new is written there.
+
+enum OutboundWebhookEndpointStatus {
+  active
+  removed
+}
+
+enum OutboundWebhookDeliveryStatus {
+  succeeded
+  failed
+}
+
+entity OutboundWebhookEndpoint mixin TenantScoped {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // The endpoint's public id (a UUID the worker mints; endpoints copied from
+  // the old ledger keep theirs). Unset only on the draft, so it doubles as the
+  // creation marker.
+  property indexed endpointKey: string?
+  property required url: string = ""
+  property required label: string = ""
+  property required events: list<string>
+  // HMAC signing secret. Sealed at rest and `private`: no generated read
+  // returns it; only the worker reads it back to sign a delivery.
+  property private encrypted signingSecret: string?
+  property required hasSigningSecret: boolean = false
+  property required status: OutboundWebhookEndpointStatus = "active"
+  property registeredAt: datetime?
+  property registeredById: string?
+  property removedAt: datetime?
+  // Newest source event (by its occurredAt) delivered successfully. The
+  // worker only looks for events at or after this point.
+  property deliveredThrough: datetime?
+
+  transition status from "active" to ["removed"]
+
+  // Configuring webhooks is a manager task (the worker's own check matches
+  // manageAccess: manager, every *_manager, admin, owner). The commands add a
+  // system-only guard so nobody bypasses the worker's URL and limit checks.
+  default policy outboundWebhookEndpointRead read: roleAllows(user.role, "manageAccess") "Managers may see outbound webhooks"
+  default policy outboundWebhookEndpointWrite write: roleAllows(user.role, "manageAccess") "Managers may update outbound webhooks"
+  default policy outboundWebhookEndpointExecute execute: roleAllows(user.role, "manageAccess") "Managers may change outbound webhooks"
+
+  // `registeredById` is the manager who registered it (the system identity
+  // runs the command). `deliveredThrough` is only set when an endpoint is
+  // copied from the old ledger with its delivery history.
+  command register(
+    newEndpointKey: string,
+    url: string,
+    label: string,
+    events: list<string>,
+    optional signingSecret: string,
+    registeredById: string,
+    registeredAt: datetime,
+    optional deliveredThrough: datetime
+  ) {
+    guard user.role == "system" "Webhook endpoints are registered through the webhook settings"
+    guard self.endpointKey == null
+    constraint webhookEndpointKey: length(trim(newEndpointKey)) > 0 "A webhook endpoint needs an id."
+    constraint webhookEndpointUrl: startsWith(url, "https://") or startsWith(url, "http://localhost") or startsWith(url, "http://127.0.0.1") or startsWith(url, "http://[::1]") "Webhook URLs must use https (use a localhost URL for local testing)."
+    constraint webhookEndpointUrlLength: length(url) <= 2048 "Webhook URL is too long."
+    constraint webhookEndpointEvents: length(events) > 0 "Select at least one event to subscribe to."
+    mutate endpointKey = newEndpointKey
+    mutate url = url
+    mutate label = label
+    mutate events = events
+    mutate signingSecret = signingSecret
+    mutate hasSigningSecret = signingSecret != null
+    mutate status = "active"
+    mutate registeredById = registeredById
+    mutate registeredAt = registeredAt
+    mutate deliveredThrough = deliveredThrough
+    emit WebhookEndpointRegistered {
+      tenantId: self.tenantId
+      endpointId: newEndpointKey
+      url: url
+      label: label
+      events: events
+      registeredAt: registeredAt
+      registeredBy: registeredById
+    }
+  }
+
+  command remove() {
+    guard user.role == "system" "Webhook endpoints are removed through the webhook settings"
+    guard self.endpointKey != null
+    guard self.status == "active"
+    mutate status = "removed"
+    mutate removedAt = now()
+    mutate signingSecret = null
+    emit WebhookEndpointRemoved {
+      tenantId: self.tenantId
+      endpointId: self.endpointKey
+      url: self.url
+      label: self.label
+      events: self.events
+      registeredAt: self.registeredAt
+      registeredBy: self.registeredById
+    }
+  }
+
+  // A successful delivery moves the watermark forward, never back.
+  command recordDelivered(occurredAt: datetime) {
+    guard user.role == "system" "Only CapsuleX records webhook deliveries"
+    guard self.endpointKey != null
+    mutate deliveredThrough = self.deliveredThrough == null or occurredAt > self.deliveredThrough ? occurredAt : self.deliveredThrough
+  }
+
+  store OutboundWebhookEndpoint in durable
+}
+
+// One HTTP attempt to deliver one source event to one endpoint. Append-only:
+// the worker counts failed attempts per `deliveryKey` (endpoint, source event,
+// event type) and stops after three; a success is never sent again.
+entity OutboundWebhookDelivery mixin TenantScoped {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // A UUID per attempt (attempts copied from the old ledger keep theirs).
+  // Unset only on the draft, so it doubles as the creation marker.
+  property attemptId: string?
+  // "<endpointKey>:<sourceEventId>:<eventType>"
+  property indexed deliveryKey: string?
+  property required endpointKey: string
+  property required sourceEventId: string
+  property required eventType: string
+  property required status: OutboundWebhookDeliveryStatus = "failed"
+  property required attempt: int = 1
+  property httpStatus: int?
+  property error: string?
+  // When the source event happened, and when this attempt was made.
+  property occurredAt: datetime?
+  property deliveredAt: datetime?
+
+  default policy outboundWebhookDeliveryRead read: roleAllows(user.role, "manageAccess") "Managers may see webhook deliveries"
+  default policy outboundWebhookDeliveryWrite write: roleAllows(user.role, "manageAccess") "Managers may update webhook deliveries"
+  default policy outboundWebhookDeliveryExecute execute: roleAllows(user.role, "manageAccess") "Managers may change webhook deliveries"
+
+  // One attempt, successful or not. Emits WebhookDeliveryAttempted with the
+  // fields the old hand-written WebhookDeliverySucceeded / WebhookDeliveryFailed
+  // rows carried (status tells them apart).
+  command record(
+    newAttemptId: string,
+    endpointKey: string,
+    sourceEventId: string,
+    eventType: string,
+    status: OutboundWebhookDeliveryStatus,
+    attempt: int,
+    optional httpStatus: int,
+    optional error: string,
+    occurredAt: datetime,
+    deliveredAt: datetime
+  ) {
+    guard user.role == "system" "Only CapsuleX records webhook deliveries"
+    guard self.attemptId == null
+    constraint webhookDeliveryAttempt: attempt >= 1 "A delivery attempt is numbered from 1."
+    mutate attemptId = newAttemptId
+    mutate deliveryKey = endpointKey + ":" + sourceEventId + ":" + eventType
+    mutate endpointKey = endpointKey
+    mutate sourceEventId = sourceEventId
+    mutate eventType = eventType
+    mutate status = status
+    mutate attempt = attempt
+    mutate httpStatus = httpStatus
+    mutate error = error
+    mutate occurredAt = occurredAt
+    mutate deliveredAt = deliveredAt
+    emit WebhookDeliveryAttempted {
+      tenantId: self.tenantId
+      deliveryId: newAttemptId
+      endpointId: endpointKey
+      sourceEventId: sourceEventId
+      eventType: eventType
+      status: status
+      attempt: attempt
+      httpStatus: httpStatus
+      error: error
+      occurredAt: occurredAt
+    }
+  }
+
+  store OutboundWebhookDelivery in durable
+}
+
+// Scheduler bookkeeping for the dispatch worker, one row per tenant: which
+// dispatch chain owns the tenant (older chains end at their next tick), when
+// the last tick ran (ticks inside half an interval collapse), and whether the
+// tenant's endpoints from the old ledger have been copied into
+// OutboundWebhookEndpoint. Infrastructure, not domain state: no generated
+// command reads or writes it — the worker writes it directly
+// (scripts/governed-write-exceptions.json "webhookDispatchStates").
+entity WebhookDispatchState mixin TenantScoped {
+  key [tenantId, id]
+  timestamps
+
+  property chainId: string?
+  property lastTickAt: datetime?
+  property legacyImportedAt: datetime?
+
+  default policy webhookDispatchStateRead read: roleAllows(user.role, "webhookDispatchSeamOnly") "Webhook scheduling runs behind the scenes"
+  default policy webhookDispatchStateWrite write: roleAllows(user.role, "webhookDispatchSeamOnly") "Only CapsuleX schedules webhook deliveries"
+  default policy webhookDispatchStateExecute execute: roleAllows(user.role, "webhookDispatchSeamOnly") "Webhook scheduling runs behind the scenes"
+
+  store WebhookDispatchState in durable
+}
