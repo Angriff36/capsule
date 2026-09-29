@@ -64,6 +64,8 @@ import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { MyDayCalendar, MyDaySection as Section } from "./MyDayDashboard";
 import { MyDayPrepList } from "./MyDayPrepList";
 import { MyPastShiftsCard } from "./MyPastShiftsCard";
+import { readClockEvidence } from "./clockLocation";
+import { breakMinutesInput } from "../workforce/timeRecordEntry";
 import { buildStaffUtilizationReport } from "../workforce/staffUtilization";
 
 const dayLabel = (ms?: number | null) =>
@@ -220,6 +222,8 @@ export function MyDayPage() {
   const [showDeclare, setShowDeclare] = useState(false);
   const [openPhotoKey, setOpenPhotoKey] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [lunchMinutes, setLunchMinutes] = useState("");
+  const [paidBreakMinutes, setPaidBreakMinutes] = useState("");
   const [now, setNow] = useState(Date.now);
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 30_000);
@@ -617,35 +621,86 @@ export function MyDayPage() {
                       : "You are not clocked in."}
                   </p>
                   {openRecord ? (
-                    <button
-                      className={BLOCK_BTN}
-                      disabled={busy != null}
-                      onClick={() =>
-                        perform("clock-out", "clock-out", "Clock out", {
-                          docId: openRecord._id,
-                          version: openRecord.version,
-                        })
-                      }
-                    >
-                      {busy === "clock-out" ? "Clocking out…" : "Clock out"}
-                    </button>
+                    <>
+                      <div
+                        className="grid grid-cols-2 gap-2"
+                        data-testid="my-day-breaks"
+                      >
+                        <label className="field-label">
+                          Lunch minutes (unpaid)
+                          <input
+                            className="input"
+                            type="number"
+                            min="0"
+                            inputMode="numeric"
+                            value={lunchMinutes}
+                            onChange={(event) =>
+                              setLunchMinutes(event.target.value)
+                            }
+                          />
+                        </label>
+                        <label className="field-label">
+                          Other breaks (paid)
+                          <input
+                            className="input"
+                            type="number"
+                            min="0"
+                            inputMode="numeric"
+                            value={paidBreakMinutes}
+                            onChange={(event) =>
+                              setPaidBreakMinutes(event.target.value)
+                            }
+                          />
+                        </label>
+                      </div>
+                      <button
+                        className={BLOCK_BTN}
+                        disabled={busy != null}
+                        onClick={() => {
+                          const lunch = breakMinutesInput(lunchMinutes);
+                          const paid = breakMinutesInput(paidBreakMinutes);
+                          perform(
+                            "clock-out",
+                            "clock-out",
+                            "Clock out",
+                            {
+                              docId: openRecord._id,
+                              version: openRecord.version,
+                              ...(lunch ? { breakMinutes: lunch } : {}),
+                              ...(paid ? { paidBreakMinutes: paid } : {}),
+                            },
+                            () => {
+                              setLunchMinutes("");
+                              setPaidBreakMinutes("");
+                            },
+                          );
+                        }}
+                      >
+                        {busy === "clock-out" ? "Clocking out…" : "Clock out"}
+                      </button>
+                    </>
                   ) : (
                     <button
                       className={BLOCK_BTN}
                       disabled={busy != null}
-                      onClick={() =>
-                        perform("clock-in", "clock-in", "Clock in", {
-                          personId: me._id,
-                          ...(clockInShift
-                            ? {
-                                shiftId: clockInShift._id,
-                                ...(clockInShift.eventId
-                                  ? { eventId: clockInShift.eventId }
-                                  : {}),
-                              }
-                            : {}),
-                        })
-                      }
+                      onClick={() => {
+                        setBusy("clock-in");
+                        void readClockEvidence().then((evidence) => {
+                          setBusy(null);
+                          perform("clock-in", "clock-in", "Clock in", {
+                            personId: me._id,
+                            ...evidence,
+                            ...(clockInShift
+                              ? {
+                                  shiftId: clockInShift._id,
+                                  ...(clockInShift.eventId
+                                    ? { eventId: clockInShift.eventId }
+                                    : {}),
+                                }
+                              : {}),
+                          });
+                        });
+                      }}
                     >
                       {busy === "clock-in" ? "Clocking in…" : "Clock in"}
                     </button>

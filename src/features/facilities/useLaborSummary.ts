@@ -7,6 +7,7 @@
 // distinguish "loading" (undefined) from "not allowed" (null).
 import { useQuery } from "convex/react";
 import { api } from "../../lib/api";
+import type { AttendanceAlert, OvertimeWarning } from "../workforce/timePay";
 
 type LaborSummaryBase = {
   cost: number;
@@ -73,8 +74,21 @@ export function usePayrollTimeRecords():
       clockOutAt: number;
       breakMinutes: number;
       status: string;
+      approvedAt: number | null;
     }>
   | null
   | undefined {
   return useQuery(api.laborSummary.payrollTimeRecords, {});
+}
+
+export type AttendanceAlertsView = {
+  alerts: Array<AttendanceAlert & { personName: string }>;
+  overtime: Array<OvertimeWarning & { personName: string }>;
+};
+
+/** Late / not-in / no-show / still-in alerts and weeks past 40 h. */
+export function useAttendanceAlerts(
+  now: number,
+): AttendanceAlertsView | null | undefined {
+  return useQuery(api.laborSummary.attendanceAlerts, { now });
 }

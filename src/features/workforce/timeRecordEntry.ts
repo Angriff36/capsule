@@ -35,6 +35,8 @@ export type TimeRecordWriteApi = {
   clockOut: (args: {
     docId: string;
     version?: number;
+    breakMinutes?: number;
+    paidBreakMinutes?: number;
   }) => Promise<{ version?: number } | void>;
   correct: (args: {
     docId: string;
@@ -202,6 +204,10 @@ export async function persistClockOut(
     version?: number;
     existingClockInAt: number;
     clockOutAt?: unknown;
+    /** Unpaid lunch minutes. */
+    breakMinutes?: number;
+    /** Other breaks; they stay paid. */
+    paidBreakMinutes?: number;
   },
 ): Promise<void> {
   // Check before closing: a refused time must leave the entry open, not
@@ -215,6 +221,10 @@ export async function persistClockOut(
   const closed = await api.clockOut({
     docId: input.docId,
     version: input.version,
+    ...(input.breakMinutes ? { breakMinutes: input.breakMinutes } : {}),
+    ...(input.paidBreakMinutes
+      ? { paidBreakMinutes: input.paidBreakMinutes }
+      : {}),
   });
   if (desiredOut == null) return;
   await api.correct({
@@ -295,3 +305,26 @@ export const CLOCK_OUT_PROMPT_FIELDS = [
     required: true,
   },
 ];
+
+/** Lunch is unpaid; other breaks stay paid (spec §12.2). */
+export const BREAK_PROMPT_FIELDS = [
+  {
+    name: "breakMinutes",
+    label: "Lunch minutes (unpaid)",
+    inputType: "number" as const,
+    helper: "Taken off paid time.",
+  },
+  {
+    name: "paidBreakMinutes",
+    label: "Other break minutes (paid)",
+    inputType: "number" as const,
+    helper: "Kept in paid time.",
+  },
+];
+
+/** Minutes typed in a break box; blank or bad input reads as none. */
+export function breakMinutesInput(value: unknown): number | undefined {
+  const minutes = Math.trunc(Number(String(value ?? "").trim()));
+  if (!Number.isFinite(minutes) || minutes < 0) return undefined;
+  return minutes;
+}
