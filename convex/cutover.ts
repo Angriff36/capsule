@@ -76,7 +76,13 @@ const PROVIDER_LABELS: Record<string, string> = {
   tiktok: "TikTok",
 };
 
-/** Providers whose connection state lives in the manifestEvents ledger. */
+/**
+ * ~~Providers whose connection state lives in the manifestEvents ledger.~~
+ * Correction 2026-09-29: providers whose connection state lived in the
+ * manifestEvents ledger before that date. A tenant whose canonical row the
+ * OAuth seam owns (grantedAt set) is read from that row; the ledger is read
+ * only for tenants not yet moved over.
+ */
 const LEDGER_PROVIDERS: Array<{
   provider: string;
   entity: string;
@@ -171,6 +177,30 @@ async function evaluateProviderReadiness(
     }
   >();
   for (const spec of LEDGER_PROVIDERS) {
+    // 2026-09-29: once the OAuth seam owns the canonical row (grantedAt set),
+    // the connection and its latest reconcile live there
+    // (convex/lib/oauthConnectionStore.ts) and the ledger no longer grows;
+    // recordOAuthGrant clears the sync fields, so they describe the current
+    // engagement only.
+    const owned = canonicalByProvider.get(spec.provider);
+    if (owned?.grantedAt != null) {
+      ledgerByProvider.set(spec.provider, {
+        engaged: true,
+        connected: owned.status === "connected",
+        lastReconcile:
+          owned.lastSyncAt != null
+            ? {
+                at: owned.lastSyncAt,
+                failed: owned.lastSyncFailedCount ?? null,
+                error:
+                  owned.lastErrorAt != null
+                    ? (owned.lastErrorMessage ?? null)
+                    : null,
+              }
+            : null,
+      });
+      continue;
+    }
     const rows = ledgerRows.filter((row) => row.entity === spec.entity);
 
     // Latest lifecycle event decides engagement: a historic connect never

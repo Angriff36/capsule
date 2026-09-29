@@ -1,7 +1,9 @@
 /**
  * Runtime proof (AC-191 outbound-outbox slice): external follow-on work for
- * subscribed domain events goes through the durable manifestEvents outbox in
- * `convex/webhookIntegrations.ts`, and repeated dispatch ticks deliver each
+ * subscribed domain events goes through a durable outbox in
+ * `convex/webhookIntegrations.ts` (~~manifestEvents rows~~ — since 2026-09-29
+ * OutboundWebhookDelivery rows written by a generated command, with dispatch
+ * ticks in webhookDispatchStates), and repeated dispatch ticks deliver each
  * outbox event to each endpoint exactly once. A failing endpoint is retried
  * on later ticks up to the attempt limit and then left alone, and the events
  * of one tenant never reach the endpoint of another tenant.
@@ -76,12 +78,12 @@ async function emitApproved(
  * the next dispatch is a real later tick, not a collapsed one. */
 async function ageTicks(t: TestConvex): Promise<void> {
   await t.run(async (ctx) => {
-    const ticks = await ctx.db
-      .query("manifestEvents")
-      .withIndex("by_entity", (q) => q.eq("entity", "WebhookDispatchTick"))
-      .collect();
-    for (const tick of ticks) {
-      await ctx.db.patch(tick._id, { createdAt: tick.createdAt - 2 * MINUTE });
+    const states = await ctx.db.query("webhookDispatchStates").collect();
+    for (const state of states) {
+      if (state.lastTickAt == null) continue;
+      await ctx.db.patch(state._id, {
+        lastTickAt: state.lastTickAt - 2 * MINUTE,
+      });
     }
   });
 }
@@ -95,10 +97,7 @@ async function dispatch(t: TestConvex, tenantId: string) {
 
 async function deliveryRows(t: TestConvex) {
   return await t.run(async (ctx) =>
-    ctx.db
-      .query("manifestEvents")
-      .withIndex("by_entity", (q) => q.eq("entity", "WebhookDelivery"))
-      .collect(),
+    ctx.db.query("outboundWebhookDeliveries").collect(),
   );
 }
 
@@ -122,15 +121,8 @@ describe("webhook outbox delivers each event once per endpoint", () => {
       "https://hooks.example.test/a",
     ]);
     const rows = await deliveryRows(t);
-    expect(rows.map((row) => row.type)).toEqual([
-      "WebhookDeliverySucceeded",
-      "WebhookDeliverySucceeded",
-    ]);
-    expect(
-      rows.map(
-        (row) => (row.payload as { sourceEventId: string }).sourceEventId,
-      ),
-    ).toEqual([first, second]);
+    expect(rows.map((row) => row.status)).toEqual(["succeeded", "succeeded"]);
+    expect(rows.map((row) => row.sourceEventId)).toEqual([first, second]);
   });
 
   it("a tick inside the collapse window sends nothing", async () => {
@@ -162,14 +154,12 @@ describe("webhook outbox delivers each event once per endpoint", () => {
 
     expect(calls).toHaveLength(3);
     const rows = await deliveryRows(t);
-    expect(rows.map((row) => row.type)).toEqual([
-      "WebhookDeliveryFailed",
-      "WebhookDeliveryFailed",
-      "WebhookDeliveryFailed",
+    expect(rows.map((row) => row.status)).toEqual([
+      "failed",
+      "failed",
+      "failed",
     ]);
-    expect(
-      rows.map((row) => (row.payload as { attempt: number }).attempt),
-    ).toEqual([1, 2, 3]);
+    expect(rows.map((row) => row.attempt)).toEqual([1, 2, 3]);
   });
 
   it("a later success after a failure is sent once and not retried again", async () => {
@@ -251,8 +241,6 @@ describe("webhook outbox delivers each event once per endpoint", () => {
       "https://hooks.example.test/a",
     ]);
     const rows = await deliveryRows(t);
-    expect(
-      rows.map((row) => (row.payload as { tenantId: string }).tenantId),
-    ).toEqual([TENANT]);
+    expect(rows.map((row) => row.tenantId)).toEqual([TENANT]);
   });
 });

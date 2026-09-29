@@ -1,0 +1,118 @@
+// IntegrationSyncRecord — what an outside service holds for one Capsule record.
+// Created 2026-09-29.
+//
+// One row per (tenant, provider, record type, Capsule record id), keyed by
+// `syncKey` = "<provider>:<recordType>:<sourceId>". Google Calendar keeps one
+// row per event ("event"); QuickBooks one per client ("customer"), invoice
+// ("invoice") and payment ("payment"). The provider seams (convex/googleCalendar.ts,
+// convex/qboSync.ts) read these rows to decide what to send next and write
+// them only through the commands below, run as the tenant's system identity
+// from the scheduled reconcile.
+//
+// Before 2026-09-29 this state lived in hand-written manifestEvents ledger rows
+// (GoogleCalendarEvent, QuickBooksCustomerLink, QuickBooksInvoiceLink,
+// QuickBooksPaymentLink). The first reconcile of each tenant copies the latest
+// ledger state into rows here through `track`, then marks the tenant's
+// IntegrationConnection `ledgerImportedAt`; the ledger is never read again.
+
+enum IntegrationSyncStatus {
+  synced
+  deleted
+  failed
+  linked
+}
+
+entity IntegrationSyncRecord mixin TenantScoped {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // "<provider>:<recordType>:<sourceId>". Unset only on the draft `track`
+  // creates, so it doubles as the creation marker.
+  property indexed syncKey: string?
+  property required provider: IntegrationProvider = "google_calendar"
+  property required recordType: string = "event"
+  property required sourceId: string
+  // The provider's id for the record (Google event id, QuickBooks entity id).
+  property externalId: string?
+  // The IntegrationConnection consent this outcome belongs to.
+  property engagementId: string?
+  property required status: IntegrationSyncStatus = "synced"
+  // Calendar: fingerprint of what was last sent, so unchanged events are skipped.
+  property contentSignature: string?
+  property lastSyncedAt: datetime?
+  property lastError: string?
+
+  // Same tiers as IntegrationConnection: managers may see sync health; the
+  // commands are system-only (see the guards).
+  default policy integrationSyncRecordRead read: roleAllows(user.role, "manageAccess") "Managers may see what outside services hold"
+  default policy integrationSyncRecordWrite write: roleAllows(user.role, "adminAccess") "Admins may update outside-service sync records"
+  default policy integrationSyncRecordExecute execute: roleAllows(user.role, "adminAccess") "Admins may change outside-service sync records"
+
+  // First outcome for a record. The seam looks the row up by syncKey first and
+  // runs `recordOutcome` when it exists, so there is one row per key.
+  command track(
+    provider: IntegrationProvider,
+    recordType: string,
+    sourceId: string,
+    optional externalId: string,
+    optional engagementId: string,
+    status: IntegrationSyncStatus,
+    optional contentSignature: string,
+    syncedAt: datetime,
+    optional error: string
+  ) {
+    guard user.role == "system" "Only CapsuleX records outside-service sync state"
+    guard self.syncKey == null
+    constraint syncRecordSource: length(trim(sourceId)) > 0 "A sync record needs the Capsule record it describes."
+    constraint syncRecordType: length(trim(recordType)) > 0 "A sync record needs a record type."
+    mutate syncKey = provider + ":" + recordType + ":" + sourceId
+    mutate provider = provider
+    mutate recordType = recordType
+    mutate sourceId = sourceId
+    mutate externalId = externalId
+    mutate engagementId = engagementId
+    mutate status = status
+    mutate contentSignature = contentSignature
+    mutate lastSyncedAt = syncedAt
+    mutate lastError = error
+    emit IntegrationRecordSynced {
+      syncRecordId: self.id
+      tenantId: self.tenantId
+      provider: provider
+      recordType: recordType
+      sourceId: sourceId
+      externalId: externalId
+      status: status
+    }
+  }
+
+  command recordOutcome(
+    optional externalId: string,
+    optional engagementId: string,
+    status: IntegrationSyncStatus,
+    optional contentSignature: string,
+    syncedAt: datetime,
+    optional error: string
+  ) {
+    guard user.role == "system" "Only CapsuleX records outside-service sync state"
+    guard self.syncKey != null
+    mutate externalId = externalId
+    mutate engagementId = engagementId
+    mutate status = status
+    mutate contentSignature = contentSignature
+    mutate lastSyncedAt = syncedAt
+    mutate lastError = error
+    emit IntegrationRecordSynced {
+      syncRecordId: self.id
+      tenantId: self.tenantId
+      provider: self.provider
+      recordType: self.recordType
+      sourceId: self.sourceId
+      externalId: externalId
+      status: status
+    }
+  }
+
+  store IntegrationSyncRecord in durable
+}

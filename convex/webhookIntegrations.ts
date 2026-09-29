@@ -1,28 +1,42 @@
 import { ConvexError, v } from "convex/values";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
+import type { Doc } from "./_generated/dataModel";
 import {
   action,
   internalAction,
   internalMutation,
   internalQuery,
   query,
+  type MutationCtx,
+  type QueryCtx,
 } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
-import { decrypt, encrypt } from "./lib/encryption";
+import { decrypt } from "./lib/encryption";
+import { parseSealedEnvelope } from "./lib/oauthConnectionStore";
+import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 
 // Outbound webhook integrations. Operators register HTTP endpoints that receive
 // a structured JSON payload when a subscribed domain event fires
-// (EventApproved, InvoicePaymentApplied, DeliveryTransitStarted). Endpoint
-// registrations, dispatch ticks, and per-event delivery attempts are recorded
-// on the manifestEvents outbox, matching the googleCalendar / invoicePayments
-// author-seam precedent. Outbound delivery is an explicit Convex worker
-// (action) — Manifest `webhook` is inbound only; see
-// docs/generation/2026-07-17-command-api-surface-boundary.md.
+// (EventApproved, InvoicePaymentApplied, DeliveryTransitStarted).
+// ~~Endpoint registrations, dispatch ticks, and per-event delivery attempts are
+// recorded on the manifestEvents outbox, matching the googleCalendar /
+// invoicePayments author-seam precedent.~~
+// Correction 2026-09-29: endpoints and delivery attempts are the
+// OutboundWebhookEndpoint / OutboundWebhookDelivery entities
+// (src/integrations/outbound-webhook.manifest), written only through their
+// generated commands as the tenant's system identity after this file's own
+// checks (manager role, endpoint limit, URL rules). Dispatch ticks and chain
+// ownership are scheduler bookkeeping in the `webhookDispatchStates` table
+// (storage-only WebhookDispatchState), written directly — see
+// scripts/governed-write-exceptions.json. Rows written before that date under
+// the ledger pseudo-entities WebhookEndpoint / WebhookDelivery are still read
+// (same keys) until the tenant's next dispatch tick copies its endpoints over;
+// nothing new is written to the ledger.
+// Outbound delivery is an explicit Convex worker (action) — Manifest `webhook`
+// is inbound only; see docs/generation/2026-07-17-command-api-surface-boundary.md.
 
 const ENDPOINT_ENTITY = "WebhookEndpoint";
 const DELIVERY_ENTITY = "WebhookDelivery";
-const TICK_ENTITY = "WebhookDispatchTick";
-const CHAIN_START_TYPE = "WebhookDispatchChainStarted";
 
 const DISPATCH_INTERVAL_MS = 60_000;
 const IDLE_INTERVAL_MS = 5 * 60_000;
@@ -75,6 +89,10 @@ interface EndpointRecord {
   label: string;
   registeredAt: number;
   registeredBy: string;
+  /** Newest delivered source event; null until the first success. */
+  deliveredThrough: number | null;
+  /** `ledger`: still only in the pre-2026-09-29 manifestEvents rows. */
+  source: "entity" | "ledger";
 }
 
 export interface EndpointView {
@@ -111,15 +129,34 @@ interface CandidateEvent {
   eventType: string;
   occurredAt: number;
   payload: unknown;
+  /** Delivery history of this (endpoint, event, type). */
+  succeeded: boolean;
+  failedAttempts: number;
+}
+
+interface LedgerAttempt {
+  deliveryId: string;
+  sourceEventId: string;
+  eventType: string;
+  status: "succeeded" | "failed";
+  attempt: number;
+  httpStatus: number | null;
+  error: string | null;
+  occurredAt: number;
+  deliveredAt: number;
+}
+
+interface LedgerImport {
+  endpoint: EndpointRecord;
+  attempts: LedgerAttempt[];
 }
 
 interface DispatchContext {
   endpoints: EndpointRecord[];
-  succeededKeys: string[];
-  attemptCounts: Array<{ key: string; attempts: number }>;
-  successWatermarkByEndpoint: Array<{ endpointId: string; watermark: number }>;
   lastTickAt: number | null;
   currentChainId: string | null;
+  /** Ledger endpoints (with their open delivery history) still to copy over. */
+  ledgerImports: LedgerImport[] | null;
 }
 
 function canManage(role: string): boolean {
@@ -174,7 +211,17 @@ function normalizeUrl(raw: string): string {
   return parsed.toString();
 }
 
-function parseEndpoint(payload: unknown): EndpointRecord | null {
+function subscribable(events: readonly unknown[]): string[] {
+  return events
+    .map((entry) => stringValue(entry))
+    .filter(
+      (entry): entry is string =>
+        entry !== null && SUBSCRIBABLE_TYPES.has(entry),
+    );
+}
+
+/** A legacy ledger `WebhookEndpointRegistered` payload. */
+function parseLedgerEndpoint(payload: unknown): EndpointRecord | null {
   const value = asRecord(payload);
   const endpointId = stringValue(value.endpointId);
   const tenantId = stringValue(value.tenantId);
@@ -191,13 +238,7 @@ function parseEndpoint(payload: unknown): EndpointRecord | null {
   ) {
     return null;
   }
-  const eventsRaw = Array.isArray(value.events) ? value.events : [];
-  const events = eventsRaw
-    .map((entry) => stringValue(entry))
-    .filter(
-      (entry): entry is string =>
-        entry !== null && SUBSCRIBABLE_TYPES.has(entry),
-    );
+  const events = subscribable(Array.isArray(value.events) ? value.events : []);
   const secretRecord = asRecord(value.secret);
   const secretCiphertext = stringValue(secretRecord.ciphertext);
   const secretKeyId = stringValue(secretRecord.keyId);
@@ -215,6 +256,28 @@ function parseEndpoint(payload: unknown): EndpointRecord | null {
     label,
     registeredAt,
     registeredBy,
+    deliveredThrough: null,
+    source: "ledger",
+  };
+}
+
+function endpointFromRow(
+  row: Doc<"outboundWebhookEndpoints">,
+): EndpointRecord | null {
+  if (row.status !== "active" || !row.endpointKey) return null;
+  const secret = parseSealedEnvelope(row.signingSecret);
+  return {
+    endpointId: row.endpointKey,
+    tenantId: row.tenantId,
+    url: row.url,
+    events: subscribable(row.events),
+    hasSecret: Boolean(secret),
+    secret,
+    label: row.label,
+    registeredAt: row.registeredAt ?? row._creationTime,
+    registeredBy: row.registeredById ?? "",
+    deliveredThrough: row.deliveredThrough ?? null,
+    source: "entity",
   };
 }
 
@@ -241,31 +304,156 @@ function latestEndpointState(rows: EndpointLogRow[]): EndpointRecord | null {
   for (const row of sorted) {
     if (row.type === "WebhookEndpointRemoved") return null;
     if (row.type === "WebhookEndpointRegistered") {
-      return parseEndpoint(row.payload);
+      return parseLedgerEndpoint(row.payload);
     }
   }
   return null;
 }
 
-function activeEndpointsFor(
-  rows: EndpointLogRow[],
+async function dispatchState(
+  db: QueryCtx["db"],
   tenantId: string,
-): EndpointRecord[] {
+): Promise<Doc<"webhookDispatchStates"> | null> {
+  return await db
+    .query("webhookDispatchStates")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .first();
+}
+
+async function endpointRow(
+  db: QueryCtx["db"],
+  tenantId: string,
+  endpointKey: string,
+): Promise<Doc<"outboundWebhookEndpoints"> | null> {
+  const rows = await db
+    .query("outboundWebhookEndpoints")
+    .withIndex("by_endpointKey", (q) => q.eq("endpointKey", endpointKey))
+    .collect();
+  return rows.find((row) => row.tenantId === tenantId) ?? null;
+}
+
+/**
+ * Active ledger endpoints of this tenant not (yet) copied to the entity. The
+ * ledger rows name the tenant only in their payload, so this reads the frozen
+ * WebhookEndpoint rows (registrations and removals only — no new ones since
+ * 2026-09-29). It runs only until the tenant's first dispatch tick copies
+ * them over and marks `legacyImportedAt`.
+ */
+async function ledgerOnlyEndpoints(
+  db: QueryCtx["db"],
+  tenantId: string,
+  knownKeys: ReadonlySet<string>,
+): Promise<EndpointRecord[]> {
+  const rows = await db
+    .query("manifestEvents")
+    .withIndex("by_entity", (q) => q.eq("entity", ENDPOINT_ENTITY))
+    .collect();
   const byEndpoint = new Map<string, EndpointLogRow[]>();
   for (const row of rows) {
-    if (asRecord(row.payload).tenantId !== tenantId) continue;
-    const endpointId = stringValue(asRecord(row.payload).endpointId);
-    if (!endpointId) continue;
+    const payload = asRecord(row.payload);
+    if (payload.tenantId !== tenantId) continue;
+    const endpointId = stringValue(payload.endpointId);
+    if (!endpointId || knownKeys.has(endpointId)) continue;
     const bucket = byEndpoint.get(endpointId) ?? [];
-    bucket.push(row);
+    bucket.push({
+      type: row.type,
+      payload: row.payload,
+      createdAt: row.createdAt,
+    });
     byEndpoint.set(endpointId, bucket);
   }
   const endpoints: EndpointRecord[] = [];
   for (const bucket of byEndpoint.values()) {
     const state = latestEndpointState(bucket);
-    if (state && state.events.length > 0) endpoints.push(state);
+    if (state) endpoints.push(state);
   }
   return endpoints;
+}
+
+/** The tenant's active endpoints with at least one subscribed event. */
+async function activeEndpoints(
+  db: QueryCtx["db"],
+  tenantId: string,
+): Promise<{ endpoints: EndpointRecord[]; legacyImported: boolean }> {
+  const [rows, state] = await Promise.all([
+    db
+      .query("outboundWebhookEndpoints")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .collect(),
+    dispatchState(db, tenantId),
+  ]);
+  const endpoints: EndpointRecord[] = [];
+  const known = new Set<string>();
+  for (const row of rows) {
+    if (row.endpointKey) known.add(row.endpointKey);
+    const endpoint = endpointFromRow(row);
+    if (endpoint) endpoints.push(endpoint);
+  }
+  const legacyImported = state?.legacyImportedAt != null;
+  if (!legacyImported) {
+    endpoints.push(...(await ledgerOnlyEndpoints(db, tenantId, known)));
+  }
+  return {
+    endpoints: endpoints.filter((endpoint) => endpoint.events.length > 0),
+    legacyImported,
+  };
+}
+
+/**
+ * The attempts a ledger endpoint's future dispatch still depends on: every
+ * attempt at or after its newest success (and all of them before a first
+ * success). Indexed: ledger delivery rows are keyed
+ * `<endpointId>:<sourceEventId>`, so one prefix range reads one endpoint.
+ */
+async function ledgerAttempts(
+  db: QueryCtx["db"],
+  tenantId: string,
+  endpointId: string,
+): Promise<{ attempts: LedgerAttempt[]; watermark: number | null }> {
+  const rows = await db
+    .query("manifestEvents")
+    .withIndex("by_entityId", (q) =>
+      q.gte("entityId", `${endpointId}:`).lt("entityId", `${endpointId};`),
+    )
+    .collect();
+  const all: LedgerAttempt[] = [];
+  let watermark: number | null = null;
+  for (const row of rows) {
+    if (row.entity !== DELIVERY_ENTITY) continue;
+    const payload = asRecord(row.payload);
+    if (payload.tenantId !== tenantId) continue;
+    const status = stringValue(payload.status);
+    const sourceEventId = stringValue(payload.sourceEventId);
+    const eventType = stringValue(payload.eventType);
+    if (
+      (status !== "succeeded" && status !== "failed") ||
+      !sourceEventId ||
+      !eventType
+    ) {
+      continue;
+    }
+    const occurredAt = numberValue(payload.occurredAt) ?? row.createdAt;
+    if (status === "succeeded") {
+      watermark = Math.max(watermark ?? 0, occurredAt);
+    }
+    all.push({
+      deliveryId: stringValue(payload.deliveryId) ?? String(row._id),
+      sourceEventId,
+      eventType,
+      status,
+      attempt: numberValue(payload.attempt) ?? 1,
+      httpStatus: numberValue(payload.httpStatus),
+      error: stringValue(payload.error),
+      occurredAt,
+      deliveredAt: row.createdAt,
+    });
+  }
+  return {
+    attempts: all.filter(
+      (attempt) => watermark == null || attempt.occurredAt >= watermark,
+    ),
+    watermark,
+  };
 }
 
 export const getCatalog = query({
@@ -280,62 +468,90 @@ export const listEndpoints = query({
   handler: async (ctx): Promise<EndpointView[]> => {
     const auth = await getAuthContext(ctx);
     if (!auth.tenantId) return [];
-    const rows = await ctx.db
-      .query("manifestEvents")
-      .withIndex("by_entity", (q) => q.eq("entity", ENDPOINT_ENTITY))
-      .collect();
-    const endpoints = activeEndpointsFor(rows, auth.tenantId);
+    const { endpoints } = await activeEndpoints(ctx.db, auth.tenantId);
     return endpoints
       .map(toView)
       .sort((left, right) => left.registeredAt - right.registeredAt);
   },
 });
 
+/** An endpoint's label, from the entity or (for ledger ids) its ledger rows. */
+async function endpointLabel(
+  db: QueryCtx["db"],
+  tenantId: string,
+  endpointId: string,
+): Promise<string | null> {
+  const row = await endpointRow(db, tenantId, endpointId);
+  if (row) return row.label || row.url;
+  const ledger = await db
+    .query("manifestEvents")
+    .withIndex("by_entityId", (q) => q.eq("entityId", endpointId))
+    .collect();
+  for (const entry of ledger) {
+    if (
+      entry.entity !== ENDPOINT_ENTITY ||
+      entry.type !== "WebhookEndpointRegistered" ||
+      asRecord(entry.payload).tenantId !== tenantId
+    ) {
+      continue;
+    }
+    const state = parseLedgerEndpoint(entry.payload);
+    if (state) return state.label || state.url;
+  }
+  return null;
+}
+
 export const listDeliveries = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, args): Promise<DeliveryView[]> => {
     const auth = await getAuthContext(ctx);
-    if (!auth.tenantId) return [];
+    const tenantId = auth.tenantId;
+    if (!tenantId) return [];
     const limit = Math.max(1, Math.min(50, args.limit ?? 20));
-    const [deliveryRows, endpointRows] = await Promise.all([
+    const [entityRows, ledgerRows] = await Promise.all([
+      ctx.db
+        .query("outboundWebhookDeliveries")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .order("desc")
+        .take(limit),
+      // Attempts from before 2026-09-29: bounded, newest first, as before.
       ctx.db
         .query("manifestEvents")
         .withIndex("by_entity", (q) => q.eq("entity", DELIVERY_ENTITY))
         .order("desc")
         .take(limit * 4),
-      ctx.db
-        .query("manifestEvents")
-        .withIndex("by_entity", (q) => q.eq("entity", ENDPOINT_ENTITY))
-        .collect(),
     ]);
-    const labelByEndpoint = new Map<string, string>();
-    for (const row of endpointRows) {
-      const payload = asRecord(row.payload);
-      if (payload.tenantId !== auth.tenantId) continue;
-      const endpointId = stringValue(payload.endpointId);
-      if (!endpointId) continue;
-      if (
-        row.type === "WebhookEndpointRegistered" &&
-        !labelByEndpoint.has(endpointId)
-      ) {
-        const state = parseEndpoint(row.payload);
-        if (state) labelByEndpoint.set(endpointId, state.label || state.url);
-      }
+    const deliveries: Array<Omit<DeliveryView, "endpointLabel">> = [];
+    const seen = new Set<string>();
+    for (const row of entityRows) {
+      const deliveryId = row.attemptId ?? String(row._id);
+      seen.add(deliveryId);
+      deliveries.push({
+        deliveryId,
+        endpointId: row.endpointKey,
+        eventType: row.eventType,
+        status: row.status,
+        attempt: row.attempt,
+        httpStatus: row.httpStatus ?? null,
+        error: row.error ?? null,
+        deliveredAt: row.deliveredAt ?? row._creationTime,
+      });
     }
-    const deliveries: DeliveryView[] = [];
-    for (const row of deliveryRows) {
+    for (const row of ledgerRows) {
       const payload = asRecord(row.payload);
-      if (payload.tenantId !== auth.tenantId) continue;
+      if (payload.tenantId !== tenantId) continue;
       const status = stringValue(payload.status);
       if (status !== "succeeded" && status !== "failed") continue;
       const endpointId = stringValue(payload.endpointId);
       const eventType = stringValue(payload.eventType);
       if (!endpointId || !eventType) continue;
+      const deliveryId =
+        stringValue(payload.deliveryId) ?? `${endpointId}:${eventType}`;
+      // Copied into the entity on import: show it once.
+      if (seen.has(deliveryId)) continue;
       deliveries.push({
-        deliveryId:
-          stringValue(payload.deliveryId) ?? `${endpointId}:${eventType}`,
+        deliveryId,
         endpointId,
-        endpointLabel: labelByEndpoint.get(endpointId) ?? endpointId,
         eventType,
         status,
         attempt: numberValue(payload.attempt) ?? 1,
@@ -343,9 +559,23 @@ export const listDeliveries = query({
         error: stringValue(payload.error),
         deliveredAt: row.createdAt,
       });
-      if (deliveries.length >= limit) break;
     }
-    return deliveries;
+    const newest = deliveries
+      .sort((left, right) => right.deliveredAt - left.deliveredAt)
+      .slice(0, limit);
+    const labels = new Map<string, string>();
+    for (const delivery of newest) {
+      if (labels.has(delivery.endpointId)) continue;
+      labels.set(
+        delivery.endpointId,
+        (await endpointLabel(ctx.db, tenantId, delivery.endpointId)) ??
+          delivery.endpointId,
+      );
+    }
+    return newest.map((delivery) => ({
+      ...delivery,
+      endpointLabel: labels.get(delivery.endpointId) ?? delivery.endpointId,
+    }));
   },
 });
 
@@ -388,16 +618,8 @@ export const registerEndpoint = action({
         `This workspace already has the maximum of ${MAX_ENDPOINTS} webhook endpoints.`,
       );
     }
-    let encryptedSecret: EncryptedSecret | null = null;
-    const secretValue = args.secret?.trim();
-    if (secretValue) {
-      encryptedSecret = await encrypt(secretValue, {
-        ctx,
-        entity: ENDPOINT_ENTITY,
-        property: "secret",
-      });
-    }
     const endpointId = crypto.randomUUID();
+    // The generated command seals the secret (signingSecret is `encrypted`).
     await ctx.runMutation(internal.webhookIntegrations.recordEndpoint, {
       type: "WebhookEndpointRegistered",
       tenantId,
@@ -405,7 +627,7 @@ export const registerEndpoint = action({
       url,
       label,
       events,
-      secret: encryptedSecret,
+      secret: args.secret?.trim() || null,
       registeredAt: Date.now(),
       registeredBy: auth.id,
     });
@@ -505,41 +727,55 @@ export const sendTest = action({
 export const countEndpoints = internalQuery({
   args: { tenantId: v.string() },
   handler: async (ctx, args): Promise<number> => {
-    const rows = await ctx.db
-      .query("manifestEvents")
-      .withIndex("by_entity", (q) => q.eq("entity", ENDPOINT_ENTITY))
-      .collect();
-    return activeEndpointsFor(rows, args.tenantId).length;
+    return (await activeEndpoints(ctx.db, args.tenantId)).endpoints.length;
   },
 });
 
 export const loadEndpoint = internalQuery({
   args: { tenantId: v.string(), endpointId: v.string() },
   handler: async (ctx, args): Promise<EndpointRecord | null> => {
+    const row = await endpointRow(ctx.db, args.tenantId, args.endpointId);
+    if (row) return endpointFromRow(row);
+    const state = await dispatchState(ctx.db, args.tenantId);
+    if (state?.legacyImportedAt != null) return null;
+    // Ledger endpoint rows are keyed entityId = endpointId.
     const rows = await ctx.db
       .query("manifestEvents")
-      .withIndex("by_entity", (q) => q.eq("entity", ENDPOINT_ENTITY))
-      .filter((q) => q.eq(q.field("entityId"), args.endpointId))
+      .withIndex("by_entityId", (q) => q.eq("entityId", args.endpointId))
       .collect();
     const bucket: EndpointLogRow[] = rows
-      .filter((row) => asRecord(row.payload).tenantId === args.tenantId)
-      .map((row) => ({
-        type: row.type,
-        payload: row.payload,
-        createdAt: row.createdAt,
+      .filter(
+        (entry) =>
+          entry.entity === ENDPOINT_ENTITY &&
+          asRecord(entry.payload).tenantId === args.tenantId,
+      )
+      .map((entry) => ({
+        type: entry.type,
+        payload: entry.payload,
+        createdAt: entry.createdAt,
       }));
-    const state = latestEndpointState(bucket);
-    if (!state || state.tenantId !== args.tenantId) return null;
-    return state;
+    const ledger = latestEndpointState(bucket);
+    if (!ledger || ledger.tenantId !== args.tenantId) return null;
+    return ledger;
   },
 });
 
 export const loadCandidateEvents = internalQuery({
-  args: { tenantId: v.string(), eventType: v.string(), since: v.number() },
+  args: {
+    tenantId: v.string(),
+    eventType: v.string(),
+    since: v.number(),
+    endpointId: v.string(),
+  },
   handler: async (ctx, args): Promise<CandidateEvent[]> => {
+    // createdAt is stamped just before the insert, so every row with
+    // createdAt >= since also has _creationTime >= since: an index range, not
+    // a scan from the start of the event type.
     const rows = await ctx.db
       .query("manifestEvents")
-      .withIndex("by_type", (q) => q.eq("type", args.eventType))
+      .withIndex("by_type", (q) =>
+        q.eq("type", args.eventType).gte("_creationTime", args.since),
+      )
       .filter((q) => q.gte(q.field("createdAt"), args.since))
       .take(MAX_EVENTS_PER_TYPE * 4);
     const candidates: CandidateEvent[] = [];
@@ -550,89 +786,60 @@ export const loadCandidateEvents = internalQuery({
         eventType: args.eventType,
         occurredAt: row.createdAt,
         payload: row.payload,
+        succeeded: false,
+        failedAttempts: 0,
       });
     }
     candidates.sort((left, right) => left.occurredAt - right.occurredAt);
-    return candidates.slice(0, MAX_EVENTS_PER_TYPE);
+    const selected = candidates.slice(0, MAX_EVENTS_PER_TYPE);
+    for (const candidate of selected) {
+      const attempts = await ctx.db
+        .query("outboundWebhookDeliveries")
+        .withIndex("by_deliveryKey", (q) =>
+          q.eq(
+            "deliveryKey",
+            `${args.endpointId}:${candidate.sourceEventId}:${candidate.eventType}`,
+          ),
+        )
+        .collect();
+      for (const attempt of attempts) {
+        if (attempt.tenantId !== args.tenantId) continue;
+        if (attempt.status === "succeeded") candidate.succeeded = true;
+        else candidate.failedAttempts += 1;
+      }
+    }
+    return selected;
   },
 });
 
 export const loadDispatchContext = internalQuery({
   args: { tenantId: v.string() },
   handler: async (ctx, args): Promise<DispatchContext> => {
-    const [endpointRows, deliveryRows, tickRows] = await Promise.all([
-      ctx.db
-        .query("manifestEvents")
-        .withIndex("by_entity", (q) => q.eq("entity", ENDPOINT_ENTITY))
-        .collect(),
-      ctx.db
-        .query("manifestEvents")
-        .withIndex("by_entity", (q) => q.eq("entity", DELIVERY_ENTITY))
-        .collect(),
-      ctx.db
-        .query("manifestEvents")
-        .withIndex("by_entity", (q) => q.eq("entity", TICK_ENTITY))
-        .collect(),
+    const [{ endpoints, legacyImported }, state] = await Promise.all([
+      activeEndpoints(ctx.db, args.tenantId),
+      dispatchState(ctx.db, args.tenantId),
     ]);
-
-    const endpoints = activeEndpointsFor(
-      endpointRows.map((row) => ({
-        type: row.type,
-        payload: row.payload,
-        createdAt: row.createdAt,
-      })),
-      args.tenantId,
-    );
-
-    const attemptCounts = new Map<string, number>();
-    const succeededKeys: string[] = [];
-    const successWatermarkByEndpoint = new Map<string, number>();
-    for (const row of deliveryRows) {
-      const payload = asRecord(row.payload);
-      if (payload.tenantId !== args.tenantId) continue;
-      const endpointId = stringValue(payload.endpointId);
-      const sourceEventId = stringValue(payload.sourceEventId);
-      const eventType = stringValue(payload.eventType);
-      if (!endpointId || !sourceEventId || !eventType) continue;
-      const key = `${endpointId}:${sourceEventId}:${eventType}`;
-      const status = stringValue(payload.status);
-      if (status === "succeeded") {
-        succeededKeys.push(key);
-        const occurredAt = numberValue(payload.occurredAt) ?? row.createdAt;
-        successWatermarkByEndpoint.set(
-          endpointId,
-          Math.max(successWatermarkByEndpoint.get(endpointId) ?? 0, occurredAt),
+    let ledgerImports: LedgerImport[] | null = null;
+    if (!legacyImported) {
+      ledgerImports = [];
+      for (const endpoint of endpoints) {
+        if (endpoint.source !== "ledger") continue;
+        const { attempts, watermark } = await ledgerAttempts(
+          ctx.db,
+          args.tenantId,
+          endpoint.endpointId,
         );
-      } else {
-        attemptCounts.set(key, (attemptCounts.get(key) ?? 0) + 1);
+        ledgerImports.push({
+          endpoint: { ...endpoint, deliveredThrough: watermark },
+          attempts,
+        });
       }
     }
-
-    let lastTickAt: number | null = null;
-    let currentChainId: string | null = null;
-    for (const row of tickRows) {
-      const payload = asRecord(row.payload);
-      if (payload.tenantId !== args.tenantId) continue;
-      if (row.type === CHAIN_START_TYPE) {
-        // Rows come in insertion order, so the last one is the newest chain.
-        currentChainId = stringValue(payload.chainId) ?? currentChainId;
-        continue;
-      }
-      if (row.createdAt > (lastTickAt ?? 0)) lastTickAt = row.createdAt;
-    }
-
     return {
       endpoints,
-      succeededKeys,
-      attemptCounts: [...attemptCounts.entries()].map(([key, attempts]) => ({
-        key,
-        attempts,
-      })),
-      successWatermarkByEndpoint: [...successWatermarkByEndpoint.entries()].map(
-        ([endpointId, watermark]) => ({ endpointId, watermark }),
-      ),
-      lastTickAt,
-      currentChainId,
+      lastTickAt: state?.lastTickAt ?? null,
+      currentChainId: state?.chainId ?? null,
+      ledgerImports,
     };
   },
 });
@@ -722,6 +929,44 @@ async function signBody(body: string, secret: string): Promise<string> {
   return hex;
 }
 
+// Domain writes below go through the generated OutboundWebhookEndpoint /
+// OutboundWebhookDelivery commands as the tenant's system identity (their
+// guards admit only that identity). Callers: registerEndpoint / removeEndpoint
+// / sendTest after requireManager, and the scheduled dispatchPending.
+
+function systemContext(ctx: MutationCtx, tenantId: string): MutationCtx {
+  return TenantSystemCommandRunner.forTenant(ctx, tenantId).context;
+}
+
+async function registerEndpointRow(
+  ctx: MutationCtx,
+  input: {
+    tenantId: string;
+    endpointId: string;
+    url: string;
+    label: string;
+    events: string[];
+    secret: string | null;
+    registeredAt: number;
+    registeredBy: string;
+    deliveredThrough: number | null;
+  },
+): Promise<void> {
+  await systemContext(ctx, input.tenantId).runMutation(
+    api.mutations.OutboundWebhookEndpoint_createViaRegister,
+    {
+      newEndpointKey: input.endpointId,
+      url: input.url,
+      label: input.label,
+      events: input.events,
+      signingSecret: input.secret ?? undefined,
+      registeredById: input.registeredBy,
+      registeredAt: input.registeredAt,
+      deliveredThrough: input.deliveredThrough ?? undefined,
+    },
+  );
+}
+
 export const recordEndpoint = internalMutation({
   args: {
     type: v.union(
@@ -733,94 +978,183 @@ export const recordEndpoint = internalMutation({
     url: v.string(),
     label: v.string(),
     events: v.array(v.string()),
-    secret: v.union(
-      v.null(),
-      v.object({ ciphertext: v.string(), keyId: v.string() }),
-    ),
+    /** Plaintext signing secret; the generated command seals it. */
+    secret: v.union(v.null(), v.string()),
     registeredAt: v.number(),
     registeredBy: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
-      type: args.type,
-      entity: ENDPOINT_ENTITY,
-      entityId: args.endpointId,
-      payload: {
-        tenantId: args.tenantId,
-        endpointId: args.endpointId,
-        url: args.url,
-        label: args.label,
-        events: args.events,
-        secret: args.secret,
-        registeredAt: args.registeredAt,
-        registeredBy: args.registeredBy,
-      },
-      createdAt: Date.now(),
-    });
+    const existing = await endpointRow(ctx.db, args.tenantId, args.endpointId);
+    if (args.type === "WebhookEndpointRegistered") {
+      if (existing) return;
+      await registerEndpointRow(ctx, { ...args, deliveredThrough: null });
+      return;
+    }
+    // Removing an endpoint still only in the ledger: record it on the entity
+    // first (without its secret), then remove it there.
+    if (!existing) {
+      await registerEndpointRow(ctx, {
+        ...args,
+        secret: null,
+        deliveredThrough: null,
+      });
+    }
+    const row = await endpointRow(ctx.db, args.tenantId, args.endpointId);
+    if (!row || row.status !== "active") return;
+    await systemContext(ctx, args.tenantId).runMutation(
+      api.mutations.OutboundWebhookEndpoint_remove,
+      { docId: row._id },
+    );
   },
 });
 
-export const recordDelivery = internalMutation({
-  args: {
-    tenantId: v.string(),
-    deliveryId: v.string(),
-    endpointId: v.string(),
-    sourceEventId: v.string(),
-    eventType: v.string(),
-    status: v.union(v.literal("succeeded"), v.literal("failed")),
-    attempt: v.number(),
-    httpStatus: v.union(v.number(), v.null()),
-    error: v.union(v.string(), v.null()),
-    occurredAt: v.number(),
-    deliveredAt: v.number(),
+const attemptArgs = {
+  deliveryId: v.string(),
+  sourceEventId: v.string(),
+  eventType: v.string(),
+  status: v.union(v.literal("succeeded"), v.literal("failed")),
+  attempt: v.number(),
+  httpStatus: v.union(v.number(), v.null()),
+  error: v.union(v.string(), v.null()),
+  occurredAt: v.number(),
+  deliveredAt: v.number(),
+};
+
+async function recordAttempt(
+  ctx: MutationCtx,
+  tenantId: string,
+  endpointId: string,
+  attempt: {
+    deliveryId: string;
+    sourceEventId: string;
+    eventType: string;
+    status: "succeeded" | "failed";
+    attempt: number;
+    httpStatus: number | null;
+    error: string | null;
+    occurredAt: number;
+    deliveredAt: number;
   },
+): Promise<void> {
+  await systemContext(ctx, tenantId).runMutation(
+    api.mutations.OutboundWebhookDelivery_createViaRecord,
+    {
+      newAttemptId: attempt.deliveryId,
+      endpointKey: endpointId,
+      sourceEventId: attempt.sourceEventId,
+      eventType: attempt.eventType,
+      status: attempt.status,
+      attempt: attempt.attempt,
+      httpStatus: attempt.httpStatus ?? undefined,
+      error: attempt.error ?? undefined,
+      occurredAt: attempt.occurredAt,
+      deliveredAt: attempt.deliveredAt,
+    },
+  );
+}
+
+export const recordDelivery = internalMutation({
+  args: { tenantId: v.string(), endpointId: v.string(), ...attemptArgs },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
-      type:
-        args.status === "succeeded"
-          ? "WebhookDeliverySucceeded"
-          : "WebhookDeliveryFailed",
-      entity: DELIVERY_ENTITY,
-      entityId: `${args.endpointId}:${args.sourceEventId}`,
-      payload: {
-        tenantId: args.tenantId,
-        deliveryId: args.deliveryId,
-        endpointId: args.endpointId,
-        sourceEventId: args.sourceEventId,
-        eventType: args.eventType,
-        status: args.status,
-        attempt: args.attempt,
-        httpStatus: args.httpStatus,
-        error: args.error,
-        occurredAt: args.occurredAt,
-      },
-      createdAt: args.deliveredAt,
-    });
+    await recordAttempt(ctx, args.tenantId, args.endpointId, args);
+    if (args.status !== "succeeded") return;
+    const row = await endpointRow(ctx.db, args.tenantId, args.endpointId);
+    if (!row) return;
+    await systemContext(ctx, args.tenantId).runMutation(
+      api.mutations.OutboundWebhookEndpoint_recordDelivered,
+      { docId: row._id, occurredAt: args.occurredAt },
+    );
   },
 });
+
+/**
+ * Copy one ledger endpoint (with its secret, watermark and the attempts its
+ * dispatch still depends on) into the entities, in one transaction.
+ */
+export const importLedgerEndpoint = internalMutation({
+  args: {
+    tenantId: v.string(),
+    endpointId: v.string(),
+    url: v.string(),
+    label: v.string(),
+    events: v.array(v.string()),
+    secret: v.union(v.null(), v.string()),
+    registeredAt: v.number(),
+    registeredBy: v.string(),
+    deliveredThrough: v.union(v.null(), v.number()),
+    attempts: v.array(v.object(attemptArgs)),
+  },
+  handler: async (ctx, args) => {
+    if (await endpointRow(ctx.db, args.tenantId, args.endpointId)) return;
+    await registerEndpointRow(ctx, args);
+    for (const attempt of args.attempts) {
+      await recordAttempt(ctx, args.tenantId, args.endpointId, attempt);
+    }
+  },
+});
+
+// Scheduler bookkeeping: one webhookDispatchStates row per tenant, written
+// directly (infrastructure, not domain state — see the table's entry in
+// scripts/governed-write-exceptions.json).
+async function patchDispatchState(
+  ctx: MutationCtx,
+  tenantId: string,
+  patch: {
+    chainId?: string;
+    lastTickAt?: number;
+    legacyImportedAt?: number;
+  },
+): Promise<void> {
+  const existing = await dispatchState(ctx.db, tenantId);
+  const now = Date.now();
+  if (existing) {
+    // raw-write: webhookDispatchStates
+    await ctx.db.patch(existing._id, { ...patch, updatedAt: now });
+    return;
+  }
+  // raw-write: webhookDispatchStates
+  await ctx.db.insert("webhookDispatchStates", {
+    tenantId,
+    ...patch,
+    createdAt: now,
+    updatedAt: now,
+  });
+}
 
 export const recordTick = internalMutation({
   args: { tenantId: v.string(), tickAt: v.number() },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
-      type: "WebhookDispatchTick",
-      entity: TICK_ENTITY,
-      entityId: args.tenantId,
-      payload: { tenantId: args.tenantId, tickAt: args.tickAt },
-      createdAt: args.tickAt,
-    });
+    await patchDispatchState(ctx, args.tenantId, { lastTickAt: args.tickAt });
   },
 });
 
 export const recordChainStart = internalMutation({
   args: { tenantId: v.string(), chainId: v.string() },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
-      type: CHAIN_START_TYPE,
-      entity: TICK_ENTITY,
-      entityId: args.tenantId,
-      payload: { tenantId: args.tenantId, chainId: args.chainId },
-      createdAt: Date.now(),
+    await patchDispatchState(ctx, args.tenantId, { chainId: args.chainId });
+  },
+});
+
+/**
+ * A chain ticking for a tenant with no recorded owner (chains started before
+ * 2026-09-29 kept their ownership in the ledger) claims the tenant; every
+ * other chain then ends at its next tick. Returns the owning chain.
+ */
+export const claimDispatchChain = internalMutation({
+  args: { tenantId: v.string(), chainId: v.string() },
+  handler: async (ctx, args): Promise<string> => {
+    const existing = await dispatchState(ctx.db, args.tenantId);
+    if (existing?.chainId) return existing.chainId;
+    await patchDispatchState(ctx, args.tenantId, { chainId: args.chainId });
+    return args.chainId;
+  },
+});
+
+export const markLedgerImported = internalMutation({
+  args: { tenantId: v.string() },
+  handler: async (ctx, args) => {
+    await patchDispatchState(ctx, args.tenantId, {
+      legacyImportedAt: Date.now(),
     });
   },
 });
@@ -835,13 +1169,24 @@ export const dispatchPending = internalAction({
     ctx,
     args,
   ): Promise<{ delivered: number; attempted: number }> => {
-    const context: DispatchContext = await ctx.runQuery(
+    let context: DispatchContext = await ctx.runQuery(
       internal.webhookIntegrations.loadDispatchContext,
       { tenantId: args.tenantId },
     );
 
     // A newer chain owns this tenant: end this one without work or reschedule.
-    if (
+    if (args.scheduleNext && args.chainId !== undefined) {
+      const owner: string =
+        context.currentChainId ??
+        (await ctx.runMutation(
+          internal.webhookIntegrations.claimDispatchChain,
+          {
+            tenantId: args.tenantId,
+            chainId: args.chainId,
+          },
+        ));
+      if (owner !== args.chainId) return { delivered: 0, attempted: 0 };
+    } else if (
       args.scheduleNext &&
       context.currentChainId != null &&
       args.chainId !== context.currentChainId
@@ -853,6 +1198,34 @@ export const dispatchPending = internalAction({
       scheduleNext: true,
       chainId: args.chainId,
     };
+
+    // First tick since 2026-09-29: copy the tenant's ledger endpoints over.
+    if (context.ledgerImports) {
+      for (const { endpoint, attempts } of context.ledgerImports) {
+        await ctx.runMutation(
+          internal.webhookIntegrations.importLedgerEndpoint,
+          {
+            tenantId: args.tenantId,
+            endpointId: endpoint.endpointId,
+            url: endpoint.url,
+            label: endpoint.label,
+            events: [...endpoint.events],
+            secret: await revealSecret(endpoint, ctx),
+            registeredAt: endpoint.registeredAt,
+            registeredBy: endpoint.registeredBy,
+            deliveredThrough: endpoint.deliveredThrough,
+            attempts,
+          },
+        );
+      }
+      await ctx.runMutation(internal.webhookIntegrations.markLedgerImported, {
+        tenantId: args.tenantId,
+      });
+      context = await ctx.runQuery(
+        internal.webhookIntegrations.loadDispatchContext,
+        { tenantId: args.tenantId },
+      );
+    }
 
     const now = Date.now();
     if (context.endpoints.length === 0) {
@@ -882,34 +1255,25 @@ export const dispatchPending = internalAction({
       return { delivered: 0, attempted: 0 };
     }
 
-    const succeeded = new Set(context.succeededKeys);
-    const attemptCounts = new Map<string, number>(
-      context.attemptCounts.map((entry) => [entry.key, entry.attempts]),
-    );
-    const successWatermarkByEndpoint = new Map<string, number>(
-      context.successWatermarkByEndpoint.map((entry) => [
-        entry.endpointId,
-        entry.watermark,
-      ]),
-    );
-
     let delivered = 0;
     let attempted = 0;
 
     for (const endpoint of context.endpoints) {
-      const since =
-        successWatermarkByEndpoint.get(endpoint.endpointId) ??
-        endpoint.registeredAt;
+      const since = endpoint.deliveredThrough ?? endpoint.registeredAt;
       const secret = await revealSecret(endpoint, ctx);
       for (const eventType of endpoint.events) {
-        const candidates = await ctx.runQuery(
+        const candidates: CandidateEvent[] = await ctx.runQuery(
           internal.webhookIntegrations.loadCandidateEvents,
-          { tenantId: args.tenantId, eventType, since },
+          {
+            tenantId: args.tenantId,
+            eventType,
+            since,
+            endpointId: endpoint.endpointId,
+          },
         );
         for (const candidate of candidates) {
-          const key = `${endpoint.endpointId}:${candidate.sourceEventId}:${candidate.eventType}`;
-          if (succeeded.has(key)) continue;
-          const priorAttempts = attemptCounts.get(key) ?? 0;
+          if (candidate.succeeded) continue;
+          const priorAttempts = candidate.failedAttempts;
           if (priorAttempts >= MAX_ATTEMPTS) continue;
           attempted += 1;
           const result = await postToEndpoint(
@@ -931,12 +1295,7 @@ export const dispatchPending = internalAction({
             occurredAt: candidate.occurredAt,
             deliveredAt: now,
           });
-          if (result.ok) {
-            succeeded.add(key);
-            delivered += 1;
-          } else {
-            attemptCounts.set(key, priorAttempts + 1);
-          }
+          if (result.ok) delivered += 1;
         }
       }
     }

@@ -1,17 +1,27 @@
 /**
  * Runtime proof (AC-191 calendar outbox slice): events go to Google Calendar
- * through the durable manifestEvents ledger in `convex/googleCalendar.ts`.
+ * through durable per-event sync state in `convex/googleCalendar.ts`
+ * (~~the manifestEvents ledger~~ — since 2026-09-29 IntegrationSyncRecord rows
+ * written by generated commands).
  * Repeated sync runs write each unchanged event once, a failed write is tried
  * again on the next run under the same fixed Google event id (so Google never
  * holds two copies), one tenant's run never writes another tenant's events,
  * and only the newest connection keeps a sync loop running.
  */
 import { convexTest } from "convex-test";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import { internal } from "../../convex/_generated/api";
-import { encrypt } from "../../convex/lib/encryption";
 import schema from "../../convex/schema";
 import { modules } from "./convex-test-modules";
+import { ensureTestFieldEncryptionKey } from "./test-field-encryption-key";
 
 const setup = () => convexTest(schema, modules);
 type TestConvex = ReturnType<typeof setup>;
@@ -20,11 +30,9 @@ const TENANT = "tenant-cal-a";
 const OTHER_TENANT = "tenant-cal-b";
 const HOUR = 60 * 60_000;
 
+beforeAll(ensureTestFieldEncryptionKey);
+
 beforeEach(() => {
-  if (!process.env.CONVEX_FIELD_ENCRYPTION_KEY) {
-    process.env.CONVEX_FIELD_ENCRYPTION_KEY =
-      "A1MKNFPVRhFaPf83T45BwooVzAogtiphQhYraAD5gqU=";
-  }
   vi.stubEnv("GOOGLE_CALENDAR_CLIENT_ID", "proof-client");
   vi.stubEnv("GOOGLE_CALENDAR_CLIENT_SECRET", "proof-secret");
   vi.stubEnv("GOOGLE_CALENDAR_REDIRECT_URI", "https://proof.example/callback");
@@ -70,17 +78,13 @@ async function connect(
   connectionId: string,
   connectedAt = Date.now(),
 ): Promise<void> {
-  const refreshToken = await encrypt("proof-refresh", {
-    entity: "GoogleCalendarConnection",
-    property: "refreshToken",
-  } as Parameters<typeof encrypt>[1]);
   await t.mutation(internal.googleCalendar.recordConnection, {
     tenantId,
     connectionId,
     calendarId: "primary",
     connectedAt,
     connectedBy: "proof-manager",
-    refreshToken,
+    refreshToken: "proof-refresh",
   });
 }
 
@@ -108,15 +112,16 @@ async function sync(t: TestConvex, tenantId: string, connectionId: string) {
   });
 }
 
+/** The command-emitted sync outcomes, oldest first. */
 async function syncRows(t: TestConvex) {
   return await t.run(async (ctx) =>
     (
       await ctx.db
         .query("manifestEvents")
-        .withIndex("by_entity", (q) => q.eq("entity", "GoogleCalendarEvent"))
+        .withIndex("by_type", (q) => q.eq("type", "IntegrationRecordSynced"))
         .collect()
     ).map((row) => ({
-      type: row.type,
+      status: (row.payload as { status: string }).status,
       tenantId: (row.payload as { tenantId: string }).tenantId,
     })),
   );
@@ -143,9 +148,7 @@ describe("calendar outbox writes each event once", () => {
     });
 
     expect(writes).toHaveLength(1);
-    expect((await syncRows(t)).map((row) => row.type)).toEqual([
-      "GoogleCalendarEventSynced",
-    ]);
+    expect((await syncRows(t)).map((row) => row.status)).toEqual(["synced"]);
   });
 
   it("a failed write is tried again next run under the same Google id, then sent once", async () => {
@@ -167,9 +170,9 @@ describe("calendar outbox writes each event once", () => {
 
     expect(writes).toHaveLength(1);
     expect(writes[0]!.googleEventId).toBe(failedWrites[0]!.googleEventId);
-    expect((await syncRows(t)).map((row) => row.type).sort()).toEqual([
-      "GoogleCalendarEventSyncFailed",
-      "GoogleCalendarEventSynced",
+    expect((await syncRows(t)).map((row) => row.status)).toEqual([
+      "failed",
+      "synced",
     ]);
   });
 

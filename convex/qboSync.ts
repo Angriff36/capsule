@@ -7,9 +7,20 @@ import {
   internalMutation,
   internalQuery,
   query,
+  type QueryCtx,
 } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
-import { decrypt, encrypt } from "./lib/encryption";
+import { decrypt } from "./lib/encryption";
+import {
+  OAuthConnectionStore,
+  connectionFromRow,
+  findConnectionRow,
+  lastSyncFromRow,
+  latestLedgerRow,
+  latestLedgerRowsByKey,
+  loadSyncRecords,
+  type OAuthConnection,
+} from "./lib/oauthConnectionStore";
 import {
   buildQboCustomer,
   buildQboInvoice,
@@ -29,10 +40,22 @@ import {
   type QboOAuthConfig,
 } from "./lib/qboSync";
 
+// Connection and per-record sync state live on IntegrationConnection (provider
+// quickbooks, externalAccountId = realm id) and IntegrationSyncRecord (record
+// types customer / invoice / payment), written by generated commands
+// (convex/lib/oauthConnectionStore.ts). The pseudo-entity names below belong
+// to the manifestEvents ledger rows written before 2026-09-29; those rows are
+// only read, for tenants not yet moved over.
+const PROVIDER = "quickbooks" as const;
 const CONNECTION_ENTITY = "QuickBooksConnection";
 const CUSTOMER_ENTITY = "QuickBooksCustomerLink";
 const INVOICE_ENTITY = "QuickBooksInvoiceLink";
 const PAYMENT_ENTITY = "QuickBooksPaymentLink";
+const LEDGER_LIFECYCLE = new Set([
+  "QuickBooksConnected",
+  "QuickBooksDisconnected",
+]);
+const LEDGER_RECONCILED = new Set(["QuickBooksReconciled"]);
 const SYNC_INTERVAL_MS = 5 * 60_000;
 const RETRY_INTERVAL_MS = 15 * 60_000;
 const OAUTH_STATE_TTL_MS = 10 * 60_000;
@@ -45,18 +68,8 @@ const INVOICE_ELIGIBLE_STATUS = new Set([
   "paid",
 ]);
 
-interface EncryptedRefreshToken {
-  ciphertext: string;
-  keyId: string;
-}
-
-interface ConnectionPayload {
-  tenantId: string;
-  connectionId: string;
+interface ConnectionPayload extends OAuthConnection {
   realmId: string;
-  connectedAt: number;
-  connectedBy: string;
-  refreshToken: EncryptedRefreshToken;
 }
 
 interface EntitySyncState {
@@ -78,6 +91,16 @@ interface ReconciliationContext {
   payments: Doc<"payments">[];
   clientsById: Record<string, Doc<"clients">>;
   customerLinks: CustomerLink[];
+  invoiceStates: Record<string, EntitySyncState>;
+  paymentStates: Record<string, EntitySyncState>;
+  /** Ledger state still to copy into IntegrationSyncRecord (first run only). */
+  ledger: LedgerState;
+}
+
+interface LedgerState {
+  customerLinks: Array<
+    CustomerLink & { connectionId: string; linkedAt: number }
+  >;
   invoiceStates: Record<string, EntitySyncState>;
   paymentStates: Record<string, EntitySyncState>;
 }
@@ -163,7 +186,8 @@ function numberValue(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
-function parseConnection(payload: unknown): ConnectionPayload | null {
+/** A legacy ledger `QuickBooksConnected` payload. */
+function parseLedgerConnection(payload: unknown): ConnectionPayload | null {
   const value = asRecord(payload);
   const token = asRecord(value.refreshToken);
   const tenantId = stringValue(value.tenantId);
@@ -187,10 +211,13 @@ function parseConnection(payload: unknown): ConnectionPayload | null {
   return {
     tenantId,
     connectionId,
+    externalAccountId: realmId,
     realmId,
     connectedAt,
     connectedBy,
     refreshToken: { ciphertext, keyId },
+    source: "ledger",
+    ledgerImported: false,
   };
 }
 
@@ -215,41 +242,66 @@ function parseSyncState(payload: unknown): EntitySyncState | null {
   };
 }
 
-function latestActiveConnection(
-  rows: Array<{
-    type: string;
-    entity: string;
-    payload: unknown;
-    createdAt: number;
-  }>,
-): ConnectionPayload | null {
-  const latest = rows
-    .filter(
-      (row) =>
-        row.entity === CONNECTION_ENTITY &&
-        (row.type === "QuickBooksConnected" ||
-          row.type === "QuickBooksDisconnected"),
-    )
-    .sort((left, right) => right.createdAt - left.createdAt)[0];
-  return latest?.type === "QuickBooksConnected"
-    ? parseConnection(latest.payload)
-    : null;
+/**
+ * The tenant's active connection: the IntegrationConnection row once it
+ * exists (it then supersedes the ledger), otherwise the newest ledger
+ * connect/disconnect row, exactly as before.
+ */
+async function activeConnection(
+  db: QueryCtx["db"],
+  tenantId: string,
+): Promise<{
+  connection: ConnectionPayload | null;
+  row: Doc<"integrationConnections"> | null;
+}> {
+  const row = await findConnectionRow(db, tenantId, PROVIDER);
+  if (row) {
+    const connection = connectionFromRow(row);
+    return {
+      row,
+      connection: connection
+        ? { ...connection, realmId: connection.externalAccountId }
+        : null,
+    };
+  }
+  const latest = await latestLedgerRow(
+    db,
+    tenantId,
+    CONNECTION_ENTITY,
+    LEDGER_LIFECYCLE,
+  );
+  return {
+    row: null,
+    connection:
+      latest?.type === "QuickBooksConnected"
+        ? parseLedgerConnection(latest.payload)
+        : null,
+  };
 }
 
 function latestStatesByEntity(
-  rows: Array<{ entityId: string; payload: unknown; createdAt: number }>,
-  tenantId: string,
+  rows: Array<{ entityId: string; payload: unknown }>,
 ): Record<string, EntitySyncState> {
   const result: Record<string, EntitySyncState> = {};
-  for (const row of rows.sort(
-    (left, right) => right.createdAt - left.createdAt,
-  )) {
-    if (asRecord(row.payload).tenantId !== tenantId) continue;
-    if (result[row.entityId]) continue;
+  for (const row of rows) {
     const state = parseSyncState(row.payload);
     if (state) result[row.entityId] = state;
   }
   return result;
+}
+
+function stateFromRecord(
+  record: Doc<"integrationSyncRecords">,
+): EntitySyncState | null {
+  if (record.status !== "synced" && record.status !== "failed") return null;
+  if (record.lastSyncedAt == null) return null;
+  return {
+    status: record.status,
+    qboId: record.externalId ?? null,
+    connectionId: record.engagementId ?? "",
+    syncedAt: record.lastSyncedAt,
+    error: record.lastError ?? null,
+  };
 }
 
 export const getConnectionStatus = query({
@@ -257,19 +309,53 @@ export const getConnectionStatus = query({
   handler: async (ctx) => {
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
-    const rows = await ctx.db
-      .query("manifestEvents")
-      .withIndex("by_entityId", (q) => q.eq("entityId", tenantId))
-      .collect();
-    const connection = latestActiveConnection(rows);
-    const lastSync = rows
-      .filter(
-        (row) =>
-          row.entity === CONNECTION_ENTITY &&
-          row.type === "QuickBooksReconciled",
-      )
-      .sort((left, right) => right.createdAt - left.createdAt)[0];
-    const sync = asRecord(lastSync?.payload);
+    const { connection, row } = await activeConnection(ctx.db, tenantId);
+    let lastSync: {
+      at: number;
+      status: string;
+      invoicesSynced: number;
+      paymentsSynced: number;
+      skipped: number;
+      failed: number;
+      error: string | null;
+    } | null = null;
+    if (row) {
+      const entitySync = lastSyncFromRow(row);
+      lastSync =
+        entitySync == null
+          ? null
+          : {
+              at: entitySync.at,
+              status: entitySync.status,
+              invoicesSynced:
+                numberValue(entitySync.summary.invoicesSynced) ?? 0,
+              paymentsSynced:
+                numberValue(entitySync.summary.paymentsSynced) ?? 0,
+              skipped: numberValue(entitySync.summary.skipped) ?? 0,
+              failed: entitySync.failed,
+              error: entitySync.error,
+            };
+    } else {
+      const ledgerSync = await latestLedgerRow(
+        ctx.db,
+        tenantId,
+        CONNECTION_ENTITY,
+        LEDGER_RECONCILED,
+      );
+      const sync = asRecord(ledgerSync?.payload);
+      lastSync =
+        ledgerSync == null
+          ? null
+          : {
+              at: ledgerSync.createdAt,
+              status: stringValue(sync.status) ?? "unknown",
+              invoicesSynced: numberValue(sync.invoicesSynced) ?? 0,
+              paymentsSynced: numberValue(sync.paymentsSynced) ?? 0,
+              skipped: numberValue(sync.skipped) ?? 0,
+              failed: numberValue(sync.failed) ?? 0,
+              error: stringValue(sync.error),
+            };
+    }
     return {
       connected: connection != null,
       realmId: connection?.realmId ?? null,
@@ -277,18 +363,7 @@ export const getConnectionStatus = query({
       providerConfigured: providerConfigured(),
       redirectUri: process.env.QBO_REDIRECT_URI?.trim() ?? null,
       canManage: canManage(auth.role),
-      lastSync:
-        lastSync == null
-          ? null
-          : {
-              at: lastSync.createdAt,
-              status: stringValue(sync.status) ?? "unknown",
-              invoicesSynced: numberValue(sync.invoicesSynced) ?? 0,
-              paymentsSynced: numberValue(sync.paymentsSynced) ?? 0,
-              skipped: numberValue(sync.skipped) ?? 0,
-              failed: numberValue(sync.failed) ?? 0,
-              error: stringValue(sync.error),
-            },
+      lastSync,
     };
   },
 });
@@ -348,19 +423,16 @@ export const completeConnection = action({
           "QuickBooks did not return a refresh token. Start the connection again.",
         );
       }
-      const encrypted = await encrypt(tokens.refreshToken, {
-        ctx,
-        entity: CONNECTION_ENTITY,
-        property: "refreshToken",
-      });
       const connectionId = crypto.randomUUID();
+      // The generated command seals the token (IntegrationConnection
+      // oauthRefreshToken is `encrypted`).
       await ctx.runMutation(internal.qboSync.recordConnection, {
         tenantId,
         connectionId,
         realmId: args.realmId,
         connectedAt: Date.now(),
         connectedBy: auth.id,
-        refreshToken: encrypted,
+        refreshToken: tokens.refreshToken,
       });
       await ctx.scheduler.runAfter(0, internal.qboSync.reconcileTenant, {
         tenantId,
@@ -399,8 +471,7 @@ export const disconnect = action({
     }
     await ctx.runMutation(internal.qboSync.recordDisconnection, {
       tenantId,
-      disconnectedAt: Date.now(),
-      disconnectedBy: auth.id,
+      realmId: connection?.realmId ?? null,
     });
     return { disconnected: true };
   },
@@ -432,34 +503,56 @@ export const syncNow = action({
 export const loadActiveConnection = internalQuery({
   args: { tenantId: v.string() },
   handler: async (ctx, args): Promise<ConnectionPayload | null> => {
-    const rows = await ctx.db
-      .query("manifestEvents")
-      .withIndex("by_entityId", (q) => q.eq("entityId", args.tenantId))
-      .collect();
-    return latestActiveConnection(rows);
+    return (await activeConnection(ctx.db, args.tenantId)).connection;
   },
 });
+
+/**
+ * Until the tenant's ledger history is copied over (first reconcile), records
+ * without a row take their state from the newest ledger row, keyed as before:
+ * customer links by payload.clientId, invoice / payment state by entityId
+ * (the Capsule record id), tenant in the payload.
+ */
+async function loadLedgerState(
+  db: QueryCtx["db"],
+  tenantId: string,
+): Promise<LedgerState> {
+  const [customerRows, invoiceRows, paymentRows] = await Promise.all([
+    latestLedgerRowsByKey(db, tenantId, CUSTOMER_ENTITY, (row) =>
+      stringValue(asRecord(row.payload).clientId),
+    ),
+    latestLedgerRowsByKey(db, tenantId, INVOICE_ENTITY, (row) => row.entityId),
+    latestLedgerRowsByKey(db, tenantId, PAYMENT_ENTITY, (row) => row.entityId),
+  ]);
+  const customerLinks: LedgerState["customerLinks"] = [];
+  for (const row of customerRows) {
+    const payload = asRecord(row.payload);
+    const clientId = stringValue(payload.clientId);
+    const qboCustomerId = stringValue(payload.qboCustomerId);
+    if (!clientId || !qboCustomerId) continue;
+    customerLinks.push({
+      clientId,
+      qboCustomerId,
+      connectionId: stringValue(payload.connectionId) ?? "",
+      linkedAt: numberValue(payload.linkedAt) ?? row.createdAt,
+    });
+  }
+  return {
+    customerLinks,
+    invoiceStates: latestStatesByEntity(invoiceRows),
+    paymentStates: latestStatesByEntity(paymentRows),
+  };
+}
 
 export const loadReconciliationContext = internalQuery({
   args: { tenantId: v.string(), connectionId: v.string() },
   handler: async (ctx, args): Promise<ReconciliationContext | null> => {
-    const connectionRows = await ctx.db
-      .query("manifestEvents")
-      .withIndex("by_entityId", (q) => q.eq("entityId", args.tenantId))
-      .collect();
-    const connection = latestActiveConnection(connectionRows);
+    const { connection } = await activeConnection(ctx.db, args.tenantId);
     if (!connection || connection.connectionId !== args.connectionId) {
       return null;
     }
 
-    const [
-      invoices,
-      payments,
-      clients,
-      customerRows,
-      invoiceRows,
-      paymentRows,
-    ] = await Promise.all([
+    const [invoices, payments, clients, records] = await Promise.all([
       ctx.db
         .query("invoices")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
@@ -472,18 +565,7 @@ export const loadReconciliationContext = internalQuery({
         .query("clients")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
         .collect(),
-      ctx.db
-        .query("manifestEvents")
-        .withIndex("by_entity", (q) => q.eq("entity", CUSTOMER_ENTITY))
-        .collect(),
-      ctx.db
-        .query("manifestEvents")
-        .withIndex("by_entity", (q) => q.eq("entity", INVOICE_ENTITY))
-        .collect(),
-      ctx.db
-        .query("manifestEvents")
-        .withIndex("by_entity", (q) => q.eq("entity", PAYMENT_ENTITY))
-        .collect(),
+      loadSyncRecords(ctx.db, args.tenantId, PROVIDER),
     ]);
 
     const eligibleInvoices = invoices.filter(
@@ -497,18 +579,36 @@ export const loadReconciliationContext = internalQuery({
     const clientsById: Record<string, Doc<"clients">> = {};
     for (const client of clients) clientsById[String(client._id)] = client;
 
-    const customerLinks: CustomerLink[] = [];
-    const seenClient = new Set<string>();
-    for (const row of customerRows.sort(
-      (left, right) => right.createdAt - left.createdAt,
-    )) {
-      const payload = asRecord(row.payload);
-      if (payload.tenantId !== args.tenantId) continue;
-      const clientId = stringValue(payload.clientId);
-      const qboCustomerId = stringValue(payload.qboCustomerId);
-      if (!clientId || !qboCustomerId || seenClient.has(clientId)) continue;
-      seenClient.add(clientId);
-      customerLinks.push({ clientId, qboCustomerId });
+    const customers = new Map<string, string>();
+    const invoiceStates: Record<string, EntitySyncState> = {};
+    const paymentStates: Record<string, EntitySyncState> = {};
+    for (const record of records) {
+      if (record.recordType === "customer") {
+        if (record.externalId)
+          customers.set(record.sourceId, record.externalId);
+        continue;
+      }
+      const state = stateFromRecord(record);
+      if (!state) continue;
+      if (record.recordType === "invoice")
+        invoiceStates[record.sourceId] = state;
+      if (record.recordType === "payment")
+        paymentStates[record.sourceId] = state;
+    }
+
+    const ledger: LedgerState = connection.ledgerImported
+      ? { customerLinks: [], invoiceStates: {}, paymentStates: {} }
+      : await loadLedgerState(ctx.db, args.tenantId);
+    for (const link of ledger.customerLinks) {
+      if (!customers.has(link.clientId)) {
+        customers.set(link.clientId, link.qboCustomerId);
+      }
+    }
+    for (const [id, state] of Object.entries(ledger.invoiceStates)) {
+      invoiceStates[id] ??= state;
+    }
+    for (const [id, state] of Object.entries(ledger.paymentStates)) {
+      paymentStates[id] ??= state;
     }
 
     return {
@@ -516,12 +616,19 @@ export const loadReconciliationContext = internalQuery({
       invoices: eligibleInvoices,
       payments: eligiblePayments,
       clientsById,
-      customerLinks,
-      invoiceStates: latestStatesByEntity(invoiceRows, args.tenantId),
-      paymentStates: latestStatesByEntity(paymentRows, args.tenantId),
+      customerLinks: [...customers.entries()].map(
+        ([clientId, qboCustomerId]) => ({ clientId, qboCustomerId }),
+      ),
+      invoiceStates,
+      paymentStates,
+      ledger,
     };
   },
 });
+
+// Every write below goes through a generated command as the tenant's system
+// identity (convex/lib/oauthConnectionStore.ts). Callers: completeConnection
+// and disconnect (after requireManager) and the scheduled reconcileTenant.
 
 export const recordConnection = internalMutation({
   args: {
@@ -530,33 +637,52 @@ export const recordConnection = internalMutation({
     realmId: v.string(),
     connectedAt: v.number(),
     connectedBy: v.string(),
-    refreshToken: v.object({ ciphertext: v.string(), keyId: v.string() }),
+    /** Plaintext; IntegrationConnection seals it. */
+    refreshToken: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
-      type: "QuickBooksConnected",
-      entity: CONNECTION_ENTITY,
-      entityId: args.tenantId,
-      payload: args,
-      createdAt: Date.now(),
+    await new OAuthConnectionStore(ctx, args.tenantId, PROVIDER).grant({
+      tenantId: args.tenantId,
+      provider: PROVIDER,
+      engagementId: args.connectionId,
+      externalAccountId: args.realmId,
+      displayName: "QuickBooks",
+      refreshToken: args.refreshToken,
+      connectedById: args.connectedBy,
+      grantedAt: args.connectedAt,
     });
+  },
+});
+
+/** QuickBooks rotated the refresh token during a reconcile. */
+export const rotateCredential = internalMutation({
+  args: {
+    tenantId: v.string(),
+    connectionId: v.string(),
+    /** Plaintext; IntegrationConnection seals it. */
+    refreshToken: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await new OAuthConnectionStore(ctx, args.tenantId, PROVIDER).rotate(
+      args.connectionId,
+      args.refreshToken,
+    );
   },
 });
 
 export const recordDisconnection = internalMutation({
   args: {
     tenantId: v.string(),
-    disconnectedAt: v.number(),
-    disconnectedBy: v.string(),
+    realmId: v.union(v.string(), v.null()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
-      type: "QuickBooksDisconnected",
-      entity: CONNECTION_ENTITY,
-      entityId: args.tenantId,
-      payload: args,
-      createdAt: args.disconnectedAt,
-    });
+    const { connection, row } = await activeConnection(ctx.db, args.tenantId);
+    // Never connected at all: nothing to record.
+    if (!row && !connection) return;
+    await new OAuthConnectionStore(ctx, args.tenantId, PROVIDER).disconnect(
+      args.realmId,
+      "QuickBooks",
+    );
   },
 });
 
@@ -569,12 +695,17 @@ export const recordCustomerLink = internalMutation({
     linkedAt: v.number(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
-      type: "QuickBooksCustomerLinked",
-      entity: CUSTOMER_ENTITY,
-      entityId: args.clientId,
-      payload: args,
-      createdAt: args.linkedAt,
+    await new OAuthConnectionStore(ctx, args.tenantId, PROVIDER).recordSync({
+      tenantId: args.tenantId,
+      provider: PROVIDER,
+      recordType: "customer",
+      sourceId: args.clientId,
+      externalId: args.qboCustomerId,
+      engagementId: args.connectionId,
+      status: "linked",
+      contentSignature: null,
+      syncedAt: args.linkedAt,
+      error: null,
     });
   },
 });
@@ -591,27 +722,109 @@ export const recordEntitySync = internalMutation({
     error: v.union(v.string(), v.null()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
-      type:
-        args.entity === "invoice"
-          ? args.status === "synced"
-            ? "QuickBooksInvoiceSynced"
-            : "QuickBooksInvoiceSyncFailed"
-          : args.status === "synced"
-            ? "QuickBooksPaymentSynced"
-            : "QuickBooksPaymentSyncFailed",
-      entity: args.entity === "invoice" ? INVOICE_ENTITY : PAYMENT_ENTITY,
-      entityId: args.sourceId,
-      payload: {
-        tenantId: args.tenantId,
-        qboId: args.qboId,
-        connectionId: args.connectionId,
-        status: args.status,
-        syncedAt: args.syncedAt,
-        error: args.error,
-      },
-      createdAt: args.syncedAt,
+    await new OAuthConnectionStore(ctx, args.tenantId, PROVIDER).recordSync({
+      tenantId: args.tenantId,
+      provider: PROVIDER,
+      recordType: args.entity,
+      sourceId: args.sourceId,
+      externalId: args.qboId,
+      engagementId: args.connectionId,
+      status: args.status,
+      contentSignature: null,
+      syncedAt: args.syncedAt,
+      error: args.error,
     });
+  },
+});
+
+const ledgerSyncStateArgs = v.object({
+  sourceId: v.string(),
+  status: v.union(v.literal("synced"), v.literal("failed")),
+  qboId: v.union(v.string(), v.null()),
+  connectionId: v.string(),
+  syncedAt: v.number(),
+  error: v.union(v.string(), v.null()),
+});
+
+/**
+ * First reconcile of a tenant still on the ledger: move the connection to
+ * IntegrationConnection (keeping its connection id, so running chains carry
+ * on) and copy the ledger's customer links and invoice / payment state into
+ * IntegrationSyncRecord rows. Also runs once for a row connected after
+ * 2026-09-29, so records synced by an earlier connection are not sent twice.
+ */
+export const adoptLedgerState = internalMutation({
+  args: {
+    tenantId: v.string(),
+    connection: v.union(
+      v.null(),
+      v.object({
+        connectionId: v.string(),
+        realmId: v.string(),
+        connectedAt: v.number(),
+        connectedBy: v.string(),
+        refreshToken: v.string(),
+      }),
+    ),
+    customerLinks: v.array(
+      v.object({
+        clientId: v.string(),
+        qboCustomerId: v.string(),
+        connectionId: v.string(),
+        linkedAt: v.number(),
+      }),
+    ),
+    invoices: v.array(ledgerSyncStateArgs),
+    payments: v.array(ledgerSyncStateArgs),
+  },
+  handler: async (ctx, args) => {
+    const store = new OAuthConnectionStore(ctx, args.tenantId, PROVIDER);
+    if (args.connection && !(await store.row())) {
+      await store.grant({
+        tenantId: args.tenantId,
+        provider: PROVIDER,
+        engagementId: args.connection.connectionId,
+        externalAccountId: args.connection.realmId,
+        displayName: "QuickBooks",
+        refreshToken: args.connection.refreshToken,
+        connectedById: args.connection.connectedBy,
+        grantedAt: args.connection.connectedAt,
+      });
+    }
+    for (const link of args.customerLinks) {
+      await store.importLedgerSync({
+        tenantId: args.tenantId,
+        provider: PROVIDER,
+        recordType: "customer",
+        sourceId: link.clientId,
+        externalId: link.qboCustomerId,
+        engagementId: link.connectionId || null,
+        status: "linked",
+        contentSignature: null,
+        syncedAt: link.linkedAt,
+        error: null,
+      });
+    }
+    for (const [recordType, states] of [
+      ["invoice", args.invoices],
+      ["payment", args.payments],
+    ] as const) {
+      for (const state of states) {
+        await store.importLedgerSync({
+          tenantId: args.tenantId,
+          provider: PROVIDER,
+          recordType,
+          sourceId: state.sourceId,
+          externalId: state.qboId,
+          engagementId: state.connectionId,
+          status: state.status,
+          contentSignature: null,
+          syncedAt: state.syncedAt,
+          error: state.error,
+        });
+      }
+    }
+    await store.markLedgerImported();
   },
 });
 
@@ -628,15 +841,34 @@ export const recordReconciliation = internalMutation({
     reconciledAt: v.number(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
-      type: "QuickBooksReconciled",
-      entity: CONNECTION_ENTITY,
-      entityId: args.tenantId,
-      payload: args,
-      createdAt: args.reconciledAt,
+    await new OAuthConnectionStore(
+      ctx,
+      args.tenantId,
+      PROVIDER,
+    ).recordReconciliation({
+      engagementId: args.connectionId,
+      outcome: args.status,
+      failed: args.failed,
+      error: args.error,
+      summary: {
+        invoicesSynced: args.invoicesSynced,
+        paymentsSynced: args.paymentsSynced,
+        skipped: args.skipped,
+      },
     });
   },
 });
+
+function ledgerStateList(states: Record<string, EntitySyncState>) {
+  return Object.entries(states).map(([sourceId, state]) => ({
+    sourceId,
+    status: state.status,
+    qboId: state.qboId,
+    connectionId: state.connectionId,
+    syncedAt: state.syncedAt,
+    error: state.error,
+  }));
+}
 
 export const reconcileTenant = internalAction({
   args: {
@@ -647,7 +879,9 @@ export const reconcileTenant = internalAction({
   handler: async (ctx, args): Promise<ReconciliationResult> => {
     const context: ReconciliationContext | null = await ctx.runQuery(
       internal.qboSync.loadReconciliationContext,
-      args,
+      // Only the fields it declares: passing `args` whole (with scheduleNext)
+      // failed argument validation, so no reconcile ever ran (fixed 2026-09-29).
+      { tenantId: args.tenantId, connectionId: args.connectionId },
     );
     if (!context) {
       return {
@@ -670,6 +904,24 @@ export const reconcileTenant = internalAction({
         context.connection.refreshToken.keyId,
         { ctx, entity: CONNECTION_ENTITY, property: "refreshToken" },
       );
+      if (!context.connection.ledgerImported) {
+        await ctx.runMutation(internal.qboSync.adoptLedgerState, {
+          tenantId: args.tenantId,
+          connection:
+            context.connection.source === "ledger"
+              ? {
+                  connectionId: context.connection.connectionId,
+                  realmId: context.connection.realmId,
+                  connectedAt: context.connection.connectedAt,
+                  connectedBy: context.connection.connectedBy,
+                  refreshToken,
+                }
+              : null,
+          customerLinks: context.ledger.customerLinks,
+          invoices: ledgerStateList(context.ledger.invoiceStates),
+          payments: ledgerStateList(context.ledger.paymentStates),
+        });
+      }
       const tokens = await refreshQboAccessToken(environment, refreshToken);
       accessToken = tokens.accessToken;
       newRefreshToken = tokens.refreshToken;
@@ -707,18 +959,10 @@ export const reconcileTenant = internalAction({
     // QuickBooks rotates the refresh token on every refresh; persist the new one
     // so the next reconcile keeps working.
     if (newRefreshToken) {
-      const encrypted = await encrypt(newRefreshToken, {
-        ctx,
-        entity: CONNECTION_ENTITY,
-        property: "refreshToken",
-      });
-      await ctx.runMutation(internal.qboSync.recordConnection, {
-        tenantId: context.connection.tenantId,
+      await ctx.runMutation(internal.qboSync.rotateCredential, {
+        tenantId: args.tenantId,
         connectionId: context.connection.connectionId,
-        realmId: context.connection.realmId,
-        connectedAt: context.connection.connectedAt,
-        connectedBy: context.connection.connectedBy,
-        refreshToken: encrypted,
+        refreshToken: newRefreshToken,
       });
     }
 
