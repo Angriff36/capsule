@@ -2,7 +2,7 @@ import type { ConvexCommandEvent } from "@angriff36/manifest/projections/convex"
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { reconcileEventPrepWork } from "./prepWorkReconciliation";
-import { reconcileDishPrep, standDownEventPrep } from "./prepRecipeEvents";
+import { reconcileDishPrep } from "./prepRecipeEvents";
 import { releaseEventInventoryHolds } from "./inventoryEvents";
 import { eventCancellationReconciliation } from "./cancellationReconciliation";
 import { reconcileEventTiming } from "./eventTimingOperations";
@@ -41,11 +41,20 @@ import { ensureEventNumber } from "./eventNumbering";
 import { recordAcceptedProposalRevision } from "./proposalAcceptanceRevision";
 import { deleteBlobIfOrphan } from "./blobs";
 
-/** Runs after declared reactions, inside the originating command transaction. */
+/**
+ * Runs after declared reactions, inside the originating command transaction.
+ * Only work a declared reaction cannot express exactly stays here: receipts,
+ * multi-row calculations, validation that throws to roll back, numbering,
+ * elevated follow-through and blob cleanup. Plain "run command X on matching
+ * rows" triggers are declared as reactions in the owning .manifest instead
+ * (e.g. EventDishRemoved → PrepTask.standDown in src/production/task.manifest).
+ */
 export async function handleManifestEvent(
   ctx: MutationCtx,
   event: ConvexCommandEvent,
 ): Promise<void> {
+  // Staffing branches: coverage planning, validation that throws to roll back,
+  // and shift reconciliation over several entities — calculations, not triggers.
   if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedCoverageChangeRequested") {
     await prepareStaffNeedCoverageChange(ctx, event.entityId as Id<"eventStaffNeeds">);
     return;
@@ -285,6 +294,7 @@ export async function handleManifestEvent(
     return;
   }
   if (event.entity === "Event" && event.type === "EventPurchasingWeekChanged") {
+    // Code: runs as the tenant system role and recalculates draft quantities.
     if (event.payload.previousPurchasingWeekStart !== event.payload.purchasingWeekStart)
       await moveEventPurchasingWeek(ctx, event.entityId as Id<"events">);
     return;
@@ -334,6 +344,7 @@ export async function handleManifestEvent(
     event.entity === "VendorOrderLine" &&
     event.type === "VendorOrderLineRequirementReconciled"
   ) {
+    // Code: retires only when line, order and demand links are all unused.
     await retireUnusedAutomaticDraft(
       ctx,
       event.entityId as Id<"vendorOrderLines">,
@@ -344,6 +355,7 @@ export async function handleManifestEvent(
     event.entity === "VendorOrderLine" &&
     event.type === "VendorOrderLineWeeklyEnsured"
   ) {
+    // Code: reads the line's event history to recover its quantity provenance.
     await adoptLegacyDraftQuantity(
       ctx,
       event.entityId as Id<"vendorOrderLines">,
@@ -355,6 +367,7 @@ export async function handleManifestEvent(
     event.entity === "PurchaseNeed" &&
     event.type === "PurchaseNeedCancelled"
   ) {
+    // Code: shrinks each draft line by the removed contribution (calculation).
     await reconcileCancelledPurchaseDrafts(
       ctx,
       event.entityId as Id<"purchaseNeeds">,
@@ -365,16 +378,9 @@ export async function handleManifestEvent(
     event.entity === "DishTask" &&
     ["DishTaskAdded", "DishTaskRevised", "DishTaskRetired"].includes(event.type)
   ) {
+    // Code: rebalances prep work per live event dish (calculation).
     if (event.payload.synchronizePrep !== false)
       await reconcileDishPrep(ctx, event.entityId as Id<"dishTasks">);
-    return;
-  }
-  if (event.entity === "EventDish" && event.type === "EventDishRemoved") {
-    await standDownEventPrep(
-      ctx,
-      { eventDishId: event.entityId as Id<"eventDishes"> },
-      String(event.payload.reason),
-    );
     return;
   }
   if (event.entity === "Event" && event.type === "EventCancelled") {
@@ -387,6 +393,8 @@ export async function handleManifestEvent(
     return;
   }
   if (event.entity === "Event" && event.type === "EventCompleted") {
+    // Code: only active holds are released. The declared form (fanOut + status
+    // match) re-reads every hold per hold — quadratic in an event's holds.
     await releaseEventInventoryHolds(ctx, event.entityId as Id<"events">);
     return;
   }

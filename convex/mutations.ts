@@ -16140,6 +16140,38 @@ async function __runEventDishRemove(ctx: MutationCtx, { docId, reason, version }
       const target = __row;
       await __runPackListItemSyncContainerServings(ctx, { docId: (__row as any)._id, quantityServings: 0 } as any);
     }
+    const fanRows2 = (await ctx.db.query("prepTasks").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect()).filter((d) => (d as any).deletedAt == null);
+    for (const __row of fanRows2) {
+      const target = __row;
+      const __fanMatch2_raw = await ctx.db.query("prepTasks").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect();
+      const __fanMatch2_rows = __fanMatch2_raw.filter((d) => (d as any).eventDishId === payload.eventDishId && (d as any).status === "pending" && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
+      const __fanMatch2_id = __fanMatch2_rows.length > 0 ? (__fanMatch2_rows[0] as any)._id : null;
+      if (__fanMatch2_id) await __runPrepTaskStandDown(ctx, { docId: __fanMatch2_id, reason: payload.reason } as any);
+    }
+    const fanRows3 = (await ctx.db.query("prepTasks").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect()).filter((d) => (d as any).deletedAt == null);
+    for (const __row of fanRows3) {
+      const target = __row;
+      const __fanMatch3_raw = await ctx.db.query("prepTasks").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect();
+      const __fanMatch3_rows = __fanMatch3_raw.filter((d) => (d as any).eventDishId === payload.eventDishId && (d as any).status === "claimed" && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
+      const __fanMatch3_id = __fanMatch3_rows.length > 0 ? (__fanMatch3_rows[0] as any)._id : null;
+      if (__fanMatch3_id) await __runPrepTaskStandDown(ctx, { docId: __fanMatch3_id, reason: payload.reason } as any);
+    }
+    const fanRows4 = (await ctx.db.query("prepTasks").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect()).filter((d) => (d as any).deletedAt == null);
+    for (const __row of fanRows4) {
+      const target = __row;
+      const __fanMatch4_raw = await ctx.db.query("prepTasks").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect();
+      const __fanMatch4_rows = __fanMatch4_raw.filter((d) => (d as any).eventDishId === payload.eventDishId && (d as any).status === "in_progress" && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
+      const __fanMatch4_id = __fanMatch4_rows.length > 0 ? (__fanMatch4_rows[0] as any)._id : null;
+      if (__fanMatch4_id) await __runPrepTaskStandDown(ctx, { docId: __fanMatch4_id, reason: payload.reason } as any);
+    }
+    const fanRows5 = (await ctx.db.query("prepTasks").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect()).filter((d) => (d as any).deletedAt == null);
+    for (const __row of fanRows5) {
+      const target = __row;
+      const __fanMatch5_raw = await ctx.db.query("prepTasks").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect();
+      const __fanMatch5_rows = __fanMatch5_raw.filter((d) => (d as any).eventDishId === payload.eventDishId && (d as any).status === "blocked" && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
+      const __fanMatch5_id = __fanMatch5_rows.length > 0 ? (__fanMatch5_rows[0] as any)._id : null;
+      if (__fanMatch5_id) await __runPrepTaskStandDown(ctx, { docId: __fanMatch5_id, reason: payload.reason } as any);
+    }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "remove", emitIndex: 0 });
     return { ...doc, ...updates };
 }

@@ -36,25 +36,21 @@ export async function reconcileDishPrep(
   }
 }
 
-/** Invoked by an already-authorized removal/cancellation command, never a public API. */
+/**
+ * Invoked by the already-authorized event cancellation, never a public API.
+ * Menu removal (EventDishRemoved) is a declared reaction in
+ * src/production/task.manifest since 2026-09-29.
+ */
 export async function standDownEventPrep(
   ctx: MutationCtx,
-  scope: { eventId: Id<"events"> } | { eventDishId: Id<"eventDishes"> },
+  scope: { eventId: Id<"events"> },
   reason: string,
 ) {
   const tenantId = requireTenant(await getAuthContext(ctx));
-  const tasks =
-    "eventId" in scope
-      ? await ctx.db
-          .query("prepTasks")
-          .withIndex("by_eventId", (q) => q.eq("eventId", scope.eventId))
-          .collect()
-      : await ctx.db
-          .query("prepTasks")
-          .withIndex("by_eventDishId", (q) =>
-            q.eq("eventDishId", scope.eventDishId),
-          )
-          .collect();
+  const tasks = await ctx.db
+    .query("prepTasks")
+    .withIndex("by_eventId", (q) => q.eq("eventId", scope.eventId))
+    .collect();
   for (const task of tasks) {
     if (
       task.tenantId !== tenantId ||
