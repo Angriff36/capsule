@@ -189,6 +189,11 @@ function PayrollExportPreview({
           {`CSV download is off until every employee has a payroll employee number — missing for ${missingNumberNames.join(", ")}. Type the number next to their name below. Raw Capsule IDs are never sent to a payroll processor.`}
         </p>
       ) : null}
+      {document.waitingOnlyNames.length > 0 ? (
+        <p className="mb-3 text-sm text-warn" role="status">
+          {`Time waiting for approval is not in this export: ${document.waitingOnlyNames.join(", ")}. Approve it on the time sheet to include it.`}
+        </p>
+      ) : null}
       {document.rows.length === 0 ? (
         <div className="document-empty">
           <p>No payroll-ready data in this period.</p>
@@ -223,6 +228,11 @@ function PayrollExportPreview({
                       {missingRate(row.personId) ? (
                         <small className="text-warn">No hourly rate set</small>
                       ) : null}
+                      {row.warnings.map((warning) => (
+                        <small key={warning} className="block text-warn">
+                          {warning}
+                        </small>
+                      ))}
                       {row.missingEmployeeNumber ? (
                         <PersonEmployeeNumberField
                           personId={row.personId}

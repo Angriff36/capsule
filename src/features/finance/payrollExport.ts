@@ -8,6 +8,8 @@ import {
   timestamp,
 } from "./payrollPeriod";
 import { parseTipPayrollNote, payrollNoteDisplayText } from "./tipDistribution";
+import { payrollRowWarnings } from "./payrollReconcile";
+import { isFinishedTime } from "../workforce/timePay";
 
 export type PayrollProcessor = "gusto" | "adp" | "paychex";
 
@@ -78,6 +80,8 @@ export type PayrollExportRow = {
   timeRecordCount: number;
   payrollInputCount: number;
   missingEmployeeNumber: boolean;
+  /** Plain warnings to check before sending (payrollReconcile). */
+  warnings: string[];
 };
 
 export type PayrollExportDocument = {
@@ -90,6 +94,8 @@ export type PayrollExportDocument = {
   timeRecordCount: number;
   payrollInputCount: number;
   missingEmployeeNumberCount: number;
+  /** People with finished time in the period that is not approved yet and no row. */
+  waitingOnlyNames: string[];
 };
 
 type BuildPayrollExportInput = {
@@ -99,6 +105,8 @@ type BuildPayrollExportInput = {
   people: readonly PersonRow[];
   timeRecords: readonly TimeRecordRow[];
   payrollInputs: readonly PayrollInputRow[];
+  /** When known: hourly rate per person (null = none on file). */
+  hourlyRateByPersonId?: ReadonlyMap<string, number | null>;
 };
 
 type Accumulator = {
@@ -249,6 +257,7 @@ export function buildPayrollExport({
   people,
   timeRecords,
   payrollInputs,
+  hourlyRateByPersonId,
 }: BuildPayrollExportInput): PayrollExportDocument {
   const startAt = localDayStart(periodStart);
   const endAt = localDayStart(periodEnd);
@@ -348,6 +357,15 @@ export function buildPayrollExport({
         timeRecordCount: entry.timeRecordCount,
         payrollInputCount: entry.payrollInputCount,
         missingEmployeeNumber: !employeeNumber,
+        warnings: payrollRowWarnings({
+          records: timeRecords,
+          personId: entry.personId,
+          startAt,
+          endExclusiveAt,
+          hourlyRate: hourlyRateByPersonId
+            ? (hourlyRateByPersonId.get(entry.personId) ?? null)
+            : undefined,
+        }),
       };
     })
     .sort(
@@ -373,5 +391,26 @@ export function buildPayrollExport({
     ),
     missingEmployeeNumberCount: rows.filter((row) => row.missingEmployeeNumber)
       .length,
+    waitingOnlyNames: [
+      ...new Set(
+        timeRecords
+          .filter(
+            (record) =>
+              isFinishedTime(record) &&
+              record.approvedAt == null &&
+              timestamp(record.clockInAt) >= startAt &&
+              timestamp(record.clockInAt) < endExclusiveAt &&
+              !accumulators.has(cleanText(record.personId)),
+          )
+          .map((record) => {
+            const person = peopleById.get(cleanText(record.personId));
+            return (
+              [cleanText(person?.givenName), cleanText(person?.familyName)]
+                .filter(Boolean)
+                .join(" ") || "Unknown person"
+            );
+          }),
+      ),
+    ].sort((a, b) => a.localeCompare(b)),
   };
 }
