@@ -184,28 +184,7 @@ export function Section({
   );
 }
 
-export function EmptyState({
-  title,
-  hint,
-  action,
-}: {
-  title: string;
-  hint?: string;
-  /** Optional CTA(s) answering "so what do I do now?" — buttons or links. */
-  action?: ReactNode;
-}) {
-  return (
-    <div className="px-4 py-8 text-center">
-      <p className="font-medium text-ink-2">{title}</p>
-      {hint ? <p className="mt-1 text-sm text-ink-3">{hint}</p> : null}
-      {action ? (
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
-          {action}
-        </div>
-      ) : null}
-    </div>
-  );
-}
+export { EmptyState, type EmptyStateStep } from "./EmptyState";
 
 export function ErrorState({
   title,

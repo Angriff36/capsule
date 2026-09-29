@@ -271,6 +271,7 @@ export function InvoiceDetailPage() {
     String(invoice.status),
   );
   const paymentLinkAvailable = amountDue > 0 && invoiceOpen;
+  const invoiceSent = invoiceOpen || invoice.status === "paid";
   const reminderAutomationAvailable =
     dueDate != null && amountDue > 0 && invoiceOpen;
   const canMarkDepositPaid =
@@ -1347,14 +1348,23 @@ export function InvoiceDetailPage() {
           <EmptyState
             title="No payments on file yet."
             hint="Add a payment after the invoice is sent."
-            action={
-              <Link
-                className="btn btn-ghost btn-sm"
-                to={FINANCE_ROUTES.payments}
-              >
-                Add payment
-              </Link>
-            }
+            steps={[
+              {
+                label: "Send the invoice (Actions above)",
+                done: invoiceSent,
+              },
+              {
+                label: "Record the client's payment",
+                action: (
+                  <Link
+                    className="btn btn-ghost btn-sm"
+                    to={FINANCE_ROUTES.payments}
+                  >
+                    Add payment
+                  </Link>
+                ),
+              },
+            ]}
           />
         ) : (
           <div className="supply-table-wrap">

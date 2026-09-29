@@ -300,6 +300,13 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
               <EmptyState
                 title="No deliveries yet"
                 hint="Deliveries appear here once an event fires."
+                steps={[
+                  {
+                    label: "Register an endpoint",
+                    done: (endpoints?.length ?? 0) > 0,
+                  },
+                  { label: "A subscribed event fires in Capsule" },
+                ]}
               />
             ) : (
               <ul className="mt-3 divide-y divide-line text-sm">
