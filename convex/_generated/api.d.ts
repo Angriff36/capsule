@@ -83,6 +83,7 @@ import type * as lib_demandReconciliation from "../lib/demandReconciliation.js";
 import type * as lib_dishRecipeRepair from "../lib/dishRecipeRepair.js";
 import type * as lib_encryption from "../lib/encryption.js";
 import type * as lib_equipmentReservationAvailability from "../lib/equipmentReservationAvailability.js";
+import type * as lib_equipmentReturns from "../lib/equipmentReturns.js";
 import type * as lib_eventCancellation from "../lib/eventCancellation.js";
 import type * as lib_eventCreateServiceStyleEnsure from "../lib/eventCreateServiceStyleEnsure.js";
 import type * as lib_eventDuplicate from "../lib/eventDuplicate.js";
@@ -133,6 +134,7 @@ import type * as lib_operationalTransactions from "../lib/operationalTransaction
 import type * as lib_orgCapabilityGate from "../lib/orgCapabilityGate.js";
 import type * as lib_ownWorkspaceLinks from "../lib/ownWorkspaceLinks.js";
 import type * as lib_packReconciliation from "../lib/packReconciliation.js";
+import type * as lib_packRuleReconciliation from "../lib/packRuleReconciliation.js";
 import type * as lib_packetReconciliation from "../lib/packetReconciliation.js";
 import type * as lib_parseSearchQuery from "../lib/parseSearchQuery.js";
 import type * as lib_personAuthPick from "../lib/personAuthPick.js";
@@ -315,6 +317,7 @@ declare const fullApi: ApiFromModules<{
   "lib/dishRecipeRepair": typeof lib_dishRecipeRepair;
   "lib/encryption": typeof lib_encryption;
   "lib/equipmentReservationAvailability": typeof lib_equipmentReservationAvailability;
+  "lib/equipmentReturns": typeof lib_equipmentReturns;
   "lib/eventCancellation": typeof lib_eventCancellation;
   "lib/eventCreateServiceStyleEnsure": typeof lib_eventCreateServiceStyleEnsure;
   "lib/eventDuplicate": typeof lib_eventDuplicate;
@@ -365,6 +368,7 @@ declare const fullApi: ApiFromModules<{
   "lib/orgCapabilityGate": typeof lib_orgCapabilityGate;
   "lib/ownWorkspaceLinks": typeof lib_ownWorkspaceLinks;
   "lib/packReconciliation": typeof lib_packReconciliation;
+  "lib/packRuleReconciliation": typeof lib_packRuleReconciliation;
   "lib/packetReconciliation": typeof lib_packetReconciliation;
   "lib/parseSearchQuery": typeof lib_parseSearchQuery;
   "lib/personAuthPick": typeof lib_personAuthPick;
