@@ -204,12 +204,16 @@ bun run check:manifest-registry  # @angriff36/manifest must be registry semver (
 
 ### Domain integration guards (part of `check`)
 
+~~`bun run check:event-manifest`, `check:culinary-manifest`, `check:supply-manifest`,
+`check:production-manifest`, `check:workforce-manifest`~~
+
+> **Correction (2026-09-25):** one runner covers every domain guard in
+> `generated/proof/guard.*.json` (culinary, event, supply, production,
+> workforce, logistics, commercial, closeout, payroll):
+
 ```bash
-bun run check:event-manifest
-bun run check:culinary-manifest
-bun run check:supply-manifest
-bun run check:production-manifest
-bun run check:workforce-manifest
+bun run check:manifest-integration
+bun run check:manifest-breaking   # domain IR vs last [release]; acks in scripts/manifest-breaking-acks.json
 ```
 
 ### Branch and release (the only path to production)

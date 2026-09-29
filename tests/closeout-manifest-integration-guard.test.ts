@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
-  inspectCloseoutManifestIntegration,
-  inspectCloseoutSource,
-} from "../scripts/check-closeout-manifest-integration";
+  inspectManifestIntegration,
+  inspectManifestSource,
+} from "../scripts/check-manifest-integration";
+
+const inspectCloseoutManifestIntegration = () =>
+  inspectManifestIntegration("closeout");
+const inspectCloseoutSource = (file: string, source: string) =>
+  inspectManifestSource("closeout", file, source);
 
 describe("Closeout Manifest integration guard", () => {
   it("keeps CloseoutLifecyclePolicy on approved generated surfaces", () => {

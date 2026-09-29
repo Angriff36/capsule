@@ -2,8 +2,9 @@
  * AUTHOR SEAM — org-wide domain kill-switches from OrganizationCapabilitySetting.
  *
  * Permissions UI writes enabled/disabled rows. getAuthContext loads disabled
- * capability ids onto the auth object; generated checkRole (patched) calls
- * orgCapabilityDeniesAction so domain policies fail closed when a switch is off.
+ * capability ids onto the auth object; generated checkRole calls
+ * roleGateDenies (manifest.config.yaml roleGateImport) so domain policies fail
+ * closed when a switch is off.
  *
  * adminAccess / staffAccess / manageAccess are never gated — admins must always
  * be able to open Permissions and turn domains back on.
@@ -60,6 +61,22 @@ export function orgCapabilityDeniesAction(
   const capability = orgCapabilityForAction(action);
   if (capability === null) return false;
   return disabledCapabilities.includes(capability);
+}
+
+/**
+ * Manifest `roleGateImport` seam: generated checkRole passes the acting user's
+ * auth object for every roleAllows(user.role, …) before the role hierarchy.
+ */
+export function roleGateDenies(
+  user: unknown,
+  action: string,
+  _target?: string,
+): boolean {
+  const disabled =
+    user !== null && typeof user === "object"
+      ? (user as { disabledCapabilities?: unknown }).disabledCapabilities
+      : undefined;
+  return orgCapabilityDeniesAction(action, disabled);
 }
 
 type CapabilityRow = {
