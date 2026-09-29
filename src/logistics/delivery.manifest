@@ -201,6 +201,71 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Driver and vehicle changes on a live delivery. The authored seams
+  // (convex/driverAssignment.ts, convex/vehicleAssignment.ts) keep the
+  // operator-readable pre-checks and call these commands; these guards make the
+  // generated mutations safe to call directly. The vehicle calendar-overlap
+  // check across sibling deliveries runs in the command transaction on
+  // DeliveryVehicleAssigned (convex/lib/operationalEvents.ts) because an
+  // aggregate cannot express a window overlap.
+  command assignDriver(driverId: uuid) {
+    guard self.deletedAt == null
+    guard self.status == "scheduled" or self.status == "in_transit"
+    constraint assignDriverActive: count(Person where id == driverId, status == "active") > 0 "Pick an active person in this workspace as the driver."
+    mutate driverId = driverId
+    emit DeliveryDriverAssigned {
+      deliveryId: self.id
+      tenantId: self.tenantId
+      driverId: driverId
+      eventId: self.eventId
+    }
+  }
+
+  command unassignDriver() {
+    guard self.deletedAt == null
+    guard self.status == "scheduled" or self.status == "in_transit"
+    guard self.driverId != null
+    compute previousDriverId = self.driverId
+    mutate driverId = null
+    emit DeliveryDriverUnassigned {
+      deliveryId: self.id
+      tenantId: self.tenantId
+      driverId: previousDriverId
+      eventId: self.eventId
+    }
+  }
+
+  command assignVehicle(vehicleId: uuid) {
+    guard self.deletedAt == null
+    guard self.status == "scheduled" or self.status == "in_transit"
+    guard self.windowStartsAt != null and self.windowEndsAt != null
+    // Present in this workspace and not retired (aggregates match equality only).
+    constraint assignVehicleUsable: count(Vehicle where id == vehicleId) - count(Vehicle where id == vehicleId, operationalStatus == "retired") > 0 "Pick a vehicle in this workspace that is not retired."
+    mutate vehicleId = vehicleId
+    emit DeliveryVehicleAssigned {
+      deliveryId: self.id
+      tenantId: self.tenantId
+      vehicleId: vehicleId
+      eventId: self.eventId
+      windowStartsAt: self.windowStartsAt
+      windowEndsAt: self.windowEndsAt
+    }
+  }
+
+  command unassignVehicle() {
+    guard self.deletedAt == null
+    guard self.status == "scheduled" or self.status == "in_transit"
+    guard self.vehicleId != null
+    compute previousVehicleId = self.vehicleId
+    mutate vehicleId = null
+    emit DeliveryVehicleUnassigned {
+      deliveryId: self.id
+      tenantId: self.tenantId
+      vehicleId: previousVehicleId
+      eventId: self.eventId
+    }
+  }
+
   store Delivery in durable
 }
 
@@ -260,11 +325,10 @@ event DeliveryCancelled: "delivery.cancelled" {
   reason: string
 }
 
-// Vehicle assignment is owned by the authored Convex seam
-// (convex/vehicleAssignment.ts) because the current Convex projection cannot
-// hydrate an overlap guard across sibling deliveries during a generated
-// command; the seam performs the range read and patch in one serializable
-// Convex transaction and emits these events.
+// Emitted by Delivery.assignVehicle / unassignVehicle (2026-09-29: the
+// authored seam convex/vehicleAssignment.ts no longer writes these rows; it
+// calls the commands, and the sibling-overlap check runs on
+// DeliveryVehicleAssigned inside the command transaction).
 event DeliveryVehicleAssigned: "delivery.vehicle_assigned" {
   deliveryId: string
   tenantId: string
@@ -278,6 +342,20 @@ event DeliveryVehicleUnassigned: "delivery.vehicle_unassigned" {
   deliveryId: string
   tenantId: string
   vehicleId: string
+  eventId: string
+}
+
+event DeliveryDriverAssigned: "delivery.driver_assigned" {
+  deliveryId: string
+  tenantId: string
+  driverId: string
+  eventId: string
+}
+
+event DeliveryDriverUnassigned: "delivery.driver_unassigned" {
+  deliveryId: string
+  tenantId: string
+  driverId: string
   eventId: string
 }
 

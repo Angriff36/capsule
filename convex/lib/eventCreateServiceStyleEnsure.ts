@@ -1,4 +1,6 @@
+import { api } from "../_generated/api";
 import type { MutationCtx } from "../_generated/server";
+import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
 
 const BUILTIN_CODES = new Set([
   "full-service",
@@ -34,6 +36,14 @@ export function isBuiltInServiceStyleCode(code: string): boolean {
   return BUILTIN_CODES.has(code);
 }
 
+/**
+ * Materializes a built-in catalog code as a consequence of booking
+ * (convex/eventCreateCatalog.ts, BOOKING_ROLES). Booking roles do not hold the
+ * ServiceStyle policies (eventManageAccess), so the generated commands run
+ * through the tenant system runner in the caller's transaction (2026-09-29):
+ * ServiceStyle_createViaRegister for a new code, ServiceStyle_register for a
+ * row that was never registered, ServiceStyle_activate for an inactive one.
+ */
 export async function ensureBuiltInServiceStyleRow(
   ctx: MutationCtx,
   input: {
@@ -51,31 +61,36 @@ export async function ensureBuiltInServiceStyleRow(
   const existing = rows.find(
     (row) => row.deletedAt == null && row.code === input.code,
   );
-  const now = Date.now();
+  const system = TenantSystemCommandRunner.forTenant(
+    ctx,
+    input.tenantId,
+  ).context;
   if (existing) {
-    if (existing.status !== "active" || existing.registeredAt == null) {
-      await ctx.db.patch(existing._id, {
-        status: "active",
-        registeredAt: existing.registeredAt ?? now,
-        deactivatedAt: undefined,
-        deactivationReason: undefined,
-        updatedAt: now,
-        version: existing.version + 1,
+    if (existing.registeredAt == null) {
+      await system.runMutation(api.mutations.ServiceStyle_register, {
+        docId: existing._id,
+        version: existing.version,
+        name: existing.name.trim() ? existing.name : input.name,
+        code: existing.code,
+        sortOrder: existing.sortOrder,
+        description: existing.description ?? undefined,
+      });
+    } else if (existing.status !== "active") {
+      await system.runMutation(api.mutations.ServiceStyle_activate, {
+        docId: existing._id,
+        version: existing.version,
       });
     }
     return existing._id;
   }
-  return await ctx.db.insert("serviceStyles", {
-    tenantId: input.tenantId,
-    name: input.name,
-    code: input.code,
-    sortOrder: input.sortOrder,
-    description: input.description,
-    status: "active",
-    registeredAt: now,
-    deletedAt: null,
-    createdAt: now,
-    updatedAt: now,
-    version: 1,
-  });
+  const created = await system.runMutation(
+    api.mutations.ServiceStyle_createViaRegister,
+    {
+      name: input.name,
+      code: input.code,
+      sortOrder: input.sortOrder,
+      description: input.description,
+    },
+  );
+  return String(created.docId);
 }

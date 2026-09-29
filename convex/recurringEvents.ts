@@ -1,7 +1,13 @@
 import { ConvexError, v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import { api, internal } from "./_generated/api";
-import { action, internalMutation } from "./_generated/server";
+import {
+  action,
+  internalMutation,
+  type MutationCtx,
+} from "./_generated/server";
+import { decrypt } from "./lib/encryption";
+import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 import {
   RECURRING_EVENT_BATCH_LIMIT,
   RECURRING_EVENT_DRAFT_HORIZON_MS,
@@ -59,48 +65,102 @@ function requireScheduleSource(event: RecurringEvent): {
   };
 }
 
-function recurringDraft(
+/** Event fields sealed by the generated Event commands (JSON envelope). */
+async function openEventField(
+  ctx: MutationCtx,
+  property: string,
+  raw: string | null | undefined,
+): Promise<string | undefined> {
+  if (raw == null) return undefined;
+  let envelope: unknown;
+  try {
+    envelope = JSON.parse(raw);
+  } catch {
+    return raw;
+  }
+  if (
+    !envelope ||
+    typeof envelope !== "object" ||
+    !("v" in envelope) ||
+    !("kid" in envelope) ||
+    !("ct" in envelope)
+  ) {
+    return raw;
+  }
+  if ((envelope as { v: unknown }).v !== 1) {
+    throw new Error(`Unsupported encryption envelope for Event.${property}`);
+  }
+  return await decrypt(
+    (envelope as { ct: string }).ct,
+    (envelope as { kid: string }).kid,
+    { ctx, entity: "Event", property },
+  );
+}
+
+/** Drops null/undefined so optional command params are omitted, not sent. */
+function present<T extends Record<string, unknown>>(value: T): T {
+  return Object.fromEntries(
+    Object.entries(value).filter(([, item]) => item != null),
+  ) as T;
+}
+
+/**
+ * Event.planEngagement params for one occurrence: the same planning facts the
+ * series has always copied from its source Event, moved to the occurrence
+ * start, plus the recurrence link. Encrypted contact fields are opened here
+ * and sealed again by the command.
+ */
+async function occurrencePlanArgs(
+  ctx: MutationCtx,
   template: RecurringEvent,
   startsAt: number,
   sequence: number,
   seriesId: string,
-  now: number,
-): Omit<Doc<"events">, "_id" | "_creationTime"> {
-  const templateStartsAt = Number(template.startsAt);
-  const templateEndsAt = Number(template.endsAt);
-  const duration = templateEndsAt - templateStartsAt;
-  return {
-    tenantId: template.tenantId,
-    clientId: template.clientId,
-    venueId: template.venueId,
-    assignedToId: template.assignedToId,
+) {
+  const duration = Number(template.endsAt) - Number(template.startsAt);
+  const primaryContactName = await openEventField(
+    ctx,
+    "primaryContactName",
+    template.primaryContactName,
+  );
+  if (!template.clientId || !primaryContactName) {
+    throw new Error(
+      "Recurring Event source is missing its client or primary contact",
+    );
+  }
+  return present({
+    clientId: String(template.clientId),
     title: template.title,
     eventType: template.eventType,
     startsAt,
     endsAt: startsAt + duration,
-    purchasingWeekStart: startsAt,
-    venueName: template.venueName,
-    venueAddress: template.venueAddress,
-    venueCapacity: template.venueCapacity,
     expectedHeadcount: template.expectedHeadcount,
-    primaryContactName: template.primaryContactName,
-    primaryContactEmail: template.primaryContactEmail,
-    primaryContactPhone: template.primaryContactPhone,
+    primaryContactName,
+    // 0 is the planning seed planEngagement needs when the source has none.
+    budgetAmount: template.budgetAmount ?? 0,
+    quotedPrice: template.quotedPrice ?? 0,
+    venueId: template.venueId ?? undefined,
+    venueName: template.venueName ?? undefined,
+    venueAddress: template.venueAddress ?? undefined,
+    venueCapacity: template.venueCapacity ?? undefined,
+    primaryContactEmail: await openEventField(
+      ctx,
+      "primaryContactEmail",
+      template.primaryContactEmail,
+    ),
+    primaryContactPhone: await openEventField(
+      ctx,
+      "primaryContactPhone",
+      template.primaryContactPhone,
+    ),
     accessibilityNeeds: template.accessibilityNeeds ?? [],
-    serviceRequirements: template.serviceRequirements,
-    operationalRequirements: template.operationalRequirements,
-    budgetAmount: template.budgetAmount,
-    quotedPrice: template.quotedPrice,
-    stage: "planning",
-    plannedAt: now,
-    recurrenceActive: false,
+    serviceRequirements: template.serviceRequirements ?? undefined,
+    operationalRequirements: template.operationalRequirements ?? undefined,
+    assignedToId: template.assignedToId ?? undefined,
+    recurrenceTemplateEventId: String(template._id),
     recurrenceSeriesId: seriesId,
-    recurrenceTemplateEventId: template._id,
     recurrenceSequence: sequence,
-    createdAt: now,
-    updatedAt: now,
-    version: 1,
-  };
+  });
 }
 
 /**
@@ -173,10 +233,19 @@ export const configure = action({
 });
 
 /**
- * Internal projection-gap seam. Manifest 3.6.41 can emit static cron calls but
+ * ~~Internal projection-gap seam. Manifest 3.6.41 can emit static cron calls but
  * cannot perform a secure tenant-wide query or supply system auth to generated
  * Event commands. This function is internal-only, tokenized per series, and
- * mirrors the generated Event.planEngagement document/event shape.
+ * mirrors the generated Event.planEngagement document/event shape.~~
+ * 2026-09-29: system auth for generated commands exists
+ * (lib/tenantSystemCommandRunner.ts). This scheduled, identity-less sweep is
+ * internal-only and tokenized per series; it plans each occurrence with the
+ * generated Event.planEngagement (recurrence params, system role only) and
+ * records progress with Event.advanceRecurrence, both through the tenant
+ * system runner in this transaction. Occurrences therefore emit a real
+ * EventPlanned, so the event-number hook and every other EventPlanned
+ * consequence run for them. A sequence that already exists is skipped, so a
+ * replayed sweep plans nothing twice.
  */
 export const materializeDue = internalMutation({
   args: {
@@ -218,6 +287,10 @@ export const materializeDue = internalMutation({
         .filter((value): value is number => typeof value === "number"),
     );
 
+    const system = TenantSystemCommandRunner.forTenant(
+      ctx,
+      args.tenantId,
+    ).context;
     const now = Date.now();
     const horizon = now + RECURRING_EVENT_DRAFT_HORIZON_MS;
     let generatedCount = Math.max(template.recurrenceGeneratedCount ?? 1, 1);
@@ -239,33 +312,16 @@ export const materializeDue = internalMutation({
       generated < RECURRING_EVENT_BATCH_LIMIT
     ) {
       if (!existingSequences.has(sequence)) {
-        const draft = recurringDraft(
-          template,
-          nextStartsAt,
-          sequence,
-          args.seriesId,
-          now,
+        await system.runMutation(
+          api.mutations.Event_createViaPlanEngagement,
+          await occurrencePlanArgs(
+            ctx,
+            template,
+            nextStartsAt,
+            sequence,
+            args.seriesId,
+          ),
         );
-        const eventId = await ctx.db.insert("events", draft);
-        await ctx.db.insert("manifestEvents", {
-          type: "EventPlanned",
-          entity: "Event",
-          entityId: eventId,
-          payload: {
-            eventId,
-            tenantId: draft.tenantId,
-            clientId: draft.clientId,
-            venueId: draft.venueId,
-            venueCapacity: draft.venueCapacity,
-            startsAt: draft.startsAt,
-            endsAt: draft.endsAt,
-            expectedHeadcount: draft.expectedHeadcount,
-            recurrenceTemplateEventId: args.templateEventId,
-            recurrenceSeriesId: args.seriesId,
-            recurrenceSequence: sequence,
-          },
-          createdAt: now,
-        });
         generated += 1;
       }
       generatedCount = sequence;
@@ -286,13 +342,12 @@ export const materializeDue = internalMutation({
       nextStartsAt,
       sequence,
     );
-    await ctx.db.patch(args.templateEventId, {
-      recurrenceGeneratedCount: generatedCount,
-      recurrenceNextStartsAt: remainsActive ? nextStartsAt : null,
-      recurrenceActive: remainsActive,
-      recurrenceCompletedAt: remainsActive ? null : now,
-      updatedAt: now,
-      version: (template.version ?? 0) + 1,
+    await system.runMutation(api.mutations.Event_advanceRecurrence, {
+      docId: args.templateEventId,
+      version: template.version,
+      seriesId: args.seriesId,
+      generatedCount,
+      ...(remainsActive ? { nextStartsAt } : {}),
     });
 
     if (remainsActive) {

@@ -115,7 +115,7 @@ export async function seedEventWithWork(
 
   await runInventory(M.EquipmentReservation_checkOut, {
     docId: second.equipmentReservationId,
-    version: 0,
+    version: 1, // createViaReserve starts a reservation at version 1
     condition: "good",
   });
 

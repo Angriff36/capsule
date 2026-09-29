@@ -1,7 +1,12 @@
 import { ConvexError, v } from "convex/values";
+import { api } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
 import { mutation } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
-import { availableEquipmentQuantity } from "./lib/equipmentReservationAvailability";
+import {
+  equipmentQuantityAvailable,
+  overbookedMessage,
+} from "./lib/equipmentReservationGuard";
 
 const EQUIPMENT_ROLES = new Set([
   "inventory_staff",
@@ -19,9 +24,14 @@ const EQUIPMENT_ROLES = new Set([
  * Authored atomic creation seam for EquipmentReservation.
  *
  * Manifest owns the entity, lifecycle, policies, events, and generated client
- * bindings. The current Convex projection cannot hydrate a hasMany overlap
+ * bindings. ~~The current Convex projection cannot hydrate a hasMany overlap
  * guard during governed creation, so this one mutation performs the range read
- * and insert in the same serializable Convex transaction.
+ * and insert in the same serializable Convex transaction.~~
+ * 2026-09-29: the row is created by the generated
+ * EquipmentReservation_createViaReserve (caller auth, same transaction), which
+ * emits EquipmentReserved. The availability read also runs inside that command
+ * transaction (lib/equipmentReservationGuard.ts via lib/operationalEvents.ts);
+ * this seam keeps it up front for the operator-readable message.
  */
 export const reserve = mutation({
   args: {
@@ -70,55 +80,27 @@ export const reserve = mutation({
       throw new ConvexError("Event is unavailable in this workspace.");
     }
 
-    const reservations = await ctx.db
-      .query("equipmentReservations")
-      .withIndex("by_equipmentId", (query) =>
-        query.eq("equipmentId", args.equipmentId),
-      )
-      .collect();
-    const availableQuantity = availableEquipmentQuantity(
-      equipment.quantity,
-      reservations,
-      { tenantId, startsAt: args.startsAt, endsAt: args.endsAt },
-    );
+    const availableQuantity = await equipmentQuantityAvailable(ctx, {
+      equipment,
+      tenantId,
+      startsAt: args.startsAt,
+      endsAt: args.endsAt,
+    });
     if (args.quantity > availableQuantity) {
-      throw new ConvexError(
-        `${equipment.name} has ${Math.max(availableQuantity, 0)} available for that window. Choose another time or reduce the quantity.`,
-      );
+      throw new ConvexError(overbookedMessage(equipment, availableQuantity));
     }
 
-    const now = Date.now();
-    const equipmentReservationId = await ctx.db.insert(
-      "equipmentReservations",
+    const created = await ctx.runMutation(
+      api.mutations.EquipmentReservation_createViaReserve,
       {
-        tenantId,
         equipmentId: args.equipmentId,
         eventId: args.eventId,
         startsAt: args.startsAt,
         endsAt: args.endsAt,
         quantity: args.quantity,
-        status: "reserved",
-        reservedAt: now,
-        createdAt: now,
-        updatedAt: now,
-        version: 0,
       },
     );
-    await ctx.db.insert("manifestEvents", {
-      type: "EquipmentReserved",
-      entity: "EquipmentReservation",
-      entityId: equipmentReservationId,
-      payload: {
-        equipmentReservationId,
-        equipmentId: args.equipmentId,
-        eventId: args.eventId,
-        tenantId,
-        startsAt: args.startsAt,
-        endsAt: args.endsAt,
-        quantity: args.quantity,
-      },
-      createdAt: now,
-    });
+    const equipmentReservationId = created.docId as Id<"equipmentReservations">;
 
     return { equipmentReservationId };
   },

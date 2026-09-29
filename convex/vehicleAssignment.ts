@@ -1,7 +1,8 @@
 import { ConvexError, v } from "convex/values";
+import { api } from "./_generated/api";
 import { mutation } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
-import { conflictingVehicleDeliveries } from "./lib/vehicleDeliveryAvailability";
+import { assertVehicleWindowFree } from "./lib/vehicleAssignmentGuard";
 
 // Delivery write policy: logisticsAccess or manageAccess (base.manifest roles).
 const DELIVERY_ROLES = new Set([
@@ -24,10 +25,17 @@ const DELIVERY_ROLES = new Set([
  * Authored vehicle-assignment seam for Delivery.
  *
  * Manifest owns the entity, lifecycle, policies, events, and generated client
- * bindings. The current Convex projection cannot hydrate an overlap guard
+ * bindings. ~~The current Convex projection cannot hydrate an overlap guard
  * across sibling deliveries during a generated command, so this seam performs
  * the vehicle calendar-conflict read and the patch in the same serializable
- * Convex transaction.
+ * Convex transaction.~~
+ * 2026-09-29: the write is the generated Delivery.assignVehicle /
+ * unassignVehicle command (caller auth, same transaction), which emits
+ * DeliveryVehicleAssigned / DeliveryVehicleUnassigned. The calendar-conflict
+ * check also runs inside that command transaction on DeliveryVehicleAssigned
+ * (lib/vehicleAssignmentGuard.ts), so a direct call to the generated mutation
+ * cannot double-book; this seam keeps the same read up front for the
+ * operator-readable message.
  */
 export const assign = mutation({
   args: {
@@ -83,45 +91,18 @@ export const assign = mutation({
       );
     }
 
-    const siblingDeliveries = await ctx.db
-      .query("deliveries")
-      .withIndex("by_vehicleId", (query) =>
-        query.eq("vehicleId", args.vehicleId),
-      )
-      .collect();
-    const conflicts = conflictingVehicleDeliveries(siblingDeliveries, {
+    await assertVehicleWindowFree(ctx, {
       tenantId,
+      deliveryId: args.deliveryId,
+      vehicle,
       startsAt: delivery.windowStartsAt,
       endsAt: delivery.windowEndsAt,
-      excludeDeliveryId: args.deliveryId,
     });
-    if (conflicts.length > 0) {
-      const clash = conflicts[0];
-      const window = `${new Date(clash.windowStartsAt ?? 0).toLocaleString()} → ${new Date(clash.windowEndsAt ?? 0).toLocaleString()}`;
-      throw new ConvexError(
-        `${vehicle.registration} is already booked for "${clash.destination}" (${window}). Pick another vehicle or adjust the window.`,
-      );
-    }
 
-    const now = Date.now();
-    await ctx.db.patch(args.deliveryId, {
+    await ctx.runMutation(api.mutations.Delivery_assignVehicle, {
+      docId: args.deliveryId,
       vehicleId: args.vehicleId,
-      updatedAt: now,
-      version: (delivery.version ?? 0) + 1,
-    });
-    await ctx.db.insert("manifestEvents", {
-      type: "DeliveryVehicleAssigned",
-      entity: "Delivery",
-      entityId: args.deliveryId,
-      payload: {
-        deliveryId: args.deliveryId,
-        tenantId,
-        vehicleId: args.vehicleId,
-        eventId: delivery.eventId,
-        windowStartsAt: delivery.windowStartsAt,
-        windowEndsAt: delivery.windowEndsAt,
-      },
-      createdAt: now,
+      version: delivery.version,
     });
 
     return { deliveryId: args.deliveryId, vehicleId: args.vehicleId };
@@ -165,23 +146,9 @@ export const unassign = mutation({
       return { deliveryId: args.deliveryId, vehicleId: null };
     }
 
-    const now = Date.now();
-    await ctx.db.patch(args.deliveryId, {
-      vehicleId: null,
-      updatedAt: now,
-      version: (delivery.version ?? 0) + 1,
-    });
-    await ctx.db.insert("manifestEvents", {
-      type: "DeliveryVehicleUnassigned",
-      entity: "Delivery",
-      entityId: args.deliveryId,
-      payload: {
-        deliveryId: args.deliveryId,
-        tenantId,
-        vehicleId,
-        eventId: delivery.eventId,
-      },
-      createdAt: now,
+    await ctx.runMutation(api.mutations.Delivery_unassignVehicle, {
+      docId: args.deliveryId,
+      version: delivery.version,
     });
 
     return { deliveryId: args.deliveryId, vehicleId: null };

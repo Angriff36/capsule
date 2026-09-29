@@ -38,6 +38,8 @@ import { moveEventPurchasingWeek } from "./purchasingReschedule";
 import { lineOverridePurchasingFollowThrough } from "./lineOverridePurchasing";
 import { ensureUniqueInvoiceNumber } from "./invoiceNumbering";
 import { ensureEventNumber } from "./eventNumbering";
+import { validateAssignedVehicle } from "./vehicleAssignmentGuard";
+import { validateReservationFits } from "./equipmentReservationGuard";
 import { recordAcceptedProposalRevision } from "./proposalAcceptanceRevision";
 import { deleteBlobIfOrphan } from "./blobs";
 
@@ -287,6 +289,17 @@ export async function handleManifestEvent(
   if (event.entity === "Event" && event.type === "EventPurchasingWeekChanged") {
     if (event.payload.previousPurchasingWeekStart !== event.payload.purchasingWeekStart)
       await moveEventPurchasingWeek(ctx, event.entityId as Id<"events">);
+    return;
+  }
+  if (event.entity === "Delivery" && event.type === "DeliveryVehicleAssigned") {
+    // Window overlap across sibling deliveries: not expressible as an aggregate.
+    await validateAssignedVehicle(ctx, event.entityId as Id<"deliveries">);
+    return;
+  }
+  if (event.entity === "EquipmentReservation" &&
+    (event.type === "EquipmentReserved" || event.type === "EquipmentReservationRescheduled")) {
+    // Pooled quantity on the hold's window: not expressible as an aggregate.
+    await validateReservationFits(ctx, event.entityId as Id<"equipmentReservations">);
     return;
   }
   if (event.entity === "Event" &&
