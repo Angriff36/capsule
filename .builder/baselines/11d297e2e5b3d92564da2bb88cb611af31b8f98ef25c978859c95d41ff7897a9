@@ -454,6 +454,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.PackListTemplate_createViaDefine, { "name": "PackListTemplate 1", "description": "demo-description-1", "items": "demo-items-1", "serviceStyleId": "serviceStyleId-pack-list-template-1", "occasionId": "occasionId-pack-list-template-1", "guestCountMin": 1, "guestCountMax": 1, "venueRequirement": "demo-venueRequirement-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.PackListTemplate_createViaDefine, { "name": "PackListTemplate 2", "description": "demo-description-2", "items": "demo-items-2", "serviceStyleId": "serviceStyleId-pack-list-template-2", "occasionId": "occasionId-pack-list-template-2", "guestCountMin": 2, "guestCountMax": 2, "venueRequirement": "demo-venueRequirement-2" } as any);
+  // PackRule → api.mutations.PackRule_createViaDefine
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PackRule_createViaDefine, { "trigger": "demo-trigger-1", "dishId": "dishId-pack-rule-1", "serviceStyleId": "serviceStyleId-pack-rule-1", "matchFact": "demo-matchFact-1", "matchText": "demo-matchText-1", "description": "demo-description-1", "category": "demo-category-1", "unit": "demo-unit-1", "baseQuantity": 1, "scaleBy": "demo-scaleBy-1", "perUnits": 1, "sparePercent": 1, "ownership": "demo-ownership-1", "returnRequired": false, "returnNote": "demo-returnNote-1", "requiredCapability": false, "note": "demo-note-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PackRule_createViaDefine, { "trigger": "demo-trigger-2", "dishId": "dishId-pack-rule-2", "serviceStyleId": "serviceStyleId-pack-rule-2", "matchFact": "demo-matchFact-2", "matchText": "demo-matchText-2", "description": "demo-description-2", "category": "demo-category-2", "unit": "demo-unit-2", "baseQuantity": 2, "scaleBy": "demo-scaleBy-2", "perUnits": 2, "sparePercent": 2, "ownership": "demo-ownership-2", "returnRequired": false, "returnNote": "demo-returnNote-2", "requiredCapability": false, "note": "demo-note-2" } as any);
   // Payment → api.mutations.Payment_createViaRecord
   rowsAttempted += 1;
   await client.mutation(api.mutations.Payment_createViaRecord, { "invoiceId": "invoiceId-payment-1", "clientId": "clientId-payment-1", "eventId": "eventId-payment-1", "amount": 1, "method": "demo-method-1", "paymentMethodId": "paymentMethodId-payment-1", "notes": "demo-notes-1" } as any);
@@ -619,9 +624,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.ServiceStyle_createViaRegister, { "name": "ServiceStyle 2", "code": "demo-code-2", "sortOrder": 2, "description": "demo-description-2" } as any);
   // ServiceStyleKitItem → api.mutations.ServiceStyleKitItem_createViaAdd
   rowsAttempted += 1;
-  await client.mutation(api.mutations.ServiceStyleKitItem_createViaAdd, { "serviceStyleId": "serviceStyleId-service-style-kit-item-1", "description": "demo-description-1", "baseQuantity": 1, "guestsPerUnit": 1, "unit": "demo-unit-1", "note": "demo-note-1", "sortOrder": 1 } as any);
+  await client.mutation(api.mutations.ServiceStyleKitItem_createViaAdd, { "serviceStyleId": "serviceStyleId-service-style-kit-item-1", "description": "demo-description-1", "baseQuantity": 1, "guestsPerUnit": 1, "sparePercent": 1, "unit": "demo-unit-1", "note": "demo-note-1", "sortOrder": 1 } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.ServiceStyleKitItem_createViaAdd, { "serviceStyleId": "serviceStyleId-service-style-kit-item-2", "description": "demo-description-2", "baseQuantity": 2, "guestsPerUnit": 2, "unit": "demo-unit-2", "note": "demo-note-2", "sortOrder": 2 } as any);
+  await client.mutation(api.mutations.ServiceStyleKitItem_createViaAdd, { "serviceStyleId": "serviceStyleId-service-style-kit-item-2", "description": "demo-description-2", "baseQuantity": 2, "guestsPerUnit": 2, "sparePercent": 2, "unit": "demo-unit-2", "note": "demo-note-2", "sortOrder": 2 } as any);
   // ShareLink → api.mutations.ShareLink_create
   rowsAttempted += 1;
   await client.mutation(api.mutations.ShareLink_create, { "proposalId": "proposalId-share-link-1", "proposalRevisionId": "proposalRevisionId-share-link-1", "expiresAt": 1767268800000 } as any);
@@ -1313,6 +1318,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "PackListTemplate",
       "createMutation": "PackListTemplate_createViaDefine",
+      "rowCount": 2
+    },
+    {
+      "entity": "PackRule",
+      "createMutation": "PackRule_createViaDefine",
       "rowCount": 2
     },
     {

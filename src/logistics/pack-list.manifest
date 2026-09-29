@@ -3,6 +3,14 @@
 // Vehicle + Return/loss deferred. Delivery lives in delivery.manifest.
 
 use "../workforce/assignment.manifest"
+use "./pack-rule.manifest"
+
+// Who covers a must-have item that is not going on the truck.
+enum PackCoverage {
+  equivalent
+  client
+  vendor
+}
 
 enum PackListStatus {
   draft
@@ -320,6 +328,33 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   property indexed serviceStyleKitItemId: uuid?
   property unitCorrectionSource: string?
   property associationSource: string?
+  // Pack-rule line (src/lib/packRules.ts): the stable key of the merged item
+  // (item + unit + owner + return need), every source that asked for it with
+  // its rule version and amount (JSON), and the amount the rules give now.
+  // requiredQuantity follows generatedQuantity until someone sets the amount
+  // by hand (followsDishServings = false).
+  property generationKey: string?
+  property sourcesJson: string?
+  property generatedQuantity: decimal(12, 4)?
+  // No source asks for this line any more and nothing was packed. The line
+  // keeps its identity so it comes back if a source returns.
+  property retiredAt: datetime?
+  property category: PackCategory?
+  property ownership: PackOwnership?
+  property returnRequired: boolean?
+  property returnNote: string?
+  property requiredCapability: boolean?
+  // Pack list template lineage: which template, which line of it, and the
+  // template version that set the amount.
+  property packListTemplateId: uuid?
+  property templateLineKey: string?
+  property templateVersion: int?
+  // Not going on the truck, on purpose. A must-have item also says what
+  // stands in for it or who covers it.
+  property excludedAt: datetime?
+  property exclusionReason: string?
+  property replacementDescription: string?
+  property coveredBy: PackCoverage?
   property required requiredQuantity: decimal(12, 4) = 0
   property required packedQuantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
@@ -659,6 +694,116 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Pack-rule line (convex/lib/packRuleReconciliation.ts). The seam lists a
+  // new line with addItem, then this stamps and keeps it in step. A line
+  // whose amount was set by hand keeps it; a line with no source left and
+  // nothing packed retires; a packed count never changes. Update-only, so
+  // addItem stays the one way to create a pack line.
+  command applyGenerated(
+    packListId: uuid,
+    generationKey: string,
+    category: PackCategory,
+    ownership: PackOwnership,
+    returnRequired: boolean,
+    optional returnNote: string,
+    requiredCapability: boolean,
+    generatedQuantity: decimal(12, 4),
+    sourcesJson: string
+  ) {
+    guard self.deletedAt == null and self.listedAt != null
+    guard self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    constraint generatedReferencesMatch: self.packListId == packListId and (self.generationKey == null or self.generationKey == generationKey) "This packing line is for a different item. Refresh and try again."
+    constraint generatedQuantityValid: generatedQuantity >= 0 "A pack amount can't be negative."
+    compute follows = self.followsDishServings != false
+    compute nothingPacked = self.packedQuantity == 0
+    mutate generationKey = generationKey
+    mutate category = category
+    mutate ownership = ownership
+    mutate returnRequired = returnRequired
+    mutate returnNote = returnNote
+    mutate requiredCapability = requiredCapability
+    mutate generatedQuantity = generatedQuantity
+    mutate sourcesJson = sourcesJson
+    mutate requiredQuantity = follows ? generatedQuantity : self.requiredQuantity
+    mutate retiredAt = generatedQuantity == 0 and follows and nothingPacked ? (self.retiredAt != null ? self.retiredAt : now()) : null
+    mutate status = follows and self.status == "packed" and generatedQuantity > self.packedQuantity ? "listed" : self.status
+    emit PackListItemRequirementSynced {
+      packListId: packListId
+      tenantId: self.tenantId
+      additionalRequired: self.excludedAt == null and self.retiredAt == null and self.requiredQuantity > self.packedQuantity
+    }
+  }
+
+  // Kit line that grows with guests: the seam sends the new amount after a
+  // guest count or kit change. A hand-set amount stays.
+  command syncKitGuests(requiredQuantity: decimal(12, 4)) {
+    guard self.deletedAt == null and self.serviceStyleKitItemId != null
+    compute eligible = self.followsDishServings != false and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    mutate requiredQuantity = eligible ? requiredQuantity : self.requiredQuantity
+    mutate status = eligible and self.status == "packed" and requiredQuantity > self.packedQuantity ? "listed" : self.status
+    emit PackListItemRequirementSynced {
+      packListId: self.packListId
+      tenantId: self.tenantId
+      additionalRequired: eligible and requiredQuantity > self.packedQuantity
+    }
+  }
+
+  // Template line, applied through convex/lib/safeMaterialization.ts: the
+  // seam lists a new line with addItem, then this stamps its lineage. The
+  // same template line on the same list stays one pack line: a retry or a
+  // second apply updates it, and only while nobody set its amount by hand.
+  command ensureTemplateLine(packListId: uuid, packListTemplateId: uuid, templateLineKey: string, templateVersion: int, requiredQuantity: decimal(12, 4)) {
+    guard self.deletedAt == null and self.listedAt != null
+    guard self.packList != null and (self.packList.status == "draft" or self.packList.status == "packing")
+    constraint templateReferencesMatch: self.packListId == packListId and (self.packListTemplateId == null or (self.packListTemplateId == packListTemplateId and self.templateLineKey == templateLineKey)) "This packing line came from a different template line. Refresh and try again."
+    constraint templateLineAmount: requiredQuantity > 0 "A template line needs an amount more than zero."
+    compute follows = self.followsDishServings != false
+    mutate packListTemplateId = packListTemplateId
+    mutate templateLineKey = templateLineKey
+    mutate requiredQuantity = follows ? requiredQuantity : self.requiredQuantity
+    mutate templateVersion = follows or self.templateVersion == null ? templateVersion : self.templateVersion
+    mutate status = follows and self.status == "packed" and requiredQuantity > self.packedQuantity ? "listed" : self.status
+    emit PackListItemRequirementSynced {
+      packListId: packListId
+      tenantId: self.tenantId
+      additionalRequired: self.requiredQuantity > self.packedQuantity
+    }
+  }
+
+  // Not going on the truck, on purpose (spec §13.2): the line stays on the
+  // list with the reason. A must-have item also names its stand-in or who
+  // covers it; without one, the list cannot be marked packed.
+  command exclude(reason: string, optional replacementDescription: string, optional coveredBy: PackCoverage) {
+    guard self.deletedAt == null
+    guard self.packList != null and self.packList.status != "cancelled"
+    constraint excludeReasonPresent: length(trim(reason)) > 0 "Say why this item is not going."
+    mutate excludedAt = now()
+    mutate exclusionReason = trim(reason)
+    mutate replacementDescription = replacementDescription != null and length(trim(replacementDescription)) > 0 ? trim(replacementDescription) : null
+    mutate coveredBy = coveredBy
+    emit PackListItemExcluded {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      description: self.description
+      reason: trim(reason)
+    }
+  }
+
+  command restoreExcluded() {
+    guard self.deletedAt == null and self.excludedAt != null
+    guard self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    mutate excludedAt = null
+    mutate exclusionReason = null
+    mutate replacementDescription = null
+    mutate coveredBy = null
+    emit PackListItemRequirementSynced {
+      packListId: self.packListId
+      tenantId: self.tenantId
+      additionalRequired: self.requiredQuantity > self.packedQuantity
+    }
+  }
+
   store PackListItem in durable
 }
 
@@ -804,6 +949,14 @@ event PackListItemKitEnsured: "pack_list_item.kit_ensured" {
   serviceStyleKitItemId: string
 }
 
+event PackListItemExcluded: "pack_list_item.excluded" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  description: string
+  reason: string
+}
+
 event PackListItemRemoved: "pack_list_item.removed" {
   packListItemId: string
   tenantId: string
@@ -858,7 +1011,8 @@ on PackListKitRequested fanOut ServiceStyleKitItem where activeKitKey = payload.
     packListId: payload.packListId
     serviceStyleKitItemId: self.id
     description: self.description
-    requiredQuantity: self.baseQuantity + (self.guestsPerUnit != null ? ceil(payload.expectedHeadcount / self.guestsPerUnit) : 0)
+    // Same formula as kitLineQuantity in src/lib/packRules.ts.
+    requiredQuantity: self.baseQuantity + (self.guestsPerUnit != null ? ceil(ceil(payload.expectedHeadcount / self.guestsPerUnit) * (100 + (self.sparePercent != null ? self.sparePercent : 0)) / 100) : 0)
     unit: self.unit
     note: self.note
   }

@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:0469c4ed0c814a019380a73675adacc62173c22b928bf9a8d16c336b313b24e0:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:0fa9c629f23816c9e51aa47d766814b4adc281ed73c0a26bad33ba65ec930114:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e112ef70ab2634ddc76e69be97bf2cf6213bc0662e21efdb998b5fe1fecbfa5:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:425786468a2c925e4a22baf51be9695b6f09848be70c0a67ee021678166c63c5:44730f01893c2c387121f8aa1d1465975c3d70ad9d2ba6bcafc51190118cfc30:461b35052a22a3f3494612a688d5024cf608ca3f5f42e7392e2e39d0b4ae3059:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:493a6e387d93dc73ab30f1e335b014ebe877fb3cfd7bb286f12f252364e161c0:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:571c1fbbd06e6f847dc0789bb6699eef2dad5b3438eb906c97bd99975eee1572:5865118d3c2cc0441916631fed5be684f876ea34c8cc603b23d1cc192c29b379:5eede5832d56f1a6f53fff1c333df6f4f34990f8b3a29f4c007b8e1b88f8c60b:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:673eea009a24475e68b862081672cfe7f5ac7d9c5fb1cae8cd3cb4e17912765f:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:77e0d3181b4febaaa663ecdb3476b943a5aa588f20396e8243a196d12cae1e7c:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7a8de9cb59f93d64dd599f21ded09010d4de32c74d4c83100dcea9b6877fe6b0:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:946747485e83cf5d41c4c5a046fc32486ecd0f7e059812185e3b5886d06852a0:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a87caa099b219e0f859edc5be5c50d0cb367def3e8348a5e9bb406bbc8502c65:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b7a8e29fcf51b07830d4c56102194730fa51e426a43be671d6ffb18c38698087:b8371dec149afe525f389169aedf38e3953a48946523b416345e61b2ba2a9543:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccd72e1626e8659c7b43fe7ac7a3f5210245e7d32107e356d0cb3df0decf6453:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:e69aaee600e0695a11cd87fca6c72ff383f0b8c2333fd92e4ab031225acb6fef:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:f7a4e5f8e94ed6c20dd10eb865c5d62a080b7e9547387be50830d7a0511564ae:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1";
+export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:0469c4ed0c814a019380a73675adacc62173c22b928bf9a8d16c336b313b24e0:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:0fa9c629f23816c9e51aa47d766814b4adc281ed73c0a26bad33ba65ec930114:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e112ef70ab2634ddc76e69be97bf2cf6213bc0662e21efdb998b5fe1fecbfa5:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2b1d0ec8d7f3b25f4980f6db642a77bc15276b01b7e0276e224c04e5e95cf2c8:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:425786468a2c925e4a22baf51be9695b6f09848be70c0a67ee021678166c63c5:44730f01893c2c387121f8aa1d1465975c3d70ad9d2ba6bcafc51190118cfc30:461b35052a22a3f3494612a688d5024cf608ca3f5f42e7392e2e39d0b4ae3059:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:493a6e387d93dc73ab30f1e335b014ebe877fb3cfd7bb286f12f252364e161c0:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:571c1fbbd06e6f847dc0789bb6699eef2dad5b3438eb906c97bd99975eee1572:5865118d3c2cc0441916631fed5be684f876ea34c8cc603b23d1cc192c29b379:5eede5832d56f1a6f53fff1c333df6f4f34990f8b3a29f4c007b8e1b88f8c60b:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:673eea009a24475e68b862081672cfe7f5ac7d9c5fb1cae8cd3cb4e17912765f:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7a8de9cb59f93d64dd599f21ded09010d4de32c74d4c83100dcea9b6877fe6b0:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:946747485e83cf5d41c4c5a046fc32486ecd0f7e059812185e3b5886d06852a0:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a87caa099b219e0f859edc5be5c50d0cb367def3e8348a5e9bb406bbc8502c65:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b44c9352035063818b8fff1dd71df3a90b604b3ca53c1c21128e1cbdc87d99d1:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b7a8e29fcf51b07830d4c56102194730fa51e426a43be671d6ffb18c38698087:b8371dec149afe525f389169aedf38e3953a48946523b416345e61b2ba2a9543:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccd72e1626e8659c7b43fe7ac7a3f5210245e7d32107e356d0cb3df0decf6453:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:e69aaee600e0695a11cd87fca6c72ff383f0b8c2333fd92e4ab031225acb6fef:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:f7a4e5f8e94ed6c20dd10eb865c5d62a080b7e9547387be50830d7a0511564ae:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -16554,6 +16554,20 @@ export const DishClassifyAllergensInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -16813,6 +16827,20 @@ export const DishClassifyKindInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -17049,6 +17077,20 @@ export const DishClearPrimaryImageInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -17269,6 +17311,20 @@ export const DishIntroduceInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
     "label": "related entity detail"
   },
   {
@@ -17679,6 +17735,20 @@ export const DishLinkAsEditionInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -17901,6 +17971,20 @@ export const DishMergeIntoInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
     "label": "related entity detail"
   },
   {
@@ -18144,6 +18228,20 @@ export const DishPurgeInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -18368,6 +18466,20 @@ export const DishReinstateInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
     "label": "related entity detail"
   },
   {
@@ -18598,6 +18710,20 @@ export const DishRetireInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
     "label": "related entity detail"
   },
   {
@@ -18839,6 +18965,20 @@ export const DishReviseDetailsInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
     "label": "related entity detail"
   },
   {
@@ -19091,6 +19231,20 @@ export const DishSaveRecipeInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -19327,6 +19481,20 @@ export const DishSaveServiceInstructionsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -19549,6 +19717,20 @@ export const DishSetPrimaryImageInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
     "label": "related entity detail"
   },
   {
@@ -19777,6 +19959,20 @@ export const DishUpdatePortioningInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
     "label": "related entity detail"
   },
   {
@@ -100657,14 +100853,14 @@ export const PackListItemAdjustQuantityCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["requiredQuantity"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"Enter a required amount more than zero."},{"kind":"constraint_block","message":"You can't set the required amount below what's already packed."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemQuantityAdjusted"],
 } as const;
 
-export type PackListItemAdjustQuantityResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+export type PackListItemAdjustQuantityResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.adjustQuantity.
@@ -100800,14 +100996,14 @@ export const PackListItemAdoptContainerLinkCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["eventDishId","followsDishServings","containerServings","expectedItemVersion","expectedPackListVersion","expectedEventDishVersion","expectedContainerVersion"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"guard_failure","message":"Guard 6 failed"},{"kind":"guard_failure","message":"Guard 7 failed"},{"kind":"guard_failure","message":"Guard 8 failed"},{"kind":"constraint_block","message":"This packing line is for a different menu line. Pick the menu line already on this packing line."},{"kind":"constraint_block","message":"Servings can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This container has to be for the same dish as this packing line."},{"kind":"constraint_block","message":"Automatic packing needs the unit from the container template. Turn off automatic packing to use a different unit."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: [],
 } as const;
 
-export type PackListItemAdoptContainerLinkResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+export type PackListItemAdoptContainerLinkResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.adoptContainerLink.
@@ -100966,14 +101162,14 @@ export const PackListItemAnnotateCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["note"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemAnnotated"],
 } as const;
 
-export type PackListItemAnnotateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+export type PackListItemAnnotateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.annotate.
@@ -101085,6 +101281,297 @@ export const PackListItemAnnotateAction = {
   ]
 } as const;
 
+// --- PackListItem.applyGenerated ---
+export interface PackListItemApplyGeneratedClientInput {
+  packListId: string;
+  generationKey: string;
+  /** Allowed: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" */
+  category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other";
+  /** Allowed: "owned" | "rented" | "client" */
+  ownership: "owned" | "rented" | "client";
+  returnRequired: boolean;
+  returnNote?: string;
+  requiredCapability: boolean;
+  /** Bounds: 0..∞ */
+  generatedQuantity: number;
+  sourcesJson: string;
+}
+
+export const PackListItemApplyGeneratedCapability = {
+  capabilityId: "PackListItem.applyGenerated",
+  entity: "PackListItem",
+  command: "applyGenerated",
+  route: "/api/manifest/PackListItem/commands/applyGenerated",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["packListId","generationKey","category","ownership","returnRequired","returnNote","requiredCapability","generatedQuantity","sourcesJson"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This packing line is for a different item. Refresh and try again."},{"kind":"constraint_block","message":"A pack amount can't be negative."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
+  emits: ["PackListItemRequirementSynced"],
+} as const;
+
+export type PackListItemApplyGeneratedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PackListItem.applyGenerated.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPackListItemApplyGeneratedInput(client: PackListItemApplyGeneratedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PackListItem.applyGenerated. */
+export const PackListItemApplyGeneratedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.lists()",
+    "readId": "PackListItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.detail(id)",
+    "readId": "PackListItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "readId": "Dish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "readId": "Dish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DishContainer",
+    "queryKeyHint": "queryKeys.dishContainer.lists()",
+    "readId": "DishContainer.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishContainer",
+    "queryKeyHint": "queryKeys.dishContainer.detail(id)",
+    "readId": "DishContainer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.lists()",
+    "readId": "EventDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.detail(id)",
+    "readId": "EventDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.lists()",
+    "readId": "PackList.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.detail(id)",
+    "readId": "PackList.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.lists()",
+    "readId": "ProductionBatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.detail(id)",
+    "readId": "ProductionBatch.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PackListItem.applyGenerated. Not a rendered control. */
+export const PackListItemApplyGeneratedAction = {
+  "exposure": "human",
+  "label": "Apply generated",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "packListId",
+      "label": "Pack list id",
+      "required": true
+    },
+    {
+      "name": "generationKey",
+      "label": "Generation key",
+      "required": true
+    },
+    {
+      "name": "category",
+      "label": "Category",
+      "required": true,
+      "choices": [
+        {
+          "value": "serving_vessel",
+          "label": "serving_vessel"
+        },
+        {
+          "value": "utensil",
+          "label": "utensil"
+        },
+        {
+          "value": "holding",
+          "label": "holding"
+        },
+        {
+          "value": "transport",
+          "label": "transport"
+        },
+        {
+          "value": "garnish",
+          "label": "garnish"
+        },
+        {
+          "value": "portioning",
+          "label": "portioning"
+        },
+        {
+          "value": "disposable",
+          "label": "disposable"
+        },
+        {
+          "value": "place_setting",
+          "label": "place_setting"
+        },
+        {
+          "value": "linen",
+          "label": "linen"
+        },
+        {
+          "value": "table_setup",
+          "label": "table_setup"
+        },
+        {
+          "value": "power",
+          "label": "power"
+        },
+        {
+          "value": "water",
+          "label": "water"
+        },
+        {
+          "value": "handwashing",
+          "label": "handwashing"
+        },
+        {
+          "value": "tent",
+          "label": "tent"
+        },
+        {
+          "value": "flooring",
+          "label": "flooring"
+        },
+        {
+          "value": "weather",
+          "label": "weather"
+        },
+        {
+          "value": "bar",
+          "label": "bar"
+        },
+        {
+          "value": "glassware",
+          "label": "glassware"
+        },
+        {
+          "value": "ice",
+          "label": "ice"
+        },
+        {
+          "value": "decor",
+          "label": "decor"
+        },
+        {
+          "value": "rental",
+          "label": "rental"
+        },
+        {
+          "value": "other",
+          "label": "other"
+        }
+      ]
+    },
+    {
+      "name": "ownership",
+      "label": "Ownership",
+      "required": true,
+      "choices": [
+        {
+          "value": "owned",
+          "label": "owned"
+        },
+        {
+          "value": "rented",
+          "label": "rented"
+        },
+        {
+          "value": "client",
+          "label": "client"
+        }
+      ]
+    },
+    {
+      "name": "returnRequired",
+      "label": "Return required",
+      "required": true
+    },
+    {
+      "name": "returnNote",
+      "label": "Return note",
+      "required": false
+    },
+    {
+      "name": "requiredCapability",
+      "label": "Required capability",
+      "required": true
+    },
+    {
+      "name": "generatedQuantity",
+      "label": "Generated quantity",
+      "required": true
+    },
+    {
+      "name": "sourcesJson",
+      "label": "Sources json",
+      "required": true
+    }
+  ]
+} as const;
+
 // --- PackListItem.correctImportedFluidOunces ---
 export interface PackListItemCorrectImportedFluidOuncesClientInput {
   sourceReference: string;
@@ -101103,14 +101590,14 @@ export const PackListItemCorrectImportedFluidOuncesCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["sourceReference","expectedVersion"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"guard_failure","message":"Guard 6 failed"},{"kind":"guard_failure","message":"Guard 7 failed"},{"kind":"constraint_block","message":"Say where this fluid-ounce fix came from."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: [],
 } as const;
 
-export type PackListItemCorrectImportedFluidOuncesResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+export type PackListItemCorrectImportedFluidOuncesResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.correctImportedFluidOunces.
@@ -101251,14 +101738,14 @@ export const PackListItemEnsureContainerCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["packListId","dishContainerId","eventDishId","dishId","description","quantityServings","unit"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This container's details don't match this line anymore. Refresh and try again."},{"kind":"constraint_block","message":"This container and menu line have to be for the same event and dish."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemRequirementSynced"],
 } as const;
 
-export type PackListItemEnsureContainerResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+export type PackListItemEnsureContainerResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.ensureContainer.
@@ -101529,14 +102016,14 @@ export const PackListItemEnsureKitItemCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["packListId","serviceStyleKitItemId","description","requiredQuantity","unit","note"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This kit line doesn't match this packing line anymore."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemKitEnsured","PackListItemRequirementSynced"],
 } as const;
 
-export type PackListItemEnsureKitItemResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+export type PackListItemEnsureKitItemResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.ensureKitItem.
@@ -101779,6 +102266,330 @@ export const PackListItemEnsureKitItemAction = {
   ]
 } as const;
 
+// --- PackListItem.ensureTemplateLine ---
+export interface PackListItemEnsureTemplateLineClientInput {
+  packListId: string;
+  packListTemplateId: string;
+  templateLineKey: string;
+  templateVersion: number;
+  /** Bounds: 1..∞ */
+  requiredQuantity: number;
+}
+
+export const PackListItemEnsureTemplateLineCapability = {
+  capabilityId: "PackListItem.ensureTemplateLine",
+  entity: "PackListItem",
+  command: "ensureTemplateLine",
+  route: "/api/manifest/PackListItem/commands/ensureTemplateLine",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["packListId","packListTemplateId","templateLineKey","templateVersion","requiredQuantity"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This packing line came from a different template line. Refresh and try again."},{"kind":"constraint_block","message":"A template line needs an amount more than zero."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
+  emits: ["PackListItemRequirementSynced"],
+} as const;
+
+export type PackListItemEnsureTemplateLineResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PackListItem.ensureTemplateLine.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPackListItemEnsureTemplateLineInput(client: PackListItemEnsureTemplateLineClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PackListItem.ensureTemplateLine. */
+export const PackListItemEnsureTemplateLineInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.lists()",
+    "readId": "PackListItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.detail(id)",
+    "readId": "PackListItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "readId": "Dish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "readId": "Dish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DishContainer",
+    "queryKeyHint": "queryKeys.dishContainer.lists()",
+    "readId": "DishContainer.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishContainer",
+    "queryKeyHint": "queryKeys.dishContainer.detail(id)",
+    "readId": "DishContainer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.lists()",
+    "readId": "EventDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.detail(id)",
+    "readId": "EventDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.lists()",
+    "readId": "PackList.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.detail(id)",
+    "readId": "PackList.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.lists()",
+    "readId": "ProductionBatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.detail(id)",
+    "readId": "ProductionBatch.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PackListItem.ensureTemplateLine. Not a rendered control. */
+export const PackListItemEnsureTemplateLineAction = {
+  "exposure": "human",
+  "label": "Ensure template line",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "packListId",
+      "label": "Pack list id",
+      "required": true
+    },
+    {
+      "name": "packListTemplateId",
+      "label": "Pack list template id",
+      "required": true
+    },
+    {
+      "name": "templateLineKey",
+      "label": "Template line key",
+      "required": true
+    },
+    {
+      "name": "templateVersion",
+      "label": "Template version",
+      "required": true
+    },
+    {
+      "name": "requiredQuantity",
+      "label": "Required quantity",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- PackListItem.exclude ---
+export interface PackListItemExcludeClientInput {
+  reason: string;
+  replacementDescription?: string;
+  /** Allowed: "equivalent" | "client" | "vendor" */
+  coveredBy?: "equivalent" | "client" | "vendor";
+}
+
+export const PackListItemExcludeCapability = {
+  capabilityId: "PackListItem.exclude",
+  entity: "PackListItem",
+  command: "exclude",
+  route: "/api/manifest/PackListItem/commands/exclude",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["reason","replacementDescription","coveredBy"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Say why this item is not going."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
+  emits: ["PackListItemExcluded"],
+} as const;
+
+export type PackListItemExcludeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PackListItem.exclude.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPackListItemExcludeInput(client: PackListItemExcludeClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PackListItem.exclude. */
+export const PackListItemExcludeInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.lists()",
+    "readId": "PackListItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.detail(id)",
+    "readId": "PackListItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "readId": "Dish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "readId": "Dish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DishContainer",
+    "queryKeyHint": "queryKeys.dishContainer.lists()",
+    "readId": "DishContainer.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishContainer",
+    "queryKeyHint": "queryKeys.dishContainer.detail(id)",
+    "readId": "DishContainer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.lists()",
+    "readId": "EventDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.detail(id)",
+    "readId": "EventDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.lists()",
+    "readId": "PackList.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.detail(id)",
+    "readId": "PackList.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.lists()",
+    "readId": "ProductionBatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.detail(id)",
+    "readId": "ProductionBatch.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PackListItem.exclude. Not a rendered control. */
+export const PackListItemExcludeAction = {
+  "exposure": "human",
+  "label": "Exclude",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "reason",
+      "label": "Reason",
+      "required": true
+    },
+    {
+      "name": "replacementDescription",
+      "label": "Replacement description",
+      "required": false
+    },
+    {
+      "name": "coveredBy",
+      "label": "Covered by",
+      "required": false,
+      "choices": [
+        {
+          "value": "equivalent",
+          "label": "equivalent"
+        },
+        {
+          "value": "client",
+          "label": "client"
+        },
+        {
+          "value": "vendor",
+          "label": "vendor"
+        }
+      ]
+    }
+  ]
+} as const;
+
 // --- PackListItem.markMissing ---
 export type PackListItemMarkMissingClientInput = Record<string, never>;
 
@@ -101794,14 +102605,14 @@ export const PackListItemMarkMissingCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemMissing"],
 } as const;
 
-export type PackListItemMarkMissingResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+export type PackListItemMarkMissingResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.markMissing.
@@ -101941,14 +102752,14 @@ export const PackListItemMarkPackedCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["packedQuantity"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"Enter a packed amount more than zero."},{"kind":"constraint_block","message":"You can't pack more than what's required. Enter a smaller amount."},{"kind":"constraint_block","message":"Save a short count on this line until you have the full amount"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemPacked"],
 } as const;
 
-export type PackListItemMarkPackedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+export type PackListItemMarkPackedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.markPacked.
@@ -102094,14 +102905,14 @@ export const PackListItemRecordPackedCountCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["packedQuantity"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"Enter a packed amount more than zero."},{"kind":"constraint_block","message":"This is the full amount. Mark the line packed."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemCountRecorded"],
 } as const;
 
-export type PackListItemRecordPackedCountResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+export type PackListItemRecordPackedCountResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.recordPackedCount.
@@ -102230,14 +103041,14 @@ export const PackListItemRecordSentInsteadCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["sentInstead"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemSentInsteadRecorded"],
 } as const;
 
-export type PackListItemRecordSentInsteadResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+export type PackListItemRecordSentInsteadResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.recordSentInstead.
@@ -102364,14 +103175,14 @@ export const PackListItemRemoveCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemRemoved"],
 } as const;
 
-export type PackListItemRemoveResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+export type PackListItemRemoveResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.remove.
@@ -102477,6 +103288,134 @@ export const PackListItemRemoveAction = {
   "fields": []
 } as const;
 
+// --- PackListItem.restoreExcluded ---
+export type PackListItemRestoreExcludedClientInput = Record<string, never>;
+
+export const PackListItemRestoreExcludedCapability = {
+  capabilityId: "PackListItem.restoreExcluded",
+  entity: "PackListItem",
+  command: "restoreExcluded",
+  route: "/api/manifest/PackListItem/commands/restoreExcluded",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
+  emits: ["PackListItemRequirementSynced"],
+} as const;
+
+export type PackListItemRestoreExcludedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PackListItem.restoreExcluded.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPackListItemRestoreExcludedInput(client: PackListItemRestoreExcludedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PackListItem.restoreExcluded. */
+export const PackListItemRestoreExcludedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.lists()",
+    "readId": "PackListItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.detail(id)",
+    "readId": "PackListItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "readId": "Dish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "readId": "Dish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DishContainer",
+    "queryKeyHint": "queryKeys.dishContainer.lists()",
+    "readId": "DishContainer.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishContainer",
+    "queryKeyHint": "queryKeys.dishContainer.detail(id)",
+    "readId": "DishContainer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.lists()",
+    "readId": "EventDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.detail(id)",
+    "readId": "EventDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.lists()",
+    "readId": "PackList.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.detail(id)",
+    "readId": "PackList.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.lists()",
+    "readId": "ProductionBatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.detail(id)",
+    "readId": "ProductionBatch.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PackListItem.restoreExcluded. Not a rendered control. */
+export const PackListItemRestoreExcludedAction = {
+  "exposure": "human",
+  "label": "Restore excluded",
+  "confirm": false,
+  "fields": []
+} as const;
+
 // --- PackListItem.restoreImportedAssociation ---
 export interface PackListItemRestoreImportedAssociationClientInput {
   dishId: string;
@@ -102501,14 +103440,14 @@ export const PackListItemRestoreImportedAssociationCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["dishId","eventDishId","expectedDescription","expectedVersion","expectedPackListVersion","expectedEventVersion","expectedEventDishVersion","sourceReference"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"guard_failure","message":"Guard 6 failed"},{"kind":"guard_failure","message":"Guard 7 failed"},{"kind":"guard_failure","message":"Guard 8 failed"},{"kind":"constraint_block","message":"Say where this packing link came from."},{"kind":"constraint_block","message":"This line's description changed since it was reviewed. Check it before continuing."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: [],
 } as const;
 
-export type PackListItemRestoreImportedAssociationResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+export type PackListItemRestoreImportedAssociationResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.restoreImportedAssociation.
@@ -102672,14 +103611,14 @@ export const PackListItemSyncContainerServingsCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["quantityServings"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemRequirementSynced"],
 } as const;
 
-export type PackListItemSyncContainerServingsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+export type PackListItemSyncContainerServingsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.syncContainerServings.
@@ -102786,6 +103725,142 @@ export const PackListItemSyncContainerServingsAction = {
     {
       "name": "quantityServings",
       "label": "Quantity servings",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- PackListItem.syncKitGuests ---
+export interface PackListItemSyncKitGuestsClientInput {
+  requiredQuantity: number;
+}
+
+export const PackListItemSyncKitGuestsCapability = {
+  capabilityId: "PackListItem.syncKitGuests",
+  entity: "PackListItem",
+  command: "syncKitGuests",
+  route: "/api/manifest/PackListItem/commands/syncKitGuests",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["requiredQuantity"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
+  emits: ["PackListItemRequirementSynced"],
+} as const;
+
+export type PackListItemSyncKitGuestsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PackListItem.syncKitGuests.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPackListItemSyncKitGuestsInput(client: PackListItemSyncKitGuestsClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PackListItem.syncKitGuests. */
+export const PackListItemSyncKitGuestsInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.lists()",
+    "readId": "PackListItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.detail(id)",
+    "readId": "PackListItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "readId": "Dish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "readId": "Dish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DishContainer",
+    "queryKeyHint": "queryKeys.dishContainer.lists()",
+    "readId": "DishContainer.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishContainer",
+    "queryKeyHint": "queryKeys.dishContainer.detail(id)",
+    "readId": "DishContainer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.lists()",
+    "readId": "EventDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.detail(id)",
+    "readId": "EventDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.lists()",
+    "readId": "PackList.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.detail(id)",
+    "readId": "PackList.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.lists()",
+    "readId": "ProductionBatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.detail(id)",
+    "readId": "ProductionBatch.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PackListItem.syncKitGuests. Not a rendered control. */
+export const PackListItemSyncKitGuestsAction = {
+  "exposure": "human",
+  "label": "Sync kit guests",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "requiredQuantity",
+      "label": "Required quantity",
       "required": true
     }
   ]
@@ -103158,6 +104233,1063 @@ export const PackListTemplateReviseAction = {
     {
       "name": "venueRequirement",
       "label": "Venue requirement",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- PackRule.define ---
+export interface PackRuleDefineClientInput {
+  /** Allowed: "dish" | "production_note" | "service_style" | "guest_count" | "event_fact" */
+  trigger: "dish" | "production_note" | "service_style" | "guest_count" | "event_fact";
+  description: string;
+  /** Allowed: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" */
+  category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other";
+  dishId?: string;
+  serviceStyleId?: string;
+  matchFact?: string;
+  matchText?: string;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+  baseQuantity?: number;
+  /** Allowed: "fixed" | "servings" | "guests" */
+  scaleBy?: "fixed" | "servings" | "guests";
+  perUnits?: number;
+  sparePercent?: number;
+  /** Allowed: "owned" | "rented" | "client" */
+  ownership?: "owned" | "rented" | "client";
+  returnRequired?: boolean;
+  returnNote?: string;
+  requiredCapability?: boolean;
+  note?: string;
+}
+
+export const PackRuleDefineCapability = {
+  capabilityId: "PackRule.define",
+  entity: "PackRule",
+  command: "define",
+  route: "/api/manifest/PackRule/commands/define",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["trigger","description","category","dishId","serviceStyleId","matchFact","matchText","unit","baseQuantity","scaleBy","perUnits","sparePercent","ownership","returnRequired","returnNote","requiredCapability","note"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see pack rules"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may update pack rules"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may change pack rules"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Say what goes on the pack list."}],
+  emits: ["PackRuleDefined"],
+} as const;
+
+export type PackRuleDefineResult = { docId: string };
+
+/**
+ * Build command input for PackRule.define.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPackRuleDefineInput(client: PackRuleDefineClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PackRule.define. */
+export const PackRuleDefineInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "readId": "Dish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "readId": "Dish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.lists()",
+    "readId": "ServiceStyle.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.detail(id)",
+    "readId": "ServiceStyle.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PackRule.define. Not a rendered control. */
+export const PackRuleDefineAction = {
+  "exposure": "human",
+  "label": "Define",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "trigger",
+      "label": "Trigger",
+      "required": true,
+      "choices": [
+        {
+          "value": "dish",
+          "label": "dish"
+        },
+        {
+          "value": "production_note",
+          "label": "production_note"
+        },
+        {
+          "value": "service_style",
+          "label": "service_style"
+        },
+        {
+          "value": "guest_count",
+          "label": "guest_count"
+        },
+        {
+          "value": "event_fact",
+          "label": "event_fact"
+        }
+      ]
+    },
+    {
+      "name": "description",
+      "label": "Description",
+      "required": true
+    },
+    {
+      "name": "category",
+      "label": "Category",
+      "required": true,
+      "choices": [
+        {
+          "value": "serving_vessel",
+          "label": "serving_vessel"
+        },
+        {
+          "value": "utensil",
+          "label": "utensil"
+        },
+        {
+          "value": "holding",
+          "label": "holding"
+        },
+        {
+          "value": "transport",
+          "label": "transport"
+        },
+        {
+          "value": "garnish",
+          "label": "garnish"
+        },
+        {
+          "value": "portioning",
+          "label": "portioning"
+        },
+        {
+          "value": "disposable",
+          "label": "disposable"
+        },
+        {
+          "value": "place_setting",
+          "label": "place_setting"
+        },
+        {
+          "value": "linen",
+          "label": "linen"
+        },
+        {
+          "value": "table_setup",
+          "label": "table_setup"
+        },
+        {
+          "value": "power",
+          "label": "power"
+        },
+        {
+          "value": "water",
+          "label": "water"
+        },
+        {
+          "value": "handwashing",
+          "label": "handwashing"
+        },
+        {
+          "value": "tent",
+          "label": "tent"
+        },
+        {
+          "value": "flooring",
+          "label": "flooring"
+        },
+        {
+          "value": "weather",
+          "label": "weather"
+        },
+        {
+          "value": "bar",
+          "label": "bar"
+        },
+        {
+          "value": "glassware",
+          "label": "glassware"
+        },
+        {
+          "value": "ice",
+          "label": "ice"
+        },
+        {
+          "value": "decor",
+          "label": "decor"
+        },
+        {
+          "value": "rental",
+          "label": "rental"
+        },
+        {
+          "value": "other",
+          "label": "other"
+        }
+      ]
+    },
+    {
+      "name": "dishId",
+      "label": "Dish id",
+      "required": false
+    },
+    {
+      "name": "serviceStyleId",
+      "label": "Service style id",
+      "required": false
+    },
+    {
+      "name": "matchFact",
+      "label": "Match fact",
+      "required": false
+    },
+    {
+      "name": "matchText",
+      "label": "Match text",
+      "required": false
+    },
+    {
+      "name": "unit",
+      "label": "Unit",
+      "required": false,
+      "choices": [
+        {
+          "value": "each",
+          "label": "each"
+        },
+        {
+          "value": "gram",
+          "label": "gram"
+        },
+        {
+          "value": "kilogram",
+          "label": "kilogram"
+        },
+        {
+          "value": "ounce",
+          "label": "ounce"
+        },
+        {
+          "value": "pound",
+          "label": "pound"
+        },
+        {
+          "value": "milliliter",
+          "label": "milliliter"
+        },
+        {
+          "value": "liter",
+          "label": "liter"
+        },
+        {
+          "value": "teaspoon",
+          "label": "teaspoon"
+        },
+        {
+          "value": "tablespoon",
+          "label": "tablespoon"
+        },
+        {
+          "value": "cup",
+          "label": "cup"
+        },
+        {
+          "value": "pint",
+          "label": "pint"
+        },
+        {
+          "value": "quart",
+          "label": "quart"
+        },
+        {
+          "value": "gallon",
+          "label": "gallon"
+        },
+        {
+          "value": "portion",
+          "label": "portion"
+        },
+        {
+          "value": "serving",
+          "label": "serving"
+        },
+        {
+          "value": "batch",
+          "label": "batch"
+        },
+        {
+          "value": "melon",
+          "label": "melon"
+        },
+        {
+          "value": "bottle",
+          "label": "bottle"
+        },
+        {
+          "value": "fluid_ounce",
+          "label": "fluid_ounce"
+        },
+        {
+          "value": "piece",
+          "label": "piece"
+        },
+        {
+          "value": "slice",
+          "label": "slice"
+        },
+        {
+          "value": "pizza",
+          "label": "pizza"
+        },
+        {
+          "value": "package",
+          "label": "package"
+        },
+        {
+          "value": "case",
+          "label": "case"
+        },
+        {
+          "value": "can",
+          "label": "can"
+        },
+        {
+          "value": "tub",
+          "label": "tub"
+        }
+      ]
+    },
+    {
+      "name": "baseQuantity",
+      "label": "Base quantity",
+      "required": false
+    },
+    {
+      "name": "scaleBy",
+      "label": "Scale by",
+      "required": false,
+      "choices": [
+        {
+          "value": "fixed",
+          "label": "fixed"
+        },
+        {
+          "value": "servings",
+          "label": "servings"
+        },
+        {
+          "value": "guests",
+          "label": "guests"
+        }
+      ]
+    },
+    {
+      "name": "perUnits",
+      "label": "Per units",
+      "required": false
+    },
+    {
+      "name": "sparePercent",
+      "label": "Spare percent",
+      "required": false
+    },
+    {
+      "name": "ownership",
+      "label": "Ownership",
+      "required": false,
+      "choices": [
+        {
+          "value": "owned",
+          "label": "owned"
+        },
+        {
+          "value": "rented",
+          "label": "rented"
+        },
+        {
+          "value": "client",
+          "label": "client"
+        }
+      ]
+    },
+    {
+      "name": "returnRequired",
+      "label": "Return required",
+      "required": false
+    },
+    {
+      "name": "returnNote",
+      "label": "Return note",
+      "required": false
+    },
+    {
+      "name": "requiredCapability",
+      "label": "Required capability",
+      "required": false
+    },
+    {
+      "name": "note",
+      "label": "Note",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- PackRule.reinstate ---
+export type PackRuleReinstateClientInput = Record<string, never>;
+
+export const PackRuleReinstateCapability = {
+  capabilityId: "PackRule.reinstate",
+  entity: "PackRule",
+  command: "reinstate",
+  route: "/api/manifest/PackRule/commands/reinstate",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: \"dish\" | \"production_note\" | \"service_style\" | \"guest_count\" | \"event_fact\"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\"; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; baseQuantity: number; scaleBy: \"fixed\" | \"servings\" | \"guests\"; perUnits: number | null; sparePercent: number; ownership: \"owned\" | \"rented\" | \"client\"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see pack rules"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may update pack rules"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may change pack rules"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackRule not found"}],
+  emits: ["PackRuleReinstated"],
+} as const;
+
+export type PackRuleReinstateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: "dish" | "production_note" | "service_style" | "guest_count" | "event_fact"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other"; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; baseQuantity: number; scaleBy: "fixed" | "servings" | "guests"; perUnits: number | null; sparePercent: number; ownership: "owned" | "rented" | "client"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PackRule.reinstate.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPackRuleReinstateInput(client: PackRuleReinstateClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PackRule.reinstate. */
+export const PackRuleReinstateInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "readId": "Dish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "readId": "Dish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.lists()",
+    "readId": "ServiceStyle.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.detail(id)",
+    "readId": "ServiceStyle.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PackRule.reinstate. Not a rendered control. */
+export const PackRuleReinstateAction = {
+  "exposure": "human",
+  "label": "Reinstate",
+  "confirm": false,
+  "fields": [],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "retired"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for PackRule.reinstate. */
+export const PackRuleReinstateLifecycle = [
+  {
+    "property": "status",
+    "from": "retired",
+    "to": "active",
+    "proven": true
+  }
+] as const;
+
+// --- PackRule.retire ---
+export type PackRuleRetireClientInput = Record<string, never>;
+
+export const PackRuleRetireCapability = {
+  capabilityId: "PackRule.retire",
+  entity: "PackRule",
+  command: "retire",
+  route: "/api/manifest/PackRule/commands/retire",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: \"dish\" | \"production_note\" | \"service_style\" | \"guest_count\" | \"event_fact\"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\"; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; baseQuantity: number; scaleBy: \"fixed\" | \"servings\" | \"guests\"; perUnits: number | null; sparePercent: number; ownership: \"owned\" | \"rented\" | \"client\"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see pack rules"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may update pack rules"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may change pack rules"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackRule not found"}],
+  emits: ["PackRuleRetired"],
+} as const;
+
+export type PackRuleRetireResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: "dish" | "production_note" | "service_style" | "guest_count" | "event_fact"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other"; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; baseQuantity: number; scaleBy: "fixed" | "servings" | "guests"; perUnits: number | null; sparePercent: number; ownership: "owned" | "rented" | "client"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PackRule.retire.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPackRuleRetireInput(client: PackRuleRetireClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PackRule.retire. */
+export const PackRuleRetireInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "readId": "Dish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "readId": "Dish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.lists()",
+    "readId": "ServiceStyle.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.detail(id)",
+    "readId": "ServiceStyle.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PackRule.retire. Not a rendered control. */
+export const PackRuleRetireAction = {
+  "exposure": "human",
+  "label": "Retire",
+  "confirm": false,
+  "fields": [],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "active"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for PackRule.retire. */
+export const PackRuleRetireLifecycle = [
+  {
+    "property": "status",
+    "from": "active",
+    "to": "retired",
+    "proven": true
+  }
+] as const;
+
+// --- PackRule.revise ---
+export interface PackRuleReviseClientInput {
+  description: string;
+  /** Allowed: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" */
+  category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other";
+  dishId?: string;
+  serviceStyleId?: string;
+  matchFact?: string;
+  matchText?: string;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+  baseQuantity: number;
+  /** Allowed: "fixed" | "servings" | "guests" */
+  scaleBy: "fixed" | "servings" | "guests";
+  perUnits?: number;
+  sparePercent: number;
+  /** Allowed: "owned" | "rented" | "client" */
+  ownership: "owned" | "rented" | "client";
+  returnRequired: boolean;
+  returnNote?: string;
+  requiredCapability: boolean;
+  note?: string;
+}
+
+export const PackRuleReviseCapability = {
+  capabilityId: "PackRule.revise",
+  entity: "PackRule",
+  command: "revise",
+  route: "/api/manifest/PackRule/commands/revise",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: \"dish\" | \"production_note\" | \"service_style\" | \"guest_count\" | \"event_fact\"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\"; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; baseQuantity: number; scaleBy: \"fixed\" | \"servings\" | \"guests\"; perUnits: number | null; sparePercent: number; ownership: \"owned\" | \"rented\" | \"client\"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["description","category","dishId","serviceStyleId","matchFact","matchText","unit","baseQuantity","scaleBy","perUnits","sparePercent","ownership","returnRequired","returnNote","requiredCapability","note"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see pack rules"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may update pack rules"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may change pack rules"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Say what goes on the pack list."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackRule not found"}],
+  emits: ["PackRuleRevised"],
+} as const;
+
+export type PackRuleReviseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: "dish" | "production_note" | "service_style" | "guest_count" | "event_fact"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other"; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; baseQuantity: number; scaleBy: "fixed" | "servings" | "guests"; perUnits: number | null; sparePercent: number; ownership: "owned" | "rented" | "client"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PackRule.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPackRuleReviseInput(client: PackRuleReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PackRule.revise. */
+export const PackRuleReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "readId": "Dish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "readId": "Dish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.lists()",
+    "readId": "ServiceStyle.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.detail(id)",
+    "readId": "ServiceStyle.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PackRule.revise. Not a rendered control. */
+export const PackRuleReviseAction = {
+  "exposure": "human",
+  "label": "Revise",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "description",
+      "label": "Description",
+      "required": true
+    },
+    {
+      "name": "category",
+      "label": "Category",
+      "required": true,
+      "choices": [
+        {
+          "value": "serving_vessel",
+          "label": "serving_vessel"
+        },
+        {
+          "value": "utensil",
+          "label": "utensil"
+        },
+        {
+          "value": "holding",
+          "label": "holding"
+        },
+        {
+          "value": "transport",
+          "label": "transport"
+        },
+        {
+          "value": "garnish",
+          "label": "garnish"
+        },
+        {
+          "value": "portioning",
+          "label": "portioning"
+        },
+        {
+          "value": "disposable",
+          "label": "disposable"
+        },
+        {
+          "value": "place_setting",
+          "label": "place_setting"
+        },
+        {
+          "value": "linen",
+          "label": "linen"
+        },
+        {
+          "value": "table_setup",
+          "label": "table_setup"
+        },
+        {
+          "value": "power",
+          "label": "power"
+        },
+        {
+          "value": "water",
+          "label": "water"
+        },
+        {
+          "value": "handwashing",
+          "label": "handwashing"
+        },
+        {
+          "value": "tent",
+          "label": "tent"
+        },
+        {
+          "value": "flooring",
+          "label": "flooring"
+        },
+        {
+          "value": "weather",
+          "label": "weather"
+        },
+        {
+          "value": "bar",
+          "label": "bar"
+        },
+        {
+          "value": "glassware",
+          "label": "glassware"
+        },
+        {
+          "value": "ice",
+          "label": "ice"
+        },
+        {
+          "value": "decor",
+          "label": "decor"
+        },
+        {
+          "value": "rental",
+          "label": "rental"
+        },
+        {
+          "value": "other",
+          "label": "other"
+        }
+      ]
+    },
+    {
+      "name": "dishId",
+      "label": "Dish id",
+      "required": false
+    },
+    {
+      "name": "serviceStyleId",
+      "label": "Service style id",
+      "required": false
+    },
+    {
+      "name": "matchFact",
+      "label": "Match fact",
+      "required": false
+    },
+    {
+      "name": "matchText",
+      "label": "Match text",
+      "required": false
+    },
+    {
+      "name": "unit",
+      "label": "Unit",
+      "required": true,
+      "choices": [
+        {
+          "value": "each",
+          "label": "each"
+        },
+        {
+          "value": "gram",
+          "label": "gram"
+        },
+        {
+          "value": "kilogram",
+          "label": "kilogram"
+        },
+        {
+          "value": "ounce",
+          "label": "ounce"
+        },
+        {
+          "value": "pound",
+          "label": "pound"
+        },
+        {
+          "value": "milliliter",
+          "label": "milliliter"
+        },
+        {
+          "value": "liter",
+          "label": "liter"
+        },
+        {
+          "value": "teaspoon",
+          "label": "teaspoon"
+        },
+        {
+          "value": "tablespoon",
+          "label": "tablespoon"
+        },
+        {
+          "value": "cup",
+          "label": "cup"
+        },
+        {
+          "value": "pint",
+          "label": "pint"
+        },
+        {
+          "value": "quart",
+          "label": "quart"
+        },
+        {
+          "value": "gallon",
+          "label": "gallon"
+        },
+        {
+          "value": "portion",
+          "label": "portion"
+        },
+        {
+          "value": "serving",
+          "label": "serving"
+        },
+        {
+          "value": "batch",
+          "label": "batch"
+        },
+        {
+          "value": "melon",
+          "label": "melon"
+        },
+        {
+          "value": "bottle",
+          "label": "bottle"
+        },
+        {
+          "value": "fluid_ounce",
+          "label": "fluid_ounce"
+        },
+        {
+          "value": "piece",
+          "label": "piece"
+        },
+        {
+          "value": "slice",
+          "label": "slice"
+        },
+        {
+          "value": "pizza",
+          "label": "pizza"
+        },
+        {
+          "value": "package",
+          "label": "package"
+        },
+        {
+          "value": "case",
+          "label": "case"
+        },
+        {
+          "value": "can",
+          "label": "can"
+        },
+        {
+          "value": "tub",
+          "label": "tub"
+        }
+      ]
+    },
+    {
+      "name": "baseQuantity",
+      "label": "Base quantity",
+      "required": true
+    },
+    {
+      "name": "scaleBy",
+      "label": "Scale by",
+      "required": true,
+      "choices": [
+        {
+          "value": "fixed",
+          "label": "fixed"
+        },
+        {
+          "value": "servings",
+          "label": "servings"
+        },
+        {
+          "value": "guests",
+          "label": "guests"
+        }
+      ]
+    },
+    {
+      "name": "perUnits",
+      "label": "Per units",
+      "required": false
+    },
+    {
+      "name": "sparePercent",
+      "label": "Spare percent",
+      "required": true
+    },
+    {
+      "name": "ownership",
+      "label": "Ownership",
+      "required": true,
+      "choices": [
+        {
+          "value": "owned",
+          "label": "owned"
+        },
+        {
+          "value": "rented",
+          "label": "rented"
+        },
+        {
+          "value": "client",
+          "label": "client"
+        }
+      ]
+    },
+    {
+      "name": "returnRequired",
+      "label": "Return required",
+      "required": true
+    },
+    {
+      "name": "returnNote",
+      "label": "Return note",
+      "required": false
+    },
+    {
+      "name": "requiredCapability",
+      "label": "Required capability",
+      "required": true
+    },
+    {
+      "name": "note",
+      "label": "Note",
       "required": false
     }
   ]
@@ -137036,6 +139168,20 @@ export const ServiceStyleActivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "QuoteSubmission",
     "queryKeyHint": "queryKeys.quoteSubmission.lists()",
     "readId": "QuoteSubmission.list",
@@ -137164,6 +139310,20 @@ export const ServiceStyleDeactivateInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
     "label": "related entity detail"
   },
   {
@@ -137306,6 +139466,20 @@ export const ServiceStyleRegisterInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
     "label": "related entity detail"
   },
   {
@@ -137466,6 +139640,20 @@ export const ServiceStyleReviseDetailsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.lists()",
+    "readId": "PackRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackRule",
+    "queryKeyHint": "queryKeys.packRule.detail(id)",
+    "readId": "PackRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "QuoteSubmission",
     "queryKeyHint": "queryKeys.quoteSubmission.lists()",
     "readId": "QuoteSubmission.list",
@@ -137542,6 +139730,7 @@ export interface ServiceStyleKitItemAddClientInput {
   unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   note?: string;
   sortOrder?: number;
+  sparePercent?: number;
 }
 
 export const ServiceStyleKitItemAddCapability = {
@@ -137557,7 +139746,7 @@ export const ServiceStyleKitItemAddCapability = {
   acceptsIdempotencyKey: true,
   resultKind: "allocation",
   returnTsType: "{ docId: string }",
-  clientParameterNames: ["serviceStyleId","description","baseQuantity","guestsPerUnit","unit","note","sortOrder"],
+  clientParameterNames: ["serviceStyleId","description","baseQuantity","guestsPerUnit","unit","note","sortOrder","sparePercent"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see service style kits"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may update service style kits"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may change service style kits"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Give this kit line a description."}],
   emits: ["ServiceStyleKitItemAdded"],
@@ -137751,6 +139940,11 @@ export const ServiceStyleKitItemAddAction = {
       "name": "sortOrder",
       "label": "Sort order",
       "required": false
+    },
+    {
+      "name": "sparePercent",
+      "label": "Spare percent",
+      "required": false
     }
   ]
 } as const;
@@ -137770,14 +139964,14 @@ export const ServiceStyleKitItemReinstateCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; note: string | null; sortOrder: number; status: \"active\" | \"retired\"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; sparePercent: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; note: string | null; sortOrder: number; status: \"active\" | \"retired\"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see service style kits"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may update service style kits"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may change service style kits"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ServiceStyleKitItem not found"}],
   emits: ["ServiceStyleKitItemReinstated"],
 } as const;
 
-export type ServiceStyleKitItemReinstateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; note: string | null; sortOrder: number; status: "active" | "retired"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number };
+export type ServiceStyleKitItemReinstateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; sparePercent: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; note: string | null; sortOrder: number; status: "active" | "retired"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ServiceStyleKitItem.reinstate.
@@ -137858,14 +140052,14 @@ export const ServiceStyleKitItemRetireCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; note: string | null; sortOrder: number; status: \"active\" | \"retired\"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; sparePercent: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; note: string | null; sortOrder: number; status: \"active\" | \"retired\"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see service style kits"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may update service style kits"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may change service style kits"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ServiceStyleKitItem not found"}],
   emits: ["ServiceStyleKitItemRetired"],
 } as const;
 
-export type ServiceStyleKitItemRetireResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; note: string | null; sortOrder: number; status: "active" | "retired"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number };
+export type ServiceStyleKitItemRetireResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; sparePercent: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; note: string | null; sortOrder: number; status: "active" | "retired"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ServiceStyleKitItem.retire.
@@ -137940,6 +140134,7 @@ export interface ServiceStyleKitItemReviseClientInput {
   unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   note?: string;
   sortOrder?: number;
+  sparePercent?: number;
 }
 
 export const ServiceStyleKitItemReviseCapability = {
@@ -137954,14 +140149,14 @@ export const ServiceStyleKitItemReviseCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; note: string | null; sortOrder: number; status: \"active\" | \"retired\"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }",
-  clientParameterNames: ["description","baseQuantity","guestsPerUnit","unit","note","sortOrder"],
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; sparePercent: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; note: string | null; sortOrder: number; status: \"active\" | \"retired\"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["description","baseQuantity","guestsPerUnit","unit","note","sortOrder","sparePercent"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see service style kits"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may update service style kits"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may change service style kits"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Give this kit line a description."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ServiceStyleKitItem not found"}],
   emits: ["ServiceStyleKitItemRevised"],
 } as const;
 
-export type ServiceStyleKitItemReviseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; note: string | null; sortOrder: number; status: "active" | "retired"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number };
+export type ServiceStyleKitItemReviseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; sparePercent: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; note: string | null; sortOrder: number; status: "active" | "retired"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ServiceStyleKitItem.revise.
@@ -138143,6 +140338,11 @@ export const ServiceStyleKitItemReviseAction = {
     {
       "name": "sortOrder",
       "label": "Sort order",
+      "required": false
+    },
+    {
+      "name": "sparePercent",
+      "label": "Spare percent",
       "required": false
     }
   ]
@@ -163427,20 +165627,29 @@ export const ALL_CAPABILITY_IDS = [
   "PackListItem.adjustQuantity",
   "PackListItem.adoptContainerLink",
   "PackListItem.annotate",
+  "PackListItem.applyGenerated",
   "PackListItem.correctImportedFluidOunces",
   "PackListItem.ensureContainer",
   "PackListItem.ensureKitItem",
+  "PackListItem.ensureTemplateLine",
+  "PackListItem.exclude",
   "PackListItem.markMissing",
   "PackListItem.markPacked",
   "PackListItem.recordPackedCount",
   "PackListItem.recordSentInstead",
   "PackListItem.remove",
+  "PackListItem.restoreExcluded",
   "PackListItem.restoreImportedAssociation",
   "PackListItem.syncContainerServings",
+  "PackListItem.syncKitGuests",
   "PackListTemplate.archive",
   "PackListTemplate.define",
   "PackListTemplate.reactivate",
   "PackListTemplate.revise",
+  "PackRule.define",
+  "PackRule.reinstate",
+  "PackRule.retire",
+  "PackRule.revise",
   "Payment.beginProcessing",
   "Payment.disputeReconciliation",
   "Payment.fail",
@@ -164253,6 +166462,11 @@ export const ALL_READ_IDS = [
   "PackListTemplate.byTenantId",
   "PackListTemplate.get",
   "PackListTemplate.list",
+  "PackRule.byDishId",
+  "PackRule.byServiceStyleId",
+  "PackRule.byTenantId",
+  "PackRule.get",
+  "PackRule.list",
   "Payment.byClientId",
   "Payment.byClientMergeAuthorizationId",
   "Payment.byEventId",
@@ -166038,32 +168252,32 @@ export type getPackListResult = { _id: string; _creationTime: number; tenantId: 
 export const listPackListRead = {"entity":"PackList","readId":"PackList.list","exportName":"listPackList","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; activeEventId: string | null; name: string; purpose: string | null; notes: string | null; status: \"draft\" | \"packing\" | \"packed\" | \"loaded\" | \"dispatched\" | \"cancelled\"; openedAt: number | null; packingStartedAt: number | null; packedAt: number | null; loadedAt: number | null; dispatchedAt: number | null; cancelledAt: number | null; cancellationReason: string | null; assistanceRequestedAt: number | null; assistanceNote: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listPackListResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; activeEventId: string | null; name: string; purpose: string | null; notes: string | null; status: "draft" | "packing" | "packed" | "loaded" | "dispatched" | "cancelled"; openedAt: number | null; packingStartedAt: number | null; packedAt: number | null; loadedAt: number | null; dispatchedAt: number | null; cancelledAt: number | null; cancellationReason: string | null; assistanceRequestedAt: number | null; assistanceNote: string | null; createdAt: number; updatedAt: number }>;
 
-export const listPackListItemByDishContainerIdRead = {"entity":"PackListItem","readId":"PackListItem.byDishContainerId","exportName":"listPackListItemByDishContainerId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"dishContainerId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemByDishContainerIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemByDishContainerIdRead = {"entity":"PackListItem","readId":"PackListItem.byDishContainerId","exportName":"listPackListItemByDishContainerId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"dishContainerId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemByDishContainerIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listPackListItemByDishIdRead = {"entity":"PackListItem","readId":"PackListItem.byDishId","exportName":"listPackListItemByDishId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"dishId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemByDishIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemByDishIdRead = {"entity":"PackListItem","readId":"PackListItem.byDishId","exportName":"listPackListItemByDishId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"dishId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemByDishIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listPackListItemByEventDishIdRead = {"entity":"PackListItem","readId":"PackListItem.byEventDishId","exportName":"listPackListItemByEventDishId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventDishId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemByEventDishIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemByEventDishIdRead = {"entity":"PackListItem","readId":"PackListItem.byEventDishId","exportName":"listPackListItemByEventDishId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventDishId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemByEventDishIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listPackListItemByPackListIdRead = {"entity":"PackListItem","readId":"PackListItem.byPackListId","exportName":"listPackListItemByPackListId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"packListId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemByPackListIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemByPackListIdRead = {"entity":"PackListItem","readId":"PackListItem.byPackListId","exportName":"listPackListItemByPackListId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"packListId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemByPackListIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listPackListItemByProductionBatchIdRead = {"entity":"PackListItem","readId":"PackListItem.byProductionBatchId","exportName":"listPackListItemByProductionBatchId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"productionBatchId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemByProductionBatchIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemByProductionBatchIdRead = {"entity":"PackListItem","readId":"PackListItem.byProductionBatchId","exportName":"listPackListItemByProductionBatchId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"productionBatchId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemByProductionBatchIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listPackListItemByServiceStyleKitItemIdRead = {"entity":"PackListItem","readId":"PackListItem.byServiceStyleKitItemId","exportName":"listPackListItemByServiceStyleKitItemId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"serviceStyleKitItemId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemByServiceStyleKitItemIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemByServiceStyleKitItemIdRead = {"entity":"PackListItem","readId":"PackListItem.byServiceStyleKitItemId","exportName":"listPackListItemByServiceStyleKitItemId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"serviceStyleKitItemId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemByServiceStyleKitItemIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listPackListItemByTenantIdRead = {"entity":"PackListItem","readId":"PackListItem.byTenantId","exportName":"listPackListItemByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemByTenantIdRead = {"entity":"PackListItem","readId":"PackListItem.byTenantId","exportName":"listPackListItemByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const getPackListItemRead = {"entity":"PackListItem","readId":"PackListItem.get","exportName":"getPackListItem","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getPackListItemResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number } | null;
+export const getPackListItemRead = {"entity":"PackListItem","readId":"PackListItem.get","exportName":"getPackListItem","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getPackListItemResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number } | null;
 
-export const listPackListItemRead = {"entity":"PackListItem","readId":"PackListItem.list","exportName":"listPackListItem","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemRead = {"entity":"PackListItem","readId":"PackListItem.list","exportName":"listPackListItem","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listPackListTemplateByTenantIdRead = {"entity":"PackListTemplate","readId":"PackListTemplate.byTenantId","exportName":"listPackListTemplateByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; description: string | null; items: string; status: \"active\" | \"archived\"; definedAt: number | null; archivedAt: number | null; archiveReason: string | null; serviceStyleId: string | null; occasionId: string | null; guestCountMin: number | null; guestCountMax: number | null; venueRequirement: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listPackListTemplateByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; description: string | null; items: string; status: "active" | "archived"; definedAt: number | null; archivedAt: number | null; archiveReason: string | null; serviceStyleId: string | null; occasionId: string | null; guestCountMin: number | null; guestCountMax: number | null; venueRequirement: string | null; createdAt: number; updatedAt: number }>;
@@ -166073,6 +168287,21 @@ export type getPackListTemplateResult = { _id: string; _creationTime: number; te
 
 export const listPackListTemplateRead = {"entity":"PackListTemplate","readId":"PackListTemplate.list","exportName":"listPackListTemplate","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; description: string | null; items: string; status: \"active\" | \"archived\"; definedAt: number | null; archivedAt: number | null; archiveReason: string | null; serviceStyleId: string | null; occasionId: string | null; guestCountMin: number | null; guestCountMax: number | null; venueRequirement: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listPackListTemplateResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; description: string | null; items: string; status: "active" | "archived"; definedAt: number | null; archivedAt: number | null; archiveReason: string | null; serviceStyleId: string | null; occasionId: string | null; guestCountMin: number | null; guestCountMax: number | null; venueRequirement: string | null; createdAt: number; updatedAt: number }>;
+
+export const listPackRuleByDishIdRead = {"entity":"PackRule","readId":"PackRule.byDishId","exportName":"listPackRuleByDishId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"dishId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: \"dish\" | \"production_note\" | \"service_style\" | \"guest_count\" | \"event_fact\"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\"; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; baseQuantity: number; scaleBy: \"fixed\" | \"servings\" | \"guests\"; perUnits: number | null; sparePercent: number; ownership: \"owned\" | \"rented\" | \"client\"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackRuleByDishIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: "dish" | "production_note" | "service_style" | "guest_count" | "event_fact"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other"; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; baseQuantity: number; scaleBy: "fixed" | "servings" | "guests"; perUnits: number | null; sparePercent: number; ownership: "owned" | "rented" | "client"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listPackRuleByServiceStyleIdRead = {"entity":"PackRule","readId":"PackRule.byServiceStyleId","exportName":"listPackRuleByServiceStyleId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"serviceStyleId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: \"dish\" | \"production_note\" | \"service_style\" | \"guest_count\" | \"event_fact\"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\"; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; baseQuantity: number; scaleBy: \"fixed\" | \"servings\" | \"guests\"; perUnits: number | null; sparePercent: number; ownership: \"owned\" | \"rented\" | \"client\"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackRuleByServiceStyleIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: "dish" | "production_note" | "service_style" | "guest_count" | "event_fact"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other"; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; baseQuantity: number; scaleBy: "fixed" | "servings" | "guests"; perUnits: number | null; sparePercent: number; ownership: "owned" | "rented" | "client"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listPackRuleByTenantIdRead = {"entity":"PackRule","readId":"PackRule.byTenantId","exportName":"listPackRuleByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: \"dish\" | \"production_note\" | \"service_style\" | \"guest_count\" | \"event_fact\"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\"; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; baseQuantity: number; scaleBy: \"fixed\" | \"servings\" | \"guests\"; perUnits: number | null; sparePercent: number; ownership: \"owned\" | \"rented\" | \"client\"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackRuleByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: "dish" | "production_note" | "service_style" | "guest_count" | "event_fact"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other"; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; baseQuantity: number; scaleBy: "fixed" | "servings" | "guests"; perUnits: number | null; sparePercent: number; ownership: "owned" | "rented" | "client"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getPackRuleRead = {"entity":"PackRule","readId":"PackRule.get","exportName":"getPackRule","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: \"dish\" | \"production_note\" | \"service_style\" | \"guest_count\" | \"event_fact\"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\"; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; baseQuantity: number; scaleBy: \"fixed\" | \"servings\" | \"guests\"; perUnits: number | null; sparePercent: number; ownership: \"owned\" | \"rented\" | \"client\"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getPackRuleResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: "dish" | "production_note" | "service_style" | "guest_count" | "event_fact"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other"; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; baseQuantity: number; scaleBy: "fixed" | "servings" | "guests"; perUnits: number | null; sparePercent: number; ownership: "owned" | "rented" | "client"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listPackRuleRead = {"entity":"PackRule","readId":"PackRule.list","exportName":"listPackRule","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: \"dish\" | \"production_note\" | \"service_style\" | \"guest_count\" | \"event_fact\"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\"; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; baseQuantity: number; scaleBy: \"fixed\" | \"servings\" | \"guests\"; perUnits: number | null; sparePercent: number; ownership: \"owned\" | \"rented\" | \"client\"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackRuleResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: "dish" | "production_note" | "service_style" | "guest_count" | "event_fact"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other"; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; baseQuantity: number; scaleBy: "fixed" | "servings" | "guests"; perUnits: number | null; sparePercent: number; ownership: "owned" | "rented" | "client"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listPaymentByClientIdRead = {"entity":"Payment","readId":"Payment.byClientId","exportName":"listPaymentByClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; amount: number; method: \"card\" | \"check\" | \"cash\" | \"ach\" | \"other\"; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"refunded\"; paymentMethodId: string | null; notes: string | null; recordedAt: number | null; settledAt: number | null; failedAt: number | null; refundedAt: number | null; failureReason: string | null; refundReason: string | null; reconciliationStatus: \"unreconciled\" | \"matched\" | \"disputed\" | \"verified\"; externalSource: \"tpp_legacy\" | \"quickbooks_online\" | \"nowsta\" | \"stripe\" | \"manual\" | \"other\" | null; externalPaymentId: string | null; providerTransactionIds: string | null; reconciliationDetails: string | null; reconciledAt: number | null; reconciledByUserId: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listPaymentByClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; amount: number; method: "card" | "check" | "cash" | "ach" | "other"; status: "pending" | "processing" | "completed" | "failed" | "refunded"; paymentMethodId: string | null; notes: string | null; recordedAt: number | null; settledAt: number | null; failedAt: number | null; refundedAt: number | null; failureReason: string | null; refundReason: string | null; reconciliationStatus: "unreconciled" | "matched" | "disputed" | "verified"; externalSource: "tpp_legacy" | "quickbooks_online" | "nowsta" | "stripe" | "manual" | "other" | null; externalPaymentId: string | null; providerTransactionIds: string | null; reconciliationDetails: string | null; reconciledAt: number | null; reconciledByUserId: string | null; createdAt: number; updatedAt: number }>;
@@ -166620,20 +168849,20 @@ export type getServiceStyleResult = { _id: string; _creationTime: number; tenant
 export const listServiceStyleRead = {"entity":"ServiceStyle","readId":"ServiceStyle.list","exportName":"listServiceStyle","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; code: string; sortOrder: number; description: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listServiceStyleResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; code: string; sortOrder: number; description: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>;
 
-export const listServiceStyleKitItemByActiveKitKeyRead = {"entity":"ServiceStyleKitItem","readId":"ServiceStyleKitItem.byActiveKitKey","exportName":"listServiceStyleKitItemByActiveKitKey","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"activeKitKey","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; note: string | null; sortOrder: number; status: \"active\" | \"retired\"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listServiceStyleKitItemByActiveKitKeyResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; note: string | null; sortOrder: number; status: "active" | "retired"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
+export const listServiceStyleKitItemByActiveKitKeyRead = {"entity":"ServiceStyleKitItem","readId":"ServiceStyleKitItem.byActiveKitKey","exportName":"listServiceStyleKitItemByActiveKitKey","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"activeKitKey","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; sparePercent: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; note: string | null; sortOrder: number; status: \"active\" | \"retired\"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listServiceStyleKitItemByActiveKitKeyResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; sparePercent: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; note: string | null; sortOrder: number; status: "active" | "retired"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listServiceStyleKitItemByServiceStyleIdRead = {"entity":"ServiceStyleKitItem","readId":"ServiceStyleKitItem.byServiceStyleId","exportName":"listServiceStyleKitItemByServiceStyleId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"serviceStyleId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; note: string | null; sortOrder: number; status: \"active\" | \"retired\"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listServiceStyleKitItemByServiceStyleIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; note: string | null; sortOrder: number; status: "active" | "retired"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
+export const listServiceStyleKitItemByServiceStyleIdRead = {"entity":"ServiceStyleKitItem","readId":"ServiceStyleKitItem.byServiceStyleId","exportName":"listServiceStyleKitItemByServiceStyleId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"serviceStyleId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; sparePercent: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; note: string | null; sortOrder: number; status: \"active\" | \"retired\"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listServiceStyleKitItemByServiceStyleIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; sparePercent: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; note: string | null; sortOrder: number; status: "active" | "retired"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listServiceStyleKitItemByTenantIdRead = {"entity":"ServiceStyleKitItem","readId":"ServiceStyleKitItem.byTenantId","exportName":"listServiceStyleKitItemByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; note: string | null; sortOrder: number; status: \"active\" | \"retired\"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listServiceStyleKitItemByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; note: string | null; sortOrder: number; status: "active" | "retired"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
+export const listServiceStyleKitItemByTenantIdRead = {"entity":"ServiceStyleKitItem","readId":"ServiceStyleKitItem.byTenantId","exportName":"listServiceStyleKitItemByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; sparePercent: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; note: string | null; sortOrder: number; status: \"active\" | \"retired\"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listServiceStyleKitItemByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; sparePercent: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; note: string | null; sortOrder: number; status: "active" | "retired"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const getServiceStyleKitItemRead = {"entity":"ServiceStyleKitItem","readId":"ServiceStyleKitItem.get","exportName":"getServiceStyleKitItem","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; note: string | null; sortOrder: number; status: \"active\" | \"retired\"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getServiceStyleKitItemResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; note: string | null; sortOrder: number; status: "active" | "retired"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number } | null;
+export const getServiceStyleKitItemRead = {"entity":"ServiceStyleKitItem","readId":"ServiceStyleKitItem.get","exportName":"getServiceStyleKitItem","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; sparePercent: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; note: string | null; sortOrder: number; status: \"active\" | \"retired\"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getServiceStyleKitItemResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; sparePercent: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; note: string | null; sortOrder: number; status: "active" | "retired"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number } | null;
 
-export const listServiceStyleKitItemRead = {"entity":"ServiceStyleKitItem","readId":"ServiceStyleKitItem.list","exportName":"listServiceStyleKitItem","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; note: string | null; sortOrder: number; status: \"active\" | \"retired\"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listServiceStyleKitItemResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; note: string | null; sortOrder: number; status: "active" | "retired"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
+export const listServiceStyleKitItemRead = {"entity":"ServiceStyleKitItem","readId":"ServiceStyleKitItem.list","exportName":"listServiceStyleKitItem","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; sparePercent: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; note: string | null; sortOrder: number; status: \"active\" | \"retired\"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listServiceStyleKitItemResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; activeServiceStyleId: string | null; activeKitKey: string | null; serviceStyleId: string; description: string; baseQuantity: number; guestsPerUnit: number | null; sparePercent: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; note: string | null; sortOrder: number; status: "active" | "retired"; addedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listShareLinkByProposalIdRead = {"entity":"ShareLink","readId":"ShareLink.byProposalId","exportName":"listShareLinkByProposalId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"proposalId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; proposalId: string; proposalRevisionId: string; status: \"active\" | \"revoked\"; expiresAt: number | null; revokedAt: number | null; revokedByPersonId: string | null; createdByPersonId: string | null; viewCount: number; firstViewedAt: number | null; lastViewedAt: number | null; lastViewerIdentity: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listShareLinkByProposalIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; proposalId: string; proposalRevisionId: string; status: "active" | "revoked"; expiresAt: number | null; revokedAt: number | null; revokedByPersonId: string | null; createdByPersonId: string | null; viewCount: number; firstViewedAt: number | null; lastViewedAt: number | null; lastViewerIdentity: string | null; createdAt: number; updatedAt: number }>;

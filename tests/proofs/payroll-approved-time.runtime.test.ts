@@ -106,7 +106,7 @@ describe("approved time to one payroll input (AC-627)", () => {
       sourceTimeRecordIds: summary.approvedTimeRecordIds,
     });
     const prepared = await read<Doc<"payrollInputs">>(input.docId);
-    expect([...prepared.sourceTimeRecordIds].sort()).toEqual(
+    expect([...(prepared.sourceTimeRecordIds ?? [])].sort()).toEqual(
       [...entries].sort(),
     );
 

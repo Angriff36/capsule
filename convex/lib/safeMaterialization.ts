@@ -8,6 +8,7 @@ import {
   readMaterializationReceipt,
   writeMaterializationReceipt,
 } from "./materializationReceipt";
+import { reconcileEventPackRules } from "./packRuleReconciliation";
 
 const DRAFTABLE_EVENT_STAGES = new Set(["planning", "quote", "sales_lock"]);
 const LOGISTICS_ROLES = new Set([
@@ -85,6 +86,20 @@ export const applyPackTemplate = mutation({
     const output = { itemCount: args.items.length };
     await writeMaterializationReceipt(ctx, tenantId, "pack", args.operationKey, args, output);
     return { ...output, recovered: false };
+  },
+});
+
+/** "Update from the event": bring the pack list in step with the event's
+ * facts and the current pack rules (after a rule change, for example). */
+export const refreshPackRules = mutation({
+  args: { packListId: v.id("packLists") },
+  handler: async (ctx, args): Promise<{ refreshed: boolean }> => {
+    const auth = await getAuthContext(ctx);
+    const tenantId = requireTenant(auth);
+    requireRole(auth, "logisticsAccess");
+    const list = await ownedLive(ctx, args.packListId, tenantId, "PackList");
+    await reconcileEventPackRules(ctx, list.eventId as Id<"events">);
+    return { refreshed: true };
   },
 });
 

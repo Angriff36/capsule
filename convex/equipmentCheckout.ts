@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
 import { availableEquipmentQuantity } from "./lib/equipmentReservationAvailability";
+import { reconcileEventPackRules } from "./lib/packRuleReconciliation";
 
 const EQUIPMENT_ROLES = new Set([
   "inventory_staff",
@@ -119,6 +120,8 @@ export const reserve = mutation({
       },
       createdAt: now,
     });
+    // The held item goes on the event's pack list as a pull-sheet line.
+    await reconcileEventPackRules(ctx, args.eventId);
 
     return { equipmentReservationId };
   },

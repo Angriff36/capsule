@@ -443,16 +443,21 @@ import {
   PackListItemAdjustQuantityParamsSchema,
   PackListItemAdoptContainerLinkParamsSchema,
   PackListItemAnnotateParamsSchema,
+  PackListItemApplyGeneratedParamsSchema,
   PackListItemCorrectImportedFluidOuncesParamsSchema,
   PackListItemEnsureContainerParamsSchema,
   PackListItemEnsureKitItemParamsSchema,
+  PackListItemEnsureTemplateLineParamsSchema,
+  PackListItemExcludeParamsSchema,
   PackListItemMarkMissingParamsSchema,
   PackListItemMarkPackedParamsSchema,
   PackListItemRecordPackedCountParamsSchema,
   PackListItemRecordSentInsteadParamsSchema,
   PackListItemRemoveParamsSchema,
+  PackListItemRestoreExcludedParamsSchema,
   PackListItemRestoreImportedAssociationParamsSchema,
   PackListItemSyncContainerServingsParamsSchema,
+  PackListItemSyncKitGuestsParamsSchema,
   PackListMarkLoadedParamsSchema,
   PackListMarkPackedParamsSchema,
   PackListOpenParamsSchema,
@@ -465,6 +470,10 @@ import {
   PackListTemplateDefineParamsSchema,
   PackListTemplateReactivateParamsSchema,
   PackListTemplateReviseParamsSchema,
+  PackRuleDefineParamsSchema,
+  PackRuleReinstateParamsSchema,
+  PackRuleRetireParamsSchema,
+  PackRuleReviseParamsSchema,
   PaymentBeginProcessingParamsSchema,
   PaymentDisputeReconciliationParamsSchema,
   PaymentFailParamsSchema,
@@ -7032,6 +7041,16 @@ export function usePackListItemAnnotate() {
   };
 }
 
+/** Mutation hook for PackListItem.applyGenerated. */
+export function usePackListItemApplyGenerated() {
+  const mutate = useMutation(api.mutations.PackListItem_applyGenerated);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackListItemApplyGeneratedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for PackListItem.correctImportedFluidOunces. */
 export function usePackListItemCorrectImportedFluidOunces() {
   const mutate = useMutation(api.mutations.PackListItem_correctImportedFluidOunces);
@@ -7058,6 +7077,26 @@ export function usePackListItemEnsureKitItem() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = PackListItemEnsureKitItemParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PackListItem.ensureTemplateLine. */
+export function usePackListItemEnsureTemplateLine() {
+  const mutate = useMutation(api.mutations.PackListItem_ensureTemplateLine);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackListItemEnsureTemplateLineParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PackListItem.exclude. */
+export function usePackListItemExclude() {
+  const mutate = useMutation(api.mutations.PackListItem_exclude);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackListItemExcludeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -7112,6 +7151,16 @@ export function usePackListItemRemove() {
   };
 }
 
+/** Mutation hook for PackListItem.restoreExcluded. */
+export function usePackListItemRestoreExcluded() {
+  const mutate = useMutation(api.mutations.PackListItem_restoreExcluded);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackListItemRestoreExcludedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for PackListItem.restoreImportedAssociation. */
 export function usePackListItemRestoreImportedAssociation() {
   const mutate = useMutation(api.mutations.PackListItem_restoreImportedAssociation);
@@ -7128,6 +7177,16 @@ export function usePackListItemSyncContainerServings() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = PackListItemSyncContainerServingsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PackListItem.syncKitGuests. */
+export function usePackListItemSyncKitGuests() {
+  const mutate = useMutation(api.mutations.PackListItem_syncKitGuests);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackListItemSyncKitGuestsParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -7199,6 +7258,67 @@ export function useCreatePackListTemplate() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = PackListTemplateDefineParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for PackRule. */
+export function useListPackRule() {
+  return useQuery(api.queries.listPackRule);
+}
+
+/** Reactive get-by-id for PackRule. Pass "skip" to suspend. */
+export function useGetPackRule(id: string | "skip") {
+  return useQuery(api.queries.getPackRule, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for PackRule.define. */
+export function usePackRuleDefine() {
+  const mutate = useMutation(api.mutations.PackRule_define);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackRuleDefineParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PackRule.reinstate. */
+export function usePackRuleReinstate() {
+  const mutate = useMutation(api.mutations.PackRule_reinstate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackRuleReinstateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PackRule.retire. */
+export function usePackRuleRetire() {
+  const mutate = useMutation(api.mutations.PackRule_retire);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackRuleRetireParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PackRule.revise. */
+export function usePackRuleRevise() {
+  const mutate = useMutation(api.mutations.PackRule_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackRuleReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for PackRule.define. */
+export function useCreatePackRule() {
+  const mutate = useMutation(api.mutations.PackRule_createViaDefine);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = PackRuleDefineParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -12033,4 +12153,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1275 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1287 as const;

@@ -10,6 +10,7 @@ import { reconcileEventTiming } from "./eventTimingOperations";
 import { eventStaffingReconciliation } from "./staffingReconciliation";
 import { eventHeadcountReconciliation } from "./headcountReconciliation";
 import { eventPackReconciliation } from "./packReconciliation";
+import { packFactEventId, reconcileEventPackRules, validatePackReadiness } from "./packRuleReconciliation";
 import { eventDemandReconciliation } from "./demandReconciliation";
 import { eventPrepReconciliation } from "./prepReconciliation";
 import { eventHeadcountStaffingReconciliation } from "./headcountStaffingReconciliation";
@@ -61,6 +62,13 @@ export async function handleManifestEvent(
 ): Promise<void> {
   await queueRouteRefresh(ctx, event);
   await queueTimingRecalculation(ctx, event);
+  // Pack lines follow every event fact that asks for equipment (spec §13.2).
+  const packEventId = packFactEventId(event);
+  if (packEventId) await reconcileEventPackRules(ctx, packEventId);
+  if (event.entity === "PackList" && event.type === "PackListPacked") {
+    await validatePackReadiness(ctx, event.entityId as Id<"packLists">);
+    return;
+  }
   if (await handleTravelLegEvent(ctx, event)) return;
   if (event.entity === "WeeklyScheduleNotice" &&
     (event.type === "WeeklySchedulePublished" || event.type === "WeeklyScheduleRepublished")) {

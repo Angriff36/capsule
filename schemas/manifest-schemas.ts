@@ -2399,6 +2399,22 @@ export const PackListItemSchema = z.object({
   serviceStyleKitItemId: z.string().uuid().nullable().optional(),
   unitCorrectionSource: z.string().nullable().optional(),
   associationSource: z.string().nullable().optional(),
+  generationKey: z.string().nullable().optional(),
+  sourcesJson: z.string().nullable().optional(),
+  generatedQuantity: z.number().nullable().optional(),
+  retiredAt: z.coerce.date().nullable().optional(),
+  category: z.enum(["serving_vessel", "utensil", "holding", "transport", "garnish", "portioning", "disposable", "place_setting", "linen", "table_setup", "power", "water", "handwashing", "tent", "flooring", "weather", "bar", "glassware", "ice", "decor", "rental", "other"]).nullable().optional(),
+  ownership: z.enum(["owned", "rented", "client"]).nullable().optional(),
+  returnRequired: z.boolean().nullable().optional(),
+  returnNote: z.string().nullable().optional(),
+  requiredCapability: z.boolean().nullable().optional(),
+  packListTemplateId: z.string().uuid().nullable().optional(),
+  templateLineKey: z.string().nullable().optional(),
+  templateVersion: z.number().int().nullable().optional(),
+  excludedAt: z.coerce.date().nullable().optional(),
+  exclusionReason: z.string().nullable().optional(),
+  replacementDescription: z.string().nullable().optional(),
+  coveredBy: z.enum(["equivalent", "client", "vendor"]).nullable().optional(),
   requiredQuantity: z.number().default(0),
   packedQuantity: z.number().min(0).default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
@@ -2447,6 +2463,38 @@ export const PackListTemplateComputedSchema = PackListTemplateSchema.extend({
 
 export type PackListTemplate = z.infer<typeof PackListTemplateSchema>;
 export type PackListTemplateWithComputed = z.infer<typeof PackListTemplateComputedSchema>;
+
+// Entity: PackRule
+export const PackRuleSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  trigger: z.enum(["dish", "production_note", "service_style", "guest_count", "event_fact"]).default("guest_count"),
+  dishId: z.string().uuid().nullable().optional(),
+  serviceStyleId: z.string().uuid().nullable().optional(),
+  matchFact: z.string().nullable().optional(),
+  matchText: z.string().nullable().optional(),
+  description: z.string().default(""),
+  category: z.enum(["serving_vessel", "utensil", "holding", "transport", "garnish", "portioning", "disposable", "place_setting", "linen", "table_setup", "power", "water", "handwashing", "tent", "flooring", "weather", "bar", "glassware", "ice", "decor", "rental", "other"]).default("other"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
+  baseQuantity: z.number().int().min(0).default(0),
+  scaleBy: z.enum(["fixed", "servings", "guests"]).default("fixed"),
+  perUnits: z.number().int().nullable().optional(),
+  sparePercent: z.number().int().min(0).default(0),
+  ownership: z.enum(["owned", "rented", "client"]).default("owned"),
+  returnRequired: z.boolean().default(true),
+  returnNote: z.string().nullable().optional(),
+  requiredCapability: z.boolean().default(false),
+  note: z.string().nullable().optional(),
+  ruleVersion: z.number().int().default(1),
+  status: z.enum(["active", "retired"]).default("active"),
+  definedAt: z.coerce.date().nullable().optional(),
+  retiredAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type PackRule = z.infer<typeof PackRuleSchema>;
 
 // Entity: Payment
 export const PaymentSchema = z.object({
@@ -3300,6 +3348,7 @@ export const ServiceStyleKitItemSchema = z.object({
   description: z.string().default(""),
   baseQuantity: z.number().int().min(0).default(1),
   guestsPerUnit: z.number().int().nullable().optional(),
+  sparePercent: z.number().int().nullable().optional(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   note: z.string().nullable().optional(),
   sortOrder: z.number().int().min(0).optional().default(0),
@@ -8219,6 +8268,21 @@ export const PackListItemAnnotateParamsSchema = z.object({
 
 export type PackListItemAnnotateParams = z.infer<typeof PackListItemAnnotateParamsSchema>;
 
+// Command: applyGenerated on PackListItem
+export const PackListItemApplyGeneratedParamsSchema = z.object({
+  packListId: z.string().min(1),
+  generationKey: z.string(),
+  category: z.enum(["serving_vessel", "utensil", "holding", "transport", "garnish", "portioning", "disposable", "place_setting", "linen", "table_setup", "power", "water", "handwashing", "tent", "flooring", "weather", "bar", "glassware", "ice", "decor", "rental", "other"]),
+  ownership: z.enum(["owned", "rented", "client"]),
+  returnRequired: z.boolean(),
+  returnNote: z.string().optional(),
+  requiredCapability: z.boolean(),
+  generatedQuantity: z.number(),
+  sourcesJson: z.string(),
+});
+
+export type PackListItemApplyGeneratedParams = z.infer<typeof PackListItemApplyGeneratedParamsSchema>;
+
 // Command: correctImportedFluidOunces on PackListItem
 export const PackListItemCorrectImportedFluidOuncesParamsSchema = z.object({
   sourceReference: z.string(),
@@ -8252,6 +8316,26 @@ export const PackListItemEnsureKitItemParamsSchema = z.object({
 
 export type PackListItemEnsureKitItemParams = z.infer<typeof PackListItemEnsureKitItemParamsSchema>;
 
+// Command: ensureTemplateLine on PackListItem
+export const PackListItemEnsureTemplateLineParamsSchema = z.object({
+  packListId: z.string().min(1),
+  packListTemplateId: z.string().uuid(),
+  templateLineKey: z.string(),
+  templateVersion: z.number().int(),
+  requiredQuantity: z.number(),
+});
+
+export type PackListItemEnsureTemplateLineParams = z.infer<typeof PackListItemEnsureTemplateLineParamsSchema>;
+
+// Command: exclude on PackListItem
+export const PackListItemExcludeParamsSchema = z.object({
+  reason: z.string(),
+  replacementDescription: z.string().optional(),
+  coveredBy: z.enum(["equivalent", "client", "vendor"]).optional(),
+});
+
+export type PackListItemExcludeParams = z.infer<typeof PackListItemExcludeParamsSchema>;
+
 // Command: markMissing on PackListItem
 export const PackListItemMarkMissingParamsSchema = z.object({});
 
@@ -8283,6 +8367,11 @@ export const PackListItemRemoveParamsSchema = z.object({});
 
 export type PackListItemRemoveParams = z.infer<typeof PackListItemRemoveParamsSchema>;
 
+// Command: restoreExcluded on PackListItem
+export const PackListItemRestoreExcludedParamsSchema = z.object({});
+
+export type PackListItemRestoreExcludedParams = z.infer<typeof PackListItemRestoreExcludedParamsSchema>;
+
 // Command: restoreImportedAssociation on PackListItem
 export const PackListItemRestoreImportedAssociationParamsSchema = z.object({
   dishId: z.string().min(1),
@@ -8303,6 +8392,13 @@ export const PackListItemSyncContainerServingsParamsSchema = z.object({
 });
 
 export type PackListItemSyncContainerServingsParams = z.infer<typeof PackListItemSyncContainerServingsParamsSchema>;
+
+// Command: syncKitGuests on PackListItem
+export const PackListItemSyncKitGuestsParamsSchema = z.object({
+  requiredQuantity: z.number(),
+});
+
+export type PackListItemSyncKitGuestsParams = z.infer<typeof PackListItemSyncKitGuestsParamsSchema>;
 
 // Command: archive on PackListTemplate
 export const PackListTemplateArchiveParamsSchema = z.object({
@@ -8343,6 +8439,61 @@ export const PackListTemplateReviseParamsSchema = z.object({
 });
 
 export type PackListTemplateReviseParams = z.infer<typeof PackListTemplateReviseParamsSchema>;
+
+// Command: define on PackRule
+export const PackRuleDefineParamsSchema = z.object({
+  trigger: z.enum(["dish", "production_note", "service_style", "guest_count", "event_fact"]),
+  description: z.string(),
+  category: z.enum(["serving_vessel", "utensil", "holding", "transport", "garnish", "portioning", "disposable", "place_setting", "linen", "table_setup", "power", "water", "handwashing", "tent", "flooring", "weather", "bar", "glassware", "ice", "decor", "rental", "other"]),
+  dishId: z.string().min(1).optional(),
+  serviceStyleId: z.string().min(1).optional(),
+  matchFact: z.string().optional(),
+  matchText: z.string().optional(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
+  baseQuantity: z.number().int().optional(),
+  scaleBy: z.enum(["fixed", "servings", "guests"]).optional(),
+  perUnits: z.number().int().optional(),
+  sparePercent: z.number().int().optional(),
+  ownership: z.enum(["owned", "rented", "client"]).optional(),
+  returnRequired: z.boolean().optional(),
+  returnNote: z.string().optional(),
+  requiredCapability: z.boolean().optional(),
+  note: z.string().optional(),
+});
+
+export type PackRuleDefineParams = z.infer<typeof PackRuleDefineParamsSchema>;
+
+// Command: reinstate on PackRule
+export const PackRuleReinstateParamsSchema = z.object({});
+
+export type PackRuleReinstateParams = z.infer<typeof PackRuleReinstateParamsSchema>;
+
+// Command: retire on PackRule
+export const PackRuleRetireParamsSchema = z.object({});
+
+export type PackRuleRetireParams = z.infer<typeof PackRuleRetireParamsSchema>;
+
+// Command: revise on PackRule
+export const PackRuleReviseParamsSchema = z.object({
+  description: z.string(),
+  category: z.enum(["serving_vessel", "utensil", "holding", "transport", "garnish", "portioning", "disposable", "place_setting", "linen", "table_setup", "power", "water", "handwashing", "tent", "flooring", "weather", "bar", "glassware", "ice", "decor", "rental", "other"]),
+  dishId: z.string().min(1).optional(),
+  serviceStyleId: z.string().min(1).optional(),
+  matchFact: z.string().optional(),
+  matchText: z.string().optional(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
+  baseQuantity: z.number().int(),
+  scaleBy: z.enum(["fixed", "servings", "guests"]),
+  perUnits: z.number().int().optional(),
+  sparePercent: z.number().int(),
+  ownership: z.enum(["owned", "rented", "client"]),
+  returnRequired: z.boolean(),
+  returnNote: z.string().optional(),
+  requiredCapability: z.boolean(),
+  note: z.string().optional(),
+});
+
+export type PackRuleReviseParams = z.infer<typeof PackRuleReviseParamsSchema>;
 
 // Command: beginProcessing on Payment
 export const PaymentBeginProcessingParamsSchema = z.object({});
@@ -9723,6 +9874,7 @@ export const ServiceStyleKitItemAddParamsSchema = z.object({
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
   note: z.string().optional(),
   sortOrder: z.number().int().optional(),
+  sparePercent: z.number().int().optional(),
 });
 
 export type ServiceStyleKitItemAddParams = z.infer<typeof ServiceStyleKitItemAddParamsSchema>;
@@ -9745,6 +9897,7 @@ export const ServiceStyleKitItemReviseParamsSchema = z.object({
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
   note: z.string().optional(),
   sortOrder: z.number().int().optional(),
+  sparePercent: z.number().int().optional(),
 });
 
 export type ServiceStyleKitItemReviseParams = z.infer<typeof ServiceStyleKitItemReviseParamsSchema>;

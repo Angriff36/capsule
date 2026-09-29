@@ -38,6 +38,8 @@ entity ServiceStyleKitItem mixin TenantScoped, SoftDeletable {
   // Scales with the event: one more unit for each N guests (1 chafer per 25
   // guests). Null = the line does not scale.
   property guestsPerUnit: int?
+  // Extra on the part that grows with guests (10 = 10% spare napkins).
+  property sparePercent: int?
   property required unit: UnitOfMeasure = "each"
   // Packer note that goes onto the pack line ("black wall kit", "soft surface
   // needs two tarps").
@@ -51,7 +53,8 @@ entity ServiceStyleKitItem mixin TenantScoped, SoftDeletable {
 
   constraint kitItemDescription: self.addedAt == null or length(trim(self.description)) > 0 "Give this kit line a description."
   constraint kitItemBase: self.baseQuantity >= 0 "Base quantity can't be negative. Use zero or more."
-  constraint kitItemPerGuests: self.guestsPerUnit == null or self.guestsPerUnit >= 1 "Guests per unit must be at least 1"
+  constraint kitItemSpare: self.sparePercent == null or self.sparePercent >= 0 "Spare can't be negative. Use zero or more."
+  constraint kitItemPerGuests:self.guestsPerUnit == null or self.guestsPerUnit >= 1 "Guests per unit must be at least 1"
   constraint kitItemQuantity: self.addedAt == null or self.baseQuantity > 0 or self.guestsPerUnit != null "A kit line needs a base quantity or a guests-per-unit rule"
   constraint kitItemSort: self.sortOrder >= 0 "Sort order can't be negative. Use zero or more."
 
@@ -71,7 +74,8 @@ entity ServiceStyleKitItem mixin TenantScoped, SoftDeletable {
     optional guestsPerUnit: int,
     optional unit: UnitOfMeasure,
     optional note: string,
-    optional sortOrder: int
+    optional sortOrder: int,
+    optional sparePercent: int
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
@@ -84,6 +88,7 @@ entity ServiceStyleKitItem mixin TenantScoped, SoftDeletable {
     mutate description = description
     mutate baseQuantity = baseQuantity != null ? baseQuantity : (guestsPerUnit != null ? 0 : 1)
     mutate guestsPerUnit = guestsPerUnit
+    mutate sparePercent = sparePercent
     mutate unit = unit != null ? unit : "each"
     mutate note = note
     mutate sortOrder = sortOrder != null ? sortOrder : 0
@@ -102,7 +107,8 @@ entity ServiceStyleKitItem mixin TenantScoped, SoftDeletable {
     optional guestsPerUnit: int,
     optional unit: UnitOfMeasure,
     optional note: string,
-    optional sortOrder: int
+    optional sortOrder: int,
+    optional sparePercent: int
   ) {
     guard self.addedAt != null
     guard self.deletedAt == null
@@ -110,6 +116,7 @@ entity ServiceStyleKitItem mixin TenantScoped, SoftDeletable {
     mutate description = description
     mutate baseQuantity = baseQuantity
     mutate guestsPerUnit = guestsPerUnit
+    mutate sparePercent = sparePercent != null ? sparePercent : self.sparePercent
     mutate unit = unit != null ? unit : self.unit
     mutate note = note
     mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
