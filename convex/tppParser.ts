@@ -2,6 +2,10 @@
 // Handles data type conversions and field mappings defined in import-dataset.manifest.
 
 import { v } from "convex/values";
+import {
+  classifyFinancialRow,
+  type FinancialRowClass,
+} from "../src/lib/financialRowClass";
 
 /**
  * TPP field mapping types from ImportDataset manifest
@@ -228,6 +232,13 @@ export interface ParsedCapsulePayment {
   amount: number;
   method: string;
   notes?: string;
+  /** The source's own type column, kept as written. */
+  paymentType?: string;
+  /** The accounting system's transaction id: the same money in any report. */
+  providerTransactionId?: string;
+  rowClass: FinancialRowClass;
+  /** Money moving on its own; only these wait to be matched (AC-084). */
+  movesMoney: boolean;
 }
 
 export interface ParsedCapsuleLead {
@@ -379,7 +390,9 @@ export function parseTppMoney(value?: string | number): number | undefined {
   if (typeof value === "number") return value;
 
   const cleaned = String(value).replace(/[$,]/g, "").trim();
-  const parsed = parseFloat(cleaned);
+  // Accounting reports write a negative amount in brackets: (50.00).
+  const bracketed = /^\((.*)\)$/.exec(cleaned);
+  const parsed = bracketed ? -parseFloat(bracketed[1]) : parseFloat(cleaned);
   return isNaN(parsed) ? undefined : parsed;
 }
 
@@ -597,14 +610,30 @@ export function parseTppVenue(record: TppVenueRecord): ParsedCapsuleVenue {
 export function parseTppPayment(
   record: TppPaymentRecord,
 ): ParsedCapsulePayment {
+  const amount = parseTppMoney(record.PaymentAmount) ?? Number.NaN;
+  const { rowClass, movesMoney } = classifyFinancialRow({
+    type: record.PaymentType,
+    id: record.PaymentID,
+    amount: Number.isFinite(amount) ? amount : 0,
+  });
+  // Report lines (totals, balances) often have no id of their own.
+  const externalId =
+    record.PaymentID ||
+    (rowClass === "aggregate_report" || rowClass === "balance_snapshot"
+      ? `report-line:${record.PaymentDate ?? ""}:${record.PaymentType ?? rowClass}:${amount}`
+      : "");
   return {
-    externalId: record.PaymentID,
+    externalId,
     invoiceId: record.InvoiceID,
     eventId: record.EventID,
     recordedAt: parseTppDateTime(record.PaymentDate),
-    amount: parseTppMoney(record.PaymentAmount) || 0,
-    method: mapTppPaymentMethod(record.PaymentMethod),
+    amount,
+    method: mapTppPaymentMethod(record.PaymentMethod ?? ""),
     notes: [record.Reference, record.Notes].filter(Boolean).join(" | "),
+    paymentType: record.PaymentType,
+    providerTransactionId: record.QuickBooksTransactionId,
+    rowClass,
+    movesMoney,
   };
 }
 
@@ -1078,7 +1107,9 @@ export function parseTppPayments(
         });
         return;
       }
-      if (!parsed.amount) {
+      // Zero and negative amounts are kept (PR05-02); only a missing or
+      // unreadable amount is an error.
+      if (!Number.isFinite(parsed.amount)) {
         errors.push({
           recordIndex: index,
           field: "PaymentAmount",
@@ -1086,7 +1117,7 @@ export function parseTppPayments(
         });
         return;
       }
-      if (!parsed.method) {
+      if (parsed.movesMoney && !parsed.method) {
         errors.push({
           recordIndex: index,
           field: "PaymentMethod",

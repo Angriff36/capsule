@@ -115,6 +115,7 @@ import {
   type TppVenueRecord,
 } from "./tppParser";
 import type { Doc, Id } from "./_generated/dataModel";
+import { FINANCIAL_ROW_LABEL } from "../src/lib/financialRowClass";
 import { buildLinkKey } from "./lib/culinaryModel/importMapping";
 import { SERVICE_STYLE_RECORD_TYPE } from "./importServiceStyle";
 import { commitStockRows } from "./openingStock";
@@ -1233,8 +1234,30 @@ export const commitImportRun = action({
             resolvedEventNote = `external event ${payment.eventId} (imported but unresolved)`;
           }
         }
+        // AC-084: only money moving on its own waits for a match; the same
+        // accounting transaction seen in an overlapping report counts once.
+        let sameMoneyAs: string | null = null;
+        if (payment.movesMoney && payment.providerTransactionId) {
+          const counted = await ctx.runQuery(internal.importCommit.findLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "payment_transaction",
+            externalId: payment.providerTransactionId,
+          });
+          const countedAs = counted
+            ? (JSON.parse(counted.rawSourceData ?? "{}").paymentId as string)
+            : null;
+          if (countedAs && countedAs !== payment.externalId)
+            sameMoneyAs = countedAs;
+        }
+        const waitsForMatch = payment.movesMoney && !sameMoneyAs;
+        const label = FINANCIAL_ROW_LABEL[payment.rowClass];
         const note = [
-          "Imported TPP payment — reconciliation reference (match via markMatched on a Capsule payment)",
+          sameMoneyAs
+            ? `Same money as payment ${sameMoneyAs} (same accounting transaction ${payment.providerTransactionId}) — counted once, kept for the record`
+            : waitsForMatch
+              ? `Imported TPP ${label} — reconciliation reference (match via markMatched on a Capsule payment)`
+              : `Imported TPP ${label} — reference only, not money of its own, not counted`,
           payment.invoiceId
             ? `external invoice ${payment.invoiceId} (no invoice import)`
             : null,
@@ -1247,6 +1270,21 @@ export const commitImportRun = action({
           .filter(Boolean)
           .join(" — ");
 
+        // The transaction marker goes first: a run that stops between the
+        // two writes resumes to the same result.
+        if (waitsForMatch && payment.providerTransactionId)
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "payment_transaction",
+            externalId: payment.providerTransactionId,
+            capsuleEntity: "payment",
+            capsuleId: "",
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify({ paymentId: payment.externalId }),
+            conflictStatus: "resolved",
+            resolutionNote: `Accounting transaction counted once, as payment ${payment.externalId}`,
+          });
         await ctx.runMutation(internal.importCommit.upsertLink, {
           tenantId,
           sourceSystem,
@@ -1256,7 +1294,7 @@ export const commitImportRun = action({
           capsuleId: "",
           sourceImportRunId: args.importRunId,
           rawSourceData: JSON.stringify(payment),
-          conflictStatus: "pending_conflict",
+          conflictStatus: waitsForMatch ? "pending_conflict" : "resolved",
           resolutionNote: note,
         });
         committed += 1;
