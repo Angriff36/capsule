@@ -268,8 +268,10 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
       </div>
       {view.latestRevision?.stale && (
         <p className="mt-3 text-sm text-danger" role="status">
-          The printed workbook is out of date. Event information or evidence has
-          changed.
+          The printed workbook is out of date.{" "}
+          {view.latestRevision.staleSections?.length
+            ? `Changed since it printed: ${view.latestRevision.staleSections.join(", ")}.`
+            : "Event information or evidence has changed."}
         </p>
       )}
       {failure && (
@@ -303,9 +305,9 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
         </label>
       </div>
       <p className="mt-2 text-sm text-ink-3">
-        What's already on this event stays in charge. Imported approvals require
-        local review. Live TPP, Nowsta, rentals and document checks remain open
-        until verified.
+        What's already on this event stays in charge. The workbook is built from
+        it: add source files only to keep an original document or settle a
+        disagreement. You never need to upload a report Capsule already has.
       </p>
       <FinalLockPanel eventId={eventId} />
       <button
