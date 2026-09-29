@@ -45,6 +45,11 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   // explicit null. ABSENT (not null) marks a pre-change record. `accepted` is
   // a terminal status, so a later revision can never re-label an acceptance.
   property acceptedRevisionId: uuid?
+  // True only between Proposal.accept (called without an explicit revision)
+  // and the recordAcceptedRevision follow-up that the acceptance callback runs
+  // in the SAME transaction, so no committed row ever holds true. It is what
+  // keeps recordAcceptedRevision from back-filling an old acceptance.
+  property acceptedRevisionPending: boolean?
   property unique proposalNumber: string?
   property required searchable title: string = ""
   property eventDate: datetime?
@@ -202,6 +207,29 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Line-set recompute (convex/lib/proposalPricing.ts): after a draft line is
+  // added, revised or removed, or a headcount follow repriced per-person
+  // lines, subtotal comes from the central calc over the live lines; tax and
+  // discount stay as the person set them.
+  command recomputeTotals(subtotal: money(12, 2), total: money(12, 2)) {
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    constraint recomputeMoneyNonnegative: subtotal >= 0 and total >= 0 "This proposal's money amounts can't be negative. Use zero or more."
+    constraint recomputeTotalMatch: total == subtotal + self.taxAmount - self.discountAmount "Proposal total must equal subtotal plus tax minus discount"
+    compute previousSubtotal = self.subtotal
+    compute previousTotal = self.total
+    mutate subtotal = subtotal
+    mutate total = total
+    emit ProposalTotalsRecomputed {
+      proposalId: self.id
+      tenantId: self.tenantId
+      previousSubtotal: previousSubtotal
+      subtotal: subtotal
+      previousTotal: previousTotal
+      total: total
+    }
+  }
+
   command send() {
     guard self.status == "draft"
     guard self.draftedAt != null
@@ -242,6 +270,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     // an explicit id or resolves the highest captured revision at this
     // moment, and rolls the whole acceptance back on a bad reference.
     mutate acceptedRevisionId = acceptedRevisionId != null ? acceptedRevisionId : null
+    mutate acceptedRevisionPending = acceptedRevisionId == null
     mutate acceptedAt = now()
     emit ProposalAccepted {
       proposalId: self.id
@@ -260,6 +289,24 @@ entity Proposal mixin TenantScoped, SoftDeletable {
       discountAmount: self.discountAmount
       total: self.total
       dishSelectionProposalId: self.eventId != null ? self.id : null
+    }
+  }
+
+  // Records the revision an acceptance without an explicit revision committed
+  // to: the highest captured live revision at acceptance time, or none. Run
+  // only by the acceptance callback (convex/lib/proposalAcceptanceRevision.ts)
+  // inside the accept transaction; acceptedRevisionPending is never true on a
+  // committed row, so this cannot relabel an earlier acceptance.
+  command recordAcceptedRevision(optional acceptedRevisionId: uuid) {
+    guard self.status == "accepted"
+    guard self.deletedAt == null
+    guard self.acceptedRevisionPending == true "This acceptance already records its revision"
+    mutate acceptedRevisionId = acceptedRevisionId != null ? acceptedRevisionId : null
+    mutate acceptedRevisionPending = false
+    emit ProposalAcceptedRevisionRecorded {
+      proposalId: self.id
+      tenantId: self.tenantId
+      acceptedRevisionId: acceptedRevisionId != null ? acceptedRevisionId : null
     }
   }
 
@@ -425,6 +472,15 @@ event ProposalEventHeadcountFollowed: "proposal.event_headcount_followed" {
   total: money(12, 2)
 }
 
+event ProposalTotalsRecomputed: "proposal.totals_recomputed" {
+  proposalId: string
+  tenantId: string
+  previousSubtotal: money(12, 2)
+  subtotal: money(12, 2)
+  previousTotal: money(12, 2)
+  total: money(12, 2)
+}
+
 event ProposalSent: "proposal.sent" {
   proposalId: string
   tenantId: string
@@ -444,9 +500,14 @@ event ProposalAccepted: "proposal.accepted" {
   tenantId: string
   clientId: string
   eventId: string?
-  // Raw acceptedRevisionId command param; the acceptance callback resolves it
+  // ~~Raw acceptedRevisionId command param; the acceptance callback resolves it
   // (highest captured revision when absent) and patches the ledger row to the
-  // same reference it stores on the proposal.
+  // same reference it stores on the proposal.~~
+  // 2026-09-29: the explicit acceptedRevisionId command param, validated by
+  // the acceptance callback. When accept named no revision this is null and
+  // a ProposalAcceptedRevisionRecorded event in the same transaction carries
+  // the resolved one. Rows written before 2026-09-29 were patched in place to
+  // the resolved value and have no ProposalAcceptedRevisionRecorded event.
   acceptedRevisionId: string?
   title: string
   eventDate: datetime?
@@ -461,6 +522,14 @@ event ProposalAccepted: "proposal.accepted" {
   // Non-null only when an Event was linked at accept time — keys the menu
   // selection → EventDish cascade (sales/proposal-dish-selection.manifest).
   dishSelectionProposalId: string?
+}
+
+// The revision an acceptance without an explicit revision committed to
+// (null: no captured revision existed at acceptance time).
+event ProposalAcceptedRevisionRecorded: "proposal.accepted_revision_recorded" {
+  proposalId: string
+  tenantId: string
+  acceptedRevisionId: string?
 }
 
 event ProposalEventLinkStaged: "proposal.event_link_staged" {

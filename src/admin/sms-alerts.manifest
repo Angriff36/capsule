@@ -1,0 +1,195 @@
+// Capsule admin — high-urgency SMS alerts (Twilio). Created 2026-09-29.
+//
+// convex/smsAlerts.ts scans for urgent triggers and sends texts to opted-in
+// people. Until 2026-09-29 the tenant's on/off switch, its last scan, and the
+// per-trigger send receipts lived only in hand-written manifestEvents rows
+// keyed by the tenant id; the authored readers still read those legacy rows
+// when a tenant has no row here, so no data migration is needed.
+
+// The tenant's SMS alert switch and its last scan. One live row per tenant.
+// An unset field means "nothing recorded here yet" and the reader falls back
+// to the legacy ledger rows.
+entity SmsAlertSetting mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property enabled: boolean?
+  // The newest enable owns the tenant's self-rescheduling scan chain.
+  property chainId: string?
+  property changedAt: datetime?
+  property changedBy: string?
+  property lastScanAt: datetime?
+  property lastScanSent: int?
+  property lastScanFailed: int?
+  property lastScanError: string?
+  property openedAt: datetime?
+
+  // Same people as convex/smsAlerts.ts requireManager: the manager tier
+  // (manager, every *_manager, admin, owner, system) holds manageAccess.
+  default policy smsAlertSettingRead read: roleAllows(user.role, "manageAccess") "Managers may see SMS alert settings"
+  default policy smsAlertSettingWrite write: roleAllows(user.role, "manageAccess") "Managers may update SMS alert settings"
+  default policy smsAlertSettingExecute execute: roleAllows(user.role, "manageAccess") "Managers may change SMS alert settings"
+
+  command open() {
+    guard self.openedAt == null
+    guard self.deletedAt == null
+    constraint oneSettingPerTenant: count(SmsAlertSetting where tenantId == self.tenantId) == 0 "This workspace already has SMS alert settings"
+    mutate openedAt = now()
+  }
+
+  command enable(chainId: string) {
+    guard self.openedAt != null
+    guard self.deletedAt == null
+    constraint enableChain: length(trim(chainId)) > 0 "Turning SMS alerts on needs a scan chain ID"
+    mutate enabled = true
+    mutate chainId = chainId
+    mutate changedAt = now()
+    mutate changedBy = user.id
+    emit SmsAlertsEnabled {
+      tenantId: self.tenantId
+      settingId: self.id
+      actorId: user.id
+      chainId: chainId
+    }
+  }
+
+  command disable() {
+    guard self.openedAt != null
+    guard self.deletedAt == null
+    mutate enabled = false
+    mutate changedAt = now()
+    mutate changedBy = user.id
+    emit SmsAlertsDisabled {
+      tenantId: self.tenantId
+      settingId: self.id
+      actorId: user.id
+    }
+  }
+
+  // Run by the scheduled scan (no user) through the tenant system runner.
+  command recordScan(sent: int, failed: int, optional error: string) {
+    guard self.openedAt != null
+    guard self.deletedAt == null
+    guard user.role == "system" "Only the SMS alert scan records its results"
+    mutate lastScanAt = now()
+    mutate lastScanSent = sent
+    mutate lastScanFailed = failed
+    mutate lastScanError = error
+    emit SmsAlertsScanned {
+      tenantId: self.tenantId
+      settingId: self.id
+      sent: sent
+      failed: failed
+      error: error
+    }
+  }
+
+  store SmsAlertSetting in durable
+}
+
+// One SMS send outcome for a trigger and a person. A (triggerKey, personId)
+// pair is done once it was sent, or after three failed tries.
+entity SmsAlertDelivery mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required triggerKey: string
+  property required personId: string
+  property required alertType: string
+  property sentAt: datetime?
+  property failedAt: datetime?
+  property messageSid: string?
+  property error: string?
+  property openedAt: datetime?
+
+  default policy smsAlertDeliveryRead read: roleAllows(user.role, "manageAccess") "Managers may see SMS alert deliveries"
+  default policy smsAlertDeliveryWrite write: roleAllows(user.role, "manageAccess") "Managers may update SMS alert deliveries"
+  default policy smsAlertDeliveryExecute execute: roleAllows(user.role, "manageAccess") "Managers may change SMS alert deliveries"
+
+  command open(triggerKey: string, personId: string, alertType: string) {
+    guard self.openedAt == null
+    guard self.deletedAt == null
+    guard user.role == "system" "Only the SMS alert scan records its sends"
+    mutate triggerKey = triggerKey
+    mutate personId = personId
+    mutate alertType = alertType
+    mutate openedAt = now()
+  }
+
+  command recordSent(messageSid: string) {
+    guard self.openedAt != null
+    guard self.sentAt == null and self.failedAt == null
+    guard self.deletedAt == null
+    guard user.role == "system" "Only the SMS alert scan records its sends"
+    mutate sentAt = now()
+    mutate messageSid = messageSid
+    emit SmsAlertSent {
+      tenantId: self.tenantId
+      deliveryId: self.id
+      triggerKey: self.triggerKey
+      personId: self.personId
+      alertType: self.alertType
+      messageSid: messageSid
+    }
+  }
+
+  command recordFailed(error: string) {
+    guard self.openedAt != null
+    guard self.sentAt == null and self.failedAt == null
+    guard self.deletedAt == null
+    guard user.role == "system" "Only the SMS alert scan records its sends"
+    mutate failedAt = now()
+    mutate error = error
+    emit SmsAlertFailed {
+      tenantId: self.tenantId
+      deliveryId: self.id
+      triggerKey: self.triggerKey
+      personId: self.personId
+      alertType: self.alertType
+      error: error
+    }
+  }
+
+  store SmsAlertDelivery in durable
+}
+
+event SmsAlertsEnabled: "sms_alerts.enabled" {
+  tenantId: string
+  settingId: string
+  actorId: string?
+  chainId: string
+}
+
+event SmsAlertsDisabled: "sms_alerts.disabled" {
+  tenantId: string
+  settingId: string
+  actorId: string?
+}
+
+event SmsAlertsScanned: "sms_alerts.scanned" {
+  tenantId: string
+  settingId: string
+  sent: int
+  failed: int
+  error: string?
+}
+
+event SmsAlertSent: "sms_alert.sent" {
+  tenantId: string
+  deliveryId: string
+  triggerKey: string
+  personId: string
+  alertType: string
+  messageSid: string
+}
+
+event SmsAlertFailed: "sms_alert.failed" {
+  tenantId: string
+  deliveryId: string
+  triggerKey: string
+  personId: string
+  alertType: string
+  error: string
+}

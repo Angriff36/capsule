@@ -1,0 +1,434 @@
+// Capsule sales/billing — invoice payment links and payment reminders.
+// Created 2026-09-29.
+//
+// Stripe payment links (convex/invoicePayments.ts) and automatic payment
+// reminders (convex/invoiceReminders.ts) keep their state here. Until
+// 2026-09-29 that state lived only in hand-written manifestEvents rows keyed by
+// the invoice id; the authored readers still read those legacy rows alongside
+// these tables, so no data migration is needed.
+//
+// Every row here records something the authored seam already did with an
+// outside provider (created a Stripe Checkout session, sent or skipped a
+// reminder email, found a Stripe payment). The seam checks the caller's access
+// to the invoice first and then records the outcome as the tenant's system
+// role (convex/lib/tenantSystemCommandRunner.ts); scheduled reminders run with
+// no user at all. The commands are system-only so nobody can write a record of
+// a link, payment or email that the seam did not produce.
+
+use "./invoice-core.manifest"
+
+enum InvoiceReminderSource {
+  scheduled
+  manual
+}
+
+enum InvoiceReminderOutcome {
+  delivered
+  suppressed
+  failed
+}
+
+// One Stripe Checkout session for an invoice balance. A manual link has no
+// configId; a reminder link belongs to one reminder schedule and offset.
+entity InvoicePaymentLink mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required invoiceId: uuid
+  property required sessionId: string
+  property required url: string
+  property required amount: money(12, 2) = 0
+  property createdByUserId: string?
+  property configId: string?
+  property offsetDays: int?
+  property scheduledFor: datetime?
+  property source: InvoiceReminderSource?
+  property openedAt: datetime?
+  property announcedAt: datetime?
+
+  belongsTo invoice: Invoice fields [tenantId, invoiceId] references [tenantId, id]
+
+  default policy invoicePaymentLinkRead read: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may see invoice payment links"
+  default policy invoicePaymentLinkWrite write: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may update invoice payment links"
+  default policy invoicePaymentLinkExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may change invoice payment links"
+
+  command open(
+    invoiceId: uuid,
+    sessionId: string,
+    url: string,
+    amount: money(12, 2),
+    optional createdByUserId: string,
+    optional configId: string,
+    optional offsetDays: int,
+    optional scheduledFor: datetime,
+    optional source: InvoiceReminderSource
+  ) {
+    guard self.openedAt == null
+    guard self.deletedAt == null
+    guard user.role == "system" "Only Capsule records a Stripe payment link it created"
+    constraint openSession: length(trim(sessionId)) > 0 and length(trim(url)) > 0 "A payment link needs its Stripe session and address"
+    mutate invoiceId = invoiceId
+    mutate sessionId = sessionId
+    mutate url = url
+    mutate amount = amount
+    mutate createdByUserId = createdByUserId
+    mutate configId = configId
+    mutate offsetDays = offsetDays
+    mutate scheduledFor = scheduledFor
+    mutate source = source
+    mutate openedAt = now()
+  }
+
+  // A link someone asked for on the invoice page.
+  command announceCreated() {
+    guard self.openedAt != null
+    guard self.announcedAt == null
+    guard self.deletedAt == null
+    guard self.configId == null
+    guard user.role == "system" "Only Capsule records a Stripe payment link it created"
+    mutate announcedAt = now()
+    emit InvoicePaymentLinkCreated {
+      tenantId: self.tenantId
+      invoiceId: self.invoiceId
+      paymentLinkId: self.id
+      sessionId: self.sessionId
+      url: self.url
+      amount: self.amount
+      createdBy: self.createdByUserId
+    }
+  }
+
+  // A link prepared for one reminder email.
+  command announceReminderLink() {
+    guard self.openedAt != null
+    guard self.announcedAt == null
+    guard self.deletedAt == null
+    guard self.configId != null
+    guard user.role == "system" "Only Capsule records a Stripe payment link it created"
+    mutate announcedAt = now()
+    emit InvoiceReminderPaymentLinkPrepared {
+      tenantId: self.tenantId
+      invoiceId: self.invoiceId
+      paymentLinkId: self.id
+      configId: self.configId
+      offsetDays: self.offsetDays
+      scheduledFor: self.scheduledFor
+      source: self.source
+      sessionId: self.sessionId
+      url: self.url
+    }
+  }
+
+  store InvoicePaymentLink in durable
+}
+
+// A paid Stripe Checkout session that was recorded as a Payment on the invoice
+// (Payment.record → Payment.settle). A session is reconciled once one of these
+// exists for it.
+entity InvoiceStripePayment mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required invoiceId: uuid
+  property required sessionId: string
+  property required paymentId: uuid
+  property required amount: money(12, 2) = 0
+  property required method: string = ""
+  property recordedAt: datetime?
+
+  belongsTo invoice: Invoice fields [tenantId, invoiceId] references [tenantId, id]
+
+  default policy invoiceStripePaymentRead read: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may see Stripe payments"
+  default policy invoiceStripePaymentWrite write: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may update Stripe payments"
+  default policy invoiceStripePaymentExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may change Stripe payments"
+
+  command record(
+    invoiceId: uuid,
+    sessionId: string,
+    paymentId: uuid,
+    amount: money(12, 2),
+    method: string
+  ) {
+    guard self.recordedAt == null
+    guard self.deletedAt == null
+    guard user.role == "system" "Only Capsule records a payment it found in Stripe"
+    constraint recordSession: length(trim(sessionId)) > 0 "A Stripe payment needs its session"
+    mutate invoiceId = invoiceId
+    mutate sessionId = sessionId
+    mutate paymentId = paymentId
+    mutate amount = amount
+    mutate method = method
+    mutate recordedAt = now()
+    emit InvoiceStripePaymentRecorded {
+      tenantId: self.tenantId
+      invoiceId: invoiceId
+      sessionId: sessionId
+      paymentId: paymentId
+      amount: amount
+      method: method
+    }
+  }
+
+  store InvoiceStripePayment in durable
+}
+
+// One automatic-reminder configuration for an invoice. The newest one is the
+// schedule in force; scheduled deliveries for an older configId stand down.
+entity InvoiceReminderSchedule mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required invoiceId: uuid
+  property required configId: string
+  property configuredAt: datetime?
+  property dueDate: datetime?
+  property offsetsDays: list<int>?
+  property openedAt: datetime?
+
+  belongsTo invoice: Invoice fields [tenantId, invoiceId] references [tenantId, id]
+
+  default policy invoiceReminderScheduleRead read: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may see reminder schedules"
+  default policy invoiceReminderScheduleWrite write: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may update reminder schedules"
+  default policy invoiceReminderScheduleExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may change reminder schedules"
+
+  // Run by convex/invoiceReminders.ts, which checks the invoice is open, has
+  // a due date and a reachable recipient, and schedules the deliveries in the
+  // same transaction.
+  command configure(
+    invoiceId: uuid,
+    configId: string,
+    configuredAt: datetime,
+    dueDate: datetime,
+    offsetsDays: list<int>
+  ) {
+    guard self.openedAt == null
+    guard self.deletedAt == null
+    constraint configureId: length(trim(configId)) > 0 "A reminder schedule needs its ID"
+    mutate invoiceId = invoiceId
+    mutate configId = configId
+    mutate configuredAt = configuredAt
+    mutate dueDate = dueDate
+    mutate offsetsDays = offsetsDays
+    mutate openedAt = now()
+    emit InvoiceReminderScheduleConfigured {
+      tenantId: self.tenantId
+      invoiceId: invoiceId
+      configId: configId
+      configuredAt: configuredAt
+      dueDate: dueDate
+      offsetsDays: offsetsDays
+    }
+  }
+
+  store InvoiceReminderSchedule in durable
+}
+
+// One reminder delivery outcome: delivered, suppressed (not sent, with the
+// reason) or failed (with the provider message and whether a retry is
+// scheduled). A (configId, offsetDays) pair with a delivered outcome is never
+// sent again.
+entity InvoiceReminderAttempt mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required invoiceId: uuid
+  property required configId: string
+  property required offsetDays: int = 0
+  property scheduledFor: datetime?
+  property source: InvoiceReminderSource?
+  property outcome: InvoiceReminderOutcome?
+  property emailId: string?
+  property sessionId: string?
+  property amountDue: money(12, 2)?
+  property dueDate: datetime?
+  property timing: string?
+  property reason: string?
+  property attempt: int?
+  property message: string?
+  property retryScheduled: boolean?
+  property openedAt: datetime?
+
+  belongsTo invoice: Invoice fields [tenantId, invoiceId] references [tenantId, id]
+
+  default policy invoiceReminderAttemptRead read: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may see reminder deliveries"
+  default policy invoiceReminderAttemptWrite write: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may update reminder deliveries"
+  default policy invoiceReminderAttemptExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may change reminder deliveries"
+
+  command open(
+    invoiceId: uuid,
+    configId: string,
+    offsetDays: int,
+    scheduledFor: datetime,
+    source: InvoiceReminderSource
+  ) {
+    guard self.openedAt == null
+    guard self.deletedAt == null
+    guard user.role == "system" "Only Capsule records a reminder it sent or skipped"
+    mutate invoiceId = invoiceId
+    mutate configId = configId
+    mutate offsetDays = offsetDays
+    mutate scheduledFor = scheduledFor
+    mutate source = source
+    mutate openedAt = now()
+  }
+
+  command recordDelivered(
+    emailId: string,
+    sessionId: string,
+    amountDue: money(12, 2),
+    dueDate: datetime,
+    timing: string
+  ) {
+    guard self.openedAt != null
+    guard self.outcome == null
+    guard self.deletedAt == null
+    guard user.role == "system" "Only Capsule records a reminder it sent or skipped"
+    mutate outcome = "delivered"
+    mutate emailId = emailId
+    mutate sessionId = sessionId
+    mutate amountDue = amountDue
+    mutate dueDate = dueDate
+    mutate timing = timing
+    emit InvoiceReminderDelivered {
+      tenantId: self.tenantId
+      invoiceId: self.invoiceId
+      attemptId: self.id
+      configId: self.configId
+      offsetDays: self.offsetDays
+      scheduledFor: self.scheduledFor
+      source: self.source
+      emailId: emailId
+      sessionId: sessionId
+      amountDue: amountDue
+      dueDate: dueDate
+      timing: timing
+    }
+  }
+
+  command recordSuppressed(reason: string) {
+    guard self.openedAt != null
+    guard self.outcome == null
+    guard self.deletedAt == null
+    guard user.role == "system" "Only Capsule records a reminder it sent or skipped"
+    mutate outcome = "suppressed"
+    mutate reason = reason
+    emit InvoiceReminderSuppressed {
+      tenantId: self.tenantId
+      invoiceId: self.invoiceId
+      attemptId: self.id
+      configId: self.configId
+      offsetDays: self.offsetDays
+      scheduledFor: self.scheduledFor
+      source: self.source
+      reason: reason
+    }
+  }
+
+  command recordFailed(attempt: int, message: string, retryScheduled: boolean) {
+    guard self.openedAt != null
+    guard self.outcome == null
+    guard self.deletedAt == null
+    guard user.role == "system" "Only Capsule records a reminder it sent or skipped"
+    mutate outcome = "failed"
+    mutate attempt = attempt
+    mutate message = message
+    mutate retryScheduled = retryScheduled
+    emit InvoiceReminderDeliveryFailed {
+      tenantId: self.tenantId
+      invoiceId: self.invoiceId
+      attemptId: self.id
+      configId: self.configId
+      offsetDays: self.offsetDays
+      scheduledFor: self.scheduledFor
+      source: self.source
+      attempt: attempt
+      message: message
+      retryScheduled: retryScheduled
+    }
+  }
+
+  store InvoiceReminderAttempt in durable
+}
+
+event InvoicePaymentLinkCreated: "invoice.payment_link_created" {
+  tenantId: string
+  invoiceId: string
+  paymentLinkId: string
+  sessionId: string
+  url: string
+  amount: money(12, 2)
+  createdBy: string?
+}
+
+event InvoiceReminderPaymentLinkPrepared: "invoice.reminder_payment_link_prepared" {
+  tenantId: string
+  invoiceId: string
+  paymentLinkId: string
+  configId: string?
+  offsetDays: int?
+  scheduledFor: datetime?
+  source: InvoiceReminderSource?
+  sessionId: string
+  url: string
+}
+
+event InvoiceStripePaymentRecorded: "invoice.stripe_payment_recorded" {
+  tenantId: string
+  invoiceId: string
+  sessionId: string
+  paymentId: string
+  amount: money(12, 2)
+  method: string
+}
+
+event InvoiceReminderScheduleConfigured: "invoice.reminder_schedule_configured" {
+  tenantId: string
+  invoiceId: string
+  configId: string
+  configuredAt: datetime
+  dueDate: datetime
+  offsetsDays: list<int>
+}
+
+event InvoiceReminderDelivered: "invoice.reminder_delivered" {
+  tenantId: string
+  invoiceId: string
+  attemptId: string
+  configId: string
+  offsetDays: int
+  scheduledFor: datetime?
+  source: InvoiceReminderSource?
+  emailId: string
+  sessionId: string
+  amountDue: money(12, 2)
+  dueDate: datetime
+  timing: string
+}
+
+event InvoiceReminderSuppressed: "invoice.reminder_suppressed" {
+  tenantId: string
+  invoiceId: string
+  attemptId: string
+  configId: string
+  offsetDays: int
+  scheduledFor: datetime?
+  source: InvoiceReminderSource?
+  reason: string
+}
+
+event InvoiceReminderDeliveryFailed: "invoice.reminder_delivery_failed" {
+  tenantId: string
+  invoiceId: string
+  attemptId: string
+  configId: string
+  offsetDays: int
+  scheduledFor: datetime?
+  source: InvoiceReminderSource?
+  attempt: int
+  message: string
+  retryScheduled: boolean
+}

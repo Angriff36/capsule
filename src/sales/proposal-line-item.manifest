@@ -174,7 +174,34 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Restamp the central-calc amount after the proposal's line set or guest
+  // count changed (convex/lib/proposalPricing.ts). Percentage and per-person
+  // lines re-resolve against the new base; the other inputs are unchanged.
+  command restampAmount(amount: money(12, 2)) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard self.proposal != null and self.proposal.status == "draft"
+    constraint restampNonnegative: amount >= 0 "This line's price can't be negative. Use zero or more."
+    compute previousAmount = self.amount
+    mutate amount = amount
+    emit ProposalLineItemRepriced {
+      lineItemId: self.id
+      tenantId: self.tenantId
+      proposalId: self.proposalId
+      previousAmount: previousAmount
+      amount: amount
+    }
+  }
+
   store ProposalLineItem in durable
+}
+
+event ProposalLineItemRepriced: "proposal_line_item.repriced" {
+  lineItemId: string
+  tenantId: string
+  proposalId: string
+  previousAmount: money(12, 2)
+  amount: money(12, 2)
 }
 
 event ProposalLineItemAdded: "proposal_line_item.added" {

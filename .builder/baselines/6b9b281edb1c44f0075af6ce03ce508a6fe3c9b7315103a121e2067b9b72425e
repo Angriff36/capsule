@@ -356,13 +356,22 @@ import {
   InvoiceMarkOverdueParamsSchema,
   InvoiceMarkViewedParamsSchema,
   InvoiceMarkVoidedParamsSchema,
+  InvoicePaymentLinkAnnounceCreatedParamsSchema,
+  InvoicePaymentLinkAnnounceReminderLinkParamsSchema,
+  InvoicePaymentLinkOpenParamsSchema,
   InvoiceReassignClientParamsSchema,
   InvoiceRecordCreditMemoParamsSchema,
   InvoiceRecordRefundParamsSchema,
+  InvoiceReminderAttemptOpenParamsSchema,
+  InvoiceReminderAttemptRecordDeliveredParamsSchema,
+  InvoiceReminderAttemptRecordFailedParamsSchema,
+  InvoiceReminderAttemptRecordSuppressedParamsSchema,
+  InvoiceReminderScheduleConfigureParamsSchema,
   InvoiceSendBalanceReminderParamsSchema,
   InvoiceSendParamsSchema,
   InvoiceSetDepositParamsSchema,
   InvoiceStageClientMergeParamsSchema,
+  InvoiceStripePaymentRecordParamsSchema,
   InvoiceWriteOffParamsSchema,
   ItemUnitMappingRecordParamsSchema,
   ItemUnitMappingRetireParamsSchema,
@@ -524,10 +533,13 @@ import {
   ProposalFollowEventHeadcountParamsSchema,
   ProposalLineItemAddLineParamsSchema,
   ProposalLineItemRemoveLineParamsSchema,
+  ProposalLineItemRestampAmountParamsSchema,
   ProposalLineItemReviseLineParamsSchema,
   ProposalLinkEventParamsSchema,
   ProposalMarkViewedParamsSchema,
   ProposalReassignClientParamsSchema,
+  ProposalRecomputeTotalsParamsSchema,
+  ProposalRecordAcceptedRevisionParamsSchema,
   ProposalRevisionCaptureParamsSchema,
   ProposalSendParamsSchema,
   ProposalStageClientMergeParamsSchema,
@@ -598,6 +610,7 @@ import {
   ServiceStyleRegisterParamsSchema,
   ServiceStyleReviseDetailsParamsSchema,
   ShareLinkCreateParamsSchema,
+  ShareLinkRecordViewParamsSchema,
   ShareLinkRevokeParamsSchema,
   ShiftApplyApprovedSwapParamsSchema,
   ShiftCancelParamsSchema,
@@ -619,10 +632,18 @@ import {
   ShiftTypeDefineParamsSchema,
   ShiftTypeReactivateParamsSchema,
   ShiftTypeRetireParamsSchema,
+  SignatureRequestCompleteInternalParamsSchema,
   SignatureRequestCompleteParamsSchema,
   SignatureRequestExpireParamsSchema,
   SignatureRequestRequestSignatureParamsSchema,
   SignatureRequestRevokeParamsSchema,
+  SmsAlertDeliveryOpenParamsSchema,
+  SmsAlertDeliveryRecordFailedParamsSchema,
+  SmsAlertDeliveryRecordSentParamsSchema,
+  SmsAlertSettingDisableParamsSchema,
+  SmsAlertSettingEnableParamsSchema,
+  SmsAlertSettingOpenParamsSchema,
+  SmsAlertSettingRecordScanParamsSchema,
   StaffChatReadCursorOpenParamsSchema,
   StaffChatReadCursorTouchParamsSchema,
   StaffMessageEditParamsSchema,
@@ -5811,6 +5832,180 @@ export function useGetInvoiceNumberSequence(id: string | "skip") {
   return useQuery(api.queries.getInvoiceNumberSequence, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Reactive list for InvoicePaymentLink. */
+export function useListInvoicePaymentLink() {
+  return useQuery(api.queries.listInvoicePaymentLink);
+}
+
+/** Reactive get-by-id for InvoicePaymentLink. Pass "skip" to suspend. */
+export function useGetInvoicePaymentLink(id: string | "skip") {
+  return useQuery(api.queries.getInvoicePaymentLink, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for InvoicePaymentLink.announceCreated. */
+export function useInvoicePaymentLinkAnnounceCreated() {
+  const mutate = useMutation(api.mutations.InvoicePaymentLink_announceCreated);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoicePaymentLinkAnnounceCreatedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for InvoicePaymentLink.announceReminderLink. */
+export function useInvoicePaymentLinkAnnounceReminderLink() {
+  const mutate = useMutation(api.mutations.InvoicePaymentLink_announceReminderLink);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoicePaymentLinkAnnounceReminderLinkParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for InvoicePaymentLink.open. */
+export function useInvoicePaymentLinkOpen() {
+  const mutate = useMutation(api.mutations.InvoicePaymentLink_open);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoicePaymentLinkOpenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for InvoicePaymentLink.open. */
+export function useCreateInvoicePaymentLink() {
+  const mutate = useMutation(api.mutations.InvoicePaymentLink_createViaOpen);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoicePaymentLinkOpenParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for InvoiceReminderAttempt. */
+export function useListInvoiceReminderAttempt() {
+  return useQuery(api.queries.listInvoiceReminderAttempt);
+}
+
+/** Reactive get-by-id for InvoiceReminderAttempt. Pass "skip" to suspend. */
+export function useGetInvoiceReminderAttempt(id: string | "skip") {
+  return useQuery(api.queries.getInvoiceReminderAttempt, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for InvoiceReminderAttempt.open. */
+export function useInvoiceReminderAttemptOpen() {
+  const mutate = useMutation(api.mutations.InvoiceReminderAttempt_open);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceReminderAttemptOpenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for InvoiceReminderAttempt.recordDelivered. */
+export function useInvoiceReminderAttemptRecordDelivered() {
+  const mutate = useMutation(api.mutations.InvoiceReminderAttempt_recordDelivered);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceReminderAttemptRecordDeliveredParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for InvoiceReminderAttempt.recordFailed. */
+export function useInvoiceReminderAttemptRecordFailed() {
+  const mutate = useMutation(api.mutations.InvoiceReminderAttempt_recordFailed);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceReminderAttemptRecordFailedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for InvoiceReminderAttempt.recordSuppressed. */
+export function useInvoiceReminderAttemptRecordSuppressed() {
+  const mutate = useMutation(api.mutations.InvoiceReminderAttempt_recordSuppressed);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceReminderAttemptRecordSuppressedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for InvoiceReminderAttempt.open. */
+export function useCreateInvoiceReminderAttempt() {
+  const mutate = useMutation(api.mutations.InvoiceReminderAttempt_createViaOpen);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceReminderAttemptOpenParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for InvoiceReminderSchedule. */
+export function useListInvoiceReminderSchedule() {
+  return useQuery(api.queries.listInvoiceReminderSchedule);
+}
+
+/** Reactive get-by-id for InvoiceReminderSchedule. Pass "skip" to suspend. */
+export function useGetInvoiceReminderSchedule(id: string | "skip") {
+  return useQuery(api.queries.getInvoiceReminderSchedule, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for InvoiceReminderSchedule.configure. */
+export function useInvoiceReminderScheduleConfigure() {
+  const mutate = useMutation(api.mutations.InvoiceReminderSchedule_configure);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceReminderScheduleConfigureParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for InvoiceReminderSchedule.configure. */
+export function useCreateInvoiceReminderSchedule() {
+  const mutate = useMutation(api.mutations.InvoiceReminderSchedule_createViaConfigure);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceReminderScheduleConfigureParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for InvoiceStripePayment. */
+export function useListInvoiceStripePayment() {
+  return useQuery(api.queries.listInvoiceStripePayment);
+}
+
+/** Reactive get-by-id for InvoiceStripePayment. Pass "skip" to suspend. */
+export function useGetInvoiceStripePayment(id: string | "skip") {
+  return useQuery(api.queries.getInvoiceStripePayment, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for InvoiceStripePayment.record. */
+export function useInvoiceStripePaymentRecord() {
+  const mutate = useMutation(api.mutations.InvoiceStripePayment_record);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceStripePaymentRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for InvoiceStripePayment.record. */
+export function useCreateInvoiceStripePayment() {
+  const mutate = useMutation(api.mutations.InvoiceStripePayment_createViaRecord);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceStripePaymentRecordParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for ItemUnitMapping. */
 export function useListItemUnitMapping() {
   return useQuery(api.queries.listItemUnitMapping);
@@ -7895,6 +8090,26 @@ export function useProposalReassignClient() {
   };
 }
 
+/** Mutation hook for Proposal.recomputeTotals. */
+export function useProposalRecomputeTotals() {
+  const mutate = useMutation(api.mutations.Proposal_recomputeTotals);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalRecomputeTotalsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Proposal.recordAcceptedRevision. */
+export function useProposalRecordAcceptedRevision() {
+  const mutate = useMutation(api.mutations.Proposal_recordAcceptedRevision);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalRecordAcceptedRevisionParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Proposal.send. */
 export function useProposalSend() {
   const mutate = useMutation(api.mutations.Proposal_send);
@@ -8074,6 +8289,16 @@ export function useProposalLineItemRemoveLine() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ProposalLineItemRemoveLineParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ProposalLineItem.restampAmount. */
+export function useProposalLineItemRestampAmount() {
+  const mutate = useMutation(api.mutations.ProposalLineItem_restampAmount);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalLineItemRestampAmountParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -9072,6 +9297,16 @@ export function useShareLinkCreate() {
   };
 }
 
+/** Mutation hook for ShareLink.recordView. */
+export function useShareLinkRecordView() {
+  const mutate = useMutation(api.mutations.ShareLink_recordView);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ShareLinkRecordViewParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for ShareLink.revoke. */
 export function useShareLinkRevoke() {
   const mutate = useMutation(api.mutations.ShareLink_revoke);
@@ -9365,6 +9600,16 @@ export function useSignatureRequestComplete() {
   };
 }
 
+/** Mutation hook for SignatureRequest.completeInternal. */
+export function useSignatureRequestCompleteInternal() {
+  const mutate = useMutation(api.mutations.SignatureRequest_completeInternal);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SignatureRequestCompleteInternalParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for SignatureRequest.expire. */
 export function useSignatureRequestExpire() {
   const mutate = useMutation(api.mutations.SignatureRequest_expire);
@@ -9401,6 +9646,118 @@ export function useCreateSignatureRequest() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = SignatureRequestRequestSignatureParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for SmsAlertDelivery. */
+export function useListSmsAlertDelivery() {
+  return useQuery(api.queries.listSmsAlertDelivery);
+}
+
+/** Reactive get-by-id for SmsAlertDelivery. Pass "skip" to suspend. */
+export function useGetSmsAlertDelivery(id: string | "skip") {
+  return useQuery(api.queries.getSmsAlertDelivery, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for SmsAlertDelivery.open. */
+export function useSmsAlertDeliveryOpen() {
+  const mutate = useMutation(api.mutations.SmsAlertDelivery_open);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertDeliveryOpenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for SmsAlertDelivery.recordFailed. */
+export function useSmsAlertDeliveryRecordFailed() {
+  const mutate = useMutation(api.mutations.SmsAlertDelivery_recordFailed);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertDeliveryRecordFailedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for SmsAlertDelivery.recordSent. */
+export function useSmsAlertDeliveryRecordSent() {
+  const mutate = useMutation(api.mutations.SmsAlertDelivery_recordSent);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertDeliveryRecordSentParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for SmsAlertDelivery.open. */
+export function useCreateSmsAlertDelivery() {
+  const mutate = useMutation(api.mutations.SmsAlertDelivery_createViaOpen);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertDeliveryOpenParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for SmsAlertSetting. */
+export function useListSmsAlertSetting() {
+  return useQuery(api.queries.listSmsAlertSetting);
+}
+
+/** Reactive get-by-id for SmsAlertSetting. Pass "skip" to suspend. */
+export function useGetSmsAlertSetting(id: string | "skip") {
+  return useQuery(api.queries.getSmsAlertSetting, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for SmsAlertSetting.disable. */
+export function useSmsAlertSettingDisable() {
+  const mutate = useMutation(api.mutations.SmsAlertSetting_disable);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertSettingDisableParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for SmsAlertSetting.enable. */
+export function useSmsAlertSettingEnable() {
+  const mutate = useMutation(api.mutations.SmsAlertSetting_enable);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertSettingEnableParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for SmsAlertSetting.open. */
+export function useSmsAlertSettingOpen() {
+  const mutate = useMutation(api.mutations.SmsAlertSetting_open);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertSettingOpenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for SmsAlertSetting.recordScan. */
+export function useSmsAlertSettingRecordScan() {
+  const mutate = useMutation(api.mutations.SmsAlertSetting_recordScan);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertSettingRecordScanParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for SmsAlertSetting.open. */
+export function useCreateSmsAlertSetting() {
+  const mutate = useMutation(api.mutations.SmsAlertSetting_createViaOpen);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertSettingOpenParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -11400,4 +11757,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1212 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1251 as const;

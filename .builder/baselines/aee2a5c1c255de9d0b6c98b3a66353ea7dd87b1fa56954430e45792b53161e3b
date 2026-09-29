@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "11d01fbd4c68f896916782a923d864799c09fefe7f23c3a67af6204ef1d3b9fa:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21c70b2b10030f5a9acdb868c2e229c0b48fd6f86e2a44f85040058ab7634e25:272a31932843884c7ac3eabb6161bd3cebde6879b8bea18fc25043fa9be4455f:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2aea5aa1d00f0d86457cb177ee29c76e1c1dc22e7f73bad7f8b1074575cbc31d:2c42c97da3b397baa523b8f7ae11ed10f988cb9ea37f6b158ecb4404f5bcab62:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:2f58e48aa70e7c4414f51af8aea7f9768e378ea26daa75b659dba78dab856030:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:327f55f7fc3badfa91db612d8da5b7a890ed54daf3398ab067c48dd29bcb6f52:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:3946e202e3a047c69528d06bc1371d5100bdc27d68d2644d8882da7bcfa1d23c:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:4021a43427a72d2daffe25a117f282ffc343ff11dd02010652045485f3bf2816:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:45b3d018cb8479a590061dabb5a6bf03edb434440cc64cd88487eb3f799fe2d6:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4ac247395613e10f80cd1bb39b0bcc11a98d99cac60463154d9c42e7b5967258:501487754e20a846402d574851966950378082990b46261a0318113100bcdca5:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:57041b3fe080152b717e2ab15050bc93d3830b1d8027e5dc5114d687ad3c6be3:5b1a6e044cc0addd7bf6bc5f82a1f15994e33d01cccd75bb4dec4971b38b039b:5b5d08c3ea56e43ddf1f2623cdc1888b7bfafc1cbf6ee4a6d49ae42e68c73c95:5fd882905c48e953a76af92b6db9cb606a0b0a9f9949c49f5ce6ca71c0d808ff:673eea009a24475e68b862081672cfe7f5ac7d9c5fb1cae8cd3cb4e17912765f:6a640d8f2f2791605a5c80bebcb59661c51018393b66d37fffa014400b7e99d4:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:6de6b132498fdb76faa9830c1ff3845816532ec79baea94836775d320903dc1f:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:78e2341ac6b83ff5eb43c7fbfc824766ef6c9f5ebb61590eb8cf7ca8270d8b9d:792131c7b95d7c0b140fb2dbbf6a4b7e3ab487a4dc26f65a3d4374fa9c0e6e6b:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7a8de9cb59f93d64dd599f21ded09010d4de32c74d4c83100dcea9b6877fe6b0:7d5c0741e3a26447773948cfe2d758cd1e210e2f37c9f39c272ca443b716a309:7dd6076ce8b39c99fb91e01b05b04c5e8d3c44f535cbcb26f27320918d21294d:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bc38accf30dad64f89fc62a930fea2e6de166c7ddcfbc5f509f57cdb9c41fb5:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:92c0c66864b3c226093e8f9f95ccbee7c79f353d8a59123003095641b38789d4:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:9e98bdeac2b20c1da7c8565bc0e68b67db011509c47c3c512b9e1c9f7be516c4:a04c9aa12c21c3811997769713ecd392ab9d47a8d216dbc42e666cabac135d05:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a363078ede0b73c3c2f7a5c6ddb5c2f0d9de214832687609020e7078b66a8cb3:a37b67df92f218d6b1fbafe7932f858f12fd11a6e1063c82b43664b1146a9fb0:a8b60c0f996f5391bb792849f2044c2e973b34d15938963afad73f7e6a9706a4:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:afbd0cf1305dff953db623162ca2ab2170e7cc3d4f7a62739a8a2653d8ec8941:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b15baf1a6241169d8eb947ae3850e26305e5d419875211954210152c3b42fcd5:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b4bcd360de08b84126452b6c53b801c7f84f1dea757f2c10c53d47f50d8b1182:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bee0f6341a01acf156773a21505eca5e20a25fdb7d1dc6c09c37720a1c2ef899:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c4f4847c56f2947ed5512b4e3254c848c5063e0e6d9d5f2a79578b289d098114:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:ca49afde92432ac008856285d940bc605b8cabecbacbf706b4cf42ac74ccce1f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d3b087f64aae628f5786c8a1cfee107ad396828d18d7e6b77b972f6a3f0f95c7:d4d9def716300b65106042da9a2f7dc8b2b1636bbd3b07ecd3e8614053a9ca73:d9ef376b473936bad5512b64a8aea50c92505d6b1a159615719328cdd79c1c1d:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dc6fcf0fd92b72ae0e511408e5e16b5a5f8007426762380770abc419eebf836f:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e610c980855414eb0532fa1a84908500dbfa3ae1d3b8aec60a88b82418fcaacb:e89da7c29b83df66466e7b996b1780a39c690560afa9a5e5f23c698003827e40:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:ee33cad2c146aefd4f3f8a4e9158f888bc228824dbd5d6e425414009f6aa8ba5:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f49c5ef7603c706a89514343223fe24d6e1496af83095a7796cb93e7336aaea4:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdaa81c70b2f571c3b10af2b3ad5acac7f74ebf613964b09e49516d7d1809937:fe7be8fbd9564de4521178c9c6f4a329db717fbd9f5499c0f5f61c18efa07f19";
+export const WIRING_CONTRACT_HASH = "11d01fbd4c68f896916782a923d864799c09fefe7f23c3a67af6204ef1d3b9fa:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:161c25c50ea646952d76c7f45670392a96b650cbdb21421741aa129897f39f39:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:2036d8db9241995bb76aa15c89b94d17d66cce3ef2e4ea63178b1e2a1909207b:21c70b2b10030f5a9acdb868c2e229c0b48fd6f86e2a44f85040058ab7634e25:272a31932843884c7ac3eabb6161bd3cebde6879b8bea18fc25043fa9be4455f:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2aea5aa1d00f0d86457cb177ee29c76e1c1dc22e7f73bad7f8b1074575cbc31d:2c2d59336f8e3b13106229c1727f4ff26e8321fea8742ca46cd4fd89508863b0:2c42c97da3b397baa523b8f7ae11ed10f988cb9ea37f6b158ecb4404f5bcab62:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:2f58e48aa70e7c4414f51af8aea7f9768e378ea26daa75b659dba78dab856030:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:327f55f7fc3badfa91db612d8da5b7a890ed54daf3398ab067c48dd29bcb6f52:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:4021a43427a72d2daffe25a117f282ffc343ff11dd02010652045485f3bf2816:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:45b3d018cb8479a590061dabb5a6bf03edb434440cc64cd88487eb3f799fe2d6:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4ac247395613e10f80cd1bb39b0bcc11a98d99cac60463154d9c42e7b5967258:4e66be5e5d1dfb8fe16f1499db8a775b0788a0c62e47ea7076d59e915357fae2:501487754e20a846402d574851966950378082990b46261a0318113100bcdca5:5046222416ff8bf182f7603802da83b33bfe97f0310849ceb624964cb9d804df:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:57041b3fe080152b717e2ab15050bc93d3830b1d8027e5dc5114d687ad3c6be3:5b1a6e044cc0addd7bf6bc5f82a1f15994e33d01cccd75bb4dec4971b38b039b:5b5d08c3ea56e43ddf1f2623cdc1888b7bfafc1cbf6ee4a6d49ae42e68c73c95:5fd882905c48e953a76af92b6db9cb606a0b0a9f9949c49f5ce6ca71c0d808ff:673eea009a24475e68b862081672cfe7f5ac7d9c5fb1cae8cd3cb4e17912765f:6a640d8f2f2791605a5c80bebcb59661c51018393b66d37fffa014400b7e99d4:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:6de6b132498fdb76faa9830c1ff3845816532ec79baea94836775d320903dc1f:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:78e2341ac6b83ff5eb43c7fbfc824766ef6c9f5ebb61590eb8cf7ca8270d8b9d:792131c7b95d7c0b140fb2dbbf6a4b7e3ab487a4dc26f65a3d4374fa9c0e6e6b:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7a8de9cb59f93d64dd599f21ded09010d4de32c74d4c83100dcea9b6877fe6b0:7d5c0741e3a26447773948cfe2d758cd1e210e2f37c9f39c272ca443b716a309:7dd6076ce8b39c99fb91e01b05b04c5e8d3c44f535cbcb26f27320918d21294d:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bc38accf30dad64f89fc62a930fea2e6de166c7ddcfbc5f509f57cdb9c41fb5:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:9e98bdeac2b20c1da7c8565bc0e68b67db011509c47c3c512b9e1c9f7be516c4:a04c9aa12c21c3811997769713ecd392ab9d47a8d216dbc42e666cabac135d05:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a363078ede0b73c3c2f7a5c6ddb5c2f0d9de214832687609020e7078b66a8cb3:a8b60c0f996f5391bb792849f2044c2e973b34d15938963afad73f7e6a9706a4:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b15baf1a6241169d8eb947ae3850e26305e5d419875211954210152c3b42fcd5:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b47b1880542839c64691ddfe2e3d70ac2aab4e48356096c5b4994d6a2e374f04:b4bcd360de08b84126452b6c53b801c7f84f1dea757f2c10c53d47f50d8b1182:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bee0f6341a01acf156773a21505eca5e20a25fdb7d1dc6c09c37720a1c2ef899:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c4f4847c56f2947ed5512b4e3254c848c5063e0e6d9d5f2a79578b289d098114:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:ca49afde92432ac008856285d940bc605b8cabecbacbf706b4cf42ac74ccce1f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d3b087f64aae628f5786c8a1cfee107ad396828d18d7e6b77b972f6a3f0f95c7:d4d9def716300b65106042da9a2f7dc8b2b1636bbd3b07ecd3e8614053a9ca73:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dc6fcf0fd92b72ae0e511408e5e16b5a5f8007426762380770abc419eebf836f:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e610c980855414eb0532fa1a84908500dbfa3ae1d3b8aec60a88b82418fcaacb:e80de7c05fa932b8305cde4e48e8310822d0813b2f3640d31fe7677f29c33a73:e89da7c29b83df66466e7b996b1780a39c690560afa9a5e5f23c698003827e40:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:ecce46aef73a59c2c8ff22bd0b4c8cb6a2ceb257a6faa4b271725b346cd2a6d6:ee33cad2c146aefd4f3f8a4e9158f888bc228824dbd5d6e425414009f6aa8ba5:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f49c5ef7603c706a89514343223fe24d6e1496af83095a7796cb93e7336aaea4:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdaa81c70b2f571c3b10af2b3ad5acac7f74ebf613964b09e49516d7d1809937:fe7be8fbd9564de4521178c9c6f4a329db717fbd9f5499c0f5f61c18efa07f19";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -81844,6 +81844,62 @@ export const InvoiceApplyCreditInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Payment",
     "queryKeyHint": "queryKeys.payment.lists()",
     "readId": "Payment.list",
@@ -81983,6 +82039,62 @@ export const InvoiceApplyPaymentInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
     "label": "related entity detail"
   },
   {
@@ -82128,6 +82240,62 @@ export const InvoiceAssignNumberInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Payment",
     "queryKeyHint": "queryKeys.payment.lists()",
     "readId": "Payment.list",
@@ -82261,6 +82429,62 @@ export const InvoiceFollowEventPriceInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
     "label": "related entity detail"
   },
   {
@@ -82416,6 +82640,62 @@ export const InvoiceIssueInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
     "label": "related entity detail"
   },
   {
@@ -82624,6 +82904,62 @@ export const InvoiceMarkDepositPaidInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Payment",
     "queryKeyHint": "queryKeys.payment.lists()",
     "readId": "Payment.list",
@@ -82748,6 +83084,62 @@ export const InvoiceMarkOverdueInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
     "label": "related entity detail"
   },
   {
@@ -82910,6 +83302,62 @@ export const InvoiceMarkViewedInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Payment",
     "queryKeyHint": "queryKeys.payment.lists()",
     "readId": "Payment.list",
@@ -83052,6 +83500,62 @@ export const InvoiceMarkVoidedInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
     "label": "related entity detail"
   },
   {
@@ -83227,6 +83731,62 @@ export const InvoiceReassignClientInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Payment",
     "queryKeyHint": "queryKeys.payment.lists()",
     "readId": "Payment.list",
@@ -83355,6 +83915,62 @@ export const InvoiceRecordCreditMemoInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
     "label": "related entity detail"
   },
   {
@@ -83498,6 +84114,62 @@ export const InvoiceRecordRefundInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
     "label": "related entity detail"
   },
   {
@@ -83685,6 +84357,62 @@ export const InvoiceSendInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Payment",
     "queryKeyHint": "queryKeys.payment.lists()",
     "readId": "Payment.list",
@@ -83829,6 +84557,62 @@ export const InvoiceSendBalanceReminderInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Payment",
     "queryKeyHint": "queryKeys.payment.lists()",
     "readId": "Payment.list",
@@ -83958,6 +84742,62 @@ export const InvoiceSetDepositInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
     "label": "related entity detail"
   },
   {
@@ -84100,6 +84940,62 @@ export const InvoiceStageClientMergeInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
     "label": "related entity detail"
   },
   {
@@ -84247,6 +85143,62 @@ export const InvoiceWriteOffInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Payment",
     "queryKeyHint": "queryKeys.payment.lists()",
     "readId": "Payment.list",
@@ -84302,6 +85254,892 @@ export const InvoiceWriteOffLifecycle = [
     "proven": true
   }
 ] as const;
+
+// --- InvoicePaymentLink.announceCreated ---
+export type InvoicePaymentLinkAnnounceCreatedClientInput = Record<string, never>;
+
+export const InvoicePaymentLinkAnnounceCreatedCapability = {
+  capabilityId: "InvoicePaymentLink.announceCreated",
+  entity: "InvoicePaymentLink",
+  command: "announceCreated",
+  route: "/api/manifest/InvoicePaymentLink/commands/announceCreated",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; url: string; amount: number; createdByUserId: string | null; configId: string | null; offsetDays: number | null; scheduledFor: number | null; source: \"scheduled\" | \"manual\" | null; openedAt: number | null; announcedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Finance staff and managers may see invoice payment links"},{"kind":"policy_denial","message":"Finance staff and managers may update invoice payment links"},{"kind":"policy_denial","message":"Finance staff and managers may change invoice payment links"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"InvoicePaymentLink not found"}],
+  emits: ["InvoicePaymentLinkCreated"],
+} as const;
+
+export type InvoicePaymentLinkAnnounceCreatedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; url: string; amount: number; createdByUserId: string | null; configId: string | null; offsetDays: number | null; scheduledFor: number | null; source: "scheduled" | "manual" | null; openedAt: number | null; announcedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for InvoicePaymentLink.announceCreated.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindInvoicePaymentLinkAnnounceCreatedInput(client: InvoicePaymentLinkAnnounceCreatedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful InvoicePaymentLink.announceCreated. */
+export const InvoicePaymentLinkAnnounceCreatedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.lists()",
+    "readId": "Invoice.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.detail(id)",
+    "readId": "Invoice.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer InvoicePaymentLink.announceCreated. Not a rendered control. */
+export const InvoicePaymentLinkAnnounceCreatedAction = {
+  "exposure": "human",
+  "label": "Announce created",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- InvoicePaymentLink.announceReminderLink ---
+export type InvoicePaymentLinkAnnounceReminderLinkClientInput = Record<string, never>;
+
+export const InvoicePaymentLinkAnnounceReminderLinkCapability = {
+  capabilityId: "InvoicePaymentLink.announceReminderLink",
+  entity: "InvoicePaymentLink",
+  command: "announceReminderLink",
+  route: "/api/manifest/InvoicePaymentLink/commands/announceReminderLink",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; url: string; amount: number; createdByUserId: string | null; configId: string | null; offsetDays: number | null; scheduledFor: number | null; source: \"scheduled\" | \"manual\" | null; openedAt: number | null; announcedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Finance staff and managers may see invoice payment links"},{"kind":"policy_denial","message":"Finance staff and managers may update invoice payment links"},{"kind":"policy_denial","message":"Finance staff and managers may change invoice payment links"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"InvoicePaymentLink not found"}],
+  emits: ["InvoiceReminderPaymentLinkPrepared"],
+} as const;
+
+export type InvoicePaymentLinkAnnounceReminderLinkResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; url: string; amount: number; createdByUserId: string | null; configId: string | null; offsetDays: number | null; scheduledFor: number | null; source: "scheduled" | "manual" | null; openedAt: number | null; announcedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for InvoicePaymentLink.announceReminderLink.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindInvoicePaymentLinkAnnounceReminderLinkInput(client: InvoicePaymentLinkAnnounceReminderLinkClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful InvoicePaymentLink.announceReminderLink. */
+export const InvoicePaymentLinkAnnounceReminderLinkInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.lists()",
+    "readId": "Invoice.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.detail(id)",
+    "readId": "Invoice.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer InvoicePaymentLink.announceReminderLink. Not a rendered control. */
+export const InvoicePaymentLinkAnnounceReminderLinkAction = {
+  "exposure": "human",
+  "label": "Announce reminder link",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- InvoicePaymentLink.open ---
+export interface InvoicePaymentLinkOpenClientInput {
+  invoiceId: string;
+  sessionId: string;
+  url: string;
+  amount: number;
+  createdByUserId?: string;
+  configId?: string;
+  offsetDays?: number;
+  scheduledFor?: string;
+  /** Allowed: "scheduled" | "manual" */
+  source?: "scheduled" | "manual";
+}
+
+export const InvoicePaymentLinkOpenCapability = {
+  capabilityId: "InvoicePaymentLink.open",
+  entity: "InvoicePaymentLink",
+  command: "open",
+  route: "/api/manifest/InvoicePaymentLink/commands/open",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: ["scheduledFor"],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["invoiceId","sessionId","url","amount","createdByUserId","configId","offsetDays","scheduledFor","source"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Finance staff and managers may see invoice payment links"},{"kind":"policy_denial","message":"Finance staff and managers may update invoice payment links"},{"kind":"policy_denial","message":"Finance staff and managers may change invoice payment links"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"A payment link needs its Stripe session and address"}],
+  emits: [],
+} as const;
+
+export type InvoicePaymentLinkOpenResult = { docId: string };
+
+/**
+ * Build command input for InvoicePaymentLink.open.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindInvoicePaymentLinkOpenInput(client: InvoicePaymentLinkOpenClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful InvoicePaymentLink.open. */
+export const InvoicePaymentLinkOpenInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.lists()",
+    "readId": "InvoicePaymentLink.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoicePaymentLink",
+    "queryKeyHint": "queryKeys.invoicePaymentLink.detail(id)",
+    "readId": "InvoicePaymentLink.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.lists()",
+    "readId": "Invoice.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.detail(id)",
+    "readId": "Invoice.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer InvoicePaymentLink.open. Not a rendered control. */
+export const InvoicePaymentLinkOpenAction = {
+  "exposure": "human",
+  "label": "Open",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "invoiceId",
+      "label": "Invoice id",
+      "required": true
+    },
+    {
+      "name": "sessionId",
+      "label": "Session id",
+      "required": true
+    },
+    {
+      "name": "url",
+      "label": "Url",
+      "required": true
+    },
+    {
+      "name": "amount",
+      "label": "Amount",
+      "required": true
+    },
+    {
+      "name": "createdByUserId",
+      "label": "Created by user id",
+      "required": false
+    },
+    {
+      "name": "configId",
+      "label": "Config id",
+      "required": false
+    },
+    {
+      "name": "offsetDays",
+      "label": "Offset days",
+      "required": false
+    },
+    {
+      "name": "scheduledFor",
+      "label": "Scheduled for",
+      "required": false
+    },
+    {
+      "name": "source",
+      "label": "Source",
+      "required": false,
+      "choices": [
+        {
+          "value": "scheduled",
+          "label": "scheduled"
+        },
+        {
+          "value": "manual",
+          "label": "manual"
+        }
+      ]
+    }
+  ]
+} as const;
+
+// --- InvoiceReminderAttempt.open ---
+export interface InvoiceReminderAttemptOpenClientInput {
+  invoiceId: string;
+  configId: string;
+  offsetDays: number;
+  /** Must not be "". */
+  scheduledFor: string & { readonly __nonEmpty?: true };
+  /** Allowed: "scheduled" | "manual" */
+  source: "scheduled" | "manual";
+}
+
+export const InvoiceReminderAttemptOpenCapability = {
+  capabilityId: "InvoiceReminderAttempt.open",
+  entity: "InvoiceReminderAttempt",
+  command: "open",
+  route: "/api/manifest/InvoiceReminderAttempt/commands/open",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: ["scheduledFor"],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["invoiceId","configId","offsetDays","scheduledFor","source"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Finance staff and managers may see reminder deliveries"},{"kind":"policy_denial","message":"Finance staff and managers may update reminder deliveries"},{"kind":"policy_denial","message":"Finance staff and managers may change reminder deliveries"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"}],
+  emits: [],
+} as const;
+
+export type InvoiceReminderAttemptOpenResult = { docId: string };
+
+/**
+ * Build command input for InvoiceReminderAttempt.open.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindInvoiceReminderAttemptOpenInput(client: InvoiceReminderAttemptOpenClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful InvoiceReminderAttempt.open. */
+export const InvoiceReminderAttemptOpenInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.lists()",
+    "readId": "Invoice.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.detail(id)",
+    "readId": "Invoice.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer InvoiceReminderAttempt.open. Not a rendered control. */
+export const InvoiceReminderAttemptOpenAction = {
+  "exposure": "human",
+  "label": "Open",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "invoiceId",
+      "label": "Invoice id",
+      "required": true
+    },
+    {
+      "name": "configId",
+      "label": "Config id",
+      "required": true
+    },
+    {
+      "name": "offsetDays",
+      "label": "Offset days",
+      "required": true
+    },
+    {
+      "name": "scheduledFor",
+      "label": "Scheduled for",
+      "required": true
+    },
+    {
+      "name": "source",
+      "label": "Source",
+      "required": true,
+      "choices": [
+        {
+          "value": "scheduled",
+          "label": "scheduled"
+        },
+        {
+          "value": "manual",
+          "label": "manual"
+        }
+      ]
+    }
+  ]
+} as const;
+
+// --- InvoiceReminderAttempt.recordDelivered ---
+export interface InvoiceReminderAttemptRecordDeliveredClientInput {
+  emailId: string;
+  sessionId: string;
+  amountDue: number;
+  /** Must not be "". */
+  dueDate: string & { readonly __nonEmpty?: true };
+  timing: string;
+}
+
+export const InvoiceReminderAttemptRecordDeliveredCapability = {
+  capabilityId: "InvoiceReminderAttempt.recordDelivered",
+  entity: "InvoiceReminderAttempt",
+  command: "recordDelivered",
+  route: "/api/manifest/InvoiceReminderAttempt/commands/recordDelivered",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: ["dueDate"],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; offsetDays: number; scheduledFor: number | null; source: \"scheduled\" | \"manual\" | null; outcome: \"delivered\" | \"suppressed\" | \"failed\" | null; emailId: string | null; sessionId: string | null; amountDue: number | null; dueDate: number | null; timing: string | null; reason: string | null; attempt: number | null; message: string | null; retryScheduled: boolean | null; openedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["emailId","sessionId","amountDue","dueDate","timing"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Finance staff and managers may see reminder deliveries"},{"kind":"policy_denial","message":"Finance staff and managers may update reminder deliveries"},{"kind":"policy_denial","message":"Finance staff and managers may change reminder deliveries"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"InvoiceReminderAttempt not found"}],
+  emits: ["InvoiceReminderDelivered"],
+} as const;
+
+export type InvoiceReminderAttemptRecordDeliveredResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; offsetDays: number; scheduledFor: number | null; source: "scheduled" | "manual" | null; outcome: "delivered" | "suppressed" | "failed" | null; emailId: string | null; sessionId: string | null; amountDue: number | null; dueDate: number | null; timing: string | null; reason: string | null; attempt: number | null; message: string | null; retryScheduled: boolean | null; openedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for InvoiceReminderAttempt.recordDelivered.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindInvoiceReminderAttemptRecordDeliveredInput(client: InvoiceReminderAttemptRecordDeliveredClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful InvoiceReminderAttempt.recordDelivered. */
+export const InvoiceReminderAttemptRecordDeliveredInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.lists()",
+    "readId": "Invoice.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.detail(id)",
+    "readId": "Invoice.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer InvoiceReminderAttempt.recordDelivered. Not a rendered control. */
+export const InvoiceReminderAttemptRecordDeliveredAction = {
+  "exposure": "human",
+  "label": "Record delivered",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "emailId",
+      "label": "Email id",
+      "required": true
+    },
+    {
+      "name": "sessionId",
+      "label": "Session id",
+      "required": true
+    },
+    {
+      "name": "amountDue",
+      "label": "Amount due",
+      "required": true
+    },
+    {
+      "name": "dueDate",
+      "label": "Due date",
+      "required": true
+    },
+    {
+      "name": "timing",
+      "label": "Timing",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- InvoiceReminderAttempt.recordFailed ---
+export interface InvoiceReminderAttemptRecordFailedClientInput {
+  attempt: number;
+  message: string;
+  retryScheduled: boolean;
+}
+
+export const InvoiceReminderAttemptRecordFailedCapability = {
+  capabilityId: "InvoiceReminderAttempt.recordFailed",
+  entity: "InvoiceReminderAttempt",
+  command: "recordFailed",
+  route: "/api/manifest/InvoiceReminderAttempt/commands/recordFailed",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; offsetDays: number; scheduledFor: number | null; source: \"scheduled\" | \"manual\" | null; outcome: \"delivered\" | \"suppressed\" | \"failed\" | null; emailId: string | null; sessionId: string | null; amountDue: number | null; dueDate: number | null; timing: string | null; reason: string | null; attempt: number | null; message: string | null; retryScheduled: boolean | null; openedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["attempt","message","retryScheduled"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Finance staff and managers may see reminder deliveries"},{"kind":"policy_denial","message":"Finance staff and managers may update reminder deliveries"},{"kind":"policy_denial","message":"Finance staff and managers may change reminder deliveries"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"InvoiceReminderAttempt not found"}],
+  emits: ["InvoiceReminderDeliveryFailed"],
+} as const;
+
+export type InvoiceReminderAttemptRecordFailedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; offsetDays: number; scheduledFor: number | null; source: "scheduled" | "manual" | null; outcome: "delivered" | "suppressed" | "failed" | null; emailId: string | null; sessionId: string | null; amountDue: number | null; dueDate: number | null; timing: string | null; reason: string | null; attempt: number | null; message: string | null; retryScheduled: boolean | null; openedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for InvoiceReminderAttempt.recordFailed.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindInvoiceReminderAttemptRecordFailedInput(client: InvoiceReminderAttemptRecordFailedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful InvoiceReminderAttempt.recordFailed. */
+export const InvoiceReminderAttemptRecordFailedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.lists()",
+    "readId": "Invoice.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.detail(id)",
+    "readId": "Invoice.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer InvoiceReminderAttempt.recordFailed. Not a rendered control. */
+export const InvoiceReminderAttemptRecordFailedAction = {
+  "exposure": "human",
+  "label": "Record failed",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "attempt",
+      "label": "Attempt",
+      "required": true
+    },
+    {
+      "name": "message",
+      "label": "Message",
+      "required": true
+    },
+    {
+      "name": "retryScheduled",
+      "label": "Retry scheduled",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- InvoiceReminderAttempt.recordSuppressed ---
+export interface InvoiceReminderAttemptRecordSuppressedClientInput {
+  reason: string;
+}
+
+export const InvoiceReminderAttemptRecordSuppressedCapability = {
+  capabilityId: "InvoiceReminderAttempt.recordSuppressed",
+  entity: "InvoiceReminderAttempt",
+  command: "recordSuppressed",
+  route: "/api/manifest/InvoiceReminderAttempt/commands/recordSuppressed",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; offsetDays: number; scheduledFor: number | null; source: \"scheduled\" | \"manual\" | null; outcome: \"delivered\" | \"suppressed\" | \"failed\" | null; emailId: string | null; sessionId: string | null; amountDue: number | null; dueDate: number | null; timing: string | null; reason: string | null; attempt: number | null; message: string | null; retryScheduled: boolean | null; openedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Finance staff and managers may see reminder deliveries"},{"kind":"policy_denial","message":"Finance staff and managers may update reminder deliveries"},{"kind":"policy_denial","message":"Finance staff and managers may change reminder deliveries"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"InvoiceReminderAttempt not found"}],
+  emits: ["InvoiceReminderSuppressed"],
+} as const;
+
+export type InvoiceReminderAttemptRecordSuppressedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; offsetDays: number; scheduledFor: number | null; source: "scheduled" | "manual" | null; outcome: "delivered" | "suppressed" | "failed" | null; emailId: string | null; sessionId: string | null; amountDue: number | null; dueDate: number | null; timing: string | null; reason: string | null; attempt: number | null; message: string | null; retryScheduled: boolean | null; openedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for InvoiceReminderAttempt.recordSuppressed.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindInvoiceReminderAttemptRecordSuppressedInput(client: InvoiceReminderAttemptRecordSuppressedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful InvoiceReminderAttempt.recordSuppressed. */
+export const InvoiceReminderAttemptRecordSuppressedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.lists()",
+    "readId": "InvoiceReminderAttempt.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderAttempt",
+    "queryKeyHint": "queryKeys.invoiceReminderAttempt.detail(id)",
+    "readId": "InvoiceReminderAttempt.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.lists()",
+    "readId": "Invoice.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.detail(id)",
+    "readId": "Invoice.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer InvoiceReminderAttempt.recordSuppressed. Not a rendered control. */
+export const InvoiceReminderAttemptRecordSuppressedAction = {
+  "exposure": "human",
+  "label": "Record suppressed",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "reason",
+      "label": "Reason",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- InvoiceReminderSchedule.configure ---
+export interface InvoiceReminderScheduleConfigureClientInput {
+  invoiceId: string;
+  configId: string;
+  /** Must not be "". */
+  configuredAt: string & { readonly __nonEmpty?: true };
+  /** Must not be "". */
+  dueDate: string & { readonly __nonEmpty?: true };
+  offsetsDays: number[];
+}
+
+export const InvoiceReminderScheduleConfigureCapability = {
+  capabilityId: "InvoiceReminderSchedule.configure",
+  entity: "InvoiceReminderSchedule",
+  command: "configure",
+  route: "/api/manifest/InvoiceReminderSchedule/commands/configure",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: ["configuredAt","dueDate"],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["invoiceId","configId","configuredAt","dueDate","offsetsDays"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Finance staff and managers may see reminder schedules"},{"kind":"policy_denial","message":"Finance staff and managers may update reminder schedules"},{"kind":"policy_denial","message":"Finance staff and managers may change reminder schedules"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"A reminder schedule needs its ID"}],
+  emits: ["InvoiceReminderScheduleConfigured"],
+} as const;
+
+export type InvoiceReminderScheduleConfigureResult = { docId: string };
+
+/**
+ * Build command input for InvoiceReminderSchedule.configure.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindInvoiceReminderScheduleConfigureInput(client: InvoiceReminderScheduleConfigureClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful InvoiceReminderSchedule.configure. */
+export const InvoiceReminderScheduleConfigureInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.lists()",
+    "readId": "InvoiceReminderSchedule.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceReminderSchedule",
+    "queryKeyHint": "queryKeys.invoiceReminderSchedule.detail(id)",
+    "readId": "InvoiceReminderSchedule.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.lists()",
+    "readId": "Invoice.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.detail(id)",
+    "readId": "Invoice.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer InvoiceReminderSchedule.configure. Not a rendered control. */
+export const InvoiceReminderScheduleConfigureAction = {
+  "exposure": "human",
+  "label": "Configure",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "invoiceId",
+      "label": "Invoice id",
+      "required": true
+    },
+    {
+      "name": "configId",
+      "label": "Config id",
+      "required": true
+    },
+    {
+      "name": "configuredAt",
+      "label": "Configured at",
+      "required": true
+    },
+    {
+      "name": "dueDate",
+      "label": "Due date",
+      "required": true
+    },
+    {
+      "name": "offsetsDays",
+      "label": "Offsets days",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- InvoiceStripePayment.record ---
+export interface InvoiceStripePaymentRecordClientInput {
+  invoiceId: string;
+  sessionId: string;
+  paymentId: string;
+  amount: number;
+  method: string;
+}
+
+export const InvoiceStripePaymentRecordCapability = {
+  capabilityId: "InvoiceStripePayment.record",
+  entity: "InvoiceStripePayment",
+  command: "record",
+  route: "/api/manifest/InvoiceStripePayment/commands/record",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["invoiceId","sessionId","paymentId","amount","method"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Finance staff and managers may see Stripe payments"},{"kind":"policy_denial","message":"Finance staff and managers may update Stripe payments"},{"kind":"policy_denial","message":"Finance staff and managers may change Stripe payments"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"A Stripe payment needs its session"}],
+  emits: ["InvoiceStripePaymentRecorded"],
+} as const;
+
+export type InvoiceStripePaymentRecordResult = { docId: string };
+
+/**
+ * Build command input for InvoiceStripePayment.record.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindInvoiceStripePaymentRecordInput(client: InvoiceStripePaymentRecordClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful InvoiceStripePayment.record. */
+export const InvoiceStripePaymentRecordInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.lists()",
+    "readId": "InvoiceStripePayment.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InvoiceStripePayment",
+    "queryKeyHint": "queryKeys.invoiceStripePayment.detail(id)",
+    "readId": "InvoiceStripePayment.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.lists()",
+    "readId": "Invoice.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Invoice",
+    "queryKeyHint": "queryKeys.invoice.detail(id)",
+    "readId": "Invoice.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer InvoiceStripePayment.record. Not a rendered control. */
+export const InvoiceStripePaymentRecordAction = {
+  "exposure": "human",
+  "label": "Record",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "invoiceId",
+      "label": "Invoice id",
+      "required": true
+    },
+    {
+      "name": "sessionId",
+      "label": "Session id",
+      "required": true
+    },
+    {
+      "name": "paymentId",
+      "label": "Payment id",
+      "required": true
+    },
+    {
+      "name": "amount",
+      "label": "Amount",
+      "required": true
+    },
+    {
+      "name": "method",
+      "label": "Method",
+      "required": true
+    }
+  ]
+} as const;
 
 // --- ItemUnitMapping.record ---
 export interface ItemUnitMappingRecordClientInput {
@@ -112462,14 +114300,14 @@ export const ProposalAcceptCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["eventId","acceptedRevisionId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see proposals"},{"kind":"policy_denial","message":"Sales staff may update proposals"},{"kind":"policy_denial","message":"Sales staff may change proposals"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Proposal not found"}],
   emits: ["ProposalAccepted"],
 } as const;
 
-export type ProposalAcceptResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
+export type ProposalAcceptResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Proposal.accept.
@@ -112708,14 +114546,14 @@ export const ProposalConfirmChangeSourceCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see proposals"},{"kind":"policy_denial","message":"Sales staff may update proposals"},{"kind":"policy_denial","message":"Sales staff may change proposals"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"constraint_block","message":"A change stays with the client who accepted the proposal"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Proposal not found"}],
   emits: [],
 } as const;
 
-export type ProposalConfirmChangeSourceResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
+export type ProposalConfirmChangeSourceResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Proposal.confirmChangeSource.
@@ -112906,14 +114744,14 @@ export const ProposalDeclineCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see proposals"},{"kind":"policy_denial","message":"Sales staff may update proposals"},{"kind":"policy_denial","message":"Sales staff may change proposals"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Proposal not found"}],
   emits: ["ProposalDeclined"],
 } as const;
 
-export type ProposalDeclineResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
+export type ProposalDeclineResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Proposal.decline.
@@ -113446,14 +115284,14 @@ export const ProposalExpireCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see proposals"},{"kind":"policy_denial","message":"Sales staff may update proposals"},{"kind":"policy_denial","message":"Sales staff may change proposals"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Proposal not found"}],
   emits: ["ProposalExpired"],
 } as const;
 
-export type ProposalExpireResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
+export type ProposalExpireResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Proposal.expire.
@@ -113674,14 +115512,14 @@ export const ProposalFollowEventHeadcountCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["guestCount","subtotal","total"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see proposals"},{"kind":"policy_denial","message":"Sales staff may update proposals"},{"kind":"policy_denial","message":"Sales staff may change proposals"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"The guest count can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This proposal's money amounts can't be negative. Use zero or more."},{"kind":"constraint_block","message":"Proposal total must equal subtotal plus tax minus discount"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Proposal not found"}],
   emits: ["ProposalEventHeadcountFollowed"],
 } as const;
 
-export type ProposalFollowEventHeadcountResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
+export type ProposalFollowEventHeadcountResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Proposal.followEventHeadcount.
@@ -113888,14 +115726,14 @@ export const ProposalLinkEventCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see proposals"},{"kind":"policy_denial","message":"Sales staff may update proposals"},{"kind":"policy_denial","message":"Sales staff may change proposals"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"constraint_block","message":"Cannot link a cancelled event"},{"kind":"constraint_block","message":"Linked event must belong to the proposal's client"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Proposal not found"}],
   emits: ["ProposalEventLinked"],
 } as const;
 
-export type ProposalLinkEventResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
+export type ProposalLinkEventResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Proposal.linkEvent.
@@ -114100,14 +115938,14 @@ export const ProposalMarkViewedCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see proposals"},{"kind":"policy_denial","message":"Sales staff may update proposals"},{"kind":"policy_denial","message":"Sales staff may change proposals"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Proposal not found"}],
   emits: ["ProposalViewed"],
 } as const;
 
-export type ProposalMarkViewedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
+export type ProposalMarkViewedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Proposal.markViewed.
@@ -114314,14 +116152,14 @@ export const ProposalReassignClientCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see proposals"},{"kind":"policy_denial","message":"Sales staff may update proposals"},{"kind":"policy_denial","message":"Sales staff may change proposals"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"guard_failure","message":"Guard 6 failed"},{"kind":"guard_failure","message":"Guard 7 failed"},{"kind":"constraint_block","message":"Merge authorization does not match the proposal client"},{"kind":"constraint_block","message":"Merge authorization does not match the primary client"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Proposal not found"}],
   emits: ["ProposalClientReassigned"],
 } as const;
 
-export type ProposalReassignClientResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
+export type ProposalReassignClientResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Proposal.reassignClient.
@@ -114497,6 +116335,426 @@ export const ProposalReassignClientAction = {
   "fields": []
 } as const;
 
+// --- Proposal.recomputeTotals ---
+export interface ProposalRecomputeTotalsClientInput {
+  /** Bounds: 0..∞ */
+  subtotal: number;
+  /** Bounds: 0..∞ */
+  total: number;
+}
+
+export const ProposalRecomputeTotalsCapability = {
+  capabilityId: "Proposal.recomputeTotals",
+  entity: "Proposal",
+  command: "recomputeTotals",
+  route: "/api/manifest/Proposal/commands/recomputeTotals",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["subtotal","total"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales staff may see proposals"},{"kind":"policy_denial","message":"Sales staff may update proposals"},{"kind":"policy_denial","message":"Sales staff may change proposals"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This proposal's money amounts can't be negative. Use zero or more."},{"kind":"constraint_block","message":"Proposal total must equal subtotal plus tax minus discount"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Proposal not found"}],
+  emits: ["ProposalTotalsRecomputed"],
+} as const;
+
+export type ProposalRecomputeTotalsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Proposal.recomputeTotals.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindProposalRecomputeTotalsInput(client: ProposalRecomputeTotalsClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Proposal.recomputeTotals. */
+export const ProposalRecomputeTotalsInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProposalDishSelection",
+    "queryKeyHint": "queryKeys.proposalDishSelection.lists()",
+    "readId": "ProposalDishSelection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProposalDishSelection",
+    "queryKeyHint": "queryKeys.proposalDishSelection.detail(id)",
+    "readId": "ProposalDishSelection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProposalEnhancement",
+    "queryKeyHint": "queryKeys.proposalEnhancement.lists()",
+    "readId": "ProposalEnhancement.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProposalEnhancement",
+    "queryKeyHint": "queryKeys.proposalEnhancement.detail(id)",
+    "readId": "ProposalEnhancement.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProposalLineItem",
+    "queryKeyHint": "queryKeys.proposalLineItem.lists()",
+    "readId": "ProposalLineItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProposalLineItem",
+    "queryKeyHint": "queryKeys.proposalLineItem.detail(id)",
+    "readId": "ProposalLineItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProposalRevision",
+    "queryKeyHint": "queryKeys.proposalRevision.lists()",
+    "readId": "ProposalRevision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProposalRevision",
+    "queryKeyHint": "queryKeys.proposalRevision.detail(id)",
+    "readId": "ProposalRevision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "QuoteSubmission",
+    "queryKeyHint": "queryKeys.quoteSubmission.lists()",
+    "readId": "QuoteSubmission.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "QuoteSubmission",
+    "queryKeyHint": "queryKeys.quoteSubmission.detail(id)",
+    "readId": "QuoteSubmission.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ShareLink",
+    "queryKeyHint": "queryKeys.shareLink.lists()",
+    "readId": "ShareLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ShareLink",
+    "queryKeyHint": "queryKeys.shareLink.detail(id)",
+    "readId": "ShareLink.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Proposal.recomputeTotals. Not a rendered control. */
+export const ProposalRecomputeTotalsAction = {
+  "exposure": "human",
+  "label": "Recompute totals",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "subtotal",
+      "label": "Subtotal",
+      "required": true
+    },
+    {
+      "name": "total",
+      "label": "Total",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- Proposal.recordAcceptedRevision ---
+export interface ProposalRecordAcceptedRevisionClientInput {
+  acceptedRevisionId?: string;
+}
+
+export const ProposalRecordAcceptedRevisionCapability = {
+  capabilityId: "Proposal.recordAcceptedRevision",
+  entity: "Proposal",
+  command: "recordAcceptedRevision",
+  route: "/api/manifest/Proposal/commands/recordAcceptedRevision",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["acceptedRevisionId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales staff may see proposals"},{"kind":"policy_denial","message":"Sales staff may update proposals"},{"kind":"policy_denial","message":"Sales staff may change proposals"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Proposal not found"}],
+  emits: ["ProposalAcceptedRevisionRecorded"],
+} as const;
+
+export type ProposalRecordAcceptedRevisionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Proposal.recordAcceptedRevision.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindProposalRecordAcceptedRevisionInput(client: ProposalRecordAcceptedRevisionClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Proposal.recordAcceptedRevision. */
+export const ProposalRecordAcceptedRevisionInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProposalDishSelection",
+    "queryKeyHint": "queryKeys.proposalDishSelection.lists()",
+    "readId": "ProposalDishSelection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProposalDishSelection",
+    "queryKeyHint": "queryKeys.proposalDishSelection.detail(id)",
+    "readId": "ProposalDishSelection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProposalEnhancement",
+    "queryKeyHint": "queryKeys.proposalEnhancement.lists()",
+    "readId": "ProposalEnhancement.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProposalEnhancement",
+    "queryKeyHint": "queryKeys.proposalEnhancement.detail(id)",
+    "readId": "ProposalEnhancement.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProposalLineItem",
+    "queryKeyHint": "queryKeys.proposalLineItem.lists()",
+    "readId": "ProposalLineItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProposalLineItem",
+    "queryKeyHint": "queryKeys.proposalLineItem.detail(id)",
+    "readId": "ProposalLineItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProposalRevision",
+    "queryKeyHint": "queryKeys.proposalRevision.lists()",
+    "readId": "ProposalRevision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProposalRevision",
+    "queryKeyHint": "queryKeys.proposalRevision.detail(id)",
+    "readId": "ProposalRevision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "QuoteSubmission",
+    "queryKeyHint": "queryKeys.quoteSubmission.lists()",
+    "readId": "QuoteSubmission.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "QuoteSubmission",
+    "queryKeyHint": "queryKeys.quoteSubmission.detail(id)",
+    "readId": "QuoteSubmission.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ShareLink",
+    "queryKeyHint": "queryKeys.shareLink.lists()",
+    "readId": "ShareLink.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ShareLink",
+    "queryKeyHint": "queryKeys.shareLink.detail(id)",
+    "readId": "ShareLink.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Proposal.recordAcceptedRevision. Not a rendered control. */
+export const ProposalRecordAcceptedRevisionAction = {
+  "exposure": "human",
+  "label": "Record accepted revision",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "acceptedRevisionId",
+      "label": "Accepted revision id",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- Proposal.send ---
 export type ProposalSendClientInput = Record<string, never>;
 
@@ -114512,14 +116770,14 @@ export const ProposalSendCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see proposals"},{"kind":"policy_denial","message":"Sales staff may update proposals"},{"kind":"policy_denial","message":"Sales staff may change proposals"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"Give this proposal a title before you send it"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Proposal not found"}],
   emits: ["ProposalSent"],
 } as const;
 
-export type ProposalSendResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
+export type ProposalSendResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Proposal.send.
@@ -114729,14 +116987,14 @@ export const ProposalStageClientMergeCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["clientMergeId","clientId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see proposals"},{"kind":"policy_denial","message":"Sales staff may update proposals"},{"kind":"policy_denial","message":"Sales staff may change proposals"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Proposal already belongs to this client"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Proposal not found"}],
   emits: ["ProposalClientMergeStaged"],
 } as const;
 
-export type ProposalStageClientMergeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
+export type ProposalStageClientMergeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Proposal.stageClientMerge.
@@ -114940,14 +117198,14 @@ export const ProposalStageEventLinkCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["eventId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see proposals"},{"kind":"policy_denial","message":"Sales staff may update proposals"},{"kind":"policy_denial","message":"Sales staff may change proposals"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Proposal not found"}],
   emits: ["ProposalEventLinkStaged"],
 } as const;
 
-export type ProposalStageEventLinkResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
+export type ProposalStageEventLinkResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Proposal.stageEventLink.
@@ -115147,14 +117405,14 @@ export const ProposalSupersedeCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["revisedById","reason"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see proposals"},{"kind":"policy_denial","message":"Sales staff may update proposals"},{"kind":"policy_denial","message":"Sales staff may change proposals"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"A proposal cannot supersede itself"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Proposal not found"}],
   emits: ["ProposalSuperseded"],
 } as const;
 
-export type ProposalSupersedeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
+export type ProposalSupersedeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Proposal.supersede.
@@ -116230,6 +118488,87 @@ export const ProposalLineItemRemoveLineAction = {
   "label": "Remove line",
   "confirm": false,
   "fields": []
+} as const;
+
+// --- ProposalLineItem.restampAmount ---
+export interface ProposalLineItemRestampAmountClientInput {
+  /** Bounds: 0..∞ */
+  amount: number;
+}
+
+export const ProposalLineItemRestampAmountCapability = {
+  capabilityId: "ProposalLineItem.restampAmount",
+  entity: "ProposalLineItem",
+  command: "restampAmount",
+  route: "/api/manifest/ProposalLineItem/commands/restampAmount",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; proposalId: string; description: string; pricingBasis: \"per_person\" | \"per_unit\" | \"flat\" | \"percentage\" | \"package\"; unitPrice: number; quantity: number; unit: string | null; amount: number; sortOrder: number; notes: string | null; menuDishId: string | null; overrideReason: string | null; addedAt: number | null; removedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["amount"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales staff may see proposal line items"},{"kind":"policy_denial","message":"Sales staff may update proposal line items"},{"kind":"policy_denial","message":"Sales staff may change proposal line items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This line's price can't be negative. Use zero or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ProposalLineItem not found"}],
+  emits: ["ProposalLineItemRepriced"],
+} as const;
+
+export type ProposalLineItemRestampAmountResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; proposalId: string; description: string; pricingBasis: "per_person" | "per_unit" | "flat" | "percentage" | "package"; unitPrice: number; quantity: number; unit: string | null; amount: number; sortOrder: number; notes: string | null; menuDishId: string | null; overrideReason: string | null; addedAt: number | null; removedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for ProposalLineItem.restampAmount.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindProposalLineItemRestampAmountInput(client: ProposalLineItemRestampAmountClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ProposalLineItem.restampAmount. */
+export const ProposalLineItemRestampAmountInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ProposalLineItem",
+    "queryKeyHint": "queryKeys.proposalLineItem.lists()",
+    "readId": "ProposalLineItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProposalLineItem",
+    "queryKeyHint": "queryKeys.proposalLineItem.detail(id)",
+    "readId": "ProposalLineItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer ProposalLineItem.restampAmount. Not a rendered control. */
+export const ProposalLineItemRestampAmountAction = {
+  "exposure": "human",
+  "label": "Restamp amount",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "amount",
+      "label": "Amount",
+      "required": true
+    }
+  ]
 } as const;
 
 // --- ProposalLineItem.reviseLine ---
@@ -120393,6 +122732,10 @@ export const QuoteSubmissionDismissAction = {
 export interface QuoteSubmissionFailClientInput {
   errorMessage: string;
   processingErrors: string;
+  clientId?: string;
+  leadId?: string;
+  eventId?: string;
+  proposalId?: string;
 }
 
 export const QuoteSubmissionFailCapability = {
@@ -120408,7 +122751,7 @@ export const QuoteSubmissionFailCapability = {
   acceptsIdempotencyKey: true,
   resultKind: "instance",
   returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; notes: string | null; consentGrantedAt: number; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }",
-  clientParameterNames: ["errorMessage","processingErrors"],
+  clientParameterNames: ["errorMessage","processingErrors","clientId","leadId","eventId","proposalId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Anyone may check a quote request"},{"kind":"policy_denial","message":"Only sales staff may update quote submissions"},{"kind":"policy_denial","message":"Anyone may send a quote request"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"QuoteSubmission not found"}],
   emits: ["QuoteProcessingFailed"],
@@ -120541,6 +122884,26 @@ export const QuoteSubmissionFailAction = {
       "name": "processingErrors",
       "label": "Processing errors",
       "required": true
+    },
+    {
+      "name": "clientId",
+      "label": "Client id",
+      "required": false
+    },
+    {
+      "name": "leadId",
+      "label": "Lead id",
+      "required": false
+    },
+    {
+      "name": "eventId",
+      "label": "Event id",
+      "required": false
+    },
+    {
+      "name": "proposalId",
+      "label": "Proposal id",
+      "required": false
     }
   ]
 } as const;
@@ -125580,6 +127943,100 @@ export const ShareLinkCreateAction = {
   ]
 } as const;
 
+// --- ShareLink.recordView ---
+export interface ShareLinkRecordViewClientInput {
+  viewerIdentity?: string;
+}
+
+export const ShareLinkRecordViewCapability = {
+  capabilityId: "ShareLink.recordView",
+  entity: "ShareLink",
+  command: "recordView",
+  route: "/api/manifest/ShareLink/commands/recordView",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; proposalId: string; proposalRevisionId: string; status: \"active\" | \"revoked\"; expiresAt: number | null; revokedAt: number | null; revokedByPersonId: string | null; createdByPersonId: string | null; viewCount: number; firstViewedAt: number | null; lastViewedAt: number | null; lastViewerIdentity: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["viewerIdentity"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales staff may see share links"},{"kind":"policy_denial","message":"Sales staff may update share links"},{"kind":"policy_denial","message":"Sales staff may change share links"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ShareLink not found"}],
+  emits: ["ShareLinkViewed"],
+} as const;
+
+export type ShareLinkRecordViewResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; proposalId: string; proposalRevisionId: string; status: "active" | "revoked"; expiresAt: number | null; revokedAt: number | null; revokedByPersonId: string | null; createdByPersonId: string | null; viewCount: number; firstViewedAt: number | null; lastViewedAt: number | null; lastViewerIdentity: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for ShareLink.recordView.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindShareLinkRecordViewInput(client: ShareLinkRecordViewClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ShareLink.recordView. */
+export const ShareLinkRecordViewInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ShareLink",
+    "queryKeyHint": "queryKeys.shareLink.lists()",
+    "readId": "ShareLink.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ShareLink",
+    "queryKeyHint": "queryKeys.shareLink.detail(id)",
+    "readId": "ShareLink.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProposalRevision",
+    "queryKeyHint": "queryKeys.proposalRevision.lists()",
+    "readId": "ProposalRevision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProposalRevision",
+    "queryKeyHint": "queryKeys.proposalRevision.detail(id)",
+    "readId": "ProposalRevision.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer ShareLink.recordView. Not a rendered control. */
+export const ShareLinkRecordViewAction = {
+  "exposure": "human",
+  "label": "Record view",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "viewerIdentity",
+      "label": "Viewer identity",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- ShareLink.revoke ---
 export type ShareLinkRevokeClientInput = Record<string, never>;
 
@@ -129404,6 +131861,148 @@ export const SignatureRequestCompleteLifecycle = [
   }
 ] as const;
 
+// --- SignatureRequest.completeInternal ---
+export interface SignatureRequestCompleteInternalClientInput {
+  signedArtifactReference: string;
+  signerIpAddress?: string;
+  signerUserAgent?: string;
+  acceptProposalId?: string;
+}
+
+export const SignatureRequestCompleteInternalCapability = {
+  capabilityId: "SignatureRequest.completeInternal",
+  entity: "SignatureRequest",
+  command: "completeInternal",
+  route: "/api/manifest/SignatureRequest/commands/completeInternal",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; proposalRevisionId: string; proposalId: string | null; recipientEmail: string; recipientName: string; recipientPersonId: string | null; recipientContactId: string | null; status: \"requested\" | \"expired\" | \"completed\" | \"revoked\"; provider: \"internal\" | \"docusign\" | \"hellosign\" | \"pandadoc\" | \"other\"; providerIds: string | null; callbackToken: string | null; requestedAt: number | null; expiresAt: number | null; completedAt: number | null; expiredAt: number | null; revokedAt: number | null; signedArtifactReference: string | null; signerIpAddress: string | null; signerUserAgent: string | null; requestedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["signedArtifactReference","signerIpAddress","signerUserAgent","acceptProposalId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales staff may see signature requests"},{"kind":"policy_denial","message":"Sales staff may update signature requests"},{"kind":"policy_denial","message":"Sales staff and clients may change signature requests"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"guard_failure","message":"Guard 6 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"SignatureRequest not found"}],
+  emits: ["SignatureCompleted"],
+} as const;
+
+export type SignatureRequestCompleteInternalResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; proposalRevisionId: string; proposalId: string | null; recipientEmail: string; recipientName: string; recipientPersonId: string | null; recipientContactId: string | null; status: "requested" | "expired" | "completed" | "revoked"; provider: "internal" | "docusign" | "hellosign" | "pandadoc" | "other"; providerIds: string | null; callbackToken: string | null; requestedAt: number | null; expiresAt: number | null; completedAt: number | null; expiredAt: number | null; revokedAt: number | null; signedArtifactReference: string | null; signerIpAddress: string | null; signerUserAgent: string | null; requestedByPersonId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for SignatureRequest.completeInternal.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindSignatureRequestCompleteInternalInput(client: SignatureRequestCompleteInternalClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful SignatureRequest.completeInternal. */
+export const SignatureRequestCompleteInternalInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "SignatureRequest",
+    "queryKeyHint": "queryKeys.signatureRequest.lists()",
+    "readId": "SignatureRequest.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "SignatureRequest",
+    "queryKeyHint": "queryKeys.signatureRequest.detail(id)",
+    "readId": "SignatureRequest.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProposalRevision",
+    "queryKeyHint": "queryKeys.proposalRevision.lists()",
+    "readId": "ProposalRevision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProposalRevision",
+    "queryKeyHint": "queryKeys.proposalRevision.detail(id)",
+    "readId": "ProposalRevision.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer SignatureRequest.completeInternal. Not a rendered control. */
+export const SignatureRequestCompleteInternalAction = {
+  "exposure": "human",
+  "label": "Complete internal",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "signedArtifactReference",
+      "label": "Signed artifact reference",
+      "required": true
+    },
+    {
+      "name": "signerIpAddress",
+      "label": "Signer ip address",
+      "required": false
+    },
+    {
+      "name": "signerUserAgent",
+      "label": "Signer user agent",
+      "required": false
+    },
+    {
+      "name": "acceptProposalId",
+      "label": "Accept proposal id",
+      "required": false
+    }
+  ],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "requested"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for SignatureRequest.completeInternal. */
+export const SignatureRequestCompleteInternalLifecycle = [
+  {
+    "property": "status",
+    "from": "requested",
+    "to": "completed",
+    "proven": true
+  }
+] as const;
+
 // --- SignatureRequest.expire ---
 export type SignatureRequestExpireClientInput = Record<string, never>;
 
@@ -129774,6 +132373,476 @@ export const SignatureRequestRevokeLifecycle = [
     "proven": true
   }
 ] as const;
+
+// --- SmsAlertDelivery.open ---
+export interface SmsAlertDeliveryOpenClientInput {
+  triggerKey: string;
+  personId: string;
+  alertType: string;
+}
+
+export const SmsAlertDeliveryOpenCapability = {
+  capabilityId: "SmsAlertDelivery.open",
+  entity: "SmsAlertDelivery",
+  command: "open",
+  route: "/api/manifest/SmsAlertDelivery/commands/open",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["triggerKey","personId","alertType"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see SMS alert deliveries"},{"kind":"policy_denial","message":"Managers may update SMS alert deliveries"},{"kind":"policy_denial","message":"Managers may change SMS alert deliveries"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"}],
+  emits: [],
+} as const;
+
+export type SmsAlertDeliveryOpenResult = { docId: string };
+
+/**
+ * Build command input for SmsAlertDelivery.open.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindSmsAlertDeliveryOpenInput(client: SmsAlertDeliveryOpenClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful SmsAlertDelivery.open. */
+export const SmsAlertDeliveryOpenInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "SmsAlertDelivery",
+    "queryKeyHint": "queryKeys.smsAlertDelivery.lists()",
+    "readId": "SmsAlertDelivery.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "SmsAlertDelivery",
+    "queryKeyHint": "queryKeys.smsAlertDelivery.detail(id)",
+    "readId": "SmsAlertDelivery.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer SmsAlertDelivery.open. Not a rendered control. */
+export const SmsAlertDeliveryOpenAction = {
+  "exposure": "human",
+  "label": "Open",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "triggerKey",
+      "label": "Trigger key",
+      "required": true
+    },
+    {
+      "name": "personId",
+      "label": "Person id",
+      "required": true
+    },
+    {
+      "name": "alertType",
+      "label": "Alert type",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- SmsAlertDelivery.recordFailed ---
+export interface SmsAlertDeliveryRecordFailedClientInput {
+  error: string;
+}
+
+export const SmsAlertDeliveryRecordFailedCapability = {
+  capabilityId: "SmsAlertDelivery.recordFailed",
+  entity: "SmsAlertDelivery",
+  command: "recordFailed",
+  route: "/api/manifest/SmsAlertDelivery/commands/recordFailed",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; triggerKey: string; personId: string; alertType: string; sentAt: number | null; failedAt: number | null; messageSid: string | null; error: string | null; openedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["error"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see SMS alert deliveries"},{"kind":"policy_denial","message":"Managers may update SMS alert deliveries"},{"kind":"policy_denial","message":"Managers may change SMS alert deliveries"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"SmsAlertDelivery not found"}],
+  emits: ["SmsAlertFailed"],
+} as const;
+
+export type SmsAlertDeliveryRecordFailedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; triggerKey: string; personId: string; alertType: string; sentAt: number | null; failedAt: number | null; messageSid: string | null; error: string | null; openedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for SmsAlertDelivery.recordFailed.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindSmsAlertDeliveryRecordFailedInput(client: SmsAlertDeliveryRecordFailedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful SmsAlertDelivery.recordFailed. */
+export const SmsAlertDeliveryRecordFailedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "SmsAlertDelivery",
+    "queryKeyHint": "queryKeys.smsAlertDelivery.lists()",
+    "readId": "SmsAlertDelivery.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "SmsAlertDelivery",
+    "queryKeyHint": "queryKeys.smsAlertDelivery.detail(id)",
+    "readId": "SmsAlertDelivery.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer SmsAlertDelivery.recordFailed. Not a rendered control. */
+export const SmsAlertDeliveryRecordFailedAction = {
+  "exposure": "human",
+  "label": "Record failed",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "error",
+      "label": "Error",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- SmsAlertDelivery.recordSent ---
+export interface SmsAlertDeliveryRecordSentClientInput {
+  messageSid: string;
+}
+
+export const SmsAlertDeliveryRecordSentCapability = {
+  capabilityId: "SmsAlertDelivery.recordSent",
+  entity: "SmsAlertDelivery",
+  command: "recordSent",
+  route: "/api/manifest/SmsAlertDelivery/commands/recordSent",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; triggerKey: string; personId: string; alertType: string; sentAt: number | null; failedAt: number | null; messageSid: string | null; error: string | null; openedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["messageSid"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see SMS alert deliveries"},{"kind":"policy_denial","message":"Managers may update SMS alert deliveries"},{"kind":"policy_denial","message":"Managers may change SMS alert deliveries"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"SmsAlertDelivery not found"}],
+  emits: ["SmsAlertSent"],
+} as const;
+
+export type SmsAlertDeliveryRecordSentResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; triggerKey: string; personId: string; alertType: string; sentAt: number | null; failedAt: number | null; messageSid: string | null; error: string | null; openedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for SmsAlertDelivery.recordSent.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindSmsAlertDeliveryRecordSentInput(client: SmsAlertDeliveryRecordSentClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful SmsAlertDelivery.recordSent. */
+export const SmsAlertDeliveryRecordSentInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "SmsAlertDelivery",
+    "queryKeyHint": "queryKeys.smsAlertDelivery.lists()",
+    "readId": "SmsAlertDelivery.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "SmsAlertDelivery",
+    "queryKeyHint": "queryKeys.smsAlertDelivery.detail(id)",
+    "readId": "SmsAlertDelivery.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer SmsAlertDelivery.recordSent. Not a rendered control. */
+export const SmsAlertDeliveryRecordSentAction = {
+  "exposure": "human",
+  "label": "Record sent",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "messageSid",
+      "label": "Message sid",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- SmsAlertSetting.disable ---
+export type SmsAlertSettingDisableClientInput = Record<string, never>;
+
+export const SmsAlertSettingDisableCapability = {
+  capabilityId: "SmsAlertSetting.disable",
+  entity: "SmsAlertSetting",
+  command: "disable",
+  route: "/api/manifest/SmsAlertSetting/commands/disable",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; enabled: boolean | null; chainId: string | null; changedAt: number | null; changedBy: string | null; lastScanAt: number | null; lastScanSent: number | null; lastScanFailed: number | null; lastScanError: string | null; openedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see SMS alert settings"},{"kind":"policy_denial","message":"Managers may update SMS alert settings"},{"kind":"policy_denial","message":"Managers may change SMS alert settings"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"SmsAlertSetting not found"}],
+  emits: ["SmsAlertsDisabled"],
+} as const;
+
+export type SmsAlertSettingDisableResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; enabled: boolean | null; chainId: string | null; changedAt: number | null; changedBy: string | null; lastScanAt: number | null; lastScanSent: number | null; lastScanFailed: number | null; lastScanError: string | null; openedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for SmsAlertSetting.disable.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindSmsAlertSettingDisableInput(client: SmsAlertSettingDisableClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful SmsAlertSetting.disable. */
+export const SmsAlertSettingDisableInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "SmsAlertSetting",
+    "queryKeyHint": "queryKeys.smsAlertSetting.lists()",
+    "readId": "SmsAlertSetting.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "SmsAlertSetting",
+    "queryKeyHint": "queryKeys.smsAlertSetting.detail(id)",
+    "readId": "SmsAlertSetting.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer SmsAlertSetting.disable. Not a rendered control. */
+export const SmsAlertSettingDisableAction = {
+  "exposure": "human",
+  "label": "Disable",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- SmsAlertSetting.enable ---
+export interface SmsAlertSettingEnableClientInput {
+  chainId: string;
+}
+
+export const SmsAlertSettingEnableCapability = {
+  capabilityId: "SmsAlertSetting.enable",
+  entity: "SmsAlertSetting",
+  command: "enable",
+  route: "/api/manifest/SmsAlertSetting/commands/enable",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; enabled: boolean | null; chainId: string | null; changedAt: number | null; changedBy: string | null; lastScanAt: number | null; lastScanSent: number | null; lastScanFailed: number | null; lastScanError: string | null; openedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["chainId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see SMS alert settings"},{"kind":"policy_denial","message":"Managers may update SMS alert settings"},{"kind":"policy_denial","message":"Managers may change SMS alert settings"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Turning SMS alerts on needs a scan chain ID"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"SmsAlertSetting not found"}],
+  emits: ["SmsAlertsEnabled"],
+} as const;
+
+export type SmsAlertSettingEnableResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; enabled: boolean | null; chainId: string | null; changedAt: number | null; changedBy: string | null; lastScanAt: number | null; lastScanSent: number | null; lastScanFailed: number | null; lastScanError: string | null; openedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for SmsAlertSetting.enable.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindSmsAlertSettingEnableInput(client: SmsAlertSettingEnableClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful SmsAlertSetting.enable. */
+export const SmsAlertSettingEnableInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "SmsAlertSetting",
+    "queryKeyHint": "queryKeys.smsAlertSetting.lists()",
+    "readId": "SmsAlertSetting.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "SmsAlertSetting",
+    "queryKeyHint": "queryKeys.smsAlertSetting.detail(id)",
+    "readId": "SmsAlertSetting.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer SmsAlertSetting.enable. Not a rendered control. */
+export const SmsAlertSettingEnableAction = {
+  "exposure": "human",
+  "label": "Enable",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "chainId",
+      "label": "Chain id",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- SmsAlertSetting.open ---
+export type SmsAlertSettingOpenClientInput = Record<string, never>;
+
+export const SmsAlertSettingOpenCapability = {
+  capabilityId: "SmsAlertSetting.open",
+  entity: "SmsAlertSetting",
+  command: "open",
+  route: "/api/manifest/SmsAlertSetting/commands/open",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see SMS alert settings"},{"kind":"policy_denial","message":"Managers may update SMS alert settings"},{"kind":"policy_denial","message":"Managers may change SMS alert settings"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This workspace already has SMS alert settings"}],
+  emits: [],
+} as const;
+
+export type SmsAlertSettingOpenResult = { docId: string };
+
+/**
+ * Build command input for SmsAlertSetting.open.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindSmsAlertSettingOpenInput(client: SmsAlertSettingOpenClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful SmsAlertSetting.open. */
+export const SmsAlertSettingOpenInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "SmsAlertSetting",
+    "queryKeyHint": "queryKeys.smsAlertSetting.lists()",
+    "readId": "SmsAlertSetting.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "SmsAlertSetting",
+    "queryKeyHint": "queryKeys.smsAlertSetting.detail(id)",
+    "readId": "SmsAlertSetting.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer SmsAlertSetting.open. Not a rendered control. */
+export const SmsAlertSettingOpenAction = {
+  "exposure": "human",
+  "label": "Open",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- SmsAlertSetting.recordScan ---
+export interface SmsAlertSettingRecordScanClientInput {
+  sent: number;
+  failed: number;
+  error?: string;
+}
+
+export const SmsAlertSettingRecordScanCapability = {
+  capabilityId: "SmsAlertSetting.recordScan",
+  entity: "SmsAlertSetting",
+  command: "recordScan",
+  route: "/api/manifest/SmsAlertSetting/commands/recordScan",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; enabled: boolean | null; chainId: string | null; changedAt: number | null; changedBy: string | null; lastScanAt: number | null; lastScanSent: number | null; lastScanFailed: number | null; lastScanError: string | null; openedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["sent","failed","error"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see SMS alert settings"},{"kind":"policy_denial","message":"Managers may update SMS alert settings"},{"kind":"policy_denial","message":"Managers may change SMS alert settings"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"SmsAlertSetting not found"}],
+  emits: ["SmsAlertsScanned"],
+} as const;
+
+export type SmsAlertSettingRecordScanResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; enabled: boolean | null; chainId: string | null; changedAt: number | null; changedBy: string | null; lastScanAt: number | null; lastScanSent: number | null; lastScanFailed: number | null; lastScanError: string | null; openedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for SmsAlertSetting.recordScan.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindSmsAlertSettingRecordScanInput(client: SmsAlertSettingRecordScanClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful SmsAlertSetting.recordScan. */
+export const SmsAlertSettingRecordScanInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "SmsAlertSetting",
+    "queryKeyHint": "queryKeys.smsAlertSetting.lists()",
+    "readId": "SmsAlertSetting.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "SmsAlertSetting",
+    "queryKeyHint": "queryKeys.smsAlertSetting.detail(id)",
+    "readId": "SmsAlertSetting.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer SmsAlertSetting.recordScan. Not a rendered control. */
+export const SmsAlertSettingRecordScanAction = {
+  "exposure": "human",
+  "label": "Record scan",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "sent",
+      "label": "Sent",
+      "required": true
+    },
+    {
+      "name": "failed",
+      "label": "Failed",
+      "required": true
+    },
+    {
+      "name": "error",
+      "label": "Error",
+      "required": false
+    }
+  ]
+} as const;
 
 // --- StaffChatReadCursor.open ---
 export interface StaffChatReadCursorOpenClientInput {
@@ -149615,6 +152684,15 @@ export const ALL_CAPABILITY_IDS = [
   "Invoice.setDeposit",
   "Invoice.stageClientMerge",
   "Invoice.writeOff",
+  "InvoicePaymentLink.announceCreated",
+  "InvoicePaymentLink.announceReminderLink",
+  "InvoicePaymentLink.open",
+  "InvoiceReminderAttempt.open",
+  "InvoiceReminderAttempt.recordDelivered",
+  "InvoiceReminderAttempt.recordFailed",
+  "InvoiceReminderAttempt.recordSuppressed",
+  "InvoiceReminderSchedule.configure",
+  "InvoiceStripePayment.record",
   "ItemUnitMapping.record",
   "ItemUnitMapping.retire",
   "Lead.capture",
@@ -149770,6 +152848,8 @@ export const ALL_CAPABILITY_IDS = [
   "Proposal.linkEvent",
   "Proposal.markViewed",
   "Proposal.reassignClient",
+  "Proposal.recomputeTotals",
+  "Proposal.recordAcceptedRevision",
   "Proposal.send",
   "Proposal.stageClientMerge",
   "Proposal.stageEventLink",
@@ -149782,6 +152862,7 @@ export const ALL_CAPABILITY_IDS = [
   "ProposalEnhancement.withdraw",
   "ProposalLineItem.addLine",
   "ProposalLineItem.removeLine",
+  "ProposalLineItem.restampAmount",
   "ProposalLineItem.reviseLine",
   "ProposalRevision.capture",
   "ProposalTemplate.archive",
@@ -149849,6 +152930,7 @@ export const ALL_CAPABILITY_IDS = [
   "ServiceStyleKitItem.retire",
   "ServiceStyleKitItem.revise",
   "ShareLink.create",
+  "ShareLink.recordView",
   "ShareLink.revoke",
   "Shift.applyApprovedSwap",
   "Shift.cancel",
@@ -149871,9 +152953,17 @@ export const ALL_CAPABILITY_IDS = [
   "ShiftType.reactivate",
   "ShiftType.retire",
   "SignatureRequest.complete",
+  "SignatureRequest.completeInternal",
   "SignatureRequest.expire",
   "SignatureRequest.requestSignature",
   "SignatureRequest.revoke",
+  "SmsAlertDelivery.open",
+  "SmsAlertDelivery.recordFailed",
+  "SmsAlertDelivery.recordSent",
+  "SmsAlertSetting.disable",
+  "SmsAlertSetting.enable",
+  "SmsAlertSetting.open",
+  "SmsAlertSetting.recordScan",
   "StaffChatReadCursor.open",
   "StaffChatReadCursor.touch",
   "StaffMessage.edit",
@@ -150397,6 +153487,22 @@ export const ALL_READ_IDS = [
   "InvoiceNumberSequence.byTenantId",
   "InvoiceNumberSequence.get",
   "InvoiceNumberSequence.list",
+  "InvoicePaymentLink.byInvoiceId",
+  "InvoicePaymentLink.byTenantId",
+  "InvoicePaymentLink.get",
+  "InvoicePaymentLink.list",
+  "InvoiceReminderAttempt.byInvoiceId",
+  "InvoiceReminderAttempt.byTenantId",
+  "InvoiceReminderAttempt.get",
+  "InvoiceReminderAttempt.list",
+  "InvoiceReminderSchedule.byInvoiceId",
+  "InvoiceReminderSchedule.byTenantId",
+  "InvoiceReminderSchedule.get",
+  "InvoiceReminderSchedule.list",
+  "InvoiceStripePayment.byInvoiceId",
+  "InvoiceStripePayment.byTenantId",
+  "InvoiceStripePayment.get",
+  "InvoiceStripePayment.list",
   "ItemUnitMapping.byIngredientId",
   "ItemUnitMapping.byTenantId",
   "ItemUnitMapping.get",
@@ -150686,6 +153792,12 @@ export const ALL_READ_IDS = [
   "SignatureRequest.byTenantId",
   "SignatureRequest.get",
   "SignatureRequest.list",
+  "SmsAlertDelivery.byTenantId",
+  "SmsAlertDelivery.get",
+  "SmsAlertDelivery.list",
+  "SmsAlertSetting.byTenantId",
+  "SmsAlertSetting.get",
+  "SmsAlertSetting.list",
   "StaffChatReadCursor.byAuthSubjectId",
   "StaffChatReadCursor.byChannelKey",
   "StaffChatReadCursor.byTenantId",
@@ -152025,6 +155137,54 @@ export type getInvoiceNumberSequenceResult = { _id: string; _creationTime: numbe
 export const listInvoiceNumberSequenceRead = {"entity":"InvoiceNumberSequence","readId":"InvoiceNumberSequence.list","exportName":"listInvoiceNumberSequence","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; lastNumber: number; createdAt: number; updatedAt: number }>"} as const;
 export type listInvoiceNumberSequenceResult = Array<{ _id: string; _creationTime: number; tenantId: string; lastNumber: number; createdAt: number; updatedAt: number }>;
 
+export const listInvoicePaymentLinkByInvoiceIdRead = {"entity":"InvoicePaymentLink","readId":"InvoicePaymentLink.byInvoiceId","exportName":"listInvoicePaymentLinkByInvoiceId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"invoiceId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; url: string; amount: number; createdByUserId: string | null; configId: string | null; offsetDays: number | null; scheduledFor: number | null; source: \"scheduled\" | \"manual\" | null; openedAt: number | null; announcedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listInvoicePaymentLinkByInvoiceIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; url: string; amount: number; createdByUserId: string | null; configId: string | null; offsetDays: number | null; scheduledFor: number | null; source: "scheduled" | "manual" | null; openedAt: number | null; announcedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listInvoicePaymentLinkByTenantIdRead = {"entity":"InvoicePaymentLink","readId":"InvoicePaymentLink.byTenantId","exportName":"listInvoicePaymentLinkByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; url: string; amount: number; createdByUserId: string | null; configId: string | null; offsetDays: number | null; scheduledFor: number | null; source: \"scheduled\" | \"manual\" | null; openedAt: number | null; announcedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listInvoicePaymentLinkByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; url: string; amount: number; createdByUserId: string | null; configId: string | null; offsetDays: number | null; scheduledFor: number | null; source: "scheduled" | "manual" | null; openedAt: number | null; announcedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getInvoicePaymentLinkRead = {"entity":"InvoicePaymentLink","readId":"InvoicePaymentLink.get","exportName":"getInvoicePaymentLink","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; url: string; amount: number; createdByUserId: string | null; configId: string | null; offsetDays: number | null; scheduledFor: number | null; source: \"scheduled\" | \"manual\" | null; openedAt: number | null; announcedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getInvoicePaymentLinkResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; url: string; amount: number; createdByUserId: string | null; configId: string | null; offsetDays: number | null; scheduledFor: number | null; source: "scheduled" | "manual" | null; openedAt: number | null; announcedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listInvoicePaymentLinkRead = {"entity":"InvoicePaymentLink","readId":"InvoicePaymentLink.list","exportName":"listInvoicePaymentLink","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; url: string; amount: number; createdByUserId: string | null; configId: string | null; offsetDays: number | null; scheduledFor: number | null; source: \"scheduled\" | \"manual\" | null; openedAt: number | null; announcedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listInvoicePaymentLinkResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; url: string; amount: number; createdByUserId: string | null; configId: string | null; offsetDays: number | null; scheduledFor: number | null; source: "scheduled" | "manual" | null; openedAt: number | null; announcedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listInvoiceReminderAttemptByInvoiceIdRead = {"entity":"InvoiceReminderAttempt","readId":"InvoiceReminderAttempt.byInvoiceId","exportName":"listInvoiceReminderAttemptByInvoiceId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"invoiceId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; offsetDays: number; scheduledFor: number | null; source: \"scheduled\" | \"manual\" | null; outcome: \"delivered\" | \"suppressed\" | \"failed\" | null; emailId: string | null; sessionId: string | null; amountDue: number | null; dueDate: number | null; timing: string | null; reason: string | null; attempt: number | null; message: string | null; retryScheduled: boolean | null; openedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listInvoiceReminderAttemptByInvoiceIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; offsetDays: number; scheduledFor: number | null; source: "scheduled" | "manual" | null; outcome: "delivered" | "suppressed" | "failed" | null; emailId: string | null; sessionId: string | null; amountDue: number | null; dueDate: number | null; timing: string | null; reason: string | null; attempt: number | null; message: string | null; retryScheduled: boolean | null; openedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listInvoiceReminderAttemptByTenantIdRead = {"entity":"InvoiceReminderAttempt","readId":"InvoiceReminderAttempt.byTenantId","exportName":"listInvoiceReminderAttemptByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; offsetDays: number; scheduledFor: number | null; source: \"scheduled\" | \"manual\" | null; outcome: \"delivered\" | \"suppressed\" | \"failed\" | null; emailId: string | null; sessionId: string | null; amountDue: number | null; dueDate: number | null; timing: string | null; reason: string | null; attempt: number | null; message: string | null; retryScheduled: boolean | null; openedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listInvoiceReminderAttemptByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; offsetDays: number; scheduledFor: number | null; source: "scheduled" | "manual" | null; outcome: "delivered" | "suppressed" | "failed" | null; emailId: string | null; sessionId: string | null; amountDue: number | null; dueDate: number | null; timing: string | null; reason: string | null; attempt: number | null; message: string | null; retryScheduled: boolean | null; openedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getInvoiceReminderAttemptRead = {"entity":"InvoiceReminderAttempt","readId":"InvoiceReminderAttempt.get","exportName":"getInvoiceReminderAttempt","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; offsetDays: number; scheduledFor: number | null; source: \"scheduled\" | \"manual\" | null; outcome: \"delivered\" | \"suppressed\" | \"failed\" | null; emailId: string | null; sessionId: string | null; amountDue: number | null; dueDate: number | null; timing: string | null; reason: string | null; attempt: number | null; message: string | null; retryScheduled: boolean | null; openedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getInvoiceReminderAttemptResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; offsetDays: number; scheduledFor: number | null; source: "scheduled" | "manual" | null; outcome: "delivered" | "suppressed" | "failed" | null; emailId: string | null; sessionId: string | null; amountDue: number | null; dueDate: number | null; timing: string | null; reason: string | null; attempt: number | null; message: string | null; retryScheduled: boolean | null; openedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listInvoiceReminderAttemptRead = {"entity":"InvoiceReminderAttempt","readId":"InvoiceReminderAttempt.list","exportName":"listInvoiceReminderAttempt","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; offsetDays: number; scheduledFor: number | null; source: \"scheduled\" | \"manual\" | null; outcome: \"delivered\" | \"suppressed\" | \"failed\" | null; emailId: string | null; sessionId: string | null; amountDue: number | null; dueDate: number | null; timing: string | null; reason: string | null; attempt: number | null; message: string | null; retryScheduled: boolean | null; openedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listInvoiceReminderAttemptResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; offsetDays: number; scheduledFor: number | null; source: "scheduled" | "manual" | null; outcome: "delivered" | "suppressed" | "failed" | null; emailId: string | null; sessionId: string | null; amountDue: number | null; dueDate: number | null; timing: string | null; reason: string | null; attempt: number | null; message: string | null; retryScheduled: boolean | null; openedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listInvoiceReminderScheduleByInvoiceIdRead = {"entity":"InvoiceReminderSchedule","readId":"InvoiceReminderSchedule.byInvoiceId","exportName":"listInvoiceReminderScheduleByInvoiceId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"invoiceId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; configuredAt: number | null; dueDate: number | null; offsetsDays: number[] | null; openedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listInvoiceReminderScheduleByInvoiceIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; configuredAt: number | null; dueDate: number | null; offsetsDays: number[] | null; openedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listInvoiceReminderScheduleByTenantIdRead = {"entity":"InvoiceReminderSchedule","readId":"InvoiceReminderSchedule.byTenantId","exportName":"listInvoiceReminderScheduleByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; configuredAt: number | null; dueDate: number | null; offsetsDays: number[] | null; openedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listInvoiceReminderScheduleByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; configuredAt: number | null; dueDate: number | null; offsetsDays: number[] | null; openedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getInvoiceReminderScheduleRead = {"entity":"InvoiceReminderSchedule","readId":"InvoiceReminderSchedule.get","exportName":"getInvoiceReminderSchedule","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; configuredAt: number | null; dueDate: number | null; offsetsDays: number[] | null; openedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getInvoiceReminderScheduleResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; configuredAt: number | null; dueDate: number | null; offsetsDays: number[] | null; openedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listInvoiceReminderScheduleRead = {"entity":"InvoiceReminderSchedule","readId":"InvoiceReminderSchedule.list","exportName":"listInvoiceReminderSchedule","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; configuredAt: number | null; dueDate: number | null; offsetsDays: number[] | null; openedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listInvoiceReminderScheduleResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; configId: string; configuredAt: number | null; dueDate: number | null; offsetsDays: number[] | null; openedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listInvoiceStripePaymentByInvoiceIdRead = {"entity":"InvoiceStripePayment","readId":"InvoiceStripePayment.byInvoiceId","exportName":"listInvoiceStripePaymentByInvoiceId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"invoiceId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; paymentId: string; amount: number; method: string; recordedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listInvoiceStripePaymentByInvoiceIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; paymentId: string; amount: number; method: string; recordedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listInvoiceStripePaymentByTenantIdRead = {"entity":"InvoiceStripePayment","readId":"InvoiceStripePayment.byTenantId","exportName":"listInvoiceStripePaymentByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; paymentId: string; amount: number; method: string; recordedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listInvoiceStripePaymentByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; paymentId: string; amount: number; method: string; recordedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getInvoiceStripePaymentRead = {"entity":"InvoiceStripePayment","readId":"InvoiceStripePayment.get","exportName":"getInvoiceStripePayment","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; paymentId: string; amount: number; method: string; recordedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getInvoiceStripePaymentResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; paymentId: string; amount: number; method: string; recordedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listInvoiceStripePaymentRead = {"entity":"InvoiceStripePayment","readId":"InvoiceStripePayment.list","exportName":"listInvoiceStripePayment","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; paymentId: string; amount: number; method: string; recordedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listInvoiceStripePaymentResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; sessionId: string; paymentId: string; amount: number; method: string; recordedAt: number | null; createdAt: number; updatedAt: number }>;
+
 export const listItemUnitMappingByIngredientIdRead = {"entity":"ItemUnitMapping","readId":"ItemUnitMapping.byIngredientId","exportName":"listItemUnitMappingByIngredientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"ingredientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; ingredientId: string | null; componentId: string | null; kind: \"pack\" | \"density\" | \"portion\" | \"yield\"; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; equalsQuantity: number; equalsUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; fromBasis: \"as_purchased\" | \"as_produced\" | \"raw\" | \"cooked\" | \"unknown\" | null; toBasis: \"as_purchased\" | \"as_produced\" | \"raw\" | \"cooked\" | \"unknown\" | null; source: string | null; confirmedByUserId: string | null; recordedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listItemUnitMappingByIngredientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; ingredientId: string | null; componentId: string | null; kind: "pack" | "density" | "portion" | "yield"; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; equalsQuantity: number; equalsUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; fromBasis: "as_purchased" | "as_produced" | "raw" | "cooked" | "unknown" | null; toBasis: "as_purchased" | "as_produced" | "raw" | "cooked" | "unknown" | null; source: string | null; confirmedByUserId: string | null; recordedAt: number | null; createdAt: number; updatedAt: number }>;
 
@@ -152448,38 +155608,38 @@ export type getProductionBatchAllocationResult = { _id: string; _creationTime: n
 export const listProductionBatchAllocationRead = {"entity":"ProductionBatchAllocation","readId":"ProductionBatchAllocation.list","exportName":"listProductionBatchAllocation","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; productionBatchId: string; eventId: string | null; eventDishId: string | null; allocatedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; formulaShare: number; isSurplus: boolean; status: \"planned\" | \"produced\" | \"portioned\" | \"released\"; allocatedAt: number | null; producedAt: number | null; portionedAt: number | null; releaseReason: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listProductionBatchAllocationResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; productionBatchId: string; eventId: string | null; eventDishId: string | null; allocatedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; formulaShare: number; isSurplus: boolean; status: "planned" | "produced" | "portioned" | "released"; allocatedAt: number | null; producedAt: number | null; portionedAt: number | null; releaseReason: string | null; createdAt: number; updatedAt: number }>;
 
-export const listProposalByAcceptedRevisionIdRead = {"entity":"Proposal","readId":"Proposal.byAcceptedRevisionId","exportName":"listProposalByAcceptedRevisionId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"acceptedRevisionId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listProposalByAcceptedRevisionIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
+export const listProposalByAcceptedRevisionIdRead = {"entity":"Proposal","readId":"Proposal.byAcceptedRevisionId","exportName":"listProposalByAcceptedRevisionId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"acceptedRevisionId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listProposalByAcceptedRevisionIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listProposalByClientIdRead = {"entity":"Proposal","readId":"Proposal.byClientId","exportName":"listProposalByClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listProposalByClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
+export const listProposalByClientIdRead = {"entity":"Proposal","readId":"Proposal.byClientId","exportName":"listProposalByClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listProposalByClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listProposalByClientMergeAuthorizationIdRead = {"entity":"Proposal","readId":"Proposal.byClientMergeAuthorizationId","exportName":"listProposalByClientMergeAuthorizationId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientMergeAuthorizationId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listProposalByClientMergeAuthorizationIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
+export const listProposalByClientMergeAuthorizationIdRead = {"entity":"Proposal","readId":"Proposal.byClientMergeAuthorizationId","exportName":"listProposalByClientMergeAuthorizationId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientMergeAuthorizationId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listProposalByClientMergeAuthorizationIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listProposalByEventIdRead = {"entity":"Proposal","readId":"Proposal.byEventId","exportName":"listProposalByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listProposalByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
+export const listProposalByEventIdRead = {"entity":"Proposal","readId":"Proposal.byEventId","exportName":"listProposalByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listProposalByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listProposalByMergeTargetClientIdRead = {"entity":"Proposal","readId":"Proposal.byMergeTargetClientId","exportName":"listProposalByMergeTargetClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"mergeTargetClientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listProposalByMergeTargetClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
+export const listProposalByMergeTargetClientIdRead = {"entity":"Proposal","readId":"Proposal.byMergeTargetClientId","exportName":"listProposalByMergeTargetClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"mergeTargetClientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listProposalByMergeTargetClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listProposalByPendingEventIdRead = {"entity":"Proposal","readId":"Proposal.byPendingEventId","exportName":"listProposalByPendingEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"pendingEventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listProposalByPendingEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
+export const listProposalByPendingEventIdRead = {"entity":"Proposal","readId":"Proposal.byPendingEventId","exportName":"listProposalByPendingEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"pendingEventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listProposalByPendingEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listProposalByReplacesProposalIdRead = {"entity":"Proposal","readId":"Proposal.byReplacesProposalId","exportName":"listProposalByReplacesProposalId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"replacesProposalId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listProposalByReplacesProposalIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
+export const listProposalByReplacesProposalIdRead = {"entity":"Proposal","readId":"Proposal.byReplacesProposalId","exportName":"listProposalByReplacesProposalId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"replacesProposalId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listProposalByReplacesProposalIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listProposalBySupersededByIdRead = {"entity":"Proposal","readId":"Proposal.bySupersededById","exportName":"listProposalBySupersededById","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"supersededById","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listProposalBySupersededByIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
+export const listProposalBySupersededByIdRead = {"entity":"Proposal","readId":"Proposal.bySupersededById","exportName":"listProposalBySupersededById","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"supersededById","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listProposalBySupersededByIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listProposalByTenantIdRead = {"entity":"Proposal","readId":"Proposal.byTenantId","exportName":"listProposalByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listProposalByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
+export const listProposalByTenantIdRead = {"entity":"Proposal","readId":"Proposal.byTenantId","exportName":"listProposalByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listProposalByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
 
-export const getProposalRead = {"entity":"Proposal","readId":"Proposal.get","exportName":"getProposal","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getProposalResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number } | null;
+export const getProposalRead = {"entity":"Proposal","readId":"Proposal.get","exportName":"getProposal","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getProposalResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number } | null;
 
-export const listProposalRead = {"entity":"Proposal","readId":"Proposal.list","exportName":"listProposal","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listProposalResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
+export const listProposalRead = {"entity":"Proposal","readId":"Proposal.list","exportName":"listProposal","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: \"draft\" | \"sent\" | \"viewed\" | \"accepted\" | \"declined\" | \"expired\" | \"superseded\"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listProposalResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; pendingEventId: string | null; acceptedRevisionId: string | null; acceptedRevisionPending: boolean | null; proposalNumber: string | null; title: string; eventDate: number | null; eventEndDate: number | null; eventType: string | null; guestCount: number; venueName: string | null; venueAddress: string | null; subtotal: number; taxAmount: number; discountAmount: number; total: number; expiresAt: number | null; notes: string | null; terms: string | null; visibleSections: string[] | null; status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded"; draftedAt: number | null; sentAt: number | null; viewedAt: number | null; acceptedAt: number | null; declinedAt: number | null; expiredAt: number | null; supersededAt: number | null; supersedeReason: string | null; supersededById: string | null; replacesProposalId: string | null; createdAt: number; updatedAt: number }>;
 
 export const listProposalDishSelectionByDishIdRead = {"entity":"ProposalDishSelection","readId":"ProposalDishSelection.byDishId","exportName":"listProposalDishSelectionByDishId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"dishId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; proposalId: string; menuId: string; dishId: string; quantityServings: number; course: string | null; serviceStyle: string | null; specialInstructions: string | null; selectedAt: number | null; removedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listProposalDishSelectionByDishIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; proposalId: string; menuId: string; dishId: string; quantityServings: number; course: string | null; serviceStyle: string | null; specialInstructions: string | null; selectedAt: number | null; removedAt: number | null; createdAt: number; updatedAt: number }>;
@@ -152891,6 +156051,24 @@ export type getSignatureRequestResult = { _id: string; _creationTime: number; te
 
 export const listSignatureRequestRead = {"entity":"SignatureRequest","readId":"SignatureRequest.list","exportName":"listSignatureRequest","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; proposalRevisionId: string; proposalId: string | null; recipientEmail: string; recipientName: string; recipientPersonId: string | null; recipientContactId: string | null; status: \"requested\" | \"expired\" | \"completed\" | \"revoked\"; provider: \"internal\" | \"docusign\" | \"hellosign\" | \"pandadoc\" | \"other\"; providerIds: string | null; callbackToken: string | null; requestedAt: number | null; expiresAt: number | null; completedAt: number | null; expiredAt: number | null; revokedAt: number | null; signedArtifactReference: string | null; signerIpAddress: string | null; signerUserAgent: string | null; requestedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listSignatureRequestResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; proposalRevisionId: string; proposalId: string | null; recipientEmail: string; recipientName: string; recipientPersonId: string | null; recipientContactId: string | null; status: "requested" | "expired" | "completed" | "revoked"; provider: "internal" | "docusign" | "hellosign" | "pandadoc" | "other"; providerIds: string | null; callbackToken: string | null; requestedAt: number | null; expiresAt: number | null; completedAt: number | null; expiredAt: number | null; revokedAt: number | null; signedArtifactReference: string | null; signerIpAddress: string | null; signerUserAgent: string | null; requestedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const listSmsAlertDeliveryByTenantIdRead = {"entity":"SmsAlertDelivery","readId":"SmsAlertDelivery.byTenantId","exportName":"listSmsAlertDeliveryByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; triggerKey: string; personId: string; alertType: string; sentAt: number | null; failedAt: number | null; messageSid: string | null; error: string | null; openedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listSmsAlertDeliveryByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; triggerKey: string; personId: string; alertType: string; sentAt: number | null; failedAt: number | null; messageSid: string | null; error: string | null; openedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getSmsAlertDeliveryRead = {"entity":"SmsAlertDelivery","readId":"SmsAlertDelivery.get","exportName":"getSmsAlertDelivery","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; triggerKey: string; personId: string; alertType: string; sentAt: number | null; failedAt: number | null; messageSid: string | null; error: string | null; openedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getSmsAlertDeliveryResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; triggerKey: string; personId: string; alertType: string; sentAt: number | null; failedAt: number | null; messageSid: string | null; error: string | null; openedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listSmsAlertDeliveryRead = {"entity":"SmsAlertDelivery","readId":"SmsAlertDelivery.list","exportName":"listSmsAlertDelivery","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; triggerKey: string; personId: string; alertType: string; sentAt: number | null; failedAt: number | null; messageSid: string | null; error: string | null; openedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listSmsAlertDeliveryResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; triggerKey: string; personId: string; alertType: string; sentAt: number | null; failedAt: number | null; messageSid: string | null; error: string | null; openedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listSmsAlertSettingByTenantIdRead = {"entity":"SmsAlertSetting","readId":"SmsAlertSetting.byTenantId","exportName":"listSmsAlertSettingByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; enabled: boolean | null; chainId: string | null; changedAt: number | null; changedBy: string | null; lastScanAt: number | null; lastScanSent: number | null; lastScanFailed: number | null; lastScanError: string | null; openedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listSmsAlertSettingByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; enabled: boolean | null; chainId: string | null; changedAt: number | null; changedBy: string | null; lastScanAt: number | null; lastScanSent: number | null; lastScanFailed: number | null; lastScanError: string | null; openedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getSmsAlertSettingRead = {"entity":"SmsAlertSetting","readId":"SmsAlertSetting.get","exportName":"getSmsAlertSetting","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; enabled: boolean | null; chainId: string | null; changedAt: number | null; changedBy: string | null; lastScanAt: number | null; lastScanSent: number | null; lastScanFailed: number | null; lastScanError: string | null; openedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getSmsAlertSettingResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; enabled: boolean | null; chainId: string | null; changedAt: number | null; changedBy: string | null; lastScanAt: number | null; lastScanSent: number | null; lastScanFailed: number | null; lastScanError: string | null; openedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listSmsAlertSettingRead = {"entity":"SmsAlertSetting","readId":"SmsAlertSetting.list","exportName":"listSmsAlertSetting","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; enabled: boolean | null; chainId: string | null; changedAt: number | null; changedBy: string | null; lastScanAt: number | null; lastScanSent: number | null; lastScanFailed: number | null; lastScanError: string | null; openedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listSmsAlertSettingResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; enabled: boolean | null; chainId: string | null; changedAt: number | null; changedBy: string | null; lastScanAt: number | null; lastScanSent: number | null; lastScanFailed: number | null; lastScanError: string | null; openedAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listStaffChatReadCursorByAuthSubjectIdRead = {"entity":"StaffChatReadCursor","readId":"StaffChatReadCursor.byAuthSubjectId","exportName":"listStaffChatReadCursorByAuthSubjectId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"authSubjectId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; channelKey: string; authSubjectId: string; lastReadAt: number; createdAt: number; updatedAt: number }>"} as const;
 export type listStaffChatReadCursorByAuthSubjectIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; channelKey: string; authSubjectId: string; lastReadAt: number; createdAt: number; updatedAt: number }>;

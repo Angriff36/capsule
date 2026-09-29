@@ -192,7 +192,18 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command fail(errorMessage: string, processingErrors: string) {
+  // A partial conversion passes whichever sales records it did create, so the
+  // failed row keeps durable links to them for the review queue and a retry
+  // reuses them instead of creating duplicates. An omitted id keeps the
+  // stored one.
+  command fail(
+    errorMessage: string,
+    processingErrors: string,
+    optional clientId: uuid,
+    optional leadId: uuid,
+    optional eventId: uuid,
+    optional proposalId: uuid
+  ) {
     guard self.status == "processing" "Only processing submissions can be marked as failed"
     guard self.deletedAt == null "Cannot fail a deleted quote submission"
 
@@ -200,6 +211,10 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     mutate completedAt = now()
     mutate errorMessage = errorMessage
     mutate processingErrors = processingErrors
+    mutate clientId = clientId != null ? clientId : self.clientId
+    mutate leadId = leadId != null ? leadId : self.leadId
+    mutate eventId = eventId != null ? eventId : self.eventId
+    mutate proposalId = proposalId != null ? proposalId : self.proposalId
 
     emit QuoteProcessingFailed {
       submissionId: self.id

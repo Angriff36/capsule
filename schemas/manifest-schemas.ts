@@ -1953,6 +1953,89 @@ export const InvoiceNumberSequenceSchema = z.object({
 
 export type InvoiceNumberSequence = z.infer<typeof InvoiceNumberSequenceSchema>;
 
+// Entity: InvoicePaymentLink
+export const InvoicePaymentLinkSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  invoiceId: z.string().uuid(),
+  sessionId: z.string(),
+  url: z.string(),
+  amount: z.number().default(0),
+  createdByUserId: z.string().nullable().optional(),
+  configId: z.string().nullable().optional(),
+  offsetDays: z.number().int().nullable().optional(),
+  scheduledFor: z.coerce.date().nullable().optional(),
+  source: z.enum(["scheduled", "manual"]).nullable().optional(),
+  openedAt: z.coerce.date().nullable().optional(),
+  announcedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type InvoicePaymentLink = z.infer<typeof InvoicePaymentLinkSchema>;
+
+// Entity: InvoiceReminderAttempt
+export const InvoiceReminderAttemptSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  invoiceId: z.string().uuid(),
+  configId: z.string(),
+  offsetDays: z.number().int().default(0),
+  scheduledFor: z.coerce.date().nullable().optional(),
+  source: z.enum(["scheduled", "manual"]).nullable().optional(),
+  outcome: z.enum(["delivered", "suppressed", "failed"]).nullable().optional(),
+  emailId: z.string().nullable().optional(),
+  sessionId: z.string().nullable().optional(),
+  amountDue: z.number().nullable().optional(),
+  dueDate: z.coerce.date().nullable().optional(),
+  timing: z.string().nullable().optional(),
+  reason: z.string().nullable().optional(),
+  attempt: z.number().int().nullable().optional(),
+  message: z.string().nullable().optional(),
+  retryScheduled: z.boolean().nullable().optional(),
+  openedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type InvoiceReminderAttempt = z.infer<typeof InvoiceReminderAttemptSchema>;
+
+// Entity: InvoiceReminderSchedule
+export const InvoiceReminderScheduleSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  invoiceId: z.string().uuid(),
+  configId: z.string(),
+  configuredAt: z.coerce.date().nullable().optional(),
+  dueDate: z.coerce.date().nullable().optional(),
+  offsetsDays: z.array(z.number().int()).nullable().optional(),
+  openedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type InvoiceReminderSchedule = z.infer<typeof InvoiceReminderScheduleSchema>;
+
+// Entity: InvoiceStripePayment
+export const InvoiceStripePaymentSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  invoiceId: z.string().uuid(),
+  sessionId: z.string(),
+  paymentId: z.string().uuid(),
+  amount: z.number().default(0),
+  method: z.string().default(""),
+  recordedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type InvoiceStripePayment = z.infer<typeof InvoiceStripePaymentSchema>;
+
 // Entity: ItemUnitMapping
 export const ItemUnitMappingSchema = z.object({
   id: z.string().uuid(),
@@ -2623,6 +2706,7 @@ export const ProposalSchema = z.object({
   eventId: z.string().uuid().nullable().optional(),
   pendingEventId: z.string().uuid().nullable().optional(),
   acceptedRevisionId: z.string().uuid().nullable().optional(),
+  acceptedRevisionPending: z.boolean().nullable().optional(),
   proposalNumber: z.string().nullable().optional(),
   title: z.string().default(""),
   eventDate: z.coerce.date().nullable().optional(),
@@ -3235,6 +3319,45 @@ export const SignatureRequestSchema = z.object({
 });
 
 export type SignatureRequest = z.infer<typeof SignatureRequestSchema>;
+
+// Entity: SmsAlertDelivery
+export const SmsAlertDeliverySchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  triggerKey: z.string(),
+  personId: z.string(),
+  alertType: z.string(),
+  sentAt: z.coerce.date().nullable().optional(),
+  failedAt: z.coerce.date().nullable().optional(),
+  messageSid: z.string().nullable().optional(),
+  error: z.string().nullable().optional(),
+  openedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type SmsAlertDelivery = z.infer<typeof SmsAlertDeliverySchema>;
+
+// Entity: SmsAlertSetting
+export const SmsAlertSettingSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  enabled: z.boolean().nullable().optional(),
+  chainId: z.string().nullable().optional(),
+  changedAt: z.coerce.date().nullable().optional(),
+  changedBy: z.string().nullable().optional(),
+  lastScanAt: z.coerce.date().nullable().optional(),
+  lastScanSent: z.number().int().nullable().optional(),
+  lastScanFailed: z.number().int().nullable().optional(),
+  lastScanError: z.string().nullable().optional(),
+  openedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type SmsAlertSetting = z.infer<typeof SmsAlertSettingSchema>;
 
 // Entity: SoftDeletable
 export const SoftDeletableSchema = z.object({
@@ -7221,6 +7344,91 @@ export const InvoiceWriteOffParamsSchema = z.object({
 
 export type InvoiceWriteOffParams = z.infer<typeof InvoiceWriteOffParamsSchema>;
 
+// Command: announceCreated on InvoicePaymentLink
+export const InvoicePaymentLinkAnnounceCreatedParamsSchema = z.object({});
+
+export type InvoicePaymentLinkAnnounceCreatedParams = z.infer<typeof InvoicePaymentLinkAnnounceCreatedParamsSchema>;
+
+// Command: announceReminderLink on InvoicePaymentLink
+export const InvoicePaymentLinkAnnounceReminderLinkParamsSchema = z.object({});
+
+export type InvoicePaymentLinkAnnounceReminderLinkParams = z.infer<typeof InvoicePaymentLinkAnnounceReminderLinkParamsSchema>;
+
+// Command: open on InvoicePaymentLink
+export const InvoicePaymentLinkOpenParamsSchema = z.object({
+  invoiceId: z.string().min(1),
+  sessionId: z.string(),
+  url: z.string(),
+  amount: z.number(),
+  createdByUserId: z.string().optional(),
+  configId: z.string().optional(),
+  offsetDays: z.number().int().optional(),
+  scheduledFor: z.coerce.date().optional(),
+  source: z.enum(["scheduled", "manual"]).optional(),
+});
+
+export type InvoicePaymentLinkOpenParams = z.infer<typeof InvoicePaymentLinkOpenParamsSchema>;
+
+// Command: open on InvoiceReminderAttempt
+export const InvoiceReminderAttemptOpenParamsSchema = z.object({
+  invoiceId: z.string().min(1),
+  configId: z.string(),
+  offsetDays: z.number().int(),
+  scheduledFor: z.coerce.date(),
+  source: z.enum(["scheduled", "manual"]),
+});
+
+export type InvoiceReminderAttemptOpenParams = z.infer<typeof InvoiceReminderAttemptOpenParamsSchema>;
+
+// Command: recordDelivered on InvoiceReminderAttempt
+export const InvoiceReminderAttemptRecordDeliveredParamsSchema = z.object({
+  emailId: z.string(),
+  sessionId: z.string(),
+  amountDue: z.number(),
+  dueDate: z.coerce.date(),
+  timing: z.string(),
+});
+
+export type InvoiceReminderAttemptRecordDeliveredParams = z.infer<typeof InvoiceReminderAttemptRecordDeliveredParamsSchema>;
+
+// Command: recordFailed on InvoiceReminderAttempt
+export const InvoiceReminderAttemptRecordFailedParamsSchema = z.object({
+  attempt: z.number().int(),
+  message: z.string(),
+  retryScheduled: z.boolean(),
+});
+
+export type InvoiceReminderAttemptRecordFailedParams = z.infer<typeof InvoiceReminderAttemptRecordFailedParamsSchema>;
+
+// Command: recordSuppressed on InvoiceReminderAttempt
+export const InvoiceReminderAttemptRecordSuppressedParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type InvoiceReminderAttemptRecordSuppressedParams = z.infer<typeof InvoiceReminderAttemptRecordSuppressedParamsSchema>;
+
+// Command: configure on InvoiceReminderSchedule
+export const InvoiceReminderScheduleConfigureParamsSchema = z.object({
+  invoiceId: z.string().min(1),
+  configId: z.string(),
+  configuredAt: z.coerce.date(),
+  dueDate: z.coerce.date(),
+  offsetsDays: z.array(z.number().int()),
+});
+
+export type InvoiceReminderScheduleConfigureParams = z.infer<typeof InvoiceReminderScheduleConfigureParamsSchema>;
+
+// Command: record on InvoiceStripePayment
+export const InvoiceStripePaymentRecordParamsSchema = z.object({
+  invoiceId: z.string().min(1),
+  sessionId: z.string(),
+  paymentId: z.string().uuid(),
+  amount: z.number(),
+  method: z.string(),
+});
+
+export type InvoiceStripePaymentRecordParams = z.infer<typeof InvoiceStripePaymentRecordParamsSchema>;
+
 // Command: record on ItemUnitMapping
 export const ItemUnitMappingRecordParamsSchema = z.object({
   kind: z.enum(["pack", "density", "portion", "yield"]),
@@ -8484,6 +8692,21 @@ export const ProposalReassignClientParamsSchema = z.object({});
 
 export type ProposalReassignClientParams = z.infer<typeof ProposalReassignClientParamsSchema>;
 
+// Command: recomputeTotals on Proposal
+export const ProposalRecomputeTotalsParamsSchema = z.object({
+  subtotal: z.number(),
+  total: z.number(),
+});
+
+export type ProposalRecomputeTotalsParams = z.infer<typeof ProposalRecomputeTotalsParamsSchema>;
+
+// Command: recordAcceptedRevision on Proposal
+export const ProposalRecordAcceptedRevisionParamsSchema = z.object({
+  acceptedRevisionId: z.string().min(1).optional(),
+});
+
+export type ProposalRecordAcceptedRevisionParams = z.infer<typeof ProposalRecordAcceptedRevisionParamsSchema>;
+
 // Command: send on Proposal
 export const ProposalSendParamsSchema = z.object({});
 
@@ -8584,6 +8807,13 @@ export type ProposalLineItemAddLineParams = z.infer<typeof ProposalLineItemAddLi
 export const ProposalLineItemRemoveLineParamsSchema = z.object({});
 
 export type ProposalLineItemRemoveLineParams = z.infer<typeof ProposalLineItemRemoveLineParamsSchema>;
+
+// Command: restampAmount on ProposalLineItem
+export const ProposalLineItemRestampAmountParamsSchema = z.object({
+  amount: z.number(),
+});
+
+export type ProposalLineItemRestampAmountParams = z.infer<typeof ProposalLineItemRestampAmountParamsSchema>;
 
 // Command: reviseLine on ProposalLineItem
 export const ProposalLineItemReviseLineParamsSchema = z.object({
@@ -8835,6 +9065,10 @@ export type QuoteSubmissionDismissParams = z.infer<typeof QuoteSubmissionDismiss
 export const QuoteSubmissionFailParamsSchema = z.object({
   errorMessage: z.string(),
   processingErrors: z.string(),
+  clientId: z.string().min(1).optional(),
+  leadId: z.string().min(1).optional(),
+  eventId: z.string().min(1).optional(),
+  proposalId: z.string().min(1).optional(),
 });
 
 export type QuoteSubmissionFailParams = z.infer<typeof QuoteSubmissionFailParamsSchema>;
@@ -9147,6 +9381,13 @@ export const ShareLinkCreateParamsSchema = z.object({
 
 export type ShareLinkCreateParams = z.infer<typeof ShareLinkCreateParamsSchema>;
 
+// Command: recordView on ShareLink
+export const ShareLinkRecordViewParamsSchema = z.object({
+  viewerIdentity: z.string().optional(),
+});
+
+export type ShareLinkRecordViewParams = z.infer<typeof ShareLinkRecordViewParamsSchema>;
+
 // Command: revoke on ShareLink
 export const ShareLinkRevokeParamsSchema = z.object({});
 
@@ -9314,6 +9555,16 @@ export const SignatureRequestCompleteParamsSchema = z.object({
 
 export type SignatureRequestCompleteParams = z.infer<typeof SignatureRequestCompleteParamsSchema>;
 
+// Command: completeInternal on SignatureRequest
+export const SignatureRequestCompleteInternalParamsSchema = z.object({
+  signedArtifactReference: z.string(),
+  signerIpAddress: z.string().optional(),
+  signerUserAgent: z.string().optional(),
+  acceptProposalId: z.string().uuid().optional(),
+});
+
+export type SignatureRequestCompleteInternalParams = z.infer<typeof SignatureRequestCompleteInternalParamsSchema>;
+
 // Command: expire on SignatureRequest
 export const SignatureRequestExpireParamsSchema = z.object({});
 
@@ -9339,6 +9590,55 @@ export const SignatureRequestRevokeParamsSchema = z.object({
 });
 
 export type SignatureRequestRevokeParams = z.infer<typeof SignatureRequestRevokeParamsSchema>;
+
+// Command: open on SmsAlertDelivery
+export const SmsAlertDeliveryOpenParamsSchema = z.object({
+  triggerKey: z.string(),
+  personId: z.string(),
+  alertType: z.string(),
+});
+
+export type SmsAlertDeliveryOpenParams = z.infer<typeof SmsAlertDeliveryOpenParamsSchema>;
+
+// Command: recordFailed on SmsAlertDelivery
+export const SmsAlertDeliveryRecordFailedParamsSchema = z.object({
+  error: z.string(),
+});
+
+export type SmsAlertDeliveryRecordFailedParams = z.infer<typeof SmsAlertDeliveryRecordFailedParamsSchema>;
+
+// Command: recordSent on SmsAlertDelivery
+export const SmsAlertDeliveryRecordSentParamsSchema = z.object({
+  messageSid: z.string(),
+});
+
+export type SmsAlertDeliveryRecordSentParams = z.infer<typeof SmsAlertDeliveryRecordSentParamsSchema>;
+
+// Command: disable on SmsAlertSetting
+export const SmsAlertSettingDisableParamsSchema = z.object({});
+
+export type SmsAlertSettingDisableParams = z.infer<typeof SmsAlertSettingDisableParamsSchema>;
+
+// Command: enable on SmsAlertSetting
+export const SmsAlertSettingEnableParamsSchema = z.object({
+  chainId: z.string(),
+});
+
+export type SmsAlertSettingEnableParams = z.infer<typeof SmsAlertSettingEnableParamsSchema>;
+
+// Command: open on SmsAlertSetting
+export const SmsAlertSettingOpenParamsSchema = z.object({});
+
+export type SmsAlertSettingOpenParams = z.infer<typeof SmsAlertSettingOpenParamsSchema>;
+
+// Command: recordScan on SmsAlertSetting
+export const SmsAlertSettingRecordScanParamsSchema = z.object({
+  sent: z.number().int(),
+  failed: z.number().int(),
+  error: z.string().optional(),
+});
+
+export type SmsAlertSettingRecordScanParams = z.infer<typeof SmsAlertSettingRecordScanParamsSchema>;
 
 // Command: open on StaffChatReadCursor
 export const StaffChatReadCursorOpenParamsSchema = z.object({
