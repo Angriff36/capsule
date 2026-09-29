@@ -8,8 +8,12 @@
 // direct messages and @mentions. The push keys let a holder push to that one
 // device and expose no message data, so they are stored plain.
 //
-// `unique` is intent only: Convex enforces no alternate key, which is why the
-// seam dedupes by endpoint itself.
+// ~~`unique` is intent only: Convex enforces no alternate key, which is why the
+// seam dedupes by endpoint itself.~~
+// 2026-09-29: `unique` is still not enforced by Convex. register and renew
+// refuse a second live row for one endpoint in a tenant, and the seam retires
+// every other owner's row (in any tenant) through `releaseDevice` before it
+// registers. Every write goes through the commands below.
 
 use "../identity/person.manifest"
 
@@ -33,15 +37,22 @@ entity PushSubscription mixin TenantScoped, SoftDeletable {
 
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
 
-  // Own rows only. `self.authSubjectId == null` is the create-time draft escape.
-  default policy pushSubscriptionRead read: roleAllows(user.role, "staffAccess") and (self.authSubjectId == null or (user.id != null and self.authSubjectId == user.id)) "Staff may see their own push devices"
-  // Write and execute require a capability no role is granted, so the
+  // Own rows only. `self.authSubjectId == null` is the create-time draft
+  // escape. `system` is the in-transaction runner
+  // (convex/lib/tenantSystemCommandRunner.ts) the seam uses for rows the
+  // caller does not own; no Person can hold that role.
+  default policy pushSubscriptionRead read: roleAllows(user.role, "staffAccess") and (self.authSubjectId == null or (user.id != null and self.authSubjectId == user.id) or user.role == "system") "Staff may see their own push devices"
+  // ~~Write and execute require a capability no role is granted, so the
   // GENERATED register/unregister commands can never run. Every row is
   // created, re-owned and retired only by the authored seam
   // convex/pushSubscriptions.ts (raw writes bypass these policies), which
-  // folds the whole endpoint key so one browser has exactly one live owner.
-  default policy pushSubscriptionWrite write: roleAllows(user.role, "pushDeviceManage") "Push devices are managed only through the app"
-  default policy pushSubscriptionExecute execute: roleAllows(user.role, "pushDeviceManage") "Push devices are managed only through the app"
+  // folds the whole endpoint key so one browser has exactly one live owner.~~
+  // 2026-09-29: staff (the roles team chat admits) run the commands. The
+  // guards keep a device with its owner, the constraints keep one live row
+  // per endpoint in a tenant, and only a holder of the endpoint can release
+  // someone else's device.
+  default policy pushSubscriptionWrite write: roleAllows(user.role, "staffAccess") "Staff may manage their own push devices"
+  default policy pushSubscriptionExecute execute: roleAllows(user.role, "staffAccess") "Staff may manage their own push devices"
 
   // Governed creation — a device asks for notifications.
   command register(
@@ -57,6 +68,8 @@ entity PushSubscription mixin TenantScoped, SoftDeletable {
     guard self.authSubjectId == null "A device is registered once; turn notifications off and on again instead"
     constraint registerEndpoint: length(trim(endpoint)) > 0 "This device is missing its push address. Try turning notifications on again."
     constraint registerKeys: length(trim(p256dh)) > 0 and length(trim(auth)) > 0 "This device is missing its notification keys. Try turning notifications on again."
+    // One live row per device in a tenant.
+    constraint registerOnce: count(PushSubscription where endpoint == endpoint) == 0 "This device already has notifications on. Turn them off and on again."
     mutate authSubjectId = user.id
     mutate personId = user.personId
     mutate endpoint = endpoint
@@ -79,6 +92,49 @@ entity PushSubscription mixin TenantScoped, SoftDeletable {
       pushSubscriptionId: self.id
       tenantId: self.tenantId
     }
+  }
+
+  // The owner turns notifications on again on a device it registered before:
+  // fresh keys, the owner's current Person, and the row is live again.
+  command renew(p256dh: string, auth: string, optional userAgent: string) {
+    guard user.id != null and self.authSubjectId == user.id "Only the owner can turn this device back on"
+    guard user.personId != null "Link your account to a staff profile before turning on notifications"
+    constraint renewKeys: length(trim(p256dh)) > 0 and length(trim(auth)) > 0 "This device is missing its notification keys. Try turning notifications on again."
+    // One live row per device in a tenant; this row may be the live one.
+    constraint renewOnce: count(PushSubscription where endpoint == self.endpoint) <= (self.deletedAt == null ? 1 : 0) "This device already has notifications on for another account. Turn them off there first."
+    mutate personId = user.personId
+    mutate p256dh = p256dh
+    mutate auth = auth
+    mutate userAgent = userAgent != null ? userAgent : self.userAgent
+    mutate deletedAt = null
+    emit PushSubscriptionRegistered {
+      pushSubscriptionId: self.id
+      tenantId: self.tenantId
+      authSubjectId: self.authSubjectId
+    }
+  }
+
+  // Retire a device by proving possession of its endpoint, a secret only the
+  // browser and its push service hold (whoever knows it can already push to
+  // the device). The seam runs it for another owner's row when a browser
+  // changes hands, when a signed-out browser releases itself, and when the
+  // push service reports the device gone.
+  command releaseDevice(endpoint: string) {
+    guard self.deletedAt == null
+    guard self.endpoint == endpoint "This is not that device"
+    mutate deletedAt = now()
+    emit PushSubscriptionRemoved {
+      pushSubscriptionId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Delivery telemetry: the push service accepted a notification for this
+  // device. The delivery seams record it as the system role.
+  command recordDelivery(at: float) {
+    guard self.deletedAt == null
+    guard user.role == "system" "Deliveries are recorded by the app"
+    mutate lastUsedAt = at
   }
 
   store PushSubscription in durable

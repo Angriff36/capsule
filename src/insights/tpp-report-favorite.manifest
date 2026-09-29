@@ -1,14 +1,33 @@
 // Per-person favorites for the Total Party Planner compatibility catalog.
 //
-// One row per canonical report id and linked Person. The authored seam
+// One row per canonical report id and linked Person. ~~The authored seam
 // convex/tppReportFavorites.ts is the only write path: it validates the id
 // against the code-owned catalog boundary and upserts/deletes raw rows using
-// trusted auth context. Favorite state has no business consequence and never
-// grants access to the report's source records.
+// trusted auth context.~~ 2026-09-29: the authored seam
+// convex/tppReportFavorites.ts validates the id against the code-owned catalog
+// boundary and runs the commands below with the caller's auth; unfavoriting
+// soft-deletes the row and favoriting again restores it. A row with no
+// reportId marks that the person's favorites were initialized. Favorite state
+// has no business consequence and never grants access to the report's source
+// records.
 
 use "../foundation/base.manifest"
 
-entity TppReportFavorite mixin TenantScoped {
+event TppReportFavorited: "tpp_report_favorite.favorited" {
+  tppReportFavoriteId: string
+  tenantId: string
+  personId: string
+  reportId: string?
+}
+
+event TppReportUnfavorited: "tpp_report_favorite.unfavorited" {
+  tppReportFavoriteId: string
+  tenantId: string
+  personId: string
+  reportId: string?
+}
+
+entity TppReportFavorite mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   unique [tenantId, personId, reportId]
   timestamps
@@ -18,8 +37,51 @@ entity TppReportFavorite mixin TenantScoped {
   property indexed reportId: string?
 
   default policy tppReportFavoriteRead read: self.personId == null or self.personId == user.personId "Staff may see their own report favorites"
-  default policy tppReportFavoriteWrite write: roleAllows(user.role, "reportFavoriteSeamOnly") "Report favorites are managed only through the app"
-  default policy tppReportFavoriteExecute execute: roleAllows(user.role, "reportFavoriteSeamOnly") "Report favorites are managed only through the app"
+  // ~~Report favorites are managed only through the app (reportFavoriteSeamOnly).~~
+  // 2026-09-29: a person with a linked staff profile keeps their own list.
+  default policy tppReportFavoriteWrite write: user.personId != null "Link your account to a staff profile to keep report favorites"
+  default policy tppReportFavoriteExecute execute: user.personId != null "Link your account to a staff profile to keep report favorites"
+
+  // Governed creation — a favorite, or (no reportId) the initialization marker.
+  command create(optional reportId: string) {
+    guard user.personId != null
+    guard self.personId == null "Favorites are added once; favorite the report again instead"
+    // One live favorite per report and person.
+    constraint createOnce: reportId == null or count(TppReportFavorite where personId == user.personId, reportId == reportId) == 0 "This report is already a favorite."
+    mutate personId = user.personId
+    mutate reportId = reportId
+    emit TppReportFavorited {
+      tppReportFavoriteId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      reportId: reportId
+    }
+  }
+
+  command unfavorite() {
+    guard self.deletedAt == null
+    guard user.personId != null and self.personId == user.personId "Only you can change your favorites"
+    mutate deletedAt = now()
+    emit TppReportUnfavorited {
+      tppReportFavoriteId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      reportId: self.reportId
+    }
+  }
+
+  command refavorite() {
+    guard self.deletedAt != null
+    guard user.personId != null and self.personId == user.personId "Only you can change your favorites"
+    constraint refavoriteOnce: count(TppReportFavorite where personId == user.personId, reportId == self.reportId) == 0 "This report is already a favorite."
+    mutate deletedAt = null
+    emit TppReportFavorited {
+      tppReportFavoriteId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      reportId: self.reportId
+    }
+  }
 
   store TppReportFavorite in durable
 }

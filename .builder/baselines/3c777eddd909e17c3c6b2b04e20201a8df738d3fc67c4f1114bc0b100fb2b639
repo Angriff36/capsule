@@ -3040,6 +3040,31 @@ export const RoleScorecardSchema = z.object({
 
 export type RoleScorecard = z.infer<typeof RoleScorecardSchema>;
 
+// Entity: RunAlertDelivery
+export const RunAlertDeliverySchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  activityId: z.string(),
+  kind: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type RunAlertDelivery = z.infer<typeof RunAlertDeliverySchema>;
+
+// Entity: RunAlertSetting
+export const RunAlertSettingSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  enabled: z.boolean().default(false),
+  generation: z.string().nullable().optional(),
+  changedBy: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type RunAlertSetting = z.infer<typeof RunAlertSettingSchema>;
+
 // Entity: SavedReportDefinition
 export const SavedReportDefinitionSchema = z.object({
   id: z.string().uuid(),
@@ -3495,6 +3520,7 @@ export type TimeRecordWithComputed = z.infer<typeof TimeRecordComputedSchema>;
 export const TppReportFavoriteSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
   personId: z.string().uuid().nullable().optional(),
   reportId: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -4119,6 +4145,15 @@ export const AssistantLlmConfigConfigureParamsSchema = z.object({
 
 export type AssistantLlmConfigConfigureParams = z.infer<typeof AssistantLlmConfigConfigureParamsSchema>;
 
+// Command: register on AssistantUpload
+export const AssistantUploadRegisterParamsSchema = z.object({
+  storageId: z.string(),
+  name: z.string(),
+  uploadedBy: z.string(),
+});
+
+export type AssistantUploadRegisterParams = z.infer<typeof AssistantUploadRegisterParamsSchema>;
+
 // Command: attach on Attachment
 export const AttachmentAttachParamsSchema = z.object({
   parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout", "dish", "ingredient", "staffMessage"]),
@@ -4219,6 +4254,20 @@ export const CandidateRevokeHireParamsSchema = z.object({
 });
 
 export type CandidateRevokeHireParams = z.infer<typeof CandidateRevokeHireParamsSchema>;
+
+// Command: create on ChatNotifyPreference
+export const ChatNotifyPreferenceCreateParamsSchema = z.object({
+  enabled: z.boolean(),
+});
+
+export type ChatNotifyPreferenceCreateParams = z.infer<typeof ChatNotifyPreferenceCreateParamsSchema>;
+
+// Command: setEnabled on ChatNotifyPreference
+export const ChatNotifyPreferenceSetEnabledParamsSchema = z.object({
+  enabled: z.boolean(),
+});
+
+export type ChatNotifyPreferenceSetEnabledParams = z.infer<typeof ChatNotifyPreferenceSetEnabledParamsSchema>;
 
 // Command: archive on Client
 export const ClientArchiveParamsSchema = z.object({
@@ -8823,6 +8872,13 @@ export const PurchaseNeedStandDownWithEventParamsSchema = z.object({});
 
 export type PurchaseNeedStandDownWithEventParams = z.infer<typeof PurchaseNeedStandDownWithEventParamsSchema>;
 
+// Command: recordDelivery on PushSubscription
+export const PushSubscriptionRecordDeliveryParamsSchema = z.object({
+  at: z.number(),
+});
+
+export type PushSubscriptionRecordDeliveryParams = z.infer<typeof PushSubscriptionRecordDeliveryParamsSchema>;
+
 // Command: register on PushSubscription
 export const PushSubscriptionRegisterParamsSchema = z.object({
   endpoint: z.string(),
@@ -8832,6 +8888,22 @@ export const PushSubscriptionRegisterParamsSchema = z.object({
 });
 
 export type PushSubscriptionRegisterParams = z.infer<typeof PushSubscriptionRegisterParamsSchema>;
+
+// Command: releaseDevice on PushSubscription
+export const PushSubscriptionReleaseDeviceParamsSchema = z.object({
+  endpoint: z.string(),
+});
+
+export type PushSubscriptionReleaseDeviceParams = z.infer<typeof PushSubscriptionReleaseDeviceParamsSchema>;
+
+// Command: renew on PushSubscription
+export const PushSubscriptionRenewParamsSchema = z.object({
+  p256dh: z.string(),
+  auth: z.string(),
+  userAgent: z.string().optional(),
+});
+
+export type PushSubscriptionRenewParams = z.infer<typeof PushSubscriptionRenewParamsSchema>;
 
 // Command: unregister on PushSubscription
 export const PushSubscriptionUnregisterParamsSchema = z.object({});
@@ -9127,6 +9199,34 @@ export type RoleScorecardDefineParams = z.infer<typeof RoleScorecardDefineParams
 export const RoleScorecardReactivateParamsSchema = z.object({});
 
 export type RoleScorecardReactivateParams = z.infer<typeof RoleScorecardReactivateParamsSchema>;
+
+// Command: record on RunAlertDelivery
+export const RunAlertDeliveryRecordParamsSchema = z.object({
+  activityId: z.string(),
+  kind: z.string(),
+});
+
+export type RunAlertDeliveryRecordParams = z.infer<typeof RunAlertDeliveryRecordParamsSchema>;
+
+// Command: create on RunAlertSetting
+export const RunAlertSettingCreateParamsSchema = z.object({});
+
+export type RunAlertSettingCreateParams = z.infer<typeof RunAlertSettingCreateParamsSchema>;
+
+// Command: disable on RunAlertSetting
+export const RunAlertSettingDisableParamsSchema = z.object({
+  actorId: z.string().optional(),
+});
+
+export type RunAlertSettingDisableParams = z.infer<typeof RunAlertSettingDisableParamsSchema>;
+
+// Command: enable on RunAlertSetting
+export const RunAlertSettingEnableParamsSchema = z.object({
+  generation: z.string(),
+  actorId: z.string().optional(),
+});
+
+export type RunAlertSettingEnableParams = z.infer<typeof RunAlertSettingEnableParamsSchema>;
 
 // Command: archive on SavedReportDefinition
 export const SavedReportDefinitionArchiveParamsSchema = z.object({});
@@ -9468,6 +9568,14 @@ export const StaffMessageMarkReadParamsSchema = z.object({});
 
 export type StaffMessageMarkReadParams = z.infer<typeof StaffMessageMarkReadParamsSchema>;
 
+// Command: recordAttachments on StaffMessage
+export const StaffMessageRecordAttachmentsParamsSchema = z.object({
+  attachmentCount: z.number().int(),
+  clearBody: z.boolean(),
+});
+
+export type StaffMessageRecordAttachmentsParams = z.infer<typeof StaffMessageRecordAttachmentsParamsSchema>;
+
 // Command: remove on StaffMessage
 export const StaffMessageRemoveParamsSchema = z.object({});
 
@@ -9724,6 +9832,23 @@ export const TimeRecordCorrectParamsSchema = z.object({
 });
 
 export type TimeRecordCorrectParams = z.infer<typeof TimeRecordCorrectParamsSchema>;
+
+// Command: create on TppReportFavorite
+export const TppReportFavoriteCreateParamsSchema = z.object({
+  reportId: z.string().optional(),
+});
+
+export type TppReportFavoriteCreateParams = z.infer<typeof TppReportFavoriteCreateParamsSchema>;
+
+// Command: refavorite on TppReportFavorite
+export const TppReportFavoriteRefavoriteParamsSchema = z.object({});
+
+export type TppReportFavoriteRefavoriteParams = z.infer<typeof TppReportFavoriteRefavoriteParamsSchema>;
+
+// Command: unfavorite on TppReportFavorite
+export const TppReportFavoriteUnfavoriteParamsSchema = z.object({});
+
+export type TppReportFavoriteUnfavoriteParams = z.infer<typeof TppReportFavoriteUnfavoriteParamsSchema>;
 
 // Command: register on Trailer
 export const TrailerRegisterParamsSchema = z.object({

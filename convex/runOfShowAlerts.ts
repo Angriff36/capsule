@@ -8,15 +8,17 @@
  *   3. "Still open"    (activity past its end + grace, not completed)
  *
  * Same posture as convex/smsAlerts.ts: a self-scheduling internalAction that
- * scans domain state, dedupes against the manifestEvents ledger, and hands
- * delivery to convex/runOfShowAlertsSend.ts (Node runtime, web-push). No
+ * scans domain state, ~~dedupes against the manifestEvents ledger,~~ dedupes
+ * against the RunAlertDelivery ledger (2026-09-29; legacy manifestEvents
+ * rows still count), and hands delivery to convex/runOfShowAlertsSend.ts
+ * (Node runtime, web-push). No
  * generated crons.ts edit, which would be drift. Delivery opt-in is the same
  * account preference team chat uses (chatNotifyPreference), so one switch
  * governs phone alerts from Capsule; the loop only runs for tenants that
  * turned the feature on.
  */
 import { v } from "convex/values";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import {
   action,
@@ -29,9 +31,12 @@ import {
 import { getAuthContext, requireTenant } from "./lib/authContext";
 import { RunAlertLoopLedger } from "./lib/runOfShowAlertLoop";
 import { live, tenantPerson } from "./lib/teamChatRead";
+import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
+import { recordDeviceResults } from "./pushSubscriptions";
 import type { PushPayload, PushTarget } from "./teamChatPush";
 
-const SENT_ENTITY = "RunAlert";
+/** Entity name of the legacy hand-written RunAlertSent ledger rows. */
+const LEGACY_SENT_ENTITY = "RunAlert";
 const SCAN_INTERVAL_MS = 60_000;
 const LEAD_MS = 5 * 60_000;
 /** Slack after an end time before the tracker calls a block late. */
@@ -64,6 +69,33 @@ function vapidConfigured(): boolean {
 }
 
 const loopLedger = new RunAlertLoopLedger();
+
+/**
+ * Alert kinds already sent for one activity: RunAlertDelivery rows, plus the
+ * legacy hand-written RunAlertSent ledger rows (entity "RunAlert", entityId =
+ * activityId) written before 2026-09-29. Both reads are indexed.
+ */
+async function sentAlertKinds(
+  ctx: QueryCtx,
+  activityId: string,
+): Promise<Set<string>> {
+  const kinds = new Set<string>();
+  for (const row of await ctx.db
+    .query("runAlertDeliveries")
+    .withIndex("by_activityId", (q) => q.eq("activityId", activityId))
+    .collect()) {
+    kinds.add(row.kind);
+  }
+  for (const row of await ctx.db
+    .query("manifestEvents")
+    .withIndex("by_entityId", (q) => q.eq("entityId", activityId))
+    .collect()) {
+    if (row.entity === LEGACY_SENT_ENTITY && row.type === "RunAlertSent") {
+      kinds.add(String((row.payload as { kind?: string }).kind));
+    }
+  }
+  return kinds;
+}
 
 /** Latest config event wins, mirroring smsAlerts.latestConfigEnabled. */
 async function alertsEnabled(
@@ -191,8 +223,7 @@ export const mayScan = internalQuery({
   returns: v.boolean(),
   handler: async (ctx, args) => {
     const owner = await loopLedger.owner(ctx, args.tenantId);
-    const latest = await loopLedger.latestConfig(ctx, args.tenantId);
-    return RunAlertLoopLedger.mayScan(owner, latest, args.generation);
+    return RunAlertLoopLedger.mayScan(owner, args.generation);
   },
 });
 
@@ -266,18 +297,7 @@ export const collectDueAlerts = internalQuery({
         ) {
           continue;
         }
-        const sentRows = await ctx.db
-          .query("manifestEvents")
-          .withIndex("by_entityId", (q) => q.eq("entityId", activity._id))
-          .collect();
-        const sentKinds = new Set(
-          sentRows
-            .filter(
-              (row) =>
-                row.entity === SENT_ENTITY && row.type === "RunAlertSent",
-            )
-            .map((row) => String((row.payload as { kind?: string }).kind)),
-        );
+        const sentKinds = await sentAlertKinds(ctx, String(activity._id));
 
         for (const window of dueWindows(activity, args.now)) {
           if (sentKinds.has(window.kind)) continue;
@@ -343,36 +363,31 @@ export const recordRunPushResults = internalMutation({
     now: v.number(),
   },
   handler: async (ctx, args) => {
-    for (const id of args.used) {
-      const row = await ctx.db.get(id);
-      if (row && live(row)) await ctx.db.patch(id, { lastUsedAt: args.now });
-    }
-    // 404/410 from the push service: the browser dropped the subscription.
-    // Prune only the exact row version the delivery held.
-    for (const { id, version } of args.gone) {
-      const row = await ctx.db.get(id);
-      if (row && live(row) && row.version === version) {
-        await ctx.db.patch(id, {
-          deletedAt: args.now,
-          updatedAt: args.now,
-          version: row.version + 1,
-        });
-      }
-    }
+    // lastUsedAt for the devices that took the push; 404/410 from the push
+    // service retires the device (only the exact row version the delivery
+    // held). PushSubscription.recordDelivery / releaseDevice, as the system role.
+    await recordDeviceResults(ctx, args.used, args.gone, args.now);
     // Mark the alert sent ONLY when at least one device took the push: a
     // full soft failure (network, 5xx on every target) must stay unsent so
     // the next scan retries it inside the fire window.
+    // RunAlertDelivery.record (emits RunAlertSent) as the activity tenant's
+    // system role; an alert already on the ledger is not recorded twice.
     if (args.used.length > 0) {
-      await ctx.db.insert("manifestEvents", {
-        type: "RunAlertSent",
-        entity: SENT_ENTITY,
-        entityId: args.alertKey.activityId,
-        payload: {
-          activityId: args.alertKey.activityId,
-          kind: args.alertKey.kind,
-        },
-        createdAt: args.now,
-      });
+      const { activityId, kind } = args.alertKey;
+      const activityDocId = ctx.db.normalizeId(
+        "eventTimelineActivities",
+        activityId,
+      );
+      const activity = activityDocId ? await ctx.db.get(activityDocId) : null;
+      if (activity && !(await sentAlertKinds(ctx, activityId)).has(kind)) {
+        await TenantSystemCommandRunner.forTenant(
+          ctx,
+          activity.tenantId,
+        ).context.runMutation(api.mutations.RunAlertDelivery_createViaRecord, {
+          activityId,
+          kind,
+        });
+      }
     }
   },
 });

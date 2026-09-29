@@ -38,10 +38,14 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
   property recipientAuthSubjectId: string?
   // May be empty when the message carries files (attachmentCount > 0).
   property required encrypted body: string
-  // Number of Attachment rows on this message. Written ONLY by the authored
+  // Number of Attachment rows on this message. ~~Written ONLY by the authored
   // seam convex/teamChatSend.ts after those rows exist in the same
   // transaction — never accepted from a caller, so no command can claim files
-  // a message does not have.
+  // a message does not have.~~
+  // 2026-09-29: written only by recordAttachments, which the send seam runs
+  // after the rows exist in the same transaction; its constraint checks the
+  // count against the rows, so no command can claim files a message does
+  // not have.
   property attachmentCount: int = 0
   // Comma-separated Person ids mentioned with @ — notification routing only.
   property mentionedPersonIds: string?
@@ -151,6 +155,21 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The files a message carries, counted from its Attachment rows by the send
+  // seam (convex/teamChatSend.ts) in the transaction that attached them. A
+  // file-only message's text placeholder becomes "" at the same time. The
+  // count must match the sender's live chat files on this message, so no
+  // call can claim files the message does not have.
+  command recordAttachments(attachmentCount: int, clearBody: boolean) {
+    guard self.deletedAt == null
+    guard user.id != null
+    guard user.personId != null and self.senderPersonId == user.personId and self.senderAuthSubjectId == user.id "Only the sender can attach files to a message"
+    constraint recordAttachmentsCounted: attachmentCount == count(Attachment where parentId == self.id, uploadedById == self.senderAuthSubjectId, parentType == "staffMessage") "This message's files changed while it was being sent. Send it again."
+    constraint recordAttachmentsBody: not clearBody or attachmentCount > 0 "Add message text or a file."
+    mutate attachmentCount = attachmentCount
+    mutate body = clearBody ? "" : self.body
+  }
+
   // Authors take back their own message; managers moderate channels.
   command remove() {
     guard self.deletedAt == null
@@ -200,6 +219,8 @@ entity StaffChatReadCursor mixin TenantScoped {
     guard self.authSubjectId == null "This chat's read position is already set. It updates automatically after that."
     constraint openChannelKey: length(trim(channelKey)) > 0 "Pick a channel."
     constraint openNotFuture: readUpTo <= now() "You can't mark a chat read before now."
+    // One cursor per (channel, account); later visits touch it.
+    constraint openOnce: count(StaffChatReadCursor where channelKey == channelKey, authSubjectId == user.id) == 0 "This chat's read position is already set. It updates automatically after that."
     mutate channelKey = channelKey
     mutate authSubjectId = user.id
     mutate lastReadAt = readUpTo

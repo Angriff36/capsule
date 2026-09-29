@@ -10,6 +10,9 @@
  * text; a file-only message gets a transient placeholder that this seam
  * replaces with "" before the transaction commits, so it is never observable
  * and a direct call can never persist a blank message.
+ * 2026-09-29: the count and the placeholder swap run through
+ * StaffMessage.recordAttachments, whose constraints check the count against
+ * the rows and refuse a blank body without files.
  *
  * The caller's idempotency key makes a retry after a lost response return the
  * same message instead of a duplicate. The nested keys are scoped to the
@@ -24,7 +27,7 @@ import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { mutation } from "./_generated/server";
 import { deleteBlobIfOrphan } from "./lib/blobs";
-import { chatAuth, encryptField, live } from "./lib/teamChatRead";
+import { chatAuth, live } from "./lib/teamChatRead";
 
 /** Files per message; mirrors src/features/chat/chatTypes.ts CHAT_MAX_FILES. */
 const MAX_FILES = 20;
@@ -145,41 +148,23 @@ export const sendWithFiles = mutation({
       return { docId };
     }
 
-    // Chat files are written here and nowhere else: the public
+    // ~~Chat files are written here and nowhere else: the public
     // Attachment.attach command rejects the chat parent type, so a row can
-    // exist only after the blob and the parent message were verified above.
-    // Same shape and audit event as the generated command. A replay never
-    // inserts — the first attempt's rows are the message's files.
+    // exist only after the blob and the parent message were verified above.~~
+    // 2026-09-29: chat files are created by Attachment.attach with the
+    // caller's auth, after the blobs were verified above; the command admits
+    // the chat parent type only for the caller's own message whose files are
+    // not yet counted. A replay never attaches — the first attempt's rows are
+    // the message's files.
     if (!replay) {
-      const now = Date.now();
       for (const file of args.files) {
-        const attachmentId = await ctx.db.insert("attachments", {
-          tenantId: auth.tenantId,
-          createdAt: now,
-          updatedAt: now,
+        await ctx.runMutation(api.mutations.Attachment_createViaAttach, {
           parentType: "staffMessage",
           parentId: docId,
           fileName: file.fileName,
           contentType: file.contentType || "application/octet-stream",
           fileSize: file.fileSize,
           storageId: file.storageId,
-          uploadedById: auth.id,
-          uploadedAt: now,
-          version: 1,
-        });
-        await ctx.db.insert("manifestEvents", {
-          type: "AttachmentAdded",
-          entity: "Attachment",
-          entityId: attachmentId,
-          payload: {
-            attachmentId,
-            tenantId: auth.tenantId,
-            parentType: "staffMessage",
-            parentId: docId,
-            fileName: file.fileName,
-            storageId: file.storageId,
-          },
-          createdAt: now,
         });
       }
     }
@@ -207,17 +192,15 @@ export const sendWithFiles = mutation({
       }
     }
 
-    const patch: { attachmentCount?: number; body?: string } = {};
-    if (message.attachmentCount !== rows.length) {
-      patch.attachmentCount = rows.length;
-    }
     // First commit of a file-only message: the placeholder becomes "". A
     // replay leaves the body alone — the sender may have edited it since.
-    if (!replay && text.length === 0) {
-      patch.body = await encryptField(ctx, "StaffMessage", "body", "");
-    }
-    if (Object.keys(patch).length > 0) {
-      await ctx.db.patch(message._id, patch);
+    const clearBody = !replay && text.length === 0;
+    if (message.attachmentCount !== rows.length || clearBody) {
+      await ctx.runMutation(api.mutations.StaffMessage_recordAttachments, {
+        docId: message._id,
+        attachmentCount: rows.length,
+        clearBody,
+      });
     }
     // Web push for the recipient / the people mentioned — after this
     // transaction commits, never on a replay (the first attempt already did).

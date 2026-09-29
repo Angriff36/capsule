@@ -16,6 +16,7 @@ import {
   type QueryCtx,
 } from "./_generated/server";
 import { live, tenantEvent, tenantPerson } from "./lib/teamChatRead";
+import { recordDeviceResults } from "./pushSubscriptions";
 
 /** A push older than this when the action finally runs is not worth sending. */
 const STALE_MS = 5 * 60_000;
@@ -175,22 +176,11 @@ export const recordPushResults = internalMutation({
     now: v.number(),
   },
   handler: async (ctx, args) => {
-    for (const id of args.used) {
-      const row = await ctx.db.get(id);
-      if (row && live(row)) await ctx.db.patch(id, { lastUsedAt: args.now });
-    }
-    // 404/410 from the push service: the browser dropped the subscription.
-    // Only if the row is the same one the delivery held — a re-registered or
-    // re-owned device has a newer version and stays.
-    for (const { id, version } of args.gone) {
-      const row = await ctx.db.get(id);
-      if (row && live(row) && row.version === version) {
-        await ctx.db.patch(id, {
-          deletedAt: args.now,
-          updatedAt: args.now,
-          version: row.version + 1,
-        });
-      }
-    }
+    // lastUsedAt for the devices that took the push; 404/410 from the push
+    // service retires the device, only if the row is the same one the
+    // delivery held — a re-registered or re-owned device has a newer version
+    // and stays. Both run PushSubscription commands (recordDelivery,
+    // releaseDevice) as the device tenant's system role.
+    await recordDeviceResults(ctx, args.used, args.gone, args.now);
   },
 });

@@ -1,0 +1,123 @@
+// Run-of-show background push alerts (convex/runOfShowAlerts.ts, loop
+// ownership in convex/lib/runOfShowAlertLoop.ts). Created 2026-09-29.
+//
+// RunAlertSetting is the tenant's switch and the scanner loop's ownership
+// token: `generation` names the one self-rescheduling scan loop allowed to
+// run, so two enables (or a disable/enable inside one scan interval) can
+// never fork a second loop (#298). Before this entity existed, the switch
+// lived only in hand-written manifestEvents rows (entity "RunAlertConfig",
+// entityId = tenantId); the seam still reads those for a tenant that has no
+// RunAlertSetting row yet.
+//
+// RunAlertDelivery is the dedupe ledger: one row per activity and alert kind
+// that at least one device accepted, so repeated scans inside a fire window
+// push each alert once. Legacy "RunAlert" manifestEvents rows (entityId =
+// activityId) are still honoured by the seam.
+//
+// The alert scanner runs without a user (a scheduled action), and the
+// enable/disable actions hand the switch to it, so every command here runs as
+// the tenant's system role (convex/lib/tenantSystemCommandRunner.ts) and
+// nobody else can run them: a direct call could mark alerts on with no loop
+// behind them, or mark an alert sent that no device received.
+
+use "../foundation/base.manifest"
+
+event RunAlertsEnabled: "run_alerts.enabled" {
+  runAlertSettingId: string
+  tenantId: string
+  actorId: string?
+  generation: string
+}
+
+event RunAlertsDisabled: "run_alerts.disabled" {
+  runAlertSettingId: string
+  tenantId: string
+  actorId: string?
+}
+
+event RunAlertSent: "run_alert.sent" {
+  activityId: string
+  kind: string
+}
+
+entity RunAlertSetting mixin TenantScoped {
+  key [tenantId, id]
+  unique [tenantId]
+  timestamps
+  versionProperty version: number
+
+  // Background alerts on for this tenant.
+  property required enabled: boolean = false
+  // The scan loop that owns the tenant while enabled.
+  property generation: string?
+  // The sign-in that last switched alerts on or off.
+  property changedBy: string?
+
+  default policy runAlertSettingRead read: roleAllows(user.role, "staffAccess") "Staff may see whether background alerts are on"
+  default policy runAlertSettingWrite write: roleAllows(user.role, "staffAccess") "Staff may switch background alerts"
+  default policy runAlertSettingExecute execute: roleAllows(user.role, "staffAccess") "Staff may switch background alerts"
+
+  // Governed creation — the tenant's switch, off until enabled.
+  command create() {
+    guard user.role == "system" "Turn background alerts on or off from the run-of-show settings"
+  }
+
+  command enable(generation: string, optional actorId: string) {
+    guard user.role == "system" "Turn background alerts on or off from the run-of-show settings"
+    guard self.enabled == false "Background alerts are already on"
+    constraint enableGeneration: length(trim(generation)) > 0 "The alert loop needs its owner token."
+    mutate enabled = true
+    mutate generation = generation
+    mutate changedBy = actorId
+    emit RunAlertsEnabled {
+      runAlertSettingId: self.id
+      tenantId: self.tenantId
+      actorId: actorId
+      generation: generation
+    }
+  }
+
+  command disable(optional actorId: string) {
+    guard user.role == "system" "Turn background alerts on or off from the run-of-show settings"
+    mutate enabled = false
+    mutate changedBy = actorId
+    emit RunAlertsDisabled {
+      runAlertSettingId: self.id
+      tenantId: self.tenantId
+      actorId: actorId
+    }
+  }
+
+  store RunAlertSetting in durable
+}
+
+entity RunAlertDelivery mixin TenantScoped {
+  key [tenantId, id]
+  unique [tenantId, activityId, kind]
+  timestamps
+  versionProperty version: number
+
+  // The EventTimelineActivity the alert was about.
+  property indexed required activityId: string
+  // lead ("in 5 minutes"), start ("now") or overdue ("still open").
+  property required kind: string
+
+  default policy runAlertDeliveryRead read: roleAllows(user.role, "staffAccess") "Staff may see which alerts went out"
+  default policy runAlertDeliveryWrite write: roleAllows(user.role, "staffAccess") "Alerts are recorded by the app"
+  default policy runAlertDeliveryExecute execute: roleAllows(user.role, "staffAccess") "Alerts are recorded by the app"
+
+  // Governed creation — at least one device accepted this alert.
+  command record(activityId: string, kind: string) {
+    guard user.role == "system" "Alerts are recorded by the app"
+    constraint recordKind: kind == "lead" or kind == "start" or kind == "overdue" "Unknown alert kind."
+    constraint recordOnce: count(RunAlertDelivery where activityId == activityId, kind == kind) == 0 "This alert was already sent."
+    mutate activityId = activityId
+    mutate kind = kind
+    emit RunAlertSent {
+      activityId: activityId
+      kind: kind
+    }
+  }
+
+  store RunAlertDelivery in durable
+}

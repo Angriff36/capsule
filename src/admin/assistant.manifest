@@ -36,7 +36,19 @@ entity AssistantLlmConfig mixin TenantScoped, SoftDeletable {
 // Files a user attached to an assistant conversation. Uploads land in Convex
 // storage anonymously; this row is what binds the blob to the uploader so the
 // turn action only inlines bytes the caller owns (or that their tenant
-// references). Authored convex/assistantConfig.ts writes the rows.
+// references). ~~Authored convex/assistantConfig.ts writes the rows.~~
+// 2026-09-29: authored convex/assistantConfig.ts resolves the caller, checks
+// the blob is an orphan (no live row in any tenant references it — a check
+// that spans every table holding files, which a command cannot express) and
+// then runs `register` as the caller tenant's system role, naming the
+// caller as the uploader. Nobody else can run it: a direct call could claim a
+// blob another tenant's record owns.
+
+event AssistantUploadRegistered: "assistant_upload.registered" {
+  assistantUploadId: string
+  tenantId: string
+  storageId: string
+}
 entity AssistantUpload mixin TenantScoped {
   key [tenantId, id]
   timestamps
@@ -48,6 +60,22 @@ entity AssistantUpload mixin TenantScoped {
   default policy assistantUploadRead read: user.id != null "Staff may see assistant upload registrations"
   default policy assistantUploadWrite write: user.id != null "Staff may register assistant uploads"
   default policy assistantUploadExecute execute: user.id != null "Staff may change assistant uploads"
+
+  // Governed creation — bind a freshly uploaded orphan blob to its uploader.
+  command register(storageId: string, name: string, uploadedBy: string) {
+    guard user.role == "system" "Upload files through the assistant"
+    guard self.uploadedByAuthSubjectId == null "An upload is registered once"
+    constraint registerStorage: length(trim(storageId)) > 0 "Nothing was uploaded."
+    constraint registerUploader: length(trim(uploadedBy)) > 0 "Sign in first."
+    mutate storageId = storageId
+    mutate uploadedByAuthSubjectId = uploadedBy
+    mutate name = name
+    emit AssistantUploadRegistered {
+      assistantUploadId: self.id
+      tenantId: self.tenantId
+      storageId: storageId
+    }
+  }
 
   store AssistantUpload in durable
 }

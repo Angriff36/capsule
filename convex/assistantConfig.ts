@@ -8,6 +8,8 @@
 //                    the verified subject is passed explicitly and the tenant
 //                    is derived from that subject's Person row. Never exposed
 //                    as a public function.
+//   registerUpload   — 2026-09-29: binds an orphan blob to its uploader
+//                    through the generated AssistantUpload.register command.
 import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import {
@@ -17,8 +19,10 @@ import {
   type MutationCtx,
   type QueryCtx,
 } from "./_generated/server";
+import { api } from "./_generated/api";
 import { storageReferencedByTenant } from "./fileStorage";
 import { blobReferenced } from "./lib/blobs";
+import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 
 async function personTenantId(
   ctx: QueryCtx,
@@ -105,11 +109,16 @@ export const registerUpload = mutation({
         return; // already registered by this caller
       }
     }
-    await ctx.db.insert("assistantUploads", {
+    // AssistantUpload.register runs as this tenant's system role, naming the
+    // caller: the orphan check above spans every file-holding table, which
+    // the command cannot express, so only this seam may run it.
+    await TenantSystemCommandRunner.forTenant(
+      ctx,
       tenantId,
+    ).context.runMutation(api.mutations.AssistantUpload_createViaRegister, {
       storageId: args.storageId,
-      uploadedByAuthSubjectId: subject,
       name: args.name,
+      uploadedBy: subject,
     });
   },
 });

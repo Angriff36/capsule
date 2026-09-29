@@ -1,4 +1,41 @@
 {
   "version": 1,
-  "acknowledged": []
+  "acknowledged": [
+    {
+      "path": "create.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive: the diff keys commands by bare name. TppReportFavorite gained its own literal `create` (governed favorites); ShareLink.create is unchanged."
+    },
+    {
+      "path": "create.parameters.expiresAt",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive of the same name collision: ShareLink.create still takes expiresAt."
+    },
+    {
+      "path": "create.parameters.proposalId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive of the same name collision: ShareLink.create still takes proposalId."
+    },
+    {
+      "path": "create.parameters.proposalRevisionId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive of the same name collision: ShareLink.create still takes proposalRevisionId."
+    },
+    {
+      "path": "create.parameters.reportId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "The new TppReportFavorite.create takes an optional reportId; no existing command changed."
+    },
+    {
+      "path": "TppReportFavorite.deletedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "SoftDeletable mixin: deletedAt is optional (v.optional in the schema), so existing rows stay valid and read as live."
+    }
+  ]
 }

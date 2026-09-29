@@ -27,7 +27,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.AssistantLlmConfig_createViaConfigure, { "baseUrl": "demo-baseUrl-1", "apiKey": "demo-apiKey-1", "model": "demo-model-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.AssistantLlmConfig_createViaConfigure, { "baseUrl": "demo-baseUrl-2", "apiKey": "demo-apiKey-2", "model": "demo-model-2" } as any);
-  // skip AssistantUpload: no creation command in IR (2 rows unused)
+  // AssistantUpload → api.mutations.AssistantUpload_createViaRegister
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.AssistantUpload_createViaRegister, { "storageId": "storageId-assistant-upload-1", "name": "AssistantUpload 1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.AssistantUpload_createViaRegister, { "storageId": "storageId-assistant-upload-2", "name": "AssistantUpload 2" } as any);
   // Attachment has multiple initialization commands (attach, remove); using the selected initialization command: attach.
   // Attachment → api.mutations.Attachment_createViaAttach
   rowsAttempted += 1;
@@ -44,7 +48,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.Candidate_createViaApply, { "fullName": "Candidate 1", "email": "user1@example.com", "phone": "demo-phone-1", "roleAppliedFor": "demo-roleAppliedFor-1", "sourceSystem": "demo-sourceSystem-1", "externalCandidateId": "externalCandidateId-candidate-1", "rawSourceData": "demo-rawSourceData-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.Candidate_createViaApply, { "fullName": "Candidate 2", "email": "user2@example.com", "phone": "demo-phone-2", "roleAppliedFor": "demo-roleAppliedFor-2", "sourceSystem": "demo-sourceSystem-2", "externalCandidateId": "externalCandidateId-candidate-2", "rawSourceData": "demo-rawSourceData-2" } as any);
-  // skip ChatNotifyPreference: no creation command in IR (2 rows unused)
+  // ChatNotifyPreference → api.mutations.ChatNotifyPreference_create
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ChatNotifyPreference_create, { "enabled": false } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ChatNotifyPreference_create, { "enabled": false } as any);
   // Client has multiple initialization commands (markMerged, register); using the selected initialization command: register.
   // Client → api.mutations.Client_createViaRegister
   rowsAttempted += 1;
@@ -553,7 +561,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.PurchaseNeed_create, { "eventId": "eventId-purchase-need-1", "ingredientDemandId": "ingredientDemandId-purchase-need-1", "ingredientId": "ingredientId-purchase-need-1", "preferredVendorId": "preferredVendorId-purchase-need-1", "requiredQuantity": 1, "unit": "demo-unit-1", "purchasingWeekStart": 1767268800000 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.PurchaseNeed_create, { "eventId": "eventId-purchase-need-2", "ingredientDemandId": "ingredientDemandId-purchase-need-2", "ingredientId": "ingredientId-purchase-need-2", "preferredVendorId": "preferredVendorId-purchase-need-2", "requiredQuantity": 2, "unit": "demo-unit-2", "purchasingWeekStart": 1767355200000 } as any);
-  // PushSubscription has multiple initialization commands (register, unregister); using the selected initialization command: register.
+  // PushSubscription has multiple initialization commands (register, releaseDevice, renew, unregister); using the selected initialization command: register.
   // PushSubscription → api.mutations.PushSubscription_createViaRegister
   rowsAttempted += 1;
   await client.mutation(api.mutations.PushSubscription_createViaRegister, { "endpoint": "demo-endpoint-1", "p256dh": "demo-p256dh-1", "auth": "demo-auth-1", "userAgent": "demo-userAgent-1" } as any);
@@ -604,6 +612,14 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.RoleScorecard_createViaDefine, { "role": "demo-role-1", "title": "RoleScorecard 1", "expectations": "demo-expectations-1", "effectiveFrom": 1767268800000 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.RoleScorecard_createViaDefine, { "role": "demo-role-2", "title": "RoleScorecard 2", "expectations": "demo-expectations-2", "effectiveFrom": 1767355200000 } as any);
+  // RunAlertDelivery → api.mutations.RunAlertDelivery_createViaRecord
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.RunAlertDelivery_createViaRecord, { "activityId": "activityId-run-alert-delivery-1", "kind": "demo-kind-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.RunAlertDelivery_createViaRecord, { "activityId": "activityId-run-alert-delivery-2", "kind": "demo-kind-2" } as any);
+  // RunAlertSetting → api.mutations.RunAlertSetting_create
+  // skip RunAlertSetting row "run-alert-setting-1": no non-blank create args
+  // skip RunAlertSetting row "run-alert-setting-2": no non-blank create args
   // SavedReportDefinition → api.mutations.SavedReportDefinition_createViaCreateDefinition
   rowsAttempted += 1;
   await client.mutation(api.mutations.SavedReportDefinition_createViaCreateDefinition, { "name": "SavedReportDefinition 1", "subjectArea": "demo-subjectArea-1", "chartType": "demo-chartType-1", "definition": "demo-definition-1", "sharingScope": "demo-sharingScope-1" } as any);
@@ -703,7 +719,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.TimeRecord_createViaClockIn, { "personId": "personId-time-record-1", "shiftId": "shiftId-time-record-1", "eventId": "eventId-time-record-1", "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.TimeRecord_createViaClockIn, { "personId": "personId-time-record-2", "shiftId": "shiftId-time-record-2", "eventId": "eventId-time-record-2", "notes": "demo-notes-2" } as any);
-  // skip TppReportFavorite: no creation command in IR (2 rows unused)
+  // TppReportFavorite → api.mutations.TppReportFavorite_create
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.TppReportFavorite_create, { "reportId": "reportId-tpp-report-favorite-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.TppReportFavorite_create, { "reportId": "reportId-tpp-report-favorite-2" } as any);
   // Trailer → api.mutations.Trailer_createViaRegister
   rowsAttempted += 1;
   await client.mutation(api.mutations.Trailer_createViaRegister, { "make": "demo-make-1", "model": "demo-model-1", "registration": "demo-registration-1", "payloadCapacityKg": 1, "operationalStatus": "demo-operationalStatus-1", "statusNote": "demo-statusNote-1" } as any);
@@ -854,7 +874,7 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "AssistantUpload",
-      "createMutation": null,
+      "createMutation": "AssistantUpload_createViaRegister",
       "rowCount": 2
     },
     {
@@ -874,7 +894,7 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "ChatNotifyPreference",
-      "createMutation": null,
+      "createMutation": "ChatNotifyPreference_create",
       "rowCount": 2
     },
     {
@@ -1433,6 +1453,16 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "RunAlertDelivery",
+      "createMutation": "RunAlertDelivery_createViaRecord",
+      "rowCount": 2
+    },
+    {
+      "entity": "RunAlertSetting",
+      "createMutation": "RunAlertSetting_create",
+      "rowCount": 2
+    },
+    {
       "entity": "SavedReportDefinition",
       "createMutation": "SavedReportDefinition_createViaCreateDefinition",
       "rowCount": 2
@@ -1539,7 +1569,7 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "TppReportFavorite",
-      "createMutation": null,
+      "createMutation": "TppReportFavorite_create",
       "rowCount": 2
     },
     {

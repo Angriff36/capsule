@@ -8,6 +8,7 @@
 // minus staffMessage, whose files are read only through convex/teamChat.ts.
 
 use "../foundation/base.manifest"
+use "../workforce/staff-message.manifest"
 
 enum AttachmentParentType {
   // "event" is a reserved word in Manifest, so the member is eventRecord.
@@ -94,10 +95,15 @@ entity Attachment mixin TenantScoped, SoftDeletable {
     // file (for example into the chat-only parent type, which the generated
     // API never shows). A stored row always has its uploader.
     guard self.uploadedById == null "Files are attached once; remove the attachment and add the file again to change it"
-    // Chat files are written only by convex/teamChatSend.ts, in the same
+    // ~~Chat files are written only by convex/teamChatSend.ts, in the same
     // transaction as their message, after the blob and the parent message are
-    // verified; the public command never creates one.
-    constraint attachNotChat: parentType != "staffMessage" "Chat files are attached through their message"
+    // verified; the public command never creates one.~~
+    // 2026-09-29: convex/teamChatSend.ts attaches chat files through this
+    // command, in the same transaction as their message, after the blobs are
+    // verified. A chat file needs a live message in this tenant sent by the
+    // caller's current sign-in and Person whose files are not yet counted
+    // (StaffMessage.recordAttachments counts them, from the rows).
+    constraint attachNotChat: parentType != "staffMessage" or count(StaffMessage where id == parentId, senderAuthSubjectId == user.id, senderPersonId == user.personId, attachmentCount == 0) > 0 "Chat files are attached through their message"
     constraint attachParent: length(trim(parentId)) > 0 "This file needs something to attach to"
     constraint attachFileName: length(trim(fileName)) > 0 "Give this file a name."
     constraint attachStorage: length(trim(storageId)) > 0 "This file hasn't finished uploading yet."
