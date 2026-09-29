@@ -18,6 +18,7 @@ import {
   type Proof,
 } from "./headcount-staffing-reconciliation.runtime.helpers";
 import { buildPayrollExport } from "../../src/features/finance/payrollExport";
+import type { PersonPeriodLaborSummary } from "../../src/features/facilities/useLaborSummary";
 
 const M = api.mutations;
 const TENANT = "tenant-clock-alerts";
@@ -69,7 +70,28 @@ async function setup(proof: Proof) {
     role: "finance_manager",
     tenantId: TENANT,
   });
-  return { workforce, manage, hire, all, read, pay: runner(proof, finance) };
+  const alertsAt = async (now: number) =>
+    (await workforce.query(api.laborSummary.attendanceAlerts, { now })) as {
+      alerts: unknown[];
+    } | null;
+  const payFor = async (
+    personId: string,
+    period: { periodStart: number; periodEnd: number },
+  ) =>
+    (await workforce.query(api.laborSummary.personPeriodLaborSummary, {
+      personId: personId as never,
+      ...period,
+    })) as PersonPeriodLaborSummary | null;
+  return {
+    workforce,
+    manage,
+    hire,
+    all,
+    read,
+    alertsAt,
+    payFor,
+    pay: runner(proof, finance),
+  };
 }
 
 async function staffedEvent(
@@ -121,9 +143,7 @@ describe("clock alerts (AC-509)", () => {
     await lateClockIn(s, kit, shiftOf(kit.personId)._id);
 
     // Half an hour in: Kit is late, Lou is not in yet.
-    const early = await s.workforce.query(api.laborSummary.attendanceAlerts, {
-      now: S.startsAt + 30 * MIN,
-    });
+    const early = await s.alertsAt(S.startsAt + 30 * MIN);
     expect(early?.alerts).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -146,9 +166,7 @@ describe("clock alerts (AC-509)", () => {
     ).toBeNull();
 
     // After the shift Lou never came: the manager records the no-show.
-    const after = await s.workforce.query(api.laborSummary.attendanceAlerts, {
-      now: S.endsAt + 60 * MIN,
-    });
+    const after = await s.alertsAt(S.endsAt + 60 * MIN);
     expect(after?.alerts).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -164,10 +182,7 @@ describe("clock alerts (AC-509)", () => {
       version: (await s.read<Doc<"shifts">>(louShift._id)).version,
     });
     expect((await s.read<Doc<"shifts">>(louShift._id)).status).toBe("no_show");
-    const recorded = await s.workforce.query(
-      api.laborSummary.attendanceAlerts,
-      { now: S.endsAt + 61 * MIN },
-    );
+    const recorded = await s.alertsAt(S.endsAt + 61 * MIN);
     expect(recorded?.alerts).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -203,15 +218,9 @@ describe("clock alerts (AC-509)", () => {
       periodStart: S.startsAt - 24 * 60 * MIN,
       periodEnd: S.endsAt + 24 * 60 * MIN,
     };
-    const kitPay = await s.workforce.query(
-      api.laborSummary.personPeriodLaborSummary,
-      { personId: kit.personId as never, ...period },
-    );
+    const kitPay = await s.payFor(kit.personId, period);
     expect(kitPay?.approvedMinutes).toBe(275);
-    const louPay = await s.workforce.query(
-      api.laborSummary.personPeriodLaborSummary,
-      { personId: lou.personId as never, ...period },
-    );
+    const louPay = await s.payFor(lou.personId, period);
     expect(louPay?.approvedMinutes).toBe(0);
     const input = await s.pay(M.PayrollInput_createViaPrepare, {
       personId: kit.personId,
@@ -254,10 +263,7 @@ describe("approved time to payroll (AC-383)", () => {
     };
 
     // Not approved yet: payroll waits for it.
-    const waiting = await s.workforce.query(
-      api.laborSummary.personPeriodLaborSummary,
-      { personId: kit.personId as never, ...period },
-    );
+    const waiting = await s.payFor(kit.personId, period);
     expect(waiting).toMatchObject({
       approvedMinutes: 0,
       approvedCount: 0,
@@ -269,10 +275,7 @@ describe("approved time to payroll (AC-383)", () => {
       docId: recordId,
       version: corrected.version,
     });
-    const pay = await s.workforce.query(
-      api.laborSummary.personPeriodLaborSummary,
-      { personId: kit.personId as never, ...period },
-    );
+    const pay = await s.payFor(kit.personId, period);
     // 5 h shift = 300 min, less 30 min lunch; paid breaks stay.
     expect(pay).toMatchObject({
       approvedMinutes: 270,
@@ -291,10 +294,10 @@ describe("approved time to payroll (AC-383)", () => {
     expect(prepared.totalMinutes).toBe(270);
 
     // The export reads the same approved hours.
-    const timeRecords = await s.workforce.query(
+    const timeRecords = (await s.workforce.query(
       api.laborSummary.payrollTimeRecords,
       {},
-    );
+    )) as Array<Record<string, unknown>> | null;
     const people = await s.all<Doc<"people">>("people");
     const day = new Date(S.startsAt);
     const ymd = (value: Date) =>
