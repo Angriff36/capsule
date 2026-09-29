@@ -121,7 +121,11 @@ entity Person mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     constraint hireGiven: length(trim(givenName)) > 0 "Give this person a first name."
-    constraint hireFamily: length(trim(familyName)) > 0 "Give this person a last name."
+    // Account bootstrap (convex/authLink.ts createAccountProfile) creates the
+    // profile from the identity provider, whose account may carry no last
+    // name. It runs as the tenant system identity AND binds the sign-in in the
+    // same step; every manager hire still needs a last name.
+    constraint hireFamily: length(trim(familyName)) > 0 or (authSubjectId != null and user.role == "system") "Give this person a last name."
     constraint hireEmail: length(trim(email)) > 0 "Give this person an email."
     mutate givenName = givenName
     mutate familyName = familyName
@@ -218,9 +222,11 @@ entity Person mixin TenantScoped, SoftDeletable {
 
   // Payroll employee number after hire. hire() already accepts it, but
   // existing rows had no command — Finance could not fix a missing number
-  // without re-hiring. Same write tier as setPayRate (workforce managers);
-  // the authored convex/personEmployeeNumber.ts seam also lets finance
-  // managers set it from the payroll preview until regen emits this command.
+  // without re-hiring. Same write tier as setPayRate (workforce managers).
+  // Finance managers set it from the payroll preview through the authored
+  // convex/personEmployeeNumber.ts seam, which checks their role and then
+  // runs THIS command as the tenant system identity (commands take only the
+  // entity default policies, so there is no per-command finance policy).
   command setEmployeeNumber(employeeNumber: string) {
     guard self.deletedAt == null
     constraint employeeNumberPresent: length(trim(employeeNumber)) > 0 "Give this person an employee number."
@@ -280,6 +286,23 @@ entity Person mixin TenantScoped, SoftDeletable {
   // mis-link is correctable without ending someone's employment.
   command unlinkAccount() {
     guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    guard roleAllows(user.role, "adminAccess") or not roleAllows(self.role, "adminAccess")
+    mutate authSubjectId = null
+    emit PersonAccountUnlinked {
+      personId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Clear a sign-in link left on ANY row of this person — including a
+  // terminated or removed row, which unlinkAccount refuses. First-sign-in
+  // self link (convex/authLink.ts linkBySubjectEmail) runs this on every row
+  // that still holds the sign-in before binding it to the matched row, so a
+  // later reactivation can never make two active rows claim one sign-in.
+  // Only takes access away; same authority rules as unlinkAccount.
+  command clearAccountLink() {
+    guard self.authSubjectId != null
     guard roleAllows(user.role, "workforceManageAccess")
     guard roleAllows(user.role, "adminAccess") or not roleAllows(self.role, "adminAccess")
     mutate authSubjectId = null

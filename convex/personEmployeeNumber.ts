@@ -1,21 +1,27 @@
 /**
  * AUTHOR SEAM — set Person.employeeNumber after hire.
  *
- * Person.hire already accepts employeeNumber. There is no generated
+ * ~~Person.hire already accepts employeeNumber. There is no generated
  * Person.setEmployeeNumber mutation until the next `bun run manifest:regen`
- * (sibling Builder is not on this machine). Finance managers on
- * /finance/payroll cannot wait: a missing number blocks CSV download.
+ * (sibling Builder is not on this machine).~~
+ * Corrected 2026-09-29: the generated Person_setEmployeeNumber exists and
+ * this seam now writes only through it (it emits PersonEmployeeNumberSet).
  *
- * Mirrors Person.setPayRate: tenant match, not deleted, version bump.
- * Finance + workforce managers may set it (payroll is the surface that
- * needs the number). Does not invent rates.
+ * Finance managers on /finance/payroll cannot wait: a missing number blocks
+ * CSV download. Finance + workforce managers may set it (payroll is the
+ * surface that needs the number). The generated command takes the Person
+ * default policies (workforceManageAccess) and Manifest has no per-command
+ * policy, so a finance manager — admitted by the role check below — runs the
+ * command as the tenant system identity. Everyone else runs it with their
+ * own auth. Does not invent rates.
  *
- * Source of truth for the next regen: src/identity/person.manifest
- * command setEmployeeNumber.
+ * Source of truth: src/identity/person.manifest command setEmployeeNumber.
  */
 import { v } from "convex/values";
+import { api } from "./_generated/api";
 import { mutation } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
+import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 
 function canSetEmployeeNumber(role: string): boolean {
   return (
@@ -58,20 +64,16 @@ export const setEmployeeNumber = mutation({
         `ConcurrencyConflict: VERSION_MISMATCH expected ${args.version} actual ${stored.version}`,
       );
     }
-    await ctx.db.patch(args.docId, {
+    // Finance managers hold financeManageAccess, not workforceManageAccess:
+    // this seam is their authority, so the command runs as the system.
+    const runner =
+      auth.role === "finance_manager"
+        ? TenantSystemCommandRunner.forTenant(ctx, auth.tenantId).context
+        : ctx;
+    await runner.runMutation(api.mutations.Person_setEmployeeNumber, {
+      docId: args.docId,
       employeeNumber,
-      version: (stored.version ?? 0) + 1,
-    });
-    await ctx.db.insert("manifestEvents", {
-      type: "PersonEmployeeNumberSet",
-      entity: "Person",
-      entityId: String(args.docId),
-      payload: {
-        personId: String(args.docId),
-        tenantId: auth.tenantId,
-        employeeNumber,
-      },
-      createdAt: Date.now(),
+      version: stored.version,
     });
     return { employeeNumber };
   },

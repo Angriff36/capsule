@@ -10,27 +10,34 @@
 //   - for each candidate: find an existing Candidate by (sourceSystem,
 //     externalCandidateId); if absent, create via Candidate_createViaApply
 //     (deterministic idempotencyKey as a 2nd dedup layer) and apply the
-//     KM-mapped stage (hire/reject/advance); if present, patch the KM-owned
-//     fields (raw + name + role + contact — stage stays an operator decision),
+//     KM-mapped stage (hire/reject/advance); if present, ~~patch~~ refresh
+//     the KM-owned fields through Candidate_refreshFromSource (raw + name +
+//     role + contact — stage stays an operator decision),
 //   - for each interview under that candidate: upsert by externalInterviewId
-//     (deduped within the payload); a KM outcome is recorded via
+//     (deduped within the payload) — an existing one is refreshed through
+//     Interview_refreshFromSource; a KM outcome is recorded via
 //     Interview_recordOutcome when the interview is still pending.
+//
+// Corrected 2026-09-29: ~~The generated Candidate/Interview commands ...
+// cannot upsert~~ still holds for the FIND step (it stays here), but every
+// write now goes through a generated command; this seam has no direct
+// ctx.db writes.
 //
 // Source IDs + raw responses live on the Candidate/Interview rows themselves
 // (not ExternalRecordLink) — candidates/interviews ARE the Capsule records, so
 // there is nothing to reconcile-match against (unlike the TPP payment/event
 // imports). The ingest is gated at the workforceManageAccess tier — the EXACT
 // roles base.manifest grants it (workforce_manager/admin/owner/system), NOT the
-// wider manager tier — so the direct ctx.db.patch update path cannot widen
-// access beyond the entities' own policy. The generated create commands
-// re-check via getAuthContext too (two layers). Auth propagates through
+// wider manager tier. ~~— so the direct ctx.db.patch update path cannot widen
+// access beyond the entities' own policy.~~ The generated commands (create
+// and refresh alike) re-check via getAuthContext too (two layers). Auth propagates through
 // ctx.runMutation (same identity), as it does for importCommit.
 import { ConvexError, v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { api } from "./_generated/api";
 import { getAuthContext } from "./lib/authContext";
 import { parseKmCandidates } from "./kmParser";
-import type { Doc, Id } from "./_generated/dataModel";
+import type { Id } from "./_generated/dataModel";
 
 // EXACT mirror of the roles granted `workforceManageAccess` in
 // src/foundation/base.manifest (workforce_manager + admin/owner/system via
@@ -83,18 +90,16 @@ export const ingestKmCandidates = mutation({
       if (existing) {
         // Re-import: KM is source of truth for identity/raw/contact. Stage is
         // an operator decision (left untouched; the raw preserves the KM stage).
-        await ctx.db.patch(existing._id, {
+        // A contact field KM no longer sends keeps its stored value (the
+        // command falls back to self.email / self.phone).
+        await ctx.runMutation(api.mutations.Candidate_refreshFromSource, {
+          docId: existing._id,
           fullName: candidate.fullName,
-          // mapKmRole guarantees a valid CapsuleRole literal; cast past the
-          // strict enum field type (the create hook uses v.any(), the patch
-          // path type-checks against the doc's union).
-          roleAppliedFor:
-            candidate.roleAppliedFor as Doc<"candidates">["roleAppliedFor"],
+          // mapKmRole guarantees a valid CapsuleRole literal.
+          roleAppliedFor: candidate.roleAppliedFor,
           rawSourceData: candidate.raw,
-          email: candidate.email ?? existing.email ?? undefined,
-          phone: candidate.phone ?? existing.phone ?? undefined,
-          updatedAt: Date.now(),
-          version: (existing.version ?? 0) + 1,
+          email: candidate.email ?? undefined,
+          phone: candidate.phone ?? undefined,
         });
         updated += 1;
         candidateId = existing._id;
@@ -155,15 +160,12 @@ export const ingestKmCandidates = mutation({
         );
 
         if (existingInterview) {
-          await ctx.db.patch(existingInterview._id, {
+          // A schedule or note KM no longer sends keeps its stored value.
+          await ctx.runMutation(api.mutations.Interview_refreshFromSource, {
+            docId: existingInterview._id,
             rawSourceData: interview.raw,
-            scheduledFor:
-              interview.scheduledFor ??
-              existingInterview.scheduledFor ??
-              undefined,
-            notes: interview.notes ?? existingInterview.notes ?? undefined,
-            updatedAt: Date.now(),
-            version: (existingInterview.version ?? 0) + 1,
+            scheduledFor: interview.scheduledFor ?? undefined,
+            notes: interview.notes ?? undefined,
           });
           if (
             interview.outcome !== "pending" &&

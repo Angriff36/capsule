@@ -7,17 +7,18 @@
 // roles. Hire already assigned that role; self-link only connects the
 // verified mailbox so the hire → email → open-app path is not blocked.
 import { v } from "convex/values";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import { action, internalMutation, internalQuery } from "./_generated/server";
 import type { MutationCtx } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
-import { decrypt, encrypt } from "./lib/encryption";
+import { decrypt } from "./lib/encryption";
 import {
   decidePersonEmailLink,
   pickLivePerson,
   tenantIdFromIdentityClaims,
 } from "./lib/personAuthPick";
+import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 
 /** Roles that carry adminAccess in src/foundation/base.manifest. */
 const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
@@ -160,34 +161,32 @@ export const createAccountProfile = internalMutation({
     }
     // Preserve a genuine manager-created invitation and its assigned work.
     // Ambiguous contact records never choose the account's identity or role.
+    // The caller has no Person yet, so it cannot pass the Person policies.
+    // The verified session above is the authority; the generated commands
+    // run as the tenant system identity, pinned to the session's tenant.
+    const system = TenantSystemCommandRunner.forTenant(
+      ctx,
+      auth.tenantId,
+    ).context;
     if (hired && !multipleHires) {
-      await ctx.db.patch(hired._id, {
+      await system.runMutation(api.mutations.Person_linkAccount, {
+        docId: hired._id,
         authSubjectId: identity.subject,
-        updatedAt: Date.now(),
-        version: hired.version + 1,
+        version: hired.version,
       });
       return { linked: true, reason: "matched" };
     }
-    const sealed = await encrypt(profile.email, {
-      ctx,
-      entity: "Person",
-      property: "email",
-    });
-    const now = Date.now();
-    await ctx.db.insert("people", {
-      tenantId: auth.tenantId,
-      authSubjectId: identity.subject,
+    // Person_createViaHire encrypts the email itself. An identity-provider
+    // account may have no last name; the hire command admits that only for
+    // this system-run bootstrap, which binds the sign-in in the same step.
+    await system.runMutation(api.mutations.Person_createViaHire, {
       givenName: profile.givenName,
       familyName: profile.familyName,
-      email: JSON.stringify({ v: 1, kid: sealed.keyId, ct: sealed.ciphertext }),
+      email: profile.email,
       // Preserve Capsule roles; Clerk member/custom roles get staff access.
       role: ACCOUNT_ROLES.find((role) => role === auth.role) ?? "staff",
-      status: "active",
       employmentType: "full_time",
-      deletedAt: null,
-      createdAt: now,
-      updatedAt: now,
-      version: 1,
+      authSubjectId: identity.subject,
     });
     return { linked: true, reason: "matched" };
   },
@@ -345,10 +344,24 @@ export const linkBySubjectEmail = internalMutation({
     // require a manual paste; that blocked the hire → email → open-app path.
     // A link left on a terminated/deleted row is cleared first, so a later
     // reactivation can never make two active rows claim this sign-in.
+    // No caller Person exists yet (or it is the wrong one), so the verified
+    // mailbox is the authority and the generated commands run as each row's
+    // own tenant system identity. Stale rows may sit in OTHER tenants.
     for (const stale of linkedRows) {
-      await ctx.db.patch(stale._id, { authSubjectId: null });
+      await TenantSystemCommandRunner.forTenant(
+        ctx,
+        stale.tenantId,
+      ).context.runMutation(api.mutations.Person_clearAccountLink, {
+        docId: stale._id,
+      });
     }
-    await ctx.db.patch(person._id, { authSubjectId: subject });
+    await TenantSystemCommandRunner.forTenant(
+      ctx,
+      person.tenantId,
+    ).context.runMutation(api.mutations.Person_linkAccount, {
+      docId: person._id,
+      authSubjectId: subject,
+    });
     return { linked: true, reason: "matched" };
   },
 });

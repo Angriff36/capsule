@@ -14,6 +14,8 @@ import {
   CandidateAdvanceParamsSchema,
   CandidateApplyParamsSchema,
   CandidateHireParamsSchema,
+  CandidateLinkHiredPersonParamsSchema,
+  CandidateRefreshFromSourceParamsSchema,
   CandidateRejectParamsSchema,
   CandidateRevokeHireParamsSchema,
   ClientArchiveParamsSchema,
@@ -329,6 +331,7 @@ import {
   IntegrationConnectionRecordFailureParamsSchema,
   IntegrationConnectionRecordSyncSuccessParamsSchema,
   InterviewRecordOutcomeParamsSchema,
+  InterviewRefreshFromSourceParamsSchema,
   InterviewScheduleParamsSchema,
   InventoryItemAdjustQuantityParamsSchema,
   InventoryItemApplyReceiptCorrectionParamsSchema,
@@ -463,6 +466,7 @@ import {
   PerformanceReviewRecordParamsSchema,
   PersonAssignRoleParamsSchema,
   PersonChangeAddressParamsSchema,
+  PersonClearAccountLinkParamsSchema,
   PersonCorrectEmailParamsSchema,
   PersonCorrectIdentityParamsSchema,
   PersonDeactivateParamsSchema,
@@ -1001,6 +1005,26 @@ export function useCandidateHire() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = CandidateHireParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Candidate.linkHiredPerson. */
+export function useCandidateLinkHiredPerson() {
+  const mutate = useMutation(api.mutations.Candidate_linkHiredPerson);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = CandidateLinkHiredPersonParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Candidate.refreshFromSource. */
+export function useCandidateRefreshFromSource() {
+  const mutate = useMutation(api.mutations.Candidate_refreshFromSource);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = CandidateRefreshFromSourceParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -5335,6 +5359,16 @@ export function useInterviewRecordOutcome() {
   };
 }
 
+/** Mutation hook for Interview.refreshFromSource. */
+export function useInterviewRefreshFromSource() {
+  const mutate = useMutation(api.mutations.Interview_refreshFromSource);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InterviewRefreshFromSourceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Interview.schedule. */
 export function useInterviewSchedule() {
   const mutate = useMutation(api.mutations.Interview_schedule);
@@ -7184,6 +7218,16 @@ export function usePersonChangeAddress() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = PersonChangeAddressParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Person.clearAccountLink. */
+export function usePersonClearAccountLink() {
+  const mutate = useMutation(api.mutations.Person_clearAccountLink);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PersonClearAccountLinkParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11400,4 +11444,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1212 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1216 as const;
