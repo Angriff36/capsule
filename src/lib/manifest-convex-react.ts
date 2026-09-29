@@ -158,7 +158,9 @@ import {
   EquipmentReviseDetailsParamsSchema,
   EquipmentServiceEntryRecordParamsSchema,
   EquipmentSetPrimaryImageParamsSchema,
+  EquipmentTransferParamsSchema,
   EquipmentUpdateConditionParamsSchema,
+  EquipmentWriteOffMissingParamsSchema,
   EventAllergenCheckRecordParamsSchema,
   EventApplyRouteTravelParamsSchema,
   EventApplyTimingPolicyParamsSchema,
@@ -2980,12 +2982,32 @@ export function useEquipmentSetPrimaryImage() {
   };
 }
 
+/** Mutation hook for Equipment.transfer. */
+export function useEquipmentTransfer() {
+  const mutate = useMutation(api.mutations.Equipment_transfer);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EquipmentTransferParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Equipment.updateCondition. */
 export function useEquipmentUpdateCondition() {
   const mutate = useMutation(api.mutations.Equipment_updateCondition);
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EquipmentUpdateConditionParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Equipment.writeOffMissing. */
+export function useEquipmentWriteOffMissing() {
+  const mutate = useMutation(api.mutations.Equipment_writeOffMissing);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EquipmentWriteOffMissingParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -12338,4 +12360,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1306 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1308 as const;

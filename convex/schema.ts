@@ -802,6 +802,7 @@ export default defineSchema({
     returnedAt: v.optional(v.union(v.number(), v.null())),
     returnCondition: v.optional(v.union(v.literal("excellent"), v.literal("good"), v.literal("fair"), v.literal("poor"), v.literal("out_of_service"), v.null())),
     returnNote: v.optional(v.union(v.string(), v.null())),
+    missingQuantity: v.optional(v.union(v.number(), v.null())),
     cancelledAt: v.optional(v.union(v.number(), v.null())),
     cancellationReason: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),

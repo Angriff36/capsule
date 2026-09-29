@@ -871,6 +871,7 @@ export const EquipmentReservationSchema = z.object({
   returnedAt: z.coerce.date().nullable().optional(),
   returnCondition: z.enum(["excellent", "good", "fair", "poor", "out_of_service"]).nullable().optional(),
   returnNote: z.string().nullable().optional(),
+  missingQuantity: z.number().int().nullable().optional(),
   cancelledAt: z.coerce.date().nullable().optional(),
   cancellationReason: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -5723,6 +5724,14 @@ export const EquipmentSetPrimaryImageParamsSchema = z.object({
 
 export type EquipmentSetPrimaryImageParams = z.infer<typeof EquipmentSetPrimaryImageParamsSchema>;
 
+// Command: transfer on Equipment
+export const EquipmentTransferParamsSchema = z.object({
+  toLocation: z.string(),
+  note: z.string().optional(),
+});
+
+export type EquipmentTransferParams = z.infer<typeof EquipmentTransferParamsSchema>;
+
 // Command: updateCondition on Equipment
 export const EquipmentUpdateConditionParamsSchema = z.object({
   condition: z.enum(["excellent", "good", "fair", "poor", "out_of_service"]),
@@ -5730,6 +5739,13 @@ export const EquipmentUpdateConditionParamsSchema = z.object({
 });
 
 export type EquipmentUpdateConditionParams = z.infer<typeof EquipmentUpdateConditionParamsSchema>;
+
+// Command: writeOffMissing on Equipment
+export const EquipmentWriteOffMissingParamsSchema = z.object({
+  missingQuantity: z.number().int(),
+});
+
+export type EquipmentWriteOffMissingParams = z.infer<typeof EquipmentWriteOffMissingParamsSchema>;
 
 // Command: applyService on EquipmentMaintenanceTask
 export const EquipmentMaintenanceTaskApplyServiceParamsSchema = z.object({
@@ -5791,6 +5807,7 @@ export type EquipmentReservationCheckOutParams = z.infer<typeof EquipmentReserva
 export const EquipmentReservationMarkReturnedParamsSchema = z.object({
   condition: z.enum(["excellent", "good", "fair", "poor", "out_of_service"]),
   note: z.string().optional(),
+  missingQuantity: z.number().int().optional(),
 });
 
 export type EquipmentReservationMarkReturnedParams = z.infer<typeof EquipmentReservationMarkReturnedParamsSchema>;
