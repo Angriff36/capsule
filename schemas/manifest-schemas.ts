@@ -1288,6 +1288,7 @@ export const EventPacketArtifactSchema = z.object({
   metadataJson: z.string().nullable().optional(),
   observationsJson: z.string().nullable().optional(),
   contextJson: z.string().nullable().optional(),
+  registeredAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1319,6 +1320,7 @@ export const EventPacketResolutionSchema = z.object({
   decidedAt: z.coerce.date().optional(),
   decisionJson: z.string().optional(),
   verificationJson: z.string().nullable().optional(),
+  recordedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1336,6 +1338,7 @@ export const EventPacketRevisionSchema = z.object({
   stage: z.string().optional(),
   createdBy: z.string().optional(),
   supersededBy: z.string().nullable().optional(),
+  printedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1952,6 +1955,89 @@ export const InvoiceNumberSequenceSchema = z.object({
 });
 
 export type InvoiceNumberSequence = z.infer<typeof InvoiceNumberSequenceSchema>;
+
+// Entity: InvoicePaymentLink
+export const InvoicePaymentLinkSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  invoiceId: z.string().uuid(),
+  sessionId: z.string(),
+  url: z.string(),
+  amount: z.number().default(0),
+  createdByUserId: z.string().nullable().optional(),
+  configId: z.string().nullable().optional(),
+  offsetDays: z.number().int().nullable().optional(),
+  scheduledFor: z.coerce.date().nullable().optional(),
+  source: z.enum(["scheduled", "manual"]).nullable().optional(),
+  openedAt: z.coerce.date().nullable().optional(),
+  announcedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type InvoicePaymentLink = z.infer<typeof InvoicePaymentLinkSchema>;
+
+// Entity: InvoiceReminderAttempt
+export const InvoiceReminderAttemptSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  invoiceId: z.string().uuid(),
+  configId: z.string(),
+  offsetDays: z.number().int().default(0),
+  scheduledFor: z.coerce.date().nullable().optional(),
+  source: z.enum(["scheduled", "manual"]).nullable().optional(),
+  outcome: z.enum(["delivered", "suppressed", "failed"]).nullable().optional(),
+  emailId: z.string().nullable().optional(),
+  sessionId: z.string().nullable().optional(),
+  amountDue: z.number().nullable().optional(),
+  dueDate: z.coerce.date().nullable().optional(),
+  timing: z.string().nullable().optional(),
+  reason: z.string().nullable().optional(),
+  attempt: z.number().int().nullable().optional(),
+  message: z.string().nullable().optional(),
+  retryScheduled: z.boolean().nullable().optional(),
+  openedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type InvoiceReminderAttempt = z.infer<typeof InvoiceReminderAttemptSchema>;
+
+// Entity: InvoiceReminderSchedule
+export const InvoiceReminderScheduleSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  invoiceId: z.string().uuid(),
+  configId: z.string(),
+  configuredAt: z.coerce.date().nullable().optional(),
+  dueDate: z.coerce.date().nullable().optional(),
+  offsetsDays: z.array(z.number().int()).nullable().optional(),
+  openedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type InvoiceReminderSchedule = z.infer<typeof InvoiceReminderScheduleSchema>;
+
+// Entity: InvoiceStripePayment
+export const InvoiceStripePaymentSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  invoiceId: z.string().uuid(),
+  sessionId: z.string(),
+  paymentId: z.string().uuid(),
+  amount: z.number().default(0),
+  method: z.string().default(""),
+  recordedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type InvoiceStripePayment = z.infer<typeof InvoiceStripePaymentSchema>;
 
 // Entity: ItemUnitMapping
 export const ItemUnitMappingSchema = z.object({
@@ -2623,6 +2709,7 @@ export const ProposalSchema = z.object({
   eventId: z.string().uuid().nullable().optional(),
   pendingEventId: z.string().uuid().nullable().optional(),
   acceptedRevisionId: z.string().uuid().nullable().optional(),
+  acceptedRevisionPending: z.boolean().nullable().optional(),
   proposalNumber: z.string().nullable().optional(),
   title: z.string().default(""),
   eventDate: z.coerce.date().nullable().optional(),
@@ -3037,6 +3124,31 @@ export const RoleScorecardSchema = z.object({
 
 export type RoleScorecard = z.infer<typeof RoleScorecardSchema>;
 
+// Entity: RunAlertDelivery
+export const RunAlertDeliverySchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  activityId: z.string(),
+  kind: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type RunAlertDelivery = z.infer<typeof RunAlertDeliverySchema>;
+
+// Entity: RunAlertSetting
+export const RunAlertSettingSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  enabled: z.boolean().default(false),
+  generation: z.string().nullable().optional(),
+  changedBy: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type RunAlertSetting = z.infer<typeof RunAlertSettingSchema>;
+
 // Entity: SavedReportDefinition
 export const SavedReportDefinitionSchema = z.object({
   id: z.string().uuid(),
@@ -3235,6 +3347,45 @@ export const SignatureRequestSchema = z.object({
 });
 
 export type SignatureRequest = z.infer<typeof SignatureRequestSchema>;
+
+// Entity: SmsAlertDelivery
+export const SmsAlertDeliverySchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  triggerKey: z.string(),
+  personId: z.string(),
+  alertType: z.string(),
+  sentAt: z.coerce.date().nullable().optional(),
+  failedAt: z.coerce.date().nullable().optional(),
+  messageSid: z.string().nullable().optional(),
+  error: z.string().nullable().optional(),
+  openedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type SmsAlertDelivery = z.infer<typeof SmsAlertDeliverySchema>;
+
+// Entity: SmsAlertSetting
+export const SmsAlertSettingSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  enabled: z.boolean().nullable().optional(),
+  chainId: z.string().nullable().optional(),
+  changedAt: z.coerce.date().nullable().optional(),
+  changedBy: z.string().nullable().optional(),
+  lastScanAt: z.coerce.date().nullable().optional(),
+  lastScanSent: z.number().int().nullable().optional(),
+  lastScanFailed: z.number().int().nullable().optional(),
+  lastScanError: z.string().nullable().optional(),
+  openedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type SmsAlertSetting = z.infer<typeof SmsAlertSettingSchema>;
 
 // Entity: SoftDeletable
 export const SoftDeletableSchema = z.object({
@@ -3492,6 +3643,7 @@ export type TimeRecordWithComputed = z.infer<typeof TimeRecordComputedSchema>;
 export const TppReportFavoriteSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
   personId: z.string().uuid().nullable().optional(),
   reportId: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -4116,6 +4268,15 @@ export const AssistantLlmConfigConfigureParamsSchema = z.object({
 
 export type AssistantLlmConfigConfigureParams = z.infer<typeof AssistantLlmConfigConfigureParamsSchema>;
 
+// Command: register on AssistantUpload
+export const AssistantUploadRegisterParamsSchema = z.object({
+  storageId: z.string(),
+  name: z.string(),
+  uploadedBy: z.string(),
+});
+
+export type AssistantUploadRegisterParams = z.infer<typeof AssistantUploadRegisterParamsSchema>;
+
 // Command: attach on Attachment
 export const AttachmentAttachParamsSchema = z.object({
   parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout", "dish", "ingredient", "staffMessage"]),
@@ -4184,6 +4345,24 @@ export const CandidateHireParamsSchema = z.object({
 
 export type CandidateHireParams = z.infer<typeof CandidateHireParamsSchema>;
 
+// Command: linkHiredPerson on Candidate
+export const CandidateLinkHiredPersonParamsSchema = z.object({
+  hiredPersonId: z.string().min(1),
+});
+
+export type CandidateLinkHiredPersonParams = z.infer<typeof CandidateLinkHiredPersonParamsSchema>;
+
+// Command: refreshFromSource on Candidate
+export const CandidateRefreshFromSourceParamsSchema = z.object({
+  fullName: z.string(),
+  roleAppliedFor: z.enum(["staff", "kitchen_staff", "kitchen_lead", "sales_staff", "event_staff", "inventory_staff", "procurement_staff", "logistics_staff", "driver", "workforce_staff", "finance_staff", "manager", "kitchen_manager", "sales_manager", "event_manager", "inventory_manager", "logistics_manager", "workforce_manager", "finance_manager", "admin", "owner", "system"]),
+  rawSourceData: z.string(),
+  email: z.string().optional(),
+  phone: z.string().optional(),
+});
+
+export type CandidateRefreshFromSourceParams = z.infer<typeof CandidateRefreshFromSourceParamsSchema>;
+
 // Command: reject on Candidate
 export const CandidateRejectParamsSchema = z.object({
   reason: z.string().optional(),
@@ -4198,6 +4377,20 @@ export const CandidateRevokeHireParamsSchema = z.object({
 });
 
 export type CandidateRevokeHireParams = z.infer<typeof CandidateRevokeHireParamsSchema>;
+
+// Command: create on ChatNotifyPreference
+export const ChatNotifyPreferenceCreateParamsSchema = z.object({
+  enabled: z.boolean(),
+});
+
+export type ChatNotifyPreferenceCreateParams = z.infer<typeof ChatNotifyPreferenceCreateParamsSchema>;
+
+// Command: setEnabled on ChatNotifyPreference
+export const ChatNotifyPreferenceSetEnabledParamsSchema = z.object({
+  enabled: z.boolean(),
+});
+
+export type ChatNotifyPreferenceSetEnabledParams = z.infer<typeof ChatNotifyPreferenceSetEnabledParamsSchema>;
 
 // Command: archive on Client
 export const ClientArchiveParamsSchema = z.object({
@@ -4906,6 +5099,20 @@ export const CutoverDecisionSetTppReadOnlyParamsSchema = z.object({
 
 export type CutoverDecisionSetTppReadOnlyParams = z.infer<typeof CutoverDecisionSetTppReadOnlyParamsSchema>;
 
+// Command: assignDriver on Delivery
+export const DeliveryAssignDriverParamsSchema = z.object({
+  driverId: z.string().min(1),
+});
+
+export type DeliveryAssignDriverParams = z.infer<typeof DeliveryAssignDriverParamsSchema>;
+
+// Command: assignVehicle on Delivery
+export const DeliveryAssignVehicleParamsSchema = z.object({
+  vehicleId: z.string().min(1),
+});
+
+export type DeliveryAssignVehicleParams = z.infer<typeof DeliveryAssignVehicleParamsSchema>;
+
 // Command: cancel on Delivery
 export const DeliveryCancelParamsSchema = z.object({
   reason: z.string(),
@@ -4947,6 +5154,16 @@ export type DeliveryStandDownWithEventParams = z.infer<typeof DeliveryStandDownW
 export const DeliveryStartTransitParamsSchema = z.object({});
 
 export type DeliveryStartTransitParams = z.infer<typeof DeliveryStartTransitParamsSchema>;
+
+// Command: unassignDriver on Delivery
+export const DeliveryUnassignDriverParamsSchema = z.object({});
+
+export type DeliveryUnassignDriverParams = z.infer<typeof DeliveryUnassignDriverParamsSchema>;
+
+// Command: unassignVehicle on Delivery
+export const DeliveryUnassignVehicleParamsSchema = z.object({});
+
+export type DeliveryUnassignVehicleParams = z.infer<typeof DeliveryUnassignVehicleParamsSchema>;
 
 // Command: classifyAllergens on Dish
 export const DishClassifyAllergensParamsSchema = z.object({
@@ -5356,6 +5573,25 @@ export const EquipmentReservationMarkReturnedParamsSchema = z.object({
 
 export type EquipmentReservationMarkReturnedParams = z.infer<typeof EquipmentReservationMarkReturnedParamsSchema>;
 
+// Command: moveWindow on EquipmentReservation
+export const EquipmentReservationMoveWindowParamsSchema = z.object({
+  startsAt: z.coerce.date(),
+  endsAt: z.coerce.date(),
+});
+
+export type EquipmentReservationMoveWindowParams = z.infer<typeof EquipmentReservationMoveWindowParamsSchema>;
+
+// Command: reserve on EquipmentReservation
+export const EquipmentReservationReserveParamsSchema = z.object({
+  equipmentId: z.string(),
+  eventId: z.string(),
+  startsAt: z.coerce.date(),
+  endsAt: z.coerce.date(),
+  quantity: z.number().int(),
+});
+
+export type EquipmentReservationReserveParams = z.infer<typeof EquipmentReservationReserveParamsSchema>;
+
 // Command: record on EquipmentServiceEntry
 export const EquipmentServiceEntryRecordParamsSchema = z.object({
   maintenanceTaskId: z.string().min(1),
@@ -5368,6 +5604,15 @@ export const EquipmentServiceEntryRecordParamsSchema = z.object({
 });
 
 export type EquipmentServiceEntryRecordParams = z.infer<typeof EquipmentServiceEntryRecordParamsSchema>;
+
+// Command: advanceRecurrence on Event
+export const EventAdvanceRecurrenceParamsSchema = z.object({
+  seriesId: z.string(),
+  generatedCount: z.number().int(),
+  nextStartsAt: z.coerce.date().optional(),
+});
+
+export type EventAdvanceRecurrenceParams = z.infer<typeof EventAdvanceRecurrenceParamsSchema>;
 
 // Command: approve on Event
 export const EventApproveParamsSchema = z.object({});
@@ -5584,6 +5829,9 @@ export const EventPlanEngagementParamsSchema = z.object({
   assignedToId: z.string().min(1).optional(),
   ownerName: z.string().optional(),
   referralSourceId: z.string().min(1).optional(),
+  recurrenceTemplateEventId: z.string().min(1).optional(),
+  recurrenceSeriesId: z.string().optional(),
+  recurrenceSequence: z.number().int().optional(),
 });
 
 export type EventPlanEngagementParams = z.infer<typeof EventPlanEngagementParamsSchema>;
@@ -6101,6 +6349,71 @@ export const EventLayoutSectionUpdateParamsSchema = z.object({
 });
 
 export type EventLayoutSectionUpdateParams = z.infer<typeof EventLayoutSectionUpdateParamsSchema>;
+
+// Command: deactivate on EventPacketArtifact
+export const EventPacketArtifactDeactivateParamsSchema = z.object({
+  contextJson: z.string(),
+});
+
+export type EventPacketArtifactDeactivateParams = z.infer<typeof EventPacketArtifactDeactivateParamsSchema>;
+
+// Command: recordEvidence on EventPacketArtifact
+export const EventPacketArtifactRecordEvidenceParamsSchema = z.object({
+  metadataJson: z.string(),
+  observationsJson: z.string(),
+  contextJson: z.string(),
+});
+
+export type EventPacketArtifactRecordEvidenceParams = z.infer<typeof EventPacketArtifactRecordEvidenceParamsSchema>;
+
+// Command: register on EventPacketArtifact
+export const EventPacketArtifactRegisterParamsSchema = z.object({
+  eventId: z.string().min(1),
+  fingerprint: z.string(),
+  storageId: z.string(),
+  purpose: z.string(),
+  name: z.string(),
+  mimeType: z.string(),
+  byteSize: z.number().int(),
+  contextJson: z.string().optional(),
+});
+
+export type EventPacketArtifactRegisterParams = z.infer<typeof EventPacketArtifactRegisterParamsSchema>;
+
+// Command: record on EventPacketResolution
+export const EventPacketResolutionRecordParamsSchema = z.object({
+  eventId: z.string().min(1),
+  decisionId: z.string(),
+  issueKey: z.string(),
+  decidedAt: z.coerce.date(),
+  decisionJson: z.string(),
+  verificationJson: z.string().optional(),
+});
+
+export type EventPacketResolutionRecordParams = z.infer<typeof EventPacketResolutionRecordParamsSchema>;
+
+// Command: capture on EventPacketRevision
+export const EventPacketRevisionCaptureParamsSchema = z.object({
+  eventId: z.string().min(1),
+  snapshotFingerprint: z.string(),
+  pdfStorageId: z.string(),
+  snapshotStorageId: z.string(),
+  stage: z.string(),
+});
+
+export type EventPacketRevisionCaptureParams = z.infer<typeof EventPacketRevisionCaptureParamsSchema>;
+
+// Command: reinstate on EventPacketRevision
+export const EventPacketRevisionReinstateParamsSchema = z.object({});
+
+export type EventPacketRevisionReinstateParams = z.infer<typeof EventPacketRevisionReinstateParamsSchema>;
+
+// Command: supersede on EventPacketRevision
+export const EventPacketRevisionSupersedeParamsSchema = z.object({
+  by: z.string(),
+});
+
+export type EventPacketRevisionSupersedeParams = z.infer<typeof EventPacketRevisionSupersedeParamsSchema>;
 
 // Command: applyApprovedShiftSwap on EventStaffNeed
 export const EventStaffNeedApplyApprovedShiftSwapParamsSchema = z.object({
@@ -6928,6 +7241,15 @@ export const InterviewRecordOutcomeParamsSchema = z.object({
 
 export type InterviewRecordOutcomeParams = z.infer<typeof InterviewRecordOutcomeParamsSchema>;
 
+// Command: refreshFromSource on Interview
+export const InterviewRefreshFromSourceParamsSchema = z.object({
+  rawSourceData: z.string(),
+  scheduledFor: z.coerce.date().optional(),
+  notes: z.string().optional(),
+});
+
+export type InterviewRefreshFromSourceParams = z.infer<typeof InterviewRefreshFromSourceParamsSchema>;
+
 // Command: schedule on Interview
 export const InterviewScheduleParamsSchema = z.object({
   candidateId: z.string().min(1),
@@ -7220,6 +7542,91 @@ export const InvoiceWriteOffParamsSchema = z.object({
 });
 
 export type InvoiceWriteOffParams = z.infer<typeof InvoiceWriteOffParamsSchema>;
+
+// Command: announceCreated on InvoicePaymentLink
+export const InvoicePaymentLinkAnnounceCreatedParamsSchema = z.object({});
+
+export type InvoicePaymentLinkAnnounceCreatedParams = z.infer<typeof InvoicePaymentLinkAnnounceCreatedParamsSchema>;
+
+// Command: announceReminderLink on InvoicePaymentLink
+export const InvoicePaymentLinkAnnounceReminderLinkParamsSchema = z.object({});
+
+export type InvoicePaymentLinkAnnounceReminderLinkParams = z.infer<typeof InvoicePaymentLinkAnnounceReminderLinkParamsSchema>;
+
+// Command: open on InvoicePaymentLink
+export const InvoicePaymentLinkOpenParamsSchema = z.object({
+  invoiceId: z.string().min(1),
+  sessionId: z.string(),
+  url: z.string(),
+  amount: z.number(),
+  createdByUserId: z.string().optional(),
+  configId: z.string().optional(),
+  offsetDays: z.number().int().optional(),
+  scheduledFor: z.coerce.date().optional(),
+  source: z.enum(["scheduled", "manual"]).optional(),
+});
+
+export type InvoicePaymentLinkOpenParams = z.infer<typeof InvoicePaymentLinkOpenParamsSchema>;
+
+// Command: open on InvoiceReminderAttempt
+export const InvoiceReminderAttemptOpenParamsSchema = z.object({
+  invoiceId: z.string().min(1),
+  configId: z.string(),
+  offsetDays: z.number().int(),
+  scheduledFor: z.coerce.date(),
+  source: z.enum(["scheduled", "manual"]),
+});
+
+export type InvoiceReminderAttemptOpenParams = z.infer<typeof InvoiceReminderAttemptOpenParamsSchema>;
+
+// Command: recordDelivered on InvoiceReminderAttempt
+export const InvoiceReminderAttemptRecordDeliveredParamsSchema = z.object({
+  emailId: z.string(),
+  sessionId: z.string(),
+  amountDue: z.number(),
+  dueDate: z.coerce.date(),
+  timing: z.string(),
+});
+
+export type InvoiceReminderAttemptRecordDeliveredParams = z.infer<typeof InvoiceReminderAttemptRecordDeliveredParamsSchema>;
+
+// Command: recordFailed on InvoiceReminderAttempt
+export const InvoiceReminderAttemptRecordFailedParamsSchema = z.object({
+  attempt: z.number().int(),
+  message: z.string(),
+  retryScheduled: z.boolean(),
+});
+
+export type InvoiceReminderAttemptRecordFailedParams = z.infer<typeof InvoiceReminderAttemptRecordFailedParamsSchema>;
+
+// Command: recordSuppressed on InvoiceReminderAttempt
+export const InvoiceReminderAttemptRecordSuppressedParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type InvoiceReminderAttemptRecordSuppressedParams = z.infer<typeof InvoiceReminderAttemptRecordSuppressedParamsSchema>;
+
+// Command: configure on InvoiceReminderSchedule
+export const InvoiceReminderScheduleConfigureParamsSchema = z.object({
+  invoiceId: z.string().min(1),
+  configId: z.string(),
+  configuredAt: z.coerce.date(),
+  dueDate: z.coerce.date(),
+  offsetsDays: z.array(z.number().int()),
+});
+
+export type InvoiceReminderScheduleConfigureParams = z.infer<typeof InvoiceReminderScheduleConfigureParamsSchema>;
+
+// Command: record on InvoiceStripePayment
+export const InvoiceStripePaymentRecordParamsSchema = z.object({
+  invoiceId: z.string().min(1),
+  sessionId: z.string(),
+  paymentId: z.string().uuid(),
+  amount: z.number(),
+  method: z.string(),
+});
+
+export type InvoiceStripePaymentRecordParams = z.infer<typeof InvoiceStripePaymentRecordParamsSchema>;
 
 // Command: record on ItemUnitMapping
 export const ItemUnitMappingRecordParamsSchema = z.object({
@@ -8035,6 +8442,11 @@ export const PersonChangeAddressParamsSchema = z.object({
 
 export type PersonChangeAddressParams = z.infer<typeof PersonChangeAddressParamsSchema>;
 
+// Command: clearAccountLink on Person
+export const PersonClearAccountLinkParamsSchema = z.object({});
+
+export type PersonClearAccountLinkParams = z.infer<typeof PersonClearAccountLinkParamsSchema>;
+
 // Command: correctEmail on Person
 export const PersonCorrectEmailParamsSchema = z.object({
   email: z.string(),
@@ -8484,6 +8896,21 @@ export const ProposalReassignClientParamsSchema = z.object({});
 
 export type ProposalReassignClientParams = z.infer<typeof ProposalReassignClientParamsSchema>;
 
+// Command: recomputeTotals on Proposal
+export const ProposalRecomputeTotalsParamsSchema = z.object({
+  subtotal: z.number(),
+  total: z.number(),
+});
+
+export type ProposalRecomputeTotalsParams = z.infer<typeof ProposalRecomputeTotalsParamsSchema>;
+
+// Command: recordAcceptedRevision on Proposal
+export const ProposalRecordAcceptedRevisionParamsSchema = z.object({
+  acceptedRevisionId: z.string().min(1).optional(),
+});
+
+export type ProposalRecordAcceptedRevisionParams = z.infer<typeof ProposalRecordAcceptedRevisionParamsSchema>;
+
 // Command: send on Proposal
 export const ProposalSendParamsSchema = z.object({});
 
@@ -8584,6 +9011,13 @@ export type ProposalLineItemAddLineParams = z.infer<typeof ProposalLineItemAddLi
 export const ProposalLineItemRemoveLineParamsSchema = z.object({});
 
 export type ProposalLineItemRemoveLineParams = z.infer<typeof ProposalLineItemRemoveLineParamsSchema>;
+
+// Command: restampAmount on ProposalLineItem
+export const ProposalLineItemRestampAmountParamsSchema = z.object({
+  amount: z.number(),
+});
+
+export type ProposalLineItemRestampAmountParams = z.infer<typeof ProposalLineItemRestampAmountParamsSchema>;
 
 // Command: reviseLine on ProposalLineItem
 export const ProposalLineItemReviseLineParamsSchema = z.object({
@@ -8723,6 +9157,13 @@ export const PurchaseNeedStandDownWithEventParamsSchema = z.object({});
 
 export type PurchaseNeedStandDownWithEventParams = z.infer<typeof PurchaseNeedStandDownWithEventParamsSchema>;
 
+// Command: recordDelivery on PushSubscription
+export const PushSubscriptionRecordDeliveryParamsSchema = z.object({
+  at: z.number(),
+});
+
+export type PushSubscriptionRecordDeliveryParams = z.infer<typeof PushSubscriptionRecordDeliveryParamsSchema>;
+
 // Command: register on PushSubscription
 export const PushSubscriptionRegisterParamsSchema = z.object({
   endpoint: z.string(),
@@ -8732,6 +9173,22 @@ export const PushSubscriptionRegisterParamsSchema = z.object({
 });
 
 export type PushSubscriptionRegisterParams = z.infer<typeof PushSubscriptionRegisterParamsSchema>;
+
+// Command: releaseDevice on PushSubscription
+export const PushSubscriptionReleaseDeviceParamsSchema = z.object({
+  endpoint: z.string(),
+});
+
+export type PushSubscriptionReleaseDeviceParams = z.infer<typeof PushSubscriptionReleaseDeviceParamsSchema>;
+
+// Command: renew on PushSubscription
+export const PushSubscriptionRenewParamsSchema = z.object({
+  p256dh: z.string(),
+  auth: z.string(),
+  userAgent: z.string().optional(),
+});
+
+export type PushSubscriptionRenewParams = z.infer<typeof PushSubscriptionRenewParamsSchema>;
 
 // Command: unregister on PushSubscription
 export const PushSubscriptionUnregisterParamsSchema = z.object({});
@@ -8835,6 +9292,10 @@ export type QuoteSubmissionDismissParams = z.infer<typeof QuoteSubmissionDismiss
 export const QuoteSubmissionFailParamsSchema = z.object({
   errorMessage: z.string(),
   processingErrors: z.string(),
+  clientId: z.string().min(1).optional(),
+  leadId: z.string().min(1).optional(),
+  eventId: z.string().min(1).optional(),
+  proposalId: z.string().min(1).optional(),
 });
 
 export type QuoteSubmissionFailParams = z.infer<typeof QuoteSubmissionFailParamsSchema>;
@@ -9028,6 +9489,34 @@ export const RoleScorecardReactivateParamsSchema = z.object({});
 
 export type RoleScorecardReactivateParams = z.infer<typeof RoleScorecardReactivateParamsSchema>;
 
+// Command: record on RunAlertDelivery
+export const RunAlertDeliveryRecordParamsSchema = z.object({
+  activityId: z.string(),
+  kind: z.string(),
+});
+
+export type RunAlertDeliveryRecordParams = z.infer<typeof RunAlertDeliveryRecordParamsSchema>;
+
+// Command: create on RunAlertSetting
+export const RunAlertSettingCreateParamsSchema = z.object({});
+
+export type RunAlertSettingCreateParams = z.infer<typeof RunAlertSettingCreateParamsSchema>;
+
+// Command: disable on RunAlertSetting
+export const RunAlertSettingDisableParamsSchema = z.object({
+  actorId: z.string().optional(),
+});
+
+export type RunAlertSettingDisableParams = z.infer<typeof RunAlertSettingDisableParamsSchema>;
+
+// Command: enable on RunAlertSetting
+export const RunAlertSettingEnableParamsSchema = z.object({
+  generation: z.string(),
+  actorId: z.string().optional(),
+});
+
+export type RunAlertSettingEnableParams = z.infer<typeof RunAlertSettingEnableParamsSchema>;
+
 // Command: archive on SavedReportDefinition
 export const SavedReportDefinitionArchiveParamsSchema = z.object({});
 
@@ -9146,6 +9635,13 @@ export const ShareLinkCreateParamsSchema = z.object({
 });
 
 export type ShareLinkCreateParams = z.infer<typeof ShareLinkCreateParamsSchema>;
+
+// Command: recordView on ShareLink
+export const ShareLinkRecordViewParamsSchema = z.object({
+  viewerIdentity: z.string().optional(),
+});
+
+export type ShareLinkRecordViewParams = z.infer<typeof ShareLinkRecordViewParamsSchema>;
 
 // Command: revoke on ShareLink
 export const ShareLinkRevokeParamsSchema = z.object({});
@@ -9314,6 +9810,16 @@ export const SignatureRequestCompleteParamsSchema = z.object({
 
 export type SignatureRequestCompleteParams = z.infer<typeof SignatureRequestCompleteParamsSchema>;
 
+// Command: completeInternal on SignatureRequest
+export const SignatureRequestCompleteInternalParamsSchema = z.object({
+  signedArtifactReference: z.string(),
+  signerIpAddress: z.string().optional(),
+  signerUserAgent: z.string().optional(),
+  acceptProposalId: z.string().uuid().optional(),
+});
+
+export type SignatureRequestCompleteInternalParams = z.infer<typeof SignatureRequestCompleteInternalParamsSchema>;
+
 // Command: expire on SignatureRequest
 export const SignatureRequestExpireParamsSchema = z.object({});
 
@@ -9339,6 +9845,55 @@ export const SignatureRequestRevokeParamsSchema = z.object({
 });
 
 export type SignatureRequestRevokeParams = z.infer<typeof SignatureRequestRevokeParamsSchema>;
+
+// Command: open on SmsAlertDelivery
+export const SmsAlertDeliveryOpenParamsSchema = z.object({
+  triggerKey: z.string(),
+  personId: z.string(),
+  alertType: z.string(),
+});
+
+export type SmsAlertDeliveryOpenParams = z.infer<typeof SmsAlertDeliveryOpenParamsSchema>;
+
+// Command: recordFailed on SmsAlertDelivery
+export const SmsAlertDeliveryRecordFailedParamsSchema = z.object({
+  error: z.string(),
+});
+
+export type SmsAlertDeliveryRecordFailedParams = z.infer<typeof SmsAlertDeliveryRecordFailedParamsSchema>;
+
+// Command: recordSent on SmsAlertDelivery
+export const SmsAlertDeliveryRecordSentParamsSchema = z.object({
+  messageSid: z.string(),
+});
+
+export type SmsAlertDeliveryRecordSentParams = z.infer<typeof SmsAlertDeliveryRecordSentParamsSchema>;
+
+// Command: disable on SmsAlertSetting
+export const SmsAlertSettingDisableParamsSchema = z.object({});
+
+export type SmsAlertSettingDisableParams = z.infer<typeof SmsAlertSettingDisableParamsSchema>;
+
+// Command: enable on SmsAlertSetting
+export const SmsAlertSettingEnableParamsSchema = z.object({
+  chainId: z.string(),
+});
+
+export type SmsAlertSettingEnableParams = z.infer<typeof SmsAlertSettingEnableParamsSchema>;
+
+// Command: open on SmsAlertSetting
+export const SmsAlertSettingOpenParamsSchema = z.object({});
+
+export type SmsAlertSettingOpenParams = z.infer<typeof SmsAlertSettingOpenParamsSchema>;
+
+// Command: recordScan on SmsAlertSetting
+export const SmsAlertSettingRecordScanParamsSchema = z.object({
+  sent: z.number().int(),
+  failed: z.number().int(),
+  error: z.string().optional(),
+});
+
+export type SmsAlertSettingRecordScanParams = z.infer<typeof SmsAlertSettingRecordScanParamsSchema>;
 
 // Command: open on StaffChatReadCursor
 export const StaffChatReadCursorOpenParamsSchema = z.object({
@@ -9367,6 +9922,14 @@ export type StaffMessageEditParams = z.infer<typeof StaffMessageEditParamsSchema
 export const StaffMessageMarkReadParamsSchema = z.object({});
 
 export type StaffMessageMarkReadParams = z.infer<typeof StaffMessageMarkReadParamsSchema>;
+
+// Command: recordAttachments on StaffMessage
+export const StaffMessageRecordAttachmentsParamsSchema = z.object({
+  attachmentCount: z.number().int(),
+  clearBody: z.boolean(),
+});
+
+export type StaffMessageRecordAttachmentsParams = z.infer<typeof StaffMessageRecordAttachmentsParamsSchema>;
 
 // Command: remove on StaffMessage
 export const StaffMessageRemoveParamsSchema = z.object({});
@@ -9624,6 +10187,23 @@ export const TimeRecordCorrectParamsSchema = z.object({
 });
 
 export type TimeRecordCorrectParams = z.infer<typeof TimeRecordCorrectParamsSchema>;
+
+// Command: create on TppReportFavorite
+export const TppReportFavoriteCreateParamsSchema = z.object({
+  reportId: z.string().optional(),
+});
+
+export type TppReportFavoriteCreateParams = z.infer<typeof TppReportFavoriteCreateParamsSchema>;
+
+// Command: refavorite on TppReportFavorite
+export const TppReportFavoriteRefavoriteParamsSchema = z.object({});
+
+export type TppReportFavoriteRefavoriteParams = z.infer<typeof TppReportFavoriteRefavoriteParamsSchema>;
+
+// Command: unfavorite on TppReportFavorite
+export const TppReportFavoriteUnfavoriteParamsSchema = z.object({});
+
+export type TppReportFavoriteUnfavoriteParams = z.infer<typeof TppReportFavoriteUnfavoriteParamsSchema>;
 
 // Command: register on Trailer
 export const TrailerRegisterParamsSchema = z.object({

@@ -8,7 +8,7 @@
       "sha256": "3b83373150a367f16a8d4b1d26b9cf03d7b33e0d03d4a7c6efd3a769e1d6b030"
     },
     "convex/http.ts": {
-      "sha256": "7a3b7b54ff64dfd1e7d2b1da47f8cff3e108215013b8c0587a92997199b9d647"
+      "sha256": "292b06ae90db6fdb3c73b65386dbad19689163a1bdfdc26f4f4e7c026f667d44"
     },
     "convex/lib/authContext.ts": {
       "sha256": "ee98a50d1d9b7db6bed6f2aedfd9ba45fa0bc8e245abdc4a230dc84b6f0aa5ad",
@@ -18,19 +18,19 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "0abd83cc728c6b590edc68f42381fcbd1599399d3d7a7bb672e000d12c0b520b"
+      "sha256": "460cc59ff9705cf9012305b1764b9c7048364e926d830bd2d765c24fd16b0f0d"
     },
     "convex/queries.ts": {
-      "sha256": "7f542180e7bfff600cdf6c7d5e930cc76c90bf06f679f24cdbd503e95876c2cc"
+      "sha256": "2eacb0e581c03a602af014317a555af301a1ccb3bc263ec1b4077a31b3bb8929"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
     },
     "convex/schema.ts": {
-      "sha256": "e7c289018dfc8e3e37506671039080306912e975cb47cde9cab6987dd9ccc03d"
+      "sha256": "f8897317804e9d8ee36aae512f09804337328b7c1356b9f1b9c5921f057d4251"
     },
     "manifest-context-summary.json": {
-      "sha256": "938150a298f47a4d2e2fae5bc2a0affbedb7c178175f90fd18a3dc8e6081344c"
+      "sha256": "c7887d8ca5f114b19b9db1969927d68e5a2e8c41ddb11f4492e486ab6b7281dd"
     },
     "package.json": {
       "sha256": "39b5393b44d082e7efdb04a947247668e98b6d36c6a944ef91c710cd64ee0737"
@@ -39,25 +39,25 @@
       "sha256": "0a182867580c09e3a3a52fb6d1e8e8a831d67e6c9d2634d5bcaeeb3443ad59d8"
     },
     "schemas/manifest-schemas.ts": {
-      "sha256": "97ae47b57bfb3e46a212440ca6c47e85ea8572dd3690789da178d8cf1c452cb9"
+      "sha256": "9355c939d0f13581fbd498cf1cec3ad4f380eed92331e22558c1ab89560d51b4"
     },
     "scripts/seed-convex.ts": {
-      "sha256": "7b0a06a6400cb045c7adccc26bc0a37fab8d0b2d752b9ed6a7f93dd3d5b6761e"
+      "sha256": "1d362ed69776a6a47b2a44a67e9808d576087043fdf420cb90f3e8d45641c489"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "af5b905ebd66f24dc8d014aad92557450da521a14b19c895b2c6d9f41c732622"
+      "sha256": "205bdee3b658f4102d46586f68acbc70add5c7a005e6d3e1a9b7adc45d9c0970"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "06bf8504b69c6090042d55883a1e50e4d69f08ff38e230a8fe5d242fd15ff977"
+      "sha256": "9bdc74048ebd1951b5750f2a7e736be5c0588fc4e715e73f4face423e6109b2b"
     },
     "src/lib/manifest-convex-react.ts": {
-      "sha256": "1120fa0bf097901985b960cf9e1979e15878d3905696a327cf1a14e8f1367c9d"
+      "sha256": "42bedf91e518ee4a7c0b806c294319e5dc2166af0bfa07b77e2a055f1ee21190"
     },
     "tsconfig.builder.json": {
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "abe66cf5b848e69c229e4f72c2c0ca6d34d9763f5a37d4342b63632e922ee5fc"
+      "sha256": "52be9a1167b6a7d621dcc195df2d01ea71ff52f6af7907520d66d7510ad8cd37"
     }
   },
   "package": {
@@ -86,6 +86,7 @@
       "src/admin/assistant.manifest",
       "src/admin/capability-setting.manifest",
       "src/admin/cutover-decision.manifest",
+      "src/admin/sms-alerts.manifest",
       "src/app.manifest",
       "src/culinary/component-import.manifest",
       "src/culinary/component.manifest",
@@ -129,6 +130,7 @@
       "src/operations/event-template.manifest",
       "src/operations/event.manifest",
       "src/operations/occasion.manifest",
+      "src/operations/run-alert.manifest",
       "src/operations/service-style-kit.manifest",
       "src/operations/service-style.manifest",
       "src/operations/venue-layout-template.manifest",
@@ -155,6 +157,7 @@
       "src/sales/contract.manifest",
       "src/sales/credit-memo.manifest",
       "src/sales/invoice-core.manifest",
+      "src/sales/invoice-notices.manifest",
       "src/sales/invoice-number-sequence.manifest",
       "src/sales/invoice.manifest",
       "src/sales/lead.manifest",

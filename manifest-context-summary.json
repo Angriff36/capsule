@@ -3,16 +3,16 @@
   "meta": {
     "compilerVersion": "3.6.58",
     "schemaVersion": "1.0",
-    "contentHash": "11d01fbd4c68f896916782a923d864799c09fefe7f23c3a67af6204ef1d3b9fa:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21c70b2b10030f5a9acdb868c2e229c0b48fd6f86e2a44f85040058ab7634e25:272a31932843884c7ac3eabb6161bd3cebde6879b8bea18fc25043fa9be4455f:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2aea5aa1d00f0d86457cb177ee29c76e1c1dc22e7f73bad7f8b1074575cbc31d:2c42c97da3b397baa523b8f7ae11ed10f988cb9ea37f6b158ecb4404f5bcab62:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:2f58e48aa70e7c4414f51af8aea7f9768e378ea26daa75b659dba78dab856030:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:327f55f7fc3badfa91db612d8da5b7a890ed54daf3398ab067c48dd29bcb6f52:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:3946e202e3a047c69528d06bc1371d5100bdc27d68d2644d8882da7bcfa1d23c:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:4021a43427a72d2daffe25a117f282ffc343ff11dd02010652045485f3bf2816:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:45b3d018cb8479a590061dabb5a6bf03edb434440cc64cd88487eb3f799fe2d6:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4ac247395613e10f80cd1bb39b0bcc11a98d99cac60463154d9c42e7b5967258:501487754e20a846402d574851966950378082990b46261a0318113100bcdca5:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:57041b3fe080152b717e2ab15050bc93d3830b1d8027e5dc5114d687ad3c6be3:5b1a6e044cc0addd7bf6bc5f82a1f15994e33d01cccd75bb4dec4971b38b039b:5b5d08c3ea56e43ddf1f2623cdc1888b7bfafc1cbf6ee4a6d49ae42e68c73c95:5fd882905c48e953a76af92b6db9cb606a0b0a9f9949c49f5ce6ca71c0d808ff:673eea009a24475e68b862081672cfe7f5ac7d9c5fb1cae8cd3cb4e17912765f:6a640d8f2f2791605a5c80bebcb59661c51018393b66d37fffa014400b7e99d4:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:6de6b132498fdb76faa9830c1ff3845816532ec79baea94836775d320903dc1f:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:78e2341ac6b83ff5eb43c7fbfc824766ef6c9f5ebb61590eb8cf7ca8270d8b9d:792131c7b95d7c0b140fb2dbbf6a4b7e3ab487a4dc26f65a3d4374fa9c0e6e6b:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7a8de9cb59f93d64dd599f21ded09010d4de32c74d4c83100dcea9b6877fe6b0:7d5c0741e3a26447773948cfe2d758cd1e210e2f37c9f39c272ca443b716a309:7dd6076ce8b39c99fb91e01b05b04c5e8d3c44f535cbcb26f27320918d21294d:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bc38accf30dad64f89fc62a930fea2e6de166c7ddcfbc5f509f57cdb9c41fb5:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:92c0c66864b3c226093e8f9f95ccbee7c79f353d8a59123003095641b38789d4:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:9e98bdeac2b20c1da7c8565bc0e68b67db011509c47c3c512b9e1c9f7be516c4:a04c9aa12c21c3811997769713ecd392ab9d47a8d216dbc42e666cabac135d05:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a363078ede0b73c3c2f7a5c6ddb5c2f0d9de214832687609020e7078b66a8cb3:a37b67df92f218d6b1fbafe7932f858f12fd11a6e1063c82b43664b1146a9fb0:a8b60c0f996f5391bb792849f2044c2e973b34d15938963afad73f7e6a9706a4:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:afbd0cf1305dff953db623162ca2ab2170e7cc3d4f7a62739a8a2653d8ec8941:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b15baf1a6241169d8eb947ae3850e26305e5d419875211954210152c3b42fcd5:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b4bcd360de08b84126452b6c53b801c7f84f1dea757f2c10c53d47f50d8b1182:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bee0f6341a01acf156773a21505eca5e20a25fdb7d1dc6c09c37720a1c2ef899:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c4f4847c56f2947ed5512b4e3254c848c5063e0e6d9d5f2a79578b289d098114:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:ca49afde92432ac008856285d940bc605b8cabecbacbf706b4cf42ac74ccce1f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d3b087f64aae628f5786c8a1cfee107ad396828d18d7e6b77b972f6a3f0f95c7:d4d9def716300b65106042da9a2f7dc8b2b1636bbd3b07ecd3e8614053a9ca73:d9ef376b473936bad5512b64a8aea50c92505d6b1a159615719328cdd79c1c1d:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dc6fcf0fd92b72ae0e511408e5e16b5a5f8007426762380770abc419eebf836f:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e610c980855414eb0532fa1a84908500dbfa3ae1d3b8aec60a88b82418fcaacb:e89da7c29b83df66466e7b996b1780a39c690560afa9a5e5f23c698003827e40:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:ee33cad2c146aefd4f3f8a4e9158f888bc228824dbd5d6e425414009f6aa8ba5:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f49c5ef7603c706a89514343223fe24d6e1496af83095a7796cb93e7336aaea4:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdaa81c70b2f571c3b10af2b3ad5acac7f74ebf613964b09e49516d7d1809937:fe7be8fbd9564de4521178c9c6f4a329db717fbd9f5499c0f5f61c18efa07f19",
+    "contentHash": "11d01fbd4c68f896916782a923d864799c09fefe7f23c3a67af6204ef1d3b9fa:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:161c25c50ea646952d76c7f45670392a96b650cbdb21421741aa129897f39f39:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:2036d8db9241995bb76aa15c89b94d17d66cce3ef2e4ea63178b1e2a1909207b:21c70b2b10030f5a9acdb868c2e229c0b48fd6f86e2a44f85040058ab7634e25:272a31932843884c7ac3eabb6161bd3cebde6879b8bea18fc25043fa9be4455f:2aa323a73d3ed4a9a683b126fa9fbd192ad362e18958639591f10ee1a767a7a9:2aea5aa1d00f0d86457cb177ee29c76e1c1dc22e7f73bad7f8b1074575cbc31d:2c2d59336f8e3b13106229c1727f4ff26e8321fea8742ca46cd4fd89508863b0:2c42c97da3b397baa523b8f7ae11ed10f988cb9ea37f6b158ecb4404f5bcab62:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:2f58e48aa70e7c4414f51af8aea7f9768e378ea26daa75b659dba78dab856030:327f55f7fc3badfa91db612d8da5b7a890ed54daf3398ab067c48dd29bcb6f52:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:34d6e0d78054119d888936d1775b68e437ce2b5dd458186826e0146bdfec677f:353a3991489aafe1d337e52672908e0eea8521d946ab792ce54227e7b6e7f1dd:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:4021a43427a72d2daffe25a117f282ffc343ff11dd02010652045485f3bf2816:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:45b3d018cb8479a590061dabb5a6bf03edb434440cc64cd88487eb3f799fe2d6:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4e66be5e5d1dfb8fe16f1499db8a775b0788a0c62e47ea7076d59e915357fae2:501487754e20a846402d574851966950378082990b46261a0318113100bcdca5:5046222416ff8bf182f7603802da83b33bfe97f0310849ceb624964cb9d804df:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:57041b3fe080152b717e2ab15050bc93d3830b1d8027e5dc5114d687ad3c6be3:5b1a6e044cc0addd7bf6bc5f82a1f15994e33d01cccd75bb4dec4971b38b039b:5b5d08c3ea56e43ddf1f2623cdc1888b7bfafc1cbf6ee4a6d49ae42e68c73c95:5e836fa9948c8fcd70fa3c8bd625238e8c00bf0699beb851e5862e93e031e2e1:5fd882905c48e953a76af92b6db9cb606a0b0a9f9949c49f5ce6ca71c0d808ff:6a640d8f2f2791605a5c80bebcb59661c51018393b66d37fffa014400b7e99d4:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:71dc273811d0229c3193f31dafbda85a69d27a2705182d1069e7e8ca0f4d28f1:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:78e2341ac6b83ff5eb43c7fbfc824766ef6c9f5ebb61590eb8cf7ca8270d8b9d:792131c7b95d7c0b140fb2dbbf6a4b7e3ab487a4dc26f65a3d4374fa9c0e6e6b:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7d5c0741e3a26447773948cfe2d758cd1e210e2f37c9f39c272ca443b716a309:7dd6076ce8b39c99fb91e01b05b04c5e8d3c44f535cbcb26f27320918d21294d:7fd8ed51d32b011977a2e27258cc6c003895e596d0456d876ce044d6e5069e4f:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:871382762a6d3b344a7428acc496a5c66a1cfc0f00ad0777398ac0a1d3badc53:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:9e98bdeac2b20c1da7c8565bc0e68b67db011509c47c3c512b9e1c9f7be516c4:a04c9aa12c21c3811997769713ecd392ab9d47a8d216dbc42e666cabac135d05:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a363078ede0b73c3c2f7a5c6ddb5c2f0d9de214832687609020e7078b66a8cb3:a8b60c0f996f5391bb792849f2044c2e973b34d15938963afad73f7e6a9706a4:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b15baf1a6241169d8eb947ae3850e26305e5d419875211954210152c3b42fcd5:b47b1880542839c64691ddfe2e3d70ac2aab4e48356096c5b4994d6a2e374f04:b5b2343a86d08707f3bb3269abdd07b498a05b7b16e40758410d8d2aabce0cfc:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bb1b349fb092708208d054b5ac620ccd7d41bb0eed9034545db82fe3247f4dfc:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bee0f6341a01acf156773a21505eca5e20a25fdb7d1dc6c09c37720a1c2ef899:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c4f4847c56f2947ed5512b4e3254c848c5063e0e6d9d5f2a79578b289d098114:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:ca49afde92432ac008856285d940bc605b8cabecbacbf706b4cf42ac74ccce1f:ca51a073d6c16a170dd50e9eb81b5819de4648b07b6a806b67daca531deba47e:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:cf4f477e9f273cf1f28dfeae53fb1ef1bc80a42fc31da956eb29edc67aacf545:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d3b087f64aae628f5786c8a1cfee107ad396828d18d7e6b77b972f6a3f0f95c7:d3b73904f336c5602aa7dd0ef4f97eda73a58cafe8c3fc7d40428788c8e0490e:d4d9def716300b65106042da9a2f7dc8b2b1636bbd3b07ecd3e8614053a9ca73:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dc6fcf0fd92b72ae0e511408e5e16b5a5f8007426762380770abc419eebf836f:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e610c980855414eb0532fa1a84908500dbfa3ae1d3b8aec60a88b82418fcaacb:e80de7c05fa932b8305cde4e48e8310822d0813b2f3640d31fe7677f29c33a73:e89da7c29b83df66466e7b996b1780a39c690560afa9a5e5f23c698003827e40:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:ecce46aef73a59c2c8ff22bd0b4c8cb6a2ceb257a6faa4b271725b346cd2a6d6:ee33cad2c146aefd4f3f8a4e9158f888bc228824dbd5d6e425414009f6aa8ba5:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f49c5ef7603c706a89514343223fe24d6e1496af83095a7796cb93e7336aaea4:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:fb42be5758f7efee955784116dcadd835bc256677a9303e394b61dcf552774b1:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdaa81c70b2f571c3b10af2b3ad5acac7f74ebf613964b09e49516d7d1809937:fe7be8fbd9564de4521178c9c6f4a329db717fbd9f5499c0f5f61c18efa07f19",
     "projection": "llm-context"
   },
   "domain": {
-    "entityCount": 164,
-    "commandCount": 748,
-    "policyCount": 483,
+    "entityCount": 172,
+    "commandCount": 801,
+    "policyCount": 507,
     "constraintCount": 254,
-    "enumCount": 159,
-    "eventCount": 646,
+    "enumCount": 161,
+    "eventCount": 683,
     "modules": [],
     "multiTenant": true
   },
@@ -380,7 +380,9 @@
       "computedProperties": [],
       "relationships": [],
       "constraints": [],
-      "commands": [],
+      "commands": [
+        "register"
+      ],
       "policies": [],
       "key": [
         "tenantId",
@@ -826,6 +828,8 @@
         "advance",
         "apply",
         "hire",
+        "linkHiredPerson",
+        "refreshFromSource",
         "reject",
         "revokeHire"
       ],
@@ -892,7 +896,10 @@
       "computedProperties": [],
       "relationships": [],
       "constraints": [],
-      "commands": [],
+      "commands": [
+        "create",
+        "setEnabled"
+      ],
       "policies": [],
       "key": [
         "tenantId",
@@ -4773,12 +4780,16 @@
         }
       ],
       "commands": [
+        "assignDriver",
+        "assignVehicle",
         "cancel",
         "confirmDelivery",
         "markFailed",
         "schedule",
         "standDownWithEvent",
-        "startTransit"
+        "startTransit",
+        "unassignDriver",
+        "unassignVehicle"
       ],
       "policies": [],
       "key": [
@@ -6931,7 +6942,9 @@
       "commands": [
         "cancel",
         "checkOut",
-        "markReturned"
+        "markReturned",
+        "moveWindow",
+        "reserve"
       ],
       "policies": [],
       "key": [
@@ -8239,6 +8252,7 @@
         }
       ],
       "commands": [
+        "advanceRecurrence",
         "approve",
         "archive",
         "assignOwner",
@@ -10598,6 +10612,12 @@
           "modifiers": []
         },
         {
+          "name": "registeredAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "createdAt",
           "type": "datetime",
           "required": false,
@@ -10642,7 +10662,11 @@
           "overrideable": false
         }
       ],
-      "commands": [],
+      "commands": [
+        "deactivate",
+        "recordEvidence",
+        "register"
+      ],
       "policies": [],
       "key": [
         "tenantId",
@@ -10812,6 +10836,12 @@
           "modifiers": []
         },
         {
+          "name": "recordedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "createdAt",
           "type": "datetime",
           "required": false,
@@ -10856,7 +10886,9 @@
           "overrideable": false
         }
       ],
-      "commands": [],
+      "commands": [
+        "record"
+      ],
       "policies": [],
       "key": [
         "tenantId",
@@ -10928,6 +10960,12 @@
           "modifiers": []
         },
         {
+          "name": "printedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "createdAt",
           "type": "datetime",
           "required": false,
@@ -10972,7 +11010,11 @@
           "overrideable": false
         }
       ],
-      "commands": [],
+      "commands": [
+        "capture",
+        "reinstate",
+        "supersede"
+      ],
       "policies": [],
       "key": [
         "tenantId",
@@ -14756,6 +14798,7 @@
       ],
       "commands": [
         "recordOutcome",
+        "refreshFromSource",
         "schedule"
       ],
       "policies": [],
@@ -16178,6 +16221,561 @@
       "relationships": [],
       "constraints": [],
       "commands": [],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
+      "name": "InvoicePaymentLink",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "invoiceId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "sessionId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "url",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "amount",
+          "type": "money",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "createdByUserId",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "configId",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "offsetDays",
+          "type": "int | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "scheduledFor",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "source",
+          "type": "InvoiceReminderSource | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "openedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "announcedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "invoice",
+          "kind": "belongsTo",
+          "target": "Invoice",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "invoiceId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [],
+      "commands": [
+        "announceCreated",
+        "announceReminderLink",
+        "open"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
+      "name": "InvoiceReminderAttempt",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "invoiceId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "configId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "offsetDays",
+          "type": "int",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "scheduledFor",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "source",
+          "type": "InvoiceReminderSource | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "outcome",
+          "type": "InvoiceReminderOutcome | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "emailId",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "sessionId",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "amountDue",
+          "type": "money | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "dueDate",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "timing",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "reason",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "attempt",
+          "type": "int | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "message",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "retryScheduled",
+          "type": "boolean | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "openedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "invoice",
+          "kind": "belongsTo",
+          "target": "Invoice",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "invoiceId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [],
+      "commands": [
+        "open",
+        "recordDelivered",
+        "recordFailed",
+        "recordSuppressed"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
+      "name": "InvoiceReminderSchedule",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "invoiceId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "configId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "configuredAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "dueDate",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "offsetsDays",
+          "type": "list<int> | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "openedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "invoice",
+          "kind": "belongsTo",
+          "target": "Invoice",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "invoiceId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [],
+      "commands": [
+        "configure"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
+      "name": "InvoiceStripePayment",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "invoiceId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "sessionId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "paymentId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "amount",
+          "type": "money",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "method",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "recordedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "invoice",
+          "kind": "belongsTo",
+          "target": "Invoice",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "invoiceId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [],
+      "commands": [
+        "record"
+      ],
       "policies": [],
       "key": [
         "tenantId",
@@ -20192,6 +20790,7 @@
       "commands": [
         "assignRole",
         "changeAddress",
+        "clearAccountLink",
         "correctEmail",
         "correctIdentity",
         "deactivate",
@@ -21793,6 +22392,12 @@
           "modifiers": []
         },
         {
+          "name": "acceptedRevisionPending",
+          "type": "boolean | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "proposalNumber",
           "type": "string | null",
           "required": false,
@@ -22146,6 +22751,8 @@
         "linkEvent",
         "markViewed",
         "reassignClient",
+        "recomputeTotals",
+        "recordAcceptedRevision",
         "send",
         "stageClientMerge",
         "stageEventLink",
@@ -22690,6 +23297,7 @@
       "commands": [
         "addLine",
         "removeLine",
+        "restampAmount",
         "reviseLine"
       ],
       "policies": [],
@@ -23475,7 +24083,10 @@
       ],
       "constraints": [],
       "commands": [
+        "recordDelivery",
         "register",
+        "releaseDevice",
+        "renew",
         "unregister"
       ],
       "policies": [],
@@ -25529,6 +26140,144 @@
       ]
     },
     {
+      "name": "RunAlertDelivery",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "activityId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "kind",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [],
+      "constraints": [],
+      "commands": [
+        "record"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
+      "name": "RunAlertSetting",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": false
+        },
+        {
+          "name": "generation",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "changedBy",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [],
+      "constraints": [],
+      "commands": [
+        "create",
+        "disable",
+        "enable"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
       "name": "SavedReportDefinition",
       "properties": [
         {
@@ -26259,6 +27008,7 @@
       "constraints": [],
       "commands": [
         "create",
+        "recordView",
         "revoke"
       ],
       "policies": [],
@@ -27367,6 +28117,7 @@
       ],
       "commands": [
         "complete",
+        "completeInternal",
         "expire",
         "requestSignature",
         "revoke"
@@ -27401,6 +28152,229 @@
           "from": "revoked",
           "to": []
         }
+      ]
+    },
+    {
+      "name": "SmsAlertDelivery",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "triggerKey",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "personId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "alertType",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "sentAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "failedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "messageSid",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "error",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "openedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [],
+      "constraints": [],
+      "commands": [
+        "open",
+        "recordFailed",
+        "recordSent"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
+      "name": "SmsAlertSetting",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "enabled",
+          "type": "boolean | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "chainId",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "changedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "changedBy",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "lastScanAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "lastScanSent",
+          "type": "int | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "lastScanFailed",
+          "type": "int | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "lastScanError",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "openedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [],
+      "constraints": [],
+      "commands": [
+        "disable",
+        "enable",
+        "open",
+        "recordScan"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
       ]
     },
     {
@@ -27686,6 +28660,7 @@
       "commands": [
         "edit",
         "markRead",
+        "recordAttachments",
         "remove",
         "send"
       ],
@@ -29330,6 +30305,12 @@
           ]
         },
         {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "personId",
           "type": "uuid | null",
           "required": false,
@@ -29365,7 +30346,11 @@
       "computedProperties": [],
       "relationships": [],
       "constraints": [],
-      "commands": [],
+      "commands": [
+        "create",
+        "refavorite",
+        "unfavorite"
+      ],
       "policies": [],
       "key": [
         "tenantId",
@@ -34394,6 +35379,80 @@
       "emits": []
     },
     {
+      "name": "register",
+      "entity": "AssistantUpload",
+      "parameters": [
+        {
+          "name": "storageId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "uploadedBy",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "registerStorage",
+          "code": "registerStorage",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Nothing was uploaded."
+        },
+        {
+          "name": "registerUploader",
+          "code": "registerUploader",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Sign in first."
+        }
+      ],
+      "policies": [
+        "assistantUploadRead",
+        "assistantUploadWrite",
+        "assistantUploadExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "storageId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "uploadedByAuthSubjectId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "AssistantUploadRegistered"
+      ]
+    },
+    {
       "name": "attach",
       "entity": "Attachment",
       "parameters": [
@@ -34924,6 +35983,110 @@
       ]
     },
     {
+      "name": "linkHiredPerson",
+      "entity": "Candidate",
+      "parameters": [
+        {
+          "name": "hiredPersonId",
+          "type": "uuid",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "candidateRead",
+        "candidateWrite",
+        "candidateExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "hiredPersonId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "CandidateHiredPersonLinked"
+      ]
+    },
+    {
+      "name": "refreshFromSource",
+      "entity": "Candidate",
+      "parameters": [
+        {
+          "name": "fullName",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "roleAppliedFor",
+          "type": "CapsuleRole",
+          "required": true
+        },
+        {
+          "name": "rawSourceData",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "phone",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "candidateRead",
+        "candidateWrite",
+        "candidateExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "fullName",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "roleAppliedFor",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "rawSourceData",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "email",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "phone",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "CandidateSourceRefreshed"
+      ]
+    },
+    {
       "name": "reject",
       "entity": "Candidate",
       "parameters": [
@@ -35020,6 +36183,88 @@
       ],
       "emits": [
         "CandidateHireRevoked"
+      ]
+    },
+    {
+      "name": "create",
+      "entity": "ChatNotifyPreference",
+      "parameters": [
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "createOnce",
+          "code": "createOnce",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Your notification setting already exists; change it instead"
+        }
+      ],
+      "policies": [
+        "chatNotifyPreferenceRead",
+        "chatNotifyPreferenceWrite",
+        "chatNotifyPreferenceExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ownerId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "enabled",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ChatNotifyPreferenceSet"
+      ]
+    },
+    {
+      "name": "setEnabled",
+      "entity": "ChatNotifyPreference",
+      "parameters": [
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "chatNotifyPreferenceRead",
+        "chatNotifyPreferenceWrite",
+        "chatNotifyPreferenceExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "enabled",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ChatNotifyPreferenceSet"
       ]
     },
     {
@@ -40463,6 +41708,85 @@
       "emits": []
     },
     {
+      "name": "assignDriver",
+      "entity": "Delivery",
+      "parameters": [
+        {
+          "name": "driverId",
+          "type": "uuid",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "assignDriverActive",
+          "code": "assignDriverActive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Pick an active person in this workspace as the driver."
+        }
+      ],
+      "policies": [
+        "deliveryRead",
+        "deliveryWrite",
+        "deliveryExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "driverId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DeliveryDriverAssigned"
+      ]
+    },
+    {
+      "name": "assignVehicle",
+      "entity": "Delivery",
+      "parameters": [
+        {
+          "name": "vehicleId",
+          "type": "uuid",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "assignVehicleUsable",
+          "code": "assignVehicleUsable",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Pick a vehicle in this workspace that is not retired."
+        }
+      ],
+      "policies": [
+        "deliveryRead",
+        "deliveryWrite",
+        "deliveryExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "vehicleId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DeliveryVehicleAssigned"
+      ]
+    },
+    {
       "name": "cancel",
       "entity": "Delivery",
       "parameters": [
@@ -40829,6 +42153,68 @@
       ],
       "emits": [
         "DeliveryTransitStarted"
+      ]
+    },
+    {
+      "name": "unassignDriver",
+      "entity": "Delivery",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "deliveryRead",
+        "deliveryWrite",
+        "deliveryExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "target": "previousDriverId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "driverId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DeliveryDriverUnassigned"
+      ]
+    },
+    {
+      "name": "unassignVehicle",
+      "entity": "Delivery",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "deliveryRead",
+        "deliveryWrite",
+        "deliveryExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "target": "previousVehicleId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "vehicleId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DeliveryVehicleUnassigned"
       ]
     },
     {
@@ -43883,6 +45269,177 @@
       ]
     },
     {
+      "name": "moveWindow",
+      "entity": "EquipmentReservation",
+      "parameters": [
+        {
+          "name": "startsAt",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "endsAt",
+          "type": "datetime",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "moveWindowDates",
+          "code": "moveWindowDates",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Return time must be after checkout time."
+        }
+      ],
+      "policies": [
+        "equipmentReservationRead",
+        "equipmentReservationWrite",
+        "equipmentReservationExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "target": "previousStartsAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "compute",
+          "target": "previousEndsAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "startsAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "endsAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EquipmentReservationRescheduled"
+      ]
+    },
+    {
+      "name": "reserve",
+      "entity": "EquipmentReservation",
+      "parameters": [
+        {
+          "name": "equipmentId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "eventId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "startsAt",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "endsAt",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "quantity",
+          "type": "int",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "reserveWindow",
+          "code": "reserveWindow",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Return time must be after checkout time."
+        },
+        {
+          "name": "reserveQuantity",
+          "code": "reserveQuantity",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Reserved quantity must be a positive whole number."
+        },
+        {
+          "name": "reserveEquipmentActive",
+          "code": "reserveEquipmentActive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Only active equipment can be reserved."
+        },
+        {
+          "name": "reserveEventPresent",
+          "code": "reserveEventPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Event is unavailable in this workspace."
+        }
+      ],
+      "policies": [
+        "equipmentReservationRead",
+        "equipmentReservationWrite",
+        "equipmentReservationExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "equipmentId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "eventId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "startsAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "endsAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "quantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "reservedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EquipmentReserved"
+      ]
+    },
+    {
       "name": "record",
       "entity": "EquipmentServiceEntry",
       "parameters": [
@@ -44011,6 +45568,72 @@
       ],
       "emits": [
         "EquipmentServiceRecorded"
+      ]
+    },
+    {
+      "name": "advanceRecurrence",
+      "entity": "Event",
+      "parameters": [
+        {
+          "name": "seriesId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "generatedCount",
+          "type": "int",
+          "required": true
+        },
+        {
+          "name": "nextStartsAt",
+          "type": "datetime",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "advanceRecurrenceCount",
+          "code": "advanceRecurrenceCount",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "The recurring count can't be below one. Use one or more."
+        }
+      ],
+      "policies": [
+        "eventRead",
+        "eventWrite",
+        "eventExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "recurrenceGeneratedCount",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recurrenceNextStartsAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recurrenceActive",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recurrenceCompletedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventRecurrenceAdvanced"
       ]
     },
     {
@@ -45572,6 +47195,21 @@
           "name": "referralSourceId",
           "type": "uuid",
           "required": false
+        },
+        {
+          "name": "recurrenceTemplateEventId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "recurrenceSeriesId",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "recurrenceSequence",
+          "type": "int",
+          "required": false
         }
       ],
       "guards": [
@@ -45580,6 +47218,27 @@
         "[omitted]"
       ],
       "constraints": [
+        {
+          "name": "planRecurrenceBySchedule",
+          "code": "planRecurrenceBySchedule",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Recurring event instances are created by the recurrence schedule."
+        },
+        {
+          "name": "planRecurrenceLinkComplete",
+          "code": "planRecurrenceLinkComplete",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Recurring event instances need their source event, series and a sequence of two or more."
+        },
+        {
+          "name": "planRecurrenceSeriesActive",
+          "code": "planRecurrenceSeriesActive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This recurring series is no longer active."
+        },
         {
           "name": "planTitle",
           "code": "planTitle",
@@ -45769,6 +47428,21 @@
         {
           "kind": "mutate",
           "target": "referralSourceId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recurrenceTemplateEventId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recurrenceSeriesId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recurrenceSequence",
           "expression": "[omitted]"
         },
         {
@@ -49774,6 +51448,556 @@
       ],
       "emits": [
         "EventLayoutSectionUpdated"
+      ]
+    },
+    {
+      "name": "deactivate",
+      "entity": "EventPacketArtifact",
+      "parameters": [
+        {
+          "name": "contextJson",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "packetArtifactRead",
+        "packetArtifactWrite",
+        "packetArtifactExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "contextJson",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventPacketSourceDeactivated"
+      ]
+    },
+    {
+      "name": "recordEvidence",
+      "entity": "EventPacketArtifact",
+      "parameters": [
+        {
+          "name": "metadataJson",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "observationsJson",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "contextJson",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "packetArtifactRead",
+        "packetArtifactWrite",
+        "packetArtifactExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "metadataJson",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "observationsJson",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "contextJson",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventPacketEvidenceImported"
+      ]
+    },
+    {
+      "name": "register",
+      "entity": "EventPacketArtifact",
+      "parameters": [
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "fingerprint",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "storageId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "purpose",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "mimeType",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "byteSize",
+          "type": "int",
+          "required": true
+        },
+        {
+          "name": "contextJson",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "packetFilePurpose",
+          "code": "packetFilePurpose",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A packet file is a source, a PDF or a snapshot."
+        },
+        {
+          "name": "packetFileFingerprint",
+          "code": "packetFileFingerprint",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A packet file needs the fingerprint of its bytes."
+        },
+        {
+          "name": "packetFileStorage",
+          "code": "packetFileStorage",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A packet file needs its stored bytes."
+        },
+        {
+          "name": "packetFileSize",
+          "code": "packetFileSize",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This file's size can't be negative. Use zero or more."
+        },
+        {
+          "name": "packetFileEvent",
+          "code": "packetFileEvent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Choose an event in this organization."
+        },
+        {
+          "name": "packetFileOnce",
+          "code": "packetFileOnce",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This file is already in the event packet."
+        },
+        {
+          "name": "packetFileBytesOnce",
+          "code": "packetFileBytesOnce",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "These stored bytes already belong to a packet file."
+        }
+      ],
+      "policies": [
+        "packetArtifactRead",
+        "packetArtifactWrite",
+        "packetArtifactExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "eventId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "fingerprint",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "storageId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purpose",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "mimeType",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "byteSize",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "contextJson",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "uploadedBy",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "registeredAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventPacketFileRegistered"
+      ]
+    },
+    {
+      "name": "record",
+      "entity": "EventPacketResolution",
+      "parameters": [
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "decisionId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "issueKey",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "decidedAt",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "decisionJson",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "verificationJson",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "packetDecisionId",
+          "code": "packetDecisionId",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A decision needs its id."
+        },
+        {
+          "name": "packetDecisionIssue",
+          "code": "packetDecisionIssue",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A decision needs the issue it settles."
+        },
+        {
+          "name": "packetDecisionEvent",
+          "code": "packetDecisionEvent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Choose an event in this organization."
+        },
+        {
+          "name": "packetDecisionOnce",
+          "code": "packetDecisionOnce",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This decision is already recorded."
+        }
+      ],
+      "policies": [
+        "packetResolutionRead",
+        "packetResolutionWrite",
+        "packetResolutionExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "eventId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "decisionId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "issueKey",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "actor",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "decidedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "decisionJson",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "verificationJson",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recordedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventPacketIssueResolved"
+      ]
+    },
+    {
+      "name": "capture",
+      "entity": "EventPacketRevision",
+      "parameters": [
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "snapshotFingerprint",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "pdfStorageId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "snapshotStorageId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "stage",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "printFingerprint",
+          "code": "printFingerprint",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A print needs its exact input fingerprint"
+        },
+        {
+          "name": "printEvent",
+          "code": "printEvent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Choose an event in this organization."
+        },
+        {
+          "name": "printOnce",
+          "code": "printOnce",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This packet version is already printed."
+        },
+        {
+          "name": "printPdfOwned",
+          "code": "printPdfOwned",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Print files must belong to this event."
+        },
+        {
+          "name": "printSnapshotOwned",
+          "code": "printSnapshotOwned",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Print files must belong to this event."
+        }
+      ],
+      "policies": [
+        "packetRevisionRead",
+        "packetRevisionWrite",
+        "packetRevisionExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "eventId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "snapshotFingerprint",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "pdfStorageId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "snapshotStorageId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "stage",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "createdBy",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "printedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventPacketPrinted"
+      ]
+    },
+    {
+      "name": "reinstate",
+      "entity": "EventPacketRevision",
+      "parameters": [],
+      "guards": [
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "packetRevisionRead",
+        "packetRevisionWrite",
+        "packetRevisionExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "supersededBy",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventPacketRevisionReinstated"
+      ]
+    },
+    {
+      "name": "supersede",
+      "entity": "EventPacketRevision",
+      "parameters": [
+        {
+          "name": "by",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "supersedeOther",
+          "code": "supersedeOther",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A print can't replace itself."
+        },
+        {
+          "name": "supersedeSameEvent",
+          "code": "supersedeSameEvent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Only another print of this event can replace it."
+        }
+      ],
+      "policies": [
+        "packetRevisionRead",
+        "packetRevisionWrite",
+        "packetRevisionExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "supersededBy",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventPacketRevisionSuperseded"
       ]
     },
     {
@@ -56348,6 +58572,58 @@
       ]
     },
     {
+      "name": "refreshFromSource",
+      "entity": "Interview",
+      "parameters": [
+        {
+          "name": "rawSourceData",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "scheduledFor",
+          "type": "datetime",
+          "required": false
+        },
+        {
+          "name": "notes",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "interviewRead",
+        "interviewWrite",
+        "interviewExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "rawSourceData",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "scheduledFor",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "notes",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "InterviewSourceRefreshed"
+      ]
+    },
+    {
       "name": "schedule",
       "entity": "Interview",
       "parameters": [
@@ -58933,6 +61209,635 @@
       ],
       "emits": [
         "InvoiceWrittenOff"
+      ]
+    },
+    {
+      "name": "announceCreated",
+      "entity": "InvoicePaymentLink",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "invoicePaymentLinkRead",
+        "invoicePaymentLinkWrite",
+        "invoicePaymentLinkExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "announcedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "InvoicePaymentLinkCreated"
+      ]
+    },
+    {
+      "name": "announceReminderLink",
+      "entity": "InvoicePaymentLink",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "invoicePaymentLinkRead",
+        "invoicePaymentLinkWrite",
+        "invoicePaymentLinkExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "announcedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "InvoiceReminderPaymentLinkPrepared"
+      ]
+    },
+    {
+      "name": "open",
+      "entity": "InvoicePaymentLink",
+      "parameters": [
+        {
+          "name": "invoiceId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "sessionId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "url",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "amount",
+          "type": "money",
+          "required": true
+        },
+        {
+          "name": "createdByUserId",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "configId",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "offsetDays",
+          "type": "int",
+          "required": false
+        },
+        {
+          "name": "scheduledFor",
+          "type": "datetime",
+          "required": false
+        },
+        {
+          "name": "source",
+          "type": "InvoiceReminderSource",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "openSession",
+          "code": "openSession",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A payment link needs its Stripe session and address"
+        }
+      ],
+      "policies": [
+        "invoicePaymentLinkRead",
+        "invoicePaymentLinkWrite",
+        "invoicePaymentLinkExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "invoiceId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sessionId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "url",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "amount",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "createdByUserId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "configId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "offsetDays",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "scheduledFor",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "source",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "openedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
+    },
+    {
+      "name": "open",
+      "entity": "InvoiceReminderAttempt",
+      "parameters": [
+        {
+          "name": "invoiceId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "configId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "offsetDays",
+          "type": "int",
+          "required": true
+        },
+        {
+          "name": "scheduledFor",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "source",
+          "type": "InvoiceReminderSource",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "invoiceReminderAttemptRead",
+        "invoiceReminderAttemptWrite",
+        "invoiceReminderAttemptExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "invoiceId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "configId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "offsetDays",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "scheduledFor",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "source",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "openedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
+    },
+    {
+      "name": "recordDelivered",
+      "entity": "InvoiceReminderAttempt",
+      "parameters": [
+        {
+          "name": "emailId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "sessionId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "amountDue",
+          "type": "money",
+          "required": true
+        },
+        {
+          "name": "dueDate",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "timing",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "invoiceReminderAttemptRead",
+        "invoiceReminderAttemptWrite",
+        "invoiceReminderAttemptExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "outcome",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "emailId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sessionId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "amountDue",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "dueDate",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "timing",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "InvoiceReminderDelivered"
+      ]
+    },
+    {
+      "name": "recordFailed",
+      "entity": "InvoiceReminderAttempt",
+      "parameters": [
+        {
+          "name": "attempt",
+          "type": "int",
+          "required": true
+        },
+        {
+          "name": "message",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "retryScheduled",
+          "type": "boolean",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "invoiceReminderAttemptRead",
+        "invoiceReminderAttemptWrite",
+        "invoiceReminderAttemptExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "outcome",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "attempt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "message",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "retryScheduled",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "InvoiceReminderDeliveryFailed"
+      ]
+    },
+    {
+      "name": "recordSuppressed",
+      "entity": "InvoiceReminderAttempt",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "invoiceReminderAttemptRead",
+        "invoiceReminderAttemptWrite",
+        "invoiceReminderAttemptExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "outcome",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "reason",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "InvoiceReminderSuppressed"
+      ]
+    },
+    {
+      "name": "configure",
+      "entity": "InvoiceReminderSchedule",
+      "parameters": [
+        {
+          "name": "invoiceId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "configId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "configuredAt",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "dueDate",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "offsetsDays",
+          "type": "list<int>",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "configureId",
+          "code": "configureId",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A reminder schedule needs its ID"
+        }
+      ],
+      "policies": [
+        "invoiceReminderScheduleRead",
+        "invoiceReminderScheduleWrite",
+        "invoiceReminderScheduleExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "invoiceId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "configId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "configuredAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "dueDate",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "offsetsDays",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "openedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "InvoiceReminderScheduleConfigured"
+      ]
+    },
+    {
+      "name": "record",
+      "entity": "InvoiceStripePayment",
+      "parameters": [
+        {
+          "name": "invoiceId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "sessionId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "paymentId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "amount",
+          "type": "money",
+          "required": true
+        },
+        {
+          "name": "method",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "recordSession",
+          "code": "recordSession",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A Stripe payment needs its session"
+        }
+      ],
+      "policies": [
+        "invoiceStripePaymentRead",
+        "invoiceStripePaymentWrite",
+        "invoiceStripePaymentExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "invoiceId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sessionId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "paymentId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "amount",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "method",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recordedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "InvoiceStripePaymentRecorded"
       ]
     },
     {
@@ -64838,6 +67743,32 @@
       ]
     },
     {
+      "name": "clearAccountLink",
+      "entity": "Person",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "personRead",
+        "personWrite",
+        "personExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "authSubjectId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PersonAccountUnlinked"
+      ]
+    },
+    {
       "name": "correctEmail",
       "entity": "Person",
       "parameters": [
@@ -67848,6 +70779,11 @@
         },
         {
           "kind": "mutate",
+          "target": "acceptedRevisionPending",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
           "target": "acceptedAt",
           "expression": "[omitted]"
         }
@@ -68423,6 +71359,113 @@
       ],
       "emits": [
         "ProposalClientReassigned"
+      ]
+    },
+    {
+      "name": "recomputeTotals",
+      "entity": "Proposal",
+      "parameters": [
+        {
+          "name": "subtotal",
+          "type": "money",
+          "required": true
+        },
+        {
+          "name": "total",
+          "type": "money",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "recomputeMoneyNonnegative",
+          "code": "recomputeMoneyNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This proposal's money amounts can't be negative. Use zero or more."
+        },
+        {
+          "name": "recomputeTotalMatch",
+          "code": "recomputeTotalMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Proposal total must equal subtotal plus tax minus discount"
+        }
+      ],
+      "policies": [
+        "proposalRead",
+        "proposalWrite",
+        "proposalExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "target": "previousSubtotal",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "compute",
+          "target": "previousTotal",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "subtotal",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "total",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ProposalTotalsRecomputed"
+      ]
+    },
+    {
+      "name": "recordAcceptedRevision",
+      "entity": "Proposal",
+      "parameters": [
+        {
+          "name": "acceptedRevisionId",
+          "type": "uuid",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "proposalRead",
+        "proposalWrite",
+        "proposalExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "acceptedRevisionId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "acceptedRevisionPending",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ProposalAcceptedRevisionRecorded"
       ]
     },
     {
@@ -69199,6 +72242,51 @@
       ],
       "emits": [
         "ProposalLineItemRemoved"
+      ]
+    },
+    {
+      "name": "restampAmount",
+      "entity": "ProposalLineItem",
+      "parameters": [
+        {
+          "name": "amount",
+          "type": "money",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "restampNonnegative",
+          "code": "restampNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This line's price can't be negative. Use zero or more."
+        }
+      ],
+      "policies": [
+        "proposalLineItemRead",
+        "proposalLineItemWrite",
+        "proposalLineItemExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "target": "previousAmount",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "amount",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ProposalLineItemRepriced"
       ]
     },
     {
@@ -70364,6 +73452,39 @@
       ]
     },
     {
+      "name": "recordDelivery",
+      "entity": "PushSubscription",
+      "parameters": [
+        {
+          "name": "at",
+          "type": "float",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "pushSubscriptionRead",
+        "pushSubscriptionWrite",
+        "pushSubscriptionExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "lastUsedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
+    },
+    {
       "name": "register",
       "entity": "PushSubscription",
       "parameters": [
@@ -70407,6 +73528,13 @@
           "severity": "block",
           "expression": "[omitted]",
           "message": "This device is missing its notification keys. Try turning notifications on again."
+        },
+        {
+          "name": "registerOnce",
+          "code": "registerOnce",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This device already has notifications on. Turn them off and on again."
         }
       ],
       "policies": [
@@ -70451,6 +73579,125 @@
         {
           "kind": "mutate",
           "target": "userAgent",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PushSubscriptionRegistered"
+      ]
+    },
+    {
+      "name": "releaseDevice",
+      "entity": "PushSubscription",
+      "parameters": [
+        {
+          "name": "endpoint",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "pushSubscriptionRead",
+        "pushSubscriptionWrite",
+        "pushSubscriptionExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PushSubscriptionRemoved"
+      ]
+    },
+    {
+      "name": "renew",
+      "entity": "PushSubscription",
+      "parameters": [
+        {
+          "name": "p256dh",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "auth",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "userAgent",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "renewKeys",
+          "code": "renewKeys",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This device is missing its notification keys. Try turning notifications on again."
+        },
+        {
+          "name": "renewOnce",
+          "code": "renewOnce",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This device already has notifications on for another account. Turn them off there first."
+        }
+      ],
+      "policies": [
+        "pushSubscriptionRead",
+        "pushSubscriptionWrite",
+        "pushSubscriptionExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "personId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "p256dh",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "auth",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "userAgent",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
           "expression": "[omitted]"
         }
       ],
@@ -71340,6 +74587,26 @@
           "name": "processingErrors",
           "type": "string",
           "required": true
+        },
+        {
+          "name": "clientId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "leadId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "proposalId",
+          "type": "uuid",
+          "required": false
         }
       ],
       "guards": [
@@ -71379,6 +74646,26 @@
         {
           "kind": "mutate",
           "target": "processingErrors",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "clientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "leadId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "eventId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "proposalId",
           "expression": "[omitted]"
         }
       ],
@@ -72868,6 +76155,187 @@
       ]
     },
     {
+      "name": "record",
+      "entity": "RunAlertDelivery",
+      "parameters": [
+        {
+          "name": "activityId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "kind",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "recordKind",
+          "code": "recordKind",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Unknown alert kind."
+        },
+        {
+          "name": "recordOnce",
+          "code": "recordOnce",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This alert was already sent."
+        }
+      ],
+      "policies": [
+        "runAlertDeliveryRead",
+        "runAlertDeliveryWrite",
+        "runAlertDeliveryExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "activityId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "kind",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RunAlertSent"
+      ]
+    },
+    {
+      "name": "create",
+      "entity": "RunAlertSetting",
+      "parameters": [],
+      "guards": [
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "runAlertSettingRead",
+        "runAlertSettingWrite",
+        "runAlertSettingExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
+    },
+    {
+      "name": "disable",
+      "entity": "RunAlertSetting",
+      "parameters": [
+        {
+          "name": "actorId",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "runAlertSettingRead",
+        "runAlertSettingWrite",
+        "runAlertSettingExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "enabled",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "changedBy",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RunAlertsDisabled"
+      ]
+    },
+    {
+      "name": "enable",
+      "entity": "RunAlertSetting",
+      "parameters": [
+        {
+          "name": "generation",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "actorId",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "enableGeneration",
+          "code": "enableGeneration",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "The alert loop needs its owner token."
+        }
+      ],
+      "policies": [
+        "runAlertSettingRead",
+        "runAlertSettingWrite",
+        "runAlertSettingExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "enabled",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "generation",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "changedBy",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RunAlertsEnabled"
+      ]
+    },
+    {
       "name": "archive",
       "entity": "SavedReportDefinition",
       "parameters": [],
@@ -73776,6 +77244,61 @@
       ],
       "emits": [
         "ShareLinkCreated"
+      ]
+    },
+    {
+      "name": "recordView",
+      "entity": "ShareLink",
+      "parameters": [
+        {
+          "name": "viewerIdentity",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "shareLinkRead",
+        "shareLinkWrite",
+        "shareLinkExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "viewCount",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "firstViewedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "lastViewedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "lastViewerIdentity",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ShareLinkViewed"
       ]
     },
     {
@@ -75410,6 +78933,101 @@
       ]
     },
     {
+      "name": "completeInternal",
+      "entity": "SignatureRequest",
+      "parameters": [
+        {
+          "name": "signedArtifactReference",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "signerIpAddress",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "signerUserAgent",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "acceptProposalId",
+          "type": "uuid",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "signatureRequestRead",
+        "signatureRequestWrite",
+        "signatureRequestExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "completedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "signedArtifactReference",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "signerIpAddress",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "signerUserAgent",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "SignatureCompleted"
+      ]
+    },
+    {
       "name": "expire",
       "entity": "SignatureRequest",
       "parameters": [],
@@ -75641,6 +79259,330 @@
     },
     {
       "name": "open",
+      "entity": "SmsAlertDelivery",
+      "parameters": [
+        {
+          "name": "triggerKey",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "personId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "alertType",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "smsAlertDeliveryRead",
+        "smsAlertDeliveryWrite",
+        "smsAlertDeliveryExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "triggerKey",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "personId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "alertType",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "openedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
+    },
+    {
+      "name": "recordFailed",
+      "entity": "SmsAlertDelivery",
+      "parameters": [
+        {
+          "name": "error",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "smsAlertDeliveryRead",
+        "smsAlertDeliveryWrite",
+        "smsAlertDeliveryExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "failedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "error",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "SmsAlertFailed"
+      ]
+    },
+    {
+      "name": "recordSent",
+      "entity": "SmsAlertDelivery",
+      "parameters": [
+        {
+          "name": "messageSid",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "smsAlertDeliveryRead",
+        "smsAlertDeliveryWrite",
+        "smsAlertDeliveryExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sentAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "messageSid",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "SmsAlertSent"
+      ]
+    },
+    {
+      "name": "disable",
+      "entity": "SmsAlertSetting",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "smsAlertSettingRead",
+        "smsAlertSettingWrite",
+        "smsAlertSettingExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "enabled",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "changedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "changedBy",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "SmsAlertsDisabled"
+      ]
+    },
+    {
+      "name": "enable",
+      "entity": "SmsAlertSetting",
+      "parameters": [
+        {
+          "name": "chainId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "enableChain",
+          "code": "enableChain",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Turning SMS alerts on needs a scan chain ID"
+        }
+      ],
+      "policies": [
+        "smsAlertSettingRead",
+        "smsAlertSettingWrite",
+        "smsAlertSettingExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "enabled",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "chainId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "changedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "changedBy",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "SmsAlertsEnabled"
+      ]
+    },
+    {
+      "name": "open",
+      "entity": "SmsAlertSetting",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "oneSettingPerTenant",
+          "code": "oneSettingPerTenant",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This workspace already has SMS alert settings"
+        }
+      ],
+      "policies": [
+        "smsAlertSettingRead",
+        "smsAlertSettingWrite",
+        "smsAlertSettingExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "openedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
+    },
+    {
+      "name": "recordScan",
+      "entity": "SmsAlertSetting",
+      "parameters": [
+        {
+          "name": "sent",
+          "type": "int",
+          "required": true
+        },
+        {
+          "name": "failed",
+          "type": "int",
+          "required": true
+        },
+        {
+          "name": "error",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "smsAlertSettingRead",
+        "smsAlertSettingWrite",
+        "smsAlertSettingExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "lastScanAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "lastScanSent",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "lastScanFailed",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "lastScanError",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "SmsAlertsScanned"
+      ]
+    },
+    {
+      "name": "open",
       "entity": "StaffChatReadCursor",
       "parameters": [
         {
@@ -75672,6 +79614,13 @@
           "severity": "block",
           "expression": "[omitted]",
           "message": "You can't mark a chat read before now."
+        },
+        {
+          "name": "openOnce",
+          "code": "openOnce",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This chat's read position is already set. It updates automatically after that."
         }
       ],
       "policies": [
@@ -75833,6 +79782,65 @@
       "emits": [
         "StaffMessageRead"
       ]
+    },
+    {
+      "name": "recordAttachments",
+      "entity": "StaffMessage",
+      "parameters": [
+        {
+          "name": "attachmentCount",
+          "type": "int",
+          "required": true
+        },
+        {
+          "name": "clearBody",
+          "type": "boolean",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "recordAttachmentsCounted",
+          "code": "recordAttachmentsCounted",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This message's files changed while it was being sent. Send it again."
+        },
+        {
+          "name": "recordAttachmentsBody",
+          "code": "recordAttachmentsBody",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Add message text or a file."
+        }
+      ],
+      "policies": [
+        "staffMessageRead",
+        "staffMessageWrite",
+        "staffMessageExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "attachmentCount",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "body",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
     },
     {
       "name": "remove",
@@ -78030,6 +82038,120 @@
       ],
       "emits": [
         "TimeRecordCorrected"
+      ]
+    },
+    {
+      "name": "create",
+      "entity": "TppReportFavorite",
+      "parameters": [
+        {
+          "name": "reportId",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "createOnce",
+          "code": "createOnce",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This report is already a favorite."
+        }
+      ],
+      "policies": [
+        "tppReportFavoriteRead",
+        "tppReportFavoriteWrite",
+        "tppReportFavoriteExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "personId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "reportId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "TppReportFavorited"
+      ]
+    },
+    {
+      "name": "refavorite",
+      "entity": "TppReportFavorite",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "refavoriteOnce",
+          "code": "refavoriteOnce",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This report is already a favorite."
+        }
+      ],
+      "policies": [
+        "tppReportFavoriteRead",
+        "tppReportFavoriteWrite",
+        "tppReportFavoriteExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "TppReportFavorited"
+      ]
+    },
+    {
+      "name": "unfavorite",
+      "entity": "TppReportFavorite",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "tppReportFavoriteRead",
+        "tppReportFavoriteWrite",
+        "tppReportFavoriteExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "TppReportUnfavorited"
       ]
     },
     {
@@ -85535,8 +89657,8 @@
       "name": "chatNotifyPreferenceExecute",
       "entity": "ChatNotifyPreference",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"pushDeviceManage\")",
-      "message": "Chat notification preference is set only through the app"
+      "expression": "user.role != \"anonymous\"",
+      "message": "Sign in to change notification settings"
     },
     {
       "name": "chatNotifyPreferenceRead",
@@ -85549,8 +89671,8 @@
       "name": "chatNotifyPreferenceWrite",
       "entity": "ChatNotifyPreference",
       "action": "write",
-      "expression": "roleAllows(user.role, \"pushDeviceManage\")",
-      "message": "Chat notification preference is set only through the app"
+      "expression": "user.role != \"anonymous\"",
+      "message": "Sign in to change notification settings"
     },
     {
       "name": "clientCommunicationExecute",
@@ -86820,11 +90942,95 @@
       "message": "Only Capsule can update invoice number counters"
     },
     {
+      "name": "invoicePaymentLinkExecute",
+      "entity": "InvoicePaymentLink",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"financeAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Finance staff and managers may change invoice payment links"
+    },
+    {
+      "name": "invoicePaymentLinkRead",
+      "entity": "InvoicePaymentLink",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"financeAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Finance staff and managers may see invoice payment links"
+    },
+    {
+      "name": "invoicePaymentLinkWrite",
+      "entity": "InvoicePaymentLink",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"financeAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Finance staff and managers may update invoice payment links"
+    },
+    {
       "name": "invoiceRead",
       "entity": "Invoice",
       "action": "read",
       "expression": "roleAllows(user.role, \"financeAccess\") or roleAllows(user.role, \"manageAccess\")",
       "message": "Finance staff and managers may see invoices"
+    },
+    {
+      "name": "invoiceReminderAttemptExecute",
+      "entity": "InvoiceReminderAttempt",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"financeAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Finance staff and managers may change reminder deliveries"
+    },
+    {
+      "name": "invoiceReminderAttemptRead",
+      "entity": "InvoiceReminderAttempt",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"financeAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Finance staff and managers may see reminder deliveries"
+    },
+    {
+      "name": "invoiceReminderAttemptWrite",
+      "entity": "InvoiceReminderAttempt",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"financeAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Finance staff and managers may update reminder deliveries"
+    },
+    {
+      "name": "invoiceReminderScheduleExecute",
+      "entity": "InvoiceReminderSchedule",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"financeAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Finance staff and managers may change reminder schedules"
+    },
+    {
+      "name": "invoiceReminderScheduleRead",
+      "entity": "InvoiceReminderSchedule",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"financeAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Finance staff and managers may see reminder schedules"
+    },
+    {
+      "name": "invoiceReminderScheduleWrite",
+      "entity": "InvoiceReminderSchedule",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"financeAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Finance staff and managers may update reminder schedules"
+    },
+    {
+      "name": "invoiceStripePaymentExecute",
+      "entity": "InvoiceStripePayment",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"financeAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Finance staff and managers may change Stripe payments"
+    },
+    {
+      "name": "invoiceStripePaymentRead",
+      "entity": "InvoiceStripePayment",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"financeAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Finance staff and managers may see Stripe payments"
+    },
+    {
+      "name": "invoiceStripePaymentWrite",
+      "entity": "InvoiceStripePayment",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"financeAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Finance staff and managers may update Stripe payments"
     },
     {
       "name": "invoiceWrite",
@@ -87089,22 +91295,22 @@
       "name": "packetArtifactExecute",
       "entity": "EventPacketArtifact",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"eventPacketSeamOnly\")",
-      "message": "Staff cannot change packet files"
+      "expression": "roleAllows(user.role, \"manageAccess\")",
+      "message": "Only managers can change the event packet files"
     },
     {
       "name": "packetArtifactRead",
       "entity": "EventPacketArtifact",
       "action": "read",
-      "expression": "roleAllows(user.role, \"eventPacketSeamOnly\")",
-      "message": "The original packet files stay behind the scenes"
+      "expression": "roleAllows(user.role, \"manageAccess\")",
+      "message": "Only managers can see the original packet files"
     },
     {
       "name": "packetArtifactWrite",
       "entity": "EventPacketArtifact",
       "action": "write",
-      "expression": "roleAllows(user.role, \"eventPacketSeamOnly\")",
-      "message": "The event packet keeps the source files"
+      "expression": "roleAllows(user.role, \"manageAccess\")",
+      "message": "Only managers can change the event packet files"
     },
     {
       "name": "packetIssueExecute",
@@ -87131,43 +91337,43 @@
       "name": "packetResolutionExecute",
       "entity": "EventPacketResolution",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"eventPacketSeamOnly\")",
-      "message": "Staff cannot change packet decisions"
+      "expression": "roleAllows(user.role, \"manageAccess\")",
+      "message": "Only managers can decide event packet issues"
     },
     {
       "name": "packetResolutionRead",
       "entity": "EventPacketResolution",
       "action": "read",
-      "expression": "roleAllows(user.role, \"eventPacketSeamOnly\")",
+      "expression": "roleAllows(user.role, \"manageAccess\")",
       "message": "Private approvals remain behind manager review"
     },
     {
       "name": "packetResolutionWrite",
       "entity": "EventPacketResolution",
       "action": "write",
-      "expression": "roleAllows(user.role, \"eventPacketSeamOnly\")",
-      "message": "The event packet keeps the packet decisions"
+      "expression": "roleAllows(user.role, \"manageAccess\")",
+      "message": "Only managers can decide event packet issues"
     },
     {
       "name": "packetRevisionExecute",
       "entity": "EventPacketRevision",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"eventPacketSeamOnly\")",
-      "message": "Staff cannot change packet prints"
+      "expression": "roleAllows(user.role, \"manageAccess\")",
+      "message": "Only managers can print the event packet"
     },
     {
       "name": "packetRevisionRead",
       "entity": "EventPacketRevision",
       "action": "read",
-      "expression": "roleAllows(user.role, \"eventPacketSeamOnly\")",
+      "expression": "roleAllows(user.role, \"manageAccess\")",
       "message": "PDF and source snapshots need scoped manager access"
     },
     {
       "name": "packetRevisionWrite",
       "entity": "EventPacketRevision",
       "action": "write",
-      "expression": "roleAllows(user.role, \"eventPacketSeamOnly\")",
-      "message": "The event packet keeps the packet prints"
+      "expression": "roleAllows(user.role, \"manageAccess\")",
+      "message": "Only managers can print the event packet"
     },
     {
       "name": "packListExecute",
@@ -87614,22 +91820,22 @@
       "name": "pushSubscriptionExecute",
       "entity": "PushSubscription",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"pushDeviceManage\")",
-      "message": "Push devices are managed only through the app"
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may manage their own push devices"
     },
     {
       "name": "pushSubscriptionRead",
       "entity": "PushSubscription",
       "action": "read",
-      "expression": "roleAllows(user.role, \"staffAccess\") and self.authSubjectId == null or user.id != null and self.authSubjectId == user.id",
+      "expression": "roleAllows(user.role, \"staffAccess\") and self.authSubjectId == null or user.id != null and self.authSubjectId == user.id or user.role == \"system\"",
       "message": "Staff may see their own push devices"
     },
     {
       "name": "pushSubscriptionWrite",
       "entity": "PushSubscription",
       "action": "write",
-      "expression": "roleAllows(user.role, \"pushDeviceManage\")",
-      "message": "Push devices are managed only through the app"
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may manage their own push devices"
     },
     {
       "name": "qualificationExecute",
@@ -87800,6 +92006,48 @@
       "message": "Workforce managers may update role scorecards"
     },
     {
+      "name": "runAlertDeliveryExecute",
+      "entity": "RunAlertDelivery",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Alerts are recorded by the app"
+    },
+    {
+      "name": "runAlertDeliveryRead",
+      "entity": "RunAlertDelivery",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may see which alerts went out"
+    },
+    {
+      "name": "runAlertDeliveryWrite",
+      "entity": "RunAlertDelivery",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Alerts are recorded by the app"
+    },
+    {
+      "name": "runAlertSettingExecute",
+      "entity": "RunAlertSetting",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may switch background alerts"
+    },
+    {
+      "name": "runAlertSettingRead",
+      "entity": "RunAlertSetting",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may see whether background alerts are on"
+    },
+    {
+      "name": "runAlertSettingWrite",
+      "entity": "RunAlertSetting",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may switch background alerts"
+    },
+    {
       "name": "savedReportExecute",
       "entity": "SavedReportDefinition",
       "action": "execute",
@@ -87966,6 +92214,48 @@
       "action": "write",
       "expression": "roleAllows(user.role, \"salesAccess\")",
       "message": "Sales staff may update signature requests"
+    },
+    {
+      "name": "smsAlertDeliveryExecute",
+      "entity": "SmsAlertDelivery",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"manageAccess\")",
+      "message": "Managers may change SMS alert deliveries"
+    },
+    {
+      "name": "smsAlertDeliveryRead",
+      "entity": "SmsAlertDelivery",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"manageAccess\")",
+      "message": "Managers may see SMS alert deliveries"
+    },
+    {
+      "name": "smsAlertDeliveryWrite",
+      "entity": "SmsAlertDelivery",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"manageAccess\")",
+      "message": "Managers may update SMS alert deliveries"
+    },
+    {
+      "name": "smsAlertSettingExecute",
+      "entity": "SmsAlertSetting",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"manageAccess\")",
+      "message": "Managers may change SMS alert settings"
+    },
+    {
+      "name": "smsAlertSettingRead",
+      "entity": "SmsAlertSetting",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"manageAccess\")",
+      "message": "Managers may see SMS alert settings"
+    },
+    {
+      "name": "smsAlertSettingWrite",
+      "entity": "SmsAlertSetting",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"manageAccess\")",
+      "message": "Managers may update SMS alert settings"
     },
     {
       "name": "staffChatReadCursorExecute",
@@ -88202,8 +92492,8 @@
       "name": "tppReportFavoriteExecute",
       "entity": "TppReportFavorite",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"reportFavoriteSeamOnly\")",
-      "message": "Report favorites are managed only through the app"
+      "expression": "user.personId != null",
+      "message": "Link your account to a staff profile to keep report favorites"
     },
     {
       "name": "tppReportFavoriteRead",
@@ -88216,8 +92506,8 @@
       "name": "tppReportFavoriteWrite",
       "entity": "TppReportFavorite",
       "action": "write",
-      "expression": "roleAllows(user.role, \"reportFavoriteSeamOnly\")",
-      "message": "Report favorites are managed only through the app"
+      "expression": "user.personId != null",
+      "message": "Link your account to a staff profile to keep report favorites"
     },
     {
       "name": "trailerExecute",
@@ -93411,6 +97701,70 @@
       "name": "payments"
     },
     {
+      "source": "InvoicePaymentLink",
+      "target": "Invoice",
+      "kind": "belongsTo",
+      "name": "invoice",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "invoiceId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "InvoiceReminderAttempt",
+      "target": "Invoice",
+      "kind": "belongsTo",
+      "name": "invoice",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "invoiceId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "InvoiceReminderSchedule",
+      "target": "Invoice",
+      "kind": "belongsTo",
+      "name": "invoice",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "invoiceId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "InvoiceStripePayment",
+      "target": "Invoice",
+      "kind": "belongsTo",
+      "name": "invoice",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "invoiceId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "ItemUnitMapping",
       "target": "Ingredient",
       "kind": "belongsTo",
@@ -97658,6 +102012,31 @@
       ]
     },
     {
+      "name": "InvoiceReminderOutcome",
+      "values": [
+        {
+          "name": "delivered"
+        },
+        {
+          "name": "suppressed"
+        },
+        {
+          "name": "failed"
+        }
+      ]
+    },
+    {
+      "name": "InvoiceReminderSource",
+      "values": [
+        {
+          "name": "scheduled"
+        },
+        {
+          "name": "manual"
+        }
+      ]
+    },
+    {
       "name": "InvoiceStatus",
       "values": [
         {
@@ -99290,6 +103669,11 @@
       "payload": "{announcementId: string, tenantId: string}"
     },
     {
+      "name": "AssistantUploadRegistered",
+      "channel": "assistant_upload.registered",
+      "payload": "{assistantUploadId: string, tenantId: string, storageId: string}"
+    },
+    {
       "name": "AttachmentAdded",
       "channel": "attachment.added",
       "payload": "{attachmentId: string, tenantId: string, parentType: string, parentId: string, fileName: string}"
@@ -99320,6 +103704,11 @@
       "payload": "{candidateId: string, tenantId: string}"
     },
     {
+      "name": "CandidateHiredPersonLinked",
+      "channel": "candidate.hired_person_linked",
+      "payload": "{candidateId: string, tenantId: string, hiredPersonId: string}"
+    },
+    {
       "name": "CandidateHireRevoked",
       "channel": "candidate.hire_revoked",
       "payload": "{candidateId: string, tenantId: string, toStage: string, reason: string | null}"
@@ -99330,9 +103719,19 @@
       "payload": "{candidateId: string, tenantId: string}"
     },
     {
+      "name": "CandidateSourceRefreshed",
+      "channel": "candidate.source_refreshed",
+      "payload": "{candidateId: string, tenantId: string, sourceSystem: string, externalCandidateId: string | null}"
+    },
+    {
       "name": "CandidateStageChanged",
       "channel": "candidate.stage_changed",
       "payload": "{candidateId: string, tenantId: string, toStage: string}"
+    },
+    {
+      "name": "ChatNotifyPreferenceSet",
+      "channel": "chat_notify_preference.set",
+      "payload": "{chatNotifyPreferenceId: string, tenantId: string, ownerId: string, enabled: boolean}"
     },
     {
       "name": "ClientArchived",
@@ -99730,6 +104129,16 @@
       "payload": "{deliveryId: string, tenantId: string, packListId: string, eventId: string, driverId: string | null, previousStatus: DeliveryStatus, status: DeliveryStatus, deliveredAt: datetime | null}"
     },
     {
+      "name": "DeliveryDriverAssigned",
+      "channel": "delivery.driver_assigned",
+      "payload": "{deliveryId: string, tenantId: string, driverId: string, eventId: string}"
+    },
+    {
+      "name": "DeliveryDriverUnassigned",
+      "channel": "delivery.driver_unassigned",
+      "payload": "{deliveryId: string, tenantId: string, driverId: string, eventId: string}"
+    },
+    {
       "name": "DeliveryFailed",
       "channel": "delivery.failed",
       "payload": "{deliveryId: string, tenantId: string, packListId: string, eventId: string, driverId: string | null, previousStatus: DeliveryStatus, status: DeliveryStatus, reason: string}"
@@ -99938,6 +104347,11 @@
       "name": "EquipmentReservationCancelled",
       "channel": "equipment.reservation_cancelled",
       "payload": "{equipmentReservationId: string, equipmentId: string, eventId: string, tenantId: string, reason: string | null}"
+    },
+    {
+      "name": "EquipmentReservationRescheduled",
+      "channel": "equipment.reservation_rescheduled",
+      "payload": "{equipmentReservationId: string, equipmentId: string, eventId: string, tenantId: string, previousStartsAt: datetime | null, previousEndsAt: datetime | null, startsAt: datetime, endsAt: datetime}"
     },
     {
       "name": "EquipmentReserved",
@@ -100215,9 +104629,44 @@
       "payload": "{eventId: string, tenantId: string, assignedToId: string | null, startsAt: datetime, endsAt: datetime}"
     },
     {
+      "name": "EventPacketEvidenceImported",
+      "channel": "event_packet.evidence_imported",
+      "payload": "{artifactId: string, tenantId: string, eventId: string, fingerprint: string, name: string}"
+    },
+    {
+      "name": "EventPacketFileRegistered",
+      "channel": "event_packet.file_registered",
+      "payload": "{artifactId: string, tenantId: string, eventId: string, fingerprint: string, purpose: string, name: string, mimeType: string, byteSize: int, uploadedBy: string}"
+    },
+    {
+      "name": "EventPacketIssueResolved",
+      "channel": "event_packet.issue_resolved",
+      "payload": "{resolutionId: string, tenantId: string, eventId: string, decisionId: string, issueKey: string, actor: string, decidedAt: datetime}"
+    },
+    {
+      "name": "EventPacketPrinted",
+      "channel": "event_packet.printed",
+      "payload": "{revisionId: string, tenantId: string, eventId: string, snapshotFingerprint: string, stage: string, createdBy: string}"
+    },
+    {
+      "name": "EventPacketRevisionReinstated",
+      "channel": "event_packet.revision_reinstated",
+      "payload": "{revisionId: string, tenantId: string, eventId: string}"
+    },
+    {
+      "name": "EventPacketRevisionSuperseded",
+      "channel": "event_packet.revision_superseded",
+      "payload": "{revisionId: string, tenantId: string, eventId: string, supersededBy: string}"
+    },
+    {
+      "name": "EventPacketSourceDeactivated",
+      "channel": "event_packet.source_deactivated",
+      "payload": "{artifactId: string, tenantId: string, eventId: string, fingerprint: string, name: string}"
+    },
+    {
       "name": "EventPlanned",
       "channel": "event.planned",
-      "payload": "{eventId: string, tenantId: string, clientId: string, serviceStyleId: string | null, venueId: string | null, venueCapacity: number | null, startsAt: datetime, endsAt: datetime, expectedHeadcount: number}"
+      "payload": "{eventId: string, tenantId: string, clientId: string, serviceStyleId: string | null, venueId: string | null, venueCapacity: number | null, startsAt: datetime, endsAt: datetime, expectedHeadcount: number, recurrenceTemplateEventId: string | null, recurrenceSeriesId: string | null, recurrenceSequence: int | null}"
     },
     {
       "name": "EventPricingChanged",
@@ -100238,6 +104687,11 @@
       "name": "EventReactivated",
       "channel": "event.reactivated",
       "payload": "{eventId: string, tenantId: string}"
+    },
+    {
+      "name": "EventRecurrenceAdvanced",
+      "channel": "event.recurrence_advanced",
+      "payload": "{eventId: string, tenantId: string, seriesId: string, generatedCount: int, nextStartsAt: datetime | null}"
     },
     {
       "name": "EventRecurrenceConfigured",
@@ -100695,6 +105149,11 @@
       "payload": "{interviewId: string, tenantId: string, candidateId: string}"
     },
     {
+      "name": "InterviewSourceRefreshed",
+      "channel": "interview.source_refreshed",
+      "payload": "{interviewId: string, tenantId: string, candidateId: string, externalInterviewId: string | null}"
+    },
+    {
       "name": "InventoryExpiryUpdated",
       "channel": "inventory_item.expiry_updated",
       "payload": "{inventoryItemId: string, tenantId: string, ingredientId: string, locationId: string, bestBeforeAt: datetime | null, useByAt: datetime | null}"
@@ -100820,14 +105279,49 @@
       "payload": "{invoiceId: string, tenantId: string, clientId: string, eventId: string | null, paymentId: string | null, paymentAmount: money, amountPaid: money, amountDue: money, status: InvoiceStatus}"
     },
     {
+      "name": "InvoicePaymentLinkCreated",
+      "channel": "invoice.payment_link_created",
+      "payload": "{tenantId: string, invoiceId: string, paymentLinkId: string, sessionId: string, url: string, amount: money, createdBy: string | null}"
+    },
+    {
       "name": "InvoiceRefundRecorded",
       "channel": "invoice.refund_recorded",
       "payload": "{invoiceId: string, tenantId: string, clientId: string, eventId: string | null, paymentId: string, refundAmount: money, amountPaid: money, amountDue: money}"
     },
     {
+      "name": "InvoiceReminderDelivered",
+      "channel": "invoice.reminder_delivered",
+      "payload": "{tenantId: string, invoiceId: string, attemptId: string, configId: string, offsetDays: int, scheduledFor: datetime | null, source: InvoiceReminderSource | null, emailId: string, sessionId: string, amountDue: money, dueDate: datetime, timing: string}"
+    },
+    {
+      "name": "InvoiceReminderDeliveryFailed",
+      "channel": "invoice.reminder_delivery_failed",
+      "payload": "{tenantId: string, invoiceId: string, attemptId: string, configId: string, offsetDays: int, scheduledFor: datetime | null, source: InvoiceReminderSource | null, attempt: int, message: string, retryScheduled: boolean}"
+    },
+    {
+      "name": "InvoiceReminderPaymentLinkPrepared",
+      "channel": "invoice.reminder_payment_link_prepared",
+      "payload": "{tenantId: string, invoiceId: string, paymentLinkId: string, configId: string | null, offsetDays: int | null, scheduledFor: datetime | null, source: InvoiceReminderSource | null, sessionId: string, url: string}"
+    },
+    {
+      "name": "InvoiceReminderScheduleConfigured",
+      "channel": "invoice.reminder_schedule_configured",
+      "payload": "{tenantId: string, invoiceId: string, configId: string, configuredAt: datetime, dueDate: datetime, offsetsDays: list<int>}"
+    },
+    {
+      "name": "InvoiceReminderSuppressed",
+      "channel": "invoice.reminder_suppressed",
+      "payload": "{tenantId: string, invoiceId: string, attemptId: string, configId: string, offsetDays: int, scheduledFor: datetime | null, source: InvoiceReminderSource | null, reason: string}"
+    },
+    {
       "name": "InvoiceSent",
       "channel": "invoice.sent",
       "payload": "{invoiceId: string, tenantId: string, clientId: string, eventId: string | null, invoiceNumber: string | null, total: money, amountDue: money}"
+    },
+    {
+      "name": "InvoiceStripePaymentRecorded",
+      "channel": "invoice.stripe_payment_recorded",
+      "payload": "{tenantId: string, invoiceId: string, sessionId: string, paymentId: string, amount: money, method: string}"
     },
     {
       "name": "InvoiceViewed",
@@ -101460,6 +105954,11 @@
       "payload": "{proposalId: string, tenantId: string, clientId: string, eventId: string | null, acceptedRevisionId: string | null, title: string, eventDate: datetime | null, eventType: string | null, guestCount: number, venueName: string | null, venueAddress: string | null, subtotal: money, taxAmount: money, discountAmount: money, total: money, dishSelectionProposalId: string | null}"
     },
     {
+      "name": "ProposalAcceptedRevisionRecorded",
+      "channel": "proposal.accepted_revision_recorded",
+      "payload": "{proposalId: string, tenantId: string, acceptedRevisionId: string | null}"
+    },
+    {
       "name": "ProposalClientMergeStaged",
       "channel": "proposal.client_merge_staged",
       "payload": "{proposalId: string, tenantId: string}"
@@ -101540,6 +106039,11 @@
       "payload": "{lineItemId: string, tenantId: string, proposalId: string}"
     },
     {
+      "name": "ProposalLineItemRepriced",
+      "channel": "proposal_line_item.repriced",
+      "payload": "{lineItemId: string, tenantId: string, proposalId: string, previousAmount: money, amount: money}"
+    },
+    {
       "name": "ProposalLineItemRevised",
       "channel": "proposal_line_item.revised",
       "payload": "{lineItemId: string, tenantId: string, proposalId: string, description: string, pricingBasis: PricingBasis, unitPrice: money, amount: money}"
@@ -101578,6 +106082,11 @@
       "name": "ProposalTemplateRevised",
       "channel": "proposal_template.revised",
       "payload": "{templateId: string, tenantId: string, name: string, visibleSections: list<string>}"
+    },
+    {
+      "name": "ProposalTotalsRecomputed",
+      "channel": "proposal.totals_recomputed",
+      "payload": "{proposalId: string, tenantId: string, previousSubtotal: money, subtotal: money, previousTotal: money, total: money}"
     },
     {
       "name": "ProposalViewed",
@@ -101765,6 +106274,21 @@
       "payload": "{scorecardId: string, tenantId: string}"
     },
     {
+      "name": "RunAlertsDisabled",
+      "channel": "run_alerts.disabled",
+      "payload": "{runAlertSettingId: string, tenantId: string, actorId: string | null}"
+    },
+    {
+      "name": "RunAlertsEnabled",
+      "channel": "run_alerts.enabled",
+      "payload": "{runAlertSettingId: string, tenantId: string, actorId: string | null, generation: string}"
+    },
+    {
+      "name": "RunAlertSent",
+      "channel": "run_alert.sent",
+      "payload": "{activityId: string, kind: string}"
+    },
+    {
       "name": "SavedReportArchived",
       "channel": "saved_report.archived",
       "payload": "{savedReportDefinitionId: string, tenantId: string, ownerId: string | null, previousStatus: SavedReportStatus, status: SavedReportStatus}"
@@ -101843,6 +106367,11 @@
       "name": "ShareLinkRevoked",
       "channel": "share_link.revoked",
       "payload": "{shareLinkId: string, tenantId: string, proposalId: string, revokedByPersonId: string, revokedAt: datetime}"
+    },
+    {
+      "name": "ShareLinkViewed",
+      "channel": "share_link.viewed",
+      "payload": "{shareLinkId: string, tenantId: string, proposalId: string, viewedAt: datetime}"
     },
     {
       "name": "ShiftCancelled",
@@ -101947,7 +106476,7 @@
     {
       "name": "SignatureCompleted",
       "channel": "signature_request.completed",
-      "payload": "{signatureRequestId: string, tenantId: string, proposalRevisionId: string, proposalId: string | null, recipientEmail: string, recipientName: string, signedAt: datetime, signedArtifactReference: string}"
+      "payload": "{signatureRequestId: string, tenantId: string, proposalRevisionId: string, proposalId: string | null, recipientEmail: string, recipientName: string, signedAt: datetime, signedArtifactReference: string, acceptProposalId: string | null}"
     },
     {
       "name": "SignatureExpired",
@@ -101963,6 +106492,31 @@
       "name": "SignatureRevoked",
       "channel": "signature_request.revoked",
       "payload": "{signatureRequestId: string, tenantId: string, proposalRevisionId: string, revokedByPersonId: string, revokeReason: string, revokedAt: datetime}"
+    },
+    {
+      "name": "SmsAlertFailed",
+      "channel": "sms_alert.failed",
+      "payload": "{tenantId: string, deliveryId: string, triggerKey: string, personId: string, alertType: string, error: string}"
+    },
+    {
+      "name": "SmsAlertsDisabled",
+      "channel": "sms_alerts.disabled",
+      "payload": "{tenantId: string, settingId: string, actorId: string | null}"
+    },
+    {
+      "name": "SmsAlertsEnabled",
+      "channel": "sms_alerts.enabled",
+      "payload": "{tenantId: string, settingId: string, actorId: string | null, chainId: string}"
+    },
+    {
+      "name": "SmsAlertSent",
+      "channel": "sms_alert.sent",
+      "payload": "{tenantId: string, deliveryId: string, triggerKey: string, personId: string, alertType: string, messageSid: string}"
+    },
+    {
+      "name": "SmsAlertsScanned",
+      "channel": "sms_alerts.scanned",
+      "payload": "{tenantId: string, settingId: string, sent: int, failed: int, error: string | null}"
     },
     {
       "name": "StaffChatChannelRead",
@@ -102118,6 +106672,16 @@
       "name": "TimeRecordCorrected",
       "channel": "time_record.corrected",
       "payload": "{timeRecordId: string, tenantId: string, personId: string, previousClockInAt: datetime | null, previousClockOutAt: datetime | null, previousBreakMinutes: number | null, clockInAt: datetime, clockOutAt: datetime, breakMinutes: number | null, status: TimeRecordStatus}"
+    },
+    {
+      "name": "TppReportFavorited",
+      "channel": "tpp_report_favorite.favorited",
+      "payload": "{tppReportFavoriteId: string, tenantId: string, personId: string, reportId: string | null}"
+    },
+    {
+      "name": "TppReportUnfavorited",
+      "channel": "tpp_report_favorite.unfavorited",
+      "payload": "{tppReportFavoriteId: string, tenantId: string, personId: string, reportId: string | null}"
     },
     {
       "name": "TrailerDetailsRevised",
@@ -102811,6 +107375,22 @@
       "target": "durable"
     },
     {
+      "entity": "InvoicePaymentLink",
+      "target": "durable"
+    },
+    {
+      "entity": "InvoiceReminderAttempt",
+      "target": "durable"
+    },
+    {
+      "entity": "InvoiceReminderSchedule",
+      "target": "durable"
+    },
+    {
+      "entity": "InvoiceStripePayment",
+      "target": "durable"
+    },
+    {
       "entity": "ItemUnitMapping",
       "target": "durable"
     },
@@ -102983,6 +107563,14 @@
       "target": "durable"
     },
     {
+      "entity": "RunAlertDelivery",
+      "target": "durable"
+    },
+    {
+      "entity": "RunAlertSetting",
+      "target": "durable"
+    },
+    {
       "entity": "SavedReportDefinition",
       "target": "durable"
     },
@@ -103012,6 +107600,14 @@
     },
     {
       "entity": "SignatureRequest",
+      "target": "durable"
+    },
+    {
+      "entity": "SmsAlertDelivery",
+      "target": "durable"
+    },
+    {
+      "entity": "SmsAlertSetting",
       "target": "durable"
     },
     {

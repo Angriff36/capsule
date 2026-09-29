@@ -6,6 +6,7 @@ import {
   AnnouncementPostParamsSchema,
   AnnouncementRemoveParamsSchema,
   AssistantLlmConfigConfigureParamsSchema,
+  AssistantUploadRegisterParamsSchema,
   AttachmentAttachParamsSchema,
   AttachmentRemoveParamsSchema,
   AttachmentSetSurveySelectionParamsSchema,
@@ -14,8 +15,12 @@ import {
   CandidateAdvanceParamsSchema,
   CandidateApplyParamsSchema,
   CandidateHireParamsSchema,
+  CandidateLinkHiredPersonParamsSchema,
+  CandidateRefreshFromSourceParamsSchema,
   CandidateRejectParamsSchema,
   CandidateRevokeHireParamsSchema,
+  ChatNotifyPreferenceCreateParamsSchema,
+  ChatNotifyPreferenceSetEnabledParamsSchema,
   ClientArchiveParamsSchema,
   ClientAssignOwnerParamsSchema,
   ClientChangeBillingProfileParamsSchema,
@@ -100,12 +105,16 @@ import {
   CutoverDecisionRecordApprovalsParamsSchema,
   CutoverDecisionRollbackParamsSchema,
   CutoverDecisionSetTppReadOnlyParamsSchema,
+  DeliveryAssignDriverParamsSchema,
+  DeliveryAssignVehicleParamsSchema,
   DeliveryCancelParamsSchema,
   DeliveryConfirmDeliveryParamsSchema,
   DeliveryMarkFailedParamsSchema,
   DeliveryScheduleParamsSchema,
   DeliveryStandDownWithEventParamsSchema,
   DeliveryStartTransitParamsSchema,
+  DeliveryUnassignDriverParamsSchema,
+  DeliveryUnassignVehicleParamsSchema,
   DishClassifyAllergensParamsSchema,
   DishClassifyKindParamsSchema,
   DishClearPrimaryImageParamsSchema,
@@ -148,10 +157,13 @@ import {
   EquipmentReservationCancelParamsSchema,
   EquipmentReservationCheckOutParamsSchema,
   EquipmentReservationMarkReturnedParamsSchema,
+  EquipmentReservationMoveWindowParamsSchema,
+  EquipmentReservationReserveParamsSchema,
   EquipmentRetireParamsSchema,
   EquipmentReviseDetailsParamsSchema,
   EquipmentServiceEntryRecordParamsSchema,
   EquipmentUpdateConditionParamsSchema,
+  EventAdvanceRecurrenceParamsSchema,
   EventAllergenCheckRecordParamsSchema,
   EventApproveParamsSchema,
   EventArchiveParamsSchema,
@@ -220,6 +232,13 @@ import {
   EventLockForSalesParamsSchema,
   EventMarkBinderBuiltParamsSchema,
   EventNormalizePurchasingWeekParamsSchema,
+  EventPacketArtifactDeactivateParamsSchema,
+  EventPacketArtifactRecordEvidenceParamsSchema,
+  EventPacketArtifactRegisterParamsSchema,
+  EventPacketResolutionRecordParamsSchema,
+  EventPacketRevisionCaptureParamsSchema,
+  EventPacketRevisionReinstateParamsSchema,
+  EventPacketRevisionSupersedeParamsSchema,
   EventPlanEngagementParamsSchema,
   EventReactivateParamsSchema,
   EventReassignClientParamsSchema,
@@ -329,6 +348,7 @@ import {
   IntegrationConnectionRecordFailureParamsSchema,
   IntegrationConnectionRecordSyncSuccessParamsSchema,
   InterviewRecordOutcomeParamsSchema,
+  InterviewRefreshFromSourceParamsSchema,
   InterviewScheduleParamsSchema,
   InventoryItemAdjustQuantityParamsSchema,
   InventoryItemApplyReceiptCorrectionParamsSchema,
@@ -356,13 +376,22 @@ import {
   InvoiceMarkOverdueParamsSchema,
   InvoiceMarkViewedParamsSchema,
   InvoiceMarkVoidedParamsSchema,
+  InvoicePaymentLinkAnnounceCreatedParamsSchema,
+  InvoicePaymentLinkAnnounceReminderLinkParamsSchema,
+  InvoicePaymentLinkOpenParamsSchema,
   InvoiceReassignClientParamsSchema,
   InvoiceRecordCreditMemoParamsSchema,
   InvoiceRecordRefundParamsSchema,
+  InvoiceReminderAttemptOpenParamsSchema,
+  InvoiceReminderAttemptRecordDeliveredParamsSchema,
+  InvoiceReminderAttemptRecordFailedParamsSchema,
+  InvoiceReminderAttemptRecordSuppressedParamsSchema,
+  InvoiceReminderScheduleConfigureParamsSchema,
   InvoiceSendBalanceReminderParamsSchema,
   InvoiceSendParamsSchema,
   InvoiceSetDepositParamsSchema,
   InvoiceStageClientMergeParamsSchema,
+  InvoiceStripePaymentRecordParamsSchema,
   InvoiceWriteOffParamsSchema,
   ItemUnitMappingRecordParamsSchema,
   ItemUnitMappingRetireParamsSchema,
@@ -463,6 +492,7 @@ import {
   PerformanceReviewRecordParamsSchema,
   PersonAssignRoleParamsSchema,
   PersonChangeAddressParamsSchema,
+  PersonClearAccountLinkParamsSchema,
   PersonCorrectEmailParamsSchema,
   PersonCorrectIdentityParamsSchema,
   PersonDeactivateParamsSchema,
@@ -524,10 +554,13 @@ import {
   ProposalFollowEventHeadcountParamsSchema,
   ProposalLineItemAddLineParamsSchema,
   ProposalLineItemRemoveLineParamsSchema,
+  ProposalLineItemRestampAmountParamsSchema,
   ProposalLineItemReviseLineParamsSchema,
   ProposalLinkEventParamsSchema,
   ProposalMarkViewedParamsSchema,
   ProposalReassignClientParamsSchema,
+  ProposalRecomputeTotalsParamsSchema,
+  ProposalRecordAcceptedRevisionParamsSchema,
   ProposalRevisionCaptureParamsSchema,
   ProposalSendParamsSchema,
   ProposalStageClientMergeParamsSchema,
@@ -547,7 +580,10 @@ import {
   PurchaseNeedReleaseCancelledDraftParamsSchema,
   PurchaseNeedReviseRequiredParamsSchema,
   PurchaseNeedStandDownWithEventParamsSchema,
+  PushSubscriptionRecordDeliveryParamsSchema,
   PushSubscriptionRegisterParamsSchema,
+  PushSubscriptionReleaseDeviceParamsSchema,
+  PushSubscriptionRenewParamsSchema,
   PushSubscriptionUnregisterParamsSchema,
   QualificationExpireParamsSchema,
   QualificationGrantParamsSchema,
@@ -583,6 +619,10 @@ import {
   RoleScorecardArchiveParamsSchema,
   RoleScorecardDefineParamsSchema,
   RoleScorecardReactivateParamsSchema,
+  RunAlertDeliveryRecordParamsSchema,
+  RunAlertSettingCreateParamsSchema,
+  RunAlertSettingDisableParamsSchema,
+  RunAlertSettingEnableParamsSchema,
   SavedReportDefinitionArchiveParamsSchema,
   SavedReportDefinitionChangeSharingParamsSchema,
   SavedReportDefinitionCreateDefinitionParamsSchema,
@@ -598,6 +638,7 @@ import {
   ServiceStyleRegisterParamsSchema,
   ServiceStyleReviseDetailsParamsSchema,
   ShareLinkCreateParamsSchema,
+  ShareLinkRecordViewParamsSchema,
   ShareLinkRevokeParamsSchema,
   ShiftApplyApprovedSwapParamsSchema,
   ShiftCancelParamsSchema,
@@ -619,14 +660,23 @@ import {
   ShiftTypeDefineParamsSchema,
   ShiftTypeReactivateParamsSchema,
   ShiftTypeRetireParamsSchema,
+  SignatureRequestCompleteInternalParamsSchema,
   SignatureRequestCompleteParamsSchema,
   SignatureRequestExpireParamsSchema,
   SignatureRequestRequestSignatureParamsSchema,
   SignatureRequestRevokeParamsSchema,
+  SmsAlertDeliveryOpenParamsSchema,
+  SmsAlertDeliveryRecordFailedParamsSchema,
+  SmsAlertDeliveryRecordSentParamsSchema,
+  SmsAlertSettingDisableParamsSchema,
+  SmsAlertSettingEnableParamsSchema,
+  SmsAlertSettingOpenParamsSchema,
+  SmsAlertSettingRecordScanParamsSchema,
   StaffChatReadCursorOpenParamsSchema,
   StaffChatReadCursorTouchParamsSchema,
   StaffMessageEditParamsSchema,
   StaffMessageMarkReadParamsSchema,
+  StaffMessageRecordAttachmentsParamsSchema,
   StaffMessageRemoveParamsSchema,
   StaffMessageSendParamsSchema,
   StationDefineParamsSchema,
@@ -657,6 +707,9 @@ import {
   TimeRecordClockInParamsSchema,
   TimeRecordClockOutParamsSchema,
   TimeRecordCorrectParamsSchema,
+  TppReportFavoriteCreateParamsSchema,
+  TppReportFavoriteRefavoriteParamsSchema,
+  TppReportFavoriteUnfavoriteParamsSchema,
   TrailerRegisterParamsSchema,
   TrailerReviseDetailsParamsSchema,
   TrailerUpdateInsuranceParamsSchema,
@@ -873,6 +926,27 @@ export function useGetAssistantUpload(id: string | "skip") {
   return useQuery(api.queries.getAssistantUpload, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for AssistantUpload.register. */
+export function useAssistantUploadRegister() {
+  const mutate = useMutation(api.mutations.AssistantUpload_register);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = AssistantUploadRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for AssistantUpload.register. */
+export function useCreateAssistantUpload() {
+  const mutate = useMutation(api.mutations.AssistantUpload_createViaRegister);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = AssistantUploadRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for Attachment. */
 export function useListAttachment() {
   return useQuery(api.queries.listAttachment);
@@ -1005,6 +1079,26 @@ export function useCandidateHire() {
   };
 }
 
+/** Mutation hook for Candidate.linkHiredPerson. */
+export function useCandidateLinkHiredPerson() {
+  const mutate = useMutation(api.mutations.Candidate_linkHiredPerson);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = CandidateLinkHiredPersonParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Candidate.refreshFromSource. */
+export function useCandidateRefreshFromSource() {
+  const mutate = useMutation(api.mutations.Candidate_refreshFromSource);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = CandidateRefreshFromSourceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Candidate.reject. */
 export function useCandidateReject() {
   const mutate = useMutation(api.mutations.Candidate_reject);
@@ -1044,6 +1138,26 @@ export function useListChatNotifyPreference() {
 /** Reactive get-by-id for ChatNotifyPreference. Pass "skip" to suspend. */
 export function useGetChatNotifyPreference(id: string | "skip") {
   return useQuery(api.queries.getChatNotifyPreference, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for ChatNotifyPreference.create. */
+export function useChatNotifyPreferenceCreate() {
+  const mutate = useMutation(api.mutations.ChatNotifyPreference_create);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ChatNotifyPreferenceCreateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ChatNotifyPreference.setEnabled. */
+export function useChatNotifyPreferenceSetEnabled() {
+  const mutate = useMutation(api.mutations.ChatNotifyPreference_setEnabled);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ChatNotifyPreferenceSetEnabledParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
 }
 
 /** Reactive list for Client. */
@@ -2252,6 +2366,26 @@ export function useGetDelivery(id: string | "skip") {
   return useQuery(api.queries.getDelivery, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for Delivery.assignDriver. */
+export function useDeliveryAssignDriver() {
+  const mutate = useMutation(api.mutations.Delivery_assignDriver);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DeliveryAssignDriverParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Delivery.assignVehicle. */
+export function useDeliveryAssignVehicle() {
+  const mutate = useMutation(api.mutations.Delivery_assignVehicle);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DeliveryAssignVehicleParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Delivery.cancel. */
 export function useDeliveryCancel() {
   const mutate = useMutation(api.mutations.Delivery_cancel);
@@ -2308,6 +2442,26 @@ export function useDeliveryStartTransit() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = DeliveryStartTransitParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Delivery.unassignDriver. */
+export function useDeliveryUnassignDriver() {
+  const mutate = useMutation(api.mutations.Delivery_unassignDriver);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DeliveryUnassignDriverParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Delivery.unassignVehicle. */
+export function useDeliveryUnassignVehicle() {
+  const mutate = useMutation(api.mutations.Delivery_unassignVehicle);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DeliveryUnassignVehicleParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -2972,6 +3126,37 @@ export function useEquipmentReservationMarkReturned() {
   };
 }
 
+/** Mutation hook for EquipmentReservation.moveWindow. */
+export function useEquipmentReservationMoveWindow() {
+  const mutate = useMutation(api.mutations.EquipmentReservation_moveWindow);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EquipmentReservationMoveWindowParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EquipmentReservation.reserve. */
+export function useEquipmentReservationReserve() {
+  const mutate = useMutation(api.mutations.EquipmentReservation_reserve);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EquipmentReservationReserveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for EquipmentReservation.reserve. */
+export function useCreateEquipmentReservation() {
+  const mutate = useMutation(api.mutations.EquipmentReservation_createViaReserve);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = EquipmentReservationReserveParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for EquipmentServiceEntry. */
 export function useListEquipmentServiceEntry() {
   return useQuery(api.queries.listEquipmentServiceEntry);
@@ -3011,6 +3196,16 @@ export function useListEvent() {
 /** Reactive get-by-id for Event. Pass "skip" to suspend. */
 export function useGetEvent(id: string | "skip") {
   return useQuery(api.queries.getEvent, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for Event.advanceRecurrence. */
+export function useEventAdvanceRecurrence() {
+  const mutate = useMutation(api.mutations.Event_advanceRecurrence);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventAdvanceRecurrenceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
 }
 
 /** Mutation hook for Event.approve. */
@@ -4053,6 +4248,47 @@ export function useGetEventPacketArtifact(id: string | "skip") {
   return useQuery(api.queries.getEventPacketArtifact, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for EventPacketArtifact.deactivate. */
+export function useEventPacketArtifactDeactivate() {
+  const mutate = useMutation(api.mutations.EventPacketArtifact_deactivate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketArtifactDeactivateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventPacketArtifact.recordEvidence. */
+export function useEventPacketArtifactRecordEvidence() {
+  const mutate = useMutation(api.mutations.EventPacketArtifact_recordEvidence);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketArtifactRecordEvidenceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventPacketArtifact.register. */
+export function useEventPacketArtifactRegister() {
+  const mutate = useMutation(api.mutations.EventPacketArtifact_register);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketArtifactRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for EventPacketArtifact.register. */
+export function useCreateEventPacketArtifact() {
+  const mutate = useMutation(api.mutations.EventPacketArtifact_createViaRegister);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketArtifactRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for EventPacketIssue. */
 export function useListEventPacketIssue() {
   return useQuery(api.queries.listEventPacketIssue);
@@ -4073,6 +4309,27 @@ export function useGetEventPacketResolution(id: string | "skip") {
   return useQuery(api.queries.getEventPacketResolution, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for EventPacketResolution.record. */
+export function useEventPacketResolutionRecord() {
+  const mutate = useMutation(api.mutations.EventPacketResolution_record);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketResolutionRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for EventPacketResolution.record. */
+export function useCreateEventPacketResolution() {
+  const mutate = useMutation(api.mutations.EventPacketResolution_createViaRecord);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketResolutionRecordParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for EventPacketRevision. */
 export function useListEventPacketRevision() {
   return useQuery(api.queries.listEventPacketRevision);
@@ -4081,6 +4338,47 @@ export function useListEventPacketRevision() {
 /** Reactive get-by-id for EventPacketRevision. Pass "skip" to suspend. */
 export function useGetEventPacketRevision(id: string | "skip") {
   return useQuery(api.queries.getEventPacketRevision, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for EventPacketRevision.capture. */
+export function useEventPacketRevisionCapture() {
+  const mutate = useMutation(api.mutations.EventPacketRevision_capture);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketRevisionCaptureParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventPacketRevision.reinstate. */
+export function useEventPacketRevisionReinstate() {
+  const mutate = useMutation(api.mutations.EventPacketRevision_reinstate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketRevisionReinstateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventPacketRevision.supersede. */
+export function useEventPacketRevisionSupersede() {
+  const mutate = useMutation(api.mutations.EventPacketRevision_supersede);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketRevisionSupersedeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for EventPacketRevision.capture. */
+export function useCreateEventPacketRevision() {
+  const mutate = useMutation(api.mutations.EventPacketRevision_createViaCapture);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = EventPacketRevisionCaptureParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
 }
 
 /** Reactive list for EventStaffNeed. */
@@ -5335,6 +5633,16 @@ export function useInterviewRecordOutcome() {
   };
 }
 
+/** Mutation hook for Interview.refreshFromSource. */
+export function useInterviewRefreshFromSource() {
+  const mutate = useMutation(api.mutations.Interview_refreshFromSource);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InterviewRefreshFromSourceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Interview.schedule. */
 export function useInterviewSchedule() {
   const mutate = useMutation(api.mutations.Interview_schedule);
@@ -5809,6 +6117,180 @@ export function useListInvoiceNumberSequence() {
 /** Reactive get-by-id for InvoiceNumberSequence. Pass "skip" to suspend. */
 export function useGetInvoiceNumberSequence(id: string | "skip") {
   return useQuery(api.queries.getInvoiceNumberSequence, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Reactive list for InvoicePaymentLink. */
+export function useListInvoicePaymentLink() {
+  return useQuery(api.queries.listInvoicePaymentLink);
+}
+
+/** Reactive get-by-id for InvoicePaymentLink. Pass "skip" to suspend. */
+export function useGetInvoicePaymentLink(id: string | "skip") {
+  return useQuery(api.queries.getInvoicePaymentLink, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for InvoicePaymentLink.announceCreated. */
+export function useInvoicePaymentLinkAnnounceCreated() {
+  const mutate = useMutation(api.mutations.InvoicePaymentLink_announceCreated);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoicePaymentLinkAnnounceCreatedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for InvoicePaymentLink.announceReminderLink. */
+export function useInvoicePaymentLinkAnnounceReminderLink() {
+  const mutate = useMutation(api.mutations.InvoicePaymentLink_announceReminderLink);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoicePaymentLinkAnnounceReminderLinkParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for InvoicePaymentLink.open. */
+export function useInvoicePaymentLinkOpen() {
+  const mutate = useMutation(api.mutations.InvoicePaymentLink_open);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoicePaymentLinkOpenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for InvoicePaymentLink.open. */
+export function useCreateInvoicePaymentLink() {
+  const mutate = useMutation(api.mutations.InvoicePaymentLink_createViaOpen);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoicePaymentLinkOpenParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for InvoiceReminderAttempt. */
+export function useListInvoiceReminderAttempt() {
+  return useQuery(api.queries.listInvoiceReminderAttempt);
+}
+
+/** Reactive get-by-id for InvoiceReminderAttempt. Pass "skip" to suspend. */
+export function useGetInvoiceReminderAttempt(id: string | "skip") {
+  return useQuery(api.queries.getInvoiceReminderAttempt, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for InvoiceReminderAttempt.open. */
+export function useInvoiceReminderAttemptOpen() {
+  const mutate = useMutation(api.mutations.InvoiceReminderAttempt_open);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceReminderAttemptOpenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for InvoiceReminderAttempt.recordDelivered. */
+export function useInvoiceReminderAttemptRecordDelivered() {
+  const mutate = useMutation(api.mutations.InvoiceReminderAttempt_recordDelivered);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceReminderAttemptRecordDeliveredParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for InvoiceReminderAttempt.recordFailed. */
+export function useInvoiceReminderAttemptRecordFailed() {
+  const mutate = useMutation(api.mutations.InvoiceReminderAttempt_recordFailed);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceReminderAttemptRecordFailedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for InvoiceReminderAttempt.recordSuppressed. */
+export function useInvoiceReminderAttemptRecordSuppressed() {
+  const mutate = useMutation(api.mutations.InvoiceReminderAttempt_recordSuppressed);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceReminderAttemptRecordSuppressedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for InvoiceReminderAttempt.open. */
+export function useCreateInvoiceReminderAttempt() {
+  const mutate = useMutation(api.mutations.InvoiceReminderAttempt_createViaOpen);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceReminderAttemptOpenParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for InvoiceReminderSchedule. */
+export function useListInvoiceReminderSchedule() {
+  return useQuery(api.queries.listInvoiceReminderSchedule);
+}
+
+/** Reactive get-by-id for InvoiceReminderSchedule. Pass "skip" to suspend. */
+export function useGetInvoiceReminderSchedule(id: string | "skip") {
+  return useQuery(api.queries.getInvoiceReminderSchedule, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for InvoiceReminderSchedule.configure. */
+export function useInvoiceReminderScheduleConfigure() {
+  const mutate = useMutation(api.mutations.InvoiceReminderSchedule_configure);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceReminderScheduleConfigureParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for InvoiceReminderSchedule.configure. */
+export function useCreateInvoiceReminderSchedule() {
+  const mutate = useMutation(api.mutations.InvoiceReminderSchedule_createViaConfigure);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceReminderScheduleConfigureParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for InvoiceStripePayment. */
+export function useListInvoiceStripePayment() {
+  return useQuery(api.queries.listInvoiceStripePayment);
+}
+
+/** Reactive get-by-id for InvoiceStripePayment. Pass "skip" to suspend. */
+export function useGetInvoiceStripePayment(id: string | "skip") {
+  return useQuery(api.queries.getInvoiceStripePayment, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for InvoiceStripePayment.record. */
+export function useInvoiceStripePaymentRecord() {
+  const mutate = useMutation(api.mutations.InvoiceStripePayment_record);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceStripePaymentRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for InvoiceStripePayment.record. */
+export function useCreateInvoiceStripePayment() {
+  const mutate = useMutation(api.mutations.InvoiceStripePayment_createViaRecord);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceStripePaymentRecordParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
 }
 
 /** Reactive list for ItemUnitMapping. */
@@ -7188,6 +7670,16 @@ export function usePersonChangeAddress() {
   };
 }
 
+/** Mutation hook for Person.clearAccountLink. */
+export function usePersonClearAccountLink() {
+  const mutate = useMutation(api.mutations.Person_clearAccountLink);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PersonClearAccountLinkParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Person.correctEmail. */
 export function usePersonCorrectEmail() {
   const mutate = useMutation(api.mutations.Person_correctEmail);
@@ -7895,6 +8387,26 @@ export function useProposalReassignClient() {
   };
 }
 
+/** Mutation hook for Proposal.recomputeTotals. */
+export function useProposalRecomputeTotals() {
+  const mutate = useMutation(api.mutations.Proposal_recomputeTotals);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalRecomputeTotalsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Proposal.recordAcceptedRevision. */
+export function useProposalRecordAcceptedRevision() {
+  const mutate = useMutation(api.mutations.Proposal_recordAcceptedRevision);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalRecordAcceptedRevisionParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Proposal.send. */
 export function useProposalSend() {
   const mutate = useMutation(api.mutations.Proposal_send);
@@ -8074,6 +8586,16 @@ export function useProposalLineItemRemoveLine() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ProposalLineItemRemoveLineParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ProposalLineItem.restampAmount. */
+export function useProposalLineItemRestampAmount() {
+  const mutate = useMutation(api.mutations.ProposalLineItem_restampAmount);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalLineItemRestampAmountParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -8311,12 +8833,42 @@ export function useGetPushSubscription(id: string | "skip") {
   return useQuery(api.queries.getPushSubscription, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for PushSubscription.recordDelivery. */
+export function usePushSubscriptionRecordDelivery() {
+  const mutate = useMutation(api.mutations.PushSubscription_recordDelivery);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PushSubscriptionRecordDeliveryParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for PushSubscription.register. */
 export function usePushSubscriptionRegister() {
   const mutate = useMutation(api.mutations.PushSubscription_register);
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = PushSubscriptionRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PushSubscription.releaseDevice. */
+export function usePushSubscriptionReleaseDevice() {
+  const mutate = useMutation(api.mutations.PushSubscription_releaseDevice);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PushSubscriptionReleaseDeviceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PushSubscription.renew. */
+export function usePushSubscriptionRenew() {
+  const mutate = useMutation(api.mutations.PushSubscription_renew);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PushSubscriptionRenewParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -8849,6 +9401,77 @@ export function useCreateRoleScorecard() {
   };
 }
 
+/** Reactive list for RunAlertDelivery. */
+export function useListRunAlertDelivery() {
+  return useQuery(api.queries.listRunAlertDelivery);
+}
+
+/** Reactive get-by-id for RunAlertDelivery. Pass "skip" to suspend. */
+export function useGetRunAlertDelivery(id: string | "skip") {
+  return useQuery(api.queries.getRunAlertDelivery, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for RunAlertDelivery.record. */
+export function useRunAlertDeliveryRecord() {
+  const mutate = useMutation(api.mutations.RunAlertDelivery_record);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RunAlertDeliveryRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for RunAlertDelivery.record. */
+export function useCreateRunAlertDelivery() {
+  const mutate = useMutation(api.mutations.RunAlertDelivery_createViaRecord);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = RunAlertDeliveryRecordParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for RunAlertSetting. */
+export function useListRunAlertSetting() {
+  return useQuery(api.queries.listRunAlertSetting);
+}
+
+/** Reactive get-by-id for RunAlertSetting. Pass "skip" to suspend. */
+export function useGetRunAlertSetting(id: string | "skip") {
+  return useQuery(api.queries.getRunAlertSetting, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for RunAlertSetting.create. */
+export function useRunAlertSettingCreate() {
+  const mutate = useMutation(api.mutations.RunAlertSetting_create);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RunAlertSettingCreateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RunAlertSetting.disable. */
+export function useRunAlertSettingDisable() {
+  const mutate = useMutation(api.mutations.RunAlertSetting_disable);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RunAlertSettingDisableParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RunAlertSetting.enable. */
+export function useRunAlertSettingEnable() {
+  const mutate = useMutation(api.mutations.RunAlertSetting_enable);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RunAlertSettingEnableParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Reactive list for SavedReportDefinition. */
 export function useListSavedReportDefinition() {
   return useQuery(api.queries.listSavedReportDefinition);
@@ -9068,6 +9691,16 @@ export function useShareLinkCreate() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ShareLinkCreateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ShareLink.recordView. */
+export function useShareLinkRecordView() {
+  const mutate = useMutation(api.mutations.ShareLink_recordView);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ShareLinkRecordViewParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -9365,6 +9998,16 @@ export function useSignatureRequestComplete() {
   };
 }
 
+/** Mutation hook for SignatureRequest.completeInternal. */
+export function useSignatureRequestCompleteInternal() {
+  const mutate = useMutation(api.mutations.SignatureRequest_completeInternal);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SignatureRequestCompleteInternalParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for SignatureRequest.expire. */
 export function useSignatureRequestExpire() {
   const mutate = useMutation(api.mutations.SignatureRequest_expire);
@@ -9401,6 +10044,118 @@ export function useCreateSignatureRequest() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = SignatureRequestRequestSignatureParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for SmsAlertDelivery. */
+export function useListSmsAlertDelivery() {
+  return useQuery(api.queries.listSmsAlertDelivery);
+}
+
+/** Reactive get-by-id for SmsAlertDelivery. Pass "skip" to suspend. */
+export function useGetSmsAlertDelivery(id: string | "skip") {
+  return useQuery(api.queries.getSmsAlertDelivery, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for SmsAlertDelivery.open. */
+export function useSmsAlertDeliveryOpen() {
+  const mutate = useMutation(api.mutations.SmsAlertDelivery_open);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertDeliveryOpenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for SmsAlertDelivery.recordFailed. */
+export function useSmsAlertDeliveryRecordFailed() {
+  const mutate = useMutation(api.mutations.SmsAlertDelivery_recordFailed);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertDeliveryRecordFailedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for SmsAlertDelivery.recordSent. */
+export function useSmsAlertDeliveryRecordSent() {
+  const mutate = useMutation(api.mutations.SmsAlertDelivery_recordSent);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertDeliveryRecordSentParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for SmsAlertDelivery.open. */
+export function useCreateSmsAlertDelivery() {
+  const mutate = useMutation(api.mutations.SmsAlertDelivery_createViaOpen);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertDeliveryOpenParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for SmsAlertSetting. */
+export function useListSmsAlertSetting() {
+  return useQuery(api.queries.listSmsAlertSetting);
+}
+
+/** Reactive get-by-id for SmsAlertSetting. Pass "skip" to suspend. */
+export function useGetSmsAlertSetting(id: string | "skip") {
+  return useQuery(api.queries.getSmsAlertSetting, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for SmsAlertSetting.disable. */
+export function useSmsAlertSettingDisable() {
+  const mutate = useMutation(api.mutations.SmsAlertSetting_disable);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertSettingDisableParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for SmsAlertSetting.enable. */
+export function useSmsAlertSettingEnable() {
+  const mutate = useMutation(api.mutations.SmsAlertSetting_enable);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertSettingEnableParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for SmsAlertSetting.open. */
+export function useSmsAlertSettingOpen() {
+  const mutate = useMutation(api.mutations.SmsAlertSetting_open);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertSettingOpenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for SmsAlertSetting.recordScan. */
+export function useSmsAlertSettingRecordScan() {
+  const mutate = useMutation(api.mutations.SmsAlertSetting_recordScan);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertSettingRecordScanParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for SmsAlertSetting.open. */
+export function useCreateSmsAlertSetting() {
+  const mutate = useMutation(api.mutations.SmsAlertSetting_createViaOpen);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = SmsAlertSettingOpenParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -9473,6 +10228,16 @@ export function useStaffMessageMarkRead() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = StaffMessageMarkReadParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for StaffMessage.recordAttachments. */
+export function useStaffMessageRecordAttachments() {
+  const mutate = useMutation(api.mutations.StaffMessage_recordAttachments);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = StaffMessageRecordAttachmentsParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -9985,6 +10750,36 @@ export function useListTppReportFavorite() {
 /** Reactive get-by-id for TppReportFavorite. Pass "skip" to suspend. */
 export function useGetTppReportFavorite(id: string | "skip") {
   return useQuery(api.queries.getTppReportFavorite, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for TppReportFavorite.create. */
+export function useTppReportFavoriteCreate() {
+  const mutate = useMutation(api.mutations.TppReportFavorite_create);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TppReportFavoriteCreateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for TppReportFavorite.refavorite. */
+export function useTppReportFavoriteRefavorite() {
+  const mutate = useMutation(api.mutations.TppReportFavorite_refavorite);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TppReportFavoriteRefavoriteParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for TppReportFavorite.unfavorite. */
+export function useTppReportFavoriteUnfavorite() {
+  const mutate = useMutation(api.mutations.TppReportFavorite_unfavorite);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TppReportFavoriteUnfavoriteParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
 }
 
 /** Reactive list for Trailer. */
@@ -11400,4 +12195,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1212 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1293 as const;
