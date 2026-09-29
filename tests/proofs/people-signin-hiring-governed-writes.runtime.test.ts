@@ -13,6 +13,7 @@
 import { convexTest } from "convex-test";
 import { beforeAll, describe, expect, it } from "vitest";
 import { api, internal } from "../../convex/_generated/api";
+import type { Id } from "../../convex/_generated/dataModel";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
@@ -28,7 +29,7 @@ function harness() {
       schema,
       modules,
     }),
-    { root },
+    { raw: root },
   );
 }
 
@@ -58,7 +59,7 @@ async function hire(
 }
 
 async function events(proof: Proof, type: string) {
-  return proof.root.run(async (ctx) =>
+  return proof.raw.run(async (ctx) =>
     (await ctx.db.query("manifestEvents").collect()).filter(
       (row) => row.type === type,
     ),
@@ -66,7 +67,7 @@ async function events(proof: Proof, type: string) {
 }
 
 async function person(proof: Proof, id: string) {
-  return proof.root.run(async (ctx) => ctx.db.get(id as never));
+  return proof.raw.run(async (ctx) => ctx.db.get(id as Id<"people">));
 }
 
 describe("personEmployeeNumber.setEmployeeNumber → Person_setEmployeeNumber", () => {
@@ -232,7 +233,7 @@ describe("authLink.createAccountProfile → Person_linkAccount / Person_createVi
     expect(
       await member.mutation(internal.authLink.createAccountProfile, profile),
     ).toEqual({ linked: true, reason: "already" });
-    const rows = await proof.root.run(async (ctx) =>
+    const rows = await proof.raw.run(async (ctx) =>
       ctx.db.query("people").collect(),
     );
     expect(rows).toHaveLength(1);
@@ -282,7 +283,7 @@ describe("authLink.createAccountProfile → Person_linkAccount / Person_createVi
   it("anonymous callers are refused and the last-name escape stays system-only", async () => {
     const proof = harness();
     expect(
-      await proof.root.mutation(internal.authLink.createAccountProfile, {
+      await proof.raw.mutation(internal.authLink.createAccountProfile, {
         email: "anon@example.invalid",
         givenName: "Anon",
         familyName: "",
@@ -297,7 +298,7 @@ describe("authLink.createAccountProfile → Person_linkAccount / Person_createVi
       }),
     ).rejects.toThrow(/Give this person a last name/);
     expect(
-      await proof.root.run(async (ctx) => ctx.db.query("people").collect()),
+      await proof.raw.run(async (ctx) => ctx.db.query("people").collect()),
     ).toHaveLength(0);
   });
 });
@@ -305,7 +306,7 @@ describe("authLink.createAccountProfile → Person_linkAccount / Person_createVi
 describe("authLink.linkBySubjectEmail → Person_clearAccountLink + Person_linkAccount", () => {
   it("clears the stale link on a removed row in another tenant, then links", async () => {
     const proof = harness();
-    const stale = await proof.root.run(async (ctx) =>
+    const stale = await proof.raw.run(async (ctx) =>
       ctx.db.insert("people", {
         tenantId: "tenant-old",
         givenName: "Hal",
@@ -329,7 +330,7 @@ describe("authLink.linkBySubjectEmail → Person_clearAccountLink + Person_linkA
       tenantId: "tenant-new",
     };
     expect(
-      await proof.root.mutation(internal.authLink.linkBySubjectEmail, args),
+      await proof.raw.mutation(internal.authLink.linkBySubjectEmail, args),
     ).toEqual({ linked: true, reason: "matched" });
     expect((await person(proof, stale))?.authSubjectId).toBeNull();
     expect((await person(proof, fresh))?.authSubjectId).toBe("account-hal");
@@ -343,7 +344,7 @@ describe("authLink.linkBySubjectEmail → Person_clearAccountLink + Person_linkA
     ]);
     // Retry: already linked, nothing new written.
     expect(
-      await proof.root.mutation(internal.authLink.linkBySubjectEmail, args),
+      await proof.raw.mutation(internal.authLink.linkBySubjectEmail, args),
     ).toEqual({ linked: true, reason: "already" });
     expect(await events(proof, "PersonAccountLinked")).toHaveLength(1);
   });
@@ -395,7 +396,7 @@ describe("candidateToTeam.hireIntoTeam → Candidate_linkHiredPerson", () => {
       candidateId,
     })) as { kind: string; personId: string };
     expect(result.kind).toBe("hired");
-    const candidate = await proof.root.run(async (ctx) =>
+    const candidate = await proof.raw.run(async (ctx) =>
       ctx.db.get(candidateId as never),
     );
     expect(candidate).toMatchObject({
@@ -445,10 +446,13 @@ describe("candidateToTeam.hireIntoTeam → Candidate_linkHiredPerson", () => {
       }),
     ).rejects.toThrow();
     await expect(
-      actor(proof, "manager").mutation(api.mutations.Candidate_linkHiredPerson, {
-        docId: candidateId,
-        hiredPersonId: personId,
-      }),
+      actor(proof, "manager").mutation(
+        api.mutations.Candidate_linkHiredPerson,
+        {
+          docId: candidateId,
+          hiredPersonId: personId,
+        },
+      ),
     ).rejects.toThrow(/Workforce managers may/);
   });
 });
@@ -511,7 +515,7 @@ describe("hiringPipeline.ingestKmCandidates → refreshFromSource commands", () 
         interviewsUpdated: 1,
       });
     }
-    const [candidates, interviews] = await proof.root.run(async (ctx) => [
+    const [candidates, interviews] = await proof.raw.run(async (ctx) => [
       await ctx.db.query("candidates").collect(),
       await ctx.db.query("interviews").collect(),
     ]);
@@ -556,7 +560,7 @@ describe("hiringPipeline.ingestKmCandidates → refreshFromSource commands", () 
         json: exportV2,
       }),
     ).rejects.toThrow(/Not authorized/);
-    const [candidate] = await proof.root.run(async (ctx) =>
+    const [candidate] = await proof.raw.run(async (ctx) =>
       ctx.db.query("candidates").collect(),
     );
     await expect(
