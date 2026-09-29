@@ -117,7 +117,7 @@ entity OutboundWebhookEndpoint mixin TenantScoped {
 
   // A successful delivery moves the watermark forward, never back.
   command recordDelivered(occurredAt: datetime) {
-    guard user.role == "system" "Only CapsuleX records webhook deliveries"
+    guard user.role == "system" "Only Capsule can save webhook deliveries"
     guard self.endpointKey != null
     mutate deliveredThrough = self.deliveredThrough == null or occurredAt > self.deliveredThrough ? occurredAt : self.deliveredThrough
   }
@@ -168,7 +168,7 @@ entity OutboundWebhookDelivery mixin TenantScoped {
     occurredAt: datetime,
     deliveredAt: datetime
   ) {
-    guard user.role == "system" "Only CapsuleX records webhook deliveries"
+    guard user.role == "system" "Only Capsule can save webhook deliveries"
     guard self.attemptId == null
     constraint webhookDeliveryAttempt: attempt >= 1 "A delivery attempt is numbered from 1."
     mutate attemptId = newAttemptId

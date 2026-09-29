@@ -133,7 +133,7 @@ entity PushSubscription mixin TenantScoped, SoftDeletable {
   // device. The delivery seams record it as the system role.
   command recordDelivery(at: float) {
     guard self.deletedAt == null
-    guard user.role == "system" "Deliveries are recorded by the app"
+    guard user.role == "system" "Only the app can save deliveries"
     mutate lastUsedAt = at
   }
 

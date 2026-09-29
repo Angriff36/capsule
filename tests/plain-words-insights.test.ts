@@ -69,9 +69,16 @@ describe("plain words on leftover insights manifests", () => {
     expect(visible).toContain("Staff may see their own report favorites");
     expectPlain("Staff may see their own report favorites");
 
-    // write/execute leftovers stay for a later slice
-    expect(visible).toContain(
+    // Favorites became governed commands (2026-09-29): the seam-only lock
+    // copy is gone and the write rule says what the person needs.
+    expect(visible).not.toContain(
       "Report favorites are managed only through the app",
+    );
+    expect(visible).toContain(
+      "Link your account to a staff profile to keep report favorites",
+    );
+    expectPlain(
+      "Link your account to a staff profile to keep report favorites",
     );
   });
 });

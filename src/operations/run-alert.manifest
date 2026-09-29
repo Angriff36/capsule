@@ -103,12 +103,12 @@ entity RunAlertDelivery mixin TenantScoped {
   property required kind: string
 
   default policy runAlertDeliveryRead read: roleAllows(user.role, "staffAccess") "Staff may see which alerts went out"
-  default policy runAlertDeliveryWrite write: roleAllows(user.role, "staffAccess") "Alerts are recorded by the app"
-  default policy runAlertDeliveryExecute execute: roleAllows(user.role, "staffAccess") "Alerts are recorded by the app"
+  default policy runAlertDeliveryWrite write: roleAllows(user.role, "staffAccess") "Only the app can save alerts"
+  default policy runAlertDeliveryExecute execute: roleAllows(user.role, "staffAccess") "Only the app can save alerts"
 
   // Governed creation — at least one device accepted this alert.
   command record(activityId: string, kind: string) {
-    guard user.role == "system" "Alerts are recorded by the app"
+    guard user.role == "system" "Only the app can save alerts"
     constraint recordKind: kind == "lead" or kind == "start" or kind == "overdue" "Unknown alert kind."
     constraint recordOnce: count(RunAlertDelivery where activityId == activityId, kind == kind) == 0 "This alert was already sent."
     mutate activityId = activityId

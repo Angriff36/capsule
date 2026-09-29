@@ -38,11 +38,11 @@ describe("plain words on leftover event-packet manifests", () => {
     }
 
     for (const fresh of [
-      "The event packet keeps the source files",
-      "Staff cannot change packet files",
+      "Only managers can change the event packet files",
+      "Only managers can see the original packet files",
       "Staff cannot change packet issues",
-      "Staff cannot change packet decisions",
-      "Staff cannot change packet prints",
+      "Only managers can decide event packet issues",
+      "Only managers can print the event packet",
       "Only Capsule can update event number counters",
       "Event number counters stay behind the scenes",
       "Only Capsule can assign event numbers",
@@ -103,8 +103,8 @@ describe("plain words on leftover event-packet manifests", () => {
     ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
     for (const later of [
       "The event packet keeps the packet issues",
-      "The event packet keeps the packet decisions",
-      "The event packet keeps the packet prints",
+      "Only managers can decide event packet issues",
+      "Only managers can print the event packet",
     ]) {
       expect(packet).toContain(later);
     }
@@ -120,23 +120,34 @@ describe("plain words on leftover event-packet manifests", () => {
     expect(visible).not.toContain(
       "Source bytes and private evidence require the scoped packet seam",
     );
+    // Lock-era copy became false on 2026-09-29: managers now change packet
+    // files, decisions and prints through generated commands.
+    for (const stale of [
+      "The event packet keeps the source files",
+      "Staff cannot change packet files",
+      "Staff cannot change packet decisions",
+      "Staff cannot change packet prints",
+      "The original packet files stay behind the scenes",
+    ]) {
+      expect(visible).not.toContain(stale);
+    }
     expect(visible).not.toContain(
       "Private issue evidence is projected through the packet seam",
     );
 
     expect(visible).toContain(
-      "The original packet files stay behind the scenes",
+      "Only managers can see the original packet files",
     );
-    expectPlain("The original packet files stay behind the scenes");
+    expectPlain("Only managers can see the original packet files");
     expect(visible).toContain("Private packet issues stay behind the scenes");
     expectPlain("Private packet issues stay behind the scenes");
 
     for (const landed of [
-      "The event packet keeps the source files",
-      "Staff cannot change packet files",
+      "Only managers can change the event packet files",
+      "Only managers can see the original packet files",
       "Staff cannot change packet issues",
-      "Staff cannot change packet decisions",
-      "Staff cannot change packet prints",
+      "Only managers can decide event packet issues",
+      "Only managers can print the event packet",
       "Private approvals remain behind manager review",
     ]) {
       expect(visible).toContain(landed);
@@ -145,8 +156,8 @@ describe("plain words on leftover event-packet manifests", () => {
     // lock the later event-packet leftovers; this test does not change them
     for (const later of [
       "The event packet keeps the packet issues",
-      "The event packet keeps the packet decisions",
-      "The event packet keeps the packet prints",
+      "Only managers can decide event packet issues",
+      "Only managers can print the event packet",
     ]) {
       expect(visible).toContain(later);
     }
@@ -169,20 +180,20 @@ describe("plain words on leftover event-packet manifests", () => {
 
     for (const fresh of [
       "The event packet keeps the packet issues",
-      "The event packet keeps the packet decisions",
-      "The event packet keeps the packet prints",
+      "Only managers can decide event packet issues",
+      "Only managers can print the event packet",
     ]) {
       expect(visible).toContain(fresh);
       expectPlain(fresh);
     }
 
     for (const landed of [
-      "The event packet keeps the source files",
-      "Staff cannot change packet files",
+      "Only managers can change the event packet files",
+      "Only managers can see the original packet files",
       "Staff cannot change packet issues",
-      "Staff cannot change packet decisions",
-      "Staff cannot change packet prints",
-      "The original packet files stay behind the scenes",
+      "Only managers can decide event packet issues",
+      "Only managers can print the event packet",
+      "Only managers can see the original packet files",
       "Private packet issues stay behind the scenes",
       "Private approvals remain behind manager review",
     ]) {
@@ -199,8 +210,8 @@ describe("plain words on leftover event-packet manifests", () => {
     }
     for (const fresh of [
       "The event packet keeps the packet issues",
-      "The event packet keeps the packet decisions",
-      "The event packet keeps the packet prints",
+      "Only managers can decide event packet issues",
+      "Only managers can print the event packet",
     ]) {
       expect(summary).toContain(fresh);
     }

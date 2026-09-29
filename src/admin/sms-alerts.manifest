@@ -73,7 +73,7 @@ entity SmsAlertSetting mixin TenantScoped, SoftDeletable {
   command recordScan(sent: int, failed: int, optional error: string) {
     guard self.openedAt != null
     guard self.deletedAt == null
-    guard user.role == "system" "Only the SMS alert scan records its results"
+    guard user.role == "system" "Only the SMS alert check can save its results"
     mutate lastScanAt = now()
     mutate lastScanSent = sent
     mutate lastScanFailed = failed
@@ -115,7 +115,7 @@ entity SmsAlertDelivery mixin TenantScoped, SoftDeletable {
   command open(triggerKey: string, personId: uuid, alertType: string) {
     guard self.openedAt == null
     guard self.deletedAt == null
-    guard user.role == "system" "Only the SMS alert scan records its sends"
+    guard user.role == "system" "Only the SMS alert check can save its texts"
     mutate triggerKey = triggerKey
     mutate personId = personId
     mutate alertType = alertType
@@ -126,7 +126,7 @@ entity SmsAlertDelivery mixin TenantScoped, SoftDeletable {
     guard self.openedAt != null
     guard self.sentAt == null and self.failedAt == null
     guard self.deletedAt == null
-    guard user.role == "system" "Only the SMS alert scan records its sends"
+    guard user.role == "system" "Only the SMS alert check can save its texts"
     mutate sentAt = now()
     mutate messageSid = messageSid
     emit SmsAlertSent {
@@ -143,7 +143,7 @@ entity SmsAlertDelivery mixin TenantScoped, SoftDeletable {
     guard self.openedAt != null
     guard self.sentAt == null and self.failedAt == null
     guard self.deletedAt == null
-    guard user.role == "system" "Only the SMS alert scan records its sends"
+    guard user.role == "system" "Only the SMS alert check can save its texts"
     mutate failedAt = now()
     mutate error = error
     emit SmsAlertFailed {

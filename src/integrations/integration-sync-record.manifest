@@ -46,8 +46,8 @@ entity IntegrationSyncRecord mixin TenantScoped {
   // Same tiers as IntegrationConnection: managers may see sync health; the
   // commands are system-only (see the guards).
   default policy integrationSyncRecordRead read: roleAllows(user.role, "manageAccess") "Managers may see what outside services hold"
-  default policy integrationSyncRecordWrite write: roleAllows(user.role, "adminAccess") "Admins may update outside-service sync records"
-  default policy integrationSyncRecordExecute execute: roleAllows(user.role, "adminAccess") "Admins may change outside-service sync records"
+  default policy integrationSyncRecordWrite write: roleAllows(user.role, "adminAccess") "Admins may update outside-service sync status"
+  default policy integrationSyncRecordExecute execute: roleAllows(user.role, "adminAccess") "Admins may change outside-service sync status"
 
   // First outcome for a record. The seam looks the row up by syncKey first and
   // runs `recordOutcome` when it exists, so there is one row per key.
@@ -62,10 +62,10 @@ entity IntegrationSyncRecord mixin TenantScoped {
     syncedAt: datetime,
     optional error: string
   ) {
-    guard user.role == "system" "Only CapsuleX records outside-service sync state"
+    guard user.role == "system" "Only Capsule can save outside-service sync status"
     guard self.syncKey == null
-    constraint syncRecordSource: length(trim(sourceId)) > 0 "A sync record needs the Capsule record it describes."
-    constraint syncRecordType: length(trim(recordType)) > 0 "A sync record needs a record type."
+    constraint syncRecordSource: length(trim(sourceId)) > 0 "Sync status needs the Capsule item it describes."
+    constraint syncRecordType: length(trim(recordType)) > 0 "Sync status needs an item type."
     mutate syncKey = provider + ":" + recordType + ":" + sourceId
     mutate provider = provider
     mutate recordType = recordType
@@ -95,7 +95,7 @@ entity IntegrationSyncRecord mixin TenantScoped {
     syncedAt: datetime,
     optional error: string
   ) {
-    guard user.role == "system" "Only CapsuleX records outside-service sync state"
+    guard user.role == "system" "Only Capsule can save outside-service sync status"
     guard self.syncKey != null
     mutate externalId = externalId
     mutate engagementId = engagementId

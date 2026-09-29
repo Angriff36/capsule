@@ -300,7 +300,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   command recordAcceptedRevision(optional acceptedRevisionId: uuid) {
     guard self.status == "accepted"
     guard self.deletedAt == null
-    guard self.acceptedRevisionPending == true "This acceptance already records its revision"
+    guard self.acceptedRevisionPending == true "This acceptance already has its version saved"
     mutate acceptedRevisionId = acceptedRevisionId != null ? acceptedRevisionId : null
     mutate acceptedRevisionPending = false
     emit ProposalAcceptedRevisionRecorded {

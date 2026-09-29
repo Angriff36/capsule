@@ -19643,7 +19643,7 @@ async function __runEventPacketResolutionRecord(ctx: MutationCtx, { docId, event
     if (!((__chk0 > 0))) throw new Error("Choose an event in this organization.");
     const __chk1_rows = await ctx.db.query("eventPacketResolutions").withIndex("by_eventId", (q) => q.eq("eventId", eventId)).collect();
     const __chk1 = __chk1_rows.filter((d) => (d as any).decisionId === decisionId).filter((d) => (d as any).tenantId === __checkTenant).length;
-    if (!((__chk1 === 0))) throw new Error("This decision is already recorded.");
+    if (!((__chk1 === 0))) throw new Error("This decision is already saved.");
     const updates = {
       eventId: eventId,
       decisionId: decisionId,
@@ -19731,7 +19731,7 @@ export const EventPacketResolution_createViaRecord = mutation({
     if (!((__chk0 > 0))) throw new Error("Choose an event in this organization.");
     const __chk1_rows = await ctx.db.query("eventPacketResolutions").withIndex("by_eventId", (q) => q.eq("eventId", eventId)).collect();
     const __chk1 = __chk1_rows.filter((d) => (d as any).decisionId === decisionId).filter((d) => (d as any).tenantId === __checkTenant).length;
-    if (!((__chk1 === 0))) throw new Error("This decision is already recorded.");
+    if (!((__chk1 === 0))) throw new Error("This decision is already saved.");
     const doc: Record<string, any> = {
       ...__draft,
     };
@@ -22489,7 +22489,7 @@ async function __runExternalRecordLinkRelink(ctx: MutationCtx, { docId, capsuleE
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(((((capsuleId).trim()).length > 0) || (conflictStatus === "pending_conflict")))) throw new Error("Give this match a Capsule ID.");
     if (!((conflictStatus !== "superseded"))) throw new Error("A re-imported match can't be marked replaced. Pick resolved or pending.");
-    if (!((((sourceImportRunId).trim()).length > 0))) throw new Error("Say which import saw this record.");
+    if (!((((sourceImportRunId).trim()).length > 0))) throw new Error("Say which import saw this item.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -27194,8 +27194,8 @@ async function __runIntegrationSyncRecordRecordOutcome(ctx: MutationCtx, { docId
     if (!doc) throw new Error("IntegrationSyncRecord not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationSyncRecord not found");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see what outside services hold");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update outside-service sync records");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change outside-service sync records");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update outside-service sync status");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change outside-service sync status");
     if (!((user.role === "system"))) throw new Error("Guard 0 failed");
     if (!((doc.syncKey != null))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -27251,12 +27251,12 @@ async function __runIntegrationSyncRecordTrack(ctx: MutationCtx, { docId, provid
     if (!doc) throw new Error("IntegrationSyncRecord not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationSyncRecord not found");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see what outside services hold");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update outside-service sync records");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change outside-service sync records");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update outside-service sync status");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change outside-service sync status");
     if (!((user.role === "system"))) throw new Error("Guard 0 failed");
     if (!((doc.syncKey == null))) throw new Error("Guard 1 failed");
-    if (!((((sourceId).trim()).length > 0))) throw new Error("A sync record needs the Capsule record it describes.");
-    if (!((((recordType).trim()).length > 0))) throw new Error("A sync record needs a record type.");
+    if (!((((sourceId).trim()).length > 0))) throw new Error("Sync status needs the Capsule item it describes.");
+    if (!((((recordType).trim()).length > 0))) throw new Error("Sync status needs an item type.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -27344,12 +27344,12 @@ export const IntegrationSyncRecord_createViaTrack = mutation({
       sourceId: args.sourceId
     };
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see what outside services hold");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update outside-service sync records");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change outside-service sync records");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update outside-service sync status");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change outside-service sync status");
     if (!((user.role === "system"))) throw new Error("Guard 0 failed");
     if (!((__draft.syncKey == null))) throw new Error("Guard 1 failed");
-    if (!((((sourceId).trim()).length > 0))) throw new Error("A sync record needs the Capsule record it describes.");
-    if (!((((recordType).trim()).length > 0))) throw new Error("A sync record needs a record type.");
+    if (!((((sourceId).trim()).length > 0))) throw new Error("Sync status needs the Capsule item it describes.");
+    if (!((((recordType).trim()).length > 0))) throw new Error("Sync status needs an item type.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -47454,8 +47454,8 @@ async function __runRunAlertDeliveryRecord(ctx: MutationCtx, { docId, activityId
     if (!doc) throw new Error("RunAlertDelivery not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("RunAlertDelivery not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see which alerts went out");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Alerts are recorded by the app");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Alerts are recorded by the app");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Only the app can save alerts");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Only the app can save alerts");
     if (!((user.role === "system"))) throw new Error("Guard 0 failed");
     if (!((((kind === "lead") || (kind === "start")) || (kind === "overdue")))) throw new Error("Unknown alert kind.");
     const __chk0_rows = await ctx.db.query("runAlertDeliveries").withIndex("by_activityId", (q) => q.eq("activityId", activityId)).collect();
@@ -47522,8 +47522,8 @@ export const RunAlertDelivery_createViaRecord = mutation({
       kind: args.kind
     };
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see which alerts went out");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Alerts are recorded by the app");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Alerts are recorded by the app");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Only the app can save alerts");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Only the app can save alerts");
     if (!((user.role === "system"))) throw new Error("Guard 0 failed");
     if (!((((kind === "lead") || (kind === "start")) || (kind === "overdue")))) throw new Error("Unknown alert kind.");
     const __chk0_rows = await ctx.db.query("runAlertDeliveries").withIndex("by_activityId", (q) => q.eq("activityId", activityId)).collect();

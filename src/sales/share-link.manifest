@@ -131,7 +131,7 @@ entity ShareLink mixin TenantScoped, SoftDeletable {
   // guards restate those conditions.
   command recordView(optional viewerIdentity: string) {
     guard self.deletedAt == null
-    guard self.status == "active" "Only active share links record views"
+    guard self.status == "active" "Only active share links count views"
     guard self.expiresAt == null or now() < self.expiresAt "This share link has expired"
     mutate viewCount = self.viewCount + 1
     mutate firstViewedAt = self.firstViewedAt != null ? self.firstViewedAt : now()

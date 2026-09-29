@@ -161,7 +161,7 @@ entity EventPacketResolution mixin TenantScoped {
     constraint packetDecisionId: length(trim(decisionId)) > 0 "A decision needs its id."
     constraint packetDecisionIssue: length(trim(issueKey)) > 0 "A decision needs the issue it settles."
     constraint packetDecisionEvent: count(Event where id == eventId) > 0 "Choose an event in this organization."
-    constraint packetDecisionOnce: count(EventPacketResolution where eventId == eventId, decisionId == decisionId) == 0 "This decision is already recorded."
+    constraint packetDecisionOnce: count(EventPacketResolution where eventId == eventId, decisionId == decisionId) == 0 "This decision is already saved."
     mutate eventId = eventId
     mutate decisionId = decisionId
     mutate issueKey = issueKey

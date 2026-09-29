@@ -400,7 +400,7 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint relinkCapsuleIdPresent: length(trim(capsuleId)) > 0 or conflictStatus == "pending_conflict" "Give this match a Capsule ID."
     constraint relinkNotSuperseded: conflictStatus != "superseded" "A re-imported match can't be marked replaced. Pick resolved or pending."
-    constraint relinkRunPresent: length(trim(sourceImportRunId)) > 0 "Say which import saw this record."
+    constraint relinkRunPresent: length(trim(sourceImportRunId)) > 0 "Say which import saw this item."
     mutate capsuleEntity = capsuleEntity
     mutate capsuleId = capsuleId
     mutate sourceImportRunId = sourceImportRunId

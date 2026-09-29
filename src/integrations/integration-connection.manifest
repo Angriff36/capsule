@@ -255,7 +255,7 @@ entity IntegrationConnection mixin TenantScoped, SoftDeletable {
     connectedById: string,
     grantedAt: datetime
   ) {
-    guard user.role == "system" "Only CapsuleX records an OAuth connection"
+    guard user.role == "system" "Only Capsule can save an outside-service sign-in"
     guard self.connectedAt != null
     guard self.deletedAt == null
     guard self.provider == "quickbooks" or self.provider == "google_calendar" "Only QuickBooks and Google Calendar connect through OAuth"
@@ -311,7 +311,7 @@ entity IntegrationConnection mixin TenantScoped, SoftDeletable {
     summary: string,
     optional error: string
   ) {
-    guard user.role == "system" "Only CapsuleX records a sync result"
+    guard user.role == "system" "Only Capsule can save a sync result"
     guard self.deletedAt == null
     guard self.engagementId == engagementId "That connection has been replaced"
     guard self.status == "connected" or self.status == "error"

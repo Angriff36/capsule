@@ -67,7 +67,7 @@ entity InvoicePaymentLink mixin TenantScoped, SoftDeletable {
   ) {
     guard self.openedAt == null
     guard self.deletedAt == null
-    guard user.role == "system" "Only Capsule records a Stripe payment link it created"
+    guard user.role == "system" "Only Capsule can save a Stripe payment link it created"
     constraint openSession: length(trim(sessionId)) > 0 and length(trim(url)) > 0 "A payment link needs its Stripe session and address"
     mutate invoiceId = invoiceId
     mutate sessionId = sessionId
@@ -87,7 +87,7 @@ entity InvoicePaymentLink mixin TenantScoped, SoftDeletable {
     guard self.announcedAt == null
     guard self.deletedAt == null
     guard self.configId == null
-    guard user.role == "system" "Only Capsule records a Stripe payment link it created"
+    guard user.role == "system" "Only Capsule can save a Stripe payment link it created"
     mutate announcedAt = now()
     emit InvoicePaymentLinkCreated {
       tenantId: self.tenantId
@@ -106,7 +106,7 @@ entity InvoicePaymentLink mixin TenantScoped, SoftDeletable {
     guard self.announcedAt == null
     guard self.deletedAt == null
     guard self.configId != null
-    guard user.role == "system" "Only Capsule records a Stripe payment link it created"
+    guard user.role == "system" "Only Capsule can save a Stripe payment link it created"
     mutate announcedAt = now()
     emit InvoiceReminderPaymentLinkPrepared {
       tenantId: self.tenantId
@@ -155,7 +155,7 @@ entity InvoiceStripePayment mixin TenantScoped, SoftDeletable {
   ) {
     guard self.recordedAt == null
     guard self.deletedAt == null
-    guard user.role == "system" "Only Capsule records a payment it found in Stripe"
+    guard user.role == "system" "Only Capsule can save a payment it found in Stripe"
     constraint recordSession: length(trim(sessionId)) > 0 "A Stripe payment needs its session"
     mutate invoiceId = invoiceId
     mutate sessionId = sessionId
@@ -269,7 +269,7 @@ entity InvoiceReminderAttempt mixin TenantScoped, SoftDeletable {
   ) {
     guard self.openedAt == null
     guard self.deletedAt == null
-    guard user.role == "system" "Only Capsule records a reminder it sent or skipped"
+    guard user.role == "system" "Only Capsule can save a reminder it sent or skipped"
     mutate invoiceId = invoiceId
     mutate configId = configId
     mutate offsetDays = offsetDays
@@ -288,7 +288,7 @@ entity InvoiceReminderAttempt mixin TenantScoped, SoftDeletable {
     guard self.openedAt != null
     guard self.outcome == null
     guard self.deletedAt == null
-    guard user.role == "system" "Only Capsule records a reminder it sent or skipped"
+    guard user.role == "system" "Only Capsule can save a reminder it sent or skipped"
     mutate outcome = "delivered"
     mutate emailId = emailId
     mutate sessionId = sessionId
@@ -315,7 +315,7 @@ entity InvoiceReminderAttempt mixin TenantScoped, SoftDeletable {
     guard self.openedAt != null
     guard self.outcome == null
     guard self.deletedAt == null
-    guard user.role == "system" "Only Capsule records a reminder it sent or skipped"
+    guard user.role == "system" "Only Capsule can save a reminder it sent or skipped"
     mutate outcome = "suppressed"
     mutate reason = reason
     emit InvoiceReminderSuppressed {
@@ -334,7 +334,7 @@ entity InvoiceReminderAttempt mixin TenantScoped, SoftDeletable {
     guard self.openedAt != null
     guard self.outcome == null
     guard self.deletedAt == null
-    guard user.role == "system" "Only Capsule records a reminder it sent or skipped"
+    guard user.role == "system" "Only Capsule can save a reminder it sent or skipped"
     mutate outcome = "failed"
     mutate attempt = attempt
     mutate message = message
