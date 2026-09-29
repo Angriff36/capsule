@@ -166,19 +166,40 @@ function job(env: Setup, configId: string, offsetDays: number, attempt = 0) {
   };
 }
 
+/**
+ * Reminder events for the invoice. Since 2026-09-29 they are emitted by the
+ * InvoiceReminderAttempt / InvoicePaymentLink / InvoiceReminderSchedule
+ * commands (entityId = that row, payload.invoiceId = the invoice).
+ */
 async function ledgerTypes(env: Setup): Promise<string[]> {
   return await env.t.run(async (ctx) =>
-    (
-      await ctx.db
-        .query("manifestEvents")
-        .withIndex("by_entityId", (q) =>
-          q.eq("entityId", String(env.invoiceId)),
-        )
-        .collect()
-    )
+    (await ctx.db.query("manifestEvents").collect())
+      .filter(
+        (row) =>
+          (row.payload as { invoiceId?: string }).invoiceId ===
+          String(env.invoiceId),
+      )
       .map((row) => row.type)
       .filter((type) => type.startsWith("InvoiceReminder")),
   );
+}
+
+/** A hand-written row exactly as the pre-2026-09-29 code wrote it. */
+async function legacyLedgerRow(
+  env: Setup,
+  type: string,
+  payload: Record<string, unknown>,
+  createdAt = Date.now(),
+): Promise<void> {
+  await env.t.run(async (ctx) => {
+    await ctx.db.insert("manifestEvents", {
+      type,
+      entity: "Invoice",
+      entityId: String(env.invoiceId),
+      payload: { tenantId: TENANT, ...payload },
+      createdAt,
+    });
+  });
 }
 
 describe("invoice reminder outbox sends each reminder once", () => {
@@ -338,5 +359,123 @@ describe("invoice reminder outbox sends each reminder once", () => {
     ).rejects.toThrow();
 
     expect(calls).toEqual([]);
+  });
+
+  it("records go through governed commands and nobody can forge them", async () => {
+    const env = await setup();
+    stubProviders({ paid: false, emailFails: false });
+    const schedule = await env.finance.action(
+      api.invoiceReminders.configureSchedule,
+      { invoiceId: env.invoiceId, offsetsDays: [7] },
+    );
+    await env.t.action(
+      internal.invoiceReminders.deliverScheduled,
+      job(env, schedule.configId, 7),
+    );
+    expect((await ledgerTypes(env)).sort()).toEqual([
+      "InvoiceReminderDelivered",
+      "InvoiceReminderPaymentLinkPrepared",
+      "InvoiceReminderScheduleConfigured",
+    ]);
+    // No hand-written Invoice-keyed ledger rows any more.
+    const legacyKeyed = await env.t.run(async (ctx) =>
+      ctx.db
+        .query("manifestEvents")
+        .withIndex("by_entityId", (q) =>
+          q.eq("entityId", String(env.invoiceId)),
+        )
+        .collect(),
+    );
+    expect(
+      legacyKeyed.filter((row) => row.type.startsWith("InvoiceReminder")),
+    ).toEqual([]);
+    const attempts = await env.t.run((ctx) =>
+      ctx.db.query("invoiceReminderAttempts").collect(),
+    );
+    expect(attempts.map((row) => row.outcome)).toEqual(["delivered"]);
+
+    // A finance user cannot write a delivery or payment-link record directly.
+    await expect(
+      env.finance.mutation(api.mutations.InvoiceReminderAttempt_createViaOpen, {
+        invoiceId: String(env.invoiceId),
+        configId: schedule.configId,
+        offsetDays: 3,
+        scheduledFor: Date.now(),
+        source: "manual",
+      }),
+    ).rejects.toThrow(/Guard/);
+    await expect(
+      env.finance.mutation(api.mutations.InvoicePaymentLink_createViaOpen, {
+        invoiceId: String(env.invoiceId),
+        sessionId: "cs_forged",
+        url: "https://checkout.example/forged",
+        amount: 1,
+      }),
+    ).rejects.toThrow(/Guard/);
+  });
+
+  it("legacy ledger rows keep working: schedule, delivery and reconciliation", async () => {
+    const env = await setup();
+    const state: ProviderState = { paid: false, emailFails: false };
+    const calls = stubProviders(state);
+    // A schedule and its first delivery written by the old code.
+    const configId = "legacy-config";
+    const configuredAt = Date.now() - 1000;
+    await legacyLedgerRow(
+      env,
+      "InvoiceReminderScheduleConfigured",
+      {
+        configId,
+        configuredAt,
+        dueDate: env.dueDate,
+        offsetsDays: [7, 3],
+      },
+      configuredAt,
+    );
+    await legacyLedgerRow(env, "InvoiceReminderDelivered", {
+      configId,
+      offsetDays: 7,
+      scheduledFor: reminderScheduledAt(env.dueDate, 7),
+      source: "scheduled",
+      emailId: "email_legacy",
+      sessionId: "cs_legacy",
+    });
+
+    // The legacy schedule is in force and its delivered offset is not resent.
+    expect(
+      await env.finance.action(api.invoiceReminders.getSchedule, {
+        invoiceId: env.invoiceId,
+      }),
+    ).toMatchObject({ configId, offsetsDays: [7, 3] });
+    await env.t.action(
+      internal.invoiceReminders.deliverScheduled,
+      job(env, configId, 7),
+    );
+    expect(calls).toEqual([]);
+
+    // The next offset sends once through the governed path.
+    await env.t.action(
+      internal.invoiceReminders.deliverScheduled,
+      job(env, configId, 3),
+    );
+    expect(calls.filter((call) => call.kind === "email")).toHaveLength(1);
+
+    // A legacy reconciled session is not recorded again by sync.
+    const sessionId = (
+      await env.t.run((ctx) => ctx.db.query("invoicePaymentLinks").collect())
+    )[0]?.sessionId;
+    expect(sessionId).toBeTruthy();
+    await legacyLedgerRow(env, "InvoiceStripePaymentRecorded", {
+      sessionId,
+      paymentId: "legacy-payment",
+      amount: 400,
+      method: "card",
+    });
+    state.paid = true;
+    expect(
+      await env.finance.action(api.invoicePayments.syncStripePayments, {
+        invoiceId: env.invoiceId,
+      }),
+    ).toMatchObject({ checked: 0, recorded: 0 });
   });
 });
