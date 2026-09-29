@@ -513,7 +513,7 @@ describe("runtime proof: retry after partial failure (AC-019)", () => {
     // lead steps succeeded, then the conversion died before event/proposal.
     // Create the two records with the same generated commands the conversion
     // uses, then checkpoint them onto a failed submission by hand — in
-    // production checkpointQuoteSubmissionIds + QuoteSubmission_fail produce
+    // production QuoteSubmission_fail (with its partial ids) produces
     // exactly this row state.
     await proof.executeCommand(owner, api.mutations.Client_createViaRegister, {
       clientType: "company",
@@ -676,7 +676,7 @@ describe("runtime proof: retry links the reused proposal to one canonical event 
     // event step failed; the conversion caught that, still saved the draft
     // proposal unlinked (the proposal step runs after the event step), then
     // checkpointed the known ids and marked the row failed — exactly the row
-    // state checkpointQuoteSubmissionIds + QuoteSubmission_fail produce. The
+    // state QuoteSubmission_fail (with its partial ids) produces. The
     // draft carries no eventId: the saved unlinked state a retry must repair.
     // This seeds persisted checkpoint state; it is not an injected transport
     // fault, and processQuoteSubmission and its persistence are never mocked.

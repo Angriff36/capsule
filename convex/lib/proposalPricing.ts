@@ -23,13 +23,21 @@
 // (the prior create flow did Proposal.draft then a sequential client-side line
 // loop, so an interruption could leave stored totals for lines never persisted).
 // Mirrors proposalRevision.ts (guarded runMutation + internal restamp).
+// 2026-09-29: the restamp itself runs generated commands
+// (ProposalLineItem.restampAmount, Proposal.recomputeTotals) with the line
+// editor's own identity; see restampProposalPricing.
 
-import { internalMutation, mutation } from "../_generated/server";
-import { api, internal } from "../_generated/api";
+import {
+  internalMutation,
+  mutation,
+  type MutationCtx,
+} from "../_generated/server";
+import { api } from "../_generated/api";
 import { v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import { computeProposalPricing, type PricingBasis } from "../../src/lib/pricing";
 import { getAuthContext } from "./authContext";
+import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
 
 // Active, non-deleted priced lines for a proposal. JS loose-equality filter
 // (governed-creation omits deletedAt at insert → fresh active rows have it
@@ -136,49 +144,79 @@ async function authoritativeAmountForTarget(
 }
 
 // Restamp every active line's `amount` and the proposal's subtotal/total from
-// the central calc. internalMutation → server-only (called after a guarded line
-// op), so it does no auth check of its own; the wrapper's guarded runMutation
-// already established salesAccess + draft status.
+// the central calc, through the generated ProposalLineItem.restampAmount and
+// Proposal.recomputeTotals commands (only for values that actually change),
+// with whatever identity `ctx` carries.
 //
 // tax/discount are operator fields (set on Proposal.draft), carried through
 // unchanged; subtotal derives from the lines, and total = subtotal + tax -
 // discount (the proposalTotalsConsistent invariant). All four values are 2dp, so
 // the invariant holds exactly — the same arithmetic path the draft command uses.
+async function restampProposalPricing(
+  ctx: MutationCtx,
+  proposalId: Id<"proposals">,
+): Promise<void> {
+  const proposal = await ctx.db.get(proposalId);
+  if (!proposal) throw new Error("Proposal not found");
+  // Only draft proposals have editable lines (the line commands guard on
+  // status=="draft"); recompute refuses otherwise.
+  if (proposal.status !== "draft") {
+    throw new Error("Proposal pricing can only be recomputed while draft");
+  }
+  const lines = await activeLines(ctx, proposalId);
+
+  const result = computeProposalPricing({
+    lines: lines.map((l) => ({
+      pricingBasis: l.pricingBasis as PricingBasis,
+      unitPrice: Number(l.unitPrice) || 0,
+      quantity: Number(l.quantity) || 0,
+    })),
+    guestCount: Number(proposal.guestCount) || 0,
+    discountAmount: Number(proposal.discountAmount) || 0,
+    taxAmount: Number(proposal.taxAmount) || 0,
+  });
+
+  // Restamp each line's authoritative amount (positional —
+  // computeProposalPricing preserves input order; percentage lines re-resolve
+  // against the new base), then the parent totals. Sequential: every command
+  // reads and writes in the same transaction.
+  for (const [i, line] of lines.entries()) {
+    const amount = result.lines[i].amount;
+    if (Number(line.amount) === amount) continue;
+    await ctx.runMutation(api.mutations.ProposalLineItem_restampAmount, {
+      docId: line._id,
+      version: line.version,
+      amount,
+    });
+  }
+  if (
+    Number(proposal.subtotal) !== result.subtotal ||
+    Number(proposal.total) !== result.total
+  ) {
+    await ctx.runMutation(api.mutations.Proposal_recomputeTotals, {
+      docId: proposalId,
+      version: proposal.version,
+      subtotal: result.subtotal,
+      total: result.total,
+    });
+  }
+}
+
+// Server-only entry for the Event headcount follow-through
+// (convex/lib/proposalReconciliation.ts). That caller changed an event's
+// headcount, which it was authorized for, and already moved the proposal via
+// the tenant system runner; the per-guest line restamp is part of the same
+// consequence, so it runs as the proposal tenant's system role too (the
+// caller may hold no sales role). internalMutation: no client can call it.
 export const recomputeProposalTotals = internalMutation({
   args: { proposalId: v.id("proposals") },
   handler: async (ctx, args) => {
     const proposal = await ctx.db.get(args.proposalId);
     if (!proposal) throw new Error("Proposal not found");
-    // Only draft proposals have editable lines (the line commands guard on
-    // status=="draft"); recompute refuses otherwise.
-    if (proposal.status !== "draft") {
-      throw new Error("Proposal pricing can only be recomputed while draft");
-    }
-    const lines = await activeLines(ctx, args.proposalId);
-
-    const result = computeProposalPricing({
-      lines: lines.map((l) => ({
-        pricingBasis: l.pricingBasis as PricingBasis,
-        unitPrice: Number(l.unitPrice) || 0,
-        quantity: Number(l.quantity) || 0,
-      })),
-      guestCount: Number(proposal.guestCount) || 0,
-      discountAmount: Number(proposal.discountAmount) || 0,
-      taxAmount: Number(proposal.taxAmount) || 0,
-    });
-
-    // Restamp each line's authoritative amount (positional —
-    // computeProposalPricing preserves input order; percentage lines re-resolve
-    // against the new base), then the parent totals.
-    await Promise.all(
-      lines.map((l, i) =>
-        ctx.db.patch(l._id, { amount: result.lines[i].amount }),
-      ),
+    await restampProposalPricing(
+      TenantSystemCommandRunner.forTenant(ctx, proposal.tenantId).context,
+      args.proposalId,
     );
-    await ctx.db.patch(args.proposalId, {
-      subtotal: result.subtotal,
-      total: result.total,
-    });
   },
 });
 
@@ -231,9 +269,7 @@ export const addProposalLineAndRecompute = mutation({
       menuDishId: args.menuDishId,
       overrideReason: args.overrideReason,
     });
-    await ctx.runMutation(internal.lib.proposalPricing.recomputeProposalTotals, {
-      proposalId: args.proposalId,
-    });
+    await restampProposalPricing(ctx, args.proposalId);
   },
 });
 
@@ -289,9 +325,7 @@ export const reviseProposalLineAndRecompute = mutation({
       menuDishId: args.menuDishId,
       overrideReason: args.overrideReason,
     });
-    await ctx.runMutation(internal.lib.proposalPricing.recomputeProposalTotals, {
-      proposalId: line.proposalId,
-    });
+    await restampProposalPricing(ctx, line.proposalId);
   },
 });
 
@@ -313,8 +347,6 @@ export const removeProposalLineAndRecompute = mutation({
       docId: args.docId,
       version: args.version,
     });
-    await ctx.runMutation(internal.lib.proposalPricing.recomputeProposalTotals, {
-      proposalId: line.proposalId,
-    });
+    await restampProposalPricing(ctx, line.proposalId);
   },
 });

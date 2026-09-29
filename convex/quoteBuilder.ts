@@ -819,55 +819,23 @@ export const processQuoteSubmission = action({
         proposalId,
       });
     } else {
-      // Persist whatever IDs WERE created onto the submission before marking it
+      // Persist whatever IDs WERE created onto the submission as it is marked
       // failed, so the failed row keeps durable links to the partial records —
       // the review queue links them, and a retry reuses them instead of
-      // creating duplicates.
-      await ctx.runMutation(
-        internal.quoteBuilder.checkpointQuoteSubmissionIds,
-        {
-          docId: submissionId,
-          clientId: clientId ?? undefined,
-          leadId: leadId ?? undefined,
-          eventId: eventId ?? undefined,
-          proposalId: proposalId ?? undefined,
-        },
-      );
+      // creating duplicates. One generated command, one transaction.
       await ctx.runMutation(api.mutations.QuoteSubmission_fail, {
         docId: submissionId,
         errorMessage:
           "Conversion could not complete all steps; see processing errors.",
         processingErrors: errors.join("; ") || "Unknown conversion failure",
+        ...(clientId ? { clientId } : {}),
+        ...(leadId ? { leadId } : {}),
+        ...(eventId ? { eventId } : {}),
+        ...(proposalId ? { proposalId } : {}),
       });
     }
 
     return { submissionId, clientId, leadId, eventId, proposalId, errors };
-  },
-});
-
-/**
- * Persists whichever sales-record IDs a partial conversion created onto the
- * QuoteSubmission (used before marking a conversion failed, so the failed
- * row retains its links for the queue and for retry). Internal — only
- * processQuoteSubmission calls it.
- */
-export const checkpointQuoteSubmissionIds = internalMutation({
-  args: {
-    docId: v.id("quoteSubmissions"),
-    clientId: v.optional(v.id("clients")),
-    leadId: v.optional(v.id("leads")),
-    eventId: v.optional(v.id("events")),
-    proposalId: v.optional(v.id("proposals")),
-  },
-  handler: async (ctx, args) => {
-    const patch: Record<string, string> = {};
-    if (args.clientId) patch.clientId = args.clientId;
-    if (args.leadId) patch.leadId = args.leadId;
-    if (args.eventId) patch.eventId = args.eventId;
-    if (args.proposalId) patch.proposalId = args.proposalId;
-    if (Object.keys(patch).length > 0) {
-      await ctx.db.patch(args.docId, patch);
-    }
   },
 });
 
