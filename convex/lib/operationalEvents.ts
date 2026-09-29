@@ -30,7 +30,7 @@ import {
   validateFilledCoverageCredentials,
 } from "./eventStaffingOperations";
 import {
-  ensureTemplateStaffNeeds, validateDescribedDemand,
+  ensureTemplateStaffNeeds, placeFromWaitlist, validateDescribedDemand, validateWaitlistJoin,
   validateNewEventStaffing, validateScheduledShift, validateShiftWindow,
 } from "./shiftSchedulingEvents";
 import {
@@ -134,6 +134,12 @@ export async function handleManifestEvent(
     (event.entity === "EventStaffNeed" && ["EventStaffNeedPosted", "EventStaffNeedClaimed", "EventStaffNeedFilled"].includes(event.type))) {
     await validateEventStaffingReferences(ctx, event.payload.eventId as Id<"events">, event.payload.personId as Id<"people"> | undefined);
     await validateNewEventStaffing(ctx, event.entity, event.entityId, event.payload.personId as Id<"people"> | undefined);
+    if (event.type === "EventStaffNeedClaimed" || event.type === "EventStaffNeedFilled")
+      await placeFromWaitlist(ctx, event.entityId as Id<"eventStaffNeeds">, event.payload.personId as Id<"people"> | undefined);
+  }
+  if (event.entity === "StaffNeedWaitlistEntry" && event.type === "StaffNeedWaitlistJoined") {
+    await validateWaitlistJoin(ctx, event.entityId as Id<"staffNeedWaitlistEntries">);
+    return;
   }
   if ((event.entity === "EventAssignment" && event.type === "EventAssignmentTimingChanged") ||
     (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedTimingChanged")) {

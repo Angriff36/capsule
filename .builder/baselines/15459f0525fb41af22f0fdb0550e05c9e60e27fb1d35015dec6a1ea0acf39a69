@@ -3472,6 +3472,23 @@ export const StaffMessageSchema = z.object({
 
 export type StaffMessage = z.infer<typeof StaffMessageSchema>;
 
+// Entity: StaffNeedWaitlistEntry
+export const StaffNeedWaitlistEntrySchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  staffNeedId: z.string().uuid(),
+  personId: z.string().uuid(),
+  status: z.enum(["waiting", "placed", "left"]).default("waiting"),
+  joinedAt: z.coerce.date().nullable().optional(),
+  placedAt: z.coerce.date().nullable().optional(),
+  leftAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type StaffNeedWaitlistEntry = z.infer<typeof StaffNeedWaitlistEntrySchema>;
+
 // Entity: Station
 export const StationSchema = z.object({
   id: z.string().uuid(),
@@ -9708,7 +9725,7 @@ export type ShiftPlanEventTimingParams = z.infer<typeof ShiftPlanEventTimingPara
 
 // Command: removeStaffNeedCoverage on Shift
 export const ShiftRemoveStaffNeedCoverageParamsSchema = z.object({
-  staffNeedId: z.string().uuid(),
+  staffNeedId: z.string().min(1),
   remainingSourceIds: z.array(z.string()),
   role: z.string().optional(),
 });
@@ -9936,6 +9953,24 @@ export const StaffMessageSendParamsSchema = z.object({
 });
 
 export type StaffMessageSendParams = z.infer<typeof StaffMessageSendParamsSchema>;
+
+// Command: join on StaffNeedWaitlistEntry
+export const StaffNeedWaitlistEntryJoinParamsSchema = z.object({
+  staffNeedId: z.string().min(1),
+  personId: z.string().min(1),
+});
+
+export type StaffNeedWaitlistEntryJoinParams = z.infer<typeof StaffNeedWaitlistEntryJoinParamsSchema>;
+
+// Command: leave on StaffNeedWaitlistEntry
+export const StaffNeedWaitlistEntryLeaveParamsSchema = z.object({});
+
+export type StaffNeedWaitlistEntryLeaveParams = z.infer<typeof StaffNeedWaitlistEntryLeaveParamsSchema>;
+
+// Command: place on StaffNeedWaitlistEntry
+export const StaffNeedWaitlistEntryPlaceParamsSchema = z.object({});
+
+export type StaffNeedWaitlistEntryPlaceParams = z.infer<typeof StaffNeedWaitlistEntryPlaceParamsSchema>;
 
 // Command: define on Station
 export const StationDefineParamsSchema = z.object({

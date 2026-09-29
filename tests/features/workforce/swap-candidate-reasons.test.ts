@@ -8,6 +8,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { SwapCandidateExclusions } from "../../../src/features/staff/SwapCandidateExclusions";
 import { StaffNeedSuggestionList } from "../../../src/features/events/StaffNeedSuggestions";
+import { waitlistLine } from "../../../src/features/events/StaffNeedWaitlist";
 import {
   autoFillSummary,
   staffNeedDemandSummary,
@@ -87,6 +88,40 @@ describe("left-out people always show a reason", () => {
     expect(html).toContain("Left out (2)");
     expect(html).toContain("Bo Pool - Approved time off at this time");
     expect(html).toContain("Cy Pool - No current Food handler certificate");
+  });
+});
+
+describe("waiting list line (AC-507)", () => {
+  it("names who is waiting, oldest first, and skips people who left", () => {
+    const entry = (
+      id: string,
+      personId: string,
+      joinedAt: number,
+      status = "waiting",
+    ) => ({
+      _id: id,
+      version: 1,
+      staffNeedId: "need",
+      personId,
+      status,
+      joinedAt,
+    });
+    expect(
+      waitlistLine(
+        [
+          entry("e1", "bo", 20),
+          entry("e2", "ann", 10),
+          entry("e3", "cy", 5, "left"),
+        ],
+        "need",
+        [
+          { _id: "ann", givenName: "Ann", familyName: "Pool" },
+          { _id: "bo", givenName: "Bo", familyName: "Pool" },
+          { _id: "cy", givenName: "Cy", familyName: "Pool" },
+        ],
+      ),
+    ).toBe("Waiting list: Ann Pool, Bo Pool");
+    expect(waitlistLine([], "need", [])).toBe("");
   });
 });
 

@@ -665,6 +665,9 @@ import {
   StaffMessageMarkReadParamsSchema,
   StaffMessageRemoveParamsSchema,
   StaffMessageSendParamsSchema,
+  StaffNeedWaitlistEntryJoinParamsSchema,
+  StaffNeedWaitlistEntryLeaveParamsSchema,
+  StaffNeedWaitlistEntryPlaceParamsSchema,
   StaffingTemplateDefineParamsSchema,
   StaffingTemplateReactivateParamsSchema,
   StaffingTemplateRetireParamsSchema,
@@ -10012,6 +10015,57 @@ export function useCreateStaffMessage() {
   };
 }
 
+/** Reactive list for StaffNeedWaitlistEntry. */
+export function useListStaffNeedWaitlistEntry() {
+  return useQuery(api.queries.listStaffNeedWaitlistEntry);
+}
+
+/** Reactive get-by-id for StaffNeedWaitlistEntry. Pass "skip" to suspend. */
+export function useGetStaffNeedWaitlistEntry(id: string | "skip") {
+  return useQuery(api.queries.getStaffNeedWaitlistEntry, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for StaffNeedWaitlistEntry.join. */
+export function useStaffNeedWaitlistEntryJoin() {
+  const mutate = useMutation(api.mutations.StaffNeedWaitlistEntry_join);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = StaffNeedWaitlistEntryJoinParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for StaffNeedWaitlistEntry.leave. */
+export function useStaffNeedWaitlistEntryLeave() {
+  const mutate = useMutation(api.mutations.StaffNeedWaitlistEntry_leave);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = StaffNeedWaitlistEntryLeaveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for StaffNeedWaitlistEntry.place. */
+export function useStaffNeedWaitlistEntryPlace() {
+  const mutate = useMutation(api.mutations.StaffNeedWaitlistEntry_place);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = StaffNeedWaitlistEntryPlaceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for StaffNeedWaitlistEntry.join. */
+export function useCreateStaffNeedWaitlistEntry() {
+  const mutate = useMutation(api.mutations.StaffNeedWaitlistEntry_createViaJoin);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = StaffNeedWaitlistEntryJoinParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for Station. */
 export function useListStation() {
   return useQuery(api.queries.listStation);
@@ -11914,4 +11968,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1262 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1268 as const;

@@ -181,9 +181,18 @@ describe("staff coverage model (AC-494, 496, 497, 498)", () => {
     const [benAfter, ...benExtra] = await c.liveShifts(ben.personId);
     expect(benExtra).toHaveLength(0);
     expect(benAfter!._id).toBe(benBefore!._id);
-    expect(benAfter!.startsAt! - benBefore!.startsAt!).toBe(
-      R1.startsAt - S.startsAt,
+    // It moved to the new day with the crew (background timing follow-up can
+    // shift the crew window by minutes, so compare to Ben's own assignment).
+    expect(benAfter!.startsAt! - benBefore!.startsAt!).toBeGreaterThan(
+      20 * HOUR,
     );
+    const benWork = (
+      await c.all<Doc<"eventAssignments">>("eventAssignments")
+    ).find((row) => row.personId === ben.personId)!;
+    expect(benAfter).toMatchObject({
+      startsAt: benWork.startsAt,
+      endsAt: benWork.endsAt,
+    });
     const [calAfter, ...calExtra] = await c.liveShifts(cal.personId);
     expect(calExtra).toHaveLength(0);
     expect(calAfter).toMatchObject({ _id: calShift!._id, ...handMoved });

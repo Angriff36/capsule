@@ -21,7 +21,10 @@ import {
   useListPerson,
   useListShift,
   useListShiftType,
+  useListStaffNeedWaitlistEntry,
   useListTimeOffRequest,
+  useCreateStaffNeedWaitlistEntry,
+  useStaffNeedWaitlistEntryLeave,
 } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useActionPrompt } from "../../ui/action-prompt";
@@ -85,6 +88,9 @@ export function EventStaffingTab({ eventId }: Props) {
   const chooseAssignmentLeg = useEventAssignmentChooseTravelLeg();
   const chooseNeedLeg = useEventStaffNeedChooseTravelLeg();
   const describeDemand = useEventStaffNeedDescribeDemand();
+  const waitlistEntries = useListStaffNeedWaitlistEntry();
+  const joinWaitlist = useCreateStaffNeedWaitlistEntry();
+  const leaveWaitlist = useStaffNeedWaitlistEntryLeave();
   const autoFill = useAutoFillEventStaffNeeds();
   const [autoFillNote, setAutoFillNote] = useState<string | null>(null);
   const routeLegs = useEventRouteLegs(eventId as Id<"events">);
@@ -599,6 +605,18 @@ export function EventStaffingTab({ eventId }: Props) {
                   });
                 });
               })();
+            }}
+            waitlist={{
+              entries: waitlistEntries ?? [],
+              busy: busy != null,
+              onJoin: (needId, personId) =>
+                void run(`waitlist:${needId}`, () =>
+                  joinWaitlist({ staffNeedId: needId, personId }),
+                ),
+              onLeave: (entry) =>
+                void run(`waitlist:${entry._id}`, () =>
+                  leaveWaitlist({ docId: entry._id, version: entry.version }),
+                ),
             }}
             onDescribeDemand={
               canManage

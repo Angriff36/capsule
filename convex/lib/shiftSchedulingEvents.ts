@@ -121,6 +121,42 @@ export async function validateDescribedDemand(
   await assertNeedQualification(ctx, need, personId, window.endsAt ?? event?.endsAt ?? null);
 }
 
+/** One waiting entry per person per shift (AC-507). */
+export async function validateWaitlistJoin(
+  ctx: MutationCtx,
+  entryId: Id<"staffNeedWaitlistEntries">,
+): Promise<void> {
+  const entry = await ctx.db.get(entryId);
+  if (!entry) return;
+  const others = await ctx.db.query("staffNeedWaitlistEntries")
+    .withIndex("by_staffNeedId", (q) => q.eq("staffNeedId", entry.staffNeedId)).collect();
+  if (others.some((row) => row._id !== entryId && row.tenantId === entry.tenantId &&
+    row.deletedAt == null && row.personId === entry.personId && row.status === "waiting"))
+    throw new ConvexError(
+      `${await personName(ctx, entry.personId)} is already on the waiting list for this shift.`,
+    );
+}
+
+/** Taking or being given a spot takes the person off its waiting list. */
+export async function placeFromWaitlist(
+  ctx: MutationCtx,
+  needId: Id<"eventStaffNeeds">,
+  personId: Id<"people"> | undefined,
+): Promise<void> {
+  if (!personId) return;
+  const need = await ctx.db.get(needId);
+  if (!need) return;
+  const entries = await ctx.db.query("staffNeedWaitlistEntries")
+    .withIndex("by_staffNeedId", (q) => q.eq("staffNeedId", needId)).collect();
+  for (const entry of entries) {
+    if (entry.tenantId !== need.tenantId || entry.deletedAt != null ||
+      entry.personId !== personId || entry.status !== "waiting") continue;
+    await ctx.runMutation(api.mutations.StaffNeedWaitlistEntry_place, {
+      docId: entry._id, version: entry.version,
+    });
+  }
+}
+
 /**
  * Crew template follow-through (AC-495/503): after approval, and after a
  * guest-count or style change while the event is approved or sales-locked,

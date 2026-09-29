@@ -6,6 +6,10 @@ import { ReviewFlagInline } from "./review-flags/ReviewFlagInline";
 import { staffNeedDemandSummary } from "./eventStaffNeedDemand";
 import { StaffNeedSuggestions } from "./StaffNeedSuggestions";
 import {
+  StaffNeedWaitlist,
+  type StaffNeedWaitlistControls,
+} from "./StaffNeedWaitlist";
+import {
   EventTimelineStaffRoster,
   type PersonRow,
   type StaffingRosterEntry,
@@ -125,6 +129,7 @@ export function EventStaffingCoverageView({
   onCancel,
   onChangeCoverage,
   onDescribeDemand,
+  waitlist,
   timingControl,
   conflictsFor,
 }: {
@@ -145,6 +150,7 @@ export function EventStaffingCoverageView({
   onCancel: (need: EventStaffNeedRow) => void;
   onChangeCoverage?: (need: EventStaffNeedRow) => void;
   onDescribeDemand?: (need: EventStaffNeedRow) => void;
+  waitlist?: StaffNeedWaitlistControls;
   timingControl?: StaffTimingControlRenderer;
   conflictsFor: (
     personId: string,
@@ -356,6 +362,14 @@ export function EventStaffingCoverageView({
                           {staffNeedDemandSummary(need)}
                         </p>
                       ) : null}
+                      {waitlist ? (
+                        <StaffNeedWaitlist
+                          need={need}
+                          people={people ?? []}
+                          currentPersonId={currentPersonId}
+                          controls={waitlist}
+                        />
+                      ) : null}
                     </td>
                     <td className="block px-3 py-2 md:table-cell align-top">
                       <StatusChip status={String(need.status)} />
@@ -552,6 +566,14 @@ export function EventStaffingCoverageView({
                     ) : null}
                     {need.notes ? (
                       <p className="mt-1 text-base text-ink-2">{need.notes}</p>
+                    ) : null}
+                    {need.status === "filled" && waitlist ? (
+                      <StaffNeedWaitlist
+                        need={need}
+                        people={people ?? []}
+                        currentPersonId={currentPersonId}
+                        controls={waitlist}
+                      />
                     ) : null}
                     {need.cancellationReason ? (
                       <p className="mt-1 text-base text-ink-2">

@@ -659,6 +659,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.StaffMessage_createViaSend, { "recipientPersonId": "recipientPersonId-staff-message-1", "eventId": "eventId-staff-message-1", "body": "demo-body-1", "mentionedPersonIds": "demo-mentionedPersonIds-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.StaffMessage_createViaSend, { "recipientPersonId": "recipientPersonId-staff-message-2", "eventId": "eventId-staff-message-2", "body": "demo-body-2", "mentionedPersonIds": "demo-mentionedPersonIds-2" } as any);
+  // StaffNeedWaitlistEntry → api.mutations.StaffNeedWaitlistEntry_createViaJoin
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.StaffNeedWaitlistEntry_createViaJoin, { "staffNeedId": "staffNeedId-staff-need-waitlist-entry-1", "personId": "personId-staff-need-waitlist-entry-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.StaffNeedWaitlistEntry_createViaJoin, { "staffNeedId": "staffNeedId-staff-need-waitlist-entry-2", "personId": "personId-staff-need-waitlist-entry-2" } as any);
   // Station → api.mutations.Station_createViaDefine
   rowsAttempted += 1;
   await client.mutation(api.mutations.Station_createViaDefine, { "name": "Station 1", "sortOrder": 1, "aliases": "demo-aliases-1" } as any);
@@ -1503,6 +1508,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "StaffMessage",
       "createMutation": "StaffMessage_createViaSend",
+      "rowCount": 2
+    },
+    {
+      "entity": "StaffNeedWaitlistEntry",
+      "createMutation": "StaffNeedWaitlistEntry_createViaJoin",
       "rowCount": 2
     },
     {
