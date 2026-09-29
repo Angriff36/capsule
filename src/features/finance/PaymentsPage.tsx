@@ -8,8 +8,10 @@ import {
   usePaymentBeginProcessing,
   usePaymentFail,
   usePaymentRefund,
+  usePaymentReverse,
   usePaymentSettle,
 } from "../../lib/manifest-convex-react";
+import { paymentBreakdown } from "./paymentBreakdown";
 import { formatMoneyExact } from "../../lib/format";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -38,6 +40,7 @@ export function PaymentsPage() {
   const settle = usePaymentSettle();
   const fail = usePaymentFail();
   const refund = usePaymentRefund();
+  const reverse = usePaymentReverse();
   const [showRecord, setShowRecord] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState("");
@@ -131,6 +134,13 @@ export function PaymentsPage() {
       );
       return;
     }
+    const optionalMoney = (name: string) => {
+      const value = money(data.get(name));
+      return String(data.get(name) ?? "").trim() && value >= 0
+        ? value
+        : undefined;
+    };
+    const paidOn = String(data.get("paidOn") || "").trim();
     void run("record-payment", async () => {
       await createPayment({
         invoiceId,
@@ -140,6 +150,11 @@ export function PaymentsPage() {
         eventId: invoice.eventId || undefined,
         paymentMethodId: paymentMethodId || undefined,
         notes: String(data.get("notes") || "").trim() || undefined,
+        feeAmount: optionalMoney("feeAmount"),
+        gratuityAmount: optionalMoney("gratuityAmount"),
+        occurredAt: paidOn
+          ? new Date(`${paidOn}T12:00:00`).getTime()
+          : undefined,
       });
       form.reset();
       setSelectedInvoiceId("");
@@ -162,6 +177,53 @@ export function PaymentsPage() {
         void run(`${row._id}:${key}`, async () => {
           await fail({ docId: row._id, version: row.version, reason });
           setNotice("Payment marked failed.");
+        });
+        return;
+      }
+      if (key === "reverse") {
+        const values = await prompt.askFields({
+          title: "Take money back",
+          description:
+            "Use this when part of a payment was refunded, the card company took it back, or the bank returned it. Money paid extra comes back first; the rest goes back on the invoice balance.",
+          fields: [
+            {
+              name: "kind",
+              label: "What happened",
+              defaultValue: "refund",
+              options: [
+                { value: "refund", label: "We refunded it" },
+                { value: "chargeback", label: "The card company took it back" },
+                { value: "ach_return", label: "The bank returned it" },
+              ],
+              required: true,
+            },
+            {
+              name: "amount",
+              label: "How much",
+              inputType: "number",
+              required: true,
+            },
+            {
+              name: "reason",
+              label: "Why",
+              placeholder: "For example: guest count dropped",
+              required: true,
+            },
+          ],
+          confirmLabel: "Take money back",
+          tone: "danger",
+        });
+        if (!values) return;
+        const kind = values.kind as "refund" | "chargeback" | "ach_return";
+        void run(`${row._id}:${key}`, async () => {
+          await reverse({
+            docId: row._id,
+            version: row.version,
+            kind,
+            amount: money(values.amount ?? ""),
+            reason: values.reason ?? "",
+          });
+          setNotice("Money taken back. Invoice balance updated.");
         });
         return;
       }
@@ -324,6 +386,30 @@ export function PaymentsPage() {
                     <option value="other">Other</option>
                   </select>
                 </label>
+                <label className="field-label">
+                  Card fee (optional)
+                  <input
+                    className="input"
+                    name="feeAmount"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                  />
+                </label>
+                <label className="field-label">
+                  Tip (optional)
+                  <input
+                    className="input"
+                    name="gratuityAmount"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                  />
+                </label>
+                <label className="field-label">
+                  Date paid (optional)
+                  <input className="input" name="paidOn" type="date" />
+                </label>
               </div>
               <label className="field-label">
                 Notes
@@ -416,7 +502,12 @@ export function PaymentsPage() {
                       </Link>
                       <small>{String(row.method)}</small>
                     </td>
-                    <td>{formatMoneyExact(Number(row.amount ?? 0))}</td>
+                    <td>
+                      {formatMoneyExact(Number(row.amount ?? 0))}
+                      {paymentBreakdown(row) ? (
+                        <small>{paymentBreakdown(row)}</small>
+                      ) : null}
+                    </td>
                     <td>
                       <StatusChip status={String(row.status)} />
                     </td>

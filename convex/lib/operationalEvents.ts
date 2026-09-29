@@ -62,6 +62,9 @@ import { handleTravelLegEvent } from "./travelLegEvents";
 import { validateEventVehicleAssignment, validateRigLoadForLine } from "./eventRouteLegRead";
 import { assertSignInUnclaimed } from "./personAuthPick";
 import { assertHireNotDuplicate } from "../personEmail";
+import {
+  assertImportedPaymentMatchedOnce, assertMatchedPaymentUnclaimed, assertProviderPaymentUnused,
+} from "./paymentAccounting";
 
 /** Runs after declared reactions, inside the originating command transaction. */
 export async function handleManifestEvent(
@@ -394,6 +397,18 @@ export async function handleManifestEvent(
     const previous = event.payload.previousStorageId;
     if (typeof previous === "string" && previous !== event.payload.storageId)
       await deleteBlobIfOrphan(ctx, previous);
+    return;
+  }
+  if (event.entity === "Payment" &&
+    (event.type === "PaymentRecorded" || event.type === "PaymentMatched")) {
+    if (event.type === "PaymentMatched")
+      await assertMatchedPaymentUnclaimed(ctx, event.entityId as Id<"payments">);
+    await assertProviderPaymentUnused(ctx, event.entityId as Id<"payments">);
+    return;
+  }
+  if (event.entity === "ExternalRecordLink" &&
+    (event.type === "ExternalRecordLinked" || event.type === "ExternalRecordCapsuleIdUpdated")) {
+    await assertImportedPaymentMatchedOnce(ctx, event.entityId as Id<"externalRecordLinks">);
     return;
   }
   if (event.entity === "Event" && event.type === "EventPurchasingWeekChanged") {

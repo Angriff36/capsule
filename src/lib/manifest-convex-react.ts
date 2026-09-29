@@ -509,6 +509,7 @@ import {
   PaymentReassignClientParamsSchema,
   PaymentRecordParamsSchema,
   PaymentRefundParamsSchema,
+  PaymentReverseParamsSchema,
   PaymentSettleParamsSchema,
   PaymentStageClientMergeParamsSchema,
   PaymentUpdateProviderTransactionIdsParamsSchema,
@@ -7683,6 +7684,16 @@ export function usePaymentRefund() {
   };
 }
 
+/** Mutation hook for Payment.reverse. */
+export function usePaymentReverse() {
+  const mutate = useMutation(api.mutations.Payment_reverse);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PaymentReverseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Payment.settle. */
 export function usePaymentSettle() {
   const mutate = useMutation(api.mutations.Payment_settle);
@@ -12523,4 +12534,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1325 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1326 as const;

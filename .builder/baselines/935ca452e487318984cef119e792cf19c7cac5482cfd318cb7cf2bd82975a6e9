@@ -2627,7 +2627,7 @@ export const PaymentSchema = z.object({
   eventId: z.string().uuid().nullable().optional(),
   amount: z.number().default(0),
   method: z.enum(["card", "check", "cash", "ach", "other"]).default("card"),
-  status: z.enum(["pending", "processing", "completed", "failed", "refunded"]).default("pending"),
+  status: z.enum(["pending", "processing", "completed", "failed", "refunded", "charged_back", "returned"]).default("pending"),
   paymentMethodId: z.string().uuid().nullable().optional(),
   notes: z.string().nullable().optional(),
   recordedAt: z.coerce.date().nullable().optional(),
@@ -2636,6 +2636,18 @@ export const PaymentSchema = z.object({
   refundedAt: z.coerce.date().nullable().optional(),
   failureReason: z.string().nullable().optional(),
   refundReason: z.string().nullable().optional(),
+  feeAmount: z.number().nullable().optional(),
+  gratuityAmount: z.number().nullable().optional(),
+  appliedAmount: z.number().nullable().optional(),
+  unappliedAmount: z.number().nullable().optional(),
+  refundedAmount: z.number().nullable().optional(),
+  chargedBackAmount: z.number().nullable().optional(),
+  returnedAmount: z.number().nullable().optional(),
+  occurredAt: z.coerce.date().nullable().optional(),
+  effectiveAt: z.coerce.date().nullable().optional(),
+  providerAccount: z.string().nullable().optional(),
+  matchedSource: z.enum(["tpp_legacy", "quickbooks_online", "nowsta", "stripe", "manual", "other"]).nullable().optional(),
+  matchedExternalId: z.string().nullable().optional(),
   reconciliationStatus: z.enum(["unreconciled", "matched", "disputed", "verified"]).default("unreconciled"),
   externalSource: z.enum(["tpp_legacy", "quickbooks_online", "nowsta", "stripe", "manual", "other"]).nullable().optional(),
   externalPaymentId: z.string().nullable().optional(),
@@ -8902,6 +8914,13 @@ export const PaymentRecordParamsSchema = z.object({
   eventId: z.string().min(1).optional(),
   paymentMethodId: z.string().min(1).optional(),
   notes: z.string().optional(),
+  feeAmount: z.number().optional(),
+  gratuityAmount: z.number().optional(),
+  occurredAt: z.coerce.date().optional(),
+  effectiveAt: z.coerce.date().optional(),
+  externalSource: z.enum(["tpp_legacy", "quickbooks_online", "nowsta", "stripe", "manual", "other"]).optional(),
+  externalPaymentId: z.string().optional(),
+  providerAccount: z.string().optional(),
 });
 
 export type PaymentRecordParams = z.infer<typeof PaymentRecordParamsSchema>;
@@ -8909,9 +8928,21 @@ export type PaymentRecordParams = z.infer<typeof PaymentRecordParamsSchema>;
 // Command: refund on Payment
 export const PaymentRefundParamsSchema = z.object({
   reason: z.string(),
+  effectiveAt: z.coerce.date().optional(),
 });
 
 export type PaymentRefundParams = z.infer<typeof PaymentRefundParamsSchema>;
+
+// Command: reverse on Payment
+export const PaymentReverseParamsSchema = z.object({
+  kind: z.enum(["refund", "chargeback", "ach_return"]),
+  amount: z.number(),
+  reason: z.string(),
+  effectiveAt: z.coerce.date().optional(),
+  providerReversalId: z.string().optional(),
+});
+
+export type PaymentReverseParams = z.infer<typeof PaymentReverseParamsSchema>;
 
 // Command: settle on Payment
 export const PaymentSettleParamsSchema = z.object({});

@@ -4,13 +4,14 @@ import {
   useListInvoice,
   useListPayment,
   useExternalRecordLinkResolveConflict,
-  useExternalRecordLinkUpdateCapsuleId,
   useExternalRecordLinkVerifyLink,
 } from "../../../lib/manifest-convex-react";
 import { ErrorState, StatusChip, TableSkeleton } from "../../../ui/primitives";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionNotice, useActionFailure } from "../../../ui/action-result";
+import { ImportedPaymentMatch } from "./ImportedPaymentMatch";
 import { OldInvoiceRebuild } from "./OldInvoiceRebuild";
+import { SameIdPaymentMatch } from "./SameIdPaymentMatch";
 import { ServiceStyleMatch } from "./ServiceStyleMatch";
 import { referenceOnlyMoneyRows } from "./referenceOnlyRows";
 
@@ -64,9 +65,6 @@ export function ExternalRecordsReconcilePage() {
   const [busy, setBusy] = useState(false);
   const { error, setError } = useActionFailure();
   const { notice, setNotice } = useActionNotice();
-  // Per-row "Match to Capsule payment" picker state.
-  const [matchingId, setMatchingId] = useState<string | null>(null);
-  const [matchPaymentId, setMatchPaymentId] = useState("");
 
   // Query for all external records + Capsule payments (for the §6.4 match flow).
   const allRecords = useListExternalRecordLink();
@@ -76,7 +74,6 @@ export function ExternalRecordsReconcilePage() {
   // Commands for resolving records.
   const verifyLink = useExternalRecordLinkVerifyLink();
   const resolveConflict = useExternalRecordLinkResolveConflict();
-  const updateCapsuleId = useExternalRecordLinkUpdateCapsuleId();
 
   // ponytail: the queue is records still needing action. Filtering on
   // `verified === false` was wrong — resolveConflict/updateCapsuleId never set
@@ -101,6 +98,23 @@ export function ExternalRecordsReconcilePage() {
   const candidatePayments = useMemo(
     () => (payments ?? []).filter((p) => p.deletedAt == null),
     [payments],
+  );
+  // A Capsule payment already matched by an imported row is not offered again.
+  const takenPaymentIds = useMemo(
+    () =>
+      new Set(
+        (allRecords ?? [])
+          .filter(
+            (r) =>
+              r.deletedAt == null &&
+              r.recordType === "payment" &&
+              r.capsuleEntity === "payment" &&
+              r.conflictStatus !== "superseded" &&
+              r.capsuleId,
+          )
+          .map((r) => String(r.capsuleId)),
+      ),
+    [allRecords],
   );
 
   const invoiceNumber = (id: string) =>
@@ -183,36 +197,6 @@ export function ExternalRecordsReconcilePage() {
     }
   }
 
-  // §6.4 match flow for an imported payment reference: link it to an existing
-  // Capsule payment, then mark the conflict resolved. The import stages payments
-  // as pending_conflict links with capsuleId "" and a note saying "match via
-  // markMatched" — this is the UI that finally performs that match.
-  async function matchPayment(linkId: string) {
-    if (!matchPaymentId) return;
-    setBusy(true);
-    setError(null);
-    setNotice(null);
-
-    try {
-      await updateCapsuleId({ docId: linkId, capsuleId: matchPaymentId });
-      await resolveConflict({
-        docId: linkId,
-        conflictStatus: "resolved",
-        resolutionNote:
-          "Matched to a Capsule payment while matching leftover items",
-      });
-      setNotice("Payment linked and resolved.");
-      setMatchingId(null);
-      setMatchPaymentId("");
-    } catch (cause: unknown) {
-      setError(
-        cause instanceof Error ? cause.message : "Failed to match payment.",
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
-
   return (
     <div className="operations-stage supply-stage">
       <header className="supply-masthead">
@@ -282,6 +266,12 @@ export function ExternalRecordsReconcilePage() {
               ))}
             </select>
           </div>
+
+          <SameIdPaymentMatch
+            disabled={busy}
+            onDone={setNotice}
+            onError={setError}
+          />
 
           <div className="ml-auto">
             <p className="text-xs text-ink-2">
@@ -420,66 +410,15 @@ export function ExternalRecordsReconcilePage() {
                     </td>
                     <td className="py-3 px-4">
                       {record.capsuleEntity === "payment" ? (
-                        matchingId === record._id ? (
-                          <div className="flex flex-wrap items-center gap-2">
-                            {/* ponytail: native select scales to hundreds of payments;
-                                a searchable combobox is the upgrade path for high-volume tenants. */}
-                            <select
-                              value={matchPaymentId}
-                              onChange={(e) =>
-                                setMatchPaymentId(e.target.value)
-                              }
-                              disabled={busy}
-                              className="px-2 py-1 border border-line-2 rounded-sm text-2xs min-w-56"
-                            >
-                              <option value="">Select Capsule payment…</option>
-                              {candidatePayments.map((payment) => (
-                                <option key={payment._id} value={payment._id}>
-                                  {invoiceNumber(String(payment.invoiceId))} ·{" "}
-                                  {Number(payment.amount ?? 0).toLocaleString(
-                                    undefined,
-                                    {
-                                      style: "currency",
-                                      currency: "USD",
-                                    },
-                                  )}{" "}
-                                  · {String(payment.status)}
-                                </option>
-                              ))}
-                            </select>
-                            <button
-                              type="button"
-                              onClick={() => void matchPayment(record._id)}
-                              disabled={busy || !matchPaymentId}
-                              className="btn btn-primary btn-sm"
-                            >
-                              Link
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setMatchingId(null);
-                                setMatchPaymentId("");
-                              }}
-                              disabled={busy}
-                              className="btn btn-ghost btn-sm"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setMatchingId(record._id);
-                              setMatchPaymentId("");
-                            }}
-                            disabled={busy}
-                            className="btn btn-secondary btn-sm"
-                          >
-                            Match
-                          </button>
-                        )
+                        <ImportedPaymentMatch
+                          link={record}
+                          payments={candidatePayments}
+                          takenPaymentIds={takenPaymentIds}
+                          invoiceLabel={invoiceNumber}
+                          disabled={busy}
+                          onDone={setNotice}
+                          onError={setError}
+                        />
                       ) : record.capsuleEntity === "service_style" ? (
                         <ServiceStyleMatch
                           linkId={record._id}
@@ -513,7 +452,9 @@ export function ExternalRecordsReconcilePage() {
           <ul className="text-xs text-ink-2 space-y-1">
             <li>
               • <strong>Match</strong>: Link an imported payment to an existing
-              Capsule payment, then mark it resolved.
+              Capsule payment, then mark it resolved. A payment with the same id
+              is safe to match; a payment that only has the same amount is a
+              guess, so check it first. One payment is matched only once.
             </li>
             <li>
               • <strong>Verify</strong>: Confirm a match is correct; the item is

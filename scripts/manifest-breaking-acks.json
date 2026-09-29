@@ -1656,6 +1656,90 @@
       "category": "property-added",
       "acknowledgedAt": "2026-09-29",
       "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
+    },
+    {
+      "path": "Payment.appliedAmount",
+      "category": "property-added",
+      "reason": "PL-ACCOUNTING 2026-09-29: new optional Payment field (fee, tip, applied/held split, refund/chargeback/return totals, dates, provider account, match id); existing rows stay valid (null = settled before the split).",
+      "acknowledgedAt": "2026-09-29"
+    },
+    {
+      "path": "Payment.chargedBackAmount",
+      "category": "property-added",
+      "reason": "PL-ACCOUNTING 2026-09-29: new optional Payment field (fee, tip, applied/held split, refund/chargeback/return totals, dates, provider account, match id); existing rows stay valid (null = settled before the split).",
+      "acknowledgedAt": "2026-09-29"
+    },
+    {
+      "path": "Payment.effectiveAt",
+      "category": "property-added",
+      "reason": "PL-ACCOUNTING 2026-09-29: new optional Payment field (fee, tip, applied/held split, refund/chargeback/return totals, dates, provider account, match id); existing rows stay valid (null = settled before the split).",
+      "acknowledgedAt": "2026-09-29"
+    },
+    {
+      "path": "Payment.feeAmount",
+      "category": "property-added",
+      "reason": "PL-ACCOUNTING 2026-09-29: new optional Payment field (fee, tip, applied/held split, refund/chargeback/return totals, dates, provider account, match id); existing rows stay valid (null = settled before the split).",
+      "acknowledgedAt": "2026-09-29"
+    },
+    {
+      "path": "Payment.gratuityAmount",
+      "category": "property-added",
+      "reason": "PL-ACCOUNTING 2026-09-29: new optional Payment field (fee, tip, applied/held split, refund/chargeback/return totals, dates, provider account, match id); existing rows stay valid (null = settled before the split).",
+      "acknowledgedAt": "2026-09-29"
+    },
+    {
+      "path": "Payment.matchedExternalId",
+      "category": "property-added",
+      "reason": "PL-ACCOUNTING 2026-09-29: new optional Payment field (fee, tip, applied/held split, refund/chargeback/return totals, dates, provider account, match id); existing rows stay valid (null = settled before the split).",
+      "acknowledgedAt": "2026-09-29"
+    },
+    {
+      "path": "Payment.matchedSource",
+      "category": "property-added",
+      "reason": "PL-ACCOUNTING 2026-09-29: new optional Payment field (fee, tip, applied/held split, refund/chargeback/return totals, dates, provider account, match id); existing rows stay valid (null = settled before the split).",
+      "acknowledgedAt": "2026-09-29"
+    },
+    {
+      "path": "Payment.occurredAt",
+      "category": "property-added",
+      "reason": "PL-ACCOUNTING 2026-09-29: new optional Payment field (fee, tip, applied/held split, refund/chargeback/return totals, dates, provider account, match id); existing rows stay valid (null = settled before the split).",
+      "acknowledgedAt": "2026-09-29"
+    },
+    {
+      "path": "Payment.providerAccount",
+      "category": "property-added",
+      "reason": "PL-ACCOUNTING 2026-09-29: new optional Payment field (fee, tip, applied/held split, refund/chargeback/return totals, dates, provider account, match id); existing rows stay valid (null = settled before the split).",
+      "acknowledgedAt": "2026-09-29"
+    },
+    {
+      "path": "Payment.refundedAmount",
+      "category": "property-added",
+      "reason": "PL-ACCOUNTING 2026-09-29: new optional Payment field (fee, tip, applied/held split, refund/chargeback/return totals, dates, provider account, match id); existing rows stay valid (null = settled before the split).",
+      "acknowledgedAt": "2026-09-29"
+    },
+    {
+      "path": "Payment.returnedAmount",
+      "category": "property-added",
+      "reason": "PL-ACCOUNTING 2026-09-29: new optional Payment field (fee, tip, applied/held split, refund/chargeback/return totals, dates, provider account, match id); existing rows stay valid (null = settled before the split).",
+      "acknowledgedAt": "2026-09-29"
+    },
+    {
+      "path": "Payment.unappliedAmount",
+      "category": "property-added",
+      "reason": "PL-ACCOUNTING 2026-09-29: new optional Payment field (fee, tip, applied/held split, refund/chargeback/return totals, dates, provider account, match id); existing rows stay valid (null = settled before the split).",
+      "acknowledgedAt": "2026-09-29"
+    },
+    {
+      "path": "PaymentSettled.payload",
+      "category": "event-payload-changed",
+      "reason": "PL-ACCOUNTING 2026-09-29: PaymentSettled adds appliedAmount, unappliedAmount and applyToInvoiceId; existing fields unchanged. The invoice reaction now applies only the applied part.",
+      "acknowledgedAt": "2026-09-29"
+    },
+    {
+      "path": "refund.parameters.effectiveAt",
+      "category": "command-parameter-added",
+      "reason": "PL-ACCOUNTING 2026-09-29: Payment.refund takes an optional accounting date; callers without it keep working.",
+      "acknowledgedAt": "2026-09-29"
     }
   ]
 }

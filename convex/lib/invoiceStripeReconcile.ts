@@ -118,6 +118,10 @@ export const recordPaidSession = internalMutation({
           amount: applied,
           method: args.method,
           ...(invoice.eventId ? { eventId: String(invoice.eventId) } : {}),
+          // The session id is the provider id: a second record of the same
+          // session is refused (convex/lib/paymentAccounting.ts, AC-620).
+          externalSource: "stripe",
+          externalPaymentId: args.sessionId,
           notes:
             overpaid > 0
               ? `Stripe Checkout ${args.sessionId} (paid ${args.amount}; ${overpaid} more than owed - refund it in Stripe)`

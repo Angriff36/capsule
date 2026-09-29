@@ -1502,7 +1502,8 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_linkKey", ["linkKey"])
-    .index("by_sourceImportRunId", ["sourceImportRunId"]),
+    .index("by_sourceImportRunId", ["sourceImportRunId"])
+    .index("by_tenantId_and_capsuleId", ["tenantId", "capsuleId"]),
   fieldConfirmations: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2387,7 +2388,7 @@ export default defineSchema({
     eventId: v.optional(v.union(v.id("events"), v.null())),
     amount: v.number(),
     method: v.union(v.literal("card"), v.literal("check"), v.literal("cash"), v.literal("ach"), v.literal("other")),
-    status: v.union(v.literal("pending"), v.literal("processing"), v.literal("completed"), v.literal("failed"), v.literal("refunded")),
+    status: v.union(v.literal("pending"), v.literal("processing"), v.literal("completed"), v.literal("failed"), v.literal("refunded"), v.literal("charged_back"), v.literal("returned")),
     paymentMethodId: v.optional(v.union(v.id("paymentMethods"), v.null())),
     notes: v.optional(v.union(v.string(), v.null())),
     recordedAt: v.optional(v.union(v.number(), v.null())),
@@ -2396,6 +2397,18 @@ export default defineSchema({
     refundedAt: v.optional(v.union(v.number(), v.null())),
     failureReason: v.optional(v.union(v.string(), v.null())),
     refundReason: v.optional(v.union(v.string(), v.null())),
+    feeAmount: v.optional(v.union(v.number(), v.null())),
+    gratuityAmount: v.optional(v.union(v.number(), v.null())),
+    appliedAmount: v.optional(v.union(v.number(), v.null())),
+    unappliedAmount: v.optional(v.union(v.number(), v.null())),
+    refundedAmount: v.optional(v.union(v.number(), v.null())),
+    chargedBackAmount: v.optional(v.union(v.number(), v.null())),
+    returnedAmount: v.optional(v.union(v.number(), v.null())),
+    occurredAt: v.optional(v.union(v.number(), v.null())),
+    effectiveAt: v.optional(v.union(v.number(), v.null())),
+    providerAccount: v.optional(v.union(v.string(), v.null())),
+    matchedSource: v.optional(v.union(v.literal("tpp_legacy"), v.literal("quickbooks_online"), v.literal("nowsta"), v.literal("stripe"), v.literal("manual"), v.literal("other"), v.null())),
+    matchedExternalId: v.optional(v.union(v.string(), v.null())),
     reconciliationStatus: v.union(v.literal("unreconciled"), v.literal("matched"), v.literal("disputed"), v.literal("verified")),
     externalSource: v.optional(v.union(v.literal("tpp_legacy"), v.literal("quickbooks_online"), v.literal("nowsta"), v.literal("stripe"), v.literal("manual"), v.literal("other"), v.null())),
     externalPaymentId: v.optional(v.union(v.string(), v.null())),
@@ -2413,7 +2426,9 @@ export default defineSchema({
     .index("by_clientMergeAuthorizationId", ["clientMergeAuthorizationId"])
     .index("by_mergeTargetClientId", ["mergeTargetClientId"])
     .index("by_eventId", ["eventId"])
-    .index("by_paymentMethodId", ["paymentMethodId"]),
+    .index("by_paymentMethodId", ["paymentMethodId"])
+    .index("by_tenantId_and_externalPaymentId", ["tenantId", "externalPaymentId"])
+    .index("by_tenantId_and_matchedExternalId", ["tenantId", "matchedExternalId"]),
   paymentMethods: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
