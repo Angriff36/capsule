@@ -21,8 +21,7 @@ bun run convex:env-set -- CONVEX_FIELD_ENCRYPTION_KEY <32-byte-secret>
 # Windows: if env list warns about trailing \r on this key, do not "clean" it
 # without migrating ciphertext — decrypt/create will fail as Server Error.
 
-bun run dev:convex    # terminal 1
-bun run dev           # terminal 2 → http://localhost:7811
+bun run dev          # Convex backend + Vite frontend → http://localhost:7811
 ```
 
 ---
@@ -30,8 +29,7 @@ bun run dev           # terminal 2 → http://localhost:7811
 ## Daily dev
 
 ```bash
-bun run dev:convex
-bun run dev
+bun run dev          # Convex backend + Vite frontend → http://localhost:7811
 ```
 
 ---
@@ -88,7 +86,7 @@ bun run check
 | Do this        | Command                              |
 | -------------- | ------------------------------------ |
 | Install        | `bun install --frozen-lockfile`      |
-| Run app        | `bun run dev` + `bun run dev:convex` |
+| Run app        | `bun run dev` |
 | Regen          | `bun run manifest:regen`             |
 | Convex codegen | `bun run codegen`                    |
 | All tests      | `bun run test`                       |

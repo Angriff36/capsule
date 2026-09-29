@@ -20,9 +20,17 @@ cp .env.example .env.local
 # Production cloud deployment:
 #   bun run convex:env-set -- --prod CONVEX_FIELD_ENCRYPTION_KEY <32-byte-secret>
 
-bun run dev:convex   # terminal 1 → http://127.0.0.1:3210
-bun run dev          # terminal 2 → http://localhost:7811 (also 127.0.0.1)
+bun run dev          # Convex backend + Vite frontend → http://localhost:7811
 ```
+
+`bun run dev` starts the Convex development backend and Vite together in this
+terminal, with logs labeled `backend` and `frontend`. Press Ctrl+C to stop both;
+if either process exits, the other is stopped too. Convex setup prompts accept
+input in the same terminal. The existing `.env.local` and `.convex` configuration
+select the local deployment and frontend connection.
+
+For just one service, use `bun run dev:frontend` or `bun run dev:convex`.
+Pass Vite options to `dev:frontend`, for example `bun run dev:frontend -- --host`.
 
 ### Git LF vs Convex secrets (do not confuse)
 
