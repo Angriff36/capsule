@@ -41,8 +41,14 @@ export type TimeRecordWriteApi = {
     version?: number;
     clockInAt: number;
     clockOutAt: number;
+    reason: string;
   }) => Promise<unknown>;
 };
+
+/** Correction reasons the time sheet writes when it saves typed times. */
+export const TYPED_WINDOW_REASON = "Hours typed in on the time sheet";
+export const TYPED_CLOCK_OUT_REASON =
+  "Clock-out time typed in on the time sheet";
 
 const SHIFT_SLACK_MS = 2 * 60 * 60 * 1000;
 
@@ -175,6 +181,7 @@ export async function persistPrimaryTimeRecord(
       ...(closed && closed.version != null ? { version: closed.version } : {}),
       clockInAt: window.clockInAt,
       clockOutAt: window.clockOutAt,
+      reason: TYPED_WINDOW_REASON,
     });
   }
   return {
@@ -215,6 +222,7 @@ export async function persistClockOut(
     ...(closed && closed.version != null ? { version: closed.version } : {}),
     clockInAt: input.existingClockInAt,
     clockOutAt: desiredOut,
+    reason: TYPED_CLOCK_OUT_REASON,
   });
 }
 

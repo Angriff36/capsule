@@ -708,9 +708,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // TimeRecord has multiple initialization commands (clockIn, clockOut); using the selected initialization command: clockIn.
   // TimeRecord → api.mutations.TimeRecord_createViaClockIn
   rowsAttempted += 1;
-  await client.mutation(api.mutations.TimeRecord_createViaClockIn, { "personId": "personId-time-record-1", "shiftId": "shiftId-time-record-1", "eventId": "eventId-time-record-1", "notes": "demo-notes-1" } as any);
+  await client.mutation(api.mutations.TimeRecord_createViaClockIn, { "personId": "personId-time-record-1", "shiftId": "shiftId-time-record-1", "eventId": "eventId-time-record-1", "timeZone": "demo-timeZone-1", "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.TimeRecord_createViaClockIn, { "personId": "personId-time-record-2", "shiftId": "shiftId-time-record-2", "eventId": "eventId-time-record-2", "notes": "demo-notes-2" } as any);
+  await client.mutation(api.mutations.TimeRecord_createViaClockIn, { "personId": "personId-time-record-2", "shiftId": "shiftId-time-record-2", "eventId": "eventId-time-record-2", "timeZone": "demo-timeZone-2", "notes": "demo-notes-2" } as any);
   // skip TppReportFavorite: no creation command in IR (2 rows unused)
   // Trailer → api.mutations.Trailer_createViaRegister
   rowsAttempted += 1;

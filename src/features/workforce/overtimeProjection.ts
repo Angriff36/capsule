@@ -95,7 +95,7 @@ export function projectWeeklyHours({
   return projections;
 }
 
-function startOfLocalWeek(timestamp: number): number {
+export function startOfLocalWeek(timestamp: number): number {
   const date = new Date(timestamp);
   date.setHours(0, 0, 0, 0);
   const daysSinceMonday = (date.getDay() + 6) % 7;

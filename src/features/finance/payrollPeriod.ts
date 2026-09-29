@@ -4,7 +4,8 @@
  *
  * One rule everywhere: a payroll period is whole LOCAL days with the end date
  * inclusive, and a time record counts when it is payroll-ready (closed or
- * corrected) and falls entirely inside the window. The Jan-9 "worksheet says
+ * corrected AND approved by a manager, spec §15.4) and falls entirely inside
+ * the window. Lunch (breakMinutes) is unpaid; paid breaks are not taken off. The Jan-9 "worksheet says
  * 0 minutes, preview says 5.00 h" bug was these surfaces disagreeing on that
  * rule — keep them importing from here so they cannot drift apart again.
  */
@@ -20,6 +21,7 @@ export type ClockedTimeRecord = {
   clockOutAt?: unknown;
   breakMinutes?: unknown;
   status?: unknown;
+  approvedAt?: unknown;
   deletedAt?: unknown;
 };
 
@@ -89,6 +91,7 @@ export function payrollReadyClockedMinutes(
 ): { personId: string; minutes: number } | null {
   if (
     record.deletedAt != null ||
+    record.approvedAt == null ||
     !PAYROLL_READY_TIME_STATUSES.has(String(record.status))
   ) {
     return null;

@@ -26,6 +26,11 @@ export type EventLaborSummary = LaborSummaryBase & {
 export type PersonPeriodLaborSummary = LaborSummaryBase & {
   hourlyRate: number | null;
   overlappingInputCount: number;
+  /** Approved time only (payroll): paid minutes, split at the weekly limit. */
+  approvedMinutes: number;
+  approvedOvertimeMinutes: number;
+  approvedCount: number;
+  waitingApprovalCount: number;
 };
 
 /** Live clocked-hours labor for one event. */

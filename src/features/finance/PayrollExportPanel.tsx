@@ -96,9 +96,10 @@ export function PayrollExportPanel({
         </button>
       </div>
       <p className="text-base text-ink-2">
-        Completed time entries supply clocked hours. A finalized payroll input
-        becomes the reviewed total for that person and period; its difference
-        from clocked time is shown as the manual adjustment.
+        Approved time entries supply clocked hours (unpaid lunch taken off, paid
+        breaks kept). A finalized payroll input becomes the reviewed total for
+        that person and period; its difference from clocked time is shown as the
+        manual adjustment.
       </p>
       <div className="supply-form-grid mt-3">
         <label className="field-label">
@@ -192,8 +193,8 @@ function PayrollExportPreview({
         <div className="document-empty">
           <p>No payroll-ready data in this period.</p>
           <span>
-            Close time entries or finalize payroll inputs, then refresh this pay
-            period.
+            Approve time entries on the time sheet or finalize payroll inputs,
+            then refresh this pay period.
           </span>
         </div>
       ) : (

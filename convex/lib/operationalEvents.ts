@@ -32,6 +32,7 @@ import {
 import {
   ensureTemplateStaffNeeds, placeFromWaitlist, validateDescribedDemand, validateWaitlistJoin,
   validateNewEventStaffing, validateScheduledShift, validateShiftWindow,
+  validateTimeRecordClockIn,
 } from "./shiftSchedulingEvents";
 import {
   adoptLegacyDraftQuantity,
@@ -136,6 +137,10 @@ export async function handleManifestEvent(
     await validateNewEventStaffing(ctx, event.entity, event.entityId, event.payload.personId as Id<"people"> | undefined);
     if (event.type === "EventStaffNeedClaimed" || event.type === "EventStaffNeedFilled")
       await placeFromWaitlist(ctx, event.entityId as Id<"eventStaffNeeds">, event.payload.personId as Id<"people"> | undefined);
+  }
+  if (event.entity === "TimeRecord" && event.type === "TimeRecordClockedIn") {
+    await validateTimeRecordClockIn(ctx, event.entityId as Id<"timeRecords">);
+    return;
   }
   if (event.entity === "StaffNeedWaitlistEntry" && event.type === "StaffNeedWaitlistJoined") {
     await validateWaitlistJoin(ctx, event.entityId as Id<"staffNeedWaitlistEntries">);

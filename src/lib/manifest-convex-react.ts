@@ -697,6 +697,7 @@ import {
   TimeOffRequestApproveParamsSchema,
   TimeOffRequestDeclineParamsSchema,
   TimeOffRequestSubmitParamsSchema,
+  TimeRecordApproveParamsSchema,
   TimeRecordClockInParamsSchema,
   TimeRecordClockOutParamsSchema,
   TimeRecordCorrectParamsSchema,
@@ -10494,6 +10495,16 @@ export function useGetTimeRecord(id: string | "skip") {
   return useQuery(api.queries.getTimeRecord, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for TimeRecord.approve. */
+export function useTimeRecordApprove() {
+  const mutate = useMutation(api.mutations.TimeRecord_approve);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TimeRecordApproveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for TimeRecord.clockIn. */
 export function useTimeRecordClockIn() {
   const mutate = useMutation(api.mutations.TimeRecord_clockIn);
@@ -11968,4 +11979,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1268 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1269 as const;

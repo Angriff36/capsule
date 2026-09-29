@@ -19,6 +19,8 @@ import {
   CLOCK_OUT_PROMPT_FIELDS,
   HIDDEN_PRIMARY_CORRECT_VERSION,
   HIDDEN_PRIMARY_PERSIST_SEAM_AT,
+  TYPED_CLOCK_OUT_REASON,
+  TYPED_WINDOW_REASON,
   buildClockInCreateArgs,
   currentShiftFor,
   hiddenPrimaryPersistLedgerRow,
@@ -172,6 +174,7 @@ describe("event association is not dropped on create", () => {
       version: 2,
       clockInAt: FIVE_PM,
       clockOutAt: TEN_PM,
+      reason: TYPED_WINDOW_REASON,
     });
   });
 
@@ -220,6 +223,7 @@ describe("window parsing and clock-out", () => {
       version: 2,
       clockInAt: FIVE_PM,
       clockOutAt: TEN_PM,
+      reason: TYPED_CLOCK_OUT_REASON,
     });
   });
 

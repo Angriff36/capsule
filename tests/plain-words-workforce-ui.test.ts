@@ -36,14 +36,15 @@ describe("plain words on workforce UI", () => {
       expect(visible).not.toContain(old);
     }
 
+    // Payroll takes only approved time (PL-TIME, spec §15.4).
     for (const fresh of [
       "No completed time entries yet.",
-      "No closed time entries in this period — enter minutes manually.",
-      'closed time ${clocked.recordCount === 1 ? "entry" : "entries"}',
-      "Completed time entries supply clocked hours.",
+      "No approved time entries in this period — approve them on the time sheet, or enter minutes manually.",
+      'approved time ${clocked.approvedCount === 1 ? "entry" : "entries"}',
+      "Approved time entries supply clocked hours",
       'formatCountNoun(document.timeRecordCount, "time entry", "time entries")',
-      "Close time entries or finalize payroll inputs",
-      'completed time ${entry.timeRecordCount === 1 ? "entry" : "entries"}',
+      "Approve time entries on the time sheet or finalize payroll inputs",
+      'approved time ${entry.timeRecordCount === 1 ? "entry" : "entries"}',
       "confirmed time entries",
       "closed or corrected time entries wholly",
     ]) {
@@ -52,9 +53,9 @@ describe("plain words on workforce UI", () => {
 
     for (const phrase of [
       "No completed time entries yet.",
-      "No closed time entries in this period — enter minutes manually.",
-      "Completed time entries supply clocked hours.",
-      "Close time entries or finalize payroll inputs",
+      "No approved time entries in this period — approve them on the time sheet, or enter minutes manually.",
+      "Approved time entries supply clocked hours",
+      "Approve time entries on the time sheet or finalize payroll inputs",
       "confirmed time entries",
       "closed or corrected time entries wholly",
     ]) {

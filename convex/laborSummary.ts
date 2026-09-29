@@ -26,6 +26,7 @@ import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import type { Doc } from "./_generated/dataModel";
+import { approvedPayroll } from "../src/features/workforce/timePay";
 
 /** Mirrors financeManageAccess | workforceManageAccess (+ admin tier). */
 function canReadRates(role: string): boolean {
@@ -240,6 +241,10 @@ export const personPeriodLaborSummary = query({
     | (LaborSummary & {
         hourlyRate: number | null;
         overlappingInputCount: number;
+        approvedMinutes: number;
+        approvedOvertimeMinutes: number;
+        approvedCount: number;
+        waitingApprovalCount: number;
       })
     | null
   > => {
@@ -272,11 +277,21 @@ export const personPeriodLaborSummary = query({
         input.periodStart <= args.periodEnd &&
         input.periodEnd >= args.periodStart,
     ).length;
+    const approved = approvedPayroll(
+      records,
+      personId,
+      args.periodStart,
+      args.periodEnd,
+    );
     return {
       ...summary,
       hourlyRate:
         typeof rate === "number" && Number.isFinite(rate) ? rate : null,
       overlappingInputCount,
+      approvedMinutes: approved.approvedMinutes,
+      approvedOvertimeMinutes: approved.overtimeMinutes,
+      approvedCount: approved.approvedCount,
+      waitingApprovalCount: approved.waitingApprovalCount,
     };
   },
 });
@@ -318,6 +333,7 @@ export const payrollTimeRecords = query({
     clockOutAt: number;
     breakMinutes: number;
     status: string;
+    approvedAt: number | null;
   }> | null> => {
     const auth = await getAuthContext(ctx);
     if (!canReadRates(auth.role)) return null;
@@ -336,6 +352,7 @@ export const payrollTimeRecords = query({
         clockOutAt: record.clockOutAt!,
         breakMinutes: Number(record.breakMinutes ?? 0),
         status: String(record.status),
+        approvedAt: record.approvedAt ?? null,
       }));
   },
 });

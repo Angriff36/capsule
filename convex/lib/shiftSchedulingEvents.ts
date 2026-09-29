@@ -137,6 +137,32 @@ export async function validateWaitlistJoin(
     );
 }
 
+const OPEN_CLOCK_IN_WINDOW_MS = 24 * 60 * 60_000;
+
+/**
+ * PL-TIME (AC-126): one open clock-in per person. A retried or doubled
+ * clock-in while the person is still clocked in (including across midnight)
+ * is refused, so no duplicate punch is made. An entry left open for more than
+ * a day does not block a new shift; the time sheet flags it instead.
+ */
+export async function validateTimeRecordClockIn(
+  ctx: MutationCtx,
+  recordId: Id<"timeRecords">,
+): Promise<void> {
+  const record = await ctx.db.get(recordId);
+  if (!record || record.clockInAt == null) return;
+  const others = await ctx.db.query("timeRecords")
+    .withIndex("by_personId", (q) => q.eq("personId", record.personId)).collect();
+  const stillIn = others.find((row) => row._id !== recordId &&
+    row.tenantId === record.tenantId && row.deletedAt == null &&
+    row.status === "open" && row.clockOutAt == null && row.clockInAt != null &&
+    record.clockInAt! - row.clockInAt < OPEN_CLOCK_IN_WINDOW_MS);
+  if (stillIn)
+    throw new ConvexError(
+      `${await personName(ctx, record.personId)} is already clocked in. Clock out that time entry first.`,
+    );
+}
+
 /** Taking or being given a spot takes the person off its waiting list. */
 export async function placeFromWaitlist(
   ctx: MutationCtx,

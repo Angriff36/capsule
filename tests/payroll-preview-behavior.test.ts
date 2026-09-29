@@ -31,6 +31,7 @@ it("lets payroll staff fix a missing employee number before downloading and flag
           clockOutAt: new Date("2026-01-09T14:00:00").getTime(),
           breakMinutes: 0,
           status: "closed",
+          approvedAt: new Date("2026-01-09T14:00:00").getTime(),
         },
       ],
       payrollInputs: [],

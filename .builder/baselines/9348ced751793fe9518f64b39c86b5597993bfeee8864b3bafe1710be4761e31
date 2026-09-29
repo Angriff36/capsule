@@ -3685,9 +3685,18 @@ export const TimeRecordSchema = z.object({
   clockInAt: z.coerce.date().nullable().optional(),
   clockOutAt: z.coerce.date().nullable().optional(),
   breakMinutes: z.number().int().nullable().optional().default(0),
+  paidBreakMinutes: z.number().int().nullable().optional().default(0),
+  timeZone: z.string().nullable().optional(),
+  clockInLatitude: z.number().nullable().optional(),
+  clockInLongitude: z.number().nullable().optional(),
+  clockInAccuracyMeters: z.number().nullable().optional(),
   notes: z.string().nullable().optional(),
   status: z.enum(["open", "closed", "corrected"]).default("open"),
   correctedAt: z.coerce.date().nullable().optional(),
+  correctedById: z.string().uuid().nullable().optional(),
+  correctionReason: z.string().nullable().optional(),
+  approvedAt: z.coerce.date().nullable().optional(),
+  approvedById: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -3695,6 +3704,7 @@ export const TimeRecordSchema = z.object({
 // Computed: TimeRecord
 export const TimeRecordComputedSchema = TimeRecordSchema.extend({
   workedMinutes: z.number().nullable(),
+  paidMinutes: z.number().nullable(),
 });
 
 export type TimeRecord = z.infer<typeof TimeRecordSchema>;
@@ -10186,12 +10196,21 @@ export const TimeOffRequestSubmitParamsSchema = z.object({
 
 export type TimeOffRequestSubmitParams = z.infer<typeof TimeOffRequestSubmitParamsSchema>;
 
+// Command: approve on TimeRecord
+export const TimeRecordApproveParamsSchema = z.object({});
+
+export type TimeRecordApproveParams = z.infer<typeof TimeRecordApproveParamsSchema>;
+
 // Command: clockIn on TimeRecord
 export const TimeRecordClockInParamsSchema = z.object({
   personId: z.string().min(1),
   shiftId: z.string().min(1).optional(),
   eventId: z.string().min(1).optional(),
   notes: z.string().optional(),
+  timeZone: z.string().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+  accuracyMeters: z.number().optional(),
 });
 
 export type TimeRecordClockInParams = z.infer<typeof TimeRecordClockInParamsSchema>;
@@ -10200,6 +10219,7 @@ export type TimeRecordClockInParams = z.infer<typeof TimeRecordClockInParamsSche
 export const TimeRecordClockOutParamsSchema = z.object({
   breakMinutes: z.number().optional(),
   notes: z.string().optional(),
+  paidBreakMinutes: z.number().optional(),
 });
 
 export type TimeRecordClockOutParams = z.infer<typeof TimeRecordClockOutParamsSchema>;
@@ -10208,8 +10228,11 @@ export type TimeRecordClockOutParams = z.infer<typeof TimeRecordClockOutParamsSc
 export const TimeRecordCorrectParamsSchema = z.object({
   clockInAt: z.coerce.date(),
   clockOutAt: z.coerce.date(),
+  reason: z.string(),
   breakMinutes: z.number().optional(),
   notes: z.string().optional(),
+  paidBreakMinutes: z.number().optional(),
+  timeZone: z.string().optional(),
 });
 
 export type TimeRecordCorrectParams = z.infer<typeof TimeRecordCorrectParamsSchema>;
