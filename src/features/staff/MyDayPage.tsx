@@ -45,6 +45,8 @@ import {
   discardUnscopedQueuedWork,
   hasUnscopedQueuedWork,
   enqueueAction,
+  removeAction,
+  sendAction,
   useCachedRead,
   useOfflineSync,
   useOnlineStatus,
@@ -171,6 +173,13 @@ export function MyDayPage() {
 
   const online = useOnlineStatus();
   const pending = useQueuedActions(offlineScope);
+  // A tap on this record saved on the phone but not yet answered.
+  const waitingOn = (docId: string) =>
+    pending.find((action) => action.args.docId === docId);
+  // A clock tap saved on the phone but not yet answered by the server.
+  const waitingClock = pending.find(
+    (action) => action.runKey === "clock-in" || action.runKey === "clock-out",
+  );
 
   // Registry of queueable mutations keyed by a stable runKey. Held in a ref so
   // the drain effect doesn't re-run on every render, while always calling the
@@ -259,11 +268,13 @@ export function MyDayPage() {
   };
 
   /**
-   * Queueable write: when offline, append to the pending queue (each entry
-   * carries its own idempotencyKey so a replay can't double-apply) and return
-   * immediately; when online, run the mutation now. `afterSuccess` only fires
-   * for the online path — the queue path drains later and the optimistic UI
-   * already reflects the user's intent.
+   * Queueable write: when offline, or while earlier work still waits, append
+   * to the pending queue (each entry carries its own idempotencyKey so a
+   * replay can't double-apply) and return immediately. When online, send now
+   * through the same queue (sendAction): the entry is saved on the phone
+   * first, so a reload or a dropped connection before the answer resends the
+   * same key instead of losing or doubling the work. `afterSuccess` only
+   * fires when the server has answered.
    */
   const perform = (
     busyKey: string,
@@ -272,7 +283,7 @@ export function MyDayPage() {
     args: Record<string, unknown>,
     afterSuccess?: () => void,
   ) => {
-    if (!online) {
+    if (!online || (offlineScope && pending.length > 0)) {
       setFailure(null);
       try {
         enqueueAction({ runKey, label, args }, offlineScope);
@@ -285,7 +296,11 @@ export function MyDayPage() {
     if (!runner) return;
     setFailure(null);
     setBusy(busyKey);
-    void Promise.resolve(runner(args))
+    void Promise.resolve(
+      offlineScope
+        ? sendAction({ runKey, label, args }, runner, offlineScope)
+        : runner(args),
+    )
       .then(() => afterSuccess?.())
       .catch(setFailure)
       .finally(() => setBusy(null));
@@ -575,6 +590,7 @@ export function MyDayPage() {
         online={online}
         pending={pending}
         onRetry={retryPending}
+        onDrop={(id) => offlineScope && removeAction(id, offlineScope)}
       />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
       {loading ? (
@@ -590,8 +606,20 @@ export function MyDayPage() {
                   <div className="my-day-clock-status">
                     <span>Status</span>
                     <StatusChip
-                      status={openRecord ? "started" : "closed"}
-                      label={openRecord ? "Clocked in" : "Clocked out"}
+                      status={
+                        waitingClock
+                          ? "pending"
+                          : openRecord
+                            ? "started"
+                            : "closed"
+                      }
+                      label={
+                        waitingClock
+                          ? "Waiting to send"
+                          : openRecord
+                            ? "Clocked in"
+                            : "Clocked out"
+                      }
                     />
                   </div>
                   <div className="my-day-current-time">
@@ -620,7 +648,17 @@ export function MyDayPage() {
                       ? `Clocked in at ${timeLabel(openRecord.clockInAt)}`
                       : "You are not clocked in."}
                   </p>
-                  {openRecord ? (
+                  {waitingClock ? (
+                    <p
+                      className="text-base text-warn"
+                      role="status"
+                      data-testid="clock-waiting"
+                    >
+                      {waitingClock.label} saved on this phone at{" "}
+                      {timeLabel(waitingClock.queuedAt)}, waiting to send. It
+                      counts once the office has it — do not tap again.
+                    </p>
+                  ) : openRecord ? (
                     <>
                       <div
                         className="grid grid-cols-2 gap-2"
@@ -985,10 +1023,19 @@ export function MyDayPage() {
                             {listName(item.packListId)} ·{" "}
                             {item.requiredQuantity} {item.unit}
                           </p>
+                          {waitingOn(item._id) ? (
+                            <p
+                              className="text-sm text-warn"
+                              data-testid="pack-waiting"
+                            >
+                              {waitingOn(item._id)!.label} saved on this phone —
+                              not done until the office has it.
+                            </p>
+                          ) : null}
                         </div>
                         <button
                           className={ROW_BTN_PRIMARY}
-                          disabled={busy != null}
+                          disabled={busy != null || !!waitingOn(item._id)}
                           onClick={() =>
                             perform(
                               `pack:${item._id}`,
@@ -1006,7 +1053,7 @@ export function MyDayPage() {
                         </button>
                         <button
                           className={ROW_BTN}
-                          disabled={busy != null}
+                          disabled={busy != null || !!waitingOn(item._id)}
                           onClick={() =>
                             perform(
                               `pack:${item._id}:missing`,

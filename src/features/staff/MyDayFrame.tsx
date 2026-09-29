@@ -12,6 +12,12 @@ import {
 import "./my-day.css";
 import { PageHeader } from "../../ui/primitives";
 import type { useQueuedActions } from "./offlineStore";
+import { classifyCommandFailure } from "../events/CommandFailure";
+
+/** Why the office did not take a queued action, in plain words. */
+export function queuedFailureText(lastError: string): string {
+  return classifyCommandFailure(new Error(lastError)).title;
+}
 
 /**
  * Chrome around the My Day view: sticky identity header, page title, and the
@@ -144,10 +150,13 @@ export function OfflineStatusBar({
   online,
   pending,
   onRetry,
+  onDrop,
 }: {
   online: boolean;
   pending: ReturnType<typeof useQueuedActions>;
   onRetry: () => void;
+  /** Remove one action the office will not take (for example a conflict). */
+  onDrop?: (id: string) => void;
 }) {
   if (pending.length === 0) {
     if (!online) {
@@ -199,9 +208,22 @@ export function OfflineStatusBar({
       </div>
       <ul className="flex flex-col gap-0.5 text-ink-2">
         {pending.slice(0, 3).map((action) => (
-          <li key={action.id} className="truncate">
-            {action.label}
-            {action.lastError ? " — failed, will retry" : ""}
+          <li key={action.id} className="flex items-center gap-2">
+            <span className="truncate">
+              {action.label}
+              {action.lastError
+                ? ` — not saved yet: ${queuedFailureText(action.lastError)}`
+                : " — waiting to send"}
+            </span>
+            {action.lastError && onDrop ? (
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm py-1"
+                onClick={() => onDrop(action.id)}
+              >
+                Drop it
+              </button>
+            ) : null}
           </li>
         ))}
         {pending.length > 3 ? (
