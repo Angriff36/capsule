@@ -27,6 +27,11 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   property clientMergeAuthorizationId: uuid?
   property mergeTargetClientId: uuid?
   property eventId: uuid?
+  // The commercial source the money came from: the accepted proposal and the
+  // revision it accepted (AC-618). Null when the event's own quoted price is
+  // the source. Checked against the workspace by the issue seam.
+  property proposalId: uuid?
+  property proposalRevisionId: uuid?
   property unique invoiceNumber: string?
   property required subtotal: money(12, 2) = 0
   property required taxAmount: money(12, 2) = 0
@@ -101,7 +106,7 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   default policy invoiceExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may change invoices"
 
   // invoiceNumber is what finance typed. When it is absent the number is
-  // "INV-<invoiceSequence + 1>" — the EventApproved cascade passes
+  // "INV-<invoiceSequence + 1>" — the event approval seam passes
   // invoiceSequence: 0, so the row is written as the placeholder "INV-1" and
   // InvoiceIssued carries autoNumbered: true; the authored numbering seam
   // replaces it in the same transaction with the tenant's persisted sequence
@@ -122,9 +127,11 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     optional lineItems: json,
     optional taxBreakdown: json,
     optional currencyCode: string,
-    optional exchangeRate: decimal(18, 8)
+    optional exchangeRate: decimal(18, 8),
+    optional proposalId: uuid,
+    optional proposalRevisionId: uuid
   ) {
-    // Idempotent issue: EventApproved match may re-run; do not fail or remint.
+    // Idempotent issue: a repeated issue neither fails nor remints.
     guard self.issuedAt == null or self.eventId == eventId
     guard self.status == "draft"
     guard self.deletedAt == null
@@ -158,6 +165,8 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     mutate notes = alreadyIssued ? self.notes : notes
     mutate currencyCode = alreadyIssued ? self.currencyCode : normalizedCurrencyCode
     mutate exchangeRate = alreadyIssued ? self.exchangeRate : resolvedExchangeRate
+    mutate proposalId = alreadyIssued ? self.proposalId : proposalId
+    mutate proposalRevisionId = alreadyIssued ? self.proposalRevisionId : proposalRevisionId
     mutate issuedAt = alreadyIssued ? self.issuedAt : now()
     emit InvoiceIssued {
       invoiceId: self.id

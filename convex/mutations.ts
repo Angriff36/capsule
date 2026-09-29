@@ -13520,38 +13520,11 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
       const target = __row;
       await __runIngredientDemandEnsurePurchaseEligible(ctx, { docId: (__row as any)._id } as any);
     }
-    const __match1_raw = await ctx.db.query("invoices").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
-    const __match1_rows = __match1_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
+    const __match1_raw = await ctx.db.query("packLists").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
+    const __match1_rows = __match1_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).activeEventId === payload.eventId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
     const __match1_id = __match1_rows.length > 0 ? (__match1_rows[0] as any)._id : null;
     if (__match1_id) {
-      await __runInvoiceIssue(ctx, { docId: __match1_id, clientId: payload.clientId, eventId: payload.eventId, invoiceSequence: 0, subtotal: payload.quotedPrice, taxAmount: 0, discountAmount: 0, total: payload.quotedPrice } as any);
-    } else {
-      const __elseArgs: Record<string, any> = { clientId: payload.clientId, eventId: payload.eventId, invoiceSequence: 0, subtotal: payload.quotedPrice, taxAmount: 0, discountAmount: 0, total: payload.quotedPrice };
-      const __elseDoc: Record<string, any> = {
-        tenantId: __auth.tenantId,
-        subtotal: 0,
-        taxAmount: 0,
-        discountAmount: 0,
-        total: 0,
-        amountPaid: 0,
-        amountDue: 0,
-        paymentTermsDays: 30,
-        status: "draft",
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        version: 0,
-      };
-      for (const __k of ["deletedAt","clientId","clientMergeAuthorizationId","mergeTargetClientId","eventId","invoiceNumber","subtotal","taxAmount","discountAmount","total","amountPaid","amountDue","amountCredited","creditMemoAmount","lineItems","taxBreakdown","paymentTermsDays","depositAmount","depositPaidAt","balanceReminderLeadDays","balanceReminderSentAt","dueDate","notes","status","issuedAt","sentAt","viewedAt","overdueSince","paidAt","voidedAt","voidReason","writtenOffAt","writeOffReason","currencyCode","exchangeRate","createdAt","updatedAt"] as string[]) {
-        if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
-      }
-      const __elseId = await ctx.db.insert("invoices", __elseDoc as any);
-      await __runInvoiceIssue(ctx, { docId: __elseId, ...__elseArgs } as any);
-    }
-    const __match2_raw = await ctx.db.query("packLists").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
-    const __match2_rows = __match2_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).activeEventId === payload.eventId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
-    const __match2_id = __match2_rows.length > 0 ? (__match2_rows[0] as any)._id : null;
-    if (__match2_id) {
-      await __runPackListOpen(ctx, { docId: __match2_id, eventId: payload.eventId, name: "Event pack list" } as any);
+      await __runPackListOpen(ctx, { docId: __match1_id, eventId: payload.eventId, name: "Event pack list" } as any);
     } else {
       const __elseArgs: Record<string, any> = { eventId: payload.eventId, name: "Event pack list" };
       const __elseDoc: Record<string, any> = {
@@ -13568,14 +13541,14 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
       const __elseId = await ctx.db.insert("packLists", __elseDoc as any);
       await __runPackListOpen(ctx, { docId: __elseId, ...__elseArgs } as any);
     }
-    const fanRows3 = (await ctx.db.query("eventDishComponentSeeds").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
-    for (const __row of fanRows3) {
+    const fanRows2 = (await ctx.db.query("eventDishComponentSeeds").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
+    for (const __row of fanRows2) {
       const target = __row;
-      const __fanMatch3_raw = await ctx.db.query("productionBatches").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
-      const __fanMatch3_rows = __fanMatch3_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).componentId === __row.componentId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
-      const __fanMatch3_id = __fanMatch3_rows.length > 0 ? (__fanMatch3_rows[0] as any)._id : null;
-      if (__fanMatch3_id) {
-        await __runProductionBatchPlan(ctx, { docId: __fanMatch3_id, componentId: __row.componentId, plannedYield: __row.servings, yieldUnit: "portion", eventId: payload.eventId } as any);
+      const __fanMatch2_raw = await ctx.db.query("productionBatches").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
+      const __fanMatch2_rows = __fanMatch2_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).componentId === __row.componentId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
+      const __fanMatch2_id = __fanMatch2_rows.length > 0 ? (__fanMatch2_rows[0] as any)._id : null;
+      if (__fanMatch2_id) {
+        await __runProductionBatchPlan(ctx, { docId: __fanMatch2_id, componentId: __row.componentId, plannedYield: __row.servings, yieldUnit: "portion", eventId: payload.eventId } as any);
       } else {
         const __elseArgs: Record<string, any> = { componentId: __row.componentId, plannedYield: __row.servings, yieldUnit: "portion", eventId: payload.eventId };
         const __elseDoc: Record<string, any> = {
@@ -13594,8 +13567,8 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
         await __runProductionBatchPlan(ctx, { docId: __elseId, ...__elseArgs } as any);
       }
     }
-    const fanRows4 = (await ctx.db.query("ingredientDemands").withIndex("by_purchaseEligibleEventId", (q) => q.eq("purchaseEligibleEventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
-    for (const __row of fanRows4) {
+    const fanRows3 = (await ctx.db.query("ingredientDemands").withIndex("by_purchaseEligibleEventId", (q) => q.eq("purchaseEligibleEventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
+    for (const __row of fanRows3) {
       const target = __row;
       await __runPurchaseNeedCreate(ctx, { eventId: __row.eventId, ingredientDemandId: (__row as any)._id, ingredientId: __row.ingredientId, requiredQuantity: __row.requiredQuantity, unit: __row.unit, purchasingWeekStart: __row.purchasingWeekStart, preferredVendorId: __row.preferredVendorId } as any);
     }
@@ -30252,7 +30225,7 @@ export const Invoice_followEventPrice = mutation({
   },
 });
 
-async function __runInvoiceIssue(ctx: MutationCtx, { docId, clientId, invoiceNumber, invoiceSequence, subtotal, taxAmount, discountAmount, total, eventId, paymentTermsDays, dueDate, notes, lineItems, taxBreakdown, currencyCode, exchangeRate, version }: any, __creation = false) {
+async function __runInvoiceIssue(ctx: MutationCtx, { docId, clientId, invoiceNumber, invoiceSequence, subtotal, taxAmount, discountAmount, total, eventId, paymentTermsDays, dueDate, notes, lineItems, taxBreakdown, currencyCode, exchangeRate, proposalId, proposalRevisionId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -30300,6 +30273,8 @@ async function __runInvoiceIssue(ctx: MutationCtx, { docId, clientId, invoiceNum
       notes: (alreadyIssued ? doc.notes : notes),
       currencyCode: (alreadyIssued ? doc.currencyCode : normalizedCurrencyCode),
       exchangeRate: (alreadyIssued ? doc.exchangeRate : resolvedExchangeRate),
+      proposalId: (alreadyIssued ? doc.proposalId : proposalId),
+      proposalRevisionId: (alreadyIssued ? doc.proposalRevisionId : proposalRevisionId),
       issuedAt: (alreadyIssued ? doc.issuedAt : Date.now()),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -30330,6 +30305,8 @@ export const Invoice_issue = mutation({
     taxBreakdown: v.optional(v.any()),
     currencyCode: v.optional(v.string()),
     exchangeRate: v.optional(v.number()),
+    proposalId: v.optional(v.string()),
+    proposalRevisionId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -30340,7 +30317,7 @@ export const Invoice_issue = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"proposalId","table":null},{"name":"proposalRevisionId","table":null}]);
     const __result = await __runInvoiceIssue(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -30366,6 +30343,8 @@ export const Invoice_createViaIssue = mutation({
     taxBreakdown: v.optional(v.any()),
     currencyCode: v.optional(v.string()),
     exchangeRate: v.optional(v.number()),
+    proposalId: v.optional(v.string()),
+    proposalRevisionId: v.optional(v.string()),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -30375,10 +30354,10 @@ export const Invoice_createViaIssue = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"eventId","table":"events"},{"name":"proposalId","table":null},{"name":"proposalRevisionId","table":null}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { clientId, invoiceNumber, invoiceSequence, subtotal, taxAmount, discountAmount, total, eventId, paymentTermsDays, dueDate, notes, lineItems, taxBreakdown, currencyCode, exchangeRate } = args;
+    const { clientId, invoiceNumber, invoiceSequence, subtotal, taxAmount, discountAmount, total, eventId, paymentTermsDays, dueDate, notes, lineItems, taxBreakdown, currencyCode, exchangeRate, proposalId, proposalRevisionId } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       paymentTermsDays: args.paymentTermsDays !== undefined ? args.paymentTermsDays : 30,
@@ -30394,6 +30373,8 @@ export const Invoice_createViaIssue = mutation({
       invoiceNumber: args.invoiceNumber,
       lineItems: args.lineItems,
       notes: args.notes,
+      proposalId: args.proposalId,
+      proposalRevisionId: args.proposalRevisionId,
       subtotal: args.subtotal,
       taxAmount: args.taxAmount,
       taxBreakdown: args.taxBreakdown,
@@ -30440,6 +30421,8 @@ export const Invoice_createViaIssue = mutation({
     doc.notes = (alreadyIssued ? doc.notes : notes);
     doc.currencyCode = (alreadyIssued ? doc.currencyCode : normalizedCurrencyCode);
     doc.exchangeRate = (alreadyIssued ? doc.exchangeRate : resolvedExchangeRate);
+    doc.proposalId = (alreadyIssued ? doc.proposalId : proposalId);
+    doc.proposalRevisionId = (alreadyIssued ? doc.proposalRevisionId : proposalRevisionId);
     doc.issuedAt = (alreadyIssued ? doc.issuedAt : Date.now());
     const docId = await ctx.db.insert("invoices", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, invoiceId: docId, tenantId: doc.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : doc.eventId), invoiceNumber: (alreadyIssued ? doc.invoiceNumber : resolvedInvoiceNumber), autoNumbered: (alreadyIssued ? false : (invoiceNumber == null)), newlyIssued: (alreadyIssued ? false : true), total: (alreadyIssued ? doc.total : total), amountDue: (alreadyIssued ? doc.amountDue : total), currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate, _subject: { entity: "Invoice", command: "issue", id: docId } };

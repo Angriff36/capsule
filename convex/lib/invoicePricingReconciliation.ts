@@ -16,6 +16,7 @@
 import { api } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
+import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
 import { eventReconciliationReceipt } from "./reconciliationReceipt";import type { ReconciliationReceiptOutput, TimingWindow } from "./reconciliationReceipt";
 
 /** Which ledger command triggered this reconcile — recorded on the receipt. */
@@ -125,3 +126,106 @@ export class EventInvoicePricingReconciliation {
 }
 
 export const eventInvoicePricingReconciliation = new EventInvoicePricingReconciliation();
+
+/** Stages in which an event is booked and should carry its draft invoice. */
+const INVOICED_STAGES = new Set(["approved", "sales_lock", "executing", "final", "completed"]);
+
+/**
+ * AC-618: an approved event with a quoted price above zero has exactly one
+ * unsent draft invoice. Runs in the approving (or re-pricing) transaction.
+ * A zero price makes nothing; any invoice already on the event (even a voided
+ * one) means nothing more is made, so a retry or replay never adds a second.
+ * The accepted proposal and its revision are recorded as the money's source.
+ * Written through the governed Invoice.issue as the workspace's system role,
+ * auto-numbered, and never sent.
+ */
+export async function ensureEventDraftInvoice(
+  ctx: MutationCtx,
+  eventId: Id<"events">,
+): Promise<void> {
+  const event = await ctx.db.get(eventId);
+  if (!event || event.deletedAt != null || !INVOICED_STAGES.has(event.stage)) return;
+  const quotedPrice = Number(event.quotedPrice ?? 0);
+  if (!(quotedPrice > 0)) return;
+  const existing = await ctx.db
+    .query("invoices")
+    .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+    .collect();
+  if (existing.some((row) => row.tenantId === event.tenantId && row.deletedAt == null)) return;
+  const source = await acceptedProposalFor(ctx, event);
+  await TenantSystemCommandRunner.forTenant(ctx, event.tenantId).context.runMutation(
+    api.mutations.Invoice_createViaIssue,
+    {
+      clientId: event.clientId,
+      eventId,
+      invoiceSequence: 0,
+      subtotal: quotedPrice,
+      taxAmount: 0,
+      discountAmount: 0,
+      total: quotedPrice,
+      ...(source
+        ? {
+            proposalId: String(source._id),
+            ...(source.acceptedRevisionId
+              ? { proposalRevisionId: String(source.acceptedRevisionId) }
+              : {}),
+          }
+        : {}),
+      idempotencyKey: `event-draft-invoice:${eventId}`,
+    },
+  );
+}
+
+/** The newest accepted proposal booked onto this event, if any. */
+async function acceptedProposalFor(ctx: MutationCtx, event: Doc<"events">) {
+  const proposals = await ctx.db
+    .query("proposals")
+    .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+    .collect();
+  return (
+    proposals
+      .filter(
+        (p) => p.tenantId === event.tenantId && p.deletedAt == null && p.status === "accepted",
+      )
+      .sort((a, b) => b._creationTime - a._creationTime)[0] ?? null
+  );
+}
+
+/**
+ * On first issue: a named proposal must be this workspace's, for this client
+ * (and this event when both have one); a named revision must be a captured
+ * revision of that proposal. Otherwise the issue rolls back.
+ */
+export async function assertInvoiceCommercialSource(
+  ctx: MutationCtx,
+  invoiceId: Id<"invoices">,
+): Promise<void> {
+  const invoice = await ctx.db.get(invoiceId);
+  if (!invoice || invoice.deletedAt != null) return;
+  const notFound = new Error(
+    "The proposal named as this invoice's source was not found for this client.",
+  );
+  if (invoice.proposalRevisionId != null && invoice.proposalId == null) throw notFound;
+  if (invoice.proposalId == null) return;
+  const proposalId = ctx.db.normalizeId("proposals", invoice.proposalId);
+  const proposal = proposalId ? await ctx.db.get(proposalId) : null;
+  if (
+    !proposal ||
+    proposal.deletedAt != null ||
+    proposal.tenantId !== invoice.tenantId ||
+    proposal.clientId !== invoice.clientId ||
+    (invoice.eventId != null && proposal.eventId != null && proposal.eventId !== invoice.eventId)
+  )
+    throw notFound;
+  if (invoice.proposalRevisionId == null) return;
+  const revisionId = ctx.db.normalizeId("proposalRevisions", invoice.proposalRevisionId);
+  const revision = revisionId ? await ctx.db.get(revisionId) : null;
+  if (
+    !revision ||
+    revision.deletedAt != null ||
+    revision.capturedAt == null ||
+    revision.tenantId !== invoice.tenantId ||
+    revision.proposalId !== proposal._id
+  )
+    throw notFound;
+}

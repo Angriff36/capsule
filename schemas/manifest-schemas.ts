@@ -2056,6 +2056,8 @@ export const InvoiceSchema = z.object({
   clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
   mergeTargetClientId: z.string().uuid().nullable().optional(),
   eventId: z.string().uuid().nullable().optional(),
+  proposalId: z.string().uuid().nullable().optional(),
+  proposalRevisionId: z.string().uuid().nullable().optional(),
   invoiceNumber: z.string().nullable().optional(),
   subtotal: z.number().default(0),
   taxAmount: z.number().default(0),
@@ -7899,6 +7901,8 @@ export const InvoiceIssueParamsSchema = z.object({
   taxBreakdown: z.unknown().optional(),
   currencyCode: z.string().optional(),
   exchangeRate: z.number().optional(),
+  proposalId: z.string().min(1).optional(),
+  proposalRevisionId: z.string().min(1).optional(),
 });
 
 export type InvoiceIssueParams = z.infer<typeof InvoiceIssueParamsSchema>;

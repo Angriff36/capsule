@@ -1889,6 +1889,8 @@ export default defineSchema({
     clientMergeAuthorizationId: v.optional(v.union(v.id("clientMerges"), v.null())),
     mergeTargetClientId: v.optional(v.union(v.id("clients"), v.null())),
     eventId: v.optional(v.union(v.id("events"), v.null())),
+    proposalId: v.optional(v.union(v.string(), v.null())),
+    proposalRevisionId: v.optional(v.union(v.string(), v.null())),
     invoiceNumber: v.optional(v.union(v.string(), v.null())),
     subtotal: v.number(),
     taxAmount: v.number(),

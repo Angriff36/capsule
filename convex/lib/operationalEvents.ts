@@ -25,7 +25,9 @@ import { eventRecipeReconciliation } from "./recipeReconciliation";
 import { eventVenueReconciliation } from "./venueReconciliation";
 import { eventStyleReconciliation } from "./styleReconciliation";
 import { eventRentalReconciliation } from "./rentalReconciliation";
-import { eventInvoicePricingReconciliation } from "./invoicePricingReconciliation";
+import {
+  assertInvoiceCommercialSource, ensureEventDraftInvoice, eventInvoicePricingReconciliation,
+} from "./invoicePricingReconciliation";
 import { eventCloseoutCommercialReconciliation } from "./closeoutCommercialReconciliation";
 import {
   reconcileEventStaffing, reflectManualEventShiftTiming, validateAutomaticEventShift,
@@ -123,6 +125,8 @@ export async function handleManifestEvent(
     return;
   }
   if (event.entity === "Event" && event.type === "EventApproved") {
+    // One unsent draft invoice when the quoted price is above zero (AC-618).
+    await ensureEventDraftInvoice(ctx, event.entityId as Id<"events">);
     await ensureTemplateStaffNeeds(ctx, event.entityId as Id<"events">);
   }
   if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedDemandDescribed") {
@@ -367,6 +371,8 @@ export async function handleManifestEvent(
       { triggerEventId: String(event.eventId), triggerType: event.type },
       Number(event.payload.quotedPrice),
     );
+    // Approved at no price and priced now: the draft appears (AC-618).
+    await ensureEventDraftInvoice(ctx, event.entityId as Id<"events">);
     return;
   }
   if (event.entity === "Event" && event.type === "EventCommercialCorrected") {
@@ -418,8 +424,10 @@ export async function handleManifestEvent(
   if (event.entity === "Invoice" &&
     (event.type === "InvoiceIssued" || event.type === "InvoiceNumberAssigned")) {
     // Line money is worked out on the server, first issue only (AC-372).
-    if (event.type === "InvoiceIssued" && event.payload.newlyIssued === true)
+    if (event.type === "InvoiceIssued" && event.payload.newlyIssued === true) {
       await assertInvoiceIssueTotals(ctx, event.entityId as Id<"invoices">);
+      await assertInvoiceCommercialSource(ctx, event.entityId as Id<"invoices">);
+    }
     // A manually assigned number is validated exactly like an explicit one at issue.
     await ensureUniqueInvoiceNumber(
       ctx,
