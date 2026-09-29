@@ -11,6 +11,7 @@ import { ErrorState, StatusChip, TableSkeleton } from "../../../ui/primitives";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionNotice, useActionFailure } from "../../../ui/action-result";
 import { ServiceStyleMatch } from "./ServiceStyleMatch";
+import { referenceOnlyMoneyRows } from "./referenceOnlyRows";
 
 // Source system labels
 const SOURCE_SYSTEM_LABELS: Record<string, string> = {
@@ -90,6 +91,11 @@ export function ExternalRecordsReconcilePage() {
     }
     return records;
   }, [allRecords, selectedSourceSystem]);
+
+  const referenceOnly = useMemo(
+    () => referenceOnlyMoneyRows(allRecords ?? []),
+    [allRecords],
+  );
 
   const candidatePayments = useMemo(
     () => (payments ?? []).filter((p) => p.deletedAt == null),
@@ -217,6 +223,15 @@ export function ExternalRecordsReconcilePage() {
             matches the right thing in Capsule. Anything still waiting shows
             here.
           </p>
+          {referenceOnly > 0 ? (
+            <p className="mt-2 max-w-160 text-sm text-ink-3">
+              {referenceOnly} old money{" "}
+              {referenceOnly === 1 ? "line is" : "lines are"} kept for the
+              record only (quotes, invoices, report totals, balances, credits,
+              $0 lines and the same money seen twice). They are not counted in
+              any total.
+            </p>
+          ) : null}
         </div>
       </header>
 
