@@ -317,6 +317,34 @@ map onto the app tokens. Phones use the same page (Ryan, 2026-09-24: "obviously 
 updated"): one tile per row, a 2x2 count strip, and a sideways-scrolling
 group switcher. This is a scoped exception. Do not add it to `design-contract-exceptions.json`.
 
+## Component picker decisions (owner, 2026-09-29)
+
+Ryan chose these in the component picker (Storybook stories carry the live
+reference; section specs below are updated where they conflict):
+
+- **Page header** — editorial masthead (`PageHeader`): uppercase eyebrow with
+  the state word in accent, large bold title, optional fact pairs on a 1.5px
+  ink rule, actions under it. `size="compact"` only in narrow shells (My Day).
+- **Event stage rail** — numbered steps on a connector line with the open
+  check count under the current step, and a gate list of the checks before
+  the next stage. Every open check links to where it is fixed. Checks come
+  from the event lifecycle and readiness data only
+  (`src/features/events/dashboard/eventStageGate.ts`).
+- **Ledger table** — see `ledger-table`.
+- **Kitchen prep task** — checklist rows (`PrepTaskRow`): 28px checkbox with a
+  44px hit area, bold task and amount, muted dish and station line, mono due
+  time that turns danger when late. Only the checkbox completes a task; there
+  is no reopen.
+- **Empty state** — left-aligned title, hint, and an optional numbered list of
+  the real steps that fill the view, done steps checked.
+- **Stat tiles** — `StatCard` is a panel tile with a mono value and, when the
+  page has a real series, a sparkline drawn to the data's range. No tinted
+  fills; tone colors only the line.
+- **Action prompt** — Origin UI alert dialog on native `<dialog>`: centered
+  modal, icon circle, title, description, reason field, Cancel + Confirm.
+  Focus starts on the first field, else Cancel.
+- **Status chip / result notice / ledger table** — see their sections.
+
 ## Overview
 
 CapsuleX is the operating system for organizations that plan, produce, staff, deliver, and execute catered events. It should feel like a beautifully maintained service book rather than a generic administration dashboard. The application sits inside a pale botanical frame. Its working surfaces are warm white, its primary ink is a deep culinary green, and its hierarchy comes from editorial serif type, fine rules, measured negative space, and dense operational lists.
@@ -585,6 +613,8 @@ Pale-sage inset region for exceptions and open decisions. It uses a serif headin
 ### **`outlook-strip`**
 
 Rule-led metrics beneath the primary focal point. Values use display or mono rhythm; labels stay small and quiet. It replaces generic equal-weight KPI cards and must preserve truthful zeros.
+
+> **Note 2026-09-29:** dashboards that show KPI tiles use `StatCard` (panel tile with an optional real-data sparkline, owner pick). The outlook strip stays the pattern under an overview page's focal point.
 
 ### **`service-list`**
 
