@@ -3426,7 +3426,7 @@ export const SmsAlertDeliverySchema = z.object({
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   triggerKey: z.string(),
-  personId: z.string(),
+  personId: z.string().uuid(),
   alertType: z.string(),
   sentAt: z.coerce.date().nullable().optional(),
   failedAt: z.coerce.date().nullable().optional(),
@@ -7818,7 +7818,7 @@ export type InvoiceReminderScheduleConfigureParams = z.infer<typeof InvoiceRemin
 export const InvoiceStripePaymentRecordParamsSchema = z.object({
   invoiceId: z.string().min(1),
   sessionId: z.string(),
-  paymentId: z.string().uuid(),
+  paymentId: z.string().min(1),
   amount: z.number(),
   method: z.string(),
 });
@@ -10088,7 +10088,7 @@ export type SignatureRequestRevokeParams = z.infer<typeof SignatureRequestRevoke
 // Command: open on SmsAlertDelivery
 export const SmsAlertDeliveryOpenParamsSchema = z.object({
   triggerKey: z.string(),
-  personId: z.string(),
+  personId: z.string().min(1),
   alertType: z.string(),
 });
 

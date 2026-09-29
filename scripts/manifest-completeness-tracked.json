@@ -7,11 +7,6 @@
       "issue": "https://github.com/Angriff36/Manifest/issues/90"
     },
     {
-      "code": "DOMAIN_ORPHAN_CREATE",
-      "key": "TppReportFavorite",
-      "issue": "https://github.com/Angriff36/Manifest/issues/90"
-    },
-    {
       "code": "DOMAIN_UNWIRED_FK",
       "key": "DishTask.stationId",
       "issue": "https://github.com/Angriff36/capsule/issues/402"

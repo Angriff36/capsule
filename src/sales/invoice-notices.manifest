@@ -16,6 +16,7 @@
 // a link, payment or email that the seam did not produce.
 
 use "./invoice-core.manifest"
+use "./payment.manifest"
 
 enum InvoiceReminderSource {
   scheduled
@@ -139,6 +140,7 @@ entity InvoiceStripePayment mixin TenantScoped, SoftDeletable {
   property recordedAt: datetime?
 
   belongsTo invoice: Invoice fields [tenantId, invoiceId] references [tenantId, id]
+  belongsTo payment: Payment fields [tenantId, paymentId] references [tenantId, id]
 
   default policy invoiceStripePaymentRead read: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may see Stripe payments"
   default policy invoiceStripePaymentWrite write: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may update Stripe payments"

@@ -3402,7 +3402,7 @@ const COMMAND_DISPATCH = {
   "SmsAlertDelivery.open": {
     ref: api.mutations.SmsAlertDelivery_createViaOpen,
     params: ["triggerKey","personId","alertType","idempotencyKey"] as const,
-    paramMeta: [{"name":"triggerKey","type":"string","required":true},{"name":"personId","type":"string","required":true},{"name":"alertType","type":"string","required":true},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    paramMeta: [{"name":"triggerKey","type":"string","required":true},{"name":"personId","type":"uuid","required":true},{"name":"alertType","type":"string","required":true},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "SmsAlertDelivery.recordFailed": {
     ref: api.mutations.SmsAlertDelivery_recordFailed,

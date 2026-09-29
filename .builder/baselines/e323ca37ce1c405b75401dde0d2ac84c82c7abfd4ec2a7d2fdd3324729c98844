@@ -1866,7 +1866,7 @@ export default defineSchema({
     deletedAt: v.optional(v.union(v.number(), v.null())),
     invoiceId: v.id("invoices"),
     sessionId: v.string(),
-    paymentId: v.string(),
+    paymentId: v.id("payments"),
     amount: v.number(),
     method: v.string(),
     recordedAt: v.optional(v.union(v.number(), v.null())),
@@ -1875,7 +1875,8 @@ export default defineSchema({
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
-    .index("by_invoiceId", ["invoiceId"]),
+    .index("by_invoiceId", ["invoiceId"])
+    .index("by_paymentId", ["paymentId"]),
   itemUnitMappings: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -3166,7 +3167,7 @@ export default defineSchema({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
     triggerKey: v.string(),
-    personId: v.string(),
+    personId: v.id("people"),
     alertType: v.string(),
     sentAt: v.optional(v.union(v.number(), v.null())),
     failedAt: v.optional(v.union(v.number(), v.null())),
@@ -3177,7 +3178,8 @@ export default defineSchema({
     updatedAt: v.optional(v.number()),
     version: v.number(),
   })
-    .index("by_tenantId", ["tenantId"]),
+    .index("by_tenantId", ["tenantId"])
+    .index("by_personId", ["personId"]),
   smsAlertSettings: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

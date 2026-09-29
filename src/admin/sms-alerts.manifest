@@ -6,6 +6,8 @@
 // keyed by the tenant id; the authored readers still read those legacy rows
 // when a tenant has no row here, so no data migration is needed.
 
+use "../identity/person.manifest"
+
 // The tenant's SMS alert switch and its last scan. One live row per tenant.
 // An unset field means "nothing recorded here yet" and the reader falls back
 // to the legacy ledger rows.
@@ -96,7 +98,7 @@ entity SmsAlertDelivery mixin TenantScoped, SoftDeletable {
   versionProperty version: number
 
   property required triggerKey: string
-  property required personId: string
+  property required personId: uuid
   property required alertType: string
   property sentAt: datetime?
   property failedAt: datetime?
@@ -104,11 +106,13 @@ entity SmsAlertDelivery mixin TenantScoped, SoftDeletable {
   property error: string?
   property openedAt: datetime?
 
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+
   default policy smsAlertDeliveryRead read: roleAllows(user.role, "manageAccess") "Managers may see SMS alert deliveries"
   default policy smsAlertDeliveryWrite write: roleAllows(user.role, "manageAccess") "Managers may update SMS alert deliveries"
   default policy smsAlertDeliveryExecute execute: roleAllows(user.role, "manageAccess") "Managers may change SMS alert deliveries"
 
-  command open(triggerKey: string, personId: string, alertType: string) {
+  command open(triggerKey: string, personId: uuid, alertType: string) {
     guard self.openedAt == null
     guard self.deletedAt == null
     guard user.role == "system" "Only the SMS alert scan records its sends"
