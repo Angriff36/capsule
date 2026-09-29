@@ -53,6 +53,7 @@ export async function writeMaterializationReceipt<T>(
   output: T,
 ): Promise<void> {
   const now = Date.now();
+  // raw-write: materializationReceipts
   await ctx.db.insert("materializationReceipts", {
     tenantId,
     receiptKey: requestKey(tenantId, family, operationKey),
@@ -65,8 +66,10 @@ export async function writeMaterializationReceipt<T>(
   const key = headKey(tenantId, family, operationKey);
   const head = await findReceipt(ctx, tenantId, key);
   if (head)
+    // raw-write: materializationReceipts
     await ctx.db.patch(head._id, { operationKey, output, updatedAt: now });
   else
+    // raw-write: materializationReceipts
     await ctx.db.insert("materializationReceipts", {
       tenantId,
       receiptKey: key,

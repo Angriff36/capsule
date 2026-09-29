@@ -1,0 +1,25 @@
+{
+  "$comment": "Tables authored Convex code may write directly (scripts/check-governed-writes.ts). Everything else changes only through generated Manifest commands. Each entry says why the table stays outside Manifest. Created 2026-09-29.",
+  "tables": {
+    "eventNumberSequences": {
+      "reason": "Per-tenant event number counter. Allocated inside the emitting command's transaction by handleManifestEvent on EventPlanned/EventNumberSet; a command cannot read and bump a sibling counter row. IR entity is storage-only (eventNumberSequenceSeamOnly).",
+      "files": ["convex/lib/eventNumbering.ts"]
+    },
+    "eventNumberAssignments": {
+      "reason": "The number allocated to one event, written with the counter bump in the same transaction so Event.planEngagement keeps a single version bump. Storage-only IR entity.",
+      "files": ["convex/lib/eventNumbering.ts"]
+    },
+    "invoiceNumberSequences": {
+      "reason": "Per-tenant invoice number counter minted inside the invoice command's transaction (convex/lib/invoiceNumbering.ts). Storage-only IR entity (invoiceNumberSequenceSeamOnly).",
+      "files": ["convex/lib/invoiceNumberSequence.ts"]
+    },
+    "materializationReceipts": {
+      "reason": "Idempotency receipts for authored multi-row materialization transactions; they record that a batch of generated commands already ran and carry no domain state. Storage-only IR entity (materializationReceiptSeamOnly).",
+      "files": ["convex/lib/materializationReceipt.ts"]
+    },
+    "eventPacketIssues": {
+      "reason": "Derived cache: issues are recomputed deterministically from the current event packet snapshot on every packet write. No human input and no domain transition.",
+      "files": ["convex/lib/eventPacket/reconcileNative.ts"]
+    }
+  }
+}

@@ -36,6 +36,7 @@ export class InvoiceNumberSequenceStore {
     // that never passed through it (hand-typed before the sequence existed,
     // or edited outside commands); skip past any holder, live or deleted.
     while (await this.ledger.isHeld(formatAutoInvoiceNumber(next))) next += 1;
+    // raw-write: invoiceNumberSequences
     await this.ctx.db.patch(row._id, {
       lastNumber: next,
       updatedAt: Date.now(),
@@ -47,6 +48,7 @@ export class InvoiceNumberSequenceStore {
   async advanceTo(n: number): Promise<void> {
     const row = await this.row();
     if (n <= row.lastNumber) return;
+    // raw-write: invoiceNumberSequences
     await this.ctx.db.patch(row._id, { lastNumber: n, updatedAt: Date.now() });
   }
 
@@ -57,6 +59,7 @@ export class InvoiceNumberSequenceStore {
       .first();
     if (existing) return existing;
     const now = Date.now();
+    // raw-write: invoiceNumberSequences
     const id = await this.ctx.db.insert("invoiceNumberSequences", {
       tenantId: this.tenantId,
       lastNumber: 0,

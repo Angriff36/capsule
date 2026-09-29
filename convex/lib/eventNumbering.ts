@@ -43,13 +43,16 @@ export async function ensureEventNumber(
       // another event may have taken it. Keep it only when it is still free.
       if (!(await isHeld(ctx, event.tenantId, given.eventNumber, eventId)))
         return;
+      // raw-write: eventNumberAssignments
       await ctx.db.delete(given._id);
     }
     const row = await sequenceRow(ctx, event.tenantId);
     let next = Math.max(row.lastNumber, FLOOR) + 1;
     while (await isHeld(ctx, event.tenantId, String(next), eventId)) next += 1;
     const now = Date.now();
+    // raw-write: eventNumberSequences
     await ctx.db.patch(row._id, { lastNumber: next, updatedAt: now });
+    // raw-write: eventNumberAssignments
     await ctx.db.insert("eventNumberAssignments", {
       tenantId: event.tenantId,
       eventId,
@@ -71,6 +74,7 @@ export async function ensureEventNumber(
   const row = await sequenceRow(ctx, event.tenantId);
   const value = Number(typed);
   if (value > row.lastNumber) {
+    // raw-write: eventNumberSequences
     await ctx.db.patch(row._id, { lastNumber: value, updatedAt: Date.now() });
   }
 }
@@ -174,6 +178,7 @@ async function sequenceRow(ctx: MutationCtx, tenantId: string) {
       lastNumber = Math.max(lastNumber, Number(number));
   }
   const now = Date.now();
+  // raw-write: eventNumberSequences
   const id = await ctx.db.insert("eventNumberSequences", {
     tenantId,
     lastNumber,

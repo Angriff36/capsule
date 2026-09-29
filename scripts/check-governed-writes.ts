@@ -18,11 +18,7 @@ import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const EXCEPTIONS = path.join(
-  ROOT,
-  "scripts",
-  "governed-write-exceptions.json",
-);
+const EXCEPTIONS = path.join(ROOT, "scripts", "governed-write-exceptions.json");
 const FORBIDDEN_TABLES = new Set(["manifestEvents"]);
 const WRITE = /\bdb\s*\.\s*(insert|patch|replace|delete)\s*\(/g;
 const MARKER = /\/\/\s*raw-write:\s*(\w+)/;
@@ -77,7 +73,9 @@ export function inspectSource(
       const kind = match[1]!;
       const rest = text.slice((match.index ?? 0) + match[0].length);
       const literal =
-        kind === "insert" ? (/^\s*["'](\w+)["']/.exec(rest)?.[1] ?? null) : null;
+        kind === "insert"
+          ? (/^\s*["'](\w+)["']/.exec(rest)?.[1] ?? null)
+          : null;
       const marker =
         MARKER.exec(text)?.[1] ?? MARKER.exec(lines[index - 1] ?? "")?.[1];
       const table = marker ?? literal;
@@ -160,7 +158,9 @@ if (import.meta.main) {
   if (violations.length > 0) {
     console.error("Governed-writes gate failed:");
     for (const v of violations) {
-      console.error(`- ${v.file}${v.line ? `:${String(v.line)}` : ""}: ${v.detail}`);
+      console.error(
+        `- ${v.file}${v.line ? `:${String(v.line)}` : ""}: ${v.detail}`,
+      );
     }
     process.exit(1);
   }

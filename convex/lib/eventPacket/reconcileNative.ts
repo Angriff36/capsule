@@ -430,8 +430,10 @@ export async function persistIssues(
     const issueJson = canonicalJson(issue);
     if (old) {
       if (old.issueJson !== issueJson)
+        // raw-write: eventPacketIssues
         await ctx.db.patch(old._id, { issueJson, updatedAt: Date.now() });
     } else
+      // raw-write: eventPacketIssues
       await ctx.db.insert("eventPacketIssues", {
         tenantId,
         eventId,
