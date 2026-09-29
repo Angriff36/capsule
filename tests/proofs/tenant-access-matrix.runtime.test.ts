@@ -223,6 +223,14 @@ const LINK_TABLE: Record<string, string> = {
   ownerPersonId: "people",
   packageId: "@outside",
   packedByPersonId: "people",
+  // PL-DELIVERY who-did-it fields: set by the server from the signed-in
+  // person, never sent by the screen.
+  loadedByPersonId: "people",
+  dispatchedByPersonId: "people",
+  departedByPersonId: "people",
+  deliveredByPersonId: "people",
+  preloadedByPersonId: "people",
+  reportedByPersonId: "people",
   parentId: "events",
   partEquipmentId: "equipments",
   partnerClientId: "clients",
