@@ -34,11 +34,18 @@ export interface ReconstructionReview {
   unpaidBalance: number | null;
 }
 
-async function requireFinance(ctx: QueryCtx): Promise<AppAuthContext> {
+// The same people who may see invoices. Saving also needs import access;
+// the import item's own write check enforces that.
+async function financeAuth(ctx: QueryCtx): Promise<AppAuthContext | null> {
   const auth = await getAuthContext(ctx);
-  // The same people who may see invoices. Saving also needs import access;
-  // the import item's own write check enforces that.
-  if (!auth.tenantId || !canRead(auth, ["financeAccess", "manageAccess"])) {
+  return auth.tenantId && canRead(auth, ["financeAccess", "manageAccess"])
+    ? auth
+    : null;
+}
+
+async function requireFinance(ctx: QueryCtx): Promise<AppAuthContext> {
+  const auth = await financeAuth(ctx);
+  if (!auth) {
     throw new Error(
       "Only finance staff and managers can rebuild old invoices.",
     );
@@ -221,11 +228,15 @@ async function buildPreview(
   return { invoices, reviews };
 }
 
-/** Preview of every old invoice the kept records describe. Writes nothing. */
+/**
+ * Preview of every old invoice the kept records describe. Writes nothing.
+ * Null for people who may not see invoices, so the screen hides the section.
+ */
 export const preview = query({
   args: { sourceSystem: v.optional(v.string()) },
   handler: async (ctx, { sourceSystem }) => {
-    const auth = await requireFinance(ctx);
+    const auth = await financeAuth(ctx);
+    if (!auth) return null;
     return await buildPreview(ctx, auth.tenantId, sourceSystem ?? "tpp_legacy");
   },
 });

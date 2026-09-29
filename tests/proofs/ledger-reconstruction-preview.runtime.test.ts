@@ -247,6 +247,11 @@ describe("old invoice rebuild preview (AC-086)", () => {
       role: "kitchen_lead",
       tenantId,
     });
-    await expect(preview(cook)).rejects.toThrow(/finance staff and managers/);
+    expect(await preview(cook)).toBeNull();
+    await expect(
+      act(cook).mutation(api.ledgerReconstruction.saveChecked, {
+        key: "OLD-90",
+      }),
+    ).rejects.toThrow(/finance staff and managers/);
   });
 });

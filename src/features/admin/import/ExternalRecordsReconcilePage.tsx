@@ -10,6 +10,7 @@ import {
 import { ErrorState, StatusChip, TableSkeleton } from "../../../ui/primitives";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionNotice, useActionFailure } from "../../../ui/action-result";
+import { OldInvoiceRebuild } from "./OldInvoiceRebuild";
 import { ServiceStyleMatch } from "./ServiceStyleMatch";
 import { referenceOnlyMoneyRows } from "./referenceOnlyRows";
 
@@ -497,6 +498,8 @@ export function ExternalRecordsReconcilePage() {
           </table>
         </div>
       </div>
+
+      <OldInvoiceRebuild onDone={setNotice} onError={setError} />
 
       {/* Help text */}
       <div className="card mt-4">
