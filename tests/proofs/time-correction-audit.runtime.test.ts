@@ -214,12 +214,15 @@ describe("time capture keeps actor, time zone and reason (AC-126)", () => {
     expect(paidMinutes(record)).toBe(510);
 
     // The ledger keeps the replaced values, the actor and the reason.
-    const ledger = (await s.workforce.run(async (ctx) =>
-      ctx.db
-        .query("manifestEvents")
-        .withIndex("by_entityId", (q) => q.eq("entityId", first.docId))
-        .collect(),
-    )) as Array<{ type: string; payload: Record<string, unknown> }>;
+    const ledger = (
+      (await s.workforce.run(async (ctx) =>
+        ctx.db.query("manifestEvents").collect(),
+      )) as Array<{
+        type: string;
+        entityId: string;
+        payload: Record<string, unknown>;
+      }>
+    ).filter((row) => row.entityId === first.docId);
     const corrected = ledger.find((row) => row.type === "TimeRecordCorrected")!;
     expect(corrected.payload).toMatchObject({
       previousClockInAt: before.in,

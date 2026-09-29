@@ -26,7 +26,13 @@ import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import type { Doc } from "./_generated/dataModel";
-import { approvedPayroll } from "../src/features/workforce/timePay";
+import {
+  approvedPayroll,
+  attendanceAlerts as findAttendanceAlerts,
+  overtimeWarnings,
+  type AttendanceAlert,
+  type OvertimeWarning,
+} from "../src/features/workforce/timePay";
 
 /** Mirrors financeManageAccess | workforceManageAccess (+ admin tier). */
 function canReadRates(role: string): boolean {
@@ -156,6 +162,55 @@ async function tenantTimeRecords(
 }
 
 const SCHEDULED_SHIFT_STATUSES = new Set(["scheduled", "started", "completed"]);
+
+/**
+ * PL-TIME (AC-509): late clock-ins, people not in yet, no-shows, entries
+ * still open, and weeks past 40 h - for the people who run labor, never for
+ * a worker. `now` comes from the caller so the answer is stable per minute.
+ */
+export const attendanceAlerts = query({
+  args: { now: v.number() },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{
+    alerts: Array<AttendanceAlert & { personName: string }>;
+    overtime: Array<OvertimeWarning & { personName: string }>;
+  } | null> => {
+    const auth = await getAuthContext(ctx);
+    if (!canReadLaborAggregates(auth.role)) return null;
+    const [people, records, shifts] = await Promise.all([
+      tenantPeople(ctx, auth.tenantId),
+      tenantTimeRecords(ctx, auth.tenantId),
+      ctx.db
+        .query("shifts")
+        .withIndex("by_tenantId", (q: any) => q.eq("tenantId", auth.tenantId))
+        .collect() as Promise<Doc<"shifts">[]>,
+    ]);
+    const nameOf = (personId: string) => {
+      const person = people.get(personId);
+      return person
+        ? `${person.givenName} ${person.familyName}`.trim()
+        : "Someone";
+    };
+    const recent = records.filter(
+      (record) =>
+        record.clockInAt != null &&
+        record.clockInAt >= args.now - 21 * 24 * 60 * 60_000,
+    );
+    return {
+      alerts: findAttendanceAlerts({
+        shifts: shifts.map((shift) => ({ ...shift, _id: String(shift._id) })),
+        records: recent,
+        now: args.now,
+      }).map((alert) => ({ ...alert, personName: nameOf(alert.personId) })),
+      overtime: overtimeWarnings(recent).map((warning) => ({
+        ...warning,
+        personName: nameOf(warning.personId),
+      })),
+    };
+  },
+});
 
 /** Aggregate labor for one event (direct eventId or via the record's shift). */
 export const eventLaborSummary = query({

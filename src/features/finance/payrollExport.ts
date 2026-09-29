@@ -46,7 +46,9 @@ type TimeRecordRow = {
   clockInAt?: unknown;
   clockOutAt?: unknown;
   breakMinutes?: unknown;
+  paidBreakMinutes?: unknown;
   status?: unknown;
+  approvedAt?: unknown;
   deletedAt?: unknown;
 };
 
