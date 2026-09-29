@@ -48,10 +48,11 @@ function Discard($h, $file) {
   Remove-Item $file -Force
 }
 
-function Review($wt, $target) {
+function Review($wt, $target, $base = 'origin/main', $extra = '') {
   $prompt = @"
-You are the independent reviewer for an automated fix. In this directory run ``git diff origin/main HEAD --stat`` and then ``git diff origin/main HEAD`` (everything not yet in production) (skip the bodies of .builder/, convex/_generated/, src/generated/ and schemas/ - only confirm those were regenerated, not hand-edited). Fix target: $target
+You are the independent reviewer for an automated fix. In this directory run ``git diff $base HEAD --stat`` and then ``git diff $base HEAD`` (everything this change adds) (skip the bodies of .builder/, convex/_generated/, src/generated/ and schemas/ - only confirm those were regenerated, not hand-edited). Fix target: $target
 Find reasons to REJECT: wrong scope, unrelated edits, secrets, hand-edited generated files, disabled tests, symptom-fixes, partial implementation of what the target says this change delivers. The change may be one checkpoint of a larger capability: work the target names as still open is not a reason to reject; anything the target claims as done must be complete and proven. Also REJECT tedium: any new guard, policy, approval, or validation that blocks a reasonable user action without a proportionate real-world reason - this is a catering app, not a bank.
+$extra
 On REJECT give numbered reasons with file and line, and say concretely what a passing fix must do - the maker's next attempt is built from your text.
 End your answer with exactly one line: VERDICT: APPROVE   or   VERDICT: REJECT - <main reason>
 "@
@@ -93,7 +94,11 @@ foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
   if (git -C $wt status --porcelain) { Record $h 'FAIL' "maker left uncommitted changes in the worktree - worktree kept: $wt"; Keep $file.FullName; continue }
 
   git -C $wt fetch origin dev main --quiet
-  if ((git -C $wt rev-list --count origin/main..HEAD) -eq '0') { Record $h 'FAIL' 'nothing new since production'; Discard $h $file.FullName; continue }
+  # CONTROL-PLANE REPAIR hand-offs (repair-*) change only the loop itself: reviewed against dev,
+  # landed on dev, never released, and landing removes the blocker so the builder resumes.
+  $isRepair = $h.runId -like 'repair-*'
+  $base = if ($isRepair) { 'origin/dev' } else { 'origin/main' }
+  if ((git -C $wt rev-list --count "$base..HEAD") -eq '0') { Record $h 'FAIL' "nothing new since $base"; Discard $h $file.FullName; continue }
   if ((git -C $wt rev-list --count HEAD..origin/dev) -ne '0') {
     git -C $wt merge --no-edit origin/dev *> $null
     if ($LASTEXITCODE -ne 0) { git -C $wt merge --abort; Record $h 'COLLISION' "newer dev work touches the same places - merge origin/dev in the kept worktree and resolve (not a strike): $wt"; Keep $file.FullName; continue }
@@ -107,7 +112,8 @@ foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
   if (-not $typecheckOk) { Record $h 'FAIL' "typecheck failed when the lander ran it: $((Get-Content (Join-Path $wt '.loop-typecheck.log') -Tail 3) -join ' | ') - worktree kept: $wt"; Remove-Item (Join-Path $wt '.loop-typecheck.log') -Force; Keep $file.FullName; continue }
   Remove-Item (Join-Path $wt '.loop-typecheck.log') -Force
 
-  $r = Review $wt "$($h.item) - $($h.target)"
+  $extra = if ($isRepair) { 'This is a CONTROL-PLANE REPAIR of the loop itself. REJECT any change to Capsule product code, and any change that weakens the product maker deny list, the independent reviewer, the pre-push guard, or the rule that the maker never checks or lands its own work.' } else { '' }
+  $r = Review $wt "$($h.item) - $($h.target)" $base $extra
   if ($r.verdict -eq 'NONE') {
     # No reviewer could answer (OpenAI plan empty, Cursor not logged in, outage). That is
     # not a verdict on the fix: keep the worktree and the hand-off, no strike, and the next
@@ -145,6 +151,13 @@ foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
 
   $sha = git -C $wt rev-parse --short HEAD
   Record $h 'LANDED' "on dev as $sha, reviewed by $($r.reviewer)"
+  if ($isRepair) {
+    Remove-Item (Join-Path $root '.loop-worktrees\_control-blocker.json') -Force -ErrorAction SilentlyContinue
+    Remove-Item (Join-Path $root ".loop-worktrees\_patches\$($h.runId).patch") -Force -ErrorAction SilentlyContinue
+    Discard $h $file.FullName
+    git -C $root pull --no-rebase --quiet origin dev *> $null   # the live loop files take the repair
+    continue
+  }
   # The day's batch passed: close the review; the next one opens 24 hours from now.
   Remove-Item (Join-Path $root '.loop-worktrees\_review-open') -Force -ErrorAction SilentlyContinue
   Set-Content (Join-Path $root '.loop-worktrees\_last-review') (Get-Date -Format s)

@@ -28,6 +28,10 @@ if exist ".loop-worktrees\_handoff\*.json" (
     exit /b 0
   )
 )
+REM CONTROL-PLANE BLOCKER (Ryan 2026-09-29): a problem in the loop itself is fixed by the
+REM separate repair process, never by the maker. No new input = no model wakes, nothing logged.
+if exist ".loop-worktrees\_control-blocker.json" pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-repair.ps1" >> ".claude\loop-tick.log" 2>&1
+if exist ".loop-worktrees\_control-blocker.json" exit /b 0
 echo [%date% %time%] build round start >> ".claude\loop-tick.log"
 set MAKEROK=1
 type ".claude\loop-tick-prompt.txt" | claude -p --model claude-opus-5-5 --settings ".claude\loop-maker-settings.json" >> ".claude\loop-tick.log" 2>&1

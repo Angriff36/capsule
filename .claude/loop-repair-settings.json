@@ -13,7 +13,8 @@
       "Edit(//c/Projects/capsule/loop-ledger.json)",
       "Bash(git mv *)",
       "Bash(git rm *)",
-      "Read(//c/Projects/capsule/.loop-worktrees/**)"
+      "Read(//c/Projects/capsule/.loop-worktrees/**)",
+      "Bash(pwsh -NoProfile -File C:/Projects/capsule/scripts/loop-repair-apply.ps1 *)"
     ],
     "deny": [
       "Bash(git push *)",
@@ -31,9 +32,7 @@
       "Edit(//c/Projects/capsule/.githooks/**)",
       "Edit(//c/Projects/capsule/loop-constraints.md)",
       "Edit(//c/Projects/capsule/.loop-worktrees/**/.claude/**)",
-      "Edit(//c/Projects/capsule/.loop-worktrees/**/.githooks/**)",
-      "Bash(*loop-repair-apply*)",
-      "Bash(*LOOP_REPAIR*)"
+      "Edit(//c/Projects/capsule/.loop-worktrees/**/.githooks/**)"
     ]
   }
 }
