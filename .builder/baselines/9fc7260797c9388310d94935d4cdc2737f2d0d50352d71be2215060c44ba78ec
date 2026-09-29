@@ -293,6 +293,11 @@ import {
   ExternalRecordLinkUnlinkExternalRecordParamsSchema,
   ExternalRecordLinkUpdateCapsuleIdParamsSchema,
   ExternalRecordLinkVerifyLinkParamsSchema,
+  FieldConfirmationCompleteParamsSchema,
+  FieldConfirmationCountersignParamsSchema,
+  FieldConfirmationEscalateParamsSchema,
+  FieldConfirmationPrepareParamsSchema,
+  FieldConfirmationReassignParamsSchema,
   ImportArtifactClassifyParamsSchema,
   ImportArtifactRecordParseParamsSchema,
   ImportArtifactRegisterParamsSchema,
@@ -4924,6 +4929,77 @@ export function useCreateExternalRecordLink() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = ExternalRecordLinkLinkParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for FieldConfirmation. */
+export function useListFieldConfirmation() {
+  return useQuery(api.queries.listFieldConfirmation);
+}
+
+/** Reactive get-by-id for FieldConfirmation. Pass "skip" to suspend. */
+export function useGetFieldConfirmation(id: string | "skip") {
+  return useQuery(api.queries.getFieldConfirmation, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for FieldConfirmation.complete. */
+export function useFieldConfirmationComplete() {
+  const mutate = useMutation(api.mutations.FieldConfirmation_complete);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = FieldConfirmationCompleteParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for FieldConfirmation.countersign. */
+export function useFieldConfirmationCountersign() {
+  const mutate = useMutation(api.mutations.FieldConfirmation_countersign);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = FieldConfirmationCountersignParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for FieldConfirmation.escalate. */
+export function useFieldConfirmationEscalate() {
+  const mutate = useMutation(api.mutations.FieldConfirmation_escalate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = FieldConfirmationEscalateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for FieldConfirmation.prepare. */
+export function useFieldConfirmationPrepare() {
+  const mutate = useMutation(api.mutations.FieldConfirmation_prepare);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = FieldConfirmationPrepareParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for FieldConfirmation.reassign. */
+export function useFieldConfirmationReassign() {
+  const mutate = useMutation(api.mutations.FieldConfirmation_reassign);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = FieldConfirmationReassignParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for FieldConfirmation.prepare. */
+export function useCreateFieldConfirmation() {
+  const mutate = useMutation(api.mutations.FieldConfirmation_createViaPrepare);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = FieldConfirmationPrepareParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -12447,4 +12523,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1317 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1325 as const;

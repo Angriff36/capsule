@@ -74,6 +74,31 @@ const num = (value: unknown) => (typeof value === "number" ? value : null);
 const str = (value: unknown) => (typeof value === "string" ? value : null);
 const version = (row: any) => num(row?.version);
 
+/** The event's day-of forms (FieldConfirmation), one per form key. */
+export async function eventFieldForms(
+  ctx: Ctx,
+  tenantId: string,
+  eventId: Id<"events">,
+) {
+  return (await eventRows(ctx, "fieldConfirmations", tenantId, eventId))
+    .filter((f) => f.preparedAt != null)
+    .sort((a, b) => a._creationTime - b._creationTime);
+}
+
+/** "Given Family" for each staff id in this workspace. */
+export async function personNames(ctx: Ctx, tenantId: string, ids: unknown[]) {
+  const names = new Map<string, string>();
+  for (const id of new Set(ids.filter((i) => typeof i === "string"))) {
+    const person = await own(ctx, "people", id, tenantId);
+    if (person)
+      names.set(
+        String(id),
+        [person.givenName, person.familyName].filter(Boolean).join(" "),
+      );
+  }
+  return names;
+}
+
 /**
  * Reads every native record the Final Lock rules use for one event, plus
  * the packet state, recorded overrides and what the latest print showed.
@@ -407,6 +432,16 @@ export async function readFinalLockInput(
       .filter((i) => i.status === "resolved")
       .map((i) => i.key),
   );
+  const fieldRows = await eventFieldForms(ctx, tenantId, eventId);
+  const names = await personNames(
+    ctx,
+    tenantId,
+    fieldRows.flatMap((f) => [
+      f.formCompletedById,
+      f.formCheckedById,
+      f.responsiblePersonId,
+    ]),
+  );
   const revisions = packet.revisionRows
     .slice()
     .sort((a, b) => b.createdAt - a.createdAt);
@@ -516,13 +551,43 @@ export async function readFinalLockInput(
           source: verificationSource(v.checkKey),
         })),
     },
+    // A day-of form counts only when people signed it on the day. A ticked
+    // box in an imported workbook or an office decision never completes one.
     confirmations: Object.fromEntries(
-      verifications
-        .filter((v) => /^field\.[a-z-]+$/.test(v.checkKey))
-        .map((v) => [
-          v.checkKey,
-          { actor: v.actor, at: v.at, source: verificationSource(v.checkKey) },
+      fieldRows
+        .filter((f) => f.status === "done")
+        .map((f) => [
+          String(f.formKey),
+          {
+            actor: [f.formCompletedById, f.formCheckedById]
+              .filter(Boolean)
+              .map((id) => names.get(String(id)) ?? "A staff member")
+              .join(" and "),
+            at: new Date(
+              Math.max(f.observedAt ?? 0, f.secondObservedAt ?? 0),
+            ).toISOString(),
+            source: {
+              table: "fieldConfirmations",
+              id: String(f._id),
+              version: version(f),
+            },
+          },
         ]),
+    ),
+    fieldForms: Object.fromEntries(
+      fieldRows.map((f) => [
+        String(f.formKey),
+        {
+          status: f.status,
+          dueAt: num(f.dueAt),
+          responsible: f.responsiblePersonId
+            ? (names.get(String(f.responsiblePersonId)) ?? null)
+            : null,
+          escalatedAt: f.escalatedAt
+            ? new Date(f.escalatedAt).toISOString()
+            : null,
+        },
+      ]),
     ),
   };
 

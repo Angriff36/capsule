@@ -300,7 +300,8 @@ export function fieldAnswers(
   for (const question of policy.filter((item) => item.form)) {
     const form = question.form!;
     const done = input.confirmations[form] ?? null;
-    const dueAt = times[DUE_AT[form] ?? ""] ?? null;
+    const setUp = input.fieldForms?.[form] ?? null;
+    const dueAt = setUp?.dueAt ?? times[DUE_AT[form] ?? ""] ?? null;
     out[question.key] = {
       result: "field_confirmation",
       value: NONE,
@@ -312,12 +313,18 @@ export function fieldAnswers(
       missing: [],
       action: done
         ? null
-        : `Complete the ${question.label.toLowerCase()} form on the day.`,
+        : setUp
+          ? `Complete the ${question.label.toLowerCase()} form on the day.`
+          : `Set up the ${question.label.toLowerCase()} form, then complete it on the day.`,
       fieldWork: {
         form,
         dueAt,
         confirmedAt: done?.at ?? null,
         confirmedBy: done?.actor ?? null,
+        prepared: !!setUp,
+        responsible: setUp?.responsible ?? null,
+        status: done ? "done" : (setUp?.status ?? "not_set_up"),
+        escalatedAt: setUp?.escalatedAt ?? null,
       },
     };
   }

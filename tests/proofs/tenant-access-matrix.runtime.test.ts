@@ -231,6 +231,14 @@ const LINK_TABLE: Record<string, string> = {
   deliveredByPersonId: "people",
   preloadedByPersonId: "people",
   reportedByPersonId: "people",
+  // PL-FIELD-CONFIRMATION day-of forms: planned people are picked by the
+  // office; who signed, checked or chased is the signed-in person.
+  responsiblePersonId: "people",
+  secondPersonId: "people",
+  formCompletedById: "people",
+  formCheckedById: "people",
+  formEscalatedById: "people",
+  photoStorageId: "@file",
   parentId: "events",
   partEquipmentId: "equipments",
   partnerClientId: "clients",

@@ -1636,6 +1636,42 @@ export const ExternalRecordLinkSchema = z.object({
 
 export type ExternalRecordLink = z.infer<typeof ExternalRecordLinkSchema>;
 
+// Entity: FieldConfirmation
+export const FieldConfirmationSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  formKey: z.string().default(""),
+  label: z.string().default(""),
+  status: z.enum(["open", "first_signed", "done"]).default("open"),
+  needsTwoPeople: z.boolean().default(false),
+  evidence: z.enum(["none", "note", "photo"]).default("none"),
+  dueAt: z.coerce.date().nullable().optional(),
+  responsiblePersonId: z.string().uuid().nullable().optional(),
+  secondPersonId: z.string().uuid().nullable().optional(),
+  instructions: z.string().nullable().optional(),
+  expectedItems: z.string().nullable().optional(),
+  preparedAt: z.coerce.date().nullable().optional(),
+  completedAt: z.coerce.date().nullable().optional(),
+  observedAt: z.coerce.date().nullable().optional(),
+  formCompletedById: z.string().uuid().nullable().optional(),
+  outcome: z.enum(["all_good", "problem"]).nullable().optional(),
+  note: z.string().nullable().optional(),
+  photoStorageId: z.string().nullable().optional(),
+  secondCompletedAt: z.coerce.date().nullable().optional(),
+  secondObservedAt: z.coerce.date().nullable().optional(),
+  formCheckedById: z.string().uuid().nullable().optional(),
+  secondNote: z.string().nullable().optional(),
+  escalatedAt: z.coerce.date().nullable().optional(),
+  formEscalatedById: z.string().uuid().nullable().optional(),
+  escalationNote: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type FieldConfirmation = z.infer<typeof FieldConfirmationSchema>;
+
 // Entity: ImportArtifact
 export const ImportArtifactSchema = z.object({
   id: z.string().uuid(),
@@ -7099,6 +7135,58 @@ export const ExternalRecordLinkVerifyLinkParamsSchema = z.object({
 });
 
 export type ExternalRecordLinkVerifyLinkParams = z.infer<typeof ExternalRecordLinkVerifyLinkParamsSchema>;
+
+// Command: complete on FieldConfirmation
+export const FieldConfirmationCompleteParamsSchema = z.object({
+  outcome: z.enum(["all_good", "problem"]),
+  observedAt: z.coerce.date().optional(),
+  note: z.string().optional(),
+  photoStorageId: z.string().optional(),
+});
+
+export type FieldConfirmationCompleteParams = z.infer<typeof FieldConfirmationCompleteParamsSchema>;
+
+// Command: countersign on FieldConfirmation
+export const FieldConfirmationCountersignParamsSchema = z.object({
+  observedAt: z.coerce.date().optional(),
+  note: z.string().optional(),
+});
+
+export type FieldConfirmationCountersignParams = z.infer<typeof FieldConfirmationCountersignParamsSchema>;
+
+// Command: escalate on FieldConfirmation
+export const FieldConfirmationEscalateParamsSchema = z.object({
+  note: z.string(),
+});
+
+export type FieldConfirmationEscalateParams = z.infer<typeof FieldConfirmationEscalateParamsSchema>;
+
+// Command: prepare on FieldConfirmation
+export const FieldConfirmationPrepareParamsSchema = z.object({
+  eventId: z.string().min(1),
+  formKey: z.string(),
+  label: z.string(),
+  needsTwoPeople: z.boolean(),
+  evidence: z.enum(["none", "note", "photo"]),
+  dueAt: z.coerce.date().optional(),
+  responsiblePersonId: z.string().min(1).optional(),
+  secondPersonId: z.string().min(1).optional(),
+  instructions: z.string().optional(),
+  expectedItems: z.string().optional(),
+});
+
+export type FieldConfirmationPrepareParams = z.infer<typeof FieldConfirmationPrepareParamsSchema>;
+
+// Command: reassign on FieldConfirmation
+export const FieldConfirmationReassignParamsSchema = z.object({
+  dueAt: z.coerce.date().optional(),
+  responsiblePersonId: z.string().min(1).optional(),
+  secondPersonId: z.string().min(1).optional(),
+  instructions: z.string().optional(),
+  expectedItems: z.string().optional(),
+});
+
+export type FieldConfirmationReassignParams = z.infer<typeof FieldConfirmationReassignParamsSchema>;
 
 // Command: classify on ImportArtifact
 export const ImportArtifactClassifyParamsSchema = z.object({

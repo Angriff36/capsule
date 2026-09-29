@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "00af3bb2af00c85d1c9942c4e788643b05f5f4b6c95488b61ffcd81c565bc0ac:0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:0469c4ed0c814a019380a73675adacc62173c22b928bf9a8d16c336b313b24e0:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:0fa9c629f23816c9e51aa47d766814b4adc281ed73c0a26bad33ba65ec930114:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e112ef70ab2634ddc76e69be97bf2cf6213bc0662e21efdb998b5fe1fecbfa5:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2b1d0ec8d7f3b25f4980f6db642a77bc15276b01b7e0276e224c04e5e95cf2c8:2c468f48d7a3ce63653f4405dceb1be68d9eca69e901b1f5f3a2604ffee230d0:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fb10d1ec8ab6d8c42913af0124b46c976247551ec394a25e42766078c72500a:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:425786468a2c925e4a22baf51be9695b6f09848be70c0a67ee021678166c63c5:44730f01893c2c387121f8aa1d1465975c3d70ad9d2ba6bcafc51190118cfc30:461b35052a22a3f3494612a688d5024cf608ca3f5f42e7392e2e39d0b4ae3059:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:493a6e387d93dc73ab30f1e335b014ebe877fb3cfd7bb286f12f252364e161c0:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:571c1fbbd06e6f847dc0789bb6699eef2dad5b3438eb906c97bd99975eee1572:5865118d3c2cc0441916631fed5be684f876ea34c8cc603b23d1cc192c29b379:5eede5832d56f1a6f53fff1c333df6f4f34990f8b3a29f4c007b8e1b88f8c60b:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:8615c9439a3c2de2b2ac53a2796d9bd5b72d81e4953b8e2498112a2650748a6d:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:91494765678fc03b0a3b9e73fb6ffcf253f784b239618d99a68ac114c5a9adf8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:946747485e83cf5d41c4c5a046fc32486ecd0f7e059812185e3b5886d06852a0:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a87caa099b219e0f859edc5be5c50d0cb367def3e8348a5e9bb406bbc8502c65:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b8371dec149afe525f389169aedf38e3953a48946523b416345e61b2ba2a9543:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bdd1b012f7d07994cf68f2b2a7d503e54200daa4b80053709945fc32f95c6374:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccd72e1626e8659c7b43fe7ac7a3f5210245e7d32107e356d0cb3df0decf6453:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e525f86638654821e0fa3123bad1b8075162ae70d0ca58589d9c8680ce48c976:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:f7a4e5f8e94ed6c20dd10eb865c5d62a080b7e9547387be50830d7a0511564ae:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1";
+export const WIRING_CONTRACT_HASH = "00af3bb2af00c85d1c9942c4e788643b05f5f4b6c95488b61ffcd81c565bc0ac:0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:0469c4ed0c814a019380a73675adacc62173c22b928bf9a8d16c336b313b24e0:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:0fa9c629f23816c9e51aa47d766814b4adc281ed73c0a26bad33ba65ec930114:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e112ef70ab2634ddc76e69be97bf2cf6213bc0662e21efdb998b5fe1fecbfa5:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2c468f48d7a3ce63653f4405dceb1be68d9eca69e901b1f5f3a2604ffee230d0:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fb10d1ec8ab6d8c42913af0124b46c976247551ec394a25e42766078c72500a:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:425786468a2c925e4a22baf51be9695b6f09848be70c0a67ee021678166c63c5:44730f01893c2c387121f8aa1d1465975c3d70ad9d2ba6bcafc51190118cfc30:461b35052a22a3f3494612a688d5024cf608ca3f5f42e7392e2e39d0b4ae3059:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:493a6e387d93dc73ab30f1e335b014ebe877fb3cfd7bb286f12f252364e161c0:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:571c1fbbd06e6f847dc0789bb6699eef2dad5b3438eb906c97bd99975eee1572:5865118d3c2cc0441916631fed5be684f876ea34c8cc603b23d1cc192c29b379:5eede5832d56f1a6f53fff1c333df6f4f34990f8b3a29f4c007b8e1b88f8c60b:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:8615c9439a3c2de2b2ac53a2796d9bd5b72d81e4953b8e2498112a2650748a6d:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:91494765678fc03b0a3b9e73fb6ffcf253f784b239618d99a68ac114c5a9adf8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:946747485e83cf5d41c4c5a046fc32486ecd0f7e059812185e3b5886d06852a0:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a87caa099b219e0f859edc5be5c50d0cb367def3e8348a5e9bb406bbc8502c65:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b8371dec149afe525f389169aedf38e3953a48946523b416345e61b2ba2a9543:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bdd1b012f7d07994cf68f2b2a7d503e54200daa4b80053709945fc32f95c6374:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c747b9cc90ee02cca62a2c094ed21683ce17e003907c0e11cb70885a6779400f:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccd72e1626e8659c7b43fe7ac7a3f5210245e7d32107e356d0cb3df0decf6453:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e525f86638654821e0fa3123bad1b8075162ae70d0ca58589d9c8680ce48c976:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:f7a4e5f8e94ed6c20dd10eb865c5d62a080b7e9547387be50830d7a0511564ae:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -27890,6 +27890,20 @@ export const EventApplyRouteTravelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -28779,6 +28793,20 @@ export const EventApplyTimingPolicyInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -29684,6 +29712,20 @@ export const EventApproveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -30572,6 +30614,20 @@ export const EventArchiveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -31447,6 +31503,20 @@ export const EventAssignOwnerInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -32328,6 +32398,20 @@ export const EventBeginExecutionInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -33216,6 +33300,20 @@ export const EventCancelInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -34178,6 +34276,20 @@ export const EventCaptureDraftInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -35176,6 +35288,20 @@ export const EventChangeHeadcountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -36053,6 +36179,20 @@ export const EventChangePricingInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -36938,6 +37078,20 @@ export const EventChangePrimaryContactInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -37832,6 +37986,20 @@ export const EventChangeRequirementsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -38721,6 +38889,20 @@ export const EventChangeServiceStyleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -39604,6 +39786,20 @@ export const EventChangeVenueInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -40501,6 +40697,20 @@ export const EventChooseOperatingLocationInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -41377,6 +41587,20 @@ export const EventClearBinderBuiltInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -42243,6 +42467,20 @@ export const EventCloseOutInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -43129,6 +43367,20 @@ export const EventCompleteInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -44026,6 +44278,20 @@ export const EventConfigureRecurrenceInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -44971,6 +45237,20 @@ export const EventConfigureTimingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -45887,6 +46167,20 @@ export const EventConfirmSalesLockInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -46779,6 +47073,20 @@ export const EventCorrectCommercialInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -47661,6 +47969,20 @@ export const EventFinalizeEventInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -48555,6 +48877,20 @@ export const EventLinkExternalChannelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -49437,6 +49773,20 @@ export const EventLockForSalesInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -50327,6 +50677,20 @@ export const EventMarkBinderBuiltInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -51193,6 +51557,20 @@ export const EventNormalizePurchasingWeekInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -52096,6 +52474,20 @@ export const EventPlanEngagementInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -53124,6 +53516,20 @@ export const EventReactivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -53990,6 +54396,20 @@ export const EventReassignClientInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -54865,6 +55285,20 @@ export const EventRescheduleInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -55748,6 +56182,20 @@ export const EventReturnToPlanningInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -56653,6 +57101,20 @@ export const EventSetEventNumberInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -57528,6 +57990,20 @@ export const EventStageClientMergeInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -58413,6 +58889,20 @@ export const EventStopRecurrenceInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -59279,6 +59769,20 @@ export const EventSubmitForApprovalInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -60169,6 +60673,20 @@ export const EventUnlinkExternalChannelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -61052,6 +61570,20 @@ export const EventUpdateDaySheetInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -62031,6 +62563,20 @@ export const EventUpdateImportDraftInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -63036,6 +63582,20 @@ export const EventUpdateSetupNotesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -63962,6 +64522,20 @@ export const EventUpdateTaskBreakdownInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Incident",
     "queryKeyHint": "queryKeys.incident.lists()",
     "readId": "Incident.list",
@@ -64877,6 +65451,20 @@ export const EventUseCompanyTimingRuleInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -77473,6 +78061,627 @@ export const ExternalRecordLinkVerifyLinkAction = {
     {
       "name": "metadata",
       "label": "Metadata",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- FieldConfirmation.complete ---
+export interface FieldConfirmationCompleteClientInput {
+  /** Allowed: "all_good" | "problem" */
+  outcome: "all_good" | "problem";
+  observedAt?: string;
+  note?: string;
+  photoStorageId?: string;
+}
+
+export const FieldConfirmationCompleteCapability = {
+  capabilityId: "FieldConfirmation.complete",
+  entity: "FieldConfirmation",
+  command: "complete",
+  route: "/api/manifest/FieldConfirmation/commands/complete",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: ["observedAt"],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: \"open\" | \"first_signed\" | \"done\"; needsTwoPeople: boolean; evidence: \"none\" | \"note\" | \"photo\"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: \"all_good\" | \"problem\" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["outcome","observedAt","note","photoStorageId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Event staff and crew may see the day-of forms"},{"kind":"policy_denial","message":"Event staff and crew may fill in the day-of forms"},{"kind":"policy_denial","message":"Event staff and crew may fill in the day-of forms"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Sign in as yourself to fill in a day-of form. The office can't fill it in for you."},{"kind":"constraint_block","message":"This form is already signed."},{"kind":"constraint_block","message":"The time it happened can't be in the future."},{"kind":"constraint_block","message":"Write what you saw."},{"kind":"constraint_block","message":"Add a photo for this form."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"FieldConfirmation not found"}],
+  emits: ["FieldConfirmationCompleted"],
+} as const;
+
+export type FieldConfirmationCompleteResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: "open" | "first_signed" | "done"; needsTwoPeople: boolean; evidence: "none" | "note" | "photo"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: "all_good" | "problem" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for FieldConfirmation.complete.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindFieldConfirmationCompleteInput(client: FieldConfirmationCompleteClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful FieldConfirmation.complete. */
+export const FieldConfirmationCompleteInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer FieldConfirmation.complete. Not a rendered control. */
+export const FieldConfirmationCompleteAction = {
+  "exposure": "human",
+  "label": "Complete",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "outcome",
+      "label": "Outcome",
+      "required": true,
+      "choices": [
+        {
+          "value": "all_good",
+          "label": "all_good"
+        },
+        {
+          "value": "problem",
+          "label": "problem"
+        }
+      ]
+    },
+    {
+      "name": "observedAt",
+      "label": "Observed at",
+      "required": false
+    },
+    {
+      "name": "note",
+      "label": "Note",
+      "required": false
+    },
+    {
+      "name": "photoStorageId",
+      "label": "Photo storage id",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- FieldConfirmation.countersign ---
+export interface FieldConfirmationCountersignClientInput {
+  observedAt?: string;
+  note?: string;
+}
+
+export const FieldConfirmationCountersignCapability = {
+  capabilityId: "FieldConfirmation.countersign",
+  entity: "FieldConfirmation",
+  command: "countersign",
+  route: "/api/manifest/FieldConfirmation/commands/countersign",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: ["observedAt"],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: \"open\" | \"first_signed\" | \"done\"; needsTwoPeople: boolean; evidence: \"none\" | \"note\" | \"photo\"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: \"all_good\" | \"problem\" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["observedAt","note"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Event staff and crew may see the day-of forms"},{"kind":"policy_denial","message":"Event staff and crew may fill in the day-of forms"},{"kind":"policy_denial","message":"Event staff and crew may fill in the day-of forms"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Sign in as yourself to fill in a day-of form. The office can't fill it in for you."},{"kind":"constraint_block","message":"The first person has to sign this form first."},{"kind":"constraint_block","message":"A second, different person has to do this check."},{"kind":"constraint_block","message":"The time it happened can't be in the future."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"FieldConfirmation not found"}],
+  emits: ["FieldConfirmationCountersigned"],
+} as const;
+
+export type FieldConfirmationCountersignResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: "open" | "first_signed" | "done"; needsTwoPeople: boolean; evidence: "none" | "note" | "photo"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: "all_good" | "problem" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for FieldConfirmation.countersign.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindFieldConfirmationCountersignInput(client: FieldConfirmationCountersignClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful FieldConfirmation.countersign. */
+export const FieldConfirmationCountersignInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer FieldConfirmation.countersign. Not a rendered control. */
+export const FieldConfirmationCountersignAction = {
+  "exposure": "human",
+  "label": "Countersign",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "observedAt",
+      "label": "Observed at",
+      "required": false
+    },
+    {
+      "name": "note",
+      "label": "Note",
+      "required": false
+    }
+  ],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "first_signed",
+      "open"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for FieldConfirmation.countersign. */
+export const FieldConfirmationCountersignLifecycle = [
+  {
+    "property": "status",
+    "from": "open",
+    "to": "done",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "first_signed",
+    "to": "done",
+    "proven": true
+  }
+] as const;
+
+// --- FieldConfirmation.escalate ---
+export interface FieldConfirmationEscalateClientInput {
+  note: string;
+}
+
+export const FieldConfirmationEscalateCapability = {
+  capabilityId: "FieldConfirmation.escalate",
+  entity: "FieldConfirmation",
+  command: "escalate",
+  route: "/api/manifest/FieldConfirmation/commands/escalate",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: \"open\" | \"first_signed\" | \"done\"; needsTwoPeople: boolean; evidence: \"none\" | \"note\" | \"photo\"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: \"all_good\" | \"problem\" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["note"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Event staff and crew may see the day-of forms"},{"kind":"policy_denial","message":"Event staff and crew may fill in the day-of forms"},{"kind":"policy_denial","message":"Event staff and crew may fill in the day-of forms"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Only event or logistics managers chase day-of forms."},{"kind":"constraint_block","message":"This form is already done."},{"kind":"constraint_block","message":"Say who you told and what happens next."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"FieldConfirmation not found"}],
+  emits: ["FieldConfirmationEscalated"],
+} as const;
+
+export type FieldConfirmationEscalateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: "open" | "first_signed" | "done"; needsTwoPeople: boolean; evidence: "none" | "note" | "photo"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: "all_good" | "problem" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for FieldConfirmation.escalate.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindFieldConfirmationEscalateInput(client: FieldConfirmationEscalateClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful FieldConfirmation.escalate. */
+export const FieldConfirmationEscalateInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer FieldConfirmation.escalate. Not a rendered control. */
+export const FieldConfirmationEscalateAction = {
+  "exposure": "human",
+  "label": "Escalate",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "note",
+      "label": "Note",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- FieldConfirmation.prepare ---
+export interface FieldConfirmationPrepareClientInput {
+  eventId: string;
+  formKey: string;
+  label: string;
+  needsTwoPeople: boolean;
+  /** Allowed: "none" | "note" | "photo" */
+  evidence: "none" | "note" | "photo";
+  dueAt?: string;
+  responsiblePersonId?: string;
+  secondPersonId?: string;
+  instructions?: string;
+  expectedItems?: string;
+}
+
+export const FieldConfirmationPrepareCapability = {
+  capabilityId: "FieldConfirmation.prepare",
+  entity: "FieldConfirmation",
+  command: "prepare",
+  route: "/api/manifest/FieldConfirmation/commands/prepare",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: ["dueAt"],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["eventId","formKey","label","needsTwoPeople","evidence","dueAt","responsiblePersonId","secondPersonId","instructions","expectedItems"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Event staff and crew may see the day-of forms"},{"kind":"policy_denial","message":"Event staff and crew may fill in the day-of forms"},{"kind":"policy_denial","message":"Event staff and crew may fill in the day-of forms"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Only event or logistics managers set up day-of forms."},{"kind":"constraint_block","message":"That event isn't in your list. Pick one of your events."},{"kind":"constraint_block","message":"Name the form."},{"kind":"constraint_block","message":"Pick people from your own staff list."},{"kind":"constraint_block","message":"The two-person check needs two different people."}],
+  emits: ["FieldConfirmationPrepared"],
+} as const;
+
+export type FieldConfirmationPrepareResult = { docId: string };
+
+/**
+ * Build command input for FieldConfirmation.prepare.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindFieldConfirmationPrepareInput(client: FieldConfirmationPrepareClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful FieldConfirmation.prepare. */
+export const FieldConfirmationPrepareInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer FieldConfirmation.prepare. Not a rendered control. */
+export const FieldConfirmationPrepareAction = {
+  "exposure": "human",
+  "label": "Prepare",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "eventId",
+      "label": "Event id",
+      "required": true
+    },
+    {
+      "name": "formKey",
+      "label": "Form key",
+      "required": true
+    },
+    {
+      "name": "label",
+      "label": "Label",
+      "required": true
+    },
+    {
+      "name": "needsTwoPeople",
+      "label": "Needs two people",
+      "required": true
+    },
+    {
+      "name": "evidence",
+      "label": "Evidence",
+      "required": true,
+      "choices": [
+        {
+          "value": "none",
+          "label": "none"
+        },
+        {
+          "value": "note",
+          "label": "note"
+        },
+        {
+          "value": "photo",
+          "label": "photo"
+        }
+      ]
+    },
+    {
+      "name": "dueAt",
+      "label": "Due at",
+      "required": false
+    },
+    {
+      "name": "responsiblePersonId",
+      "label": "Responsible person id",
+      "required": false
+    },
+    {
+      "name": "secondPersonId",
+      "label": "Second person id",
+      "required": false
+    },
+    {
+      "name": "instructions",
+      "label": "Instructions",
+      "required": false
+    },
+    {
+      "name": "expectedItems",
+      "label": "Expected items",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- FieldConfirmation.reassign ---
+export interface FieldConfirmationReassignClientInput {
+  dueAt?: string;
+  responsiblePersonId?: string;
+  secondPersonId?: string;
+  instructions?: string;
+  expectedItems?: string;
+}
+
+export const FieldConfirmationReassignCapability = {
+  capabilityId: "FieldConfirmation.reassign",
+  entity: "FieldConfirmation",
+  command: "reassign",
+  route: "/api/manifest/FieldConfirmation/commands/reassign",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: ["dueAt"],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: \"open\" | \"first_signed\" | \"done\"; needsTwoPeople: boolean; evidence: \"none\" | \"note\" | \"photo\"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: \"all_good\" | \"problem\" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["dueAt","responsiblePersonId","secondPersonId","instructions","expectedItems"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Event staff and crew may see the day-of forms"},{"kind":"policy_denial","message":"Event staff and crew may fill in the day-of forms"},{"kind":"policy_denial","message":"Event staff and crew may fill in the day-of forms"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Only event or logistics managers change who does a day-of form."},{"kind":"constraint_block","message":"This form is already done."},{"kind":"constraint_block","message":"The two-person check needs two different people."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"FieldConfirmation not found"}],
+  emits: ["FieldConfirmationReassigned"],
+} as const;
+
+export type FieldConfirmationReassignResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: "open" | "first_signed" | "done"; needsTwoPeople: boolean; evidence: "none" | "note" | "photo"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: "all_good" | "problem" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for FieldConfirmation.reassign.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindFieldConfirmationReassignInput(client: FieldConfirmationReassignClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful FieldConfirmation.reassign. */
+export const FieldConfirmationReassignInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer FieldConfirmation.reassign. Not a rendered control. */
+export const FieldConfirmationReassignAction = {
+  "exposure": "human",
+  "label": "Reassign",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "dueAt",
+      "label": "Due at",
+      "required": false
+    },
+    {
+      "name": "responsiblePersonId",
+      "label": "Responsible person id",
+      "required": false
+    },
+    {
+      "name": "secondPersonId",
+      "label": "Second person id",
+      "required": false
+    },
+    {
+      "name": "instructions",
+      "label": "Instructions",
+      "required": false
+    },
+    {
+      "name": "expectedItems",
+      "label": "Expected items",
       "required": false
     }
   ]
@@ -113321,6 +114530,20 @@ export const PersonAssignRoleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Interview",
     "queryKeyHint": "queryKeys.interview.lists()",
     "readId": "Interview.list",
@@ -113971,6 +115194,20 @@ export const PersonChangeAddressInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Interview",
     "queryKeyHint": "queryKeys.interview.lists()",
     "readId": "Interview.list",
@@ -114547,6 +115784,20 @@ export const PersonCorrectEmailInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Interview",
     "queryKeyHint": "queryKeys.interview.lists()",
     "readId": "Interview.list",
@@ -115101,6 +116352,20 @@ export const PersonCorrectIdentityInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -115665,6 +116930,20 @@ export const PersonDeactivateInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -116241,6 +117520,20 @@ export const PersonHireInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -116949,6 +118242,20 @@ export const PersonLinkAccountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Interview",
     "queryKeyHint": "queryKeys.interview.lists()",
     "readId": "Interview.list",
@@ -117499,6 +118806,20 @@ export const PersonReactivateInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -118069,6 +119390,20 @@ export const PersonSetEmployeeNumberInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Interview",
     "queryKeyHint": "queryKeys.interview.lists()",
     "readId": "Interview.list",
@@ -118622,6 +119957,20 @@ export const PersonSetPayRateInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -119182,6 +120531,20 @@ export const PersonSetSchedulingHoldInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Interview",
     "queryKeyHint": "queryKeys.interview.lists()",
     "readId": "Interview.list",
@@ -119738,6 +121101,20 @@ export const PersonSetSmsAlertsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Interview",
     "queryKeyHint": "queryKeys.interview.lists()",
     "readId": "Interview.list",
@@ -120290,6 +121667,20 @@ export const PersonSetStaffingVendorInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -120851,6 +122242,20 @@ export const PersonSetWorkPreferencesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Interview",
     "queryKeyHint": "queryKeys.interview.lists()",
     "readId": "Interview.list",
@@ -121408,6 +122813,20 @@ export const PersonTerminateInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -121985,6 +123404,20 @@ export const PersonUnlinkAccountInvalidation = [
     "entity": "EventVehicleAssignment",
     "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
     "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.lists()",
+    "readId": "FieldConfirmation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "FieldConfirmation",
+    "queryKeyHint": "queryKeys.fieldConfirmation.detail(id)",
+    "readId": "FieldConfirmation.get",
     "label": "related entity detail"
   },
   {
@@ -170829,6 +172262,11 @@ export const ALL_CAPABILITY_IDS = [
   "ExternalRecordLink.unlinkExternalRecord",
   "ExternalRecordLink.updateCapsuleId",
   "ExternalRecordLink.verifyLink",
+  "FieldConfirmation.complete",
+  "FieldConfirmation.countersign",
+  "FieldConfirmation.escalate",
+  "FieldConfirmation.prepare",
+  "FieldConfirmation.reassign",
   "ImportArtifact.classify",
   "ImportArtifact.recordParse",
   "ImportArtifact.register",
@@ -171692,6 +173130,12 @@ export const ALL_READ_IDS = [
   "ExternalRecordLink.byTenantId",
   "ExternalRecordLink.get",
   "ExternalRecordLink.list",
+  "FieldConfirmation.byEventId",
+  "FieldConfirmation.byResponsiblePersonId",
+  "FieldConfirmation.bySecondPersonId",
+  "FieldConfirmation.byTenantId",
+  "FieldConfirmation.get",
+  "FieldConfirmation.list",
   "ImportArtifact.byImportRunId",
   "ImportArtifact.byTenantId",
   "ImportArtifact.get",
@@ -173235,6 +174679,24 @@ export type getExternalRecordLinkResult = { _id: string; _creationTime: number; 
 
 export const listExternalRecordLinkRead = {"entity":"ExternalRecordLink","readId":"ExternalRecordLink.list","exportName":"listExternalRecordLink","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\" | \"quickbooks_online\" | \"google_calendar\" | \"stripe\" | \"other\"; recordType: string; externalId: string; capsuleEntity: \"event_record\" | \"contact\" | \"lead\" | \"menu\" | \"venue\" | \"payment\" | \"invoice\" | \"contract\" | \"proposal\" | \"client\" | \"vendor\" | \"person\" | \"task\" | \"batch\" | \"order\" | \"delivery\" | \"stock\" | \"location\" | \"pack_list\" | \"ingredient\" | \"component\" | \"component_portion_spec\" | \"component_ingredient\" | \"component_component\" | \"dish\" | \"dish_ingredient\" | \"dish_component\" | \"dish_task\" | \"dish_container\" | \"station\" | \"unit\" | \"event_dish\" | \"prep_task\" | \"service_style\"; capsuleId: string; sourceAccount: string | null; role: string | null; ordinal: number | null; linkKey: string | null; decision: \"suggested\" | \"approved\" | \"rejected\" | null; suggestedBy: string | null; decidedByUserId: string | null; decidedAt: number | null; appliedValues: string | null; appliedSourceVersion: string | null; appliedAt: number | null; appliedImportRunId: string | null; sourceVersion: string | null; lastSeenAt: number | null; lastSeenImportRunId: string | null; verified: boolean; lastVerifiedAt: number | null; verifiedByUserId: string | null; sourceImportRunId: string | null; effectiveStartDate: number | null; effectiveEndDate: number | null; rawSourceData: string | null; metadata: string | null; conflictStatus: \"resolved\" | \"pending_conflict\" | \"superseded\"; resolvedByUserId: string | null; resolutionNote: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listExternalRecordLinkResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync" | "quickbooks_online" | "google_calendar" | "stripe" | "other"; recordType: string; externalId: string; capsuleEntity: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task" | "service_style"; capsuleId: string; sourceAccount: string | null; role: string | null; ordinal: number | null; linkKey: string | null; decision: "suggested" | "approved" | "rejected" | null; suggestedBy: string | null; decidedByUserId: string | null; decidedAt: number | null; appliedValues: string | null; appliedSourceVersion: string | null; appliedAt: number | null; appliedImportRunId: string | null; sourceVersion: string | null; lastSeenAt: number | null; lastSeenImportRunId: string | null; verified: boolean; lastVerifiedAt: number | null; verifiedByUserId: string | null; sourceImportRunId: string | null; effectiveStartDate: number | null; effectiveEndDate: number | null; rawSourceData: string | null; metadata: string | null; conflictStatus: "resolved" | "pending_conflict" | "superseded"; resolvedByUserId: string | null; resolutionNote: string | null; createdAt: number; updatedAt: number }>;
+
+export const listFieldConfirmationByEventIdRead = {"entity":"FieldConfirmation","readId":"FieldConfirmation.byEventId","exportName":"listFieldConfirmationByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: \"open\" | \"first_signed\" | \"done\"; needsTwoPeople: boolean; evidence: \"none\" | \"note\" | \"photo\"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: \"all_good\" | \"problem\" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listFieldConfirmationByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: "open" | "first_signed" | "done"; needsTwoPeople: boolean; evidence: "none" | "note" | "photo"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: "all_good" | "problem" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number }>;
+
+export const listFieldConfirmationByResponsiblePersonIdRead = {"entity":"FieldConfirmation","readId":"FieldConfirmation.byResponsiblePersonId","exportName":"listFieldConfirmationByResponsiblePersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"responsiblePersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: \"open\" | \"first_signed\" | \"done\"; needsTwoPeople: boolean; evidence: \"none\" | \"note\" | \"photo\"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: \"all_good\" | \"problem\" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listFieldConfirmationByResponsiblePersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: "open" | "first_signed" | "done"; needsTwoPeople: boolean; evidence: "none" | "note" | "photo"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: "all_good" | "problem" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number }>;
+
+export const listFieldConfirmationBySecondPersonIdRead = {"entity":"FieldConfirmation","readId":"FieldConfirmation.bySecondPersonId","exportName":"listFieldConfirmationBySecondPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"secondPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: \"open\" | \"first_signed\" | \"done\"; needsTwoPeople: boolean; evidence: \"none\" | \"note\" | \"photo\"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: \"all_good\" | \"problem\" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listFieldConfirmationBySecondPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: "open" | "first_signed" | "done"; needsTwoPeople: boolean; evidence: "none" | "note" | "photo"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: "all_good" | "problem" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number }>;
+
+export const listFieldConfirmationByTenantIdRead = {"entity":"FieldConfirmation","readId":"FieldConfirmation.byTenantId","exportName":"listFieldConfirmationByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: \"open\" | \"first_signed\" | \"done\"; needsTwoPeople: boolean; evidence: \"none\" | \"note\" | \"photo\"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: \"all_good\" | \"problem\" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listFieldConfirmationByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: "open" | "first_signed" | "done"; needsTwoPeople: boolean; evidence: "none" | "note" | "photo"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: "all_good" | "problem" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number }>;
+
+export const getFieldConfirmationRead = {"entity":"FieldConfirmation","readId":"FieldConfirmation.get","exportName":"getFieldConfirmation","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: \"open\" | \"first_signed\" | \"done\"; needsTwoPeople: boolean; evidence: \"none\" | \"note\" | \"photo\"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: \"all_good\" | \"problem\" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getFieldConfirmationResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: "open" | "first_signed" | "done"; needsTwoPeople: boolean; evidence: "none" | "note" | "photo"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: "all_good" | "problem" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number } | null;
+
+export const listFieldConfirmationRead = {"entity":"FieldConfirmation","readId":"FieldConfirmation.list","exportName":"listFieldConfirmation","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: \"open\" | \"first_signed\" | \"done\"; needsTwoPeople: boolean; evidence: \"none\" | \"note\" | \"photo\"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: \"all_good\" | \"problem\" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listFieldConfirmationResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; formKey: string; label: string; status: "open" | "first_signed" | "done"; needsTwoPeople: boolean; evidence: "none" | "note" | "photo"; dueAt: number | null; responsiblePersonId: string | null; secondPersonId: string | null; instructions: string | null; expectedItems: string | null; preparedAt: number | null; completedAt: number | null; observedAt: number | null; formCompletedById: string | null; outcome: "all_good" | "problem" | null; note: string | null; photoStorageId: string | null; secondCompletedAt: number | null; secondObservedAt: number | null; formCheckedById: string | null; secondNote: string | null; escalatedAt: number | null; formEscalatedById: string | null; escalationNote: string | null; createdAt: number; updatedAt: number }>;
 
 export const listImportArtifactByImportRunIdRead = {"entity":"ImportArtifact","readId":"ImportArtifact.byImportRunId","exportName":"listImportArtifactByImportRunId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"importRunId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: \"pending\" | \"normalized\" | \"linked_reference\" | \"duplicate_view\" | \"needs_mapping\" | \"unsupported\" | \"invalid\"; parseStatus: \"pending\" | \"parsed\" | \"failed\"; totalRowCount: number; rowOutcomeCounts: string; createdAt: number; updatedAt: number }>"} as const;
 export type listImportArtifactByImportRunIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: "pending" | "normalized" | "linked_reference" | "duplicate_view" | "needs_mapping" | "unsupported" | "invalid"; parseStatus: "pending" | "parsed" | "failed"; totalRowCount: number; rowOutcomeCounts: string; createdAt: number; updatedAt: number }>;

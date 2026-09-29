@@ -103,6 +103,16 @@ export async function handleManifestEvent(
     await raiseVendorReturnIssue(ctx, event.entityId as Id<"rentalOrderLines">);
     return;
   }
+  // PL-FIELD-CONFIRMATION: a day-of form's photo has to be a real upload.
+  if (event.entity === "FieldConfirmation" && event.type === "FieldConfirmationCompleted") {
+    const storageId = event.payload.photoStorageId;
+    if (typeof storageId === "string" && storageId.trim()) {
+      const id = ctx.db.system.normalizeId("_storage", storageId);
+      if (!id || !(await ctx.db.system.get(id)))
+        throw new Error("That photo didn't upload. Take or pick the photo again.");
+    }
+    return;
+  }
   if (await handleTravelLegEvent(ctx, event)) return;
   if (event.entity === "WeeklyScheduleNotice" &&
     (event.type === "WeeklySchedulePublished" || event.type === "WeeklyScheduleRepublished")) {

@@ -212,45 +212,72 @@ describe("Final Lock answers keep the payer, booked names, sign-off versions and
     );
     expect(signature).toBeDefined();
     await sign(signature);
-    // A completed day-of form, saved before decisions carried a version.
-    const form = "field.arrival";
+    // A sign-off saved before decisions carried a version reads as 1 too.
     await t.run(async (ctx) => {
       await ctx.db.insert("eventPacketResolutions", {
         tenantId: "tenant-a",
         eventId,
-        decisionId: "arrival-form",
-        issueKey: form,
+        decisionId: "older-note",
+        issueKey: "older-note",
         actor: "final-lock-staff",
         decidedAt: Date.now(),
-        decisionJson: JSON.stringify({ id: "arrival-form" }),
-        verificationJson: JSON.stringify({
-          checkKey: form,
-          answer: "yes",
-          actor: "final-lock-staff",
-          at: new Date().toISOString(),
-        }),
+        decisionJson: JSON.stringify({ id: "older-note" }),
         createdAt: Date.now(),
         updatedAt: Date.now(),
       });
     });
+    // A completed day-of form: signed on the day by a person (PL-FIELD-CONFIRMATION).
+    const form = "field.arrival";
+    await t.run((ctx) =>
+      ctx.db.insert("people", {
+        tenantId: "tenant-a",
+        givenName: "Lena",
+        familyName: "Crew",
+        email: "final-lock-crew@example.test",
+        role: "staff",
+        employmentType: "full_time",
+        status: "active",
+        authSubjectId: "final-lock-crew",
+        version: 1,
+      } as never),
+    );
+    await manager.mutation(finalLock.prepareFieldForms, { eventId });
+    const formRow = (
+      await manager.query(finalLock.listEventFieldForms, { eventId })
+    ).find((f: any) => f.formKey === form)!;
+    await t
+      .withIdentity({
+        subject: "final-lock-crew",
+        org_id: "tenant-a",
+        role: "staff",
+      })
+      .mutation(api.mutations.FieldConfirmation_complete, {
+        docId: formRow.id,
+        outcome: "all_good",
+      });
     const report = await manager.query(finalLock.getFinalLock, { eventId });
     const rows = await t.run(async (ctx) =>
       ctx.db.query("eventPacketResolutions").collect(),
     );
-    const bySource = (a: any) =>
-      a.sources.filter((s: any) => s.table === "eventPacketResolutions");
-    const readinessSources = bySource(answer(report, "readiness.dispatch"));
-    const formSources = bySource(answer(report, form));
-    for (const s of [...readinessSources, ...formSources]) {
+    const bySource = (a: any, table: string) =>
+      a.sources.filter((s: any) => s.table === table);
+    const readinessSources = bySource(
+      answer(report, "readiness.dispatch"),
+      "eventPacketResolutions",
+    );
+    for (const s of readinessSources) {
       expect(s.version).toBe(1);
       expect(rows.map((r) => String(r._id))).toContain(s.id);
     }
     expect(readinessSources.length).toBeGreaterThan(0);
-    expect(formSources.length).toBeGreaterThan(0);
+    // The form names the signed record at the version it was read.
+    expect(bySource(answer(report, form), "fieldConfirmations")).toEqual([
+      { table: "fieldConfirmations", id: formRow.id, version: 2 },
+    ]);
     // Decisions saved now carry version 1; the older row reads as 1 too.
     expect(
       rows
-        .filter((r) => r.decisionId !== "arrival-form")
+        .filter((r) => r.decisionId !== "older-note")
         .every((r) => r.version === 1),
     ).toBe(true);
   });

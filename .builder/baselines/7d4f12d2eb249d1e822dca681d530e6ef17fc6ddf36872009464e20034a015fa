@@ -311,6 +311,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.ExternalRecordLink_createViaLink, { "sourceSystem": "demo-sourceSystem-1", "recordType": "demo-recordType-1", "externalId": "externalId-external-record-link-1", "capsuleEntity": "demo-capsuleEntity-1", "capsuleId": "capsuleId-external-record-link-1", "sourceAccount": "demo-sourceAccount-1", "role": "demo-role-1", "ordinal": 1, "linkKey": "demo-linkKey-1", "decision": "demo-decision-1", "suggestedBy": "demo-suggestedBy-1", "sourceVersion": "demo-sourceVersion-1", "verified": false, "sourceImportRunId": "sourceImportRunId-external-record-link-1", "effectiveStartDate": 1767268800000, "effectiveEndDate": 1767268800000, "rawSourceData": "demo-rawSourceData-1", "metadata": "demo-metadata-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.ExternalRecordLink_createViaLink, { "sourceSystem": "demo-sourceSystem-2", "recordType": "demo-recordType-2", "externalId": "externalId-external-record-link-2", "capsuleEntity": "demo-capsuleEntity-2", "capsuleId": "capsuleId-external-record-link-2", "sourceAccount": "demo-sourceAccount-2", "role": "demo-role-2", "ordinal": 2, "linkKey": "demo-linkKey-2", "decision": "demo-decision-2", "suggestedBy": "demo-suggestedBy-2", "sourceVersion": "demo-sourceVersion-2", "verified": false, "sourceImportRunId": "sourceImportRunId-external-record-link-2", "effectiveStartDate": 1767355200000, "effectiveEndDate": 1767355200000, "rawSourceData": "demo-rawSourceData-2", "metadata": "demo-metadata-2" } as any);
+  // FieldConfirmation → api.mutations.FieldConfirmation_createViaPrepare
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.FieldConfirmation_createViaPrepare, { "eventId": "eventId-field-confirmation-1", "formKey": "demo-formKey-1", "label": "demo-label-1", "needsTwoPeople": false, "evidence": "demo-evidence-1", "dueAt": 1767268800000, "responsiblePersonId": "responsiblePersonId-field-confirmation-1", "secondPersonId": "secondPersonId-field-confirmation-1", "instructions": "demo-instructions-1", "expectedItems": "demo-expectedItems-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.FieldConfirmation_createViaPrepare, { "eventId": "eventId-field-confirmation-2", "formKey": "demo-formKey-2", "label": "demo-label-2", "needsTwoPeople": false, "evidence": "demo-evidence-2", "dueAt": 1767355200000, "responsiblePersonId": "responsiblePersonId-field-confirmation-2", "secondPersonId": "secondPersonId-field-confirmation-2", "instructions": "demo-instructions-2", "expectedItems": "demo-expectedItems-2" } as any);
   // skip ImportArtifact: no creation command in IR (2 rows unused)
   // ImportConflict → api.mutations.ImportConflict_createViaRaise
   rowsAttempted += 1;
@@ -1178,6 +1183,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "ExternalRecordLink",
       "createMutation": "ExternalRecordLink_createViaLink",
+      "rowCount": 2
+    },
+    {
+      "entity": "FieldConfirmation",
+      "createMutation": "FieldConfirmation_createViaPrepare",
       "rowCount": 2
     },
     {

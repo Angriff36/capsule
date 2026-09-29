@@ -58,6 +58,19 @@ export interface FieldWork {
   dueAt: number | null;
   confirmedAt: string | null;
   confirmedBy: string | null;
+  /** Set up for the day (a FieldConfirmation exists), who does it, chased. */
+  prepared?: boolean;
+  responsible?: string | null;
+  status?: "not_set_up" | "open" | "first_signed" | "done";
+  escalatedAt?: string | null;
+}
+
+/** A day-of form the office set up (FieldConfirmation), as read for Final Lock. */
+export interface FieldFormState {
+  status: "open" | "first_signed" | "done";
+  dueAt: number | null;
+  responsible: string | null;
+  escalatedAt: string | null;
 }
 
 export interface FinalLockAnswer {
@@ -229,9 +242,14 @@ export interface FinalLockInput {
       source: AnswerSource | null;
     }[];
   };
-  /** Physical confirmations recorded by people, keyed by form key. */
+  /**
+   * Physical confirmations signed by people on the day, keyed by form key.
+   * Only a completed day-of form (every signature it needs) appears here.
+   */
   confirmations: Record<
     string,
     { actor: string; at: string; source: AnswerSource | null }
   >;
+  /** Day-of forms the office set up, keyed by form key. */
+  fieldForms?: Record<string, FieldFormState>;
 }

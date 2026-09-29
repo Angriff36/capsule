@@ -962,6 +962,10 @@ describe("Final Lock answer engine", () => {
       dueAt: T - 120 * MIN,
       confirmedAt: null,
       confirmedBy: null,
+      prepared: false,
+      responsible: null,
+      status: "not_set_up",
+      escalatedAt: null,
     });
     const review = input();
     review.event.venueName = null;
