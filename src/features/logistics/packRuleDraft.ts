@@ -1,5 +1,11 @@
-import { PACK_EVENT_FACTS, ruleQuantity } from "../../lib/packRules";
+import {
+  PACK_CATEGORIES,
+  PACK_EVENT_FACTS,
+  ruleQuantity,
+} from "../../lib/packRules";
 import { packCategoryLabel } from "./packLineExplanation";
+
+export { PACK_CATEGORIES };
 
 export const PACK_RULE_TRIGGERS = [
   { value: "dish", label: "A dish is on the menu" },
@@ -7,31 +13,6 @@ export const PACK_RULE_TRIGGERS = [
   { value: "service_style", label: "The service style is" },
   { value: "guest_count", label: "Every event (by guests)" },
   { value: "event_fact", label: "An event answer says" },
-] as const;
-
-export const PACK_CATEGORIES = [
-  "serving_vessel",
-  "utensil",
-  "holding",
-  "transport",
-  "garnish",
-  "portioning",
-  "disposable",
-  "place_setting",
-  "linen",
-  "table_setup",
-  "power",
-  "water",
-  "handwashing",
-  "tent",
-  "flooring",
-  "weather",
-  "bar",
-  "glassware",
-  "ice",
-  "decor",
-  "rental",
-  "other",
 ] as const;
 
 export type PackRuleDraft = {

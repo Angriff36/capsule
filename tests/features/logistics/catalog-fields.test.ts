@@ -128,7 +128,11 @@ describe("rental catalog fields (AC-545)", () => {
 
     // A photo on the catalog item.
     const storageId = (await staff.run(async (ctx) =>
-      ctx.storage.store(new Blob(["chair"], { type: "image/png" })),
+      (
+        ctx as unknown as {
+          storage: { store: (blob: Blob) => Promise<string> };
+        }
+      ).storage.store(new Blob(["chair"], { type: "image/png" })),
     )) as string;
     await run(staff, M.Equipment_setPrimaryImage, {
       docId: chairs.docId,

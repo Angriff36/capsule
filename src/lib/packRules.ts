@@ -12,6 +12,42 @@
  * numbers used and the amount, so the pack screen can answer "why 18?".
  */
 
+/** The pack line categories the PackCategory enum allows. */
+export const PACK_CATEGORIES = [
+  "serving_vessel",
+  "utensil",
+  "holding",
+  "transport",
+  "garnish",
+  "portioning",
+  "disposable",
+  "place_setting",
+  "linen",
+  "table_setup",
+  "power",
+  "water",
+  "handwashing",
+  "tent",
+  "flooring",
+  "weather",
+  "bar",
+  "glassware",
+  "ice",
+  "decor",
+  "rental",
+  "other",
+] as const;
+
+/** An equipment kind is free text ("Furniture", "Table setup"); a pack line
+ * takes it only when it names a pack category, otherwise "other". */
+export function packCategoryFor(kind: string | null | undefined): string {
+  const key = (kind ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
+  return (PACK_CATEGORIES as readonly string[]).includes(key) ? key : "other";
+}
+
 export type PackRuleTrigger =
   "dish" | "production_note" | "service_style" | "guest_count" | "event_fact";
 export type PackRuleScale = "fixed" | "servings" | "guests";
@@ -304,7 +340,7 @@ function rentalLine(rental: PackRentalInput): Omit<PlannedPackLine, "key"> {
   return {
     description: rental.name,
     unit: "each",
-    category: rented ? "rental" : rental.category?.trim() || "other",
+    category: rented ? "rental" : packCategoryFor(rental.category),
     ownership: rental.ownership,
     returnRequired: true,
     returnNote: rented

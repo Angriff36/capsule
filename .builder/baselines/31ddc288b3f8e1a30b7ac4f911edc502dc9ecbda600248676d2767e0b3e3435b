@@ -8511,6 +8511,15 @@ export const PackListItemRestoreImportedAssociationParamsSchema = z.object({
 
 export type PackListItemRestoreImportedAssociationParams = z.infer<typeof PackListItemRestoreImportedAssociationParamsSchema>;
 
+// Command: setResponsibility on PackListItem
+export const PackListItemSetResponsibilityParamsSchema = z.object({
+  ownership: z.enum(["owned", "rented", "client"]),
+  returnRequired: z.boolean(),
+  returnNote: z.string().optional(),
+});
+
+export type PackListItemSetResponsibilityParams = z.infer<typeof PackListItemSetResponsibilityParamsSchema>;
+
 // Command: syncContainerServings on PackListItem
 export const PackListItemSyncContainerServingsParamsSchema = z.object({
   quantityServings: z.number(),

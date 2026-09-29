@@ -699,6 +699,24 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // PL-ASSET-CATALOG (AC-548): say who supplies a hand-added line - ours,
+  // rented from a vendor, or the client's - and whether it must come back.
+  // Pack-rule lines take this from their rule, so they are changed there.
+  command setResponsibility(ownership: PackOwnership, returnRequired: boolean, optional returnNote: string) {
+    guard self.deletedAt == null and self.listedAt != null
+    constraint responsibilityManualLine: self.generationKey == null "This line comes from a pack rule. Change who supplies it on the rule."
+    mutate ownership = ownership
+    mutate returnRequired = returnRequired
+    mutate returnNote = returnNote != null and length(trim(returnNote)) > 0 ? trim(returnNote) : null
+    emit PackListItemResponsibilitySet {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      ownership: ownership
+      returnRequired: returnRequired
+    }
+  }
+
   // Record a stand-in without rewriting the listed item. A blank entry clears it.
   command recordSentInstead(optional sentInstead: string) {
     guard self.deletedAt == null
@@ -1009,6 +1027,14 @@ event PackListItemAnnotated: "pack_list_item.annotated" {
   packListItemId: string
   tenantId: string
   packListId: string
+}
+
+event PackListItemResponsibilitySet: "pack_list_item.responsibility_set" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  ownership: PackOwnership
+  returnRequired: boolean
 }
 
 event PackListItemSentInsteadRecorded: "pack_list_item.sent_instead_recorded" {
