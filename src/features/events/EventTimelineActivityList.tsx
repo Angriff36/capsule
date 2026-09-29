@@ -43,15 +43,15 @@ type Props = {
 /** Block-type badge tone. Service leads, guest-facing reads info, back-of-house
  *  prep reads warn, and load in/out stays quiet. */
 const CATEGORY_TONE: Record<string, string> = {
-  service: "border-accent/40 bg-accent-soft text-accent-deep",
-  guest_arrival: "border-info/40 bg-info-soft text-info",
-  staff_arrival: "border-info/40 bg-info-soft text-info",
-  kitchen_setup: "border-warn/40 bg-warn-soft text-warn",
-  bar_setup: "border-warn/40 bg-warn-soft text-warn",
-  setup: "border-line-2 bg-inset text-ink-2",
-  load_in: "border-line-2 bg-inset text-ink-2",
-  load_out: "border-line-2 bg-mute-soft text-ink-2",
-  breakdown: "border-line-2 bg-mute-soft text-ink-2",
+  service: "chip-tone-brand",
+  guest_arrival: "chip-tone-info",
+  staff_arrival: "chip-tone-info",
+  kitchen_setup: "chip-tone-warn",
+  bar_setup: "chip-tone-warn",
+  setup: "chip-tone-mute",
+  load_in: "chip-tone-mute",
+  load_out: "chip-tone-mute",
+  breakdown: "chip-tone-mute",
 };
 
 function categoryLabel(category: string): string {
@@ -199,8 +199,7 @@ export function EventTimelineActivityList({
                     {category ? (
                       <span
                         className={`chip ${
-                          CATEGORY_TONE[category] ??
-                          "border-line-2 bg-inset text-ink-2"
+                          CATEGORY_TONE[category] ?? "chip-tone-mute"
                         }`}
                       >
                         {categoryLabel(category)}

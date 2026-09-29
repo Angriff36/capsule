@@ -81,7 +81,7 @@ it.each([
   [
     "/clients",
     "useGetClient",
-    "HarborviewActive",
+    "Harborview",
     { clientType: "company", companyName: "Harborview", status: "active" },
   ],
   [

@@ -43,8 +43,17 @@ export function EventWorkbooksPage() {
         title="Event Workbooks"
         lead={
           summaries
-            ? `${totals.events} ${totals.events === 1 ? "workbook" : "workbooks"} · ${totals.openBlocking} open blocking · ${totals.ready} ready — counts as of the last import or decision`
+            ? "Source evidence, open issues, and printable packets across every event — counts as of the last import or decision"
             : "Source evidence, open issues, and printable packets across every event"
+        }
+        facts={
+          summaries
+            ? [
+                { label: "Workbooks", value: totals.events },
+                { label: "Open blocking", value: totals.openBlocking },
+                { label: "Ready", value: totals.ready },
+              ]
+            : undefined
         }
         actions={
           <Link to={eventImportPath()} className="btn btn-primary">

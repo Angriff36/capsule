@@ -138,7 +138,7 @@ export function MyDayFrame({
         className={`my-day-main ${wide ? "max-w-md md:max-w-5xl" : "max-w-md"}`}
       >
         <div id="my-day-dashboard">
-          <PageHeader title="My Day" lead={identityLead} />
+          <PageHeader title="My Day" lead={identityLead} size="compact" />
         </div>
         {children}
       </main>

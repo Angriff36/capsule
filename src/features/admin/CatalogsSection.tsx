@@ -297,13 +297,9 @@ export function CatalogsSection({
                       #{row.sortOrder ?? 0}
                     </span>
                     {active ? (
-                      <span className="chip border-ok/30 bg-ok-soft text-ok">
-                        Active
-                      </span>
+                      <span className="chip chip-tone-ok">Active</span>
                     ) : (
-                      <span className="chip border-line-2 bg-inset text-ink-3">
-                        Retired
-                      </span>
+                      <span className="chip chip-tone-mute">Retired</span>
                     )}
                   </p>
                   {row.description ? (

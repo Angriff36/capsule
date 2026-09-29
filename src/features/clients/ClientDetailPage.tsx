@@ -25,7 +25,6 @@ import {
   ErrorState,
   PageHeader,
   Section,
-  StatusChip,
   TableSkeleton,
 } from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
@@ -214,37 +213,35 @@ export function ClientDetailPage() {
   };
 
   const name = clientDisplayName(client._id, [client]);
-  const profileLine = [
-    formatStatusLabel(String(client.clientType)),
-    client.email,
-    client.phone,
-    client.website,
-    `Net ${Number(client.paymentTermsDays ?? 30)} terms`,
-    client.registeredAt != null
-      ? `Client since ${formatDate(Number(client.registeredAt))}`
-      : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  const facts = [
+    { label: "Type", value: formatStatusLabel(String(client.clientType)) },
+    { label: "Email", value: client.email || null },
+    { label: "Phone", value: client.phone || null },
+    { label: "Website", value: client.website || null },
+    { label: "Terms", value: `Net ${Number(client.paymentTermsDays ?? 30)}` },
+    {
+      label: "Client since",
+      value:
+        client.registeredAt != null
+          ? formatDate(Number(client.registeredAt))
+          : null,
+    },
+  ];
 
   return (
     <div className="space-y-4">
       <PageHeader
-        title={
-          <span className="inline-flex flex-wrap items-center gap-2">
-            {name}
-            <StatusChip status={String(client.status)} />
-          </span>
-        }
-        lead={
-          <span className="text-base">
-            {profileLine}
-            {" · "}
-            <Link className="text-link" to={CLIENTS_ROUTES.root}>
+        eyebrow={
+          <>
+            <Link className="hover:underline" to={CLIENTS_ROUTES.root}>
               All clients
             </Link>
-          </span>
+            {" / "}
+            <b>{formatStatusLabel(String(client.status))}</b>
+          </>
         }
+        title={name}
+        facts={facts}
         actions={
           <>
             {actions.map((action) => (

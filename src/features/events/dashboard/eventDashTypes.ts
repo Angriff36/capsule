@@ -11,6 +11,9 @@ export type DashEvent = {
   hasExpectedHeadcount?: boolean;
   hasMenuDishes?: boolean;
   hasStaffAssigned?: boolean;
+  hasServiceStyle?: boolean;
+  hasFinalLockTiming?: boolean;
+  plannedAt?: number | null;
   eventType: string;
   clientName?: string | null;
   venueId?: Id<"venues"> | null;

@@ -219,8 +219,58 @@
   .field-label {
     @apply grid gap-1 text-xs font-semibold text-ink-2;
   }
-  .chip {
-    @apply inline-flex h-6 items-center gap-1 rounded-full border px-2.5 text-xs font-semibold whitespace-nowrap capitalize;
+  /* Status chip (DESIGN.md `status-chip`, owner pick 2026-09-29): a neutral
+     outline with ink text; the tone lives in a leading icon, so state never
+     rides on color alone. Give each chip one `chip-tone-*` class.
+     `.chip-state` + `chip-state-ok|warn|danger` is the older spelling. */
+  .chip,
+  .chip-state {
+    @apply inline-flex h-[26px] items-center gap-1.5 rounded-sm border border-line bg-panel pr-2.5 pl-2 text-sm font-medium whitespace-nowrap text-ink capitalize;
+  }
+  .chip:is(
+      .chip-tone-mute,
+      .chip-tone-info,
+      .chip-tone-warn,
+      .chip-tone-ok,
+      .chip-tone-danger,
+      .chip-tone-brand
+    )::before,
+  .chip-state::before {
+    content: "";
+    @apply size-3.5 shrink-0;
+    background-color: var(--chip-tone);
+    mask: var(--chip-icon) center / contain no-repeat;
+  }
+  .chip-tone-mute {
+    --chip-tone: var(--color-ink-3);
+    --chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.1 2.2a10 10 0 0 1 3.8 0M17.6 3.7a10 10 0 0 1 2.7 2.7M21.8 10.1a10 10 0 0 1 0 3.8M20.3 17.6a10 10 0 0 1-2.7 2.7M13.9 21.8a10 10 0 0 1-3.8 0M6.4 20.3a10 10 0 0 1-2.7-2.7M2.2 13.9a10 10 0 0 1 0-3.8M3.7 6.4a10 10 0 0 1 2.7-2.7'/%3E%3C/svg%3E");
+  }
+  .chip-tone-info {
+    --chip-tone: var(--color-info);
+    --chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m12 16 4-4-4-4M8 12h8'/%3E%3C/svg%3E");
+  }
+  .chip-tone-warn,
+  .chip-state,
+  .chip-state-warn {
+    --chip-tone: var(--color-warn);
+    --chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3Z'/%3E%3Cpath d='M12 9v4M12 17h.01'/%3E%3C/svg%3E");
+  }
+  .chip-tone-ok,
+  .chip-state-ok {
+    --chip-tone: var(--color-ok);
+    --chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E");
+  }
+  .chip-tone-danger,
+  .chip-state-danger {
+    --chip-tone: var(--color-danger);
+    --chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m15 9-6 6M9 9l6 6'/%3E%3C/svg%3E");
+  }
+  .chip-tone-brand {
+    --chip-tone: var(--color-brand);
+    --chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Ccircle cx='12' cy='12' r='3' fill='black'/%3E%3C/svg%3E");
+  }
+  .chip-icon-lock {
+    --chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E");
   }
   .card {
     @apply rounded-md border border-line bg-panel shadow-[0_1px_2px_rgb(30_40_36/0.05),0_2px_8px_-2px_rgb(30_40_36/0.08)];
@@ -260,30 +310,24 @@
     @apply border-y border-sage-2 bg-sage;
   }
 
-  /* status-chip vs meta-chip: solid fill claims state, inset carries tags. */
-  .chip-state {
-    @apply inline-flex h-[30px] items-center rounded-full px-4 text-sm font-semibold tracking-[0.06em] whitespace-nowrap text-on-brand uppercase;
-  }
-  .chip-state-ok {
-    @apply bg-ok;
-  }
-  .chip-state-warn {
-    @apply bg-warn;
-  }
-  .chip-state-danger {
-    @apply bg-danger;
-  }
+  /* meta-chip carries tags; state belongs to .chip (below the base controls). */
   .chip-meta {
     @apply inline-flex h-7 items-center rounded-full bg-inset px-3.5 text-base whitespace-nowrap text-ink-2;
   }
+  /* Ledger table (owner pick 2026-09-29, component picker variant A): no
+     header fill, an uppercase label row over a strong ink rule, hairline
+     rows, tabular figures so numbers compare down a column. */
   .th {
-    @apply border-b border-line-2 bg-inset px-3 py-1.5 text-left text-xs font-semibold tracking-[0.02em] whitespace-nowrap text-ink-2;
+    @apply border-b-[1.5px] border-ink px-3 pt-2 pb-2 text-left text-sm font-bold tracking-[0.04em] whitespace-nowrap text-ink-3 uppercase;
   }
   .td {
-    @apply h-8 border-b border-line px-3 py-0 align-middle whitespace-nowrap text-ink;
+    @apply h-10 border-b border-line px-3 py-2 align-middle whitespace-nowrap text-ink tabular-nums;
   }
   tbody tr:last-child > .td {
     @apply border-b-0;
+  }
+  tbody tr:hover > .td {
+    @apply bg-inset;
   }
   .kbd {
     @apply inline-flex h-[17px] min-w-[17px] items-center justify-center rounded-xs border border-line-2 bg-inset px-1 font-mono text-2xs text-ink-2;
@@ -2060,22 +2104,30 @@
   min-width: 760px;
 }
 
+/* Same ledger grammar as .th/.td (owner pick 2026-09-29). */
 .supply-table th,
 .data-table th {
-  padding: 0.7rem 0.8rem;
+  padding: 0.5rem 0.8rem;
+  border-bottom: 1.5px solid var(--color-ink);
   color: var(--color-ink-3);
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-align: left;
   text-transform: uppercase;
 }
 
 .supply-table td,
 .data-table td {
-  padding: 0.85rem 0.8rem;
+  padding: 0.65rem 0.8rem;
   border-top: 1px solid var(--color-line);
   vertical-align: middle;
+  font-variant-numeric: tabular-nums;
+}
+
+.supply-table tbody tr:first-child td,
+.data-table tbody tr:first-child td {
+  border-top: 0;
 }
 
 .supply-table tbody tr:hover,

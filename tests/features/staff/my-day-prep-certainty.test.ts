@@ -99,6 +99,8 @@ describe("My Day prep facts and versions (AC-492)", () => {
             ],
             events: [{ _id: "event-1", title: "Harbor gala" }],
             busy: null,
+            now: Date.UTC(2026, 10, 14, 12, 0),
+            queuedCompleteIds: new Set<string>(),
             perform,
           }),
         ),
@@ -106,8 +108,11 @@ describe("My Day prep facts and versions (AC-492)", () => {
     );
 
   const row = (name: string) =>
-    Array.from(container.querySelectorAll("li.my-day-prep-row")).find(
-      (li) => li.querySelector(".my-day-prep-task-name")?.textContent === name,
+    Array.from(container.querySelectorAll("li")).find((li) =>
+      li
+        .querySelector('input[type="checkbox"]')
+        ?.getAttribute("aria-label")
+        ?.startsWith(`Done: ${name},`),
     )!;
 
   it("an unscheduled task shows an explicit unknown-time label and actions surface the updated version", async () => {
@@ -116,9 +121,9 @@ describe("My Day prep facts and versions (AC-492)", () => {
     expect(container.textContent).toContain("Roast chicken");
 
     const sauceRow = row("Make sauce");
-    expect(sauceRow.textContent).toContain("20 portion to make");
+    expect(sauceRow.textContent).toContain("Make sauce · 20 portion");
     expect(sauceRow.textContent).toContain("20 portion already made");
-    expect(sauceRow.textContent).toContain("No prep time set");
+    expect(sauceRow.textContent).toContain("No time");
     expect(sauceRow.querySelector("a")?.textContent).toBe("Recipe: Make sauce");
 
     // Plate waits on the sauce: its Start is locked and says why.
@@ -135,8 +140,8 @@ describe("My Day prep facts and versions (AC-492)", () => {
 
     const garnishRow = row("Garnish");
     expect(garnishRow.textContent).toContain("Blocked: Herbs not delivered");
-    expect(garnishRow.textContent).toMatch(/Due /);
-    expect(garnishRow.textContent).not.toContain("No prep time set");
+    expect(garnishRow.querySelector("time")).not.toBeNull();
+    expect(garnishRow.textContent).not.toContain("No time");
 
     await act(async () =>
       sauceRow

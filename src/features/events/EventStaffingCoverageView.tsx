@@ -83,24 +83,21 @@ function AvailabilityChips({
   const chips: ReactNode[] = [];
   if (conflict.overlappingShifts.length > 0) {
     chips.push(
-      <span key="shift" className="chip border-warn/30 bg-warn-soft text-warn">
+      <span key="shift" className="chip chip-tone-warn">
         Overlapping shift
       </span>,
     );
   }
   if (conflict.approvedOff.length > 0) {
     chips.push(
-      <span
-        key="off"
-        className="chip border-danger/30 bg-danger-soft text-danger"
-      >
+      <span key="off" className="chip chip-tone-danger">
         Approved time off
       </span>,
     );
   }
   if (chips.length === 0 && conflict.available) {
     chips.push(
-      <span key="ok" className="chip border-ok/30 bg-ok-soft text-ok">
+      <span key="ok" className="chip chip-tone-ok">
         Window ok
       </span>,
     );
