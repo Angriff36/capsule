@@ -103,7 +103,8 @@ async function seed(actor: Actor, tenantId: string) {
         ...extra,
       });
     const live: Record<string, string> = {};
-    for (const status of LIVE) live[status] = await task(eventDishId, status);
+    for (const status of LIVE)
+      live[status] = String(await task(eventDishId, status));
     const completed = await task(eventDishId, "completed", {
       completedAt: 1,
     });
