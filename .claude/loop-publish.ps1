@@ -37,5 +37,8 @@ $env:LOOP_LANDER = $null
 if (-not $pushed) { Say "push to dev refused (see above) - retried next round"; exit 0 }
 Say "on dev as $(git -C $wt rev-parse --short HEAD)"
 # Ryan tests on the main checkout: bring it up to date (never forced; a clash is only logged).
+# convex dev rewrites convex/_generated on its own; that local copy would block every pull,
+# and convex dev writes it again after the pull.
+git -C $root checkout -- convex/_generated *>> $log
 git -C $root pull --no-rebase --quiet origin dev *>> $log
 if ($LASTEXITCODE -ne 0) { Say 'main checkout pull refused - it keeps its local files; pull by hand' }
