@@ -19,6 +19,7 @@ import {
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { FailureBanner } from "../FailureBanner";
 import { eventDetailPath, type EventDetailTab } from "../eventRoutes";
+import { FieldFormsPanel } from "./FieldFormsPanel";
 import { OutsideChannelForm } from "./OutsideChannelForm";
 
 const OUTCOME: Record<FinalLockOutcome, string> = {
@@ -73,6 +74,7 @@ const SOURCE: Record<string, { label: string; tab?: EventDetailTab }> = {
   proposalEnhancements: { label: "Proposal extra", tab: "client" },
   eventPacketResolutions: { label: "Recorded decision" },
   eventPacketRevisions: { label: "Printed workbook" },
+  fieldConfirmations: { label: "Signed day-of form" },
 };
 
 function sourceLink(eventId: string, source: AnswerSource) {
@@ -121,6 +123,7 @@ export function FinalLockPanel({ eventId }: { eventId: Id<"events"> }) {
         report={report}
         onOverride={override}
       />
+      <FieldFormsPanel eventId={eventId} />
       <OutsideChannelForm
         eventId={eventId}
         suggestedName={typeof suggested === "string" ? suggested : null}
@@ -237,10 +240,16 @@ function QuestionRow({
       {field && (
         <p className="mt-1 text-ink-2">
           {field.confirmedAt
-            ? `Confirmed ${when(field.confirmedAt)}`
-            : field.dueAt
-              ? `Due ${when(field.dueAt)}`
-              : "Due on the day"}
+            ? `Done by ${field.confirmedBy ?? "a staff member"}, ${when(field.confirmedAt)}`
+            : `${field.dueAt ? `Due ${when(field.dueAt)}` : "Due on the day"}${
+                field.status === "not_set_up"
+                  ? " · not set up yet"
+                  : field.status === "first_signed"
+                    ? " · waiting for the second person"
+                    : field.responsible
+                      ? ` · ${field.responsible} is down to do it`
+                      : ""
+              }`}
         </p>
       )}
       {answer.sources.length > 0 && (

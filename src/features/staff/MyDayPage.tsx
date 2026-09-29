@@ -65,6 +65,7 @@ import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 import { MyDayCalendar, MyDaySection as Section } from "./MyDayDashboard";
 import { MyDayPrepList } from "./MyDayPrepList";
+import { MyDayFieldForms } from "./MyDayFieldForms";
 import { MyPastShiftsCard } from "./MyPastShiftsCard";
 import { readClockEvidence } from "./clockLocation";
 import { breakMinutesInput } from "../workforce/timeRecordEntry";
@@ -893,6 +894,7 @@ export function MyDayPage() {
                 )}
               </Section>
             </div>
+            <MyDayFieldForms personId={me._id} />
           </div>
           <div className="my-day-secondary-grid">
             <div className="my-day-section-stack">
