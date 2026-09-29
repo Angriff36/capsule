@@ -3,6 +3,7 @@
 // business validation, provider readiness, rollback plan, TPP read-only transition.
 
 import { ConvexError, v } from "convex/values";
+import { api } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import {
   action,
@@ -11,6 +12,7 @@ import {
   internalQuery,
   mutation,
   query,
+  type MutationCtx,
   type QueryCtx,
 } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
@@ -612,33 +614,37 @@ export const getCutoverStatus = query({
  */
 
 /**
- * Find or create cutover decision for tenant
+ * Find or create cutover decision for tenant.
+ *
+ * The create goes through the generated `CutoverDecision_create` command
+ * (same transaction: a nested `runMutation` from a mutation is a
+ * sub-transaction of the caller), under the caller's own auth. Callers have
+ * already restricted this to admin/owner, which hold `adminAccess` — the
+ * command's guard.
  */
 async function findOrCreateCutoverDecision(
-  ctx: any,
+  ctx: MutationCtx,
   tenantId: string,
 ): Promise<Id<"cutoverDecisions">> {
   const existing = await ctx.db
     .query("cutoverDecisions")
-    .withIndex("by_tenantId", (q: any) => q.eq("tenantId", tenantId))
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
     .first();
 
   if (existing) {
     return existing._id;
   }
 
-  // Create new cutover decision using the generated mutation
-  // Note: We can't call mutations from within mutations, so we insert directly
-  // This is safe because we're in a controlled admin-only context
-  return await ctx.db.insert("cutoverDecisions", {
-    tenantId,
-    status: "not_started",
-    decidedAt: Date.now(),
-    decidedBy: (await getAuthContext(ctx)).id,
+  // ~~Note: We can't call mutations from within mutations, so we insert directly~~
+  // Corrected 2026-09-29: that was false — `ctx.runMutation` from a mutation
+  // runs as a sub-transaction of the caller, so the governed create command
+  // is used instead of a raw insert.
+  const created = (await ctx.runMutation(api.mutations.CutoverDecision_create, {
     reason: "Cutover initialized",
     rollbackPlan: "",
     businessApproved: false,
-  });
+  })) as { _id: Id<"cutoverDecisions"> };
+  return created._id;
 }
 
 /**
@@ -661,16 +667,11 @@ export const recordCutoverApprovals = mutation({
 
     const docId = await findOrCreateCutoverDecision(ctx, tenantId);
 
-    // Inline the logic from CutoverDecision_recordApprovals
-    const doc = await ctx.db.get(docId);
-    if (!doc) throw new ConvexError("Switch decision isn't on file");
-    const updates = {
+    await ctx.runMutation(api.mutations.CutoverDecision_recordApprovals, {
+      docId,
       businessApproved: args.businessApproved,
       rollbackPlan: args.rollbackPlan,
-      decidedAt: Date.now(),
-      decidedBy: auth.id,
-    };
-    await ctx.db.patch(docId, updates);
+    });
 
     return {
       success: true,
@@ -782,18 +783,12 @@ export const executeCutoverDecision = mutation({
       }
     }
 
-    // Inline the logic from CutoverDecision_execute
-    const executeDecision = args.decision as "go" | "no_go";
-    const executeDoc = await ctx.db.get(docId);
-    if (!executeDoc) throw new ConvexError("Switch decision isn't on file");
-
-    const executeUpdates = {
-      status: executeDecision,
+    const executeDecision = cutoverDecision;
+    await ctx.runMutation(api.mutations.CutoverDecision_execute, {
+      docId,
+      decision: executeDecision,
       reason: args.reason,
-      decidedAt: Date.now(),
-      decidedBy: auth.id,
-    };
-    await ctx.db.patch(docId, executeUpdates);
+    });
 
     return {
       success: true,
@@ -837,11 +832,10 @@ export const setTppReadOnly = mutation({
       );
     }
 
-    // Inline the logic from CutoverDecision_setTppReadOnly
-    const readOnlyUpdates = {
-      tppReadOnlyAt: Date.now(),
-    };
-    await ctx.db.patch(decision._id, readOnlyUpdates);
+    await ctx.runMutation(api.mutations.CutoverDecision_setTppReadOnly, {
+      docId: decision._id,
+      reason: args.reason,
+    });
 
     return {
       success: true,
@@ -880,14 +874,10 @@ export const rollbackCutover = mutation({
       throw new ConvexError("Can't undo: the switch was not approved.");
     }
 
-    // Inline the logic from CutoverDecision_rollback
-    const rollbackUpdates = {
-      status: "rolled_back" as const,
+    await ctx.runMutation(api.mutations.CutoverDecision_rollback, {
+      docId: decision._id,
       reason: args.reason,
-      decidedAt: Date.now(),
-      decidedBy: auth.id,
-    };
-    await ctx.db.patch(decision._id, rollbackUpdates);
+    });
 
     return {
       success: true,
