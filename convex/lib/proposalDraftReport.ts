@@ -5,10 +5,12 @@
 // a dish with no menu price, rentals not priced, no terms, no company name).
 // Nothing here blocks sending; sending stays an explicit action.
 
-import { query } from "../_generated/server";
+import { query, type QueryCtx } from "../_generated/server";
 import { api } from "../_generated/api";
 import { v } from "convex/values";
-import type { Id } from "../_generated/dataModel";
+import type { Doc, Id } from "../_generated/dataModel";
+import { equipmentBlock, equipmentConflicts } from "./equipmentReservationAvailability";
+import { resolveCatalogPrice } from "./proposalPricing";
 import {
   parseGenerationRecord,
   staleSections,
@@ -81,6 +83,8 @@ export const getProposalDraftReport = query({
       }
     }
 
+    issues.push(...(await availabilityIssues(ctx, proposal, liveLines, event)));
+
     if (proposal.eventDate == null) issues.push(issue("no_event_date", "This proposal has no event date.", proposalId));
     if (!proposal.venueName?.trim()) issues.push(issue("no_venue", "This proposal has no venue.", proposalId));
     if (!(proposal.guestCount > 0)) issues.push(issue("no_guest_count", "This proposal has no guest count.", proposalId));
@@ -122,4 +126,84 @@ export const getProposalDraftReport = query({
 
 function issue(code: string, message: string, proposalId: Id<"proposals">): DraftIssue {
   return { code, message, recordIds: [String(proposalId)] };
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const day = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+
+/**
+ * PL-ASSET-AVAILABILITY / BE-7.2-09 (AC-419): before the proposal goes out,
+ * each rental line is checked against the equipment list for the event window
+ * and each menu line against the published menus, where Capsule knows enough.
+ * A conflict is an issue on that one line - the line stays on the proposal
+ * (never silently dropped) and sending is not blocked: the office can rent
+ * the rest from a vendor or change the amount.
+ */
+async function availabilityIssues(
+  ctx: QueryCtx,
+  proposal: Doc<"proposals">,
+  lines: Doc<"proposalLineItems">[],
+  event: Doc<"events"> | null,
+): Promise<DraftIssue[]> {
+  const issues: DraftIssue[] = [];
+  const startsAt = event?.startsAt ?? proposal.eventDate ?? null;
+  const endsAt =
+    event?.endsAt ?? proposal.eventEndDate ?? (startsAt != null ? startsAt + DAY_MS : null);
+  for (const line of lines) {
+    const lineId = [String(line._id)];
+    if (line.menuDishId && (await resolveCatalogPrice(ctx, line.menuDishId, proposal.tenantId)) == null) {
+      issues.push({
+        code: "menu_item_unavailable",
+        message: `"${line.description}" is no longer on a published menu. Pick another dish or remove the menu link.`,
+        recordIds: lineId,
+      });
+    }
+    if (!line.equipmentId) continue;
+    const item = await ctx.db.get(line.equipmentId);
+    if (!item || item.tenantId !== proposal.tenantId || item.deletedAt != null || item.status !== "active") {
+      issues.push({
+        code: "rental_unavailable",
+        message: `"${line.description}" is no longer in your equipment list. Pick another item or rent it from a vendor.`,
+        recordIds: lineId,
+      });
+      continue;
+    }
+    if (equipmentBlock(item) === "out_of_service") {
+      issues.push({
+        code: "rental_unavailable",
+        message: `${item.name} is marked out of service. Rent it from a vendor, pick another item, or mark it back in service once it is fixed.`,
+        recordIds: lineId,
+      });
+      continue;
+    }
+    if (startsAt == null || endsAt == null || endsAt <= startsAt) continue;
+    const wanted = Number(line.quantity) > 0 ? Number(line.quantity) : 1;
+    const holds = await ctx.db
+      .query("equipmentReservations")
+      .withIndex("by_equipmentId", (q) => q.eq("equipmentId", item._id))
+      .collect();
+    const window = {
+      tenantId: proposal.tenantId,
+      startsAt,
+      endsAt,
+      now: Date.now(),
+      ...(proposal.eventId ? { excludeEventId: String(proposal.eventId) } : {}),
+    };
+    const conflicts = equipmentConflicts(holds, window);
+    const free = Math.max(0, item.quantity - conflicts.reduce((sum, row) => sum + row.quantity, 0));
+    if (wanted <= free) continue;
+    const booked: string[] = [];
+    for (const conflict of conflicts) {
+      const other = await ctx.db.get(conflict.eventId as Id<"events">);
+      booked.push(`${other && other.tenantId === proposal.tenantId ? other.title : "another event"} (${conflict.quantity})`);
+    }
+    issues.push({
+      code: "rental_unavailable",
+      message: `${item.name}: ${free} free on ${day.format(startsAt)}, this proposal asks for ${wanted}.${
+        booked.length ? ` Already booked by ${booked.join(", ")}.` : ""
+      } Rent the rest from a vendor or change the amount.`,
+      recordIds: lineId,
+    });
+  }
+  return issues;
 }
