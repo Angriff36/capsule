@@ -22,6 +22,9 @@ export type ChecklistDraft = {
   note: string;
   /** Return check only: how many did not come back. */
   missing?: number;
+  /** Return check only: back but broken, back but needs cleaning. */
+  damaged?: number;
+  cleaning?: number;
 };
 
 /** One reservation, already joined to its catalog item by the panel. */
@@ -243,6 +246,49 @@ export function EventEquipmentSheet({
                               are not booked again.
                             </span>
                           </label>
+                        ) : null}
+                        {draft.mode === "return" ? (
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <label className="field-label">
+                              How many came back broken
+                              <input
+                                type="number"
+                                className="input"
+                                min={0}
+                                max={row.quantity}
+                                value={draft.damaged ?? 0}
+                                onChange={(changeEvent) =>
+                                  onDraftChange({
+                                    ...draft,
+                                    damaged:
+                                      Number(changeEvent.target.value) || 0,
+                                  })
+                                }
+                              />
+                            </label>
+                            <label className="field-label">
+                              How many need cleaning
+                              <input
+                                type="number"
+                                className="input"
+                                min={0}
+                                max={row.quantity}
+                                value={draft.cleaning ?? 0}
+                                onChange={(changeEvent) =>
+                                  onDraftChange({
+                                    ...draft,
+                                    cleaning:
+                                      Number(changeEvent.target.value) || 0,
+                                  })
+                                }
+                              />
+                            </label>
+                            <span className="field-hint sm:col-span-2">
+                              Broken and dirty ones can't be booked until
+                              someone marks them fixed or cleaned. They show
+                              under Equipment problems.
+                            </span>
+                          </div>
                         ) : null}
                         <div className="equipment-inspection__actions">
                           <button

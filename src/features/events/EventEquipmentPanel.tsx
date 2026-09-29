@@ -29,6 +29,16 @@ import {
   type EquipmentCategoryCount,
 } from "./EventEquipmentSidebar";
 import { EventEquipmentReserveForm } from "./EventEquipmentReserveForm";
+import { EventEquipmentProblems } from "./EventEquipmentProblems";
+import { useAuthStatus } from "../../lib/useAuthStatus";
+
+/** Same list as convex/equipmentCheckout.ts OVERRIDE_ROLES. */
+const OVERRIDE_ROLES = new Set([
+  "inventory_manager",
+  "logistics_manager",
+  "admin",
+  "owner",
+]);
 
 export function EventEquipmentPanel({
   eventId,
@@ -45,6 +55,7 @@ export function EventEquipmentPanel({
   const checkOut = useEquipmentReservationCheckOut();
   const markReturned = useEquipmentReservationMarkReturned();
   const cancelReservation = useEquipmentReservationCancel();
+  const role = useAuthStatus()?.role;
   const [showReserveForm, setShowReserveForm] = useState(false);
   const [selectedEquipmentId, setSelectedEquipmentId] = useState("");
   const [checklistDraft, setChecklistDraft] = useState<ChecklistDraft | null>(
@@ -154,6 +165,8 @@ export function EventEquipmentPanel({
         startsAt: new Date(String(data.get("startsAt"))).getTime(),
         endsAt: new Date(String(data.get("endsAt"))).getTime(),
         quantity: Number(data.get("quantity")),
+        overrideReason:
+          String(data.get("overrideReason") ?? "").trim() || undefined,
       });
       form.reset();
       setSelectedEquipmentId("");
@@ -202,6 +215,8 @@ export function EventEquipmentPanel({
         await markReturned({
           ...args,
           missingQuantity: checklistDraft.missing ?? 0,
+          damagedQuantity: checklistDraft.damaged ?? 0,
+          cleaningQuantity: checklistDraft.cleaning ?? 0,
         });
       setChecklistDraft(null);
       setNotice(
@@ -314,6 +329,8 @@ export function EventEquipmentPanel({
               />
             )}
 
+            <EventEquipmentProblems eventId={String(eventId)} />
+
             {showReserveForm ? (
               <EventEquipmentReserveForm
                 equipment={equipmentRows}
@@ -324,6 +341,7 @@ export function EventEquipmentPanel({
                 busy={busy}
                 onSubmit={submitReservation}
                 onDismiss={() => setShowReserveForm(false)}
+                canOverride={OVERRIDE_ROLES.has(role ?? "")}
                 availability={availability?.map((row) => ({
                   ...row,
                   equipmentId: String(row.equipmentId),

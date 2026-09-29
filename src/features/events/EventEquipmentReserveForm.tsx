@@ -23,6 +23,8 @@ type Props = {
   readonly onDismiss: () => void;
   /** Free counts and holds for this event's time (PL-ASSET-AVAILABILITY). */
   readonly availability?: readonly ItemAvailability[];
+  /** A manager may book out-of-service or in-repair units with a reason. */
+  readonly canOverride?: boolean;
 };
 
 /** "Lock a load window": pick an item, quantity, and the checkout/return times. */
@@ -36,6 +38,7 @@ export function EventEquipmentReserveForm({
   onSubmit,
   onDismiss,
   availability,
+  canOverride = false,
 }: Props) {
   const selected = equipment.find((item) => item._id === selectedEquipmentId);
   const [wanted, setWanted] = useState(1);
@@ -43,6 +46,10 @@ export function EventEquipmentReserveForm({
     (availability ?? []).map((row) => [row.equipmentId, row]),
   );
   const selectedAvailability = freeById.get(selectedEquipmentId);
+  const outOfUse =
+    selectedAvailability != null &&
+    (selectedAvailability.blocked === "out_of_service" ||
+      (selectedAvailability.outOfUse ?? 0) > 0);
   return (
     <form
       className="card grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-4"
@@ -146,6 +153,20 @@ export function EventEquipmentReserveForm({
           required
         />
       </label>
+      {canOverride && outOfUse ? (
+        <label className="field-label sm:col-span-2 lg:col-span-4">
+          Book it anyway - why? (managers only)
+          <input
+            name="overrideReason"
+            className="input"
+            placeholder="Optional: e.g. latch is taped, still heats fine"
+          />
+          <span className="field-hint">
+            Leave empty to keep broken or in-repair units out. With a reason,
+            they can be booked and checked out, and the reason is kept.
+          </span>
+        </label>
+      ) : null}
       <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-4">
         <button
           className="btn btn-primary"

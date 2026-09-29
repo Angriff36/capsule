@@ -31,6 +31,7 @@ import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { EventCostSummaryReport } from "./EventCostSummaryReport";
 import { EventFoodCostPanel } from "./EventFoodCostPanel";
+import { EventEquipmentProblems } from "../events/EventEquipmentProblems";
 import { canReadEventFoodCost } from "../../lib/culinaryDemandClient";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useActionNotice } from "../../ui/action-result";
@@ -249,6 +250,15 @@ export function CloseoutPage() {
           eventId={String(summaryCloseout.eventId)}
           enabled={canReadEventFoodCost(authStatus?.role)}
         />
+      ) : null}
+      {summaryCloseout ? (
+        <EventEquipmentProblems
+          eventId={String(summaryCloseout.eventId)}
+          hideWhenEmpty
+        />
+      ) : null}
+      {showCapture && formEventId ? (
+        <EventEquipmentProblems eventId={formEventId} hideWhenEmpty />
       ) : null}
 
       {showCapture ? (

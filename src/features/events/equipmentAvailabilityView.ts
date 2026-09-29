@@ -21,6 +21,8 @@ export type ItemAvailability = {
   readonly location: string | null;
   readonly quantity: number;
   readonly free: number;
+  /** PL-RETURNS: broken, being cleaned or in repair right now. */
+  readonly outOfUse?: number;
   readonly blocked: "out_of_service" | "retired" | null;
   readonly conflicts: readonly AvailabilityConflict[];
 };
@@ -52,6 +54,9 @@ export function availabilitySummary(item: ItemAvailability): string {
   }
   return [
     `${item.free} of ${item.quantity} free for this time`,
+    item.outOfUse
+      ? `${item.outOfUse} broken, being cleaned or in repair`
+      : null,
     item.location ? `kept at ${item.location}` : null,
     `condition ${item.condition.replace(/_/g, " ")}`,
   ]

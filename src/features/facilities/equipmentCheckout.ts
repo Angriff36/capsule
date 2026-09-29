@@ -19,6 +19,15 @@ export function useEquipmentAvailability(
   );
 }
 
+/** PL-RETURNS: an event's equipment problems, late returns, money and the
+ * duties a cancelled event still has. Null for roles that may not see it. */
+export function useEventEquipmentExceptions(eventId: string | null) {
+  return useQuery(
+    api.equipmentCheckout.eventEquipmentExceptions,
+    eventId ? { eventId: eventId as Id<"events"> } : "skip",
+  );
+}
+
 /** Vendor names (no contact details) for picking who a rental comes from. */
 export function useRentalVendorChoices() {
   return useQuery(api.equipmentCheckout.rentalVendorChoices, {});

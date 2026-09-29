@@ -14,6 +14,7 @@ import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { EquipmentMaintenanceBoard } from "./EquipmentMaintenanceBoard";
+import { EquipmentRepairsPanel } from "./EquipmentRepairsPanel";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 import { EquipmentBulkAddPanel } from "./EquipmentBulkAddPanel";
 import { assetTagFor } from "./equipmentPackListParser";
@@ -300,6 +301,7 @@ export function EquipmentCatalogPage() {
         />
       ) : null}
 
+      <EquipmentRepairsPanel equipment={rows as EquipmentRow[]} />
       <EquipmentMaintenanceBoard equipment={rows as EquipmentRow[]} />
 
       <section className="working-ledger">
