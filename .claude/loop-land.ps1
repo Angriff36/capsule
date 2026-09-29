@@ -52,7 +52,7 @@ function Release($h, $reviewer) {
   # Approved -> production, from a private clean copy so the running loop cannot disturb it.
   # A failed release leaves _release-pending; a landed control-plane repair retries it.
   $pending = Join-Path $root '.loop-worktrees\_release-pending'
-  $rel = (& 'C:\Program Files\Gitinash.exe' -lc "cd /c/Projects/capsule && bash scripts/release-clean.sh --reviewer $reviewer" 2>&1) -join "`n"
+  $rel = (& 'C:\Program Files\Git\bin\bash.exe' -lc "cd /c/Projects/capsule && bash scripts/release-clean.sh --reviewer $reviewer" 2>&1) -join "`n"
   $rel | Add-Content $log
   $result = ([regex]::Matches($rel, '(?m)^RESULT: .*$') | Select-Object -Last 1).Value
   if ($result -like 'RESULT: PASS*') { Remove-Item $pending -Force -ErrorAction SilentlyContinue; Record $h 'RELEASED' "production: $result" }

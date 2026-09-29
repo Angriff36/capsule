@@ -5,9 +5,12 @@ Catering / event ops app: Vite + React, Convex, Clerk. Assembled from Manifest p
 ## Ralph loop (this checkout)
 
 This checkout is the main capsule checkout on branch `dev`, not a Ralph
-worktree. The loop runs in a Ralph worktree (sibling `C:/Projects/capsule-ralph`
-on branch `ralph/wiggum-loop`, or one under `.loop-worktrees/`) and never
-touches this checkout.
+worktree. The loop builds in a worktree under `.loop-worktrees/` (or the sibling
+`C:/Projects/capsule-ralph` on `ralph/wiggum-loop`) and never edits files here.
+The product builder's publisher (`.claude/loop-publish.ps1`) pushes each round
+to `dev` and then pulls `dev` into this checkout, so the owner tests the newest
+work here (Ryan, 2026-09-28: "why doesnt it go to dev? i need to be able to
+test the changes myself too").
 
 - `./loop.sh plan` → studies `specs/ralph/` + `src/`, writes IMPLEMENTATION_PLAN.md
   + ACCEPTANCE_TESTS.md. Human reviews the plan. Then `./loop.sh 20` builds one
@@ -322,7 +325,10 @@ switch the checkout, never make a worktree unless the owner asks. Those pushes
 are chores — `vercel.json` `ignoreCommand` skips every non-`main` ref, so
 nothing builds and nothing deploys. Dev work uses the LOCAL Convex backend
 (`bun run dev:convex`, 127.0.0.1:3210). Release ONLY when the owner says
-"release" in the current conversation; a release merges `dev` into `main`:
+"release" in the current conversation — except the product builder: when its
+daily review APPROVES, `.claude/loop-land.ps1` releases on its own (Ryan,
+2026-09-28: "once the reviewer clears it it should go to production"). A
+release merges `dev` into `main`:
 
 ```text
 bash scripts/release.sh --reviewer <model>
