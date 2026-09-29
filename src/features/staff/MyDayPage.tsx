@@ -765,7 +765,13 @@ export function MyDayPage() {
           </div>
           <div className="my-day-secondary-grid">
             <div className="my-day-section-stack">
-              <MyPastShiftsCard records={myRecords} eventTitle={eventTitle} />
+              <MyPastShiftsCard
+                records={myRecords}
+                eventTitle={eventTitle}
+                plannedFor={(shiftId) =>
+                  (shifts ?? []).find((row) => row._id === shiftId) ?? null
+                }
+              />
               <div data-testid="staff-schedule-notices">
                 <Section
                   title="Published schedule"

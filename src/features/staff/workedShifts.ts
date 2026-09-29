@@ -1,6 +1,8 @@
 /** A finished time entry, ready to list as a worked shift. */
 export type WorkedShift = {
   id: string;
+  /** The scheduled shift this clock-in was for, when linked. */
+  shiftId: string | null;
   eventId: string | null;
   clockInAt: number;
   clockOutAt: number;
@@ -19,6 +21,7 @@ export type WorkedWeek = {
 
 type TimeRecordRow = {
   _id: string;
+  shiftId?: string | null;
   eventId?: string | null;
   clockInAt?: number | null;
   clockOutAt?: number | null;
@@ -43,6 +46,7 @@ export function workedShifts(records: readonly TimeRecordRow[]): WorkedShift[] {
         (row.clockOutAt! - row.clockInAt!) / 3_600_000 - breakMinutes / 60;
       return {
         id: row._id,
+        shiftId: row.shiftId ?? null,
         eventId: row.eventId ?? null,
         clockInAt: row.clockInAt!,
         clockOutAt: row.clockOutAt!,
@@ -76,6 +80,26 @@ export function workedWeeks(shifts: readonly WorkedShift[]): WorkedWeek[] {
       shifts: rows,
       hours: rows.reduce((total, row) => total + row.hours, 0),
     }));
+}
+
+/**
+ * Recorded time against the planned shift (AC-517): "15 min longer than
+ * planned", "30 min shorter than planned", "As planned" (within 5 minutes),
+ * or null when there is no complete plan to compare with.
+ */
+export function plannedComparison(
+  shift: Pick<WorkedShift, "hours">,
+  planned: { startsAt?: number | null; endsAt?: number | null } | null,
+): string | null {
+  if (planned?.startsAt == null || planned.endsAt == null) return null;
+  const plannedMinutes = (planned.endsAt - planned.startsAt) / 60_000;
+  const diff = Math.round(shift.hours * 60 - plannedMinutes);
+  if (Math.abs(diff) <= 5) return "As planned";
+  const size =
+    Math.abs(diff) >= 60
+      ? hoursLabel(Math.abs(diff) / 60)
+      : `${Math.abs(diff)} min`;
+  return `${size} ${diff > 0 ? "longer" : "shorter"} than planned`;
 }
 
 /** "7.5 h" — hours to one decimal, trailing ".0" dropped. */

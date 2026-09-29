@@ -32,7 +32,12 @@ import {
   type TimeRecordLedgerRow,
 } from "./timeRecordEntry";
 import { useWorkingEventId } from "../events/workingEvent";
-import { hoursLabel, workedShifts, workedWeeks } from "../staff/workedShifts";
+import {
+  hoursLabel,
+  plannedComparison,
+  workedShifts,
+  workedWeeks,
+} from "../staff/workedShifts";
 
 const policy = new WorkforceLifecyclePolicy();
 
@@ -161,6 +166,39 @@ export function TimeSheetBreakCell({
 }) {
   return (
     <td className="supply-number">{timeRecordBreakLabel(breakMinutes)}</td>
+  );
+}
+
+/** Under the hours: the planned shift and how the recorded time compares. */
+export function PlannedVsRecorded({
+  row,
+  planned,
+}: {
+  row: {
+    clockInAt?: number | null;
+    clockOutAt?: number | null;
+    breakMinutes?: number | null;
+  };
+  planned?: { startsAt?: number | null; endsAt?: number | null };
+}) {
+  if (
+    planned?.startsAt == null ||
+    planned.endsAt == null ||
+    row.clockInAt == null ||
+    row.clockOutAt == null ||
+    row.clockOutAt < row.clockInAt
+  )
+    return null;
+  const hours = Math.max(
+    0,
+    (row.clockOutAt - row.clockInAt) / 3_600_000 -
+      Math.max(0, row.breakMinutes ?? 0) / 60,
+  );
+  return (
+    <small className="block text-ink-3" data-testid="planned-vs-recorded">
+      Planned {formatTime(planned.startsAt)} – {formatTime(planned.endsAt)} ·{" "}
+      {plannedComparison({ hours }, planned)}
+    </small>
   );
 }
 
@@ -533,6 +571,16 @@ export function TimeSheetPage() {
                             ),
                           )
                         : "—"}
+                      <PlannedVsRecorded
+                        row={row}
+                        planned={
+                          row.shiftId
+                            ? (shifts ?? []).find(
+                                (shift) => shift._id === row.shiftId,
+                              )
+                            : undefined
+                        }
+                      />
                     </td>
                     <td>
                       <TimeSheetRecordState row={row} />

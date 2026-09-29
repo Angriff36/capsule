@@ -3,12 +3,14 @@ import { formatTime } from "../../lib/format";
 import { EmptyState, Section } from "../../ui/primitives";
 import {
   hoursLabel,
+  plannedComparison,
   workedShifts,
   workedWeeks,
   type WorkedShift,
 } from "./workedShifts";
 
 type TimeRecordRow = Parameters<typeof workedShifts>[0][number];
+type PlannedWindow = { startsAt?: number | null; endsAt?: number | null };
 
 const WEEKS_SHOWN = 6;
 
@@ -34,9 +36,12 @@ const weekLabel = (weekStart: number) =>
 export function MyPastShiftsCard({
   records,
   eventTitle,
+  plannedFor = () => null,
 }: {
   readonly records: readonly TimeRecordRow[];
   readonly eventTitle: (eventId: string) => string;
+  /** The scheduled window of a shift, to show recorded against planned. */
+  readonly plannedFor?: (shiftId: string) => PlannedWindow | null;
 }) {
   const [showAll, setShowAll] = useState(false);
   const shifts = workedShifts(records);
@@ -74,6 +79,7 @@ export function MyPastShiftsCard({
                       key={shift.id}
                       shift={shift}
                       eventTitle={eventTitle}
+                      planned={shift.shiftId ? plannedFor(shift.shiftId) : null}
                     />
                   ))}
                 </ul>
@@ -100,10 +106,13 @@ export function MyPastShiftsCard({
 function PastShiftRow({
   shift,
   eventTitle,
+  planned,
 }: {
   readonly shift: WorkedShift;
   readonly eventTitle: (eventId: string) => string;
+  readonly planned: PlannedWindow | null;
 }) {
+  const comparison = plannedComparison(shift, planned);
   return (
     <li className="flex items-center justify-between gap-3 py-2">
       <span className="min-w-0">
@@ -115,6 +124,17 @@ function PastShiftRow({
           {formatTime(shift.clockOutAt)}
           {shift.breakMinutes > 0 ? ` · ${shift.breakMinutes} min break` : ""}
         </span>
+        {comparison && planned?.startsAt != null && planned.endsAt != null ? (
+          <span
+            className="block text-sm text-ink-3"
+            data-testid="planned-vs-recorded"
+          >
+            Planned {formatTime(planned.startsAt)} –{" "}
+            {formatTime(planned.endsAt)}
+            {" · "}
+            {comparison}
+          </span>
+        ) : null}
       </span>
       {/* No status chip: every row is a finished shift, and entering a past
           shift uses a hidden correction, so "Corrected" would mislead. */}
