@@ -28,7 +28,11 @@ import {
   useShiftStart,
   useTimeRecordClockOut,
   useWeeklyScheduleNoticeAcknowledge,
+  useEventAssignmentConfirm,
+  useListEventAssignment,
+  useListEventStaffNeed,
 } from "../../lib/manifest-convex-react";
+import { MyShiftWorkDetails, shiftWorkDetails } from "./MyShiftWorkDetails";
 import { formatDate, formatTime } from "../../lib/format";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import {
@@ -137,6 +141,16 @@ export function MyDayPage() {
     useListAvailabilityWindow(),
     offlineScope,
   );
+  const assignments = useCachedRead(
+    "eventAssignments",
+    useListEventAssignment(),
+    offlineScope,
+  );
+  const staffNeeds = useCachedRead(
+    "eventStaffNeeds",
+    useListEventStaffNeed(),
+    offlineScope,
+  );
 
   const clockIn = useCreateTimeRecord();
   const clockOut = useTimeRecordClockOut();
@@ -151,6 +165,7 @@ export function MyDayPage() {
   const markItemMissing = usePackListItemMarkMissing();
   const declareWindow = useCreateAvailabilityWindow();
   const withdrawWindow = useAvailabilityWindowWithdraw();
+  const confirmAssignment = useEventAssignmentConfirm();
 
   const online = useOnlineStatus();
   const pending = useQueuedActions(offlineScope);
@@ -172,6 +187,7 @@ export function MyDayPage() {
     "pack-mark-missing": markItemMissing,
     "availability-declare": declareWindow,
     "availability-withdraw": withdrawWindow,
+    "assignment-confirm": confirmAssignment,
   });
   runnersRef.current = {
     "clock-in": clockIn,
@@ -187,6 +203,7 @@ export function MyDayPage() {
     "pack-mark-missing": markItemMissing,
     "availability-declare": declareWindow,
     "availability-withdraw": withdrawWindow,
+    "assignment-confirm": confirmAssignment,
   };
 
   const userId = user?.id;
@@ -695,6 +712,27 @@ export function MyDayPage() {
                             {timeLabel(shift.endsAt)}
                             {shift.role ? ` · ${shift.role}` : ""}
                           </p>
+                          {shift.eventId ? (
+                            <MyShiftWorkDetails
+                              details={shiftWorkDetails(
+                                shift,
+                                assignments ?? [],
+                                staffNeeds ?? [],
+                                (events ?? []).find(
+                                  (row) => row._id === shift.eventId,
+                                ) ?? null,
+                              )}
+                              busy={busy != null}
+                              onConfirm={(target) =>
+                                perform(
+                                  `assignment:${target.docId}`,
+                                  "assignment-confirm",
+                                  "Confirm shift",
+                                  target,
+                                )
+                              }
+                            />
+                          ) : null}
                         </div>
                         <StatusChip status={String(shift.status)} />
                         {String(shift.status) === "scheduled" &&
