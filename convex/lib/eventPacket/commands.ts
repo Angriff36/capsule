@@ -188,19 +188,24 @@ export const registerFile = internalMutation({
       await ctx.storage.delete(args.storageId);
       return { storageId: old.storageId, fingerprint: old.fingerprint };
     }
-    await ctx.db.insert("eventPacketArtifacts", {
-      tenantId: auth.tenantId,
-      ...args,
+    // Convex actions pass the caller's identity to runMutation, so this runs
+    // (and records uploadedBy) as the manager who uploaded the bytes.
+    await ctx.runMutation(api.mutations.EventPacketArtifact_createViaRegister, {
+      eventId: args.eventId,
+      fingerprint: args.fingerprint,
       storageId: args.storageId,
-      ...{ snapshotFingerprint: undefined },
-      contextJson: args.snapshotFingerprint
-        ? JSON.stringify({ snapshotFingerprint: args.snapshotFingerprint })
-        : undefined,
-      uploadedBy: auth.id,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      deletedAt: null,
-    } as any);
+      purpose: args.purpose,
+      name: args.name,
+      mimeType: args.mimeType,
+      byteSize: args.byteSize,
+      ...(args.snapshotFingerprint
+        ? {
+            contextJson: JSON.stringify({
+              snapshotFingerprint: args.snapshotFingerprint,
+            }),
+          }
+        : {}),
+    });
     return { storageId: args.storageId, fingerprint: args.fingerprint };
   },
 });
@@ -358,6 +363,7 @@ export const importEvidence = mutation({
       throw new Error(
         "Source invoice does not match the established event packet",
       );
+    const deactivated = new Set<string>();
     for (const artifact of incoming.artifacts) {
       const supplied = args.artifacts.find(
         (a) => a.fingerprint === artifact.fingerprint,
@@ -375,7 +381,8 @@ export const importEvidence = mutation({
       const observations = incoming.observations.filter(
         (o) => o.evidence[0]?.artifactFingerprint === artifact.fingerprint,
       );
-      for (const previous of owned)
+      for (const previous of owned) {
+        const previousContext = JSON.parse(previous.contextJson ?? "{}");
         if (
           previous._id !== file._id &&
           previous.purpose === "source" &&
@@ -384,15 +391,19 @@ export const importEvidence = mutation({
           JSON.parse(previous.metadataJson).kind === artifact.kind &&
           !incoming.artifacts.some(
             (a) => a.fingerprint === previous.fingerprint,
-          )
-        )
-          await ctx.db.patch(previous._id, {
-            contextJson: canonicalJson({
-              ...JSON.parse(previous.contextJson ?? "{}"),
-              active: false,
-            }),
-            updatedAt: Date.now(),
+          ) &&
+          // Already replaced: the stored value would not change, so a repeat
+          // import records no second deactivation.
+          previousContext.active !== false &&
+          !deactivated.has(previous._id)
+        ) {
+          deactivated.add(previous._id);
+          await ctx.runMutation(api.mutations.EventPacketArtifact_deactivate, {
+            docId: previous._id,
+            contextJson: canonicalJson({ ...previousContext, active: false }),
           });
+        }
+      }
       const observationsJson = canonicalJson(observations);
       if (new TextEncoder().encode(observationsJson).byteLength > 900_000)
         throw new Error(
@@ -404,7 +415,8 @@ export const importEvidence = mutation({
         mimeType: file.mimeType,
         importedAt: new Date(file.createdAt).toISOString(),
       };
-      await ctx.db.patch(file._id, {
+      await ctx.runMutation(api.mutations.EventPacketArtifact_recordEvidence, {
+        docId: file._id,
         metadataJson: canonicalJson(metadata),
         observationsJson,
         contextJson: canonicalJson({
@@ -416,7 +428,6 @@ export const importEvidence = mutation({
             incoming.checklistVerifications.length,
           quarantinedFacts: incoming.facts.length,
         }),
-        updatedAt: Date.now(),
       });
     }
     const current = await readCurrentPacket(ctx, auth.tenantId, args.eventId);
@@ -609,19 +620,17 @@ export const resolveOperationalIssue = mutation({
     const verification = updated.checklistVerifications.find(
       (c) => c.checkKey === issue.key,
     );
-    await ctx.db.insert("eventPacketResolutions", {
-      tenantId: auth.tenantId,
+    // The command stamps the signed-in manager as the actor and emits
+    // EventPacketIssueResolved, so every decision leaves an audit event.
+    await ctx.runMutation(api.mutations.EventPacketResolution_createViaRecord, {
       eventId: args.eventId,
       decisionId: decision.id,
       issueKey: issue.key,
-      actor: auth.id,
       decidedAt: Date.parse(at),
       decisionJson: canonicalJson(decision),
       ...(verification
         ? { verificationJson: canonicalJson(verification) }
         : {}),
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
     });
     const refreshed = await readCurrentPacket(ctx, auth.tenantId, args.eventId);
     await persistIssues(ctx, auth.tenantId, args.eventId, refreshed.snapshot);
@@ -648,14 +657,13 @@ export const recordPacketRevision = mutation({
     if (existing) {
       for (const row of current.revisionRows) {
         if (row._id === existing._id && row.supersededBy)
-          await ctx.db.patch(row._id, {
-            supersededBy: undefined,
-            updatedAt: Date.now(),
+          await ctx.runMutation(api.mutations.EventPacketRevision_reinstate, {
+            docId: row._id,
           });
         else if (row._id !== existing._id && row.supersededBy !== existing._id)
-          await ctx.db.patch(row._id, {
-            supersededBy: existing._id,
-            updatedAt: Date.now(),
+          await ctx.runMutation(api.mutations.EventPacketRevision_supersede, {
+            docId: row._id,
+            by: existing._id,
           });
       }
       return {
@@ -681,22 +689,21 @@ export const recordPacketRevision = mutation({
       throw new Error(
         "Print files must be owned by this event and contain the exact current snapshot",
       );
-    const id = await ctx.db.insert("eventPacketRevisions", {
-      tenantId: auth.tenantId,
-      eventId: args.eventId,
-      snapshotFingerprint: args.inputFingerprint,
-      pdfStorageId: args.pdfStorageId,
-      snapshotStorageId: args.snapshotStorageId,
-      stage: current.snapshot.stage,
-      createdBy: auth.id,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
+    const { docId: id } = await ctx.runMutation(
+      api.mutations.EventPacketRevision_createViaCapture,
+      {
+        eventId: args.eventId,
+        snapshotFingerprint: args.inputFingerprint,
+        pdfStorageId: args.pdfStorageId,
+        snapshotStorageId: args.snapshotStorageId,
+        stage: current.snapshot.stage,
+      },
+    );
     for (const old of current.revisionRows)
       if (!old.supersededBy)
-        await ctx.db.patch(old._id, {
-          supersededBy: id,
-          updatedAt: Date.now(),
+        await ctx.runMutation(api.mutations.EventPacketRevision_supersede, {
+          docId: old._id,
+          by: id,
         });
     return { id, fingerprint: args.inputFingerprint, reused: false };
   },

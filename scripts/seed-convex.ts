@@ -262,10 +262,22 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.EventLayoutSection_createViaAdd, { "eventId": "eventId-event-layout-section-2", "type": "demo-type-2", "instructions": "demo-instructions-2", "sortOrder": 2 } as any);
   // skip EventNumberAssignment: no creation command in IR (2 rows unused)
   // skip EventNumberSequence: no creation command in IR (2 rows unused)
-  // skip EventPacketArtifact: no creation command in IR (2 rows unused)
+  // EventPacketArtifact → api.mutations.EventPacketArtifact_createViaRegister
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EventPacketArtifact_createViaRegister, { "eventId": "eventId-event-packet-artifact-1", "fingerprint": "demo-fingerprint-1", "storageId": "storageId-event-packet-artifact-1", "purpose": "demo-purpose-1", "name": "EventPacketArtifact 1", "mimeType": "demo-mimeType-1", "byteSize": 1, "contextJson": "demo-contextJson-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EventPacketArtifact_createViaRegister, { "eventId": "eventId-event-packet-artifact-2", "fingerprint": "demo-fingerprint-2", "storageId": "storageId-event-packet-artifact-2", "purpose": "demo-purpose-2", "name": "EventPacketArtifact 2", "mimeType": "demo-mimeType-2", "byteSize": 2, "contextJson": "demo-contextJson-2" } as any);
   // skip EventPacketIssue: no creation command in IR (2 rows unused)
-  // skip EventPacketResolution: no creation command in IR (2 rows unused)
-  // skip EventPacketRevision: no creation command in IR (2 rows unused)
+  // EventPacketResolution → api.mutations.EventPacketResolution_createViaRecord
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EventPacketResolution_createViaRecord, { "eventId": "eventId-event-packet-resolution-1", "decisionId": "decisionId-event-packet-resolution-1", "issueKey": "demo-issueKey-1", "decidedAt": 1767268800000, "decisionJson": "demo-decisionJson-1", "verificationJson": "demo-verificationJson-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EventPacketResolution_createViaRecord, { "eventId": "eventId-event-packet-resolution-2", "decisionId": "decisionId-event-packet-resolution-2", "issueKey": "demo-issueKey-2", "decidedAt": 1767355200000, "decisionJson": "demo-decisionJson-2", "verificationJson": "demo-verificationJson-2" } as any);
+  // EventPacketRevision → api.mutations.EventPacketRevision_createViaCapture
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EventPacketRevision_createViaCapture, { "eventId": "eventId-event-packet-revision-1", "snapshotFingerprint": "demo-snapshotFingerprint-1", "pdfStorageId": "pdfStorageId-event-packet-revision-1", "snapshotStorageId": "snapshotStorageId-event-packet-revision-1", "stage": "demo-stage-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EventPacketRevision_createViaCapture, { "eventId": "eventId-event-packet-revision-2", "snapshotFingerprint": "demo-snapshotFingerprint-2", "pdfStorageId": "pdfStorageId-event-packet-revision-2", "snapshotStorageId": "snapshotStorageId-event-packet-revision-2", "stage": "demo-stage-2" } as any);
   // EventStaffNeed has multiple initialization commands (changeCoverage, postOpen); using the selected initialization command: postOpen.
   // EventStaffNeed → api.mutations.EventStaffNeed_createViaPostOpen
   rowsAttempted += 1;
@@ -1077,7 +1089,7 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "EventPacketArtifact",
-      "createMutation": null,
+      "createMutation": "EventPacketArtifact_createViaRegister",
       "rowCount": 2
     },
     {
@@ -1087,12 +1099,12 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "EventPacketResolution",
-      "createMutation": null,
+      "createMutation": "EventPacketResolution_createViaRecord",
       "rowCount": 2
     },
     {
       "entity": "EventPacketRevision",
-      "createMutation": null,
+      "createMutation": "EventPacketRevision_createViaCapture",
       "rowCount": 2
     },
     {
