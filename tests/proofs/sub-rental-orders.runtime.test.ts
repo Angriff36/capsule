@@ -188,6 +188,6 @@ describe("runtime proof: rentals from vendors and client items (AC-548)", () => 
         endsAt: ENDS,
         quantity: 1,
       }),
-    ).rejects.toThrow(/has 0 available/);
+    ).rejects.toThrow(/has 0 free for that time/);
   });
 });
