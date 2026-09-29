@@ -141,7 +141,7 @@ foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
   Discard $h $file.FullName
   git -C $root pull --no-rebase --quiet origin dev *> $null   # best effort; never forced
   # Approved -> production, from a private clean copy so the running loop cannot disturb it.
-  $rel = (& 'C:\Program Files\Gitinash.exe' -lc "cd /c/Projects/capsule && bash scripts/release-clean.sh --reviewer $($r.reviewer)" 2>&1) -join "`n"
+  $rel = (& 'C:\Program Files\Git\bin\bash.exe' -lc "cd /c/Projects/capsule && bash scripts/release-clean.sh --reviewer $($r.reviewer)" 2>&1) -join "`n"
   $rel | Add-Content $log
   $result = ([regex]::Matches($rel, '(?m)^RESULT: .*$') | Select-Object -Last 1).Value
   if ($result -like 'RESULT: PASS*') { Record $h 'RELEASED' "production: $result" }
