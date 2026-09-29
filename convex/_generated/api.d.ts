@@ -54,6 +54,7 @@ import type * as invoicePayments from "../invoicePayments.js";
 import type * as invoiceReminders from "../invoiceReminders.js";
 import type * as kmParser from "../kmParser.js";
 import type * as laborSummary from "../laborSummary.js";
+import type * as ledgerReconstruction from "../ledgerReconstruction.js";
 import type * as lib_assistantToolSurface from "../lib/assistantToolSurface.js";
 import type * as lib_authContext from "../lib/authContext.js";
 import type * as lib_blobs from "../lib/blobs.js";
@@ -285,6 +286,7 @@ declare const fullApi: ApiFromModules<{
   invoiceReminders: typeof invoiceReminders;
   kmParser: typeof kmParser;
   laborSummary: typeof laborSummary;
+  ledgerReconstruction: typeof ledgerReconstruction;
   "lib/assistantToolSurface": typeof lib_assistantToolSurface;
   "lib/authContext": typeof lib_authContext;
   "lib/blobs": typeof lib_blobs;
