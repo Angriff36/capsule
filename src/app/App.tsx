@@ -275,6 +275,11 @@ const FoodCostPercentagePage = lazy(() =>
     default: module.FoodCostPercentagePage,
   })),
 );
+const FinanceReconciliationPage = lazy(() =>
+  import("../features/finance/FinanceReconciliationPage").then((module) => ({
+    default: module.FinanceReconciliationPage,
+  })),
+);
 const ProfitMarginReportsPage = lazy(() =>
   import("../features/finance/ProfitMarginReportsPage").then((module) => ({
     default: module.ProfitMarginReportsPage,
@@ -1155,6 +1160,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <ProfitMarginReportsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/money-check"
+              element={
+                <SupplyRoute>
+                  <FinanceReconciliationPage />
                 </SupplyRoute>
               }
             />

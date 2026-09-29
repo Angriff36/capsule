@@ -664,6 +664,15 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: ["Find the low-margin work and reprice or drop it."],
   },
   {
+    prefix: "/finance/money-check",
+    title: "Money check",
+    purpose:
+      "Old-system payments next to Capsule payments, by month, with every row that does not agree.",
+    steps: [
+      "Pick the dates, read each month's difference, and save a copy when it is right.",
+    ],
+  },
+  {
     prefix: "/reports",
     title: "Reports",
     purpose: "The business dashboards — KPIs, scorecards, and trends.",
