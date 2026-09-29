@@ -796,6 +796,15 @@ export const EquipmentSchema = z.object({
   registeredAt: z.coerce.date().nullable().optional(),
   retiredAt: z.coerce.date().nullable().optional(),
   retirementReason: z.string().nullable().optional(),
+  trackingMode: z.enum(["serialized", "bulk"]).nullable().optional(),
+  serialNumber: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
+  countUnit: z.string().nullable().optional(),
+  replacementCost: z.number().nullable().optional(),
+  customerPrice: z.number().nullable().optional(),
+  vendorId: z.string().uuid().nullable().optional(),
+  primaryImageStorageId: z.string().nullable().optional(),
+  primaryImageFileName: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -826,6 +835,23 @@ export const EquipmentMaintenanceTaskSchema = z.object({
 });
 
 export type EquipmentMaintenanceTask = z.infer<typeof EquipmentMaintenanceTaskSchema>;
+
+// Entity: EquipmentPart
+export const EquipmentPartSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  equipmentId: z.string().uuid(),
+  partEquipmentId: z.string().uuid(),
+  role: z.enum(["part", "accessory"]).default("part"),
+  quantity: z.number().int().min(1).default(1),
+  attachedAt: z.coerce.date().nullable().optional(),
+  removedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EquipmentPart = z.infer<typeof EquipmentPartSchema>;
 
 // Entity: EquipmentReservation
 export const EquipmentReservationSchema = z.object({
@@ -3220,6 +3246,44 @@ export const ReferralSourceComputedSchema = ReferralSourceSchema.extend({
 export type ReferralSource = z.infer<typeof ReferralSourceSchema>;
 export type ReferralSourceWithComputed = z.infer<typeof ReferralSourceComputedSchema>;
 
+// Entity: RentalOrderLine
+export const RentalOrderLineSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  vendorId: z.string().uuid(),
+  equipmentId: z.string().uuid().nullable().optional(),
+  description: z.string().default(""),
+  quantity: z.number().int().min(1).default(1),
+  countUnit: z.string().default("each"),
+  vendorCost: z.number().min(0).default(0),
+  deliverBy: z.coerce.date().nullable().optional(),
+  pickupAt: z.coerce.date().nullable().optional(),
+  vendorReference: z.string().nullable().optional(),
+  note: z.string().nullable().optional(),
+  status: z.enum(["requested", "confirmed", "delivered", "returned", "cancelled"]).default("requested"),
+  requestedAt: z.coerce.date().nullable().optional(),
+  confirmedAt: z.coerce.date().nullable().optional(),
+  deliveredAt: z.coerce.date().nullable().optional(),
+  deliveredQuantity: z.number().int().nullable().optional(),
+  returnedAt: z.coerce.date().nullable().optional(),
+  returnedQuantity: z.number().int().nullable().optional(),
+  returnNote: z.string().nullable().optional(),
+  cancelledAt: z.coerce.date().nullable().optional(),
+  cancellationReason: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+// Computed: RentalOrderLine
+export const RentalOrderLineComputedSchema = RentalOrderLineSchema.extend({
+  missingQuantity: z.number().int(),
+});
+
+export type RentalOrderLine = z.infer<typeof RentalOrderLineSchema>;
+export type RentalOrderLineWithComputed = z.infer<typeof RentalOrderLineComputedSchema>;
+
 // Entity: RevenueAttribution
 export const RevenueAttributionSchema = z.object({
   id: z.string().uuid(),
@@ -5587,6 +5651,11 @@ export const EmailNotificationSubscriptionUpdateSubscriptionsParamsSchema = z.ob
 
 export type EmailNotificationSubscriptionUpdateSubscriptionsParams = z.infer<typeof EmailNotificationSubscriptionUpdateSubscriptionsParamsSchema>;
 
+// Command: clearPrimaryImage on Equipment
+export const EquipmentClearPrimaryImageParamsSchema = z.object({});
+
+export type EquipmentClearPrimaryImageParams = z.infer<typeof EquipmentClearPrimaryImageParamsSchema>;
+
 // Command: reactivate on Equipment
 export const EquipmentReactivateParamsSchema = z.object({});
 
@@ -5608,6 +5677,14 @@ export const EquipmentRegisterParamsSchema = z.object({
   quantity: z.number().int().optional(),
   purchaseValue: z.number().optional(),
   condition: z.enum(["excellent", "good", "fair", "poor", "out_of_service"]).optional(),
+  trackingMode: z.enum(["serialized", "bulk"]).optional(),
+  serialNumber: z.string().optional(),
+  description: z.string().optional(),
+  countUnit: z.string().optional(),
+  replacementCost: z.number().optional(),
+  customerPrice: z.number().optional(),
+  vendorId: z.string().min(1).optional(),
+  homeLocation: z.string().optional(),
 });
 
 export type EquipmentRegisterParams = z.infer<typeof EquipmentRegisterParamsSchema>;
@@ -5627,9 +5704,24 @@ export const EquipmentReviseDetailsParamsSchema = z.object({
   purchaseValue: z.number().optional(),
   homeLocation: z.string().optional(),
   currentLocation: z.string().optional(),
+  trackingMode: z.enum(["serialized", "bulk"]).optional(),
+  serialNumber: z.string().optional(),
+  description: z.string().optional(),
+  countUnit: z.string().optional(),
+  replacementCost: z.number().optional(),
+  customerPrice: z.number().optional(),
+  vendorId: z.string().min(1).optional(),
 });
 
 export type EquipmentReviseDetailsParams = z.infer<typeof EquipmentReviseDetailsParamsSchema>;
+
+// Command: setPrimaryImage on Equipment
+export const EquipmentSetPrimaryImageParamsSchema = z.object({
+  storageId: z.string(),
+  fileName: z.string().optional(),
+});
+
+export type EquipmentSetPrimaryImageParams = z.infer<typeof EquipmentSetPrimaryImageParamsSchema>;
 
 // Command: updateCondition on Equipment
 export const EquipmentUpdateConditionParamsSchema = z.object({
@@ -5657,6 +5749,28 @@ export const EquipmentMaintenanceTaskScheduleParamsSchema = z.object({
 });
 
 export type EquipmentMaintenanceTaskScheduleParams = z.infer<typeof EquipmentMaintenanceTaskScheduleParamsSchema>;
+
+// Command: attach on EquipmentPart
+export const EquipmentPartAttachParamsSchema = z.object({
+  equipmentId: z.string().min(1),
+  partEquipmentId: z.string().min(1),
+  role: z.enum(["part", "accessory"]),
+  quantity: z.number().int().optional(),
+});
+
+export type EquipmentPartAttachParams = z.infer<typeof EquipmentPartAttachParamsSchema>;
+
+// Command: changeAmount on EquipmentPart
+export const EquipmentPartChangeAmountParamsSchema = z.object({
+  quantity: z.number().int(),
+});
+
+export type EquipmentPartChangeAmountParams = z.infer<typeof EquipmentPartChangeAmountParamsSchema>;
+
+// Command: detach on EquipmentPart
+export const EquipmentPartDetachParamsSchema = z.object({});
+
+export type EquipmentPartDetachParams = z.infer<typeof EquipmentPartDetachParamsSchema>;
 
 // Command: cancel on EquipmentReservation
 export const EquipmentReservationCancelParamsSchema = z.object({
@@ -9686,6 +9800,64 @@ export const ReferralSourceReviseDetailsParamsSchema = z.object({
 });
 
 export type ReferralSourceReviseDetailsParams = z.infer<typeof ReferralSourceReviseDetailsParamsSchema>;
+
+// Command: askVendor on RentalOrderLine
+export const RentalOrderLineAskVendorParamsSchema = z.object({
+  eventId: z.string().min(1),
+  vendorId: z.string().min(1),
+  description: z.string(),
+  quantity: z.number().int(),
+  equipmentId: z.string().min(1).optional(),
+  countUnit: z.string().optional(),
+  vendorCost: z.number().optional(),
+  deliverBy: z.coerce.date().optional(),
+  pickupAt: z.coerce.date().optional(),
+  note: z.string().optional(),
+});
+
+export type RentalOrderLineAskVendorParams = z.infer<typeof RentalOrderLineAskVendorParamsSchema>;
+
+// Command: cancel on RentalOrderLine
+export const RentalOrderLineCancelParamsSchema = z.object({
+  reason: z.string().optional(),
+});
+
+export type RentalOrderLineCancelParams = z.infer<typeof RentalOrderLineCancelParamsSchema>;
+
+// Command: confirm on RentalOrderLine
+export const RentalOrderLineConfirmParamsSchema = z.object({
+  vendorReference: z.string().optional(),
+});
+
+export type RentalOrderLineConfirmParams = z.infer<typeof RentalOrderLineConfirmParamsSchema>;
+
+// Command: markDelivered on RentalOrderLine
+export const RentalOrderLineMarkDeliveredParamsSchema = z.object({
+  deliveredQuantity: z.number().int(),
+});
+
+export type RentalOrderLineMarkDeliveredParams = z.infer<typeof RentalOrderLineMarkDeliveredParamsSchema>;
+
+// Command: markReturned on RentalOrderLine
+export const RentalOrderLineMarkReturnedParamsSchema = z.object({
+  returnedQuantity: z.number().int(),
+  note: z.string().optional(),
+});
+
+export type RentalOrderLineMarkReturnedParams = z.infer<typeof RentalOrderLineMarkReturnedParamsSchema>;
+
+// Command: revise on RentalOrderLine
+export const RentalOrderLineReviseParamsSchema = z.object({
+  description: z.string(),
+  quantity: z.number().int(),
+  countUnit: z.string().optional(),
+  vendorCost: z.number().optional(),
+  deliverBy: z.coerce.date().optional(),
+  pickupAt: z.coerce.date().optional(),
+  note: z.string().optional(),
+});
+
+export type RentalOrderLineReviseParams = z.infer<typeof RentalOrderLineReviseParamsSchema>;
 
 // Command: apply on RevenueAttribution
 export const RevenueAttributionApplyParamsSchema = z.object({

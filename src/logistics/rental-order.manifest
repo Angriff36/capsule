@@ -1,0 +1,240 @@
+// RentalOrderLine — one item rented from an outside vendor for one event
+// (PL-ASSET-CATALOG, spec §13.3 "vendor sub-rental orders ... without falsely
+// treating them as Mangia stock", AC-548).
+//
+// A rental line is never our stock: it does not reserve, count against or
+// change any Equipment quantity. When the vendor's item is also in our
+// catalog (ownership rented), equipmentId names it so the client price and
+// replacement cost can be read; otherwise the description carries it.
+//
+// The line follows the vendor's job: we ask for it, the vendor confirms it,
+// it arrives (maybe short), and it goes back (maybe short again). What did not
+// go back is what the vendor will bill as missing or damaged at closeout.
+
+use "../foundation/base.manifest"
+
+enum RentalOrderStatus {
+  requested
+  confirmed
+  delivered
+  returned
+  cancelled
+}
+
+entity RentalOrderLine mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required eventId: uuid
+  property required vendorId: uuid
+  property equipmentId: uuid?
+  property required searchable description: string = ""
+  property required quantity: int = 1
+  property required countUnit: string = "each"
+  // What the vendor charges for the whole line.
+  property required vendorCost: money(12, 2) = 0
+  property deliverBy: datetime?
+  property pickupAt: datetime?
+  property vendorReference: string?
+  property note: string?
+  property required status: RentalOrderStatus = "requested"
+  property requestedAt: datetime?
+  property confirmedAt: datetime?
+  property deliveredAt: datetime?
+  property deliveredQuantity: int?
+  property returnedAt: datetime?
+  property returnedQuantity: int?
+  property returnNote: string?
+  property cancelledAt: datetime?
+  property cancellationReason: string?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
+  belongsTo equipment: Equipment fields [tenantId, equipmentId] references [tenantId, id]
+
+  computed missingQuantity: int = self.deliveredQuantity != null and self.returnedQuantity != null and self.deliveredQuantity > self.returnedQuantity ? self.deliveredQuantity - self.returnedQuantity : 0
+
+  constraint rentalLineAmount: self.quantity > 0 "Rent at least 1."
+  constraint rentalLineCost: self.vendorCost >= 0 "The vendor's cost can't be negative. Use zero or more."
+  constraint rentalLineWindow: self.deliverBy == null or self.pickupAt == null or self.pickupAt > self.deliverBy "Pick-up has to be after drop-off."
+
+  transition status from "requested" to ["confirmed", "delivered", "cancelled"]
+  transition status from "confirmed" to ["delivered", "cancelled"]
+  transition status from "delivered" to ["returned"]
+
+  default policy rentalOrderRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Logistics, inventory or event staff may see rentals from vendors"
+  default policy rentalOrderWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Logistics, inventory or event staff may update rentals from vendors"
+  default policy rentalOrderExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Logistics, inventory or event staff may change rentals from vendors"
+
+  command askVendor(
+    eventId: uuid,
+    vendorId: uuid,
+    description: string,
+    quantity: int,
+    optional equipmentId: uuid,
+    optional countUnit: string,
+    optional vendorCost: money(12, 2),
+    optional deliverBy: datetime,
+    optional pickupAt: datetime,
+    optional note: string
+  ) {
+    guard self.requestedAt == null
+    guard self.deletedAt == null
+    constraint requestRentalEvent: self.event != null "That event isn't one of yours. Open the event and try again."
+    constraint requestRentalVendor: self.vendor != null "Pick a vendor from your vendor list."
+    constraint requestRentalItem: equipmentId == null or self.equipment != null "That item isn't in your equipment list. Pick one of yours or type what it is."
+    constraint requestRentalName: length(trim(description)) > 0 "Say what you are renting."
+    constraint requestRentalAmount: quantity > 0 "Rent at least 1."
+    constraint requestRentalCost: vendorCost == null or vendorCost >= 0 "The vendor's cost can't be negative. Use zero or more."
+    constraint requestRentalWindow: deliverBy == null or pickupAt == null or pickupAt > deliverBy "Pick-up has to be after drop-off."
+    mutate eventId = eventId
+    mutate vendorId = vendorId
+    mutate equipmentId = equipmentId
+    mutate description = description
+    mutate quantity = quantity
+    mutate countUnit = countUnit != null and length(trim(countUnit)) > 0 ? countUnit : "each"
+    mutate vendorCost = vendorCost != null ? vendorCost : 0
+    mutate deliverBy = deliverBy
+    mutate pickupAt = pickupAt
+    mutate note = note
+    mutate requestedAt = now()
+    emit RentalOrderLineRequested {
+      rentalOrderLineId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      vendorId: vendorId
+      quantity: quantity
+    }
+  }
+
+  // Change the ask before the vendor has brought it.
+  command revise(
+    description: string,
+    quantity: int,
+    optional countUnit: string,
+    optional vendorCost: money(12, 2),
+    optional deliverBy: datetime,
+    optional pickupAt: datetime,
+    optional note: string
+  ) {
+    guard self.requestedAt != null
+    guard self.deletedAt == null
+    constraint reviseRentalOpen: self.status == "requested" or self.status == "confirmed" "This rental has already arrived. Record what came back instead."
+    constraint reviseRentalName: length(trim(description)) > 0 "Say what you are renting."
+    constraint reviseRentalAmount: quantity > 0 "Rent at least 1."
+    constraint reviseRentalCost: vendorCost == null or vendorCost >= 0 "The vendor's cost can't be negative. Use zero or more."
+    mutate description = description
+    mutate quantity = quantity
+    mutate countUnit = countUnit != null and length(trim(countUnit)) > 0 ? countUnit : self.countUnit
+    mutate vendorCost = vendorCost != null ? vendorCost : self.vendorCost
+    mutate deliverBy = deliverBy != null ? deliverBy : self.deliverBy
+    mutate pickupAt = pickupAt != null ? pickupAt : self.pickupAt
+    mutate note = note != null ? note : self.note
+  }
+
+  command confirm(optional vendorReference: string) {
+    guard self.status == "requested"
+    guard self.deletedAt == null
+    mutate status = "confirmed"
+    mutate confirmedAt = now()
+    mutate vendorReference = vendorReference != null ? vendorReference : self.vendorReference
+    emit RentalOrderLineConfirmed {
+      rentalOrderLineId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  // What actually arrived. A short drop is recorded, not refused.
+  command markDelivered(deliveredQuantity: int) {
+    guard self.status == "requested" or self.status == "confirmed"
+    guard self.deletedAt == null
+    constraint deliveredRentalAmount: deliveredQuantity >= 0 "The amount that arrived can't be negative. Use zero or more."
+    mutate status = "delivered"
+    mutate deliveredAt = now()
+    mutate deliveredQuantity = deliveredQuantity
+    emit RentalOrderLineDelivered {
+      rentalOrderLineId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      quantity: self.quantity
+      deliveredQuantity: deliveredQuantity
+    }
+  }
+
+  // What went back to the vendor. Anything short is what the vendor will
+  // bill as missing or damaged; the note says what happened.
+  command markReturned(returnedQuantity: int, optional note: string) {
+    guard self.status == "delivered"
+    guard self.deletedAt == null
+    constraint returnedRentalAmount: returnedQuantity >= 0 "The amount sent back can't be negative. Use zero or more."
+    constraint returnedRentalNotMore: self.deliveredQuantity == null or returnedQuantity <= self.deliveredQuantity "You can't send back more than arrived. Check the count."
+    mutate status = "returned"
+    mutate returnedAt = now()
+    mutate returnedQuantity = returnedQuantity
+    mutate returnNote = note
+    emit RentalOrderLineReturned {
+      rentalOrderLineId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      deliveredQuantity: self.deliveredQuantity
+      returnedQuantity: returnedQuantity
+      note: note
+    }
+  }
+
+  command cancel(optional reason: string) {
+    guard self.status == "requested" or self.status == "confirmed"
+    guard self.deletedAt == null
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate cancellationReason = reason
+    emit RentalOrderLineCancelled {
+      rentalOrderLineId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      reason: reason
+    }
+  }
+
+  store RentalOrderLine in durable
+}
+
+event RentalOrderLineRequested: "rental_order_line.requested" {
+  rentalOrderLineId: string
+  tenantId: string
+  eventId: string
+  vendorId: string
+  quantity: int
+}
+
+event RentalOrderLineConfirmed: "rental_order_line.confirmed" {
+  rentalOrderLineId: string
+  tenantId: string
+  eventId: string
+}
+
+event RentalOrderLineDelivered: "rental_order_line.delivered" {
+  rentalOrderLineId: string
+  tenantId: string
+  eventId: string
+  quantity: int
+  deliveredQuantity: int
+}
+
+event RentalOrderLineReturned: "rental_order_line.returned" {
+  rentalOrderLineId: string
+  tenantId: string
+  eventId: string
+  deliveredQuantity: int?
+  returnedQuantity: int
+  note: string?
+}
+
+event RentalOrderLineCancelled: "rental_order_line.cancelled" {
+  rentalOrderLineId: string
+  tenantId: string
+  eventId: string
+  reason: string?
+}

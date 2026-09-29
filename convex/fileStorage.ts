@@ -138,6 +138,15 @@ export async function storageReferencedByTenant(
       if (!first) return false;
     } else if (ingredient.deletedAt == null) live = true;
   }
+  for await (const equipment of ctx.db
+    .query("equipments")
+    .withIndex("by_primaryImageStorageId", (q) =>
+      q.eq("primaryImageStorageId", storageId),
+    )) {
+    if (equipment.tenantId !== tenantId) {
+      if (!first) return false;
+    } else if (equipment.deletedAt == null) live = true;
+  }
   return live;
 }
 

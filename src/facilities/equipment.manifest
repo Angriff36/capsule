@@ -21,6 +21,20 @@ enum EquipmentStatus {
   retired
 }
 
+// serialized = one tagged piece with its own serial (a warmer, a generator);
+// bulk = a counted pool (200 chairs, 40 linens). PL-ASSET-CATALOG (AC-339).
+enum EquipmentTracking {
+  serialized
+  bulk
+}
+
+// How a piece joins a catalog line: a bundle part always goes with it (the
+// lid of a chafer), an accessory is offered with it (a sterno stand).
+enum EquipmentPartRole {
+  part
+  accessory
+}
+
 enum EquipmentReservationStatus {
   reserved
   checked_out
@@ -51,7 +65,24 @@ entity Equipment mixin TenantScoped, SoftDeletable {
   property registeredAt: datetime?
   property retiredAt: datetime?
   property retirementReason: string?
+  // PL-ASSET-CATALOG (AC-339, AC-545): the rental catalog facts.
+  // Optional so rows saved before these facts existed stay valid; empty
+  // tracking reads as bulk, empty unit as "each", empty money as not set.
+  property trackingMode: EquipmentTracking?
+  property serialNumber: string?
+  property description: string?
+  // What one counts as ("each", "set of 10", "case of 25").
+  property countUnit: string?
+  // What it costs to replace one if it is lost or broken.
+  property replacementCost: money(12, 2)?
+  // What a client pays to rent one for an event.
+  property customerPrice: money(12, 2)?
+  // Who we rent it from when ownership is rented.
+  property vendorId: uuid?
+  property indexed primaryImageStorageId: string?
+  property primaryImageFileName: string?
 
+  belongsTo vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
   hasMany reservations: EquipmentReservation
   hasMany maintenanceTasks: EquipmentMaintenanceTask
 
@@ -60,6 +91,8 @@ entity Equipment mixin TenantScoped, SoftDeletable {
 
   constraint equipmentQuantityNonnegative: self.quantity >= 0 "This equipment's amount on hand can't be negative. Use zero or more."
   constraint equipmentValueNonnegative: self.purchaseValue >= 0 "This equipment's purchase value can't be negative. Use zero or more."
+  constraint equipmentPricesNonnegative: (self.replacementCost == null or self.replacementCost >= 0) and (self.customerPrice == null or self.customerPrice >= 0) "Replacement cost and client price can't be negative. Use zero or more."
+  constraint equipmentSerializedSingle: self.trackingMode != "serialized" or self.quantity <= 1 "A piece tracked by serial number is one piece. Count it as 1, or 0 if it is lost. Use a counted item for a group."
 
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
@@ -76,7 +109,15 @@ entity Equipment mixin TenantScoped, SoftDeletable {
     ownership: EquipmentOwnership,
     optional quantity: int,
     optional purchaseValue: money(12, 2),
-    optional condition: EquipmentCondition
+    optional condition: EquipmentCondition,
+    optional trackingMode: EquipmentTracking,
+    optional serialNumber: string,
+    optional description: string,
+    optional countUnit: string,
+    optional replacementCost: money(12, 2),
+    optional customerPrice: money(12, 2),
+    optional vendorId: uuid,
+    optional homeLocation: string
   ) {
     guard self.registeredAt == null
     guard self.deletedAt == null
@@ -85,6 +126,9 @@ entity Equipment mixin TenantScoped, SoftDeletable {
     constraint registerEquipmentCategory: length(trim(category)) > 0 "Pick what kind of equipment this is."
     constraint registerEquipmentQuantity: quantity == null or quantity > 0 "This equipment's amount has to be more than zero. Enter how many you have."
     constraint registerEquipmentValue: purchaseValue == null or purchaseValue >= 0 "This equipment's purchase value can't be negative. Use zero or more."
+    constraint registerEquipmentSerialSingle: trackingMode != "serialized" or quantity == null or quantity == 1 "A piece tracked by serial number is one piece. Enter 1, or pick counted for a group."
+    constraint registerEquipmentPrices: (replacementCost == null or replacementCost >= 0) and (customerPrice == null or customerPrice >= 0) "Replacement cost and client price can't be negative. Use zero or more."
+    constraint registerEquipmentVendor: vendorId == null or self.vendor != null "That vendor isn't in your vendor list. Pick one of your vendors."
     mutate name = name
     mutate assetTag = assetTag
     mutate category = category
@@ -92,6 +136,14 @@ entity Equipment mixin TenantScoped, SoftDeletable {
     mutate quantity = quantity != null ? quantity : 1
     mutate purchaseValue = purchaseValue != null ? purchaseValue : 0
     mutate condition = condition != null ? condition : "good"
+    mutate trackingMode = trackingMode != null ? trackingMode : "bulk"
+    mutate serialNumber = serialNumber
+    mutate description = description
+    mutate countUnit = countUnit != null and length(trim(countUnit)) > 0 ? countUnit : "each"
+    mutate replacementCost = replacementCost
+    mutate customerPrice = customerPrice
+    mutate vendorId = vendorId
+    mutate homeLocation = homeLocation
     mutate registeredAt = now()
     emit EquipmentRegistered {
       equipmentId: self.id
@@ -109,7 +161,14 @@ entity Equipment mixin TenantScoped, SoftDeletable {
     optional ownership: EquipmentOwnership,
     optional purchaseValue: money(12, 2),
     optional homeLocation: string,
-    optional currentLocation: string
+    optional currentLocation: string,
+    optional trackingMode: EquipmentTracking,
+    optional serialNumber: string,
+    optional description: string,
+    optional countUnit: string,
+    optional replacementCost: money(12, 2),
+    optional customerPrice: money(12, 2),
+    optional vendorId: uuid
   ) {
     guard self.registeredAt != null
     guard self.status == "active"
@@ -117,12 +176,22 @@ entity Equipment mixin TenantScoped, SoftDeletable {
     constraint reviseEquipmentName: length(trim(name)) > 0 "Give this equipment a name."
     constraint reviseEquipmentCategory: length(trim(category)) > 0 "Pick what kind of equipment this is."
     constraint reviseEquipmentValue: purchaseValue == null or purchaseValue >= 0 "This equipment's purchase value can't be negative. Use zero or more."
+    constraint reviseEquipmentSerialSingle: trackingMode != "serialized" or self.quantity <= 1 "A piece tracked by serial number is one piece. Recount this line to 1 first, or keep it counted."
+    constraint reviseEquipmentPrices: (replacementCost == null or replacementCost >= 0) and (customerPrice == null or customerPrice >= 0) "Replacement cost and client price can't be negative. Use zero or more."
     mutate name = name
     mutate category = category
     mutate ownership = ownership != null ? ownership : self.ownership
     mutate purchaseValue = purchaseValue != null ? purchaseValue : self.purchaseValue
     mutate homeLocation = homeLocation != null ? homeLocation : self.homeLocation
     mutate currentLocation = currentLocation != null ? currentLocation : self.currentLocation
+    mutate trackingMode = trackingMode != null ? trackingMode : self.trackingMode
+    mutate serialNumber = serialNumber != null ? serialNumber : self.serialNumber
+    mutate description = description != null ? description : self.description
+    mutate countUnit = countUnit != null and length(trim(countUnit)) > 0 ? countUnit : self.countUnit
+    mutate replacementCost = replacementCost != null ? replacementCost : self.replacementCost
+    mutate customerPrice = customerPrice != null ? customerPrice : self.customerPrice
+    // convex/lib/ownWorkspaceLinks.ts refuses another company's vendor id.
+    mutate vendorId = vendorId != null ? vendorId : self.vendorId
     emit EquipmentDetailsRevised {
       equipmentId: self.id
       tenantId: self.tenantId
@@ -146,10 +215,34 @@ entity Equipment mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command setPrimaryImage(storageId: string, optional fileName: string) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    constraint equipmentImageStorage: length(trim(storageId)) > 0 "Add a photo before you set it as the main picture."
+    mutate primaryImageStorageId = storageId
+    mutate primaryImageFileName = fileName
+    emit EquipmentImageChanged {
+      equipmentId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command clearPrimaryImage() {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    mutate primaryImageStorageId = null
+    mutate primaryImageFileName = null
+    emit EquipmentImageChanged {
+      equipmentId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   command recount(actualQuantity: int) {
     guard self.registeredAt != null
     guard self.deletedAt == null
     constraint recountEquipmentNonnegative: actualQuantity >= 0 "This equipment's counted amount can't be negative. Use zero or more."
+    constraint recountEquipmentSerialSingle: self.trackingMode != "serialized" or actualQuantity <= 1 "A piece tracked by serial number is one piece. Count it as 1, or 0 if it is lost."
     compute previousQuantity = self.quantity
     mutate quantity = actualQuantity
     emit EquipmentRecounted {
@@ -214,6 +307,11 @@ event EquipmentConditionUpdated: "equipment.condition_updated" {
   previousCondition: EquipmentCondition
   condition: EquipmentCondition
   note: string?
+}
+
+event EquipmentImageChanged: "equipment.image_changed" {
+  equipmentId: string
+  tenantId: string
 }
 
 event EquipmentRecounted: "equipment.recounted" {
@@ -543,3 +641,82 @@ on EquipmentReturned fanOut Equipment where id = payload.equipmentId
     condition: payload.condition
     note: payload.note
   }
+
+// A bundle part or accessory of one catalog line (PL-ASSET-CATALOG, AC-545).
+// Both sides are this company's own Equipment rows; the part keeps its own
+// count, condition and availability.
+entity EquipmentPart mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required equipmentId: uuid
+  property required partEquipmentId: uuid
+  property required role: EquipmentPartRole = "part"
+  property required quantity: int = 1
+  property attachedAt: datetime?
+  property removedAt: datetime?
+
+  belongsTo equipment: Equipment fields [tenantId, equipmentId] references [tenantId, id]
+  belongsTo partEquipment: Equipment fields [tenantId, partEquipmentId] references [tenantId, id]
+
+  constraint equipmentPartQuantity: self.quantity > 0 "A part has to come in an amount of at least 1."
+
+  default policy equipmentPartRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may see equipment parts"
+  default policy equipmentPartWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may update equipment parts"
+  default policy equipmentPartExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may change equipment parts"
+
+  command attach(equipmentId: uuid, partEquipmentId: uuid, role: EquipmentPartRole, optional quantity: int) {
+    guard self.attachedAt == null
+    guard self.deletedAt == null
+    constraint attachPartOwnItems: self.equipment != null and self.partEquipment != null "Pick both the item and its part from your own equipment list."
+    constraint attachPartNotItself: equipmentId != partEquipmentId "An item can't be a part of itself. Pick a different part."
+    constraint attachPartAmount: quantity == null or quantity > 0 "A part has to come in an amount of at least 1."
+    mutate equipmentId = equipmentId
+    mutate partEquipmentId = partEquipmentId
+    mutate role = role
+    mutate quantity = quantity != null ? quantity : 1
+    mutate attachedAt = now()
+    emit EquipmentPartAttached {
+      equipmentPartId: self.id
+      tenantId: self.tenantId
+      equipmentId: equipmentId
+      partEquipmentId: partEquipmentId
+      role: role
+    }
+  }
+
+  command changeAmount(quantity: int) {
+    guard self.attachedAt != null and self.removedAt == null
+    guard self.deletedAt == null
+    constraint changePartAmount: quantity > 0 "A part has to come in an amount of at least 1."
+    mutate quantity = quantity
+  }
+
+  command detach() {
+    guard self.attachedAt != null and self.removedAt == null
+    guard self.deletedAt == null
+    mutate removedAt = now()
+    emit EquipmentPartDetached {
+      equipmentPartId: self.id
+      tenantId: self.tenantId
+      equipmentId: self.equipmentId
+    }
+  }
+
+  store EquipmentPart in durable
+}
+
+event EquipmentPartAttached: "equipment.part_attached" {
+  equipmentPartId: string
+  tenantId: string
+  equipmentId: string
+  partEquipmentId: string
+  role: EquipmentPartRole
+}
+
+event EquipmentPartDetached: "equipment.part_detached" {
+  equipmentPartId: string
+  tenantId: string
+  equipmentId: string
+}

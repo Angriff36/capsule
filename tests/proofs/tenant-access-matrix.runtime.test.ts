@@ -219,6 +219,7 @@ const LINK_TABLE: Record<string, string> = {
   packageId: "@outside",
   packedByPersonId: "people",
   parentId: "events",
+  partEquipmentId: "equipments",
   partnerClientId: "clients",
   partnerPersonId: "people",
   pdfStorageId: "@file",

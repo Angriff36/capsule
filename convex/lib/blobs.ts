@@ -1,7 +1,7 @@
 /**
  * AUTHOR SEAM helper — delete an uploaded blob only when nothing references
  * it: no live Attachment row (the whole exact index range is read, not a
- * page) and no Dish or Ingredient whose primary image it is (those rows hold
+ * page) and no Dish, Ingredient or Equipment whose primary image it is (those rows hold
  * the storage id directly; any such row, live or removed, keeps the blob).
  * One reference keeps the blob, so a caller can never remove a file that is
  * in use — an event document, another message's photo, a dish image — by
@@ -50,7 +50,14 @@ export async function blobReferenced(
       q.eq("primaryImageStorageId", storageId),
     )
     .first();
-  return ingredient !== null;
+  if (ingredient) return true;
+  const equipment = await ctx.db
+    .query("equipments")
+    .withIndex("by_primaryImageStorageId", (q) =>
+      q.eq("primaryImageStorageId", storageId),
+    )
+    .first();
+  return equipment !== null;
 }
 
 /** True when the blob was deleted; false when a live row keeps it or it is already gone. */

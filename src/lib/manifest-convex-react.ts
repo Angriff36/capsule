@@ -142,8 +142,12 @@ import {
   DishUpdatePortioningParamsSchema,
   EmailNotificationSubscriptionConfigureParamsSchema,
   EmailNotificationSubscriptionUpdateSubscriptionsParamsSchema,
+  EquipmentClearPrimaryImageParamsSchema,
   EquipmentMaintenanceTaskApplyServiceParamsSchema,
   EquipmentMaintenanceTaskScheduleParamsSchema,
+  EquipmentPartAttachParamsSchema,
+  EquipmentPartChangeAmountParamsSchema,
+  EquipmentPartDetachParamsSchema,
   EquipmentReactivateParamsSchema,
   EquipmentRecountParamsSchema,
   EquipmentRegisterParamsSchema,
@@ -153,6 +157,7 @@ import {
   EquipmentRetireParamsSchema,
   EquipmentReviseDetailsParamsSchema,
   EquipmentServiceEntryRecordParamsSchema,
+  EquipmentSetPrimaryImageParamsSchema,
   EquipmentUpdateConditionParamsSchema,
   EventAllergenCheckRecordParamsSchema,
   EventApplyRouteTravelParamsSchema,
@@ -618,6 +623,12 @@ import {
   ReferralSourceDeactivateParamsSchema,
   ReferralSourceRegisterParamsSchema,
   ReferralSourceReviseDetailsParamsSchema,
+  RentalOrderLineAskVendorParamsSchema,
+  RentalOrderLineCancelParamsSchema,
+  RentalOrderLineConfirmParamsSchema,
+  RentalOrderLineMarkDeliveredParamsSchema,
+  RentalOrderLineMarkReturnedParamsSchema,
+  RentalOrderLineReviseParamsSchema,
   RevenueAttributionApplyParamsSchema,
   RevenueAttributionApproveParamsSchema,
   RevenueAttributionCreateParamsSchema,
@@ -2898,6 +2909,16 @@ export function useGetEquipment(id: string | "skip") {
   return useQuery(api.queries.getEquipment, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for Equipment.clearPrimaryImage. */
+export function useEquipmentClearPrimaryImage() {
+  const mutate = useMutation(api.mutations.Equipment_clearPrimaryImage);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EquipmentClearPrimaryImageParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Equipment.reactivate. */
 export function useEquipmentReactivate() {
   const mutate = useMutation(api.mutations.Equipment_reactivate);
@@ -2944,6 +2965,16 @@ export function useEquipmentReviseDetails() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EquipmentReviseDetailsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Equipment.setPrimaryImage. */
+export function useEquipmentSetPrimaryImage() {
+  const mutate = useMutation(api.mutations.Equipment_setPrimaryImage);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EquipmentSetPrimaryImageParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -3005,6 +3036,57 @@ export function useCreateEquipmentMaintenanceTask() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = EquipmentMaintenanceTaskScheduleParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for EquipmentPart. */
+export function useListEquipmentPart() {
+  return useQuery(api.queries.listEquipmentPart);
+}
+
+/** Reactive get-by-id for EquipmentPart. Pass "skip" to suspend. */
+export function useGetEquipmentPart(id: string | "skip") {
+  return useQuery(api.queries.getEquipmentPart, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for EquipmentPart.attach. */
+export function useEquipmentPartAttach() {
+  const mutate = useMutation(api.mutations.EquipmentPart_attach);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EquipmentPartAttachParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EquipmentPart.changeAmount. */
+export function useEquipmentPartChangeAmount() {
+  const mutate = useMutation(api.mutations.EquipmentPart_changeAmount);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EquipmentPartChangeAmountParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EquipmentPart.detach. */
+export function useEquipmentPartDetach() {
+  const mutate = useMutation(api.mutations.EquipmentPart_detach);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EquipmentPartDetachParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for EquipmentPart.attach. */
+export function useCreateEquipmentPart() {
+  const mutate = useMutation(api.mutations.EquipmentPart_createViaAttach);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = EquipmentPartAttachParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -9289,6 +9371,87 @@ export function useCreateReferralSource() {
   };
 }
 
+/** Reactive list for RentalOrderLine. */
+export function useListRentalOrderLine() {
+  return useQuery(api.queries.listRentalOrderLine);
+}
+
+/** Reactive get-by-id for RentalOrderLine. Pass "skip" to suspend. */
+export function useGetRentalOrderLine(id: string | "skip") {
+  return useQuery(api.queries.getRentalOrderLine, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for RentalOrderLine.askVendor. */
+export function useRentalOrderLineAskVendor() {
+  const mutate = useMutation(api.mutations.RentalOrderLine_askVendor);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RentalOrderLineAskVendorParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RentalOrderLine.cancel. */
+export function useRentalOrderLineCancel() {
+  const mutate = useMutation(api.mutations.RentalOrderLine_cancel);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RentalOrderLineCancelParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RentalOrderLine.confirm. */
+export function useRentalOrderLineConfirm() {
+  const mutate = useMutation(api.mutations.RentalOrderLine_confirm);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RentalOrderLineConfirmParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RentalOrderLine.markDelivered. */
+export function useRentalOrderLineMarkDelivered() {
+  const mutate = useMutation(api.mutations.RentalOrderLine_markDelivered);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RentalOrderLineMarkDeliveredParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RentalOrderLine.markReturned. */
+export function useRentalOrderLineMarkReturned() {
+  const mutate = useMutation(api.mutations.RentalOrderLine_markReturned);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RentalOrderLineMarkReturnedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RentalOrderLine.revise. */
+export function useRentalOrderLineRevise() {
+  const mutate = useMutation(api.mutations.RentalOrderLine_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RentalOrderLineReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for RentalOrderLine.askVendor. */
+export function useCreateRentalOrderLine() {
+  const mutate = useMutation(api.mutations.RentalOrderLine_createViaAskVendor);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = RentalOrderLineAskVendorParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for RevenueAttribution. */
 export function useListRevenueAttribution() {
   return useQuery(api.queries.listRevenueAttribution);
@@ -12164,4 +12327,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1288 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1305 as const;

@@ -188,14 +188,19 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.EmailNotificationSubscription_createViaConfigure, { "eventUpdates": false, "invoiceReminders": false, "lowStockAlerts": false, "shiftChanges": false } as any);
   // Equipment → api.mutations.Equipment_createViaRegister
   rowsAttempted += 1;
-  await client.mutation(api.mutations.Equipment_createViaRegister, { "name": "Equipment 1", "assetTag": "demo-assetTag-1", "category": "demo-category-1", "ownership": "demo-ownership-1", "quantity": 1, "purchaseValue": 1, "condition": "demo-condition-1" } as any);
+  await client.mutation(api.mutations.Equipment_createViaRegister, { "name": "Equipment 1", "assetTag": "demo-assetTag-1", "category": "demo-category-1", "ownership": "demo-ownership-1", "quantity": 1, "purchaseValue": 1, "condition": "demo-condition-1", "homeLocation": "demo-homeLocation-1", "trackingMode": "demo-trackingMode-1", "serialNumber": "demo-serialNumber-1", "description": "demo-description-1", "countUnit": "demo-countUnit-1", "replacementCost": 1, "customerPrice": 1, "vendorId": "vendorId-equipment-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.Equipment_createViaRegister, { "name": "Equipment 2", "assetTag": "demo-assetTag-2", "category": "demo-category-2", "ownership": "demo-ownership-2", "quantity": 2, "purchaseValue": 2, "condition": "demo-condition-2" } as any);
+  await client.mutation(api.mutations.Equipment_createViaRegister, { "name": "Equipment 2", "assetTag": "demo-assetTag-2", "category": "demo-category-2", "ownership": "demo-ownership-2", "quantity": 2, "purchaseValue": 2, "condition": "demo-condition-2", "homeLocation": "demo-homeLocation-2", "trackingMode": "demo-trackingMode-2", "serialNumber": "demo-serialNumber-2", "description": "demo-description-2", "countUnit": "demo-countUnit-2", "replacementCost": 2, "customerPrice": 2, "vendorId": "vendorId-equipment-2" } as any);
   // EquipmentMaintenanceTask → api.mutations.EquipmentMaintenanceTask_createViaSchedule
   rowsAttempted += 1;
   await client.mutation(api.mutations.EquipmentMaintenanceTask_createViaSchedule, { "equipmentId": "equipmentId-equipment-maintenance-task-1", "taskName": "EquipmentMaintenanceTask 1", "intervalDays": 1, "nextDueAt": 1767268800000, "instructions": "demo-instructions-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.EquipmentMaintenanceTask_createViaSchedule, { "equipmentId": "equipmentId-equipment-maintenance-task-2", "taskName": "EquipmentMaintenanceTask 2", "intervalDays": 2, "nextDueAt": 1767355200000, "instructions": "demo-instructions-2" } as any);
+  // EquipmentPart → api.mutations.EquipmentPart_createViaAttach
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EquipmentPart_createViaAttach, { "equipmentId": "equipmentId-equipment-part-1", "partEquipmentId": "partEquipmentId-equipment-part-1", "role": "demo-role-1", "quantity": 1 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EquipmentPart_createViaAttach, { "equipmentId": "equipmentId-equipment-part-2", "partEquipmentId": "partEquipmentId-equipment-part-2", "role": "demo-role-2", "quantity": 2 } as any);
   // skip EquipmentReservation: no creation command in IR (2 rows unused)
   // EquipmentServiceEntry → api.mutations.EquipmentServiceEntry_createViaRecord
   rowsAttempted += 1;
@@ -597,6 +602,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.ReferralSource_createViaRegister, { "name": "ReferralSource 1", "code": "demo-code-1", "sortOrder": 1, "description": "demo-description-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.ReferralSource_createViaRegister, { "name": "ReferralSource 2", "code": "demo-code-2", "sortOrder": 2, "description": "demo-description-2" } as any);
+  // RentalOrderLine → api.mutations.RentalOrderLine_createViaAskVendor
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.RentalOrderLine_createViaAskVendor, { "eventId": "eventId-rental-order-line-1", "vendorId": "vendorId-rental-order-line-1", "equipmentId": "equipmentId-rental-order-line-1", "description": "demo-description-1", "quantity": 1, "countUnit": "demo-countUnit-1", "vendorCost": 1, "deliverBy": 1767268800000, "pickupAt": 1767268800000, "note": "demo-note-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.RentalOrderLine_createViaAskVendor, { "eventId": "eventId-rental-order-line-2", "vendorId": "vendorId-rental-order-line-2", "equipmentId": "equipmentId-rental-order-line-2", "description": "demo-description-2", "quantity": 2, "countUnit": "demo-countUnit-2", "vendorCost": 2, "deliverBy": 1767355200000, "pickupAt": 1767355200000, "note": "demo-note-2" } as any);
   // RevenueAttribution → api.mutations.RevenueAttribution_create
   rowsAttempted += 1;
   await client.mutation(api.mutations.RevenueAttribution_create, { "eventId": "eventId-revenue-attribution-1", "attributionType": "demo-attributionType-1", "allocationMethod": "demo-allocationMethod-1", "venueId": "venueId-revenue-attribution-1", "salespersonId": "salespersonId-revenue-attribution-1", "referralSourceId": "referralSourceId-revenue-attribution-1", "partnerPersonId": "partnerPersonId-revenue-attribution-1", "partnerClientId": "partnerClientId-revenue-attribution-1", "percentBasis": 1, "fixedAmount": 1, "effectiveStartDate": 1767268800000, "effectiveEndDate": 1767268800000, "reason": "demo-reason-1" } as any);
@@ -1036,6 +1046,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "EquipmentPart",
+      "createMutation": "EquipmentPart_createViaAttach",
+      "rowCount": 2
+    },
+    {
       "entity": "EquipmentReservation",
       "createMutation": null,
       "rowCount": 2
@@ -1453,6 +1468,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "ReferralSource",
       "createMutation": "ReferralSource_createViaRegister",
+      "rowCount": 2
+    },
+    {
+      "entity": "RentalOrderLine",
+      "createMutation": "RentalOrderLine_createViaAskVendor",
       "rowCount": 2
     },
     {
