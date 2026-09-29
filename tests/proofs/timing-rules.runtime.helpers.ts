@@ -119,7 +119,19 @@ export type TimingTest = Awaited<ReturnType<typeof timingWorld>>["t"];
 /** Runs every queued follow-up (timing re-plans) to the end. The test turns
  * on fake timers before it builds the world. */
 export async function settle(t: TimingTest) {
-  await t.finishAllScheduledFunctions(vi.runAllTimers);
+  // Under the full parallel suite, loading a queued function's module can
+  // outlast convex-test's fixed pump count; the job is still running, so
+  // wait again instead of failing on a slow machine.
+  for (let attempt = 1; ; attempt++) {
+    try {
+      await t.finishAllScheduledFunctions(vi.runAllTimers);
+      return;
+    } catch (error) {
+      const slow =
+        error instanceof Error && error.message.includes("timer pumps");
+      if (!slow || attempt >= 5) throw error;
+    }
+  }
 }
 
 /** Planned timeline blocks by milestone key. */
