@@ -36,6 +36,144 @@
       "category": "property-added",
       "acknowledgedAt": "2026-09-29",
       "reason": "SoftDeletable mixin: deletedAt is optional (v.optional in the schema), so existing rows stay valid and read as live."
+    },
+    {
+      "path": "EventPacketArtifact.registeredAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive: the property is optional in the generated schema (v.optional), so existing rows are valid; added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "EventPacketResolution.recordedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive: the property is optional in the generated schema (v.optional), so existing rows are valid; added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "EventPacketRevision.printedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive: the property is optional in the generated schema (v.optional), so existing rows are valid; added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "EventPlanned.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Additive: the payload gained optional fields only (EventPlanned: recurrence link fields for schedule-created occurrences; SignatureCompleted: acceptProposalId for the declared Proposal.accept reaction); no field removed or retyped."
+    },
+    {
+      "path": "fail.parameters.clientId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Optional parameter (v.optional in the generated mutation); existing callers are unaffected. Added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "fail.parameters.eventId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Optional parameter (v.optional in the generated mutation); existing callers are unaffected. Added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "fail.parameters.leadId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Optional parameter (v.optional in the generated mutation); existing callers are unaffected. Added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "fail.parameters.proposalId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Optional parameter (v.optional in the generated mutation); existing callers are unaffected. Added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "ImportArtifact.registeredAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive: the property is optional in the generated schema (v.optional), so existing rows are valid; added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "IntegrationConnection.connectedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive: the property is optional in the generated schema (v.optional), so existing rows are valid; added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "IntegrationConnection.engagementId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive: the property is optional in the generated schema (v.optional), so existing rows are valid; added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "IntegrationConnection.grantedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive: the property is optional in the generated schema (v.optional), so existing rows are valid; added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "IntegrationConnection.lastSyncAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive: the property is optional in the generated schema (v.optional), so existing rows are valid; added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "IntegrationConnection.lastSyncFailedCount",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive: the property is optional in the generated schema (v.optional), so existing rows are valid; added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "IntegrationConnection.lastSyncStatus",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive: the property is optional in the generated schema (v.optional), so existing rows are valid; added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "IntegrationConnection.lastSyncSummary",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive: the property is optional in the generated schema (v.optional), so existing rows are valid; added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "IntegrationConnection.ledgerImportedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive: the property is optional in the generated schema (v.optional), so existing rows are valid; added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "IntegrationConnection.oauthRefreshToken",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive: the property is optional in the generated schema (v.optional), so existing rows are valid; added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "planEngagement.parameters.recurrenceSequence",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Optional parameter (v.optional in the generated mutation); existing callers are unaffected. Added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "planEngagement.parameters.recurrenceSeriesId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Optional parameter (v.optional in the generated mutation); existing callers are unaffected. Added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "planEngagement.parameters.recurrenceTemplateEventId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Optional parameter (v.optional in the generated mutation); existing callers are unaffected. Added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "Proposal.acceptedRevisionPending",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "False positive: the property is optional in the generated schema (v.optional), so existing rows are valid; added by the governed-writes conversion (2026-09-29)."
+    },
+    {
+      "path": "SignatureCompleted.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Additive: the payload gained optional fields only (EventPlanned: recurrence link fields for schedule-created occurrences; SignatureCompleted: acceptProposalId for the declared Proposal.accept reaction); no field removed or retyped."
     }
   ]
 }
