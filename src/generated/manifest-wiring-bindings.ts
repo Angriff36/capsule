@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "11d01fbd4c68f896916782a923d864799c09fefe7f23c3a67af6204ef1d3b9fa:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21c70b2b10030f5a9acdb868c2e229c0b48fd6f86e2a44f85040058ab7634e25:272a31932843884c7ac3eabb6161bd3cebde6879b8bea18fc25043fa9be4455f:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2aea5aa1d00f0d86457cb177ee29c76e1c1dc22e7f73bad7f8b1074575cbc31d:2c42c97da3b397baa523b8f7ae11ed10f988cb9ea37f6b158ecb4404f5bcab62:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:2f58e48aa70e7c4414f51af8aea7f9768e378ea26daa75b659dba78dab856030:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:327f55f7fc3badfa91db612d8da5b7a890ed54daf3398ab067c48dd29bcb6f52:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:3946e202e3a047c69528d06bc1371d5100bdc27d68d2644d8882da7bcfa1d23c:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:4021a43427a72d2daffe25a117f282ffc343ff11dd02010652045485f3bf2816:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:45b3d018cb8479a590061dabb5a6bf03edb434440cc64cd88487eb3f799fe2d6:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4ac247395613e10f80cd1bb39b0bcc11a98d99cac60463154d9c42e7b5967258:501487754e20a846402d574851966950378082990b46261a0318113100bcdca5:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:57041b3fe080152b717e2ab15050bc93d3830b1d8027e5dc5114d687ad3c6be3:5b1a6e044cc0addd7bf6bc5f82a1f15994e33d01cccd75bb4dec4971b38b039b:5b5d08c3ea56e43ddf1f2623cdc1888b7bfafc1cbf6ee4a6d49ae42e68c73c95:5fd882905c48e953a76af92b6db9cb606a0b0a9f9949c49f5ce6ca71c0d808ff:673eea009a24475e68b862081672cfe7f5ac7d9c5fb1cae8cd3cb4e17912765f:6a640d8f2f2791605a5c80bebcb59661c51018393b66d37fffa014400b7e99d4:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:6de6b132498fdb76faa9830c1ff3845816532ec79baea94836775d320903dc1f:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:78e2341ac6b83ff5eb43c7fbfc824766ef6c9f5ebb61590eb8cf7ca8270d8b9d:792131c7b95d7c0b140fb2dbbf6a4b7e3ab487a4dc26f65a3d4374fa9c0e6e6b:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7a8de9cb59f93d64dd599f21ded09010d4de32c74d4c83100dcea9b6877fe6b0:7d5c0741e3a26447773948cfe2d758cd1e210e2f37c9f39c272ca443b716a309:7dd6076ce8b39c99fb91e01b05b04c5e8d3c44f535cbcb26f27320918d21294d:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bc38accf30dad64f89fc62a930fea2e6de166c7ddcfbc5f509f57cdb9c41fb5:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:92c0c66864b3c226093e8f9f95ccbee7c79f353d8a59123003095641b38789d4:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:9e98bdeac2b20c1da7c8565bc0e68b67db011509c47c3c512b9e1c9f7be516c4:a04c9aa12c21c3811997769713ecd392ab9d47a8d216dbc42e666cabac135d05:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a363078ede0b73c3c2f7a5c6ddb5c2f0d9de214832687609020e7078b66a8cb3:a37b67df92f218d6b1fbafe7932f858f12fd11a6e1063c82b43664b1146a9fb0:a8b60c0f996f5391bb792849f2044c2e973b34d15938963afad73f7e6a9706a4:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:afbd0cf1305dff953db623162ca2ab2170e7cc3d4f7a62739a8a2653d8ec8941:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b15baf1a6241169d8eb947ae3850e26305e5d419875211954210152c3b42fcd5:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b4bcd360de08b84126452b6c53b801c7f84f1dea757f2c10c53d47f50d8b1182:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bee0f6341a01acf156773a21505eca5e20a25fdb7d1dc6c09c37720a1c2ef899:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c4f4847c56f2947ed5512b4e3254c848c5063e0e6d9d5f2a79578b289d098114:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:ca49afde92432ac008856285d940bc605b8cabecbacbf706b4cf42ac74ccce1f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d3b087f64aae628f5786c8a1cfee107ad396828d18d7e6b77b972f6a3f0f95c7:d4d9def716300b65106042da9a2f7dc8b2b1636bbd3b07ecd3e8614053a9ca73:d9ef376b473936bad5512b64a8aea50c92505d6b1a159615719328cdd79c1c1d:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dc6fcf0fd92b72ae0e511408e5e16b5a5f8007426762380770abc419eebf836f:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e610c980855414eb0532fa1a84908500dbfa3ae1d3b8aec60a88b82418fcaacb:e89da7c29b83df66466e7b996b1780a39c690560afa9a5e5f23c698003827e40:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:ee33cad2c146aefd4f3f8a4e9158f888bc228824dbd5d6e425414009f6aa8ba5:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f49c5ef7603c706a89514343223fe24d6e1496af83095a7796cb93e7336aaea4:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdaa81c70b2f571c3b10af2b3ad5acac7f74ebf613964b09e49516d7d1809937:fe7be8fbd9564de4521178c9c6f4a329db717fbd9f5499c0f5f61c18efa07f19";
+export const WIRING_CONTRACT_HASH = "11d01fbd4c68f896916782a923d864799c09fefe7f23c3a67af6204ef1d3b9fa:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21c70b2b10030f5a9acdb868c2e229c0b48fd6f86e2a44f85040058ab7634e25:272a31932843884c7ac3eabb6161bd3cebde6879b8bea18fc25043fa9be4455f:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2aea5aa1d00f0d86457cb177ee29c76e1c1dc22e7f73bad7f8b1074575cbc31d:2c42c97da3b397baa523b8f7ae11ed10f988cb9ea37f6b158ecb4404f5bcab62:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:2f58e48aa70e7c4414f51af8aea7f9768e378ea26daa75b659dba78dab856030:327f55f7fc3badfa91db612d8da5b7a890ed54daf3398ab067c48dd29bcb6f52:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:34d6e0d78054119d888936d1775b68e437ce2b5dd458186826e0146bdfec677f:3946e202e3a047c69528d06bc1371d5100bdc27d68d2644d8882da7bcfa1d23c:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:4021a43427a72d2daffe25a117f282ffc343ff11dd02010652045485f3bf2816:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:45b3d018cb8479a590061dabb5a6bf03edb434440cc64cd88487eb3f799fe2d6:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4ac247395613e10f80cd1bb39b0bcc11a98d99cac60463154d9c42e7b5967258:501487754e20a846402d574851966950378082990b46261a0318113100bcdca5:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:57041b3fe080152b717e2ab15050bc93d3830b1d8027e5dc5114d687ad3c6be3:5b1a6e044cc0addd7bf6bc5f82a1f15994e33d01cccd75bb4dec4971b38b039b:5b5d08c3ea56e43ddf1f2623cdc1888b7bfafc1cbf6ee4a6d49ae42e68c73c95:5e836fa9948c8fcd70fa3c8bd625238e8c00bf0699beb851e5862e93e031e2e1:5fd882905c48e953a76af92b6db9cb606a0b0a9f9949c49f5ce6ca71c0d808ff:673eea009a24475e68b862081672cfe7f5ac7d9c5fb1cae8cd3cb4e17912765f:6a640d8f2f2791605a5c80bebcb59661c51018393b66d37fffa014400b7e99d4:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:6de6b132498fdb76faa9830c1ff3845816532ec79baea94836775d320903dc1f:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:78e2341ac6b83ff5eb43c7fbfc824766ef6c9f5ebb61590eb8cf7ca8270d8b9d:792131c7b95d7c0b140fb2dbbf6a4b7e3ab487a4dc26f65a3d4374fa9c0e6e6b:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7d5c0741e3a26447773948cfe2d758cd1e210e2f37c9f39c272ca443b716a309:7dd6076ce8b39c99fb91e01b05b04c5e8d3c44f535cbcb26f27320918d21294d:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:871382762a6d3b344a7428acc496a5c66a1cfc0f00ad0777398ac0a1d3badc53:8bc38accf30dad64f89fc62a930fea2e6de166c7ddcfbc5f509f57cdb9c41fb5:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:92c0c66864b3c226093e8f9f95ccbee7c79f353d8a59123003095641b38789d4:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:9e98bdeac2b20c1da7c8565bc0e68b67db011509c47c3c512b9e1c9f7be516c4:a04c9aa12c21c3811997769713ecd392ab9d47a8d216dbc42e666cabac135d05:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a363078ede0b73c3c2f7a5c6ddb5c2f0d9de214832687609020e7078b66a8cb3:a37b67df92f218d6b1fbafe7932f858f12fd11a6e1063c82b43664b1146a9fb0:a8b60c0f996f5391bb792849f2044c2e973b34d15938963afad73f7e6a9706a4:afbd0cf1305dff953db623162ca2ab2170e7cc3d4f7a62739a8a2653d8ec8941:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b15baf1a6241169d8eb947ae3850e26305e5d419875211954210152c3b42fcd5:b4bcd360de08b84126452b6c53b801c7f84f1dea757f2c10c53d47f50d8b1182:b5b2343a86d08707f3bb3269abdd07b498a05b7b16e40758410d8d2aabce0cfc:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bee0f6341a01acf156773a21505eca5e20a25fdb7d1dc6c09c37720a1c2ef899:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c4f4847c56f2947ed5512b4e3254c848c5063e0e6d9d5f2a79578b289d098114:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:ca49afde92432ac008856285d940bc605b8cabecbacbf706b4cf42ac74ccce1f:ca51a073d6c16a170dd50e9eb81b5819de4648b07b6a806b67daca531deba47e:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:cf4f477e9f273cf1f28dfeae53fb1ef1bc80a42fc31da956eb29edc67aacf545:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d3b087f64aae628f5786c8a1cfee107ad396828d18d7e6b77b972f6a3f0f95c7:d4d9def716300b65106042da9a2f7dc8b2b1636bbd3b07ecd3e8614053a9ca73:d9ef376b473936bad5512b64a8aea50c92505d6b1a159615719328cdd79c1c1d:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dc6fcf0fd92b72ae0e511408e5e16b5a5f8007426762380770abc419eebf836f:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e610c980855414eb0532fa1a84908500dbfa3ae1d3b8aec60a88b82418fcaacb:e89da7c29b83df66466e7b996b1780a39c690560afa9a5e5f23c698003827e40:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:ee33cad2c146aefd4f3f8a4e9158f888bc228824dbd5d6e425414009f6aa8ba5:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f49c5ef7603c706a89514343223fe24d6e1496af83095a7796cb93e7336aaea4:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:fb42be5758f7efee955784116dcadd835bc256677a9303e394b61dcf552774b1:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdaa81c70b2f571c3b10af2b3ad5acac7f74ebf613964b09e49516d7d1809937:fe7be8fbd9564de4521178c9c6f4a329db717fbd9f5499c0f5f61c18efa07f19";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -378,6 +378,84 @@ export const AssistantLlmConfigConfigureAction = {
     {
       "name": "model",
       "label": "Model",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- AssistantUpload.register ---
+export interface AssistantUploadRegisterClientInput {
+  storageId: string;
+  name: string;
+  uploadedBy: string;
+}
+
+export const AssistantUploadRegisterCapability = {
+  capabilityId: "AssistantUpload.register",
+  entity: "AssistantUpload",
+  command: "register",
+  route: "/api/manifest/AssistantUpload/commands/register",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["storageId","name","uploadedBy"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see assistant upload registrations"},{"kind":"policy_denial","message":"Staff may register assistant uploads"},{"kind":"policy_denial","message":"Staff may change assistant uploads"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Nothing was uploaded."},{"kind":"constraint_block","message":"Sign in first."}],
+  emits: ["AssistantUploadRegistered"],
+} as const;
+
+export type AssistantUploadRegisterResult = { docId: string };
+
+/**
+ * Build command input for AssistantUpload.register.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindAssistantUploadRegisterInput(client: AssistantUploadRegisterClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful AssistantUpload.register. */
+export const AssistantUploadRegisterInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "AssistantUpload",
+    "queryKeyHint": "queryKeys.assistantUpload.lists()",
+    "readId": "AssistantUpload.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AssistantUpload",
+    "queryKeyHint": "queryKeys.assistantUpload.detail(id)",
+    "readId": "AssistantUpload.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer AssistantUpload.register. Not a rendered control. */
+export const AssistantUploadRegisterAction = {
+  "exposure": "human",
+  "label": "Register",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "storageId",
+      "label": "Storage id",
+      "required": true
+    },
+    {
+      "name": "name",
+      "label": "Name",
+      "required": true
+    },
+    {
+      "name": "uploadedBy",
+      "label": "Uploaded by",
       "required": true
     }
   ]
@@ -1538,6 +1616,138 @@ export const CandidateRevokeHireAction = {
       "name": "reason",
       "label": "Reason",
       "required": false
+    }
+  ]
+} as const;
+
+// --- ChatNotifyPreference.create ---
+export interface ChatNotifyPreferenceCreateClientInput {
+  enabled: boolean;
+}
+
+export const ChatNotifyPreferenceCreateCapability = {
+  capabilityId: "ChatNotifyPreference.create",
+  entity: "ChatNotifyPreference",
+  command: "create",
+  route: "/api/manifest/ChatNotifyPreference/commands/create",
+  instanceCommand: false,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "created",
+  returnTsType: "{ _id: string; tenantId: string; ownerId: string | null; enabled: boolean; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["enabled"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Users may see their own chat notification preference"},{"kind":"policy_denial","message":"Sign in to change notification settings"},{"kind":"policy_denial","message":"Sign in to change notification settings"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Your notification setting already exists; change it instead"}],
+  emits: ["ChatNotifyPreferenceSet"],
+} as const;
+
+export type ChatNotifyPreferenceCreateResult = { _id: string; tenantId: string; ownerId: string | null; enabled: boolean; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for ChatNotifyPreference.create.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindChatNotifyPreferenceCreateInput(client: ChatNotifyPreferenceCreateClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ChatNotifyPreference.create. */
+export const ChatNotifyPreferenceCreateInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ChatNotifyPreference",
+    "queryKeyHint": "queryKeys.chatNotifyPreference.lists()",
+    "readId": "ChatNotifyPreference.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ChatNotifyPreference",
+    "queryKeyHint": "queryKeys.chatNotifyPreference.detail(id)",
+    "readId": "ChatNotifyPreference.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer ChatNotifyPreference.create. Not a rendered control. */
+export const ChatNotifyPreferenceCreateAction = {
+  "exposure": "human",
+  "label": "Create",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "enabled",
+      "label": "Enabled",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- ChatNotifyPreference.setEnabled ---
+export interface ChatNotifyPreferenceSetEnabledClientInput {
+  enabled: boolean;
+}
+
+export const ChatNotifyPreferenceSetEnabledCapability = {
+  capabilityId: "ChatNotifyPreference.setEnabled",
+  entity: "ChatNotifyPreference",
+  command: "setEnabled",
+  route: "/api/manifest/ChatNotifyPreference/commands/setEnabled",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; ownerId: string | null; enabled: boolean; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["enabled"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Users may see their own chat notification preference"},{"kind":"policy_denial","message":"Sign in to change notification settings"},{"kind":"policy_denial","message":"Sign in to change notification settings"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ChatNotifyPreference not found"}],
+  emits: ["ChatNotifyPreferenceSet"],
+} as const;
+
+export type ChatNotifyPreferenceSetEnabledResult = { _id: string; _creationTime: number; tenantId: string; ownerId: string | null; enabled: boolean; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for ChatNotifyPreference.setEnabled.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindChatNotifyPreferenceSetEnabledInput(client: ChatNotifyPreferenceSetEnabledClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ChatNotifyPreference.setEnabled. */
+export const ChatNotifyPreferenceSetEnabledInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ChatNotifyPreference",
+    "queryKeyHint": "queryKeys.chatNotifyPreference.lists()",
+    "readId": "ChatNotifyPreference.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ChatNotifyPreference",
+    "queryKeyHint": "queryKeys.chatNotifyPreference.detail(id)",
+    "readId": "ChatNotifyPreference.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer ChatNotifyPreference.setEnabled. Not a rendered control. */
+export const ChatNotifyPreferenceSetEnabledAction = {
+  "exposure": "human",
+  "label": "Set enabled",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "enabled",
+      "label": "Enabled",
+      "required": true
     }
   ]
 } as const;
@@ -118777,6 +118987,86 @@ export const PurchaseNeedStandDownWithEventLifecycle = [
   }
 ] as const;
 
+// --- PushSubscription.recordDelivery ---
+export interface PushSubscriptionRecordDeliveryClientInput {
+  at: number;
+}
+
+export const PushSubscriptionRecordDeliveryCapability = {
+  capabilityId: "PushSubscription.recordDelivery",
+  entity: "PushSubscription",
+  command: "recordDelivery",
+  route: "/api/manifest/PushSubscription/commands/recordDelivery",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; authSubjectId: string; personId: string; endpoint: string; p256dh: string; auth: string; userAgent: string | null; lastUsedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["at"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see their own push devices"},{"kind":"policy_denial","message":"Staff may manage their own push devices"},{"kind":"policy_denial","message":"Staff may manage their own push devices"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PushSubscription not found"}],
+  emits: [],
+} as const;
+
+export type PushSubscriptionRecordDeliveryResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; authSubjectId: string; personId: string; endpoint: string; p256dh: string; auth: string; userAgent: string | null; lastUsedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PushSubscription.recordDelivery.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPushSubscriptionRecordDeliveryInput(client: PushSubscriptionRecordDeliveryClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PushSubscription.recordDelivery. */
+export const PushSubscriptionRecordDeliveryInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PushSubscription",
+    "queryKeyHint": "queryKeys.pushSubscription.lists()",
+    "readId": "PushSubscription.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PushSubscription",
+    "queryKeyHint": "queryKeys.pushSubscription.detail(id)",
+    "readId": "PushSubscription.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PushSubscription.recordDelivery. Not a rendered control. */
+export const PushSubscriptionRecordDeliveryAction = {
+  "exposure": "human",
+  "label": "Record delivery",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "at",
+      "label": "At",
+      "required": true
+    }
+  ]
+} as const;
+
 // --- PushSubscription.register ---
 export interface PushSubscriptionRegisterClientInput {
   endpoint: string;
@@ -118800,7 +119090,7 @@ export const PushSubscriptionRegisterCapability = {
   returnTsType: "{ docId: string }",
   clientParameterNames: ["endpoint","p256dh","auth","userAgent"],
   serverParameterNames: [],
-  failures: [{"kind":"policy_denial","message":"Staff may see their own push devices"},{"kind":"policy_denial","message":"Push devices are managed only through the app"},{"kind":"policy_denial","message":"Push devices are managed only through the app"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This device is missing its push address. Try turning notifications on again."},{"kind":"constraint_block","message":"This device is missing its notification keys. Try turning notifications on again."}],
+  failures: [{"kind":"policy_denial","message":"Staff may see their own push devices"},{"kind":"policy_denial","message":"Staff may manage their own push devices"},{"kind":"policy_denial","message":"Staff may manage their own push devices"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This device is missing its push address. Try turning notifications on again."},{"kind":"constraint_block","message":"This device is missing its notification keys. Try turning notifications on again."},{"kind":"constraint_block","message":"This device already has notifications on. Turn them off and on again."}],
   emits: ["PushSubscriptionRegistered"],
 } as const;
 
@@ -118875,6 +119165,178 @@ export const PushSubscriptionRegisterAction = {
   ]
 } as const;
 
+// --- PushSubscription.releaseDevice ---
+export interface PushSubscriptionReleaseDeviceClientInput {
+  endpoint: string;
+}
+
+export const PushSubscriptionReleaseDeviceCapability = {
+  capabilityId: "PushSubscription.releaseDevice",
+  entity: "PushSubscription",
+  command: "releaseDevice",
+  route: "/api/manifest/PushSubscription/commands/releaseDevice",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; authSubjectId: string; personId: string; endpoint: string; p256dh: string; auth: string; userAgent: string | null; lastUsedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["endpoint"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see their own push devices"},{"kind":"policy_denial","message":"Staff may manage their own push devices"},{"kind":"policy_denial","message":"Staff may manage their own push devices"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PushSubscription not found"}],
+  emits: ["PushSubscriptionRemoved"],
+} as const;
+
+export type PushSubscriptionReleaseDeviceResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; authSubjectId: string; personId: string; endpoint: string; p256dh: string; auth: string; userAgent: string | null; lastUsedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PushSubscription.releaseDevice.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPushSubscriptionReleaseDeviceInput(client: PushSubscriptionReleaseDeviceClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PushSubscription.releaseDevice. */
+export const PushSubscriptionReleaseDeviceInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PushSubscription",
+    "queryKeyHint": "queryKeys.pushSubscription.lists()",
+    "readId": "PushSubscription.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PushSubscription",
+    "queryKeyHint": "queryKeys.pushSubscription.detail(id)",
+    "readId": "PushSubscription.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PushSubscription.releaseDevice. Not a rendered control. */
+export const PushSubscriptionReleaseDeviceAction = {
+  "exposure": "human",
+  "label": "Release device",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "endpoint",
+      "label": "Endpoint",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- PushSubscription.renew ---
+export interface PushSubscriptionRenewClientInput {
+  p256dh: string;
+  auth: string;
+  userAgent?: string;
+}
+
+export const PushSubscriptionRenewCapability = {
+  capabilityId: "PushSubscription.renew",
+  entity: "PushSubscription",
+  command: "renew",
+  route: "/api/manifest/PushSubscription/commands/renew",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; authSubjectId: string; personId: string; endpoint: string; p256dh: string; auth: string; userAgent: string | null; lastUsedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["p256dh","auth","userAgent"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see their own push devices"},{"kind":"policy_denial","message":"Staff may manage their own push devices"},{"kind":"policy_denial","message":"Staff may manage their own push devices"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This device is missing its notification keys. Try turning notifications on again."},{"kind":"constraint_block","message":"This device already has notifications on for another account. Turn them off there first."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PushSubscription not found"}],
+  emits: ["PushSubscriptionRegistered"],
+} as const;
+
+export type PushSubscriptionRenewResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; authSubjectId: string; personId: string; endpoint: string; p256dh: string; auth: string; userAgent: string | null; lastUsedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PushSubscription.renew.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPushSubscriptionRenewInput(client: PushSubscriptionRenewClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PushSubscription.renew. */
+export const PushSubscriptionRenewInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PushSubscription",
+    "queryKeyHint": "queryKeys.pushSubscription.lists()",
+    "readId": "PushSubscription.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PushSubscription",
+    "queryKeyHint": "queryKeys.pushSubscription.detail(id)",
+    "readId": "PushSubscription.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PushSubscription.renew. Not a rendered control. */
+export const PushSubscriptionRenewAction = {
+  "exposure": "human",
+  "label": "Renew",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "p256dh",
+      "label": "P256dh",
+      "required": true
+    },
+    {
+      "name": "auth",
+      "label": "Auth",
+      "required": true
+    },
+    {
+      "name": "userAgent",
+      "label": "User agent",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- PushSubscription.unregister ---
 export type PushSubscriptionUnregisterClientInput = Record<string, never>;
 
@@ -118893,7 +119355,7 @@ export const PushSubscriptionUnregisterCapability = {
   returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; authSubjectId: string; personId: string; endpoint: string; p256dh: string; auth: string; userAgent: string | null; lastUsedAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
-  failures: [{"kind":"policy_denial","message":"Staff may see their own push devices"},{"kind":"policy_denial","message":"Push devices are managed only through the app"},{"kind":"policy_denial","message":"Push devices are managed only through the app"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PushSubscription not found"}],
+  failures: [{"kind":"policy_denial","message":"Staff may see their own push devices"},{"kind":"policy_denial","message":"Staff may manage their own push devices"},{"kind":"policy_denial","message":"Staff may manage their own push devices"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PushSubscription not found"}],
   emits: ["PushSubscriptionRemoved"],
 } as const;
 
@@ -123729,6 +124191,274 @@ export const RoleScorecardReactivateLifecycle = [
     "proven": true
   }
 ] as const;
+
+// --- RunAlertDelivery.record ---
+export interface RunAlertDeliveryRecordClientInput {
+  activityId: string;
+  kind: string;
+}
+
+export const RunAlertDeliveryRecordCapability = {
+  capabilityId: "RunAlertDelivery.record",
+  entity: "RunAlertDelivery",
+  command: "record",
+  route: "/api/manifest/RunAlertDelivery/commands/record",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["activityId","kind"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see which alerts went out"},{"kind":"policy_denial","message":"Alerts are recorded by the app"},{"kind":"policy_denial","message":"Alerts are recorded by the app"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"Unknown alert kind."},{"kind":"constraint_block","message":"This alert was already sent."}],
+  emits: ["RunAlertSent"],
+} as const;
+
+export type RunAlertDeliveryRecordResult = { docId: string };
+
+/**
+ * Build command input for RunAlertDelivery.record.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRunAlertDeliveryRecordInput(client: RunAlertDeliveryRecordClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RunAlertDelivery.record. */
+export const RunAlertDeliveryRecordInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RunAlertDelivery",
+    "queryKeyHint": "queryKeys.runAlertDelivery.lists()",
+    "readId": "RunAlertDelivery.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RunAlertDelivery",
+    "queryKeyHint": "queryKeys.runAlertDelivery.detail(id)",
+    "readId": "RunAlertDelivery.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer RunAlertDelivery.record. Not a rendered control. */
+export const RunAlertDeliveryRecordAction = {
+  "exposure": "human",
+  "label": "Record",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "activityId",
+      "label": "Activity id",
+      "required": true
+    },
+    {
+      "name": "kind",
+      "label": "Kind",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- RunAlertSetting.create ---
+export type RunAlertSettingCreateClientInput = Record<string, never>;
+
+export const RunAlertSettingCreateCapability = {
+  capabilityId: "RunAlertSetting.create",
+  entity: "RunAlertSetting",
+  command: "create",
+  route: "/api/manifest/RunAlertSetting/commands/create",
+  instanceCommand: false,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "created",
+  returnTsType: "{ _id: string; tenantId: string; enabled: boolean; generation: string | null; changedBy: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see whether background alerts are on"},{"kind":"policy_denial","message":"Staff may switch background alerts"},{"kind":"policy_denial","message":"Staff may switch background alerts"},{"kind":"guard_failure","message":"Guard 0 failed"}],
+  emits: [],
+} as const;
+
+export type RunAlertSettingCreateResult = { _id: string; tenantId: string; enabled: boolean; generation: string | null; changedBy: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for RunAlertSetting.create.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRunAlertSettingCreateInput(client: RunAlertSettingCreateClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RunAlertSetting.create. */
+export const RunAlertSettingCreateInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RunAlertSetting",
+    "queryKeyHint": "queryKeys.runAlertSetting.lists()",
+    "readId": "RunAlertSetting.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RunAlertSetting",
+    "queryKeyHint": "queryKeys.runAlertSetting.detail(id)",
+    "readId": "RunAlertSetting.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer RunAlertSetting.create. Not a rendered control. */
+export const RunAlertSettingCreateAction = {
+  "exposure": "human",
+  "label": "Create",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- RunAlertSetting.disable ---
+export interface RunAlertSettingDisableClientInput {
+  actorId?: string;
+}
+
+export const RunAlertSettingDisableCapability = {
+  capabilityId: "RunAlertSetting.disable",
+  entity: "RunAlertSetting",
+  command: "disable",
+  route: "/api/manifest/RunAlertSetting/commands/disable",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; enabled: boolean; generation: string | null; changedBy: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["actorId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see whether background alerts are on"},{"kind":"policy_denial","message":"Staff may switch background alerts"},{"kind":"policy_denial","message":"Staff may switch background alerts"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"RunAlertSetting not found"}],
+  emits: ["RunAlertsDisabled"],
+} as const;
+
+export type RunAlertSettingDisableResult = { _id: string; _creationTime: number; tenantId: string; enabled: boolean; generation: string | null; changedBy: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for RunAlertSetting.disable.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRunAlertSettingDisableInput(client: RunAlertSettingDisableClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RunAlertSetting.disable. */
+export const RunAlertSettingDisableInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RunAlertSetting",
+    "queryKeyHint": "queryKeys.runAlertSetting.lists()",
+    "readId": "RunAlertSetting.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RunAlertSetting",
+    "queryKeyHint": "queryKeys.runAlertSetting.detail(id)",
+    "readId": "RunAlertSetting.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer RunAlertSetting.disable. Not a rendered control. */
+export const RunAlertSettingDisableAction = {
+  "exposure": "human",
+  "label": "Disable",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "actorId",
+      "label": "Actor id",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- RunAlertSetting.enable ---
+export interface RunAlertSettingEnableClientInput {
+  generation: string;
+  actorId?: string;
+}
+
+export const RunAlertSettingEnableCapability = {
+  capabilityId: "RunAlertSetting.enable",
+  entity: "RunAlertSetting",
+  command: "enable",
+  route: "/api/manifest/RunAlertSetting/commands/enable",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; enabled: boolean; generation: string | null; changedBy: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["generation","actorId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see whether background alerts are on"},{"kind":"policy_denial","message":"Staff may switch background alerts"},{"kind":"policy_denial","message":"Staff may switch background alerts"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"The alert loop needs its owner token."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"RunAlertSetting not found"}],
+  emits: ["RunAlertsEnabled"],
+} as const;
+
+export type RunAlertSettingEnableResult = { _id: string; _creationTime: number; tenantId: string; enabled: boolean; generation: string | null; changedBy: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for RunAlertSetting.enable.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRunAlertSettingEnableInput(client: RunAlertSettingEnableClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RunAlertSetting.enable. */
+export const RunAlertSettingEnableInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RunAlertSetting",
+    "queryKeyHint": "queryKeys.runAlertSetting.lists()",
+    "readId": "RunAlertSetting.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RunAlertSetting",
+    "queryKeyHint": "queryKeys.runAlertSetting.detail(id)",
+    "readId": "RunAlertSetting.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer RunAlertSetting.enable. Not a rendered control. */
+export const RunAlertSettingEnableAction = {
+  "exposure": "human",
+  "label": "Enable",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "generation",
+      "label": "Generation",
+      "required": true
+    },
+    {
+      "name": "actorId",
+      "label": "Actor id",
+      "required": false
+    }
+  ]
+} as const;
 
 // --- SavedReportDefinition.archive ---
 export type SavedReportDefinitionArchiveClientInput = Record<string, never>;
@@ -129796,7 +130526,7 @@ export const StaffChatReadCursorOpenCapability = {
   returnTsType: "{ docId: string }",
   clientParameterNames: ["channelKey","readUpTo"],
   serverParameterNames: [],
-  failures: [{"kind":"policy_denial","message":"Staff may see how far they have gotten in a chat"},{"kind":"policy_denial","message":"Staff may mark which chats they have read"},{"kind":"policy_denial","message":"Staff may mark chat channels read for themselves"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Pick a channel."},{"kind":"constraint_block","message":"You can't mark a chat read before now."}],
+  failures: [{"kind":"policy_denial","message":"Staff may see how far they have gotten in a chat"},{"kind":"policy_denial","message":"Staff may mark which chats they have read"},{"kind":"policy_denial","message":"Staff may mark chat channels read for themselves"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Pick a channel."},{"kind":"constraint_block","message":"You can't mark a chat read before now."},{"kind":"constraint_block","message":"This chat's read position is already set. It updates automatically after that."}],
   emits: ["StaffChatChannelRead"],
 } as const;
 
@@ -130097,6 +130827,107 @@ export const StaffMessageMarkReadAction = {
   "label": "Mark read",
   "confirm": false,
   "fields": []
+} as const;
+
+// --- StaffMessage.recordAttachments ---
+export interface StaffMessageRecordAttachmentsClientInput {
+  /** Bounds: 1..∞ */
+  attachmentCount: number;
+  clearBody: boolean;
+}
+
+export const StaffMessageRecordAttachmentsCapability = {
+  capabilityId: "StaffMessage.recordAttachments",
+  entity: "StaffMessage",
+  command: "recordAttachments",
+  route: "/api/manifest/StaffMessage/commands/recordAttachments",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; senderPersonId: string; recipientPersonId: string | null; eventId: string | null; senderAuthSubjectId: string | null; recipientAuthSubjectId: string | null; body: string; attachmentCount: number; mentionedPersonIds: string | null; editedAt: number | null; readAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["attachmentCount","clearBody"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see channel messages and their own direct messages"},{"kind":"policy_denial","message":"Staff may update staff messages"},{"kind":"policy_denial","message":"Staff may change staff messages"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This message's files changed while it was being sent. Send it again."},{"kind":"constraint_block","message":"Add message text or a file."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"StaffMessage not found"}],
+  emits: [],
+} as const;
+
+export type StaffMessageRecordAttachmentsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; senderPersonId: string; recipientPersonId: string | null; eventId: string | null; senderAuthSubjectId: string | null; recipientAuthSubjectId: string | null; body: string; attachmentCount: number; mentionedPersonIds: string | null; editedAt: number | null; readAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for StaffMessage.recordAttachments.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindStaffMessageRecordAttachmentsInput(client: StaffMessageRecordAttachmentsClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful StaffMessage.recordAttachments. */
+export const StaffMessageRecordAttachmentsInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "StaffMessage",
+    "queryKeyHint": "queryKeys.staffMessage.lists()",
+    "readId": "StaffMessage.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StaffMessage",
+    "queryKeyHint": "queryKeys.staffMessage.detail(id)",
+    "readId": "StaffMessage.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer StaffMessage.recordAttachments. Not a rendered control. */
+export const StaffMessageRecordAttachmentsAction = {
+  "exposure": "human",
+  "label": "Record attachments",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "attachmentCount",
+      "label": "Attachment count",
+      "required": true
+    },
+    {
+      "name": "clearBody",
+      "label": "Clear body",
+      "required": true
+    }
+  ]
 } as const;
 
 // --- StaffMessage.remove ---
@@ -133805,6 +134636,188 @@ export const TimeRecordCorrectLifecycle = [
     "proven": true
   }
 ] as const;
+
+// --- TppReportFavorite.create ---
+export interface TppReportFavoriteCreateClientInput {
+  reportId?: string;
+}
+
+export const TppReportFavoriteCreateCapability = {
+  capabilityId: "TppReportFavorite.create",
+  entity: "TppReportFavorite",
+  command: "create",
+  route: "/api/manifest/TppReportFavorite/commands/create",
+  instanceCommand: false,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "created",
+  returnTsType: "{ _id: string; tenantId: string; deletedAt: number | null; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["reportId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see their own report favorites"},{"kind":"policy_denial","message":"Link your account to a staff profile to keep report favorites"},{"kind":"policy_denial","message":"Link your account to a staff profile to keep report favorites"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This report is already a favorite."}],
+  emits: ["TppReportFavorited"],
+} as const;
+
+export type TppReportFavoriteCreateResult = { _id: string; tenantId: string; deletedAt: number | null; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for TppReportFavorite.create.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindTppReportFavoriteCreateInput(client: TppReportFavoriteCreateClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful TppReportFavorite.create. */
+export const TppReportFavoriteCreateInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "TppReportFavorite",
+    "queryKeyHint": "queryKeys.tppReportFavorite.lists()",
+    "readId": "TppReportFavorite.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TppReportFavorite",
+    "queryKeyHint": "queryKeys.tppReportFavorite.detail(id)",
+    "readId": "TppReportFavorite.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer TppReportFavorite.create. Not a rendered control. */
+export const TppReportFavoriteCreateAction = {
+  "exposure": "human",
+  "label": "Create",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "reportId",
+      "label": "Report id",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- TppReportFavorite.refavorite ---
+export type TppReportFavoriteRefavoriteClientInput = Record<string, never>;
+
+export const TppReportFavoriteRefavoriteCapability = {
+  capabilityId: "TppReportFavorite.refavorite",
+  entity: "TppReportFavorite",
+  command: "refavorite",
+  route: "/api/manifest/TppReportFavorite/commands/refavorite",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see their own report favorites"},{"kind":"policy_denial","message":"Link your account to a staff profile to keep report favorites"},{"kind":"policy_denial","message":"Link your account to a staff profile to keep report favorites"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This report is already a favorite."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"TppReportFavorite not found"}],
+  emits: ["TppReportFavorited"],
+} as const;
+
+export type TppReportFavoriteRefavoriteResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for TppReportFavorite.refavorite.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindTppReportFavoriteRefavoriteInput(client: TppReportFavoriteRefavoriteClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful TppReportFavorite.refavorite. */
+export const TppReportFavoriteRefavoriteInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "TppReportFavorite",
+    "queryKeyHint": "queryKeys.tppReportFavorite.lists()",
+    "readId": "TppReportFavorite.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TppReportFavorite",
+    "queryKeyHint": "queryKeys.tppReportFavorite.detail(id)",
+    "readId": "TppReportFavorite.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer TppReportFavorite.refavorite. Not a rendered control. */
+export const TppReportFavoriteRefavoriteAction = {
+  "exposure": "human",
+  "label": "Refavorite",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- TppReportFavorite.unfavorite ---
+export type TppReportFavoriteUnfavoriteClientInput = Record<string, never>;
+
+export const TppReportFavoriteUnfavoriteCapability = {
+  capabilityId: "TppReportFavorite.unfavorite",
+  entity: "TppReportFavorite",
+  command: "unfavorite",
+  route: "/api/manifest/TppReportFavorite/commands/unfavorite",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see their own report favorites"},{"kind":"policy_denial","message":"Link your account to a staff profile to keep report favorites"},{"kind":"policy_denial","message":"Link your account to a staff profile to keep report favorites"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"TppReportFavorite not found"}],
+  emits: ["TppReportUnfavorited"],
+} as const;
+
+export type TppReportFavoriteUnfavoriteResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for TppReportFavorite.unfavorite.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindTppReportFavoriteUnfavoriteInput(client: TppReportFavoriteUnfavoriteClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful TppReportFavorite.unfavorite. */
+export const TppReportFavoriteUnfavoriteInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "TppReportFavorite",
+    "queryKeyHint": "queryKeys.tppReportFavorite.lists()",
+    "readId": "TppReportFavorite.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TppReportFavorite",
+    "queryKeyHint": "queryKeys.tppReportFavorite.detail(id)",
+    "readId": "TppReportFavorite.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer TppReportFavorite.unfavorite. Not a rendered control. */
+export const TppReportFavoriteUnfavoriteAction = {
+  "exposure": "human",
+  "label": "Unfavorite",
+  "confirm": false,
+  "fields": []
+} as const;
 
 // --- Trailer.register ---
 export interface TrailerRegisterClientInput {
@@ -149257,6 +150270,7 @@ export const ALL_CAPABILITY_IDS = [
   "Announcement.remove",
   "AnnouncementDismissal.dismiss",
   "AssistantLlmConfig.configure",
+  "AssistantUpload.register",
   "Attachment.attach",
   "Attachment.remove",
   "Attachment.setSurveySelection",
@@ -149267,6 +150281,8 @@ export const ALL_CAPABILITY_IDS = [
   "Candidate.hire",
   "Candidate.reject",
   "Candidate.revokeHire",
+  "ChatNotifyPreference.create",
+  "ChatNotifyPreference.setEnabled",
   "Client.archive",
   "Client.assignOwner",
   "Client.changeBillingProfile",
@@ -149798,7 +150814,10 @@ export const ALL_CAPABILITY_IDS = [
   "PurchaseNeed.releaseCancelledDraft",
   "PurchaseNeed.reviseRequired",
   "PurchaseNeed.standDownWithEvent",
+  "PushSubscription.recordDelivery",
   "PushSubscription.register",
+  "PushSubscription.releaseDevice",
+  "PushSubscription.renew",
   "PushSubscription.unregister",
   "Qualification.expire",
   "Qualification.grant",
@@ -149834,6 +150853,10 @@ export const ALL_CAPABILITY_IDS = [
   "RoleScorecard.archive",
   "RoleScorecard.define",
   "RoleScorecard.reactivate",
+  "RunAlertDelivery.record",
+  "RunAlertSetting.create",
+  "RunAlertSetting.disable",
+  "RunAlertSetting.enable",
   "SavedReportDefinition.archive",
   "SavedReportDefinition.changeSharing",
   "SavedReportDefinition.createDefinition",
@@ -149878,6 +150901,7 @@ export const ALL_CAPABILITY_IDS = [
   "StaffChatReadCursor.touch",
   "StaffMessage.edit",
   "StaffMessage.markRead",
+  "StaffMessage.recordAttachments",
   "StaffMessage.remove",
   "StaffMessage.send",
   "Station.define",
@@ -149908,6 +150932,9 @@ export const ALL_CAPABILITY_IDS = [
   "TimeRecord.clockIn",
   "TimeRecord.clockOut",
   "TimeRecord.correct",
+  "TppReportFavorite.create",
+  "TppReportFavorite.refavorite",
+  "TppReportFavorite.unfavorite",
   "Trailer.register",
   "Trailer.reviseDetails",
   "Trailer.updateInsurance",
@@ -150637,6 +151664,13 @@ export const ALL_READ_IDS = [
   "RoleScorecard.byTenantId",
   "RoleScorecard.get",
   "RoleScorecard.list",
+  "RunAlertDelivery.byActivityId",
+  "RunAlertDelivery.byTenantId",
+  "RunAlertDelivery.get",
+  "RunAlertDelivery.list",
+  "RunAlertSetting.byTenantId",
+  "RunAlertSetting.get",
+  "RunAlertSetting.list",
   "SavedReportDefinition.byOwnerId",
   "SavedReportDefinition.byTenantId",
   "SavedReportDefinition.get",
@@ -152745,6 +153779,27 @@ export type getRoleScorecardResult = { _id: string; _creationTime: number; tenan
 export const listRoleScorecardRead = {"entity":"RoleScorecard","readId":"RoleScorecard.list","exportName":"listRoleScorecard","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; role: \"staff\" | \"kitchen_staff\" | \"kitchen_lead\" | \"sales_staff\" | \"event_staff\" | \"inventory_staff\" | \"procurement_staff\" | \"logistics_staff\" | \"driver\" | \"workforce_staff\" | \"finance_staff\" | \"manager\" | \"kitchen_manager\" | \"sales_manager\" | \"event_manager\" | \"inventory_manager\" | \"logistics_manager\" | \"workforce_manager\" | \"finance_manager\" | \"admin\" | \"owner\" | \"system\"; title: string; expectations: string; effectiveFrom: number | null; effectiveTo: number | null; status: \"active\" | \"archived\"; definedAt: number | null; archivedAt: number | null; archiveReason: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listRoleScorecardResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; role: "staff" | "kitchen_staff" | "kitchen_lead" | "sales_staff" | "event_staff" | "inventory_staff" | "procurement_staff" | "logistics_staff" | "driver" | "workforce_staff" | "finance_staff" | "manager" | "kitchen_manager" | "sales_manager" | "event_manager" | "inventory_manager" | "logistics_manager" | "workforce_manager" | "finance_manager" | "admin" | "owner" | "system"; title: string; expectations: string; effectiveFrom: number | null; effectiveTo: number | null; status: "active" | "archived"; definedAt: number | null; archivedAt: number | null; archiveReason: string | null; createdAt: number; updatedAt: number }>;
 
+export const listRunAlertDeliveryByActivityIdRead = {"entity":"RunAlertDelivery","readId":"RunAlertDelivery.byActivityId","exportName":"listRunAlertDeliveryByActivityId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"activityId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; activityId: string; kind: string; createdAt: number; updatedAt: number }>"} as const;
+export type listRunAlertDeliveryByActivityIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; activityId: string; kind: string; createdAt: number; updatedAt: number }>;
+
+export const listRunAlertDeliveryByTenantIdRead = {"entity":"RunAlertDelivery","readId":"RunAlertDelivery.byTenantId","exportName":"listRunAlertDeliveryByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; activityId: string; kind: string; createdAt: number; updatedAt: number }>"} as const;
+export type listRunAlertDeliveryByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; activityId: string; kind: string; createdAt: number; updatedAt: number }>;
+
+export const getRunAlertDeliveryRead = {"entity":"RunAlertDelivery","readId":"RunAlertDelivery.get","exportName":"getRunAlertDelivery","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; activityId: string; kind: string; createdAt: number; updatedAt: number } | null"} as const;
+export type getRunAlertDeliveryResult = { _id: string; _creationTime: number; tenantId: string; activityId: string; kind: string; createdAt: number; updatedAt: number } | null;
+
+export const listRunAlertDeliveryRead = {"entity":"RunAlertDelivery","readId":"RunAlertDelivery.list","exportName":"listRunAlertDelivery","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; activityId: string; kind: string; createdAt: number; updatedAt: number }>"} as const;
+export type listRunAlertDeliveryResult = Array<{ _id: string; _creationTime: number; tenantId: string; activityId: string; kind: string; createdAt: number; updatedAt: number }>;
+
+export const listRunAlertSettingByTenantIdRead = {"entity":"RunAlertSetting","readId":"RunAlertSetting.byTenantId","exportName":"listRunAlertSettingByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; enabled: boolean; generation: string | null; changedBy: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listRunAlertSettingByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; enabled: boolean; generation: string | null; changedBy: string | null; createdAt: number; updatedAt: number }>;
+
+export const getRunAlertSettingRead = {"entity":"RunAlertSetting","readId":"RunAlertSetting.get","exportName":"getRunAlertSetting","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; enabled: boolean; generation: string | null; changedBy: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getRunAlertSettingResult = { _id: string; _creationTime: number; tenantId: string; enabled: boolean; generation: string | null; changedBy: string | null; createdAt: number; updatedAt: number } | null;
+
+export const listRunAlertSettingRead = {"entity":"RunAlertSetting","readId":"RunAlertSetting.list","exportName":"listRunAlertSetting","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; enabled: boolean; generation: string | null; changedBy: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listRunAlertSettingResult = Array<{ _id: string; _creationTime: number; tenantId: string; enabled: boolean; generation: string | null; changedBy: string | null; createdAt: number; updatedAt: number }>;
+
 export const listSavedReportDefinitionByOwnerIdRead = {"entity":"SavedReportDefinition","readId":"SavedReportDefinition.byOwnerId","exportName":"listSavedReportDefinitionByOwnerId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"ownerId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; ownerId: string | null; name: string; subjectArea: \"events\" | \"sales\" | \"inventory\" | \"production\" | \"workforce\" | \"logistics\" | \"finance\"; chartType: string; definition: unknown; sharingScope: \"owner_only\" | \"team\" | \"tenant_wide\"; status: \"active\" | \"archived\"; definedAt: number | null; archivedAt: number | null; restoredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listSavedReportDefinitionByOwnerIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; ownerId: string | null; name: string; subjectArea: "events" | "sales" | "inventory" | "production" | "workforce" | "logistics" | "finance"; chartType: string; definition: unknown; sharingScope: "owner_only" | "team" | "tenant_wide"; status: "active" | "archived"; definedAt: number | null; archivedAt: number | null; restoredAt: number | null; createdAt: number; updatedAt: number }>;
 
@@ -153045,20 +154100,20 @@ export type getTimeRecordResult = { _id: string; _creationTime: number; tenantId
 export const listTimeRecordRead = {"entity":"TimeRecord","readId":"TimeRecord.list","exportName":"listTimeRecord","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; shiftId: string | null; eventId: string | null; clockInAt: number | null; clockOutAt: number | null; breakMinutes: number | null; notes: string | null; status: \"open\" | \"closed\" | \"corrected\"; correctedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listTimeRecordResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; shiftId: string | null; eventId: string | null; clockInAt: number | null; clockOutAt: number | null; breakMinutes: number | null; notes: string | null; status: "open" | "closed" | "corrected"; correctedAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listTppReportFavoriteByPersonIdRead = {"entity":"TppReportFavorite","readId":"TppReportFavorite.byPersonId","exportName":"listTppReportFavoriteByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"personId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listTppReportFavoriteByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }>;
+export const listTppReportFavoriteByPersonIdRead = {"entity":"TppReportFavorite","readId":"TppReportFavorite.byPersonId","exportName":"listTppReportFavoriteByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"personId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listTppReportFavoriteByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listTppReportFavoriteByReportIdRead = {"entity":"TppReportFavorite","readId":"TppReportFavorite.byReportId","exportName":"listTppReportFavoriteByReportId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"reportId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listTppReportFavoriteByReportIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }>;
+export const listTppReportFavoriteByReportIdRead = {"entity":"TppReportFavorite","readId":"TppReportFavorite.byReportId","exportName":"listTppReportFavoriteByReportId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"reportId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listTppReportFavoriteByReportIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listTppReportFavoriteByTenantIdRead = {"entity":"TppReportFavorite","readId":"TppReportFavorite.byTenantId","exportName":"listTppReportFavoriteByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listTppReportFavoriteByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }>;
+export const listTppReportFavoriteByTenantIdRead = {"entity":"TppReportFavorite","readId":"TppReportFavorite.byTenantId","exportName":"listTppReportFavoriteByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listTppReportFavoriteByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }>;
 
-export const getTppReportFavoriteRead = {"entity":"TppReportFavorite","readId":"TppReportFavorite.get","exportName":"getTppReportFavorite","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getTppReportFavoriteResult = { _id: string; _creationTime: number; tenantId: string; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number } | null;
+export const getTppReportFavoriteRead = {"entity":"TppReportFavorite","readId":"TppReportFavorite.get","exportName":"getTppReportFavorite","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getTppReportFavoriteResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number } | null;
 
-export const listTppReportFavoriteRead = {"entity":"TppReportFavorite","readId":"TppReportFavorite.list","exportName":"listTppReportFavorite","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listTppReportFavoriteResult = Array<{ _id: string; _creationTime: number; tenantId: string; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }>;
+export const listTppReportFavoriteRead = {"entity":"TppReportFavorite","readId":"TppReportFavorite.list","exportName":"listTppReportFavorite","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listTppReportFavoriteResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string | null; reportId: string | null; createdAt: number; updatedAt: number }>;
 
 export const listTrailerByTenantIdRead = {"entity":"Trailer","readId":"Trailer.byTenantId","exportName":"listTrailerByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listTrailerByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }>;

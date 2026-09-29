@@ -6,6 +6,7 @@ import {
   AnnouncementPostParamsSchema,
   AnnouncementRemoveParamsSchema,
   AssistantLlmConfigConfigureParamsSchema,
+  AssistantUploadRegisterParamsSchema,
   AttachmentAttachParamsSchema,
   AttachmentRemoveParamsSchema,
   AttachmentSetSurveySelectionParamsSchema,
@@ -16,6 +17,8 @@ import {
   CandidateHireParamsSchema,
   CandidateRejectParamsSchema,
   CandidateRevokeHireParamsSchema,
+  ChatNotifyPreferenceCreateParamsSchema,
+  ChatNotifyPreferenceSetEnabledParamsSchema,
   ClientArchiveParamsSchema,
   ClientAssignOwnerParamsSchema,
   ClientChangeBillingProfileParamsSchema,
@@ -547,7 +550,10 @@ import {
   PurchaseNeedReleaseCancelledDraftParamsSchema,
   PurchaseNeedReviseRequiredParamsSchema,
   PurchaseNeedStandDownWithEventParamsSchema,
+  PushSubscriptionRecordDeliveryParamsSchema,
   PushSubscriptionRegisterParamsSchema,
+  PushSubscriptionReleaseDeviceParamsSchema,
+  PushSubscriptionRenewParamsSchema,
   PushSubscriptionUnregisterParamsSchema,
   QualificationExpireParamsSchema,
   QualificationGrantParamsSchema,
@@ -583,6 +589,10 @@ import {
   RoleScorecardArchiveParamsSchema,
   RoleScorecardDefineParamsSchema,
   RoleScorecardReactivateParamsSchema,
+  RunAlertDeliveryRecordParamsSchema,
+  RunAlertSettingCreateParamsSchema,
+  RunAlertSettingDisableParamsSchema,
+  RunAlertSettingEnableParamsSchema,
   SavedReportDefinitionArchiveParamsSchema,
   SavedReportDefinitionChangeSharingParamsSchema,
   SavedReportDefinitionCreateDefinitionParamsSchema,
@@ -627,6 +637,7 @@ import {
   StaffChatReadCursorTouchParamsSchema,
   StaffMessageEditParamsSchema,
   StaffMessageMarkReadParamsSchema,
+  StaffMessageRecordAttachmentsParamsSchema,
   StaffMessageRemoveParamsSchema,
   StaffMessageSendParamsSchema,
   StationDefineParamsSchema,
@@ -657,6 +668,9 @@ import {
   TimeRecordClockInParamsSchema,
   TimeRecordClockOutParamsSchema,
   TimeRecordCorrectParamsSchema,
+  TppReportFavoriteCreateParamsSchema,
+  TppReportFavoriteRefavoriteParamsSchema,
+  TppReportFavoriteUnfavoriteParamsSchema,
   TrailerRegisterParamsSchema,
   TrailerReviseDetailsParamsSchema,
   TrailerUpdateInsuranceParamsSchema,
@@ -873,6 +887,27 @@ export function useGetAssistantUpload(id: string | "skip") {
   return useQuery(api.queries.getAssistantUpload, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for AssistantUpload.register. */
+export function useAssistantUploadRegister() {
+  const mutate = useMutation(api.mutations.AssistantUpload_register);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = AssistantUploadRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for AssistantUpload.register. */
+export function useCreateAssistantUpload() {
+  const mutate = useMutation(api.mutations.AssistantUpload_createViaRegister);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = AssistantUploadRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for Attachment. */
 export function useListAttachment() {
   return useQuery(api.queries.listAttachment);
@@ -1044,6 +1079,26 @@ export function useListChatNotifyPreference() {
 /** Reactive get-by-id for ChatNotifyPreference. Pass "skip" to suspend. */
 export function useGetChatNotifyPreference(id: string | "skip") {
   return useQuery(api.queries.getChatNotifyPreference, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for ChatNotifyPreference.create. */
+export function useChatNotifyPreferenceCreate() {
+  const mutate = useMutation(api.mutations.ChatNotifyPreference_create);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ChatNotifyPreferenceCreateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ChatNotifyPreference.setEnabled. */
+export function useChatNotifyPreferenceSetEnabled() {
+  const mutate = useMutation(api.mutations.ChatNotifyPreference_setEnabled);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ChatNotifyPreferenceSetEnabledParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
 }
 
 /** Reactive list for Client. */
@@ -8311,12 +8366,42 @@ export function useGetPushSubscription(id: string | "skip") {
   return useQuery(api.queries.getPushSubscription, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for PushSubscription.recordDelivery. */
+export function usePushSubscriptionRecordDelivery() {
+  const mutate = useMutation(api.mutations.PushSubscription_recordDelivery);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PushSubscriptionRecordDeliveryParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for PushSubscription.register. */
 export function usePushSubscriptionRegister() {
   const mutate = useMutation(api.mutations.PushSubscription_register);
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = PushSubscriptionRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PushSubscription.releaseDevice. */
+export function usePushSubscriptionReleaseDevice() {
+  const mutate = useMutation(api.mutations.PushSubscription_releaseDevice);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PushSubscriptionReleaseDeviceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PushSubscription.renew. */
+export function usePushSubscriptionRenew() {
+  const mutate = useMutation(api.mutations.PushSubscription_renew);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PushSubscriptionRenewParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -8846,6 +8931,77 @@ export function useCreateRoleScorecard() {
     const parsed = RoleScorecardDefineParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for RunAlertDelivery. */
+export function useListRunAlertDelivery() {
+  return useQuery(api.queries.listRunAlertDelivery);
+}
+
+/** Reactive get-by-id for RunAlertDelivery. Pass "skip" to suspend. */
+export function useGetRunAlertDelivery(id: string | "skip") {
+  return useQuery(api.queries.getRunAlertDelivery, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for RunAlertDelivery.record. */
+export function useRunAlertDeliveryRecord() {
+  const mutate = useMutation(api.mutations.RunAlertDelivery_record);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RunAlertDeliveryRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for RunAlertDelivery.record. */
+export function useCreateRunAlertDelivery() {
+  const mutate = useMutation(api.mutations.RunAlertDelivery_createViaRecord);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = RunAlertDeliveryRecordParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for RunAlertSetting. */
+export function useListRunAlertSetting() {
+  return useQuery(api.queries.listRunAlertSetting);
+}
+
+/** Reactive get-by-id for RunAlertSetting. Pass "skip" to suspend. */
+export function useGetRunAlertSetting(id: string | "skip") {
+  return useQuery(api.queries.getRunAlertSetting, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for RunAlertSetting.create. */
+export function useRunAlertSettingCreate() {
+  const mutate = useMutation(api.mutations.RunAlertSetting_create);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RunAlertSettingCreateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RunAlertSetting.disable. */
+export function useRunAlertSettingDisable() {
+  const mutate = useMutation(api.mutations.RunAlertSetting_disable);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RunAlertSettingDisableParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RunAlertSetting.enable. */
+export function useRunAlertSettingEnable() {
+  const mutate = useMutation(api.mutations.RunAlertSetting_enable);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RunAlertSettingEnableParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
 
@@ -9477,6 +9633,16 @@ export function useStaffMessageMarkRead() {
   };
 }
 
+/** Mutation hook for StaffMessage.recordAttachments. */
+export function useStaffMessageRecordAttachments() {
+  const mutate = useMutation(api.mutations.StaffMessage_recordAttachments);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = StaffMessageRecordAttachmentsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for StaffMessage.remove. */
 export function useStaffMessageRemove() {
   const mutate = useMutation(api.mutations.StaffMessage_remove);
@@ -9985,6 +10151,36 @@ export function useListTppReportFavorite() {
 /** Reactive get-by-id for TppReportFavorite. Pass "skip" to suspend. */
 export function useGetTppReportFavorite(id: string | "skip") {
   return useQuery(api.queries.getTppReportFavorite, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for TppReportFavorite.create. */
+export function useTppReportFavoriteCreate() {
+  const mutate = useMutation(api.mutations.TppReportFavorite_create);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TppReportFavoriteCreateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for TppReportFavorite.refavorite. */
+export function useTppReportFavoriteRefavorite() {
+  const mutate = useMutation(api.mutations.TppReportFavorite_refavorite);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TppReportFavoriteRefavoriteParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for TppReportFavorite.unfavorite. */
+export function useTppReportFavoriteUnfavorite() {
+  const mutate = useMutation(api.mutations.TppReportFavorite_unfavorite);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TppReportFavoriteUnfavoriteParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
 }
 
 /** Reactive list for Trailer. */
@@ -11400,4 +11596,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1212 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1232 as const;

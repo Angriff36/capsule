@@ -4,11 +4,20 @@
 // per-device push subscription still lives in PushSubscription; this only
 // records whether the person WANTS notifications, which each device applies.
 //
-// Written only by the authored seam convex/chatNotifyPreference.ts (raw
+// ~~Written only by the authored seam convex/chatNotifyPreference.ts (raw
 // upsert, keyed by ownerId): the write/execute policies require a capability
-// no role holds, so the generated commands can never run.
+// no role holds, so the generated commands can never run.~~
+// 2026-09-29: the seam convex/chatNotifyPreference.ts upserts through the
+// commands below (create for the first choice, setEnabled after that).
 
 use "../foundation/base.manifest"
+
+event ChatNotifyPreferenceSet: "chat_notify_preference.set" {
+  chatNotifyPreferenceId: string
+  tenantId: string
+  ownerId: string
+  enabled: boolean
+}
 
 entity ChatNotifyPreference mixin TenantScoped {
   key [tenantId, id]
@@ -23,10 +32,40 @@ entity ChatNotifyPreference mixin TenantScoped {
 
   // Owner-only. `ownerId == null` is the create-time draft escape.
   default policy chatNotifyPreferenceRead read: self.ownerId == null or self.ownerId == user.id "Users may see their own chat notification preference"
-  // The authored seam does raw writes (policy-exempt); the generated commands
-  // require a capability no role is granted, so they can never run.
-  default policy chatNotifyPreferenceWrite write: roleAllows(user.role, "pushDeviceManage") "Chat notification preference is set only through the app"
-  default policy chatNotifyPreferenceExecute execute: roleAllows(user.role, "pushDeviceManage") "Chat notification preference is set only through the app"
+  // ~~The authored seam does raw writes (policy-exempt); the generated commands
+  // require a capability no role is granted, so they can never run.~~
+  // 2026-09-29: any signed-in tenant member sets their own preference — the
+  // same people the seam has always admitted.
+  default policy chatNotifyPreferenceWrite write: user.role != "anonymous" "Sign in to change notification settings"
+  default policy chatNotifyPreferenceExecute execute: user.role != "anonymous" "Sign in to change notification settings"
+
+  // Governed creation — the account's first choice.
+  command create(enabled: boolean) {
+    guard user.id != null
+    guard self.ownerId == null "Your notification setting already exists; change it instead"
+    // One preference per account in a tenant.
+    constraint createOnce: count(ChatNotifyPreference where ownerId == user.id) == 0 "Your notification setting already exists; change it instead"
+    mutate ownerId = user.id
+    mutate enabled = enabled
+    emit ChatNotifyPreferenceSet {
+      chatNotifyPreferenceId: self.id
+      tenantId: self.tenantId
+      ownerId: self.ownerId
+      enabled: enabled
+    }
+  }
+
+  // The owner turns team-chat notifications on or off for every device.
+  command setEnabled(enabled: boolean) {
+    guard user.id != null and self.ownerId == user.id "Only you can change your notification setting"
+    mutate enabled = enabled
+    emit ChatNotifyPreferenceSet {
+      chatNotifyPreferenceId: self.id
+      tenantId: self.tenantId
+      ownerId: self.ownerId
+      enabled: enabled
+    }
+  }
 
   store ChatNotifyPreference in durable
 }
