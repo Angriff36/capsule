@@ -33,8 +33,12 @@ export type PackLine = {
   _id: string;
   packListId: string;
   description: string;
+  unit: string;
   requiredQuantity: number;
   packedQuantity: number;
+  packListTemplateId?: string | null;
+  templateLineKey?: string | null;
+  templateVersion?: number | null;
   generatedQuantity?: number | null;
   generationKey?: string | null;
   sourcesJson?: string | null;
