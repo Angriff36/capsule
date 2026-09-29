@@ -4184,6 +4184,24 @@ export const CandidateHireParamsSchema = z.object({
 
 export type CandidateHireParams = z.infer<typeof CandidateHireParamsSchema>;
 
+// Command: linkHiredPerson on Candidate
+export const CandidateLinkHiredPersonParamsSchema = z.object({
+  hiredPersonId: z.string().min(1),
+});
+
+export type CandidateLinkHiredPersonParams = z.infer<typeof CandidateLinkHiredPersonParamsSchema>;
+
+// Command: refreshFromSource on Candidate
+export const CandidateRefreshFromSourceParamsSchema = z.object({
+  fullName: z.string(),
+  roleAppliedFor: z.enum(["staff", "kitchen_staff", "kitchen_lead", "sales_staff", "event_staff", "inventory_staff", "procurement_staff", "logistics_staff", "driver", "workforce_staff", "finance_staff", "manager", "kitchen_manager", "sales_manager", "event_manager", "inventory_manager", "logistics_manager", "workforce_manager", "finance_manager", "admin", "owner", "system"]),
+  rawSourceData: z.string(),
+  email: z.string().optional(),
+  phone: z.string().optional(),
+});
+
+export type CandidateRefreshFromSourceParams = z.infer<typeof CandidateRefreshFromSourceParamsSchema>;
+
 // Command: reject on Candidate
 export const CandidateRejectParamsSchema = z.object({
   reason: z.string().optional(),
@@ -6928,6 +6946,15 @@ export const InterviewRecordOutcomeParamsSchema = z.object({
 
 export type InterviewRecordOutcomeParams = z.infer<typeof InterviewRecordOutcomeParamsSchema>;
 
+// Command: refreshFromSource on Interview
+export const InterviewRefreshFromSourceParamsSchema = z.object({
+  rawSourceData: z.string(),
+  scheduledFor: z.coerce.date().optional(),
+  notes: z.string().optional(),
+});
+
+export type InterviewRefreshFromSourceParams = z.infer<typeof InterviewRefreshFromSourceParamsSchema>;
+
 // Command: schedule on Interview
 export const InterviewScheduleParamsSchema = z.object({
   candidateId: z.string().min(1),
@@ -8034,6 +8061,11 @@ export const PersonChangeAddressParamsSchema = z.object({
 });
 
 export type PersonChangeAddressParams = z.infer<typeof PersonChangeAddressParamsSchema>;
+
+// Command: clearAccountLink on Person
+export const PersonClearAccountLinkParamsSchema = z.object({});
+
+export type PersonClearAccountLinkParams = z.infer<typeof PersonClearAccountLinkParamsSchema>;
 
 // Command: correctEmail on Person
 export const PersonCorrectEmailParamsSchema = z.object({

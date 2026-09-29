@@ -13,9 +13,12 @@
 //
 // Candidates already marked hired WITHOUT a linked profile — the old button's
 // output and KM imports with a hired stage — are converted here too:
-// Candidate_hire refuses stage "hired", so the link is a direct patch, the
+// ~~Candidate_hire refuses stage "hired", so the link is a direct patch, the
 // same direct-write shape hiringPipeline.ts uses for its upserts, behind the
-// same role gate.
+// same role gate.~~
+// Corrected 2026-09-29: Candidate_hire refuses stage "hired", so the link
+// goes through the generated Candidate_linkHiredPerson command (caller auth,
+// emits CandidateHiredPersonLinked). No direct writes remain in this seam.
 //
 // The generated create command does a plain insert: the manifest's
 // `unique [tenantId, email]` is NOT enforced at the DB, so this seam resolves
@@ -321,11 +324,11 @@ export const hireIntoTeam = mutation({
     if (alreadyHired) {
       // Old-path hires (pre-feature button, KM imports) reached stage hired
       // with no Person and Candidate_hire refuses stage "hired" — link the
-      // profile directly, the same direct patch hiringPipeline's upserts use.
-      await ctx.db.patch(candidateId, {
+      // profile through the dedicated command instead.
+      await ctx.runMutation(api.mutations.Candidate_linkHiredPerson, {
+        docId: candidateId,
+        version: candidate.version,
         hiredPersonId: personId,
-        updatedAt: Date.now(),
-        version: (candidate.version ?? 0) + 1,
       });
     } else {
       await ctx.runMutation(api.mutations.Candidate_hire, {

@@ -2,7 +2,7 @@
 // account, links it to the Person, and asks Clerk to email the invitation.
 // No custom sending domain or plaintext password email is required.
 import { ConvexError, v } from "convex/values";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import { action, internalMutation, internalQuery } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import { ClerkStaffAccountDirectory } from "./lib/clerkStaffAccount";
@@ -93,7 +93,15 @@ export const linkProvisionedSubject = internalMutation({
     if (clash) {
       throw new Error("That sign-in is already used by another team member.");
     }
-    await ctx.db.patch(personId, { authSubjectId });
+    // The generated command runs with the caller's auth. Its guards are the
+    // same rules provisionStaffSignIn already applied when it loaded the
+    // person (active only; admin/owner/system rows need an admin caller),
+    // so a person deactivated or promoted in between is refused here too.
+    await ctx.runMutation(api.mutations.Person_linkAccount, {
+      docId: personId,
+      authSubjectId,
+      version: row.version,
+    });
   },
 });
 

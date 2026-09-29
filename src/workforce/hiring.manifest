@@ -155,6 +155,49 @@ entity Candidate mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Re-import from the source system (convex/hiringPipeline.ts
+  // ingestKmCandidates): the source owns identity, raw response and contact.
+  // Stage stays an operator decision. A contact field the source no longer
+  // sends keeps its stored value.
+  command refreshFromSource(
+    fullName: string,
+    roleAppliedFor: CapsuleRole,
+    rawSourceData: string,
+    optional email: string,
+    optional phone: string
+  ) {
+    guard self.sourceSystem != null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate fullName = fullName
+    mutate roleAppliedFor = roleAppliedFor
+    mutate rawSourceData = rawSourceData
+    mutate email = email != null ? email : self.email
+    mutate phone = phone != null ? phone : self.phone
+    emit CandidateSourceRefreshed {
+      candidateId: self.id
+      tenantId: self.tenantId
+      sourceSystem: self.sourceSystem
+      externalCandidateId: self.externalCandidateId
+    }
+  }
+
+  // Link the team profile to a candidate that is ALREADY hired (old-path
+  // hires and KM imports reached stage hired with no profile; hire refuses
+  // stage hired). Run by convex/candidateToTeam.ts hireIntoTeam after it
+  // resolved or created the Person in the caller's tenant.
+  command linkHiredPerson(hiredPersonId: uuid) {
+    guard self.stage == "hired"
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate hiredPersonId = hiredPersonId
+    emit CandidateHiredPersonLinked {
+      candidateId: self.id
+      tenantId: self.tenantId
+      hiredPersonId: hiredPersonId
+    }
+  }
+
   command hire(optional hiredPersonId: uuid) {
     guard self.appliedAt != null
     guard self.stage != "hired"
@@ -243,6 +286,28 @@ entity Interview mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Re-import from the source system (convex/hiringPipeline.ts
+  // ingestKmCandidates). A schedule or note the source no longer sends keeps
+  // its stored value; the outcome goes through recordOutcome.
+  command refreshFromSource(
+    rawSourceData: string,
+    optional scheduledFor: datetime,
+    optional notes: string
+  ) {
+    guard self.sourceSystem != null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate rawSourceData = rawSourceData
+    mutate scheduledFor = scheduledFor != null ? scheduledFor : self.scheduledFor
+    mutate notes = notes != null ? notes : self.notes
+    emit InterviewSourceRefreshed {
+      interviewId: self.id
+      tenantId: self.tenantId
+      candidateId: self.candidateId
+      externalInterviewId: self.externalInterviewId
+    }
+  }
+
   store Interview in durable
 }
 
@@ -269,6 +334,19 @@ event CandidateHired: "candidate.hired" {
   tenantId: string
 }
 
+event CandidateSourceRefreshed: "candidate.source_refreshed" {
+  candidateId: string
+  tenantId: string
+  sourceSystem: string
+  externalCandidateId: string?
+}
+
+event CandidateHiredPersonLinked: "candidate.hired_person_linked" {
+  candidateId: string
+  tenantId: string
+  hiredPersonId: string
+}
+
 event CandidateHireRevoked: "candidate.hire_revoked" {
   candidateId: string
   tenantId: string
@@ -287,4 +365,11 @@ event InterviewOutcomeRecorded: "interview.outcome_recorded" {
   tenantId: string
   candidateId: string
   outcome: string
+}
+
+event InterviewSourceRefreshed: "interview.source_refreshed" {
+  interviewId: string
+  tenantId: string
+  candidateId: string
+  externalInterviewId: string?
 }
