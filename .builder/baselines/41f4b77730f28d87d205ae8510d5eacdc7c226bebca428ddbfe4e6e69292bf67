@@ -57,7 +57,7 @@ export default defineSchema({
   attachments: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
-    parentType: v.union(v.literal("eventRecord"), v.literal("client"), v.literal("contract"), v.literal("vendor"), v.literal("delivery"), v.literal("closeout"), v.literal("dish"), v.literal("ingredient"), v.literal("staffMessage")),
+    parentType: v.union(v.literal("eventRecord"), v.literal("client"), v.literal("contract"), v.literal("vendor"), v.literal("delivery"), v.literal("closeout"), v.literal("dish"), v.literal("ingredient"), v.literal("equipment"), v.literal("staffMessage")),
     parentId: v.string(),
     fileName: v.string(),
     contentType: v.string(),

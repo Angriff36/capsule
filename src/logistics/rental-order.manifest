@@ -120,7 +120,7 @@ entity RentalOrderLine mixin TenantScoped, SoftDeletable {
   ) {
     guard self.requestedAt != null
     guard self.deletedAt == null
-    constraint reviseRentalOpen: self.status == "requested" or self.status == "confirmed" "This rental has already arrived. Record what came back instead."
+    constraint reviseRentalOpen: self.status == "requested" or self.status == "confirmed" "This rental has already arrived. Enter what went back instead."
     constraint reviseRentalName: length(trim(description)) > 0 "Say what you are renting."
     constraint reviseRentalAmount: quantity > 0 "Rent at least 1."
     constraint reviseRentalCost: vendorCost == null or vendorCost >= 0 "The vendor's cost can't be negative. Use zero or more."

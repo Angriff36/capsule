@@ -9,21 +9,29 @@ import {
   useListEquipment,
 } from "../../lib/manifest-convex-react";
 import { formatMoney } from "../../lib/format";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { EquipmentMaintenanceBoard } from "./EquipmentMaintenanceBoard";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 import { EquipmentBulkAddPanel } from "./EquipmentBulkAddPanel";
 import { assetTagFor } from "./equipmentPackListParser";
+import { useRentalVendorChoices } from "./equipmentCheckout";
+import { EquipmentCatalogTable } from "./EquipmentCatalogTable";
+import { EquipmentDetailPanel } from "./EquipmentDetailPanel";
 import {
   EQUIPMENT_CONDITIONS as CONDITIONS,
   EquipmentForm,
+  equipmentCatalogFields,
   type EquipmentDetailRow,
+  type VendorChoice,
 } from "./EquipmentForm";
 
 export function EquipmentCatalogPage() {
   const equipment = useListEquipment();
+  const vendors = (useRentalVendorChoices() ?? []) as VendorChoice[];
+  const vendorNames = new Map(vendors.map((v) => [v.vendorId, v.name]));
+  const [detailId, setDetailId] = useState<string | null>(null);
   const createEquipment = useCreateEquipment();
   const updateCondition = useEquipmentUpdateCondition();
   const recount = useEquipmentRecount();
@@ -39,6 +47,7 @@ export function EquipmentCatalogPage() {
   const { prompt, host } = useActionPrompt();
 
   const rows = (equipment ?? []).filter((item) => item.deletedAt == null);
+  const detailItem = rows.find((item) => item._id === detailId) ?? null;
   const activeRows = rows.filter((item) => item.status === "active");
   const ownedValue = activeRows
     .filter((item) => item.ownership === "owned")
@@ -73,6 +82,7 @@ export function EquipmentCatalogPage() {
         quantity: Number(data.get("quantity")),
         purchaseValue: Number(data.get("purchaseValue")),
         condition: String(data.get("condition")) as (typeof CONDITIONS)[number],
+        ...equipmentCatalogFields(data),
       });
       element.reset();
       setShowForm(false);
@@ -93,6 +103,7 @@ export function EquipmentCatalogPage() {
         category: String(data.get("category") ?? "").trim(),
         ownership: String(data.get("ownership")) as "owned" | "rented",
         purchaseValue: Number(data.get("purchaseValue")),
+        ...equipmentCatalogFields(data),
         homeLocation: String(data.get("homeLocation") ?? "").trim(),
         currentLocation: String(data.get("currentLocation") ?? "").trim(),
       });
@@ -242,6 +253,7 @@ export function EquipmentCatalogPage() {
           busy={busy != null}
           onSubmit={submit}
           onClose={() => setShowForm(false)}
+          vendors={vendors}
         />
       ) : null}
       {editing ? (
@@ -250,6 +262,16 @@ export function EquipmentCatalogPage() {
           onSubmit={submitEdit}
           onClose={() => setEditing(null)}
           editItem={editing}
+          vendors={vendors}
+        />
+      ) : null}
+      {detailItem ? (
+        <EquipmentDetailPanel
+          item={detailItem}
+          catalog={rows}
+          vendors={vendors}
+          onClose={() => setDetailId(null)}
+          onError={setFailure}
         />
       ) : null}
 
@@ -275,109 +297,17 @@ export function EquipmentCatalogPage() {
             </span>
           </div>
         ) : (
-          <div className="supply-table-wrap">
-            <table className="supply-table">
-              <thead>
-                <tr>
-                  <th>Equipment</th>
-                  <th>Category</th>
-                  <th>Location</th>
-                  <th>Ownership</th>
-                  <th>Qty</th>
-                  <th>Purchase value</th>
-                  <th>Condition</th>
-                  <th>State</th>
-                  <th aria-label="Actions" />
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((item) => (
-                  <tr key={item._id}>
-                    <td>
-                      <strong>{item.name}</strong>
-                      <small>{item.assetTag}</small>
-                    </td>
-                    <td>{item.category}</td>
-                    <td>
-                      {item.homeLocation ? (
-                        <div>
-                          <div>{item.homeLocation}</div>
-                          {item.currentLocation &&
-                          item.currentLocation !== item.homeLocation ? (
-                            <small>now: {item.currentLocation}</small>
-                          ) : null}
-                        </div>
-                      ) : item.currentLocation ? (
-                        <small>{item.currentLocation}</small>
-                      ) : (
-                        "—"
-                      )}
-                    </td>
-                    <td>
-                      <StatusChip status={String(item.ownership)} />
-                    </td>
-                    <td className="supply-number">{item.quantity}</td>
-                    <td className="supply-number">
-                      {formatMoney(item.purchaseValue)}
-                    </td>
-                    <td>
-                      <StatusChip status={String(item.condition)} />
-                    </td>
-                    <td>
-                      <StatusChip status={String(item.status)} />
-                    </td>
-                    <td>
-                      <div className="supply-row-actions">
-                        {item.status === "active" ? (
-                          <>
-                            <button
-                              className="btn btn-ghost btn-sm"
-                              disabled={busy != null}
-                              onClick={() => {
-                                setShowForm(false);
-                                setEditing(item);
-                              }}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              className="btn btn-ghost btn-sm"
-                              disabled={busy != null}
-                              onClick={() => rowAction(item, "recount")}
-                            >
-                              Recount
-                            </button>
-                            <button
-                              className="btn btn-ghost btn-sm"
-                              disabled={busy != null}
-                              onClick={() => rowAction(item, "condition")}
-                            >
-                              Condition
-                            </button>
-                            <button
-                              className="btn btn-ghost btn-sm"
-                              disabled={busy != null}
-                              onClick={() => rowAction(item, "retire")}
-                            >
-                              Retire
-                            </button>
-                          </>
-                        ) : (
-                          <button
-                            className="btn btn-ghost btn-sm"
-                            disabled={busy != null}
-                            onClick={() => rowAction(item, "reactivate")}
-                          >
-                            Reactivate
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <EquipmentCatalogTable
+            rows={rows}
+            busy={busy != null}
+            vendorNames={vendorNames}
+            onEdit={(item) => {
+              setShowForm(false);
+              setEditing(item as EquipmentDetailRow);
+            }}
+            onDetails={(item) => setDetailId(item._id)}
+            onAction={rowAction}
+          />
         )}
       </section>
     </div>

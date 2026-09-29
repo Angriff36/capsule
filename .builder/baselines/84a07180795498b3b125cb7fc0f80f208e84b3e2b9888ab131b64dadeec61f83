@@ -48902,7 +48902,7 @@ async function __runRentalOrderLineRevise(ctx: MutationCtx, { docId, description
     if (!(((checkRole(user, "logisticsAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Logistics, inventory or event staff may change rentals from vendors");
     if (!((doc.requestedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((doc.status === "requested") || (doc.status === "confirmed")))) throw new Error("This rental has already arrived. Record what came back instead.");
+    if (!(((doc.status === "requested") || (doc.status === "confirmed")))) throw new Error("This rental has already arrived. Enter what went back instead.");
     if (!((((description).trim()).length > 0))) throw new Error("Say what you are renting.");
     if (!((quantity > 0))) throw new Error("Rent at least 1.");
     if (!(((vendorCost == null) || (vendorCost >= 0)))) throw new Error("The vendor's cost can't be negative. Use zero or more.");

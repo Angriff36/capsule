@@ -64,7 +64,7 @@ export const AttachmentSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
-  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout", "dish", "ingredient", "staffMessage"]).default("eventRecord"),
+  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout", "dish", "ingredient", "equipment", "staffMessage"]).default("eventRecord"),
   parentId: z.string(),
   fileName: z.string(),
   contentType: z.string(),
@@ -4492,7 +4492,7 @@ export type AssistantLlmConfigConfigureParams = z.infer<typeof AssistantLlmConfi
 
 // Command: attach on Attachment
 export const AttachmentAttachParamsSchema = z.object({
-  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout", "dish", "ingredient", "staffMessage"]),
+  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout", "dish", "ingredient", "equipment", "staffMessage"]),
   parentId: z.string(),
   fileName: z.string(),
   contentType: z.string(),

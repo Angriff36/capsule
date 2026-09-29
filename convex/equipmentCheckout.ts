@@ -1,5 +1,5 @@
 import { ConvexError, v } from "convex/values";
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
 import { availableEquipmentQuantity } from "./lib/equipmentReservationAvailability";
 import { reconcileEventPackRules } from "./lib/packRuleReconciliation";
@@ -124,5 +124,32 @@ export const reserve = mutation({
     await reconcileEventPackRules(ctx, args.eventId);
 
     return { equipmentReservationId };
+  },
+});
+
+/**
+ * PL-ASSET-CATALOG: the company's vendors by name only, for picking who a
+ * rented item comes from. Logistics and inventory staff cannot read the
+ * vendor list (it holds contact and payment details); a rental still needs a
+ * vendor, so this returns the id and name and nothing else.
+ */
+export const rentalVendorChoices = query({
+  args: {},
+  handler: async (ctx) => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId) return [];
+    if (!EQUIPMENT_ROLES.has(auth.role) && auth.role !== "event_manager") {
+      return [];
+    }
+    const vendors = await ctx.db
+      .query("vendors")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", auth.tenantId))
+      .collect();
+    return vendors
+      .filter(
+        (vendor) => vendor.deletedAt == null && vendor.status === "active",
+      )
+      .map((vendor) => ({ vendorId: vendor._id, name: vendor.name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
   },
 });

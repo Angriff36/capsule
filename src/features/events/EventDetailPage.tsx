@@ -57,6 +57,8 @@ import { EventArchiveMenuItems } from "./EventArchiveMenuItems";
 import { EventDuplicateMenuItem } from "./EventDuplicateMenuItem";
 import { EventDashboard } from "./dashboard/EventDashboard";
 import { EventEquipmentPanel } from "./EventEquipmentPanel";
+import { EventRentalOrdersPanel } from "./EventRentalOrdersPanel";
+import { EventRequirementsPanel } from "./EventRequirementsPanel";
 import { EventGuestPanel } from "./EventGuestPanel";
 import { EventIncidentPanel } from "./EventIncidentPanel";
 import { EventInventoryPanel } from "./EventInventoryPanel";
@@ -560,11 +562,15 @@ function EventDetailContent({
       ) : null}
       {activeTab === "equipment" ? (
         <EventTabErrorBoundary tabLabel="Equipment" key="equipment">
-          <EventEquipmentPanel
-            eventId={event._id}
-            startsAt={event.startsAt}
-            endsAt={event.endsAt}
-          />
+          <div className="space-y-6">
+            <EventRequirementsPanel eventId={event._id} />
+            <EventEquipmentPanel
+              eventId={event._id}
+              startsAt={event.startsAt}
+              endsAt={event.endsAt}
+            />
+            <EventRentalOrdersPanel eventId={event._id} />
+          </div>
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "client" ? (
