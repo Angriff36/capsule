@@ -850,8 +850,34 @@ event PrepTaskCancelled: "prep_task.cancelled" {
 on PrepTaskCompleted fanOut PrepTaskDependency where predecessorTaskId = payload.prepTaskId
   run satisfy
 
-// Event cancellation and menu removal stand down only unfinished tasks through
-// convex/lib/operationalEvents.ts; completed/cancelled rows are never invoked.
+// Event cancellation stands down only unfinished tasks through
+// convex/lib/cancellationReconciliation.ts (it also records the §8.2 receipt).
+// Menu removal is declared here (2026-09-29; it was a hand-written branch in
+// convex/lib/operationalEvents.ts). Completed/cancelled rows are never invoked:
+// fanOut visits each live task of the removed dish, and the status `match`
+// picks the next still-unfinished task of that status (or skips), so every
+// pending/claimed/in_progress/blocked task is stood down exactly once and a
+// settled task never gets a second PrepTaskCancelled. Reads are quadratic in
+// the dish's own task count, which recipe steps keep small.
+on EventDishRemoved fanOut PrepTask where eventDishId = payload.eventDishId
+  run standDown
+  match eventDishId = payload.eventDishId, status = "pending"
+  params { reason: payload.reason }
+
+on EventDishRemoved fanOut PrepTask where eventDishId = payload.eventDishId
+  run standDown
+  match eventDishId = payload.eventDishId, status = "claimed"
+  params { reason: payload.reason }
+
+on EventDishRemoved fanOut PrepTask where eventDishId = payload.eventDishId
+  run standDown
+  match eventDishId = payload.eventDishId, status = "in_progress"
+  params { reason: payload.reason }
+
+on EventDishRemoved fanOut PrepTask where eventDishId = payload.eventDishId
+  run standDown
+  match eventDishId = payload.eventDishId, status = "blocked"
+  params { reason: payload.reason }
 
 // EventDishServingsAdjusted is reconciled by convex/lib/operationalEvents.ts
 // in the originating transaction. Balance the entire recipe-step group so
