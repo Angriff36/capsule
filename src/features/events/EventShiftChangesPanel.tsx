@@ -15,7 +15,10 @@ import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
 import { timeLabel } from "./EventTimingPlannerDraft";
 
-const window = (times: { startsAt: number | null; endsAt: number | null }) =>
+const shiftTimeLabel = (times: {
+  startsAt: number | null;
+  endsAt: number | null;
+}) =>
   times.startsAt == null
     ? "no time yet"
     : `${timeLabel(times.startsAt)}${times.endsAt != null ? ` – ${timeLabel(times.endsAt)}` : ""}`;
@@ -54,7 +57,7 @@ export function EventShiftChangesPanel({ eventId }: { eventId: string }) {
     const week = shiftsInScheduleWeek(moved, startOfScheduleWeek(anchor));
     return (
       buildStaffShiftSummary(week, eventName) ||
-      `${change.role} · ${window(change.to)}`
+      `${change.role} · ${shiftTimeLabel(change.to)}`
     );
   };
 
@@ -96,7 +99,8 @@ export function EventShiftChangesPanel({ eventId }: { eventId: string }) {
                 {change.personName} · {change.role}
               </p>
               <p className="text-base">
-                Now {window(change.from)} → new {window(change.to)}
+                Now {shiftTimeLabel(change.from)} → new{" "}
+                {shiftTimeLabel(change.to)}
               </p>
               <p className="text-sm text-ink-2">
                 {change.acknowledged
