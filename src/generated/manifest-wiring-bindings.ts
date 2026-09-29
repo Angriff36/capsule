@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "11d01fbd4c68f896916782a923d864799c09fefe7f23c3a67af6204ef1d3b9fa:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:161c25c50ea646952d76c7f45670392a96b650cbdb21421741aa129897f39f39:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:2036d8db9241995bb76aa15c89b94d17d66cce3ef2e4ea63178b1e2a1909207b:21c70b2b10030f5a9acdb868c2e229c0b48fd6f86e2a44f85040058ab7634e25:272a31932843884c7ac3eabb6161bd3cebde6879b8bea18fc25043fa9be4455f:2aa323a73d3ed4a9a683b126fa9fbd192ad362e18958639591f10ee1a767a7a9:2aea5aa1d00f0d86457cb177ee29c76e1c1dc22e7f73bad7f8b1074575cbc31d:2c2d59336f8e3b13106229c1727f4ff26e8321fea8742ca46cd4fd89508863b0:2c42c97da3b397baa523b8f7ae11ed10f988cb9ea37f6b158ecb4404f5bcab62:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:2f58e48aa70e7c4414f51af8aea7f9768e378ea26daa75b659dba78dab856030:327f55f7fc3badfa91db612d8da5b7a890ed54daf3398ab067c48dd29bcb6f52:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:34d6e0d78054119d888936d1775b68e437ce2b5dd458186826e0146bdfec677f:353a3991489aafe1d337e52672908e0eea8521d946ab792ce54227e7b6e7f1dd:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:4021a43427a72d2daffe25a117f282ffc343ff11dd02010652045485f3bf2816:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:45b3d018cb8479a590061dabb5a6bf03edb434440cc64cd88487eb3f799fe2d6:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4e66be5e5d1dfb8fe16f1499db8a775b0788a0c62e47ea7076d59e915357fae2:501487754e20a846402d574851966950378082990b46261a0318113100bcdca5:5046222416ff8bf182f7603802da83b33bfe97f0310849ceb624964cb9d804df:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:57041b3fe080152b717e2ab15050bc93d3830b1d8027e5dc5114d687ad3c6be3:5b1a6e044cc0addd7bf6bc5f82a1f15994e33d01cccd75bb4dec4971b38b039b:5b5d08c3ea56e43ddf1f2623cdc1888b7bfafc1cbf6ee4a6d49ae42e68c73c95:5e836fa9948c8fcd70fa3c8bd625238e8c00bf0699beb851e5862e93e031e2e1:5fd882905c48e953a76af92b6db9cb606a0b0a9f9949c49f5ce6ca71c0d808ff:6a640d8f2f2791605a5c80bebcb59661c51018393b66d37fffa014400b7e99d4:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:71dc273811d0229c3193f31dafbda85a69d27a2705182d1069e7e8ca0f4d28f1:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:78e2341ac6b83ff5eb43c7fbfc824766ef6c9f5ebb61590eb8cf7ca8270d8b9d:792131c7b95d7c0b140fb2dbbf6a4b7e3ab487a4dc26f65a3d4374fa9c0e6e6b:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7d5c0741e3a26447773948cfe2d758cd1e210e2f37c9f39c272ca443b716a309:7dd6076ce8b39c99fb91e01b05b04c5e8d3c44f535cbcb26f27320918d21294d:7fd8ed51d32b011977a2e27258cc6c003895e596d0456d876ce044d6e5069e4f:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:871382762a6d3b344a7428acc496a5c66a1cfc0f00ad0777398ac0a1d3badc53:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:9e98bdeac2b20c1da7c8565bc0e68b67db011509c47c3c512b9e1c9f7be516c4:a04c9aa12c21c3811997769713ecd392ab9d47a8d216dbc42e666cabac135d05:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a363078ede0b73c3c2f7a5c6ddb5c2f0d9de214832687609020e7078b66a8cb3:a8b60c0f996f5391bb792849f2044c2e973b34d15938963afad73f7e6a9706a4:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b15baf1a6241169d8eb947ae3850e26305e5d419875211954210152c3b42fcd5:b47b1880542839c64691ddfe2e3d70ac2aab4e48356096c5b4994d6a2e374f04:b5b2343a86d08707f3bb3269abdd07b498a05b7b16e40758410d8d2aabce0cfc:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bb1b349fb092708208d054b5ac620ccd7d41bb0eed9034545db82fe3247f4dfc:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bee0f6341a01acf156773a21505eca5e20a25fdb7d1dc6c09c37720a1c2ef899:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c4f4847c56f2947ed5512b4e3254c848c5063e0e6d9d5f2a79578b289d098114:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:ca49afde92432ac008856285d940bc605b8cabecbacbf706b4cf42ac74ccce1f:ca51a073d6c16a170dd50e9eb81b5819de4648b07b6a806b67daca531deba47e:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:cf4f477e9f273cf1f28dfeae53fb1ef1bc80a42fc31da956eb29edc67aacf545:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d3b087f64aae628f5786c8a1cfee107ad396828d18d7e6b77b972f6a3f0f95c7:d3b73904f336c5602aa7dd0ef4f97eda73a58cafe8c3fc7d40428788c8e0490e:d4d9def716300b65106042da9a2f7dc8b2b1636bbd3b07ecd3e8614053a9ca73:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dc6fcf0fd92b72ae0e511408e5e16b5a5f8007426762380770abc419eebf836f:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e610c980855414eb0532fa1a84908500dbfa3ae1d3b8aec60a88b82418fcaacb:e80de7c05fa932b8305cde4e48e8310822d0813b2f3640d31fe7677f29c33a73:e89da7c29b83df66466e7b996b1780a39c690560afa9a5e5f23c698003827e40:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:ecce46aef73a59c2c8ff22bd0b4c8cb6a2ceb257a6faa4b271725b346cd2a6d6:ee33cad2c146aefd4f3f8a4e9158f888bc228824dbd5d6e425414009f6aa8ba5:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f49c5ef7603c706a89514343223fe24d6e1496af83095a7796cb93e7336aaea4:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:fb42be5758f7efee955784116dcadd835bc256677a9303e394b61dcf552774b1:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdaa81c70b2f571c3b10af2b3ad5acac7f74ebf613964b09e49516d7d1809937:fe7be8fbd9564de4521178c9c6f4a329db717fbd9f5499c0f5f61c18efa07f19";
+export const WIRING_CONTRACT_HASH = "01395f4a3dddfff91a6895e810b66411e76a8460dd4a18de9e60aa86df3a1f58:11d01fbd4c68f896916782a923d864799c09fefe7f23c3a67af6204ef1d3b9fa:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:161c25c50ea646952d76c7f45670392a96b650cbdb21421741aa129897f39f39:18966862450765ae8a0b995d77ce2779e0f86680762ba6e647bea1efbb86921c:1b4ebe95df115c7ade52ea30f5720acf726e6d0ea5e2fd514fc0fb95ae9e0b0d:1b75767e04898dc04f1b67ee0b5b3d7dd6bb41150ddc6dac459cfa7c9c43ee01:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:2036d8db9241995bb76aa15c89b94d17d66cce3ef2e4ea63178b1e2a1909207b:21c70b2b10030f5a9acdb868c2e229c0b48fd6f86e2a44f85040058ab7634e25:272a31932843884c7ac3eabb6161bd3cebde6879b8bea18fc25043fa9be4455f:2aa323a73d3ed4a9a683b126fa9fbd192ad362e18958639591f10ee1a767a7a9:2aea5aa1d00f0d86457cb177ee29c76e1c1dc22e7f73bad7f8b1074575cbc31d:2c2d59336f8e3b13106229c1727f4ff26e8321fea8742ca46cd4fd89508863b0:2c42c97da3b397baa523b8f7ae11ed10f988cb9ea37f6b158ecb4404f5bcab62:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:2f58e48aa70e7c4414f51af8aea7f9768e378ea26daa75b659dba78dab856030:327f55f7fc3badfa91db612d8da5b7a890ed54daf3398ab067c48dd29bcb6f52:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:34d6e0d78054119d888936d1775b68e437ce2b5dd458186826e0146bdfec677f:353a3991489aafe1d337e52672908e0eea8521d946ab792ce54227e7b6e7f1dd:3ed0f7037847734ceba408b4dcfda72892a1d0a345f14f5b0f3080096610ccdb:4021a43427a72d2daffe25a117f282ffc343ff11dd02010652045485f3bf2816:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4e66be5e5d1dfb8fe16f1499db8a775b0788a0c62e47ea7076d59e915357fae2:5046222416ff8bf182f7603802da83b33bfe97f0310849ceb624964cb9d804df:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:57041b3fe080152b717e2ab15050bc93d3830b1d8027e5dc5114d687ad3c6be3:5b1a6e044cc0addd7bf6bc5f82a1f15994e33d01cccd75bb4dec4971b38b039b:5b5d08c3ea56e43ddf1f2623cdc1888b7bfafc1cbf6ee4a6d49ae42e68c73c95:5e836fa9948c8fcd70fa3c8bd625238e8c00bf0699beb851e5862e93e031e2e1:5fd882905c48e953a76af92b6db9cb606a0b0a9f9949c49f5ce6ca71c0d808ff:626c58f8b578afec7fbe9df1c0e44d6c111cbd9de85b0cbf6db3355778716b43:6a640d8f2f2791605a5c80bebcb59661c51018393b66d37fffa014400b7e99d4:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:71dc273811d0229c3193f31dafbda85a69d27a2705182d1069e7e8ca0f4d28f1:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:76e3196f40d12bbde4c652a75a834bd3da976a70963b46a4a4ca697bba8e526d:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:78e2341ac6b83ff5eb43c7fbfc824766ef6c9f5ebb61590eb8cf7ca8270d8b9d:792131c7b95d7c0b140fb2dbbf6a4b7e3ab487a4dc26f65a3d4374fa9c0e6e6b:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7fd8ed51d32b011977a2e27258cc6c003895e596d0456d876ce044d6e5069e4f:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:871382762a6d3b344a7428acc496a5c66a1cfc0f00ad0777398ac0a1d3badc53:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:9e98bdeac2b20c1da7c8565bc0e68b67db011509c47c3c512b9e1c9f7be516c4:a04c9aa12c21c3811997769713ecd392ab9d47a8d216dbc42e666cabac135d05:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a363078ede0b73c3c2f7a5c6ddb5c2f0d9de214832687609020e7078b66a8cb3:a6b6ed155553bdefd22ca6cf1354f8a2ae27407cabaae2e4560b23f49bcf4ed0:a8b60c0f996f5391bb792849f2044c2e973b34d15938963afad73f7e6a9706a4:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b15baf1a6241169d8eb947ae3850e26305e5d419875211954210152c3b42fcd5:b1ca59e86c9dcf3a0514ba73fc86bd012091620590a6e7a475ff5fa0408107bf:b47b1880542839c64691ddfe2e3d70ac2aab4e48356096c5b4994d6a2e374f04:b5b2343a86d08707f3bb3269abdd07b498a05b7b16e40758410d8d2aabce0cfc:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bb1b349fb092708208d054b5ac620ccd7d41bb0eed9034545db82fe3247f4dfc:be2cb11e4595ea79d5d2407bc55349c5132adab9a65b754d11e5b93cc16588d2:bee0f6341a01acf156773a21505eca5e20a25fdb7d1dc6c09c37720a1c2ef899:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c4f4847c56f2947ed5512b4e3254c848c5063e0e6d9d5f2a79578b289d098114:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:ca49afde92432ac008856285d940bc605b8cabecbacbf706b4cf42ac74ccce1f:ca51a073d6c16a170dd50e9eb81b5819de4648b07b6a806b67daca531deba47e:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:cf4f477e9f273cf1f28dfeae53fb1ef1bc80a42fc31da956eb29edc67aacf545:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d3b087f64aae628f5786c8a1cfee107ad396828d18d7e6b77b972f6a3f0f95c7:d3b73904f336c5602aa7dd0ef4f97eda73a58cafe8c3fc7d40428788c8e0490e:d4d9def716300b65106042da9a2f7dc8b2b1636bbd3b07ecd3e8614053a9ca73:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dc6fcf0fd92b72ae0e511408e5e16b5a5f8007426762380770abc419eebf836f:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e610c980855414eb0532fa1a84908500dbfa3ae1d3b8aec60a88b82418fcaacb:e80de7c05fa932b8305cde4e48e8310822d0813b2f3640d31fe7677f29c33a73:e89da7c29b83df66466e7b996b1780a39c690560afa9a5e5f23c698003827e40:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:ee33cad2c146aefd4f3f8a4e9158f888bc228824dbd5d6e425414009f6aa8ba5:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11991c48c78047f7aad90edc81b4880cd7b6c60d9b0e10bdb59cd42f2d70ca3:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f49c5ef7603c706a89514343223fe24d6e1496af83095a7796cb93e7336aaea4:f4fc0b55b51fc83457ecdc4b2f715dbc1e3d5c9b5d9279d7b62d8dd73b97a162:f64d2714b1d2d75aa89c7bfabce82f2dd2ab9ee79b2a016537d5a2a0d6774700:fb42be5758f7efee955784116dcadd835bc256677a9303e394b61dcf552774b1:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdaa81c70b2f571c3b10af2b3ad5acac7f74ebf613964b09e49516d7d1809937:fe7be8fbd9564de4521178c9c6f4a329db717fbd9f5499c0f5f61c18efa07f19";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -68300,6 +68300,268 @@ export const ExternalRecordLinkDecideAction = {
   ]
 } as const;
 
+// --- ExternalRecordLink.decideReclassification ---
+export interface ExternalRecordLinkDecideReclassificationClientInput {
+  /** Allowed: "suggested" | "approved" | "rejected" */
+  decision: "suggested" | "approved" | "rejected";
+  decidedByUserId: string;
+  /** Allowed: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task" */
+  capsuleEntity?: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task";
+  metadata?: string;
+}
+
+export const ExternalRecordLinkDecideReclassificationCapability = {
+  capabilityId: "ExternalRecordLink.decideReclassification",
+  entity: "ExternalRecordLink",
+  command: "decideReclassification",
+  route: "/api/manifest/ExternalRecordLink/commands/decideReclassification",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\" | \"quickbooks_online\" | \"google_calendar\" | \"stripe\" | \"other\"; recordType: string; externalId: string; capsuleEntity: \"event_record\" | \"contact\" | \"lead\" | \"menu\" | \"venue\" | \"payment\" | \"invoice\" | \"contract\" | \"proposal\" | \"client\" | \"vendor\" | \"person\" | \"task\" | \"batch\" | \"order\" | \"delivery\" | \"stock\" | \"location\" | \"pack_list\" | \"ingredient\" | \"component\" | \"component_portion_spec\" | \"component_ingredient\" | \"component_component\" | \"dish\" | \"dish_ingredient\" | \"dish_component\" | \"dish_task\" | \"dish_container\" | \"station\" | \"unit\" | \"event_dish\" | \"prep_task\"; capsuleId: string; sourceAccount: string | null; role: string | null; ordinal: number | null; linkKey: string | null; decision: \"suggested\" | \"approved\" | \"rejected\" | null; suggestedBy: string | null; decidedByUserId: string | null; decidedAt: number | null; appliedValues: string | null; appliedSourceVersion: string | null; appliedAt: number | null; appliedImportRunId: string | null; sourceVersion: string | null; lastSeenAt: number | null; lastSeenImportRunId: string | null; verified: boolean; lastVerifiedAt: number | null; verifiedByUserId: string | null; sourceImportRunId: string | null; effectiveStartDate: number | null; effectiveEndDate: number | null; rawSourceData: string | null; metadata: string | null; conflictStatus: \"resolved\" | \"pending_conflict\" | \"superseded\"; resolvedByUserId: string | null; resolutionNote: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["decision","decidedByUserId","capsuleEntity","metadata"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see import matches"},{"kind":"policy_denial","message":"Staff may update import matches"},{"kind":"policy_denial","message":"Staff may change import matches"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Pick who decided this."},{"kind":"constraint_block","message":"Approve or reject this suggestion."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ExternalRecordLink not found"}],
+  emits: ["ExternalRecordReclassificationDecided"],
+} as const;
+
+export type ExternalRecordLinkDecideReclassificationResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync" | "quickbooks_online" | "google_calendar" | "stripe" | "other"; recordType: string; externalId: string; capsuleEntity: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task"; capsuleId: string; sourceAccount: string | null; role: string | null; ordinal: number | null; linkKey: string | null; decision: "suggested" | "approved" | "rejected" | null; suggestedBy: string | null; decidedByUserId: string | null; decidedAt: number | null; appliedValues: string | null; appliedSourceVersion: string | null; appliedAt: number | null; appliedImportRunId: string | null; sourceVersion: string | null; lastSeenAt: number | null; lastSeenImportRunId: string | null; verified: boolean; lastVerifiedAt: number | null; verifiedByUserId: string | null; sourceImportRunId: string | null; effectiveStartDate: number | null; effectiveEndDate: number | null; rawSourceData: string | null; metadata: string | null; conflictStatus: "resolved" | "pending_conflict" | "superseded"; resolvedByUserId: string | null; resolutionNote: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for ExternalRecordLink.decideReclassification.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindExternalRecordLinkDecideReclassificationInput(client: ExternalRecordLinkDecideReclassificationClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ExternalRecordLink.decideReclassification. */
+export const ExternalRecordLinkDecideReclassificationInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ExternalRecordLink",
+    "queryKeyHint": "queryKeys.externalRecordLink.lists()",
+    "readId": "ExternalRecordLink.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ExternalRecordLink",
+    "queryKeyHint": "queryKeys.externalRecordLink.detail(id)",
+    "readId": "ExternalRecordLink.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ImportConflict",
+    "queryKeyHint": "queryKeys.importConflict.lists()",
+    "readId": "ImportConflict.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportConflict",
+    "queryKeyHint": "queryKeys.importConflict.detail(id)",
+    "readId": "ImportConflict.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ImportRun",
+    "queryKeyHint": "queryKeys.importRun.lists()",
+    "readId": "ImportRun.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportRun",
+    "queryKeyHint": "queryKeys.importRun.detail(id)",
+    "readId": "ImportRun.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer ExternalRecordLink.decideReclassification. Not a rendered control. */
+export const ExternalRecordLinkDecideReclassificationAction = {
+  "exposure": "human",
+  "label": "Decide reclassification",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "decision",
+      "label": "Decision",
+      "required": true,
+      "choices": [
+        {
+          "value": "suggested",
+          "label": "suggested"
+        },
+        {
+          "value": "approved",
+          "label": "approved"
+        },
+        {
+          "value": "rejected",
+          "label": "rejected"
+        }
+      ]
+    },
+    {
+      "name": "decidedByUserId",
+      "label": "Decided by user id",
+      "required": true
+    },
+    {
+      "name": "capsuleEntity",
+      "label": "Capsule entity",
+      "required": false,
+      "choices": [
+        {
+          "value": "event_record",
+          "label": "event_record"
+        },
+        {
+          "value": "contact",
+          "label": "contact"
+        },
+        {
+          "value": "lead",
+          "label": "lead"
+        },
+        {
+          "value": "menu",
+          "label": "menu"
+        },
+        {
+          "value": "venue",
+          "label": "venue"
+        },
+        {
+          "value": "payment",
+          "label": "payment"
+        },
+        {
+          "value": "invoice",
+          "label": "invoice"
+        },
+        {
+          "value": "contract",
+          "label": "contract"
+        },
+        {
+          "value": "proposal",
+          "label": "proposal"
+        },
+        {
+          "value": "client",
+          "label": "client"
+        },
+        {
+          "value": "vendor",
+          "label": "vendor"
+        },
+        {
+          "value": "person",
+          "label": "person"
+        },
+        {
+          "value": "task",
+          "label": "task"
+        },
+        {
+          "value": "batch",
+          "label": "batch"
+        },
+        {
+          "value": "order",
+          "label": "order"
+        },
+        {
+          "value": "delivery",
+          "label": "delivery"
+        },
+        {
+          "value": "stock",
+          "label": "stock"
+        },
+        {
+          "value": "location",
+          "label": "location"
+        },
+        {
+          "value": "pack_list",
+          "label": "pack_list"
+        },
+        {
+          "value": "ingredient",
+          "label": "ingredient"
+        },
+        {
+          "value": "component",
+          "label": "component"
+        },
+        {
+          "value": "component_portion_spec",
+          "label": "component_portion_spec"
+        },
+        {
+          "value": "component_ingredient",
+          "label": "component_ingredient"
+        },
+        {
+          "value": "component_component",
+          "label": "component_component"
+        },
+        {
+          "value": "dish",
+          "label": "dish"
+        },
+        {
+          "value": "dish_ingredient",
+          "label": "dish_ingredient"
+        },
+        {
+          "value": "dish_component",
+          "label": "dish_component"
+        },
+        {
+          "value": "dish_task",
+          "label": "dish_task"
+        },
+        {
+          "value": "dish_container",
+          "label": "dish_container"
+        },
+        {
+          "value": "station",
+          "label": "station"
+        },
+        {
+          "value": "unit",
+          "label": "unit"
+        },
+        {
+          "value": "event_dish",
+          "label": "event_dish"
+        },
+        {
+          "value": "prep_task",
+          "label": "prep_task"
+        }
+      ]
+    },
+    {
+      "name": "metadata",
+      "label": "Metadata",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- ExternalRecordLink.discard ---
 export interface ExternalRecordLinkDiscardClientInput {
   reason: string;
@@ -68418,6 +68680,9 @@ export interface ExternalRecordLinkLinkClientInput {
   decision?: "suggested" | "approved" | "rejected";
   suggestedBy?: string;
   sourceVersion?: string;
+  /** Allowed: "resolved" | "pending_conflict" | "superseded" */
+  conflictStatus?: "resolved" | "pending_conflict" | "superseded";
+  resolutionNote?: string;
 }
 
 export const ExternalRecordLinkLinkCapability = {
@@ -68433,9 +68698,9 @@ export const ExternalRecordLinkLinkCapability = {
   acceptsIdempotencyKey: true,
   resultKind: "allocation",
   returnTsType: "{ docId: string }",
-  clientParameterNames: ["sourceSystem","recordType","externalId","capsuleEntity","capsuleId","verified","verifiedByUserId","sourceImportRunId","effectiveStartDate","effectiveEndDate","rawSourceData","metadata","sourceAccount","role","ordinal","linkKey","decision","suggestedBy","sourceVersion"],
+  clientParameterNames: ["sourceSystem","recordType","externalId","capsuleEntity","capsuleId","verified","verifiedByUserId","sourceImportRunId","effectiveStartDate","effectiveEndDate","rawSourceData","metadata","sourceAccount","role","ordinal","linkKey","decision","suggestedBy","sourceVersion","conflictStatus","resolutionNote"],
   serverParameterNames: [],
-  failures: [{"kind":"policy_denial","message":"Staff may see import matches"},{"kind":"policy_denial","message":"Staff may update import matches"},{"kind":"policy_denial","message":"Staff may change import matches"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"Pick a source system for this match."},{"kind":"constraint_block","message":"Give this match an external ID."},{"kind":"constraint_block","message":"Give this match a Capsule ID."},{"kind":"constraint_block","message":"This match can't be marked verified without picking who verified it."},{"kind":"constraint_block","message":"This match's start date has to be on or before its end date."}],
+  failures: [{"kind":"policy_denial","message":"Staff may see import matches"},{"kind":"policy_denial","message":"Staff may update import matches"},{"kind":"policy_denial","message":"Staff may change import matches"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"Pick a source system for this match."},{"kind":"constraint_block","message":"Give this match an external ID."},{"kind":"constraint_block","message":"Give this match a Capsule ID."},{"kind":"constraint_block","message":"A new match can't start out replaced. Pick resolved or pending."},{"kind":"constraint_block","message":"This match can't be marked verified without picking who verified it."},{"kind":"constraint_block","message":"This match's start date has to be on or before its end date."}],
   emits: ["ExternalRecordLinked"],
 } as const;
 
@@ -68773,6 +69038,30 @@ export const ExternalRecordLinkLinkAction = {
       "name": "sourceVersion",
       "label": "Source version",
       "required": false
+    },
+    {
+      "name": "conflictStatus",
+      "label": "Conflict status",
+      "required": false,
+      "choices": [
+        {
+          "value": "resolved",
+          "label": "resolved"
+        },
+        {
+          "value": "pending_conflict",
+          "label": "pending_conflict"
+        },
+        {
+          "value": "superseded",
+          "label": "superseded"
+        }
+      ]
+    },
+    {
+      "name": "resolutionNote",
+      "label": "Resolution note",
+      "required": false
     }
   ]
 } as const;
@@ -68989,6 +69278,862 @@ export const ExternalRecordLinkRecordAppliedAction = {
   ]
 } as const;
 
+// --- ExternalRecordLink.recordReclassified ---
+export interface ExternalRecordLinkRecordReclassifiedClientInput {
+  /** Allowed: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task" */
+  capsuleEntity: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task";
+  capsuleId: string;
+  appliedValues: string;
+  resolutionNote: string;
+}
+
+export const ExternalRecordLinkRecordReclassifiedCapability = {
+  capabilityId: "ExternalRecordLink.recordReclassified",
+  entity: "ExternalRecordLink",
+  command: "recordReclassified",
+  route: "/api/manifest/ExternalRecordLink/commands/recordReclassified",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\" | \"quickbooks_online\" | \"google_calendar\" | \"stripe\" | \"other\"; recordType: string; externalId: string; capsuleEntity: \"event_record\" | \"contact\" | \"lead\" | \"menu\" | \"venue\" | \"payment\" | \"invoice\" | \"contract\" | \"proposal\" | \"client\" | \"vendor\" | \"person\" | \"task\" | \"batch\" | \"order\" | \"delivery\" | \"stock\" | \"location\" | \"pack_list\" | \"ingredient\" | \"component\" | \"component_portion_spec\" | \"component_ingredient\" | \"component_component\" | \"dish\" | \"dish_ingredient\" | \"dish_component\" | \"dish_task\" | \"dish_container\" | \"station\" | \"unit\" | \"event_dish\" | \"prep_task\"; capsuleId: string; sourceAccount: string | null; role: string | null; ordinal: number | null; linkKey: string | null; decision: \"suggested\" | \"approved\" | \"rejected\" | null; suggestedBy: string | null; decidedByUserId: string | null; decidedAt: number | null; appliedValues: string | null; appliedSourceVersion: string | null; appliedAt: number | null; appliedImportRunId: string | null; sourceVersion: string | null; lastSeenAt: number | null; lastSeenImportRunId: string | null; verified: boolean; lastVerifiedAt: number | null; verifiedByUserId: string | null; sourceImportRunId: string | null; effectiveStartDate: number | null; effectiveEndDate: number | null; rawSourceData: string | null; metadata: string | null; conflictStatus: \"resolved\" | \"pending_conflict\" | \"superseded\"; resolvedByUserId: string | null; resolutionNote: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["capsuleEntity","capsuleId","appliedValues","resolutionNote"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see import matches"},{"kind":"policy_denial","message":"Staff may update import matches"},{"kind":"policy_denial","message":"Staff may change import matches"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"Give this match a Capsule ID."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ExternalRecordLink not found"}],
+  emits: ["ExternalRecordReclassified"],
+} as const;
+
+export type ExternalRecordLinkRecordReclassifiedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync" | "quickbooks_online" | "google_calendar" | "stripe" | "other"; recordType: string; externalId: string; capsuleEntity: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task"; capsuleId: string; sourceAccount: string | null; role: string | null; ordinal: number | null; linkKey: string | null; decision: "suggested" | "approved" | "rejected" | null; suggestedBy: string | null; decidedByUserId: string | null; decidedAt: number | null; appliedValues: string | null; appliedSourceVersion: string | null; appliedAt: number | null; appliedImportRunId: string | null; sourceVersion: string | null; lastSeenAt: number | null; lastSeenImportRunId: string | null; verified: boolean; lastVerifiedAt: number | null; verifiedByUserId: string | null; sourceImportRunId: string | null; effectiveStartDate: number | null; effectiveEndDate: number | null; rawSourceData: string | null; metadata: string | null; conflictStatus: "resolved" | "pending_conflict" | "superseded"; resolvedByUserId: string | null; resolutionNote: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for ExternalRecordLink.recordReclassified.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindExternalRecordLinkRecordReclassifiedInput(client: ExternalRecordLinkRecordReclassifiedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ExternalRecordLink.recordReclassified. */
+export const ExternalRecordLinkRecordReclassifiedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ExternalRecordLink",
+    "queryKeyHint": "queryKeys.externalRecordLink.lists()",
+    "readId": "ExternalRecordLink.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ExternalRecordLink",
+    "queryKeyHint": "queryKeys.externalRecordLink.detail(id)",
+    "readId": "ExternalRecordLink.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ImportConflict",
+    "queryKeyHint": "queryKeys.importConflict.lists()",
+    "readId": "ImportConflict.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportConflict",
+    "queryKeyHint": "queryKeys.importConflict.detail(id)",
+    "readId": "ImportConflict.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ImportRun",
+    "queryKeyHint": "queryKeys.importRun.lists()",
+    "readId": "ImportRun.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportRun",
+    "queryKeyHint": "queryKeys.importRun.detail(id)",
+    "readId": "ImportRun.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer ExternalRecordLink.recordReclassified. Not a rendered control. */
+export const ExternalRecordLinkRecordReclassifiedAction = {
+  "exposure": "human",
+  "label": "Record reclassified",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "capsuleEntity",
+      "label": "Capsule entity",
+      "required": true,
+      "choices": [
+        {
+          "value": "event_record",
+          "label": "event_record"
+        },
+        {
+          "value": "contact",
+          "label": "contact"
+        },
+        {
+          "value": "lead",
+          "label": "lead"
+        },
+        {
+          "value": "menu",
+          "label": "menu"
+        },
+        {
+          "value": "venue",
+          "label": "venue"
+        },
+        {
+          "value": "payment",
+          "label": "payment"
+        },
+        {
+          "value": "invoice",
+          "label": "invoice"
+        },
+        {
+          "value": "contract",
+          "label": "contract"
+        },
+        {
+          "value": "proposal",
+          "label": "proposal"
+        },
+        {
+          "value": "client",
+          "label": "client"
+        },
+        {
+          "value": "vendor",
+          "label": "vendor"
+        },
+        {
+          "value": "person",
+          "label": "person"
+        },
+        {
+          "value": "task",
+          "label": "task"
+        },
+        {
+          "value": "batch",
+          "label": "batch"
+        },
+        {
+          "value": "order",
+          "label": "order"
+        },
+        {
+          "value": "delivery",
+          "label": "delivery"
+        },
+        {
+          "value": "stock",
+          "label": "stock"
+        },
+        {
+          "value": "location",
+          "label": "location"
+        },
+        {
+          "value": "pack_list",
+          "label": "pack_list"
+        },
+        {
+          "value": "ingredient",
+          "label": "ingredient"
+        },
+        {
+          "value": "component",
+          "label": "component"
+        },
+        {
+          "value": "component_portion_spec",
+          "label": "component_portion_spec"
+        },
+        {
+          "value": "component_ingredient",
+          "label": "component_ingredient"
+        },
+        {
+          "value": "component_component",
+          "label": "component_component"
+        },
+        {
+          "value": "dish",
+          "label": "dish"
+        },
+        {
+          "value": "dish_ingredient",
+          "label": "dish_ingredient"
+        },
+        {
+          "value": "dish_component",
+          "label": "dish_component"
+        },
+        {
+          "value": "dish_task",
+          "label": "dish_task"
+        },
+        {
+          "value": "dish_container",
+          "label": "dish_container"
+        },
+        {
+          "value": "station",
+          "label": "station"
+        },
+        {
+          "value": "unit",
+          "label": "unit"
+        },
+        {
+          "value": "event_dish",
+          "label": "event_dish"
+        },
+        {
+          "value": "prep_task",
+          "label": "prep_task"
+        }
+      ]
+    },
+    {
+      "name": "capsuleId",
+      "label": "Capsule id",
+      "required": true
+    },
+    {
+      "name": "appliedValues",
+      "label": "Applied values",
+      "required": true
+    },
+    {
+      "name": "resolutionNote",
+      "label": "Resolution note",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- ExternalRecordLink.recordReclassifyFailure ---
+export interface ExternalRecordLinkRecordReclassifyFailureClientInput {
+  resolutionNote: string;
+}
+
+export const ExternalRecordLinkRecordReclassifyFailureCapability = {
+  capabilityId: "ExternalRecordLink.recordReclassifyFailure",
+  entity: "ExternalRecordLink",
+  command: "recordReclassifyFailure",
+  route: "/api/manifest/ExternalRecordLink/commands/recordReclassifyFailure",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\" | \"quickbooks_online\" | \"google_calendar\" | \"stripe\" | \"other\"; recordType: string; externalId: string; capsuleEntity: \"event_record\" | \"contact\" | \"lead\" | \"menu\" | \"venue\" | \"payment\" | \"invoice\" | \"contract\" | \"proposal\" | \"client\" | \"vendor\" | \"person\" | \"task\" | \"batch\" | \"order\" | \"delivery\" | \"stock\" | \"location\" | \"pack_list\" | \"ingredient\" | \"component\" | \"component_portion_spec\" | \"component_ingredient\" | \"component_component\" | \"dish\" | \"dish_ingredient\" | \"dish_component\" | \"dish_task\" | \"dish_container\" | \"station\" | \"unit\" | \"event_dish\" | \"prep_task\"; capsuleId: string; sourceAccount: string | null; role: string | null; ordinal: number | null; linkKey: string | null; decision: \"suggested\" | \"approved\" | \"rejected\" | null; suggestedBy: string | null; decidedByUserId: string | null; decidedAt: number | null; appliedValues: string | null; appliedSourceVersion: string | null; appliedAt: number | null; appliedImportRunId: string | null; sourceVersion: string | null; lastSeenAt: number | null; lastSeenImportRunId: string | null; verified: boolean; lastVerifiedAt: number | null; verifiedByUserId: string | null; sourceImportRunId: string | null; effectiveStartDate: number | null; effectiveEndDate: number | null; rawSourceData: string | null; metadata: string | null; conflictStatus: \"resolved\" | \"pending_conflict\" | \"superseded\"; resolvedByUserId: string | null; resolutionNote: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["resolutionNote"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see import matches"},{"kind":"policy_denial","message":"Staff may update import matches"},{"kind":"policy_denial","message":"Staff may change import matches"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Say why this change failed."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ExternalRecordLink not found"}],
+  emits: ["ExternalRecordReclassifyFailed"],
+} as const;
+
+export type ExternalRecordLinkRecordReclassifyFailureResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync" | "quickbooks_online" | "google_calendar" | "stripe" | "other"; recordType: string; externalId: string; capsuleEntity: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task"; capsuleId: string; sourceAccount: string | null; role: string | null; ordinal: number | null; linkKey: string | null; decision: "suggested" | "approved" | "rejected" | null; suggestedBy: string | null; decidedByUserId: string | null; decidedAt: number | null; appliedValues: string | null; appliedSourceVersion: string | null; appliedAt: number | null; appliedImportRunId: string | null; sourceVersion: string | null; lastSeenAt: number | null; lastSeenImportRunId: string | null; verified: boolean; lastVerifiedAt: number | null; verifiedByUserId: string | null; sourceImportRunId: string | null; effectiveStartDate: number | null; effectiveEndDate: number | null; rawSourceData: string | null; metadata: string | null; conflictStatus: "resolved" | "pending_conflict" | "superseded"; resolvedByUserId: string | null; resolutionNote: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for ExternalRecordLink.recordReclassifyFailure.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindExternalRecordLinkRecordReclassifyFailureInput(client: ExternalRecordLinkRecordReclassifyFailureClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ExternalRecordLink.recordReclassifyFailure. */
+export const ExternalRecordLinkRecordReclassifyFailureInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ExternalRecordLink",
+    "queryKeyHint": "queryKeys.externalRecordLink.lists()",
+    "readId": "ExternalRecordLink.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ExternalRecordLink",
+    "queryKeyHint": "queryKeys.externalRecordLink.detail(id)",
+    "readId": "ExternalRecordLink.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ImportConflict",
+    "queryKeyHint": "queryKeys.importConflict.lists()",
+    "readId": "ImportConflict.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportConflict",
+    "queryKeyHint": "queryKeys.importConflict.detail(id)",
+    "readId": "ImportConflict.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ImportRun",
+    "queryKeyHint": "queryKeys.importRun.lists()",
+    "readId": "ImportRun.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportRun",
+    "queryKeyHint": "queryKeys.importRun.detail(id)",
+    "readId": "ImportRun.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer ExternalRecordLink.recordReclassifyFailure. Not a rendered control. */
+export const ExternalRecordLinkRecordReclassifyFailureAction = {
+  "exposure": "human",
+  "label": "Record reclassify failure",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "resolutionNote",
+      "label": "Resolution note",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- ExternalRecordLink.refreshSuggestion ---
+export interface ExternalRecordLinkRefreshSuggestionClientInput {
+  /** Allowed: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task" */
+  capsuleEntity: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task";
+  metadata: string;
+  suggestedBy: string;
+}
+
+export const ExternalRecordLinkRefreshSuggestionCapability = {
+  capabilityId: "ExternalRecordLink.refreshSuggestion",
+  entity: "ExternalRecordLink",
+  command: "refreshSuggestion",
+  route: "/api/manifest/ExternalRecordLink/commands/refreshSuggestion",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\" | \"quickbooks_online\" | \"google_calendar\" | \"stripe\" | \"other\"; recordType: string; externalId: string; capsuleEntity: \"event_record\" | \"contact\" | \"lead\" | \"menu\" | \"venue\" | \"payment\" | \"invoice\" | \"contract\" | \"proposal\" | \"client\" | \"vendor\" | \"person\" | \"task\" | \"batch\" | \"order\" | \"delivery\" | \"stock\" | \"location\" | \"pack_list\" | \"ingredient\" | \"component\" | \"component_portion_spec\" | \"component_ingredient\" | \"component_component\" | \"dish\" | \"dish_ingredient\" | \"dish_component\" | \"dish_task\" | \"dish_container\" | \"station\" | \"unit\" | \"event_dish\" | \"prep_task\"; capsuleId: string; sourceAccount: string | null; role: string | null; ordinal: number | null; linkKey: string | null; decision: \"suggested\" | \"approved\" | \"rejected\" | null; suggestedBy: string | null; decidedByUserId: string | null; decidedAt: number | null; appliedValues: string | null; appliedSourceVersion: string | null; appliedAt: number | null; appliedImportRunId: string | null; sourceVersion: string | null; lastSeenAt: number | null; lastSeenImportRunId: string | null; verified: boolean; lastVerifiedAt: number | null; verifiedByUserId: string | null; sourceImportRunId: string | null; effectiveStartDate: number | null; effectiveEndDate: number | null; rawSourceData: string | null; metadata: string | null; conflictStatus: \"resolved\" | \"pending_conflict\" | \"superseded\"; resolvedByUserId: string | null; resolutionNote: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["capsuleEntity","metadata","suggestedBy"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see import matches"},{"kind":"policy_denial","message":"Staff may update import matches"},{"kind":"policy_denial","message":"Staff may change import matches"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"This suggestion needs its details."},{"kind":"constraint_block","message":"Say where this suggestion came from."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ExternalRecordLink not found"}],
+  emits: ["ExternalRecordSuggestionRefreshed"],
+} as const;
+
+export type ExternalRecordLinkRefreshSuggestionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync" | "quickbooks_online" | "google_calendar" | "stripe" | "other"; recordType: string; externalId: string; capsuleEntity: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task"; capsuleId: string; sourceAccount: string | null; role: string | null; ordinal: number | null; linkKey: string | null; decision: "suggested" | "approved" | "rejected" | null; suggestedBy: string | null; decidedByUserId: string | null; decidedAt: number | null; appliedValues: string | null; appliedSourceVersion: string | null; appliedAt: number | null; appliedImportRunId: string | null; sourceVersion: string | null; lastSeenAt: number | null; lastSeenImportRunId: string | null; verified: boolean; lastVerifiedAt: number | null; verifiedByUserId: string | null; sourceImportRunId: string | null; effectiveStartDate: number | null; effectiveEndDate: number | null; rawSourceData: string | null; metadata: string | null; conflictStatus: "resolved" | "pending_conflict" | "superseded"; resolvedByUserId: string | null; resolutionNote: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for ExternalRecordLink.refreshSuggestion.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindExternalRecordLinkRefreshSuggestionInput(client: ExternalRecordLinkRefreshSuggestionClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ExternalRecordLink.refreshSuggestion. */
+export const ExternalRecordLinkRefreshSuggestionInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ExternalRecordLink",
+    "queryKeyHint": "queryKeys.externalRecordLink.lists()",
+    "readId": "ExternalRecordLink.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ExternalRecordLink",
+    "queryKeyHint": "queryKeys.externalRecordLink.detail(id)",
+    "readId": "ExternalRecordLink.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ImportConflict",
+    "queryKeyHint": "queryKeys.importConflict.lists()",
+    "readId": "ImportConflict.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportConflict",
+    "queryKeyHint": "queryKeys.importConflict.detail(id)",
+    "readId": "ImportConflict.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ImportRun",
+    "queryKeyHint": "queryKeys.importRun.lists()",
+    "readId": "ImportRun.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportRun",
+    "queryKeyHint": "queryKeys.importRun.detail(id)",
+    "readId": "ImportRun.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer ExternalRecordLink.refreshSuggestion. Not a rendered control. */
+export const ExternalRecordLinkRefreshSuggestionAction = {
+  "exposure": "human",
+  "label": "Refresh suggestion",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "capsuleEntity",
+      "label": "Capsule entity",
+      "required": true,
+      "choices": [
+        {
+          "value": "event_record",
+          "label": "event_record"
+        },
+        {
+          "value": "contact",
+          "label": "contact"
+        },
+        {
+          "value": "lead",
+          "label": "lead"
+        },
+        {
+          "value": "menu",
+          "label": "menu"
+        },
+        {
+          "value": "venue",
+          "label": "venue"
+        },
+        {
+          "value": "payment",
+          "label": "payment"
+        },
+        {
+          "value": "invoice",
+          "label": "invoice"
+        },
+        {
+          "value": "contract",
+          "label": "contract"
+        },
+        {
+          "value": "proposal",
+          "label": "proposal"
+        },
+        {
+          "value": "client",
+          "label": "client"
+        },
+        {
+          "value": "vendor",
+          "label": "vendor"
+        },
+        {
+          "value": "person",
+          "label": "person"
+        },
+        {
+          "value": "task",
+          "label": "task"
+        },
+        {
+          "value": "batch",
+          "label": "batch"
+        },
+        {
+          "value": "order",
+          "label": "order"
+        },
+        {
+          "value": "delivery",
+          "label": "delivery"
+        },
+        {
+          "value": "stock",
+          "label": "stock"
+        },
+        {
+          "value": "location",
+          "label": "location"
+        },
+        {
+          "value": "pack_list",
+          "label": "pack_list"
+        },
+        {
+          "value": "ingredient",
+          "label": "ingredient"
+        },
+        {
+          "value": "component",
+          "label": "component"
+        },
+        {
+          "value": "component_portion_spec",
+          "label": "component_portion_spec"
+        },
+        {
+          "value": "component_ingredient",
+          "label": "component_ingredient"
+        },
+        {
+          "value": "component_component",
+          "label": "component_component"
+        },
+        {
+          "value": "dish",
+          "label": "dish"
+        },
+        {
+          "value": "dish_ingredient",
+          "label": "dish_ingredient"
+        },
+        {
+          "value": "dish_component",
+          "label": "dish_component"
+        },
+        {
+          "value": "dish_task",
+          "label": "dish_task"
+        },
+        {
+          "value": "dish_container",
+          "label": "dish_container"
+        },
+        {
+          "value": "station",
+          "label": "station"
+        },
+        {
+          "value": "unit",
+          "label": "unit"
+        },
+        {
+          "value": "event_dish",
+          "label": "event_dish"
+        },
+        {
+          "value": "prep_task",
+          "label": "prep_task"
+        }
+      ]
+    },
+    {
+      "name": "metadata",
+      "label": "Metadata",
+      "required": true
+    },
+    {
+      "name": "suggestedBy",
+      "label": "Suggested by",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- ExternalRecordLink.relink ---
+export interface ExternalRecordLinkRelinkClientInput {
+  /** Allowed: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task" */
+  capsuleEntity: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task";
+  capsuleId: string;
+  sourceImportRunId: string;
+  rawSourceData: string;
+  /** Allowed: "resolved" | "pending_conflict" | "superseded" */
+  conflictStatus: "resolved" | "pending_conflict" | "superseded";
+  resolutionNote?: string;
+}
+
+export const ExternalRecordLinkRelinkCapability = {
+  capabilityId: "ExternalRecordLink.relink",
+  entity: "ExternalRecordLink",
+  command: "relink",
+  route: "/api/manifest/ExternalRecordLink/commands/relink",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\" | \"quickbooks_online\" | \"google_calendar\" | \"stripe\" | \"other\"; recordType: string; externalId: string; capsuleEntity: \"event_record\" | \"contact\" | \"lead\" | \"menu\" | \"venue\" | \"payment\" | \"invoice\" | \"contract\" | \"proposal\" | \"client\" | \"vendor\" | \"person\" | \"task\" | \"batch\" | \"order\" | \"delivery\" | \"stock\" | \"location\" | \"pack_list\" | \"ingredient\" | \"component\" | \"component_portion_spec\" | \"component_ingredient\" | \"component_component\" | \"dish\" | \"dish_ingredient\" | \"dish_component\" | \"dish_task\" | \"dish_container\" | \"station\" | \"unit\" | \"event_dish\" | \"prep_task\"; capsuleId: string; sourceAccount: string | null; role: string | null; ordinal: number | null; linkKey: string | null; decision: \"suggested\" | \"approved\" | \"rejected\" | null; suggestedBy: string | null; decidedByUserId: string | null; decidedAt: number | null; appliedValues: string | null; appliedSourceVersion: string | null; appliedAt: number | null; appliedImportRunId: string | null; sourceVersion: string | null; lastSeenAt: number | null; lastSeenImportRunId: string | null; verified: boolean; lastVerifiedAt: number | null; verifiedByUserId: string | null; sourceImportRunId: string | null; effectiveStartDate: number | null; effectiveEndDate: number | null; rawSourceData: string | null; metadata: string | null; conflictStatus: \"resolved\" | \"pending_conflict\" | \"superseded\"; resolvedByUserId: string | null; resolutionNote: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["capsuleEntity","capsuleId","sourceImportRunId","rawSourceData","conflictStatus","resolutionNote"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see import matches"},{"kind":"policy_denial","message":"Staff may update import matches"},{"kind":"policy_denial","message":"Staff may change import matches"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"Give this match a Capsule ID."},{"kind":"constraint_block","message":"A re-imported match can't be marked replaced. Pick resolved or pending."},{"kind":"constraint_block","message":"Say which import saw this record."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ExternalRecordLink not found"}],
+  emits: ["ExternalRecordRelinked"],
+} as const;
+
+export type ExternalRecordLinkRelinkResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync" | "quickbooks_online" | "google_calendar" | "stripe" | "other"; recordType: string; externalId: string; capsuleEntity: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task"; capsuleId: string; sourceAccount: string | null; role: string | null; ordinal: number | null; linkKey: string | null; decision: "suggested" | "approved" | "rejected" | null; suggestedBy: string | null; decidedByUserId: string | null; decidedAt: number | null; appliedValues: string | null; appliedSourceVersion: string | null; appliedAt: number | null; appliedImportRunId: string | null; sourceVersion: string | null; lastSeenAt: number | null; lastSeenImportRunId: string | null; verified: boolean; lastVerifiedAt: number | null; verifiedByUserId: string | null; sourceImportRunId: string | null; effectiveStartDate: number | null; effectiveEndDate: number | null; rawSourceData: string | null; metadata: string | null; conflictStatus: "resolved" | "pending_conflict" | "superseded"; resolvedByUserId: string | null; resolutionNote: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for ExternalRecordLink.relink.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindExternalRecordLinkRelinkInput(client: ExternalRecordLinkRelinkClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ExternalRecordLink.relink. */
+export const ExternalRecordLinkRelinkInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ExternalRecordLink",
+    "queryKeyHint": "queryKeys.externalRecordLink.lists()",
+    "readId": "ExternalRecordLink.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ExternalRecordLink",
+    "queryKeyHint": "queryKeys.externalRecordLink.detail(id)",
+    "readId": "ExternalRecordLink.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ImportConflict",
+    "queryKeyHint": "queryKeys.importConflict.lists()",
+    "readId": "ImportConflict.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportConflict",
+    "queryKeyHint": "queryKeys.importConflict.detail(id)",
+    "readId": "ImportConflict.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ImportRun",
+    "queryKeyHint": "queryKeys.importRun.lists()",
+    "readId": "ImportRun.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportRun",
+    "queryKeyHint": "queryKeys.importRun.detail(id)",
+    "readId": "ImportRun.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer ExternalRecordLink.relink. Not a rendered control. */
+export const ExternalRecordLinkRelinkAction = {
+  "exposure": "human",
+  "label": "Relink",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "capsuleEntity",
+      "label": "Capsule entity",
+      "required": true,
+      "choices": [
+        {
+          "value": "event_record",
+          "label": "event_record"
+        },
+        {
+          "value": "contact",
+          "label": "contact"
+        },
+        {
+          "value": "lead",
+          "label": "lead"
+        },
+        {
+          "value": "menu",
+          "label": "menu"
+        },
+        {
+          "value": "venue",
+          "label": "venue"
+        },
+        {
+          "value": "payment",
+          "label": "payment"
+        },
+        {
+          "value": "invoice",
+          "label": "invoice"
+        },
+        {
+          "value": "contract",
+          "label": "contract"
+        },
+        {
+          "value": "proposal",
+          "label": "proposal"
+        },
+        {
+          "value": "client",
+          "label": "client"
+        },
+        {
+          "value": "vendor",
+          "label": "vendor"
+        },
+        {
+          "value": "person",
+          "label": "person"
+        },
+        {
+          "value": "task",
+          "label": "task"
+        },
+        {
+          "value": "batch",
+          "label": "batch"
+        },
+        {
+          "value": "order",
+          "label": "order"
+        },
+        {
+          "value": "delivery",
+          "label": "delivery"
+        },
+        {
+          "value": "stock",
+          "label": "stock"
+        },
+        {
+          "value": "location",
+          "label": "location"
+        },
+        {
+          "value": "pack_list",
+          "label": "pack_list"
+        },
+        {
+          "value": "ingredient",
+          "label": "ingredient"
+        },
+        {
+          "value": "component",
+          "label": "component"
+        },
+        {
+          "value": "component_portion_spec",
+          "label": "component_portion_spec"
+        },
+        {
+          "value": "component_ingredient",
+          "label": "component_ingredient"
+        },
+        {
+          "value": "component_component",
+          "label": "component_component"
+        },
+        {
+          "value": "dish",
+          "label": "dish"
+        },
+        {
+          "value": "dish_ingredient",
+          "label": "dish_ingredient"
+        },
+        {
+          "value": "dish_component",
+          "label": "dish_component"
+        },
+        {
+          "value": "dish_task",
+          "label": "dish_task"
+        },
+        {
+          "value": "dish_container",
+          "label": "dish_container"
+        },
+        {
+          "value": "station",
+          "label": "station"
+        },
+        {
+          "value": "unit",
+          "label": "unit"
+        },
+        {
+          "value": "event_dish",
+          "label": "event_dish"
+        },
+        {
+          "value": "prep_task",
+          "label": "prep_task"
+        }
+      ]
+    },
+    {
+      "name": "capsuleId",
+      "label": "Capsule id",
+      "required": true
+    },
+    {
+      "name": "sourceImportRunId",
+      "label": "Source import run id",
+      "required": true
+    },
+    {
+      "name": "rawSourceData",
+      "label": "Raw source data",
+      "required": true
+    },
+    {
+      "name": "conflictStatus",
+      "label": "Conflict status",
+      "required": true,
+      "choices": [
+        {
+          "value": "resolved",
+          "label": "resolved"
+        },
+        {
+          "value": "pending_conflict",
+          "label": "pending_conflict"
+        },
+        {
+          "value": "superseded",
+          "label": "superseded"
+        }
+      ]
+    },
+    {
+      "name": "resolutionNote",
+      "label": "Resolution note",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- ExternalRecordLink.resolveConflict ---
 export interface ExternalRecordLinkResolveConflictClientInput {
   /** Allowed: "resolved" | "pending_conflict" | "superseded" */
@@ -69130,7 +70275,7 @@ export const ExternalRecordLinkRetireCapability = {
   returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\" | \"quickbooks_online\" | \"google_calendar\" | \"stripe\" | \"other\"; recordType: string; externalId: string; capsuleEntity: \"event_record\" | \"contact\" | \"lead\" | \"menu\" | \"venue\" | \"payment\" | \"invoice\" | \"contract\" | \"proposal\" | \"client\" | \"vendor\" | \"person\" | \"task\" | \"batch\" | \"order\" | \"delivery\" | \"stock\" | \"location\" | \"pack_list\" | \"ingredient\" | \"component\" | \"component_portion_spec\" | \"component_ingredient\" | \"component_component\" | \"dish\" | \"dish_ingredient\" | \"dish_component\" | \"dish_task\" | \"dish_container\" | \"station\" | \"unit\" | \"event_dish\" | \"prep_task\"; capsuleId: string; sourceAccount: string | null; role: string | null; ordinal: number | null; linkKey: string | null; decision: \"suggested\" | \"approved\" | \"rejected\" | null; suggestedBy: string | null; decidedByUserId: string | null; decidedAt: number | null; appliedValues: string | null; appliedSourceVersion: string | null; appliedAt: number | null; appliedImportRunId: string | null; sourceVersion: string | null; lastSeenAt: number | null; lastSeenImportRunId: string | null; verified: boolean; lastVerifiedAt: number | null; verifiedByUserId: string | null; sourceImportRunId: string | null; effectiveStartDate: number | null; effectiveEndDate: number | null; rawSourceData: string | null; metadata: string | null; conflictStatus: \"resolved\" | \"pending_conflict\" | \"superseded\"; resolvedByUserId: string | null; resolutionNote: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["effectiveEndDate"],
   serverParameterNames: [],
-  failures: [{"kind":"policy_denial","message":"Staff may see import matches"},{"kind":"policy_denial","message":"Staff may update import matches"},{"kind":"policy_denial","message":"Staff may change import matches"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ExternalRecordLink not found"}],
+  failures: [{"kind":"policy_denial","message":"Staff may see import matches"},{"kind":"policy_denial","message":"Staff may update import matches"},{"kind":"policy_denial","message":"Staff may change import matches"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ExternalRecordLink not found"}],
   emits: ["ExternalRecordRetired"],
 } as const;
 
@@ -69525,14 +70670,14 @@ export const ImportArtifactClassifyCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: \"pending\" | \"normalized\" | \"linked_reference\" | \"duplicate_view\" | \"needs_mapping\" | \"unsupported\" | \"invalid\"; parseStatus: \"pending\" | \"parsed\" | \"failed\"; totalRowCount: number; rowOutcomeCounts: string; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: \"pending\" | \"normalized\" | \"linked_reference\" | \"duplicate_view\" | \"needs_mapping\" | \"unsupported\" | \"invalid\"; parseStatus: \"pending\" | \"parsed\" | \"failed\"; totalRowCount: number; rowOutcomeCounts: string; registeredAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["disposition","totalRowCount","rowOutcomeCounts"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see imported files"},{"kind":"policy_denial","message":"Staff may update imported files"},{"kind":"policy_denial","message":"Staff may change imported files"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Pick what this file turned out to be. It can't stay set to pending."},{"kind":"constraint_block","message":"This file's total row count can't be negative. Use zero or more."},{"kind":"constraint_block","message":"If you give row counts for this file, they can't be blank."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ImportArtifact not found"}],
   emits: ["ImportArtifactClassified"],
 } as const;
 
-export type ImportArtifactClassifyResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: "pending" | "normalized" | "linked_reference" | "duplicate_view" | "needs_mapping" | "unsupported" | "invalid"; parseStatus: "pending" | "parsed" | "failed"; totalRowCount: number; rowOutcomeCounts: string; createdAt: number; updatedAt: number };
+export type ImportArtifactClassifyResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: "pending" | "normalized" | "linked_reference" | "duplicate_view" | "needs_mapping" | "unsupported" | "invalid"; parseStatus: "pending" | "parsed" | "failed"; totalRowCount: number; rowOutcomeCounts: string; registeredAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ImportArtifact.classify.
@@ -69647,14 +70792,14 @@ export const ImportArtifactRecordParseCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: \"pending\" | \"normalized\" | \"linked_reference\" | \"duplicate_view\" | \"needs_mapping\" | \"unsupported\" | \"invalid\"; parseStatus: \"pending\" | \"parsed\" | \"failed\"; totalRowCount: number; rowOutcomeCounts: string; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: \"pending\" | \"normalized\" | \"linked_reference\" | \"duplicate_view\" | \"needs_mapping\" | \"unsupported\" | \"invalid\"; parseStatus: \"pending\" | \"parsed\" | \"failed\"; totalRowCount: number; rowOutcomeCounts: string; registeredAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["parseStatus","provenance"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see imported files"},{"kind":"policy_denial","message":"Staff may update imported files"},{"kind":"policy_denial","message":"Staff may change imported files"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Say if reading this file worked or failed. It can't stay pending."},{"kind":"constraint_block","message":"If you give origin details for this file, they can't be blank."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ImportArtifact not found"}],
   emits: ["ImportArtifactParseRecorded"],
 } as const;
 
-export type ImportArtifactRecordParseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: "pending" | "normalized" | "linked_reference" | "duplicate_view" | "needs_mapping" | "unsupported" | "invalid"; parseStatus: "pending" | "parsed" | "failed"; totalRowCount: number; rowOutcomeCounts: string; createdAt: number; updatedAt: number };
+export type ImportArtifactRecordParseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: "pending" | "normalized" | "linked_reference" | "duplicate_view" | "needs_mapping" | "unsupported" | "invalid"; parseStatus: "pending" | "parsed" | "failed"; totalRowCount: number; rowOutcomeCounts: string; registeredAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ImportArtifact.recordParse.
@@ -69749,19 +70894,19 @@ export const ImportArtifactRegisterCapability = {
   route: "/api/manifest/ImportArtifact/commands/register",
   instanceCommand: true,
   dispatchable: true,
-  targetsExistingInstance: true,
+  targetsExistingInstance: false,
   dateParameterNames: [],
-  versionField: "version",
+  versionField: null,
   acceptsIdempotencyKey: true,
-  resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: \"pending\" | \"normalized\" | \"linked_reference\" | \"duplicate_view\" | \"needs_mapping\" | \"unsupported\" | \"invalid\"; parseStatus: \"pending\" | \"parsed\" | \"failed\"; totalRowCount: number; rowOutcomeCounts: string; createdAt: number; updatedAt: number }",
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
   clientParameterNames: ["importRunId","name","byteSize","entryCount","checksum","storageId","provenance"],
   serverParameterNames: [],
-  failures: [{"kind":"policy_denial","message":"Staff may see imported files"},{"kind":"policy_denial","message":"Staff may update imported files"},{"kind":"policy_denial","message":"Staff may change imported files"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Say which import this file belongs to."},{"kind":"constraint_block","message":"Give this file a name."},{"kind":"constraint_block","message":"This file's size can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This file's number of entries can't be negative. Use zero or more."},{"kind":"constraint_block","message":"If you give a checksum for this file, it can't be blank."},{"kind":"constraint_block","message":"If you give a storage ID for this file, it can't be blank."},{"kind":"constraint_block","message":"If you give origin details for this file, they can't be blank."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ImportArtifact not found"}],
+  failures: [{"kind":"policy_denial","message":"Staff may see imported files"},{"kind":"policy_denial","message":"Staff may update imported files"},{"kind":"policy_denial","message":"Staff may change imported files"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Say which import this file belongs to."},{"kind":"constraint_block","message":"Give this file a name."},{"kind":"constraint_block","message":"This file's size can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This file's number of entries can't be negative. Use zero or more."},{"kind":"constraint_block","message":"If you give a checksum for this file, it can't be blank."},{"kind":"constraint_block","message":"If you give a storage ID for this file, it can't be blank."},{"kind":"constraint_block","message":"If you give origin details for this file, they can't be blank."}],
   emits: ["ImportArtifactRegistered"],
 } as const;
 
-export type ImportArtifactRegisterResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: "pending" | "normalized" | "linked_reference" | "duplicate_view" | "needs_mapping" | "unsupported" | "invalid"; parseStatus: "pending" | "parsed" | "failed"; totalRowCount: number; rowOutcomeCounts: string; createdAt: number; updatedAt: number };
+export type ImportArtifactRegisterResult = { docId: string };
 
 /**
  * Build command input for ImportArtifact.register.
@@ -71914,19 +73059,19 @@ export const ImportRunStartCapability = {
   route: "/api/manifest/ImportRun/commands/start",
   instanceCommand: true,
   dispatchable: true,
-  targetsExistingInstance: true,
+  targetsExistingInstance: false,
   dateParameterNames: [],
-  versionField: "version",
+  versionField: null,
   acceptsIdempotencyKey: true,
-  resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\"; datasetType: \"events\" | \"contacts\" | \"leads\" | \"menus\" | \"venues\" | \"payments\" | \"pack_list\"; status: \"started\" | \"parsing\" | \"validating\" | \"reviewing\" | \"committing\" | \"completed\" | \"failed\" | \"reverted\"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number }",
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
   clientParameterNames: ["sourceSystem","datasetType","actorId","checksum"],
   serverParameterNames: [],
-  failures: [{"kind":"policy_denial","message":"Staff may see imports"},{"kind":"policy_denial","message":"Staff may update imports"},{"kind":"policy_denial","message":"Staff may change imports"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"If you name who's doing this, that name can't be blank."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ImportRun not found"}],
+  failures: [{"kind":"policy_denial","message":"Staff may see imports"},{"kind":"policy_denial","message":"Staff may update imports"},{"kind":"policy_denial","message":"Staff may change imports"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"If you name who's doing this, that name can't be blank."}],
   emits: ["ImportRunStarted"],
 } as const;
 
-export type ImportRunStartResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync"; datasetType: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "pack_list"; status: "started" | "parsing" | "validating" | "reviewing" | "committing" | "completed" | "failed" | "reverted"; startTime: number | null; endTime: number | null; completionTime: number | null; parsedAt: number | null; validatedAt: number | null; reviewStartedAt: number | null; reviewApprovedAt: number | null; commitStartedAt: number | null; revertedAt: number | null; recordCounts: string; checksum: string | null; actorId: string; failureDetails: string | null; archiveStorageId: string | null; archiveChecksum: string | null; archiveWorkbookCount: number | null; indexWorkbookCount: number | null; discrepancyExplained: boolean | null; discrepancyNote: string | null; dispositionCounts: string | null; unaccountedRecordCount: number | null; commitCheckpoint: string | null; indexNameMismatch: boolean | null; createdAt: number; updatedAt: number };
+export type ImportRunStartResult = { docId: string };
 
 /**
  * Build command input for ImportRun.start.
@@ -80671,14 +81816,14 @@ export const IntegrationConnectionDisconnectCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["reason"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Managers may see outside-service connections"},{"kind":"policy_denial","message":"Admins may update outside-service connections"},{"kind":"policy_denial","message":"Admins may change outside-service connections"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"IntegrationConnection not found"}],
   emits: ["IntegrationConnectionRevoked"],
 } as const;
 
-export type IntegrationConnectionDisconnectResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; createdAt: number; updatedAt: number };
+export type IntegrationConnectionDisconnectResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for IntegrationConnection.disconnect.
@@ -80778,14 +81923,14 @@ export const IntegrationConnectionMarkConnectedCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["externalAccountId","displayName","scopes","chargesEnabled","payoutsEnabled"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Managers may see outside-service connections"},{"kind":"policy_denial","message":"Admins may update outside-service connections"},{"kind":"policy_denial","message":"Admins may change outside-service connections"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"IntegrationConnection not found"}],
   emits: ["IntegrationConnectionEstablished"],
 } as const;
 
-export type IntegrationConnectionMarkConnectedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; createdAt: number; updatedAt: number };
+export type IntegrationConnectionMarkConnectedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for IntegrationConnection.markConnected.
@@ -80884,6 +82029,64 @@ export const IntegrationConnectionMarkConnectedLifecycle = [
   }
 ] as const;
 
+// --- IntegrationConnection.markLedgerImported ---
+export type IntegrationConnectionMarkLedgerImportedClientInput = Record<string, never>;
+
+export const IntegrationConnectionMarkLedgerImportedCapability = {
+  capabilityId: "IntegrationConnection.markLedgerImported",
+  entity: "IntegrationConnection",
+  command: "markLedgerImported",
+  route: "/api/manifest/IntegrationConnection/commands/markLedgerImported",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see outside-service connections"},{"kind":"policy_denial","message":"Admins may update outside-service connections"},{"kind":"policy_denial","message":"Admins may change outside-service connections"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"IntegrationConnection not found"}],
+  emits: ["IntegrationLedgerImported"],
+} as const;
+
+export type IntegrationConnectionMarkLedgerImportedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for IntegrationConnection.markLedgerImported.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindIntegrationConnectionMarkLedgerImportedInput(client: IntegrationConnectionMarkLedgerImportedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful IntegrationConnection.markLedgerImported. */
+export const IntegrationConnectionMarkLedgerImportedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "IntegrationConnection",
+    "queryKeyHint": "queryKeys.integrationConnection.lists()",
+    "readId": "IntegrationConnection.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IntegrationConnection",
+    "queryKeyHint": "queryKeys.integrationConnection.detail(id)",
+    "readId": "IntegrationConnection.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer IntegrationConnection.markLedgerImported. Not a rendered control. */
+export const IntegrationConnectionMarkLedgerImportedAction = {
+  "exposure": "human",
+  "label": "Mark ledger imported",
+  "confirm": false,
+  "fields": []
+} as const;
+
 // --- IntegrationConnection.reauthorize ---
 export type IntegrationConnectionReauthorizeClientInput = Record<string, never>;
 
@@ -80899,14 +82102,14 @@ export const IntegrationConnectionReauthorizeCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Managers may see outside-service connections"},{"kind":"policy_denial","message":"Admins may update outside-service connections"},{"kind":"policy_denial","message":"Admins may change outside-service connections"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"IntegrationConnection not found"}],
   emits: ["IntegrationConnectionReauthorized"],
 } as const;
 
-export type IntegrationConnectionReauthorizeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; createdAt: number; updatedAt: number };
+export type IntegrationConnectionReauthorizeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for IntegrationConnection.reauthorize.
@@ -80996,14 +82199,14 @@ export const IntegrationConnectionRecordFailureCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["reason"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Managers may see outside-service connections"},{"kind":"policy_denial","message":"Admins may update outside-service connections"},{"kind":"policy_denial","message":"Admins may change outside-service connections"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Say why the connection failed."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"IntegrationConnection not found"}],
   emits: ["IntegrationConnectionFailed"],
 } as const;
 
-export type IntegrationConnectionRecordFailureResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; createdAt: number; updatedAt: number };
+export type IntegrationConnectionRecordFailureResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for IntegrationConnection.recordFailure.
@@ -81082,6 +82285,224 @@ export const IntegrationConnectionRecordFailureLifecycle = [
   }
 ] as const;
 
+// --- IntegrationConnection.recordOAuthGrant ---
+export interface IntegrationConnectionRecordOAuthGrantClientInput {
+  engagementId: string;
+  externalAccountId: string;
+  refreshToken: string;
+  connectedById: string;
+  /** Must not be "". */
+  grantedAt: string & { readonly __nonEmpty?: true };
+}
+
+export const IntegrationConnectionRecordOAuthGrantCapability = {
+  capabilityId: "IntegrationConnection.recordOAuthGrant",
+  entity: "IntegrationConnection",
+  command: "recordOAuthGrant",
+  route: "/api/manifest/IntegrationConnection/commands/recordOAuthGrant",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: ["grantedAt"],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["engagementId","externalAccountId","refreshToken","connectedById","grantedAt"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see outside-service connections"},{"kind":"policy_denial","message":"Admins may update outside-service connections"},{"kind":"policy_denial","message":"Admins may change outside-service connections"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"The connection needs an id."},{"kind":"constraint_block","message":"The provider did not return a refresh token."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"IntegrationConnection not found"}],
+  emits: ["IntegrationConnectionGranted"],
+} as const;
+
+export type IntegrationConnectionRecordOAuthGrantResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for IntegrationConnection.recordOAuthGrant.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindIntegrationConnectionRecordOAuthGrantInput(client: IntegrationConnectionRecordOAuthGrantClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful IntegrationConnection.recordOAuthGrant. */
+export const IntegrationConnectionRecordOAuthGrantInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "IntegrationConnection",
+    "queryKeyHint": "queryKeys.integrationConnection.lists()",
+    "readId": "IntegrationConnection.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IntegrationConnection",
+    "queryKeyHint": "queryKeys.integrationConnection.detail(id)",
+    "readId": "IntegrationConnection.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer IntegrationConnection.recordOAuthGrant. Not a rendered control. */
+export const IntegrationConnectionRecordOAuthGrantAction = {
+  "exposure": "human",
+  "label": "Record o auth grant",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "engagementId",
+      "label": "Engagement id",
+      "required": true
+    },
+    {
+      "name": "externalAccountId",
+      "label": "External account id",
+      "required": true
+    },
+    {
+      "name": "refreshToken",
+      "label": "Refresh token",
+      "required": true
+    },
+    {
+      "name": "connectedById",
+      "label": "Connected by id",
+      "required": true
+    },
+    {
+      "name": "grantedAt",
+      "label": "Granted at",
+      "required": true
+    }
+  ],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "connected",
+      "disconnected",
+      "error",
+      "pending"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for IntegrationConnection.recordOAuthGrant. */
+export const IntegrationConnectionRecordOAuthGrantLifecycle = [
+  {
+    "property": "status",
+    "from": "disconnected",
+    "to": "connected",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "pending",
+    "to": "connected",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "connected",
+    "to": "connected",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "error",
+    "to": "connected",
+    "proven": true
+  }
+] as const;
+
+// --- IntegrationConnection.recordReconciliation ---
+export interface IntegrationConnectionRecordReconciliationClientInput {
+  engagementId: string;
+  outcome: string;
+  failedCount: number;
+  summary: string;
+  error?: string;
+}
+
+export const IntegrationConnectionRecordReconciliationCapability = {
+  capabilityId: "IntegrationConnection.recordReconciliation",
+  entity: "IntegrationConnection",
+  command: "recordReconciliation",
+  route: "/api/manifest/IntegrationConnection/commands/recordReconciliation",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["engagementId","outcome","failedCount","summary","error"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see outside-service connections"},{"kind":"policy_denial","message":"Admins may update outside-service connections"},{"kind":"policy_denial","message":"Admins may change outside-service connections"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"IntegrationConnection not found"}],
+  emits: ["IntegrationConnectionReconciled"],
+} as const;
+
+export type IntegrationConnectionRecordReconciliationResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for IntegrationConnection.recordReconciliation.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindIntegrationConnectionRecordReconciliationInput(client: IntegrationConnectionRecordReconciliationClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful IntegrationConnection.recordReconciliation. */
+export const IntegrationConnectionRecordReconciliationInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "IntegrationConnection",
+    "queryKeyHint": "queryKeys.integrationConnection.lists()",
+    "readId": "IntegrationConnection.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IntegrationConnection",
+    "queryKeyHint": "queryKeys.integrationConnection.detail(id)",
+    "readId": "IntegrationConnection.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer IntegrationConnection.recordReconciliation. Not a rendered control. */
+export const IntegrationConnectionRecordReconciliationAction = {
+  "exposure": "human",
+  "label": "Record reconciliation",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "engagementId",
+      "label": "Engagement id",
+      "required": true
+    },
+    {
+      "name": "outcome",
+      "label": "Outcome",
+      "required": true
+    },
+    {
+      "name": "failedCount",
+      "label": "Failed count",
+      "required": true
+    },
+    {
+      "name": "summary",
+      "label": "Summary",
+      "required": true
+    },
+    {
+      "name": "error",
+      "label": "Error",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- IntegrationConnection.recordSyncSuccess ---
 export type IntegrationConnectionRecordSyncSuccessClientInput = Record<string, never>;
 
@@ -81097,14 +82518,14 @@ export const IntegrationConnectionRecordSyncSuccessCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Managers may see outside-service connections"},{"kind":"policy_denial","message":"Admins may update outside-service connections"},{"kind":"policy_denial","message":"Admins may change outside-service connections"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"IntegrationConnection not found"}],
   emits: ["IntegrationConnectionSynced"],
 } as const;
 
-export type IntegrationConnectionRecordSyncSuccessResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; createdAt: number; updatedAt: number };
+export type IntegrationConnectionRecordSyncSuccessResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for IntegrationConnection.recordSyncSuccess.
@@ -81176,6 +82597,367 @@ export const IntegrationConnectionRecordSyncSuccessLifecycle = [
     "proven": true
   }
 ] as const;
+
+// --- IntegrationConnection.rotateOAuthCredential ---
+export interface IntegrationConnectionRotateOAuthCredentialClientInput {
+  engagementId: string;
+  refreshToken: string;
+}
+
+export const IntegrationConnectionRotateOAuthCredentialCapability = {
+  capabilityId: "IntegrationConnection.rotateOAuthCredential",
+  entity: "IntegrationConnection",
+  command: "rotateOAuthCredential",
+  route: "/api/manifest/IntegrationConnection/commands/rotateOAuthCredential",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["engagementId","refreshToken"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see outside-service connections"},{"kind":"policy_denial","message":"Admins may update outside-service connections"},{"kind":"policy_denial","message":"Admins may change outside-service connections"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"The provider did not return a refresh token."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"IntegrationConnection not found"}],
+  emits: ["IntegrationCredentialRotated"],
+} as const;
+
+export type IntegrationConnectionRotateOAuthCredentialResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for IntegrationConnection.rotateOAuthCredential.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindIntegrationConnectionRotateOAuthCredentialInput(client: IntegrationConnectionRotateOAuthCredentialClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful IntegrationConnection.rotateOAuthCredential. */
+export const IntegrationConnectionRotateOAuthCredentialInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "IntegrationConnection",
+    "queryKeyHint": "queryKeys.integrationConnection.lists()",
+    "readId": "IntegrationConnection.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IntegrationConnection",
+    "queryKeyHint": "queryKeys.integrationConnection.detail(id)",
+    "readId": "IntegrationConnection.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer IntegrationConnection.rotateOAuthCredential. Not a rendered control. */
+export const IntegrationConnectionRotateOAuthCredentialAction = {
+  "exposure": "human",
+  "label": "Rotate o auth credential",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "engagementId",
+      "label": "Engagement id",
+      "required": true
+    },
+    {
+      "name": "refreshToken",
+      "label": "Refresh token",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- IntegrationSyncRecord.recordOutcome ---
+export interface IntegrationSyncRecordRecordOutcomeClientInput {
+  externalId?: string;
+  engagementId?: string;
+  /** Allowed: "synced" | "deleted" | "failed" | "linked" */
+  status: "synced" | "deleted" | "failed" | "linked";
+  contentSignature?: string;
+  /** Must not be "". */
+  syncedAt: string & { readonly __nonEmpty?: true };
+  error?: string;
+}
+
+export const IntegrationSyncRecordRecordOutcomeCapability = {
+  capabilityId: "IntegrationSyncRecord.recordOutcome",
+  entity: "IntegrationSyncRecord",
+  command: "recordOutcome",
+  route: "/api/manifest/IntegrationSyncRecord/commands/recordOutcome",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: ["syncedAt"],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; syncKey: string | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; recordType: string; sourceId: string; externalId: string | null; engagementId: string | null; status: \"synced\" | \"deleted\" | \"failed\" | \"linked\"; contentSignature: string | null; lastSyncedAt: number | null; lastError: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["externalId","engagementId","status","contentSignature","syncedAt","error"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see what outside services hold"},{"kind":"policy_denial","message":"Admins may update outside-service sync records"},{"kind":"policy_denial","message":"Admins may change outside-service sync records"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"IntegrationSyncRecord not found"}],
+  emits: ["IntegrationRecordSynced"],
+} as const;
+
+export type IntegrationSyncRecordRecordOutcomeResult = { _id: string; _creationTime: number; tenantId: string; syncKey: string | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; recordType: string; sourceId: string; externalId: string | null; engagementId: string | null; status: "synced" | "deleted" | "failed" | "linked"; contentSignature: string | null; lastSyncedAt: number | null; lastError: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for IntegrationSyncRecord.recordOutcome.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindIntegrationSyncRecordRecordOutcomeInput(client: IntegrationSyncRecordRecordOutcomeClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful IntegrationSyncRecord.recordOutcome. */
+export const IntegrationSyncRecordRecordOutcomeInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "IntegrationSyncRecord",
+    "queryKeyHint": "queryKeys.integrationSyncRecord.lists()",
+    "readId": "IntegrationSyncRecord.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IntegrationSyncRecord",
+    "queryKeyHint": "queryKeys.integrationSyncRecord.detail(id)",
+    "readId": "IntegrationSyncRecord.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer IntegrationSyncRecord.recordOutcome. Not a rendered control. */
+export const IntegrationSyncRecordRecordOutcomeAction = {
+  "exposure": "human",
+  "label": "Record outcome",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "externalId",
+      "label": "External id",
+      "required": false
+    },
+    {
+      "name": "engagementId",
+      "label": "Engagement id",
+      "required": false
+    },
+    {
+      "name": "status",
+      "label": "Status",
+      "required": true,
+      "choices": [
+        {
+          "value": "synced",
+          "label": "synced"
+        },
+        {
+          "value": "deleted",
+          "label": "deleted"
+        },
+        {
+          "value": "failed",
+          "label": "failed"
+        },
+        {
+          "value": "linked",
+          "label": "linked"
+        }
+      ]
+    },
+    {
+      "name": "contentSignature",
+      "label": "Content signature",
+      "required": false
+    },
+    {
+      "name": "syncedAt",
+      "label": "Synced at",
+      "required": true
+    },
+    {
+      "name": "error",
+      "label": "Error",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- IntegrationSyncRecord.track ---
+export interface IntegrationSyncRecordTrackClientInput {
+  /** Allowed: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok" */
+  provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok";
+  recordType: string;
+  sourceId: string;
+  externalId?: string;
+  engagementId?: string;
+  /** Allowed: "synced" | "deleted" | "failed" | "linked" */
+  status: "synced" | "deleted" | "failed" | "linked";
+  contentSignature?: string;
+  /** Must not be "". */
+  syncedAt: string & { readonly __nonEmpty?: true };
+  error?: string;
+}
+
+export const IntegrationSyncRecordTrackCapability = {
+  capabilityId: "IntegrationSyncRecord.track",
+  entity: "IntegrationSyncRecord",
+  command: "track",
+  route: "/api/manifest/IntegrationSyncRecord/commands/track",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: ["syncedAt"],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["provider","recordType","sourceId","externalId","engagementId","status","contentSignature","syncedAt","error"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see what outside services hold"},{"kind":"policy_denial","message":"Admins may update outside-service sync records"},{"kind":"policy_denial","message":"Admins may change outside-service sync records"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"A sync record needs the Capsule record it describes."},{"kind":"constraint_block","message":"A sync record needs a record type."}],
+  emits: ["IntegrationRecordSynced"],
+} as const;
+
+export type IntegrationSyncRecordTrackResult = { docId: string };
+
+/**
+ * Build command input for IntegrationSyncRecord.track.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindIntegrationSyncRecordTrackInput(client: IntegrationSyncRecordTrackClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful IntegrationSyncRecord.track. */
+export const IntegrationSyncRecordTrackInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "IntegrationSyncRecord",
+    "queryKeyHint": "queryKeys.integrationSyncRecord.lists()",
+    "readId": "IntegrationSyncRecord.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IntegrationSyncRecord",
+    "queryKeyHint": "queryKeys.integrationSyncRecord.detail(id)",
+    "readId": "IntegrationSyncRecord.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer IntegrationSyncRecord.track. Not a rendered control. */
+export const IntegrationSyncRecordTrackAction = {
+  "exposure": "human",
+  "label": "Track",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "provider",
+      "label": "Provider",
+      "required": true,
+      "choices": [
+        {
+          "value": "stripe",
+          "label": "stripe"
+        },
+        {
+          "value": "quickbooks",
+          "label": "quickbooks"
+        },
+        {
+          "value": "google_calendar",
+          "label": "google_calendar"
+        },
+        {
+          "value": "email",
+          "label": "email"
+        },
+        {
+          "value": "sms",
+          "label": "sms"
+        },
+        {
+          "value": "nowsta",
+          "label": "nowsta"
+        },
+        {
+          "value": "instagram",
+          "label": "instagram"
+        },
+        {
+          "value": "facebook",
+          "label": "facebook"
+        },
+        {
+          "value": "tiktok",
+          "label": "tiktok"
+        }
+      ]
+    },
+    {
+      "name": "recordType",
+      "label": "Record type",
+      "required": true
+    },
+    {
+      "name": "sourceId",
+      "label": "Source id",
+      "required": true
+    },
+    {
+      "name": "externalId",
+      "label": "External id",
+      "required": false
+    },
+    {
+      "name": "engagementId",
+      "label": "Engagement id",
+      "required": false
+    },
+    {
+      "name": "status",
+      "label": "Status",
+      "required": true,
+      "choices": [
+        {
+          "value": "synced",
+          "label": "synced"
+        },
+        {
+          "value": "deleted",
+          "label": "deleted"
+        },
+        {
+          "value": "failed",
+          "label": "failed"
+        },
+        {
+          "value": "linked",
+          "label": "linked"
+        }
+      ]
+    },
+    {
+      "name": "contentSignature",
+      "label": "Content signature",
+      "required": false
+    },
+    {
+      "name": "syncedAt",
+      "label": "Synced at",
+      "required": true
+    },
+    {
+      "name": "error",
+      "label": "Error",
+      "required": false
+    }
+  ]
+} as const;
 
 // --- Interview.recordOutcome ---
 export interface InterviewRecordOutcomeClientInput {
@@ -94346,6 +96128,391 @@ export const OrganizationCapabilitySettingSetEnabledAction = {
     }
   ]
 } as const;
+
+// --- OutboundWebhookDelivery.record ---
+export interface OutboundWebhookDeliveryRecordClientInput {
+  newAttemptId: string;
+  endpointKey: string;
+  sourceEventId: string;
+  eventType: string;
+  /** Allowed: "succeeded" | "failed" */
+  status: "succeeded" | "failed";
+  /** Bounds: 1..∞ */
+  attempt: number;
+  httpStatus?: number;
+  error?: string;
+  /** Must not be "". */
+  occurredAt: string & { readonly __nonEmpty?: true };
+  /** Must not be "". */
+  deliveredAt: string & { readonly __nonEmpty?: true };
+}
+
+export const OutboundWebhookDeliveryRecordCapability = {
+  capabilityId: "OutboundWebhookDelivery.record",
+  entity: "OutboundWebhookDelivery",
+  command: "record",
+  route: "/api/manifest/OutboundWebhookDelivery/commands/record",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: ["occurredAt","deliveredAt"],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["newAttemptId","endpointKey","sourceEventId","eventType","status","attempt","httpStatus","error","occurredAt","deliveredAt"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see webhook deliveries"},{"kind":"policy_denial","message":"Managers may update webhook deliveries"},{"kind":"policy_denial","message":"Managers may change webhook deliveries"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"A delivery attempt is numbered from 1."}],
+  emits: ["WebhookDeliveryAttempted"],
+} as const;
+
+export type OutboundWebhookDeliveryRecordResult = { docId: string };
+
+/**
+ * Build command input for OutboundWebhookDelivery.record.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindOutboundWebhookDeliveryRecordInput(client: OutboundWebhookDeliveryRecordClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful OutboundWebhookDelivery.record. */
+export const OutboundWebhookDeliveryRecordInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "OutboundWebhookDelivery",
+    "queryKeyHint": "queryKeys.outboundWebhookDelivery.lists()",
+    "readId": "OutboundWebhookDelivery.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OutboundWebhookDelivery",
+    "queryKeyHint": "queryKeys.outboundWebhookDelivery.detail(id)",
+    "readId": "OutboundWebhookDelivery.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer OutboundWebhookDelivery.record. Not a rendered control. */
+export const OutboundWebhookDeliveryRecordAction = {
+  "exposure": "human",
+  "label": "Record",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "newAttemptId",
+      "label": "New attempt id",
+      "required": true
+    },
+    {
+      "name": "endpointKey",
+      "label": "Endpoint key",
+      "required": true
+    },
+    {
+      "name": "sourceEventId",
+      "label": "Source event id",
+      "required": true
+    },
+    {
+      "name": "eventType",
+      "label": "Event type",
+      "required": true
+    },
+    {
+      "name": "status",
+      "label": "Status",
+      "required": true,
+      "choices": [
+        {
+          "value": "succeeded",
+          "label": "succeeded"
+        },
+        {
+          "value": "failed",
+          "label": "failed"
+        }
+      ]
+    },
+    {
+      "name": "attempt",
+      "label": "Attempt",
+      "required": true
+    },
+    {
+      "name": "httpStatus",
+      "label": "Http status",
+      "required": false
+    },
+    {
+      "name": "error",
+      "label": "Error",
+      "required": false
+    },
+    {
+      "name": "occurredAt",
+      "label": "Occurred at",
+      "required": true
+    },
+    {
+      "name": "deliveredAt",
+      "label": "Delivered at",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- OutboundWebhookEndpoint.recordDelivered ---
+export interface OutboundWebhookEndpointRecordDeliveredClientInput {
+  /** Must not be "". */
+  occurredAt: string & { readonly __nonEmpty?: true };
+}
+
+export const OutboundWebhookEndpointRecordDeliveredCapability = {
+  capabilityId: "OutboundWebhookEndpoint.recordDelivered",
+  entity: "OutboundWebhookEndpoint",
+  command: "recordDelivered",
+  route: "/api/manifest/OutboundWebhookEndpoint/commands/recordDelivered",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: ["occurredAt"],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; endpointKey: string | null; url: string; label: string; events: string[]; hasSigningSecret: boolean; status: \"active\" | \"removed\"; registeredAt: number | null; registeredById: string | null; removedAt: number | null; deliveredThrough: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["occurredAt"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see outbound webhooks"},{"kind":"policy_denial","message":"Managers may update outbound webhooks"},{"kind":"policy_denial","message":"Managers may change outbound webhooks"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"OutboundWebhookEndpoint not found"}],
+  emits: [],
+} as const;
+
+export type OutboundWebhookEndpointRecordDeliveredResult = { _id: string; _creationTime: number; tenantId: string; endpointKey: string | null; url: string; label: string; events: string[]; hasSigningSecret: boolean; status: "active" | "removed"; registeredAt: number | null; registeredById: string | null; removedAt: number | null; deliveredThrough: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for OutboundWebhookEndpoint.recordDelivered.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindOutboundWebhookEndpointRecordDeliveredInput(client: OutboundWebhookEndpointRecordDeliveredClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful OutboundWebhookEndpoint.recordDelivered. */
+export const OutboundWebhookEndpointRecordDeliveredInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "OutboundWebhookEndpoint",
+    "queryKeyHint": "queryKeys.outboundWebhookEndpoint.lists()",
+    "readId": "OutboundWebhookEndpoint.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OutboundWebhookEndpoint",
+    "queryKeyHint": "queryKeys.outboundWebhookEndpoint.detail(id)",
+    "readId": "OutboundWebhookEndpoint.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer OutboundWebhookEndpoint.recordDelivered. Not a rendered control. */
+export const OutboundWebhookEndpointRecordDeliveredAction = {
+  "exposure": "human",
+  "label": "Record delivered",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "occurredAt",
+      "label": "Occurred at",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- OutboundWebhookEndpoint.register ---
+export interface OutboundWebhookEndpointRegisterClientInput {
+  newEndpointKey: string;
+  url: string;
+  label: string;
+  /** Non-empty string required (static). */
+  events: string[];
+  signingSecret?: string;
+  registeredById: string;
+  /** Must not be "". */
+  registeredAt: string & { readonly __nonEmpty?: true };
+  deliveredThrough?: string;
+}
+
+export const OutboundWebhookEndpointRegisterCapability = {
+  capabilityId: "OutboundWebhookEndpoint.register",
+  entity: "OutboundWebhookEndpoint",
+  command: "register",
+  route: "/api/manifest/OutboundWebhookEndpoint/commands/register",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: ["registeredAt","deliveredThrough"],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["newEndpointKey","url","label","events","signingSecret","registeredById","registeredAt","deliveredThrough"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see outbound webhooks"},{"kind":"policy_denial","message":"Managers may update outbound webhooks"},{"kind":"policy_denial","message":"Managers may change outbound webhooks"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"A webhook endpoint needs an id."},{"kind":"constraint_block","message":"Webhook URLs must use https (use a localhost URL for local testing)."},{"kind":"constraint_block","message":"Webhook URL is too long."},{"kind":"constraint_block","message":"Select at least one event to subscribe to."}],
+  emits: ["WebhookEndpointRegistered"],
+} as const;
+
+export type OutboundWebhookEndpointRegisterResult = { docId: string };
+
+/**
+ * Build command input for OutboundWebhookEndpoint.register.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindOutboundWebhookEndpointRegisterInput(client: OutboundWebhookEndpointRegisterClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful OutboundWebhookEndpoint.register. */
+export const OutboundWebhookEndpointRegisterInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "OutboundWebhookEndpoint",
+    "queryKeyHint": "queryKeys.outboundWebhookEndpoint.lists()",
+    "readId": "OutboundWebhookEndpoint.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OutboundWebhookEndpoint",
+    "queryKeyHint": "queryKeys.outboundWebhookEndpoint.detail(id)",
+    "readId": "OutboundWebhookEndpoint.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer OutboundWebhookEndpoint.register. Not a rendered control. */
+export const OutboundWebhookEndpointRegisterAction = {
+  "exposure": "human",
+  "label": "Register",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "newEndpointKey",
+      "label": "New endpoint key",
+      "required": true
+    },
+    {
+      "name": "url",
+      "label": "Url",
+      "required": true
+    },
+    {
+      "name": "label",
+      "label": "Label",
+      "required": true
+    },
+    {
+      "name": "events",
+      "label": "Events",
+      "required": true
+    },
+    {
+      "name": "signingSecret",
+      "label": "Signing secret",
+      "required": false
+    },
+    {
+      "name": "registeredById",
+      "label": "Registered by id",
+      "required": true
+    },
+    {
+      "name": "registeredAt",
+      "label": "Registered at",
+      "required": true
+    },
+    {
+      "name": "deliveredThrough",
+      "label": "Delivered through",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- OutboundWebhookEndpoint.remove ---
+export type OutboundWebhookEndpointRemoveClientInput = Record<string, never>;
+
+export const OutboundWebhookEndpointRemoveCapability = {
+  capabilityId: "OutboundWebhookEndpoint.remove",
+  entity: "OutboundWebhookEndpoint",
+  command: "remove",
+  route: "/api/manifest/OutboundWebhookEndpoint/commands/remove",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; endpointKey: string | null; url: string; label: string; events: string[]; hasSigningSecret: boolean; status: \"active\" | \"removed\"; registeredAt: number | null; registeredById: string | null; removedAt: number | null; deliveredThrough: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see outbound webhooks"},{"kind":"policy_denial","message":"Managers may update outbound webhooks"},{"kind":"policy_denial","message":"Managers may change outbound webhooks"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"OutboundWebhookEndpoint not found"}],
+  emits: ["WebhookEndpointRemoved"],
+} as const;
+
+export type OutboundWebhookEndpointRemoveResult = { _id: string; _creationTime: number; tenantId: string; endpointKey: string | null; url: string; label: string; events: string[]; hasSigningSecret: boolean; status: "active" | "removed"; registeredAt: number | null; registeredById: string | null; removedAt: number | null; deliveredThrough: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for OutboundWebhookEndpoint.remove.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindOutboundWebhookEndpointRemoveInput(client: OutboundWebhookEndpointRemoveClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful OutboundWebhookEndpoint.remove. */
+export const OutboundWebhookEndpointRemoveInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "OutboundWebhookEndpoint",
+    "queryKeyHint": "queryKeys.outboundWebhookEndpoint.lists()",
+    "readId": "OutboundWebhookEndpoint.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OutboundWebhookEndpoint",
+    "queryKeyHint": "queryKeys.outboundWebhookEndpoint.detail(id)",
+    "readId": "OutboundWebhookEndpoint.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer OutboundWebhookEndpoint.remove. Not a rendered control. */
+export const OutboundWebhookEndpointRemoveAction = {
+  "exposure": "human",
+  "label": "Remove",
+  "confirm": false,
+  "fields": [],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "active"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for OutboundWebhookEndpoint.remove. */
+export const OutboundWebhookEndpointRemoveLifecycle = [
+  {
+    "property": "status",
+    "from": "active",
+    "to": "removed",
+    "proven": true
+  }
+] as const;
 
 // --- PackList.acknowledgePackingRequirement ---
 export interface PackListAcknowledgePackingRequirementClientInput {
@@ -156822,10 +158989,15 @@ export const ALL_CAPABILITY_IDS = [
   "EventVehicleAssignment.markPreloaded",
   "EventVehicleAssignment.release",
   "ExternalRecordLink.decide",
+  "ExternalRecordLink.decideReclassification",
   "ExternalRecordLink.discard",
   "ExternalRecordLink.link",
   "ExternalRecordLink.observe",
   "ExternalRecordLink.recordApplied",
+  "ExternalRecordLink.recordReclassified",
+  "ExternalRecordLink.recordReclassifyFailure",
+  "ExternalRecordLink.refreshSuggestion",
+  "ExternalRecordLink.relink",
   "ExternalRecordLink.resolveConflict",
   "ExternalRecordLink.retire",
   "ExternalRecordLink.unlinkExternalRecord",
@@ -156887,9 +159059,15 @@ export const ALL_CAPABILITY_IDS = [
   "IntegrationConnection.authorize",
   "IntegrationConnection.disconnect",
   "IntegrationConnection.markConnected",
+  "IntegrationConnection.markLedgerImported",
   "IntegrationConnection.reauthorize",
   "IntegrationConnection.recordFailure",
+  "IntegrationConnection.recordOAuthGrant",
+  "IntegrationConnection.recordReconciliation",
   "IntegrationConnection.recordSyncSuccess",
+  "IntegrationConnection.rotateOAuthCredential",
+  "IntegrationSyncRecord.recordOutcome",
+  "IntegrationSyncRecord.track",
   "Interview.recordOutcome",
   "Interview.refreshFromSource",
   "Interview.schedule",
@@ -156979,6 +159157,10 @@ export const ALL_CAPABILITY_IDS = [
   "Organization.suspend",
   "OrganizationCapabilitySetting.register",
   "OrganizationCapabilitySetting.setEnabled",
+  "OutboundWebhookDelivery.record",
+  "OutboundWebhookEndpoint.recordDelivered",
+  "OutboundWebhookEndpoint.register",
+  "OutboundWebhookEndpoint.remove",
   "PackList.acknowledgePackingRequirement",
   "PackList.applyServiceStyleKit",
   "PackList.cancel",
@@ -157700,6 +159882,10 @@ export const ALL_READ_IDS = [
   "IntegrationConnection.byTenantId",
   "IntegrationConnection.get",
   "IntegrationConnection.list",
+  "IntegrationSyncRecord.bySyncKey",
+  "IntegrationSyncRecord.byTenantId",
+  "IntegrationSyncRecord.get",
+  "IntegrationSyncRecord.list",
   "Interview.byCandidateId",
   "Interview.byInterviewerPersonId",
   "Interview.byTenantId",
@@ -157812,6 +159998,14 @@ export const ALL_READ_IDS = [
   "OrganizationCapabilitySetting.byTenantId",
   "OrganizationCapabilitySetting.get",
   "OrganizationCapabilitySetting.list",
+  "OutboundWebhookDelivery.byDeliveryKey",
+  "OutboundWebhookDelivery.byTenantId",
+  "OutboundWebhookDelivery.get",
+  "OutboundWebhookDelivery.list",
+  "OutboundWebhookEndpoint.byEndpointKey",
+  "OutboundWebhookEndpoint.byTenantId",
+  "OutboundWebhookEndpoint.get",
+  "OutboundWebhookEndpoint.list",
   "PackList.byEventId",
   "PackList.byTenantId",
   "PackList.get",
@@ -158213,6 +160407,9 @@ export const ALL_READ_IDS = [
   "WasteRecord.byTenantId",
   "WasteRecord.get",
   "WasteRecord.list",
+  "WebhookDispatchState.byTenantId",
+  "WebhookDispatchState.get",
+  "WebhookDispatchState.list",
   "WeeklyPurchasingConfig.byDefaultVendorId",
   "WeeklyPurchasingConfig.byTenantId",
   "WeeklyPurchasingConfig.get",
@@ -159144,17 +161341,17 @@ export type getExternalRecordLinkResult = { _id: string; _creationTime: number; 
 export const listExternalRecordLinkRead = {"entity":"ExternalRecordLink","readId":"ExternalRecordLink.list","exportName":"listExternalRecordLink","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: \"tpp_legacy\" | \"csv_export\" | \"api_sync\" | \"quickbooks_online\" | \"google_calendar\" | \"stripe\" | \"other\"; recordType: string; externalId: string; capsuleEntity: \"event_record\" | \"contact\" | \"lead\" | \"menu\" | \"venue\" | \"payment\" | \"invoice\" | \"contract\" | \"proposal\" | \"client\" | \"vendor\" | \"person\" | \"task\" | \"batch\" | \"order\" | \"delivery\" | \"stock\" | \"location\" | \"pack_list\" | \"ingredient\" | \"component\" | \"component_portion_spec\" | \"component_ingredient\" | \"component_component\" | \"dish\" | \"dish_ingredient\" | \"dish_component\" | \"dish_task\" | \"dish_container\" | \"station\" | \"unit\" | \"event_dish\" | \"prep_task\"; capsuleId: string; sourceAccount: string | null; role: string | null; ordinal: number | null; linkKey: string | null; decision: \"suggested\" | \"approved\" | \"rejected\" | null; suggestedBy: string | null; decidedByUserId: string | null; decidedAt: number | null; appliedValues: string | null; appliedSourceVersion: string | null; appliedAt: number | null; appliedImportRunId: string | null; sourceVersion: string | null; lastSeenAt: number | null; lastSeenImportRunId: string | null; verified: boolean; lastVerifiedAt: number | null; verifiedByUserId: string | null; sourceImportRunId: string | null; effectiveStartDate: number | null; effectiveEndDate: number | null; rawSourceData: string | null; metadata: string | null; conflictStatus: \"resolved\" | \"pending_conflict\" | \"superseded\"; resolvedByUserId: string | null; resolutionNote: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listExternalRecordLinkResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: "tpp_legacy" | "csv_export" | "api_sync" | "quickbooks_online" | "google_calendar" | "stripe" | "other"; recordType: string; externalId: string; capsuleEntity: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task"; capsuleId: string; sourceAccount: string | null; role: string | null; ordinal: number | null; linkKey: string | null; decision: "suggested" | "approved" | "rejected" | null; suggestedBy: string | null; decidedByUserId: string | null; decidedAt: number | null; appliedValues: string | null; appliedSourceVersion: string | null; appliedAt: number | null; appliedImportRunId: string | null; sourceVersion: string | null; lastSeenAt: number | null; lastSeenImportRunId: string | null; verified: boolean; lastVerifiedAt: number | null; verifiedByUserId: string | null; sourceImportRunId: string | null; effectiveStartDate: number | null; effectiveEndDate: number | null; rawSourceData: string | null; metadata: string | null; conflictStatus: "resolved" | "pending_conflict" | "superseded"; resolvedByUserId: string | null; resolutionNote: string | null; createdAt: number; updatedAt: number }>;
 
-export const listImportArtifactByImportRunIdRead = {"entity":"ImportArtifact","readId":"ImportArtifact.byImportRunId","exportName":"listImportArtifactByImportRunId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"importRunId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: \"pending\" | \"normalized\" | \"linked_reference\" | \"duplicate_view\" | \"needs_mapping\" | \"unsupported\" | \"invalid\"; parseStatus: \"pending\" | \"parsed\" | \"failed\"; totalRowCount: number; rowOutcomeCounts: string; createdAt: number; updatedAt: number }>"} as const;
-export type listImportArtifactByImportRunIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: "pending" | "normalized" | "linked_reference" | "duplicate_view" | "needs_mapping" | "unsupported" | "invalid"; parseStatus: "pending" | "parsed" | "failed"; totalRowCount: number; rowOutcomeCounts: string; createdAt: number; updatedAt: number }>;
+export const listImportArtifactByImportRunIdRead = {"entity":"ImportArtifact","readId":"ImportArtifact.byImportRunId","exportName":"listImportArtifactByImportRunId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"importRunId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: \"pending\" | \"normalized\" | \"linked_reference\" | \"duplicate_view\" | \"needs_mapping\" | \"unsupported\" | \"invalid\"; parseStatus: \"pending\" | \"parsed\" | \"failed\"; totalRowCount: number; rowOutcomeCounts: string; registeredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listImportArtifactByImportRunIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: "pending" | "normalized" | "linked_reference" | "duplicate_view" | "needs_mapping" | "unsupported" | "invalid"; parseStatus: "pending" | "parsed" | "failed"; totalRowCount: number; rowOutcomeCounts: string; registeredAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listImportArtifactByTenantIdRead = {"entity":"ImportArtifact","readId":"ImportArtifact.byTenantId","exportName":"listImportArtifactByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: \"pending\" | \"normalized\" | \"linked_reference\" | \"duplicate_view\" | \"needs_mapping\" | \"unsupported\" | \"invalid\"; parseStatus: \"pending\" | \"parsed\" | \"failed\"; totalRowCount: number; rowOutcomeCounts: string; createdAt: number; updatedAt: number }>"} as const;
-export type listImportArtifactByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: "pending" | "normalized" | "linked_reference" | "duplicate_view" | "needs_mapping" | "unsupported" | "invalid"; parseStatus: "pending" | "parsed" | "failed"; totalRowCount: number; rowOutcomeCounts: string; createdAt: number; updatedAt: number }>;
+export const listImportArtifactByTenantIdRead = {"entity":"ImportArtifact","readId":"ImportArtifact.byTenantId","exportName":"listImportArtifactByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: \"pending\" | \"normalized\" | \"linked_reference\" | \"duplicate_view\" | \"needs_mapping\" | \"unsupported\" | \"invalid\"; parseStatus: \"pending\" | \"parsed\" | \"failed\"; totalRowCount: number; rowOutcomeCounts: string; registeredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listImportArtifactByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: "pending" | "normalized" | "linked_reference" | "duplicate_view" | "needs_mapping" | "unsupported" | "invalid"; parseStatus: "pending" | "parsed" | "failed"; totalRowCount: number; rowOutcomeCounts: string; registeredAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const getImportArtifactRead = {"entity":"ImportArtifact","readId":"ImportArtifact.get","exportName":"getImportArtifact","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: \"pending\" | \"normalized\" | \"linked_reference\" | \"duplicate_view\" | \"needs_mapping\" | \"unsupported\" | \"invalid\"; parseStatus: \"pending\" | \"parsed\" | \"failed\"; totalRowCount: number; rowOutcomeCounts: string; createdAt: number; updatedAt: number } | null"} as const;
-export type getImportArtifactResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: "pending" | "normalized" | "linked_reference" | "duplicate_view" | "needs_mapping" | "unsupported" | "invalid"; parseStatus: "pending" | "parsed" | "failed"; totalRowCount: number; rowOutcomeCounts: string; createdAt: number; updatedAt: number } | null;
+export const getImportArtifactRead = {"entity":"ImportArtifact","readId":"ImportArtifact.get","exportName":"getImportArtifact","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: \"pending\" | \"normalized\" | \"linked_reference\" | \"duplicate_view\" | \"needs_mapping\" | \"unsupported\" | \"invalid\"; parseStatus: \"pending\" | \"parsed\" | \"failed\"; totalRowCount: number; rowOutcomeCounts: string; registeredAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getImportArtifactResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: "pending" | "normalized" | "linked_reference" | "duplicate_view" | "needs_mapping" | "unsupported" | "invalid"; parseStatus: "pending" | "parsed" | "failed"; totalRowCount: number; rowOutcomeCounts: string; registeredAt: number | null; createdAt: number; updatedAt: number } | null;
 
-export const listImportArtifactRead = {"entity":"ImportArtifact","readId":"ImportArtifact.list","exportName":"listImportArtifact","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: \"pending\" | \"normalized\" | \"linked_reference\" | \"duplicate_view\" | \"needs_mapping\" | \"unsupported\" | \"invalid\"; parseStatus: \"pending\" | \"parsed\" | \"failed\"; totalRowCount: number; rowOutcomeCounts: string; createdAt: number; updatedAt: number }>"} as const;
-export type listImportArtifactResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: "pending" | "normalized" | "linked_reference" | "duplicate_view" | "needs_mapping" | "unsupported" | "invalid"; parseStatus: "pending" | "parsed" | "failed"; totalRowCount: number; rowOutcomeCounts: string; createdAt: number; updatedAt: number }>;
+export const listImportArtifactRead = {"entity":"ImportArtifact","readId":"ImportArtifact.list","exportName":"listImportArtifact","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: \"pending\" | \"normalized\" | \"linked_reference\" | \"duplicate_view\" | \"needs_mapping\" | \"unsupported\" | \"invalid\"; parseStatus: \"pending\" | \"parsed\" | \"failed\"; totalRowCount: number; rowOutcomeCounts: string; registeredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listImportArtifactResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; importRunId: string; name: string; storageId: string | null; checksum: string | null; byteSize: number; entryCount: number; provenance: string; disposition: "pending" | "normalized" | "linked_reference" | "duplicate_view" | "needs_mapping" | "unsupported" | "invalid"; parseStatus: "pending" | "parsed" | "failed"; totalRowCount: number; rowOutcomeCounts: string; registeredAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listImportConflictByExternalRecordLinkIdRead = {"entity":"ImportConflict","readId":"ImportConflict.byExternalRecordLinkId","exportName":"listImportConflictByExternalRecordLinkId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"externalRecordLinkId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; externalRecordLinkId: string; field: string; appliedValue: string | null; capsuleValue: string | null; sourceValue: string | null; sourceVersion: string | null; status: \"pending\" | \"keep_capsule\" | \"take_source\" | \"manual\"; resolvedByUserId: string | null; resolvedAt: number | null; resolvedOnSourceVersion: string | null; raisedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listImportConflictByExternalRecordLinkIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; externalRecordLinkId: string; field: string; appliedValue: string | null; capsuleValue: string | null; sourceValue: string | null; sourceVersion: string | null; status: "pending" | "keep_capsule" | "take_source" | "manual"; resolvedByUserId: string | null; resolvedAt: number | null; resolvedOnSourceVersion: string | null; raisedAt: number | null; createdAt: number; updatedAt: number }>;
@@ -159264,14 +161461,26 @@ export type getIngredientPriceObservationResult = { _id: string; _creationTime: 
 export const listIngredientPriceObservationRead = {"entity":"IngredientPriceObservation","readId":"IngredientPriceObservation.list","exportName":"listIngredientPriceObservation","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; ingredientId: string; vendorId: string; vendorOrderId: string; vendorOrderLineId: string; receiptQuantity: number; cumulativeReceivedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitPrice: number; observedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listIngredientPriceObservationResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; ingredientId: string; vendorId: string; vendorOrderId: string; vendorOrderLineId: string; receiptQuantity: number; cumulativeReceivedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitPrice: number; observedAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listIntegrationConnectionByTenantIdRead = {"entity":"IntegrationConnection","readId":"IntegrationConnection.byTenantId","exportName":"listIntegrationConnectionByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listIntegrationConnectionByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; createdAt: number; updatedAt: number }>;
+export const listIntegrationConnectionByTenantIdRead = {"entity":"IntegrationConnection","readId":"IntegrationConnection.byTenantId","exportName":"listIntegrationConnectionByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listIntegrationConnectionByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const getIntegrationConnectionRead = {"entity":"IntegrationConnection","readId":"IntegrationConnection.get","exportName":"getIntegrationConnection","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getIntegrationConnectionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; createdAt: number; updatedAt: number } | null;
+export const getIntegrationConnectionRead = {"entity":"IntegrationConnection","readId":"IntegrationConnection.get","exportName":"getIntegrationConnection","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getIntegrationConnectionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number } | null;
 
-export const listIntegrationConnectionRead = {"entity":"IntegrationConnection","readId":"IntegrationConnection.list","exportName":"listIntegrationConnection","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listIntegrationConnectionResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; createdAt: number; updatedAt: number }>;
+export const listIntegrationConnectionRead = {"entity":"IntegrationConnection","readId":"IntegrationConnection.list","exportName":"listIntegrationConnection","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; status: \"disconnected\" | \"pending\" | \"connected\" | \"error\" | \"revoked\"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listIntegrationConnectionResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; status: "disconnected" | "pending" | "connected" | "error" | "revoked"; externalAccountId: string | null; displayName: string | null; scopes: string | null; credentialRef: string | null; lastSuccessfulSyncAt: number | null; lastErrorMessage: string | null; lastErrorAt: number | null; chargesEnabled: boolean; payoutsEnabled: boolean; connectedAt: number | null; engagementId: string | null; connectedById: string | null; grantedAt: number | null; lastSyncAt: number | null; lastSyncStatus: string | null; lastSyncFailedCount: number | null; lastSyncSummary: string | null; ledgerImportedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listIntegrationSyncRecordBySyncKeyRead = {"entity":"IntegrationSyncRecord","readId":"IntegrationSyncRecord.bySyncKey","exportName":"listIntegrationSyncRecordBySyncKey","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"syncKey","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; syncKey: string | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; recordType: string; sourceId: string; externalId: string | null; engagementId: string | null; status: \"synced\" | \"deleted\" | \"failed\" | \"linked\"; contentSignature: string | null; lastSyncedAt: number | null; lastError: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listIntegrationSyncRecordBySyncKeyResult = Array<{ _id: string; _creationTime: number; tenantId: string; syncKey: string | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; recordType: string; sourceId: string; externalId: string | null; engagementId: string | null; status: "synced" | "deleted" | "failed" | "linked"; contentSignature: string | null; lastSyncedAt: number | null; lastError: string | null; createdAt: number; updatedAt: number }>;
+
+export const listIntegrationSyncRecordByTenantIdRead = {"entity":"IntegrationSyncRecord","readId":"IntegrationSyncRecord.byTenantId","exportName":"listIntegrationSyncRecordByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; syncKey: string | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; recordType: string; sourceId: string; externalId: string | null; engagementId: string | null; status: \"synced\" | \"deleted\" | \"failed\" | \"linked\"; contentSignature: string | null; lastSyncedAt: number | null; lastError: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listIntegrationSyncRecordByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; syncKey: string | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; recordType: string; sourceId: string; externalId: string | null; engagementId: string | null; status: "synced" | "deleted" | "failed" | "linked"; contentSignature: string | null; lastSyncedAt: number | null; lastError: string | null; createdAt: number; updatedAt: number }>;
+
+export const getIntegrationSyncRecordRead = {"entity":"IntegrationSyncRecord","readId":"IntegrationSyncRecord.get","exportName":"getIntegrationSyncRecord","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; syncKey: string | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; recordType: string; sourceId: string; externalId: string | null; engagementId: string | null; status: \"synced\" | \"deleted\" | \"failed\" | \"linked\"; contentSignature: string | null; lastSyncedAt: number | null; lastError: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getIntegrationSyncRecordResult = { _id: string; _creationTime: number; tenantId: string; syncKey: string | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; recordType: string; sourceId: string; externalId: string | null; engagementId: string | null; status: "synced" | "deleted" | "failed" | "linked"; contentSignature: string | null; lastSyncedAt: number | null; lastError: string | null; createdAt: number; updatedAt: number } | null;
+
+export const listIntegrationSyncRecordRead = {"entity":"IntegrationSyncRecord","readId":"IntegrationSyncRecord.list","exportName":"listIntegrationSyncRecord","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; syncKey: string | null; provider: \"stripe\" | \"quickbooks\" | \"google_calendar\" | \"email\" | \"sms\" | \"nowsta\" | \"instagram\" | \"facebook\" | \"tiktok\"; recordType: string; sourceId: string; externalId: string | null; engagementId: string | null; status: \"synced\" | \"deleted\" | \"failed\" | \"linked\"; contentSignature: string | null; lastSyncedAt: number | null; lastError: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listIntegrationSyncRecordResult = Array<{ _id: string; _creationTime: number; tenantId: string; syncKey: string | null; provider: "stripe" | "quickbooks" | "google_calendar" | "email" | "sms" | "nowsta" | "instagram" | "facebook" | "tiktok"; recordType: string; sourceId: string; externalId: string | null; engagementId: string | null; status: "synced" | "deleted" | "failed" | "linked"; contentSignature: string | null; lastSyncedAt: number | null; lastError: string | null; createdAt: number; updatedAt: number }>;
 
 export const listInterviewByCandidateIdRead = {"entity":"Interview","readId":"Interview.byCandidateId","exportName":"listInterviewByCandidateId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"candidateId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; candidateId: string; outcome: \"pending\" | \"passed\" | \"failed\"; bookedAt: number | null; scheduledFor: number | null; conductedAt: number | null; interviewerPersonId: string | null; notes: string | null; sourceSystem: string | null; externalInterviewId: string | null; rawSourceData: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listInterviewByCandidateIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; candidateId: string; outcome: "pending" | "passed" | "failed"; bookedAt: number | null; scheduledFor: number | null; conductedAt: number | null; interviewerPersonId: string | null; notes: string | null; sourceSystem: string | null; externalInterviewId: string | null; rawSourceData: string | null; createdAt: number; updatedAt: number }>;
@@ -159608,6 +161817,30 @@ export type getOrganizationCapabilitySettingResult = { _id: string; _creationTim
 
 export const listOrganizationCapabilitySettingRead = {"entity":"OrganizationCapabilitySetting","readId":"OrganizationCapabilitySetting.list","exportName":"listOrganizationCapabilitySetting","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; capability: \"kitchen\" | \"inventory\" | \"procurement\" | \"events\" | \"sales\" | \"logistics\" | \"workforce\" | \"finance\" | \"reports\" | \"administration\"; enabled: boolean; updatedBy: string | null; registeredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listOrganizationCapabilitySettingResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; capability: "kitchen" | "inventory" | "procurement" | "events" | "sales" | "logistics" | "workforce" | "finance" | "reports" | "administration"; enabled: boolean; updatedBy: string | null; registeredAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listOutboundWebhookDeliveryByDeliveryKeyRead = {"entity":"OutboundWebhookDelivery","readId":"OutboundWebhookDelivery.byDeliveryKey","exportName":"listOutboundWebhookDeliveryByDeliveryKey","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"deliveryKey","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; attemptId: string | null; deliveryKey: string | null; endpointKey: string; sourceEventId: string; eventType: string; status: \"succeeded\" | \"failed\"; attempt: number; httpStatus: number | null; error: string | null; occurredAt: number | null; deliveredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listOutboundWebhookDeliveryByDeliveryKeyResult = Array<{ _id: string; _creationTime: number; tenantId: string; attemptId: string | null; deliveryKey: string | null; endpointKey: string; sourceEventId: string; eventType: string; status: "succeeded" | "failed"; attempt: number; httpStatus: number | null; error: string | null; occurredAt: number | null; deliveredAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listOutboundWebhookDeliveryByTenantIdRead = {"entity":"OutboundWebhookDelivery","readId":"OutboundWebhookDelivery.byTenantId","exportName":"listOutboundWebhookDeliveryByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; attemptId: string | null; deliveryKey: string | null; endpointKey: string; sourceEventId: string; eventType: string; status: \"succeeded\" | \"failed\"; attempt: number; httpStatus: number | null; error: string | null; occurredAt: number | null; deliveredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listOutboundWebhookDeliveryByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; attemptId: string | null; deliveryKey: string | null; endpointKey: string; sourceEventId: string; eventType: string; status: "succeeded" | "failed"; attempt: number; httpStatus: number | null; error: string | null; occurredAt: number | null; deliveredAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getOutboundWebhookDeliveryRead = {"entity":"OutboundWebhookDelivery","readId":"OutboundWebhookDelivery.get","exportName":"getOutboundWebhookDelivery","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; attemptId: string | null; deliveryKey: string | null; endpointKey: string; sourceEventId: string; eventType: string; status: \"succeeded\" | \"failed\"; attempt: number; httpStatus: number | null; error: string | null; occurredAt: number | null; deliveredAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getOutboundWebhookDeliveryResult = { _id: string; _creationTime: number; tenantId: string; attemptId: string | null; deliveryKey: string | null; endpointKey: string; sourceEventId: string; eventType: string; status: "succeeded" | "failed"; attempt: number; httpStatus: number | null; error: string | null; occurredAt: number | null; deliveredAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listOutboundWebhookDeliveryRead = {"entity":"OutboundWebhookDelivery","readId":"OutboundWebhookDelivery.list","exportName":"listOutboundWebhookDelivery","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; attemptId: string | null; deliveryKey: string | null; endpointKey: string; sourceEventId: string; eventType: string; status: \"succeeded\" | \"failed\"; attempt: number; httpStatus: number | null; error: string | null; occurredAt: number | null; deliveredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listOutboundWebhookDeliveryResult = Array<{ _id: string; _creationTime: number; tenantId: string; attemptId: string | null; deliveryKey: string | null; endpointKey: string; sourceEventId: string; eventType: string; status: "succeeded" | "failed"; attempt: number; httpStatus: number | null; error: string | null; occurredAt: number | null; deliveredAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listOutboundWebhookEndpointByEndpointKeyRead = {"entity":"OutboundWebhookEndpoint","readId":"OutboundWebhookEndpoint.byEndpointKey","exportName":"listOutboundWebhookEndpointByEndpointKey","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"endpointKey","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; endpointKey: string | null; url: string; label: string; events: string[]; hasSigningSecret: boolean; status: \"active\" | \"removed\"; registeredAt: number | null; registeredById: string | null; removedAt: number | null; deliveredThrough: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listOutboundWebhookEndpointByEndpointKeyResult = Array<{ _id: string; _creationTime: number; tenantId: string; endpointKey: string | null; url: string; label: string; events: string[]; hasSigningSecret: boolean; status: "active" | "removed"; registeredAt: number | null; registeredById: string | null; removedAt: number | null; deliveredThrough: number | null; createdAt: number; updatedAt: number }>;
+
+export const listOutboundWebhookEndpointByTenantIdRead = {"entity":"OutboundWebhookEndpoint","readId":"OutboundWebhookEndpoint.byTenantId","exportName":"listOutboundWebhookEndpointByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; endpointKey: string | null; url: string; label: string; events: string[]; hasSigningSecret: boolean; status: \"active\" | \"removed\"; registeredAt: number | null; registeredById: string | null; removedAt: number | null; deliveredThrough: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listOutboundWebhookEndpointByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; endpointKey: string | null; url: string; label: string; events: string[]; hasSigningSecret: boolean; status: "active" | "removed"; registeredAt: number | null; registeredById: string | null; removedAt: number | null; deliveredThrough: number | null; createdAt: number; updatedAt: number }>;
+
+export const getOutboundWebhookEndpointRead = {"entity":"OutboundWebhookEndpoint","readId":"OutboundWebhookEndpoint.get","exportName":"getOutboundWebhookEndpoint","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; endpointKey: string | null; url: string; label: string; events: string[]; hasSigningSecret: boolean; status: \"active\" | \"removed\"; registeredAt: number | null; registeredById: string | null; removedAt: number | null; deliveredThrough: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getOutboundWebhookEndpointResult = { _id: string; _creationTime: number; tenantId: string; endpointKey: string | null; url: string; label: string; events: string[]; hasSigningSecret: boolean; status: "active" | "removed"; registeredAt: number | null; registeredById: string | null; removedAt: number | null; deliveredThrough: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listOutboundWebhookEndpointRead = {"entity":"OutboundWebhookEndpoint","readId":"OutboundWebhookEndpoint.list","exportName":"listOutboundWebhookEndpoint","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; endpointKey: string | null; url: string; label: string; events: string[]; hasSigningSecret: boolean; status: \"active\" | \"removed\"; registeredAt: number | null; registeredById: string | null; removedAt: number | null; deliveredThrough: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listOutboundWebhookEndpointResult = Array<{ _id: string; _creationTime: number; tenantId: string; endpointKey: string | null; url: string; label: string; events: string[]; hasSigningSecret: boolean; status: "active" | "removed"; registeredAt: number | null; registeredById: string | null; removedAt: number | null; deliveredThrough: number | null; createdAt: number; updatedAt: number }>;
 
 export const listPackListByEventIdRead = {"entity":"PackList","readId":"PackList.byEventId","exportName":"listPackListByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; activeEventId: string | null; name: string; purpose: string | null; notes: string | null; status: \"draft\" | \"packing\" | \"packed\" | \"loaded\" | \"dispatched\" | \"cancelled\"; openedAt: number | null; packingStartedAt: number | null; packedAt: number | null; loadedAt: number | null; dispatchedAt: number | null; cancelledAt: number | null; cancellationReason: string | null; assistanceRequestedAt: number | null; assistanceNote: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listPackListByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; activeEventId: string | null; name: string; purpose: string | null; notes: string | null; status: "draft" | "packing" | "packed" | "loaded" | "dispatched" | "cancelled"; openedAt: number | null; packingStartedAt: number | null; packedAt: number | null; loadedAt: number | null; dispatchedAt: number | null; cancelledAt: number | null; cancellationReason: string | null; assistanceRequestedAt: number | null; assistanceNote: string | null; createdAt: number; updatedAt: number }>;
@@ -160811,6 +163044,15 @@ export type getWasteRecordResult = { _id: string; _creationTime: number; tenantI
 
 export const listWasteRecordRead = {"entity":"WasteRecord","readId":"WasteRecord.list","exportName":"listWasteRecord","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; ingredientId: string; locationId: string; eventId: string | null; inventoryItemId: string | null; quantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; reason: \"spoilage\" | \"prep_error\" | \"overproduction\" | \"dropped\" | \"date_expired\" | \"quality_reject\" | \"other\"; unitCost: number; status: \"pending\" | \"recorded\" | \"voided\"; notes: string | null; recordedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listWasteRecordResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; ingredientId: string; locationId: string; eventId: string | null; inventoryItemId: string | null; quantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; reason: "spoilage" | "prep_error" | "overproduction" | "dropped" | "date_expired" | "quality_reject" | "other"; unitCost: number; status: "pending" | "recorded" | "voided"; notes: string | null; recordedAt: number | null; voidedAt: number | null; voidReason: string | null; createdAt: number; updatedAt: number }>;
+
+export const listWebhookDispatchStateByTenantIdRead = {"entity":"WebhookDispatchState","readId":"WebhookDispatchState.byTenantId","exportName":"listWebhookDispatchStateByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; chainId: string | null; lastTickAt: number | null; legacyImportedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listWebhookDispatchStateByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; chainId: string | null; lastTickAt: number | null; legacyImportedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getWebhookDispatchStateRead = {"entity":"WebhookDispatchState","readId":"WebhookDispatchState.get","exportName":"getWebhookDispatchState","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; chainId: string | null; lastTickAt: number | null; legacyImportedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getWebhookDispatchStateResult = { _id: string; _creationTime: number; tenantId: string; chainId: string | null; lastTickAt: number | null; legacyImportedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listWebhookDispatchStateRead = {"entity":"WebhookDispatchState","readId":"WebhookDispatchState.list","exportName":"listWebhookDispatchState","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; chainId: string | null; lastTickAt: number | null; legacyImportedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listWebhookDispatchStateResult = Array<{ _id: string; _creationTime: number; tenantId: string; chainId: string | null; lastTickAt: number | null; legacyImportedAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listWeeklyPurchasingConfigByDefaultVendorIdRead = {"entity":"WeeklyPurchasingConfig","readId":"WeeklyPurchasingConfig.byDefaultVendorId","exportName":"listWeeklyPurchasingConfigByDefaultVendorId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"defaultVendorId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; defaultVendorId: string; configuredAt: number | null; orderApprovalThresholdAmount: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listWeeklyPurchasingConfigByDefaultVendorIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; defaultVendorId: string; configuredAt: number | null; orderApprovalThresholdAmount: number | null; createdAt: number; updatedAt: number }>;

@@ -12455,12 +12455,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-<<<<<<<< HEAD:.builder/baselines/42bedf91e518ee4a7c0b806c294319e5dc2166af0bfa07b77e2a055f1ee21190
-<<<<<<<< HEAD:.builder/baselines/42bedf91e518ee4a7c0b806c294319e5dc2166af0bfa07b77e2a055f1ee21190
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1293 as const;
-========
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1219 as const;
->>>>>>>> worktree-agent-a7e7d06b567eff73d:.builder/baselines/90153a31d96e9276da4e6468bcb09b37eb976c4b22c2ac4c113aa7c6b670f106
-========
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1233 as const;
->>>>>>>> worktree-agent-aac75fad4e0228047:.builder/baselines/3baa39b0ed0985599cbc7e71f956381af65964d11ad56a6a43508b3b7464269b
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1321 as const;
