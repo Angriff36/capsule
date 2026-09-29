@@ -8,9 +8,17 @@ import {
   type ActionCtx,
 } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
+import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 
-// Stripe payment links per invoice. Link + reconciliation state live on the
-// invoice ledger (manifestEvents), matching the invoiceReminders precedent.
+// Stripe payment links per invoice. ~~Link + reconciliation state live on the
+// invoice ledger (manifestEvents), matching the invoiceReminders precedent.~~
+// 2026-09-29: link + reconciliation state live in the InvoicePaymentLink and
+// InvoiceStripePayment entities (src/sales/invoice-notices.manifest), written
+// through their generated commands as the tenant's system role after the
+// caller's invoice access is checked. Readers also read the legacy
+// hand-written manifestEvents rows (InvoicePaymentLinkCreated /
+// InvoiceReminderPaymentLinkPrepared / InvoiceStripePaymentRecorded, entity
+// "Invoice", entityId = invoice id) that older links left behind.
 // Inbound Stripe webhooks are blocked (issue #52: the generated Convex webhook
 // verifier cannot parse Stripe's `t=...,v1=...` signature and convex/http.ts is
 // generated/owned), so confirmation is pulled from Stripe by an authenticated
@@ -130,65 +138,138 @@ async function requireInvoice(
 export const loadLedgerView = internalQuery({
   args: { invoiceId: v.id("invoices"), tenantId: v.string() },
   handler: async (ctx, args): Promise<LedgerView> => {
-    const ledgerRows = await ctx.db
-      .query("manifestEvents")
-      .withIndex("by_entityId", (q) => q.eq("entityId", String(args.invoiceId)))
-      .collect();
-    const rows = ledgerRows
-      .filter(
-        (row) =>
-          row.entity === "Invoice" &&
-          asRecord(row.payload).tenantId === args.tenantId,
-      )
-      .sort((left, right) => right.createdAt - left.createdAt);
+    const [ledgerRows, linkRows, paymentRows] = await Promise.all([
+      // Legacy rows written before 2026-09-29.
+      ctx.db
+        .query("manifestEvents")
+        .withIndex("by_entityId", (q) =>
+          q.eq("entityId", String(args.invoiceId)),
+        )
+        .collect(),
+      ctx.db
+        .query("invoicePaymentLinks")
+        .withIndex("by_invoiceId", (q) => q.eq("invoiceId", args.invoiceId))
+        .collect(),
+      ctx.db
+        .query("invoiceStripePayments")
+        .withIndex("by_invoiceId", (q) => q.eq("invoiceId", args.invoiceId))
+        .collect(),
+    ]);
+    const legacy = ledgerRows.filter(
+      (row) =>
+        row.entity === "Invoice" &&
+        asRecord(row.payload).tenantId === args.tenantId,
+    );
+
+    const candidates: SessionRecord[] = [
+      ...legacy
+        .filter(
+          (row) =>
+            row.type === EVENT.linkCreated ||
+            row.type === EVENT.reminderLinkPrepared,
+        )
+        .map((row) => {
+          const payload = asRecord(row.payload);
+          return {
+            sessionId: stringValue(payload.sessionId) ?? "",
+            url: stringValue(payload.url) ?? "",
+            createdAt: row.createdAt,
+            amount: typeof payload.amount === "number" ? payload.amount : 0,
+          };
+        }),
+      ...linkRows
+        .filter(
+          (row) =>
+            row.tenantId === args.tenantId &&
+            row.deletedAt == null &&
+            row.openedAt != null,
+        )
+        .map((row) => ({
+          sessionId: row.sessionId,
+          url: row.url,
+          createdAt: row.openedAt ?? row._creationTime,
+          amount: Number(row.amount),
+        })),
+    ].sort((left, right) => right.createdAt - left.createdAt);
 
     const sessions: SessionRecord[] = [];
     const seen = new Set<string>();
-    for (const row of rows) {
-      if (
-        row.type !== EVENT.linkCreated &&
-        row.type !== EVENT.reminderLinkPrepared
-      ) {
+    for (const session of candidates) {
+      if (!session.sessionId || !session.url || seen.has(session.sessionId)) {
         continue;
       }
-      const payload = asRecord(row.payload);
-      const sessionId = stringValue(payload.sessionId);
-      const url = stringValue(payload.url);
-      if (!sessionId || !url || seen.has(sessionId)) continue;
-      seen.add(sessionId);
-      sessions.push({
-        sessionId,
-        url,
-        createdAt: row.createdAt,
-        amount: typeof payload.amount === "number" ? payload.amount : 0,
-      });
+      seen.add(session.sessionId);
+      sessions.push(session);
     }
 
-    const reconciledSessionIds = rows
-      .filter((row) => row.type === EVENT.stripePaymentRecorded)
-      .map((row) => stringValue(asRecord(row.payload).sessionId))
-      .filter((sessionId): sessionId is string => sessionId !== null);
+    const reconciledSessionIds = [
+      ...legacy
+        .filter((row) => row.type === EVENT.stripePaymentRecorded)
+        .map((row) => stringValue(asRecord(row.payload).sessionId)),
+      ...paymentRows
+        .filter(
+          (row) => row.tenantId === args.tenantId && row.deletedAt == null,
+        )
+        .map((row) => row.sessionId),
+    ].filter((sessionId): sessionId is string => sessionId !== null);
 
     return { sessions, reconciledSessionIds };
   },
 });
 
-export const recordLedgerEvent = internalMutation({
+/**
+ * Records a manual payment link through the generated InvoicePaymentLink
+ * commands, as the invoice tenant's system role (the action already checked
+ * the caller's invoice access; the link records what Stripe returned).
+ */
+export const recordPaymentLink = internalMutation({
   args: {
-    type: v.union(
-      v.literal(EVENT.linkCreated),
-      v.literal(EVENT.stripePaymentRecorded),
-    ),
     invoiceId: v.id("invoices"),
-    payload: v.any(),
+    tenantId: v.string(),
+    sessionId: v.string(),
+    url: v.string(),
+    amount: v.number(),
+    createdBy: v.string(),
   },
   handler: async (ctx, args): Promise<void> => {
-    await ctx.db.insert("manifestEvents", {
-      type: args.type,
-      entity: "Invoice",
-      entityId: String(args.invoiceId),
-      payload: args.payload,
-      createdAt: Date.now(),
+    const system = TenantSystemCommandRunner.forTenant(
+      ctx,
+      args.tenantId,
+    ).context;
+    const created: { docId: Id<"invoicePaymentLinks"> } =
+      await system.runMutation(api.mutations.InvoicePaymentLink_createViaOpen, {
+        invoiceId: String(args.invoiceId),
+        sessionId: args.sessionId,
+        url: args.url,
+        amount: args.amount,
+        ...(args.createdBy ? { createdByUserId: args.createdBy } : {}),
+      });
+    await system.runMutation(api.mutations.InvoicePaymentLink_announceCreated, {
+      docId: created.docId,
+    });
+  },
+});
+
+/** Records a reconciled Stripe session, as the invoice tenant's system role. */
+export const recordStripePayment = internalMutation({
+  args: {
+    invoiceId: v.id("invoices"),
+    tenantId: v.string(),
+    sessionId: v.string(),
+    paymentId: v.id("payments"),
+    amount: v.number(),
+    method: v.string(),
+  },
+  handler: async (ctx, args): Promise<void> => {
+    await TenantSystemCommandRunner.forTenant(
+      ctx,
+      args.tenantId,
+    ).context.runMutation(api.mutations.InvoiceStripePayment_createViaRecord, {
+      invoiceId: String(args.invoiceId),
+      sessionId: args.sessionId,
+      paymentId: String(args.paymentId),
+      amount: args.amount,
+      method: args.method,
     });
   },
 });
@@ -343,16 +424,13 @@ export const createPaymentLink = action({
       throw new ConvexError("Stripe did not return a payment link.");
     }
 
-    await ctx.runMutation(internal.invoicePayments.recordLedgerEvent, {
-      type: EVENT.linkCreated,
+    await ctx.runMutation(internal.invoicePayments.recordPaymentLink, {
       invoiceId: args.invoiceId,
-      payload: {
-        tenantId: invoice.tenantId,
-        sessionId,
-        url,
-        amount: amountDue,
-        createdBy: auth.id,
-      },
+      tenantId: invoice.tenantId,
+      sessionId,
+      url,
+      amount: amountDue,
+      createdBy: auth.id,
     });
     return { sessionId, url, createdAt: Date.now(), amount: amountDue };
   },
@@ -419,16 +497,13 @@ export const syncStripePayments = action({
           docId: recordResult.docId,
           idempotencyKey: `stripe-checkout/${session.sessionId}/settle`,
         });
-        await ctx.runMutation(internal.invoicePayments.recordLedgerEvent, {
-          type: EVENT.stripePaymentRecorded,
+        await ctx.runMutation(internal.invoicePayments.recordStripePayment, {
           invoiceId: args.invoiceId,
-          payload: {
-            tenantId: invoice.tenantId,
-            sessionId: session.sessionId,
-            paymentId: String(recordResult.docId),
-            amount,
-            method,
-          },
+          tenantId: invoice.tenantId,
+          sessionId: session.sessionId,
+          paymentId: recordResult.docId,
+          amount,
+          method,
         });
         result.recorded += 1;
         result.recordedAmount += amount;

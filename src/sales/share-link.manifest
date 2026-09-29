@@ -19,9 +19,13 @@
 // HMAC or denylist required.
 //
 // View tracking (firstViewedAt / lastViewedAt / viewCount / lastViewerIdentity)
-// is written by the authored public seam (convex/shareLinks.ts recordShareView),
+// ~~is written by the authored public seam (convex/shareLinks.ts recordShareView),
 // which authenticates by token in-handler (a raw ctx.db.patch, no Clerk auth —
-// the same posture as the clientPortal.ts anonymous query). Decks are a separate
+// the same posture as the clientPortal.ts anonymous query).~~
+// 2026-09-29: is written by the recordView command. The authored public seam
+// (convex/shareLinks.ts recordShareView) authenticates the anonymous viewer by
+// token in-handler (no Clerk auth — the same posture as the clientPortal.ts
+// anonymous query) and runs recordView as the tenant's system role. Decks are a separate
 // concept with no Deck entity today and are intentionally out of scope here.
 
 use "./proposal.manifest"
@@ -60,7 +64,7 @@ entity ShareLink mixin TenantScoped, SoftDeletable {
   property createdByPersonId: uuid?
 
   // View tracking (spec §4.6: "Record ... first/last view, and viewer identity
-  // when known"). Written by the authored public seam, not by these commands.
+  // when known"). Written by recordView, run by the authored public seam.
   property required viewCount: int = 0
   property firstViewedAt: datetime?
   property lastViewedAt: datetime?
@@ -122,6 +126,25 @@ entity ShareLink mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Record one view of a live link. The public seam checks the token and
+  // silently ignores a revoked/expired/unknown link before running this; the
+  // guards restate those conditions.
+  command recordView(optional viewerIdentity: string) {
+    guard self.deletedAt == null
+    guard self.status == "active" "Only active share links record views"
+    guard self.expiresAt == null or now() < self.expiresAt "This share link has expired"
+    mutate viewCount = self.viewCount + 1
+    mutate firstViewedAt = self.firstViewedAt != null ? self.firstViewedAt : now()
+    mutate lastViewedAt = now()
+    mutate lastViewerIdentity = viewerIdentity != null ? viewerIdentity : self.lastViewerIdentity
+    emit ShareLinkViewed {
+      shareLinkId: self.id
+      tenantId: self.tenantId
+      proposalId: self.proposalId
+      viewedAt: now()
+    }
+  }
+
   store ShareLink in durable
 }
 
@@ -152,4 +175,11 @@ event ShareLinkRevoked: "share_link.revoked" {
   proposalId: string
   revokedByPersonId: string
   revokedAt: datetime
+}
+
+event ShareLinkViewed: "share_link.viewed" {
+  shareLinkId: string
+  tenantId: string
+  proposalId: string
+  viewedAt: datetime
 }

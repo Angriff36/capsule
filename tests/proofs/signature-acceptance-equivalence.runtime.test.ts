@@ -376,9 +376,26 @@ async function assertCanonicalAcceptance(
   expect(proposal.acceptedRevisionId ?? null).toBe(fx.revisionId);
   expect(proposal.eventId ?? null).toBe(fx.eventId);
 
+  // The ledger evidence: an explicit revision (signature paths) travels in
+  // the ProposalAccepted payload; an operator accept without one records the
+  // resolved id in ProposalAcceptedRevisionRecorded (2026-09-29 — emitted
+  // rows are never rewritten).
   const ledger = await acceptanceLedgerRows(actor, fx.proposalId);
   expect(ledger).toHaveLength(1);
-  expect(ledger[0].payload.acceptedRevisionId).toBe(fx.revisionId);
+  const recorded = (await ledgerRows(actor)).filter(
+    (row) =>
+      row.type === "ProposalAcceptedRevisionRecorded" &&
+      row.entityId === fx.proposalId,
+  );
+  expect(recorded.length).toBeLessThanOrEqual(1);
+  expect(
+    recorded.length === 1
+      ? recorded[0].payload.acceptedRevisionId
+      : ledger[0].payload.acceptedRevisionId,
+  ).toBe(fx.revisionId);
+  if (recorded.length === 1) {
+    expect(ledger[0].payload.acceptedRevisionId).toBeNull();
+  }
   expect(ledger[0].payload.eventId).toBe(fx.eventId);
 
   // The event holds exactly the expected live menu set with the copied
@@ -916,12 +933,14 @@ describe("disabled sales capability (tenant kill-switch)", () => {
     const ledgerBefore = await ledgerRows(owner);
     // The refusal must come from the canonical generated sales policy, not
     // an incidental error — the seam must route through the same capability
-    // check the generated runner applies.
+    // check the generated runner applies. Since 2026-09-29 the completion is
+    // the generated SignatureRequest.completeInternal command, so the sales
+    // policy refuses there first (before the reaction's Proposal.accept).
     await expect(
       proof.anonymous.mutation(api.signatureAcceptance.completeSignature, {
         token: requestId,
       }),
-    ).rejects.toThrow("Sales staff may see proposals");
+    ).rejects.toThrow("Sales staff may see signature requests");
 
     // Full rollback: the request stays requested, the proposal stays viewed,
     // no completion/acceptance reached the ledger, no menu copy landed.
@@ -1169,5 +1188,107 @@ describe("public token guards", () => {
     }
     expect((await proposalRow(owner, base.proposalId)).status).toBe("viewed");
     expect((await proposalRow(owner, other.proposalId)).status).toBe("viewed");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Governed completion (2026-09-29): the public click runs the generated
+// SignatureRequest.completeInternal command, and the declared
+// SignatureCompleted → Proposal.accept reaction does the acceptance.
+// ---------------------------------------------------------------------------
+
+describe("public completion runs through SignatureRequest.completeInternal", () => {
+  it("the command emits SignatureCompleted and the declared reaction accepts", async () => {
+    const tenantId = "tenant-sig-governed";
+    const subject = "owner-sig-governed";
+    const proof = harness();
+    const owner = proof.asRole({ subject, role: "owner", tenantId });
+    const fx = await linkedProposalFixture(
+      proof,
+      owner,
+      tenantId,
+      "Governed completion proposal",
+    );
+    const requestId = await createSignatureRequest(
+      proof,
+      owner,
+      tenantId,
+      subject,
+      fx,
+    );
+
+    // A signed-in sales/owner user cannot forge the client's click through
+    // the now-generated public mutation: completeInternal is system-only.
+    await expect(
+      proof.executeCommand(
+        owner,
+        api.mutations.SignatureRequest_completeInternal,
+        {
+          docId: requestId,
+          signedArtifactReference: "forged://click",
+          acceptProposalId: fx.proposalId,
+        },
+      ),
+    ).rejects.toThrow(/Guard/);
+    expect(await signatureCompletedRows(owner, requestId)).toHaveLength(0);
+
+    const result = (await proof.anonymous.mutation(
+      api.signatureAcceptance.completeSignature,
+      { token: requestId, signerIpAddress: "203.0.113.9" },
+    )) as { ok: boolean };
+    expect(result.ok).toBe(true);
+
+    // The completion row is the command's: status, signer audit, and exactly
+    // one SignatureCompleted naming the proposal it drove.
+    const request = (await owner.run(async (ctx) =>
+      ctx.db.get(requestId as never),
+    )) as {
+      status?: string;
+      signerIpAddress?: string;
+      signedArtifactReference?: string;
+    };
+    expect(request.status).toBe("completed");
+    expect(request.signerIpAddress).toBe("203.0.113.9");
+    expect(request.signedArtifactReference).toMatch(/^internal:click-accept:/);
+    const completed = await signatureCompletedRows(owner, requestId);
+    expect(completed).toHaveLength(1);
+    expect(completed[0].payload.proposalId).toBe(fx.proposalId);
+    expect(completed[0].payload.acceptProposalId).toBe(fx.proposalId);
+    expect(completed[0].payload.proposalRevisionId).toBe(fx.revisionId);
+
+    // The reaction ran the canonical acceptance with the signed revision.
+    await assertCanonicalAcceptance(owner, fx, proposalMenuExpectation(fx));
+  });
+
+  it("an already-accepted proposal records the signature without a second acceptance", async () => {
+    const tenantId = "tenant-sig-governed-accepted";
+    const subject = "owner-sig-governed-accepted";
+    const proof = harness();
+    const owner = proof.asRole({ subject, role: "owner", tenantId });
+    const fx = await linkedProposalFixture(
+      proof,
+      owner,
+      tenantId,
+      "Governed already-accepted proposal",
+    );
+    await proof.executeCommand(owner, api.mutations.Proposal_accept, {
+      docId: fx.proposalId,
+    });
+    const requestId = await createSignatureRequest(
+      proof,
+      owner,
+      tenantId,
+      subject,
+      fx,
+    );
+    await proof.anonymous.mutation(api.signatureAcceptance.completeSignature, {
+      token: requestId,
+    });
+    const completed = await signatureCompletedRows(owner, requestId);
+    expect(completed).toHaveLength(1);
+    expect(completed[0].payload.proposalId).toBe(fx.proposalId);
+    // No reaction target: the reaction did not run a second accept.
+    expect(completed[0].payload.acceptProposalId ?? null).toBeNull();
+    expect(await acceptanceLedgerRows(owner, fx.proposalId)).toHaveLength(1);
   });
 });

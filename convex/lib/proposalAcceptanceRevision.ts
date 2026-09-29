@@ -1,4 +1,5 @@
 import type { ConvexCommandEvent } from "@angriff36/manifest/projections/convex";
+import { api } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 
@@ -22,9 +23,18 @@ import type { MutationCtx } from "../_generated/server";
  *   in this tenant AT ACCEPTANCE TIME, else explicit null — an honest "no
  *   revision captured" that a later capture never back-fills.
  *
- * The resolved reference is patched onto the proposal (no extra version
+ * ~~The resolved reference is patched onto the proposal (no extra version
  * increment — the accept command already bumped it) and onto the just-written
- * ProposalAccepted ledger row, so the payload carries the same evidence.
+ * ProposalAccepted ledger row, so the payload carries the same evidence.~~
+ * 2026-09-29: an explicit revision is already stored by `Proposal.accept`
+ * and carried in its ProposalAccepted payload; this callback only validates
+ * it. Without one, the resolved reference (or null) is recorded through the
+ * generated `Proposal.recordAcceptedRevision` command, run with the same
+ * identity as the accept (the caller, or the system runner's elevated ctx),
+ * which stores it and emits ProposalAcceptedRevisionRecorded. Emitted ledger
+ * rows are never rewritten. Pre-2026-09-29 ProposalAccepted rows carry the
+ * resolved value in their own (then patched) payload and have no
+ * ProposalAcceptedRevisionRecorded row.
  * `accepted` is a terminal status, so a later revision can never re-label an
  * old acceptance.
  */
@@ -73,8 +83,12 @@ export async function recordAcceptedProposalRevision(
     }
   }
 
-  await ctx.db.patch(proposal._id, { acceptedRevisionId: resolved });
-  await ctx.db.patch(event.eventId as Id<"manifestEvents">, {
-    payload: { ...event.payload, acceptedRevisionId: resolved },
+  // Explicit revision: Proposal.accept already stored it (and cleared the
+  // pending marker); validation above is all that is left.
+  if (proposal.acceptedRevisionPending !== true) return;
+  await ctx.runMutation(api.mutations.Proposal_recordAcceptedRevision, {
+    docId: proposal._id,
+    version: proposal.version,
+    ...(resolved !== null ? { acceptedRevisionId: resolved } : {}),
   });
 }

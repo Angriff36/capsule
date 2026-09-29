@@ -1,6 +1,8 @@
 import { v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
+import { api } from "./_generated/api";
+import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 
 /**
  * AUTHOR SEAM — public, token-authorized proposal share links (spec §4.6).
@@ -9,8 +11,10 @@ import { mutation, query } from "./_generated/server";
  * SignatureRequest callbackToken). These two functions are the ONLY public
  * surface for a shared proposal: they authenticate by token in-handler (no
  * Clerk auth) — the same posture as the anonymous `clientPortal.getEvent`
- * query. `getSharedProposal` is read-only; `recordShareView` is a raw
- * `ctx.db.patch` (no generated guard, no Clerk auth) that bumps view stats. Both
+ * query. `getSharedProposal` is read-only; `recordShareView` ~~is a raw
+ * `ctx.db.patch` (no generated guard, no Clerk auth) that bumps view stats~~
+ * (2026-09-29) bumps view stats through the generated `ShareLink.recordView`
+ * command, run as the link tenant's system role. Both
  * enforce revocation + expiry against the row before doing anything, so a
  * revoked/expired link resolves to nothing.
  *
@@ -236,7 +240,10 @@ export const getSharedProposal = query({
 /**
  * Record a view against a share link (spec §4.6: first/last view + viewer
  * identity when known). Public, token-authorized; a revoked/expired/unknown
- * token is a silent no-op (no view recorded). Raw patch — no guard, no Clerk.
+ * token is a silent no-op (no view recorded). ~~Raw patch — no guard, no
+ * Clerk.~~ 2026-09-29: no Clerk; after the token checks the generated
+ * ShareLink.recordView command runs as the link tenant's system role (the
+ * anonymous viewer holds no role), pinned to the row's own tenantId.
  */
 export const recordShareView = mutation({
   args: { token: v.string(), viewerIdentity: v.optional(v.string()) },
@@ -248,14 +255,13 @@ export const recordShareView = mutation({
     if (link.status !== "active") return;
     if (link.expiresAt != null && link.expiresAt <= Date.now()) return;
 
-    const now = Date.now();
-    await ctx.db.patch(linkId, {
-      viewCount: (link.viewCount ?? 0) + 1,
-      firstViewedAt: link.firstViewedAt ?? now,
-      lastViewedAt: now,
-      lastViewerIdentity: viewerIdentity ?? link.lastViewerIdentity,
-      updatedAt: now,
-    } as Partial<Doc<"shareLinks">>);
+    await TenantSystemCommandRunner.forTenant(
+      ctx,
+      link.tenantId,
+    ).context.runMutation(api.mutations.ShareLink_recordView, {
+      docId: linkId,
+      ...(viewerIdentity !== undefined ? { viewerIdentity } : {}),
+    });
   },
 });
 

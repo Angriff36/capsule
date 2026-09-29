@@ -172,6 +172,21 @@ async function acceptanceLedgerRows(actor: Actor, proposalId: string) {
   );
 }
 
+async function revisionRecordedRows(actor: Actor, proposalId: string) {
+  const rows = (await actor.run(async (ctx) =>
+    ctx.db.query("manifestEvents").collect(),
+  )) as Array<{
+    type: string;
+    entityId: string;
+    payload: Record<string, unknown>;
+  }>;
+  return rows.filter(
+    (row) =>
+      row.type === "ProposalAcceptedRevisionRecorded" &&
+      row.entityId === proposalId,
+  );
+}
+
 async function acceptedRevisionIdOf(actor: Actor, proposalId: string) {
   const row = (await actor.run(async (ctx) =>
     ctx.db.get(proposalId as never),
@@ -229,11 +244,17 @@ describe("accepted revision link (AC-413 / AC-434)", () => {
     });
     expect(await acceptedRevisionIdOf(owner, proposalId)).toBe(revision1Id);
 
-    // The ProposalAccepted ledger payload carries the same id — exactly one
-    // acceptance.
+    // Exactly one acceptance. Its ProposalAccepted payload carries the
+    // command's own (absent → null) revision param — emitted rows are never
+    // rewritten (2026-09-29) — and the generated
+    // Proposal.recordAcceptedRevision follow-up, in the same transaction,
+    // emits the resolved id.
     const ledger = await acceptanceLedgerRows(owner, proposalId);
     expect(ledger).toHaveLength(1);
-    expect(ledger[0].payload.acceptedRevisionId).toBe(revision1Id);
+    expect(ledger[0].payload.acceptedRevisionId).toBeNull();
+    const recorded = await revisionRecordedRows(owner, proposalId);
+    expect(recorded).toHaveLength(1);
+    expect(recorded[0].payload.acceptedRevisionId).toBe(revision1Id);
 
     // After acceptance a later revision is captured. The original snapshot
     // must stay byte-for-byte unchanged.
@@ -247,9 +268,19 @@ describe("accepted revision link (AC-413 / AC-434)", () => {
     expect(stored1?.revisionNumber).toBe(revision1.revisionNumber);
     expect(stored1?.snapshot).toBe(revision1.snapshot);
 
+    // The now-public generated follow-up cannot relabel the committed
+    // acceptance: its pending marker never survives the accept transaction.
+    await expect(
+      proof.executeCommand(owner, api.mutations.Proposal_recordAcceptedRevision, {
+        docId: proposalId,
+        acceptedRevisionId: revision2?._id,
+      }),
+    ).rejects.toThrow(/Guard/);
+
     // The stored reference and the event-side label still name revision 1 —
     // the accepted snapshot is never inferred from the latest mutable draft.
     expect(await acceptedRevisionIdOf(owner, proposalId)).toBe(revision1Id);
+    expect(await revisionRecordedRows(owner, proposalId)).toHaveLength(1);
     const booked = await book(proof, owner, clientId, proposalId);
     const booking = (await owner.query(
       api.quoteBuilder.getEventBookingDetails,
@@ -714,6 +745,10 @@ describe("accepted revision link (AC-413 / AC-434)", () => {
       docId: proposalId,
     });
     expect(await acceptedRevisionIdOf(owner, proposalId)).toBeNull();
+    // The follow-up records the honest "none" and clears the pending marker.
+    const recorded = await revisionRecordedRows(owner, proposalId);
+    expect(recorded).toHaveLength(1);
+    expect(recorded[0].payload.acceptedRevisionId).toBeNull();
 
     const booked = await book(proof, owner, clientId, proposalId);
     const booking = (await owner.query(
@@ -726,6 +761,12 @@ describe("accepted revision link (AC-413 / AC-434)", () => {
     // reference stays null and the label stays honest.
     const later = await captureLaterRevision(proof, owner, proposalId, 1);
     expect(later).toBeTruthy();
+    await expect(
+      proof.executeCommand(owner, api.mutations.Proposal_recordAcceptedRevision, {
+        docId: proposalId,
+        acceptedRevisionId: later?._id,
+      }),
+    ).rejects.toThrow(/Guard/);
     expect(await acceptedRevisionIdOf(owner, proposalId)).toBeNull();
     const bookingAfter = (await owner.query(
       api.quoteBuilder.getEventBookingDetails,

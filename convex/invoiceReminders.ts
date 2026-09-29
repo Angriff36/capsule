@@ -10,6 +10,7 @@ import {
   type QueryCtx,
 } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
+import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 import {
   connectedAccountHeaders,
   requireConnectedAccountId,
@@ -268,14 +269,73 @@ function assertOpenInvoice(invoice: Doc<"invoices">): void {
   }
 }
 
+/**
+ * The reminder state kept in the InvoiceReminderSchedule, InvoicePaymentLink
+ * and InvoiceReminderAttempt entities (src/sales/invoice-notices.manifest),
+ * in the same shape as the legacy ledger rows so one set of readers
+ * (latestSchedule, paymentSessions, wasDelivered) serves both.
+ */
+function reminderStateAsLedger(
+  tenantId: string,
+  schedules: Doc<"invoiceReminderSchedules">[],
+  links: Doc<"invoicePaymentLinks">[],
+  attempts: Doc<"invoiceReminderAttempts">[],
+): LedgerEvent[] {
+  const live = <T extends { tenantId: string; deletedAt?: number | null }>(
+    row: T,
+  ) => row.tenantId === tenantId && row.deletedAt == null;
+  return [
+    ...schedules.filter(live).map((row) => ({
+      type: EVENT.scheduleConfigured as string,
+      createdAt: row.configuredAt ?? row._creationTime,
+      payload: {
+        configId: row.configId,
+        configuredAt: row.configuredAt ?? null,
+        dueDate: row.dueDate ?? null,
+        offsetsDays: row.offsetsDays ?? [],
+      } as Record<string, unknown>,
+    })),
+    ...links
+      .filter((row) => live(row) && row.configId != null)
+      .map((row) => ({
+        type: EVENT.paymentLinkPrepared as string,
+        createdAt: row.openedAt ?? row._creationTime,
+        payload: {
+          configId: row.configId,
+          offsetDays: row.offsetDays ?? null,
+          sessionId: row.sessionId,
+          url: row.url,
+        } as Record<string, unknown>,
+      })),
+    ...attempts
+      .filter((row) => live(row) && row.outcome === "delivered")
+      .map((row) => ({
+        type: EVENT.delivered as string,
+        createdAt: row.openedAt ?? row._creationTime,
+        payload: {
+          configId: row.configId,
+          offsetDays: row.offsetDays,
+        } as Record<string, unknown>,
+      })),
+  ];
+}
+
 export const loadDeliveryContext = internalQuery({
   args: { invoiceId: v.id("invoices"), tenantId: v.string() },
   handler: async (ctx, args): Promise<DeliveryContext | null> => {
     const invoice = await ctx.db.get(args.invoiceId);
     if (!invoice || invoice.tenantId !== args.tenantId) return null;
 
-    const [client, contacts, organizations, ledgerRows, linkedEvent] =
-      await Promise.all([
+    const [
+      client,
+      contacts,
+      organizations,
+      ledgerRows,
+      linkedEvent,
+      scheduleRows,
+      linkRows,
+      attemptRows,
+    ] = await Promise.all([
         ctx.db.get(invoice.clientId),
         ctx.db
           .query("clientContacts")
@@ -292,6 +352,18 @@ export const loadDeliveryContext = internalQuery({
           )
           .collect(),
         invoice.eventId ? ctx.db.get(invoice.eventId) : Promise.resolve(null),
+        ctx.db
+          .query("invoiceReminderSchedules")
+          .withIndex("by_invoiceId", (q) => q.eq("invoiceId", invoice._id))
+          .collect(),
+        ctx.db
+          .query("invoicePaymentLinks")
+          .withIndex("by_invoiceId", (q) => q.eq("invoiceId", invoice._id))
+          .collect(),
+        ctx.db
+          .query("invoiceReminderAttempts")
+          .withIndex("by_invoiceId", (q) => q.eq("invoiceId", invoice._id))
+          .collect(),
       ]);
 
     const eligibleContacts = contacts.filter(
@@ -345,41 +417,125 @@ export const loadDeliveryContext = internalQuery({
         linkedEvent && linkedEvent.tenantId === args.tenantId
           ? linkedEvent.title?.trim() || null
           : null,
-      ledger: ledgerRows
-        .filter(
-          (row) =>
-            row.entity === "Invoice" &&
-            asRecord(row.payload).tenantId === args.tenantId,
-        )
-        .map((row) => ({
-          type: row.type,
-          createdAt: row.createdAt,
-          payload: asRecord(row.payload),
-        })),
+      ledger: [
+        // Legacy hand-written rows (before 2026-09-29), keyed by invoice id.
+        ...ledgerRows
+          .filter(
+            (row) =>
+              row.entity === "Invoice" &&
+              asRecord(row.payload).tenantId === args.tenantId,
+          )
+          .map((row) => ({
+            type: row.type,
+            createdAt: row.createdAt,
+            payload: asRecord(row.payload),
+          })),
+        ...reminderStateAsLedger(
+          args.tenantId,
+          scheduleRows,
+          linkRows,
+          attemptRows,
+        ),
+      ],
     };
   },
 });
 
-export const recordEvent = internalMutation({
+/**
+ * Records one reminder outcome (or the payment link prepared for it) through
+ * the generated InvoicePaymentLink / InvoiceReminderAttempt commands. Runs as
+ * the invoice tenant's system role: scheduled deliveries have no user, and a
+ * manual send records what the provider did after the caller's invoice access
+ * was checked.
+ */
+export const recordReminderOutcome = internalMutation({
   args: {
-    type: v.union(
-      v.literal(EVENT.scheduleConfigured),
+    kind: v.union(
       v.literal(EVENT.paymentLinkPrepared),
       v.literal(EVENT.delivered),
       v.literal(EVENT.suppressed),
       v.literal(EVENT.failed),
     ),
     invoiceId: v.id("invoices"),
-    payload: v.any(),
+    tenantId: v.string(),
+    configId: v.string(),
+    offsetDays: v.number(),
+    scheduledFor: v.number(),
+    source: v.union(v.literal("scheduled"), v.literal("manual")),
+    sessionId: v.optional(v.string()),
+    url: v.optional(v.string()),
+    amount: v.optional(v.number()),
+    emailId: v.optional(v.string()),
+    amountDue: v.optional(v.number()),
+    dueDate: v.optional(v.number()),
+    timing: v.optional(v.string()),
+    reason: v.optional(v.string()),
+    attempt: v.optional(v.number()),
+    message: v.optional(v.string()),
+    retryScheduled: v.optional(v.boolean()),
   },
   handler: async (ctx, args): Promise<void> => {
-    await ctx.db.insert("manifestEvents", {
-      type: args.type,
-      entity: "Invoice",
-      entityId: String(args.invoiceId),
-      payload: args.payload,
-      createdAt: Date.now(),
-    });
+    const system = TenantSystemCommandRunner.forTenant(
+      ctx,
+      args.tenantId,
+    ).context;
+    const where = {
+      invoiceId: String(args.invoiceId),
+      configId: args.configId,
+      offsetDays: args.offsetDays,
+      scheduledFor: args.scheduledFor,
+      source: args.source,
+    };
+    if (args.kind === EVENT.paymentLinkPrepared) {
+      const link: { docId: Id<"invoicePaymentLinks"> } =
+        await system.runMutation(
+          api.mutations.InvoicePaymentLink_createViaOpen,
+          {
+            ...where,
+            sessionId: args.sessionId ?? "",
+            url: args.url ?? "",
+            amount: args.amount ?? 0,
+          },
+        );
+      await system.runMutation(
+        api.mutations.InvoicePaymentLink_announceReminderLink,
+        { docId: link.docId },
+      );
+      return;
+    }
+    const opened: { docId: Id<"invoiceReminderAttempts"> } =
+      await system.runMutation(
+        api.mutations.InvoiceReminderAttempt_createViaOpen,
+        where,
+      );
+    if (args.kind === EVENT.delivered) {
+      await system.runMutation(
+        api.mutations.InvoiceReminderAttempt_recordDelivered,
+        {
+          docId: opened.docId,
+          emailId: args.emailId ?? "",
+          sessionId: args.sessionId ?? "",
+          amountDue: args.amountDue ?? 0,
+          dueDate: args.dueDate ?? 0,
+          timing: args.timing ?? "",
+        },
+      );
+    } else if (args.kind === EVENT.suppressed) {
+      await system.runMutation(
+        api.mutations.InvoiceReminderAttempt_recordSuppressed,
+        { docId: opened.docId, reason: args.reason ?? "" },
+      );
+    } else {
+      await system.runMutation(
+        api.mutations.InvoiceReminderAttempt_recordFailed,
+        {
+          docId: opened.docId,
+          attempt: args.attempt ?? 0,
+          message: args.message ?? "",
+          retryScheduled: args.retryScheduled ?? false,
+        },
+      );
+    }
   },
 });
 
@@ -393,19 +549,19 @@ export const applySchedule = internalMutation({
     offsetsDays: v.array(v.number()),
   },
   handler: async (ctx, args): Promise<void> => {
-    await ctx.db.insert("manifestEvents", {
-      type: EVENT.scheduleConfigured,
-      entity: "Invoice",
-      entityId: String(args.invoiceId),
-      payload: {
-        tenantId: args.tenantId,
+    // The configuring user's own identity (configureSchedule already checked
+    // the invoice and recipient); the generated command's finance/manager
+    // policy is the same one that guards reading the invoice.
+    await ctx.runMutation(
+      api.mutations.InvoiceReminderSchedule_createViaConfigure,
+      {
+        invoiceId: String(args.invoiceId),
         configId: args.configId,
         configuredAt: args.configuredAt,
         dueDate: args.dueDate,
         offsetsDays: args.offsetsDays,
       },
-      createdAt: args.configuredAt,
-    });
+    );
 
     const checkpoints = args.offsetsDays.map((offsetDays) => ({
       offsetDays,
@@ -705,23 +861,35 @@ async function sendReminderEmail(
   return emailId;
 }
 
+interface ReminderOutcomeDetails {
+  sessionId?: string;
+  url?: string;
+  amount?: number;
+  emailId?: string;
+  amountDue?: number;
+  dueDate?: number;
+  timing?: string;
+  reason?: string;
+  attempt?: number;
+  message?: string;
+  retryScheduled?: boolean;
+}
+
 async function recordReminderEvent(
   ctx: ActionCtx,
-  type: ReminderEventType,
+  type: Exclude<ReminderEventType, typeof EVENT.scheduleConfigured>,
   attempt: DeliveryAttempt,
-  payload: Record<string, unknown>,
+  details: ReminderOutcomeDetails,
 ): Promise<void> {
-  await ctx.runMutation(internal.invoiceReminders.recordEvent, {
-    type,
+  await ctx.runMutation(internal.invoiceReminders.recordReminderOutcome, {
+    kind: type,
     invoiceId: attempt.invoiceId,
-    payload: {
-      tenantId: attempt.tenantId,
-      configId: attempt.configId,
-      offsetDays: attempt.offsetDays,
-      scheduledFor: attempt.scheduledFor,
-      source: attempt.source,
-      ...payload,
-    },
+    tenantId: attempt.tenantId,
+    configId: attempt.configId,
+    offsetDays: attempt.offsetDays,
+    scheduledFor: attempt.scheduledFor,
+    source: attempt.source,
+    ...details,
   });
 }
 
@@ -804,6 +972,7 @@ async function deliverReminder(
     await recordReminderEvent(ctx, EVENT.paymentLinkPrepared, attempt, {
       sessionId: created.sessionId,
       url: created.url,
+      amount: Number(context.invoice.amountDue),
     });
   }
 

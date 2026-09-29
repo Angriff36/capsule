@@ -13,8 +13,8 @@ const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 // §5.4 L276; codex review findings 3/C): same-tenant, non-removed MenuDish
 // (deletedAt null, addedAt set), priced, in a non-deleted published menu, with
 // an active dish — the same rules proposalPricing.resolveCatalogPrice enforces.
-// Kept LOCAL (not imported across modules) so this module's raw-write +
-// event-table references stay clear of the event-manifest integration guard.
+// Kept LOCAL (not imported across modules) so this module's event-table
+// references stay clear of the event-manifest integration guard.
 // Non-throwing: the publish snapshot records null; the send audit throws on null.
 async function resolveCatalogPrice(
   ctx: { db: any },
@@ -417,22 +417,22 @@ export const captureProposalRevision = internalMutation({
     const identity = await ctx.auth.getUserIdentity();
     const capturedByName = identity?.name ?? "Unknown";
 
-    // Create the revision record
-    const revisionId = await ctx.db.insert("proposalRevisions", {
-      tenantId: proposal.tenantId,
-      proposalId: proposal._id,
-      revisionNumber: nextRevisionNumber,
-      changeSummary: changeSummary || "Proposal sent to client",
-      capturedByName: capturedByName,
-      capturedByAuthSubjectId: identity?.subject ?? null,
-      capturedAt: Date.now(),
-      snapshot: snapshot,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      version: 0,
-    });
+    // Create the revision record through the generated capture command, with
+    // the sender's own identity (it stamps capturedByAuthSubjectId = user.id
+    // and emits ProposalRevisionCaptured). The revision number and snapshot
+    // stay computed here.
+    const created: { docId: Id<"proposalRevisions"> } = await ctx.runMutation(
+      api.mutations.ProposalRevision_createViaCapture,
+      {
+        proposalId: proposal._id,
+        revisionNumber: nextRevisionNumber,
+        changeSummary: changeSummary || "Proposal sent to client",
+        capturedByName,
+        snapshot,
+      },
+    );
 
-    return { revisionId, revisionNumber: nextRevisionNumber };
+    return { revisionId: created.docId, revisionNumber: nextRevisionNumber };
   },
 });
 

@@ -165,6 +165,53 @@ entity SignatureRequest mixin TenantScoped, SoftDeletable {
       recipientName: self.recipientName
       signedAt: now()
       signedArtifactReference: signedArtifactReference
+      acceptProposalId: self.proposalId
+    }
+  }
+
+  // Internal click-to-accept completion. The public acceptance seam
+  // (convex/signatureAcceptance.ts) authorizes the anonymous signer by the
+  // row's Convex _id (the internal flow stores no callbackToken, so `complete`
+  // cannot pass its token guard), validates the signed revision and its
+  // proposal, then runs THIS command as the tenant's system role. Only the
+  // system role may run it: sales staff record their own acceptance through
+  // Proposal.accept and must not be able to forge a client signature.
+  //
+  // acceptProposalId is the proposal the seam validated from the signed
+  // revision. It is omitted when that proposal is already accepted (another
+  // request or the operator got there first), so the signature is still
+  // recorded but the SignatureCompleted → Proposal.accept reaction does not
+  // run a second acceptance.
+  command completeInternal(
+    signedArtifactReference: string,
+    optional signerIpAddress: string,
+    optional signerUserAgent: string,
+    optional acceptProposalId: uuid
+  ) {
+    guard self.deletedAt == null
+    guard user.role == "system" "Only the client's acceptance link can complete a click-to-accept request"
+    guard self.provider == "internal" "Only click-to-accept requests complete this way"
+    guard self.status == "requested" "Can only complete pending requests"
+    guard self.requestedAt != null "Request must be initiated"
+    guard self.expiresAt == null or now() < self.expiresAt "Request has expired"
+    guard self.proposalId == null or acceptProposalId == null or acceptProposalId == self.proposalId "This acceptance link is inconsistent"
+
+    mutate status = "completed"
+    mutate completedAt = now()
+    mutate signedArtifactReference = signedArtifactReference
+    mutate signerIpAddress = signerIpAddress
+    mutate signerUserAgent = signerUserAgent
+
+    emit SignatureCompleted {
+      signatureRequestId: self.id
+      tenantId: self.tenantId
+      proposalRevisionId: self.proposalRevisionId
+      proposalId: self.proposalId
+      recipientEmail: self.recipientEmail
+      recipientName: self.recipientName
+      signedAt: now()
+      signedArtifactReference: signedArtifactReference
+      acceptProposalId: acceptProposalId
     }
   }
 
@@ -269,6 +316,10 @@ event SignatureCompleted: "signature_request.completed" {
   recipientName: string
   signedAt: datetime
   signedArtifactReference: string
+  // The proposal the SignatureCompleted → Proposal.accept reaction accepts.
+  // Null when no acceptance should run (no bound proposal, or the proposal
+  // was already accepted). Rows written before 2026-09-29 lack this field.
+  acceptProposalId: string?
 }
 
 event SignatureExpired: "signature_request.expired" {
@@ -290,21 +341,22 @@ event SignatureRevoked: "signature_request.revoked" {
 
 // Acceptance cascade (spec §5.5). SignatureCompleted drives the bound
 // Proposal through accept: the generator projects this single-target `run`
-// reaction inline into the generated SignatureRequest_complete mutation, so
-// the accept (its guards, cascade, and ProposalAccepted ledger row) runs in
-// the SAME transaction as the completion, right after the completion's own
-// ledger insert. The request's proposalRevisionId travels into Proposal.accept
-// so the acceptance records the exact revision the signer saw
-// (convex/lib/proposalAcceptanceRevision.ts validates and stores it). The
-// reaction only fires when the request carries a proposalId; the authored
-// public seam convex/signatureAcceptance.ts serves anonymous token clicks,
-// which cannot pass the generated command guards. It validates the token and
-// the signed revision itself, then runs the SAME generated Proposal_accept
-// under the established tenant system runner
+// reaction inline into the generated SignatureRequest_complete and
+// SignatureRequest_completeInternal mutations, so the accept (its guards,
+// cascade, and ProposalAccepted ledger row) runs in the SAME transaction as
+// the completion, right after the completion's own ledger insert. The
+// request's proposalRevisionId travels into Proposal.accept so the acceptance
+// records the exact revision the signer saw
+// (convex/lib/proposalAcceptanceRevision.ts validates it). The reaction fires
+// only when the event carries acceptProposalId: `complete` passes the
+// request's proposalId; `completeInternal` passes the proposal the public
+// seam convex/signatureAcceptance.ts validated from the signed revision, or
+// nothing when that proposal is already accepted. The anonymous click runs
+// completeInternal under the established tenant system runner
 // (convex/lib/tenantSystemCommandRunner.ts), so an anonymous acceptance
 // commits the identical guards, ProposalAccepted ledger row and menu cascade
 // in one transaction (issue #390).
-on SignatureCompleted run Proposal.accept resolve payload.proposalId
+on SignatureCompleted run Proposal.accept resolve payload.acceptProposalId
   params {
     acceptedRevisionId: payload.proposalRevisionId
   }

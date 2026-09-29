@@ -394,6 +394,27 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   rowsAttempted += 1;
   await client.mutation(api.mutations.Invoice_createViaIssue, { "clientId": "clientId-invoice-2", "eventId": "eventId-invoice-2", "invoiceNumber": "demo-invoiceNumber-2", "subtotal": 2, "taxAmount": 2, "discountAmount": 2, "total": 2, "lineItems": "demo-lineItems-2", "taxBreakdown": "demo-taxBreakdown-2", "paymentTermsDays": 2, "dueDate": 1767355200000, "notes": "demo-notes-2", "currencyCode": "demo-currencyCode-2", "exchangeRate": 2 } as any);
   // skip InvoiceNumberSequence: no creation command in IR (2 rows unused)
+  // InvoicePaymentLink has multiple initialization commands (announceCreated, announceReminderLink, open); using the selected initialization command: open.
+  // InvoicePaymentLink → api.mutations.InvoicePaymentLink_createViaOpen
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.InvoicePaymentLink_createViaOpen, { "invoiceId": "invoiceId-invoice-payment-link-1", "sessionId": "sessionId-invoice-payment-link-1", "url": "demo-url-1", "amount": 1, "createdByUserId": "createdByUserId-invoice-payment-link-1", "configId": "configId-invoice-payment-link-1", "offsetDays": 1, "scheduledFor": 1767268800000, "source": "demo-source-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.InvoicePaymentLink_createViaOpen, { "invoiceId": "invoiceId-invoice-payment-link-2", "sessionId": "sessionId-invoice-payment-link-2", "url": "demo-url-2", "amount": 2, "createdByUserId": "createdByUserId-invoice-payment-link-2", "configId": "configId-invoice-payment-link-2", "offsetDays": 2, "scheduledFor": 1767355200000, "source": "demo-source-2" } as any);
+  // InvoiceReminderAttempt → api.mutations.InvoiceReminderAttempt_createViaOpen
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.InvoiceReminderAttempt_createViaOpen, { "invoiceId": "invoiceId-invoice-reminder-attempt-1", "configId": "configId-invoice-reminder-attempt-1", "offsetDays": 1, "scheduledFor": 1767268800000, "source": "demo-source-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.InvoiceReminderAttempt_createViaOpen, { "invoiceId": "invoiceId-invoice-reminder-attempt-2", "configId": "configId-invoice-reminder-attempt-2", "offsetDays": 2, "scheduledFor": 1767355200000, "source": "demo-source-2" } as any);
+  // InvoiceReminderSchedule → api.mutations.InvoiceReminderSchedule_createViaConfigure
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.InvoiceReminderSchedule_createViaConfigure, { "invoiceId": "invoiceId-invoice-reminder-schedule-1", "configId": "configId-invoice-reminder-schedule-1", "configuredAt": 1767268800000, "dueDate": 1767268800000, "offsetsDays": "demo-offsetsDays-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.InvoiceReminderSchedule_createViaConfigure, { "invoiceId": "invoiceId-invoice-reminder-schedule-2", "configId": "configId-invoice-reminder-schedule-2", "configuredAt": 1767355200000, "dueDate": 1767355200000, "offsetsDays": "demo-offsetsDays-2" } as any);
+  // InvoiceStripePayment → api.mutations.InvoiceStripePayment_createViaRecord
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.InvoiceStripePayment_createViaRecord, { "invoiceId": "invoiceId-invoice-stripe-payment-1", "sessionId": "sessionId-invoice-stripe-payment-1", "paymentId": "paymentId-invoice-stripe-payment-1", "amount": 1, "method": "demo-method-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.InvoiceStripePayment_createViaRecord, { "invoiceId": "invoiceId-invoice-stripe-payment-2", "sessionId": "sessionId-invoice-stripe-payment-2", "paymentId": "paymentId-invoice-stripe-payment-2", "amount": 2, "method": "demo-method-2" } as any);
   // ItemUnitMapping has multiple initialization commands (record, retire); using the selected initialization command: record.
   // ItemUnitMapping → api.mutations.ItemUnitMapping_createViaRecord
   rowsAttempted += 1;
@@ -665,6 +686,14 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.SignatureRequest_createViaRequestSignature, { "proposalRevisionId": "proposalRevisionId-signature-request-1", "proposalId": "proposalId-signature-request-1", "recipientEmail": "user1@example.com", "recipientName": "SignatureRequest 1", "recipientPersonId": "recipientPersonId-signature-request-1", "recipientContactId": "recipientContactId-signature-request-1", "provider": "demo-provider-1", "expiresAt": 1767268800000 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.SignatureRequest_createViaRequestSignature, { "proposalRevisionId": "proposalRevisionId-signature-request-2", "proposalId": "proposalId-signature-request-2", "recipientEmail": "user2@example.com", "recipientName": "SignatureRequest 2", "recipientPersonId": "recipientPersonId-signature-request-2", "recipientContactId": "recipientContactId-signature-request-2", "provider": "demo-provider-2", "expiresAt": 1767355200000 } as any);
+  // SmsAlertDelivery → api.mutations.SmsAlertDelivery_createViaOpen
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.SmsAlertDelivery_createViaOpen, { "triggerKey": "demo-triggerKey-1", "personId": "personId-sms-alert-delivery-1", "alertType": "demo-alertType-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.SmsAlertDelivery_createViaOpen, { "triggerKey": "demo-triggerKey-2", "personId": "personId-sms-alert-delivery-2", "alertType": "demo-alertType-2" } as any);
+  // SmsAlertSetting → api.mutations.SmsAlertSetting_createViaOpen
+  // skip SmsAlertSetting row "sms-alert-setting-1": no non-blank create args
+  // skip SmsAlertSetting row "sms-alert-setting-2": no non-blank create args
   // skip SoftDeletable: not a Convex-persistent store (2 rows unused)
   // StaffChatReadCursor → api.mutations.StaffChatReadCursor_createViaOpen
   rowsAttempted += 1;
@@ -1243,6 +1272,26 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "InvoicePaymentLink",
+      "createMutation": "InvoicePaymentLink_createViaOpen",
+      "rowCount": 2
+    },
+    {
+      "entity": "InvoiceReminderAttempt",
+      "createMutation": "InvoiceReminderAttempt_createViaOpen",
+      "rowCount": 2
+    },
+    {
+      "entity": "InvoiceReminderSchedule",
+      "createMutation": "InvoiceReminderSchedule_createViaConfigure",
+      "rowCount": 2
+    },
+    {
+      "entity": "InvoiceStripePayment",
+      "createMutation": "InvoiceStripePayment_createViaRecord",
+      "rowCount": 2
+    },
+    {
       "entity": "ItemUnitMapping",
       "createMutation": "ItemUnitMapping_createViaRecord",
       "rowCount": 2
@@ -1505,6 +1554,16 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "SignatureRequest",
       "createMutation": "SignatureRequest_createViaRequestSignature",
+      "rowCount": 2
+    },
+    {
+      "entity": "SmsAlertDelivery",
+      "createMutation": "SmsAlertDelivery_createViaOpen",
+      "rowCount": 2
+    },
+    {
+      "entity": "SmsAlertSetting",
+      "createMutation": "SmsAlertSetting_createViaOpen",
       "rowCount": 2
     },
     {
