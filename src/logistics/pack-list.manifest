@@ -512,10 +512,16 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
 
   command syncContainerServings(quantityServings: number) {
     // Active planning only: list not terminal, line still follows, EventDish still live. Event.changeHeadcount already refuses completed/closed_out/cancelled — do not use self.packList.event (generator never loads that hop).
-    compute eligible = self.deletedAt == null and self.followsDishServings == true and self.dishContainer != null and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled" and self.eventDish != null and self.eventDish.deletedAt == null and self.eventDish.removedAt == null
-    compute planned = quantityServings > 0 and self.dishContainer != null and self.dishContainer.deletedAt == null and self.dishContainer.status == "active" ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
+    compute live = self.deletedAt == null and self.followsDishServings == true and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    // A removed dish zeroes its following container line (AC-524).
+    compute dishGone = self.eventDish == null or self.eventDish.deletedAt != null or self.eventDish.removedAt != null
+    compute eligible = live and (dishGone or self.dishContainer != null)
+    compute planned = not dishGone and quantityServings > 0 and self.dishContainer != null and self.dishContainer.deletedAt == null and self.dishContainer.status == "active" ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
     mutate requiredQuantity = eligible ? planned : self.requiredQuantity
-    mutate containerServings = eligible ? quantityServings : self.containerServings
+    mutate containerServings = eligible and not dishGone ? quantityServings : self.containerServings
+    // A dish taken off the menu retires its unpacked container line; a packed
+    // count keeps the line so the packer sees what to bring back.
+    mutate retiredAt = eligible ? (planned == 0 and self.packedQuantity == 0 ? (self.retiredAt != null ? self.retiredAt : now()) : null) : self.retiredAt
     mutate status = eligible and self.status == "packed" and planned > self.packedQuantity ? "listed" : self.status
     emit PackListItemRequirementSynced {
       packListId: self.packListId

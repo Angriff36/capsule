@@ -36240,8 +36240,10 @@ async function __runPackListItemSyncContainerServings(ctx: MutationCtx, { docId,
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
-    const eligible = (((((((((doc.deletedAt == null) && (doc.followsDishServings === true)) && (__rel_dishContainer != null)) && (__rel_packList != null)) && (__rel_packList.status !== "dispatched")) && (__rel_packList.status !== "cancelled")) && (__rel_eventDish != null)) && (__rel_eventDish.deletedAt == null)) && (__rel_eventDish.removedAt == null));
-    const planned = (((((quantityServings > 0) && (__rel_dishContainer != null)) && (__rel_dishContainer.deletedAt == null)) && (__rel_dishContainer.status === "active")) ? (Math.ceil((quantityServings / __rel_dishContainer.servingsPerContainer)) + __rel_dishContainer.baseQuantity) : 0);
+    const live = (((((doc.deletedAt == null) && (doc.followsDishServings === true)) && (__rel_packList != null)) && (__rel_packList.status !== "dispatched")) && (__rel_packList.status !== "cancelled"));
+    const dishGone = (((__rel_eventDish == null) || (__rel_eventDish.deletedAt != null)) || (__rel_eventDish.removedAt != null));
+    const eligible = (live && (dishGone || (__rel_dishContainer != null)));
+    const planned = ((((((!dishGone) && (quantityServings > 0)) && (__rel_dishContainer != null)) && (__rel_dishContainer.deletedAt == null)) && (__rel_dishContainer.status === "active")) ? (Math.ceil((quantityServings / __rel_dishContainer.servingsPerContainer)) + __rel_dishContainer.baseQuantity) : 0);
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -36259,7 +36261,8 @@ async function __runPackListItemSyncContainerServings(ctx: MutationCtx, { docId,
     }
     const updates = {
       requiredQuantity: (eligible ? planned : doc.requiredQuantity),
-      containerServings: (eligible ? quantityServings : doc.containerServings),
+      containerServings: ((eligible && (!dishGone)) ? quantityServings : doc.containerServings),
+      retiredAt: (eligible ? (((planned === 0) && (doc.packedQuantity === 0)) ? ((doc.retiredAt != null) ? doc.retiredAt : Date.now()) : null) : doc.retiredAt),
       status: (((eligible && (doc.status === "packed")) && (planned > doc.packedQuantity)) ? "listed" : doc.status),
       version: ((doc as any).version ?? 0) + 1
     };
