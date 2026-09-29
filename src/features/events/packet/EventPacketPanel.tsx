@@ -7,6 +7,7 @@ import {
   type PacketDecision,
 } from "../../../lib/eventPacket/useEventPacket";
 import { importSources } from "../../../lib/eventPacket/importSources";
+import { describeSource } from "../../../lib/eventPacket/sourceProvenance";
 import {
   parsePacketSnapshot,
   parsePortablePacket,
@@ -176,6 +177,19 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
               snapshot.identity.invoiceNumber) &&
           candidate.identity.eventDate === snapshot.identity.eventDate,
       );
+      // Only diagrams or forms picked: keep them on this event as they are.
+      const referenceOnly =
+        result.candidates.length === 0 &&
+        result.sharedReferences.length > 0 &&
+        result.ungrouped.length === 0;
+      if (referenceOnly)
+        matches.push({
+          key: "this-event",
+          identity: snapshot.identity,
+          sources: [],
+          associationEvidence: [],
+          observations: [],
+        });
       if (matches.length !== 1)
         throw new Error(
           "These files do not identify this event unambiguously. Review their invoice number and event date, then select this event’s sources.",
@@ -288,7 +302,7 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
           <input
             className="mt-1 block max-w-full"
             type="file"
-            accept=".pdf,.rtf,.csv,.json"
+            accept=".pdf,.rtf,.csv,.json,.png,.jpg,.jpeg,.gif,.webp"
             multiple
             disabled={busy}
             onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
@@ -306,8 +320,9 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
       </div>
       <p className="mt-2 text-sm text-ink-3">
         What's already on this event stays in charge. The workbook is built from
-        it: add source files only to keep an original document or settle a
-        disagreement. You never need to upload a report Capsule already has.
+        it: add source files only to keep an original document or a setup
+        diagram picture, or to settle a disagreement. You never need to upload a
+        report Capsule already has.
       </p>
       <FinalLockPanel eventId={eventId} />
       <button
@@ -404,6 +419,16 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
                     {artifact.name}
                   </button>{" "}
                   · {artifact.kind.replaceAll("_", " ")}
+                  {(() => {
+                    const kept = view.sources?.find(
+                      (s) => s.checksum === artifact.fingerprint,
+                    );
+                    return kept ? (
+                      <span className="block text-ink-3">
+                        {describeSource(kept)}
+                      </span>
+                    ) : null;
+                  })()}
                 </li>
               ))}
             </ul>

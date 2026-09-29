@@ -28,6 +28,8 @@ import {
 import { appendFinalLockPages } from "../../../src/lib/eventPacket/finalLock/pdfStamp";
 import { parsePacketSnapshot } from "../../../src/lib/eventPacket/packetContract";
 import { resolveIssue } from "../../../src/lib/eventPacket/resolveIssue";
+import { referenceKinds } from "../../../src/lib/eventPacket/groupSources";
+import { sourceProvenance } from "../../../src/lib/eventPacket/sourceProvenance";
 import {
   partFingerprints,
   staleParts,
@@ -193,7 +195,30 @@ export const getPacket = query({
             await partFingerprints(current.snapshot, currentJson),
           )
         : [];
+    const sourceRows = (
+      await eventRows(ctx, "eventPacketArtifacts", auth.tenantId, eventId)
+    ).filter((r) => r.purpose === "source");
+    const names = new Map<string, string>();
+    for (const subject of new Set(sourceRows.map((r) => r.uploadedBy)))
+      if (subject) {
+        const person = (
+          await ctx.db
+            .query("people")
+            .withIndex("by_authSubjectId", (q) =>
+              q.eq("authSubjectId", subject),
+            )
+            .collect()
+        ).find((p) => p.tenantId === auth.tenantId);
+        const name = [person?.givenName, person?.familyName]
+          .filter(Boolean)
+          .join(" ");
+        if (name) names.set(subject, name);
+      }
     return clean({
+      sources: sourceProvenance(
+        sourceRows,
+        (subject) => (subject && names.get(subject)) || "Someone not on the team list",
+      ),
       snapshot: current.snapshot,
       currentFingerprint: current.currentFingerprint,
       finalLock: lock.print,
@@ -445,7 +470,13 @@ export const importEvidence = mutation({
     if (incoming.identity.eventId && incoming.identity.eventId !== args.eventId)
       throw new Error("Source belongs to a different native event");
     const native = await scopedEvent(ctx, auth.tenantId, args.eventId);
+    // Reference files (diagrams, forms, training) carry no event number or
+    // date: kept on this event, they neither set nor test its identity.
+    const identifies = incoming.artifacts.some(
+      (a) => !referenceKinds.has(a.kind),
+    );
     if (
+      identifies &&
       native.startsAt != null &&
       localDate(native.startsAt, args.timeZone) !== incoming.identity.eventDate
     )
@@ -457,9 +488,14 @@ export const importEvidence = mutation({
       args.eventId,
     );
     const established = owned.find(
-      (r) => r.purpose === "source" && r.metadataJson && r.contextJson,
+      (r) =>
+        r.purpose === "source" &&
+        r.metadataJson &&
+        r.contextJson &&
+        JSON.parse(r.contextJson).invoiceNumber,
     );
     if (
+      identifies &&
       established &&
       JSON.parse(established.contextJson).invoiceNumber !==
         incoming.identity.invoiceNumber
@@ -517,8 +553,12 @@ export const importEvidence = mutation({
         metadataJson: canonicalJson(metadata),
         observationsJson,
         contextJson: canonicalJson({
-          invoiceNumber: incoming.identity.invoiceNumber,
-          eventDate: incoming.identity.eventDate,
+          ...(identifies
+            ? {
+                invoiceNumber: incoming.identity.invoiceNumber,
+                eventDate: incoming.identity.eventDate,
+              }
+            : {}),
           timeZone: args.timeZone,
           quarantinedApprovals:
             incoming.resolutions.length +

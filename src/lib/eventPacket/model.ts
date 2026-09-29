@@ -14,6 +14,8 @@ export type SourceKind =
   | "training"
   | "nowsta_event_timesheet"
   | "kitchen_shift"
+  /** A picture: setup, load-in or floor diagram. Kept, never read for values. */
+  | "diagram"
   | "unknown";
 export type Section =
   | "venue"

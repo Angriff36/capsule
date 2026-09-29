@@ -5,6 +5,7 @@ import { prepareNativeWorkbook } from "./prepareNativeWorkbook";
 import type { EventPacketSnapshot, FieldValue } from "./model";
 import type { FinalLockPrint } from "./finalLock/evaluate";
 import type { PacketWorkbookSummary } from "./summaryProjection";
+import type { SourceProvenance } from "./sourceProvenance";
 
 export interface PacketView {
   snapshot: EventPacketSnapshot;
@@ -20,6 +21,8 @@ export interface PacketView {
     staleSections?: string[];
   } | null;
   nativeTargets?: Record<string, { id: string; label: string }[]>;
+  /** Kept source files with who uploaded them, when, and their checksum. */
+  sources?: SourceProvenance[];
 }
 export interface PacketDecision {
   issueId: string;

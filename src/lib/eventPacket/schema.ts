@@ -126,6 +126,7 @@ export const artifactSchema = z
       "training",
       "nowsta_event_timesheet",
       "kitchen_shift",
+      "diagram",
       "unknown",
     ]),
     parserVersion: text,

@@ -122,9 +122,12 @@ export async function readCurrentPacket(
   const event = await scopedEvent(ctx, tenantId, eventId);
   const files = await eventRows(ctx, "eventPacketArtifacts", tenantId, eventId);
   const sources = files.filter((f) => f.purpose === "source" && f.metadataJson);
-  const context = sources[0]?.contextJson
-    ? JSON.parse(sources[0].contextJson)
-    : {};
+  // Reference files (diagrams, forms) carry only a time zone, no identity.
+  const contexts = sources.map((s) => JSON.parse(s.contextJson ?? "{}"));
+  const context = {
+    ...(contexts.find((c) => c.timeZone) ?? {}),
+    ...(contexts.find((c) => c.invoiceNumber) ?? {}),
+  };
   const zone = context.timeZone ?? "UTC";
   const artifactMetadata = sources.map((s) => JSON.parse(s.metadataJson));
   const observations = sources
