@@ -2415,6 +2415,7 @@ export const PackListItemSchema = z.object({
   exclusionReason: z.string().nullable().optional(),
   replacementDescription: z.string().nullable().optional(),
   coveredBy: z.enum(["equivalent", "client", "vendor"]).nullable().optional(),
+  loadAssignmentId: z.string().uuid().nullable().optional(),
   requiredQuantity: z.number().default(0),
   packedQuantity: z.number().min(0).default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
@@ -2423,6 +2424,9 @@ export const PackListItemSchema = z.object({
   packedAt: z.coerce.date().nullable().optional(),
   packedByPersonId: z.string().uuid().nullable().optional(),
   missingAt: z.coerce.date().nullable().optional(),
+  missingByPersonId: z.string().uuid().nullable().optional(),
+  sentInsteadByPersonId: z.string().uuid().nullable().optional(),
+  excludedByPersonId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -8282,6 +8286,13 @@ export const PackListItemApplyGeneratedParamsSchema = z.object({
 });
 
 export type PackListItemApplyGeneratedParams = z.infer<typeof PackListItemApplyGeneratedParamsSchema>;
+
+// Command: assignLoad on PackListItem
+export const PackListItemAssignLoadParamsSchema = z.object({
+  loadAssignmentId: z.string().min(1).optional(),
+});
+
+export type PackListItemAssignLoadParams = z.infer<typeof PackListItemAssignLoadParamsSchema>;
 
 // Command: correctImportedFluidOunces on PackListItem
 export const PackListItemCorrectImportedFluidOuncesParamsSchema = z.object({

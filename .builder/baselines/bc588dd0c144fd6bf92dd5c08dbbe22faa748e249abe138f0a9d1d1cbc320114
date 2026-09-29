@@ -2183,6 +2183,7 @@ export default defineSchema({
     exclusionReason: v.optional(v.union(v.string(), v.null())),
     replacementDescription: v.optional(v.union(v.string(), v.null())),
     coveredBy: v.optional(v.union(v.literal("equivalent"), v.literal("client"), v.literal("vendor"), v.null())),
+    loadAssignmentId: v.optional(v.union(v.id("eventVehicleAssignments"), v.null())),
     requiredQuantity: v.number(),
     packedQuantity: v.number(),
     unit: v.union(v.literal("each"), v.literal("gram"), v.literal("kilogram"), v.literal("ounce"), v.literal("pound"), v.literal("milliliter"), v.literal("liter"), v.literal("teaspoon"), v.literal("tablespoon"), v.literal("cup"), v.literal("pint"), v.literal("quart"), v.literal("gallon"), v.literal("portion"), v.literal("serving"), v.literal("batch"), v.literal("melon"), v.literal("bottle"), v.literal("fluid_ounce"), v.literal("piece"), v.literal("slice"), v.literal("pizza"), v.literal("package"), v.literal("case"), v.literal("can"), v.literal("tub")),
@@ -2191,6 +2192,9 @@ export default defineSchema({
     packedAt: v.optional(v.union(v.number(), v.null())),
     packedByPersonId: v.optional(v.union(v.string(), v.null())),
     missingAt: v.optional(v.union(v.number(), v.null())),
+    missingByPersonId: v.optional(v.union(v.string(), v.null())),
+    sentInsteadByPersonId: v.optional(v.union(v.string(), v.null())),
+    excludedByPersonId: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),
@@ -2201,7 +2205,8 @@ export default defineSchema({
     .index("by_dishId", ["dishId"])
     .index("by_dishContainerId", ["dishContainerId"])
     .index("by_eventDishId", ["eventDishId"])
-    .index("by_productionBatchId", ["productionBatchId"]),
+    .index("by_productionBatchId", ["productionBatchId"])
+    .index("by_loadAssignmentId", ["loadAssignmentId"]),
   packListTemplates: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

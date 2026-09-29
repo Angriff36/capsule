@@ -355,6 +355,10 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   property exclusionReason: string?
   property replacementDescription: string?
   property coveredBy: PackCoverage?
+  // Which truck, trailer or vendor drop on the event carries this line (the
+  // truck-load view). Empty = not placed; with one truck on the event it
+  // rides on that one.
+  property loadAssignmentId: uuid?
   property required requiredQuantity: decimal(12, 4) = 0
   property required packedQuantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
@@ -365,12 +369,18 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   // account is not linked to a profile. Saving a count is never blocked for that.
   property packedByPersonId: uuid?
   property missingAt: datetime?
+  // Who marked it missing, recorded what went instead, and left it off
+  // (AC-134). Missing when the account is not linked to a staff profile.
+  property missingByPersonId: uuid?
+  property sentInsteadByPersonId: uuid?
+  property excludedByPersonId: uuid?
 
   belongsTo packList: PackList fields [tenantId, packListId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
   belongsTo dishContainer: DishContainer fields [tenantId, dishContainerId] references [tenantId, id]
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
   belongsTo productionBatch: ProductionBatch fields [tenantId, productionBatchId] references [tenantId, id]
+  belongsTo loadAssignment: EventVehicleAssignment fields [tenantId, loadAssignmentId] references [tenantId, id]
 
   constraint itemListedComplete: self.listedAt == null or (length(trim(self.description)) > 0 and self.requiredQuantity >= 0) "Give this pack item a description, and make sure the amount needed isn't negative."
   constraint itemPackedNonnegative: self.packedQuantity >= 0 "This item's packed amount can't be negative. Use zero or more."
@@ -596,6 +606,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     compute previousStatus = self.status
     mutate status = "missing"
     mutate missingAt = now()
+    mutate missingByPersonId = user.personId
     emit PackListItemMissing {
       packListItemId: self.id
       tenantId: self.tenantId
@@ -692,6 +703,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   command recordSentInstead(optional sentInstead: string) {
     guard self.deletedAt == null
     mutate sentInstead = sentInstead != null and length(trim(sentInstead)) > 0 ? trim(sentInstead) : null
+    mutate sentInsteadByPersonId = user.personId
     emit PackListItemSentInsteadRecorded {
       packListItemId: self.id
       tenantId: self.tenantId
@@ -787,12 +799,28 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     mutate exclusionReason = trim(reason)
     mutate replacementDescription = replacementDescription != null and length(trim(replacementDescription)) > 0 ? trim(replacementDescription) : null
     mutate coveredBy = coveredBy
+    mutate excludedByPersonId = user.personId
     emit PackListItemExcluded {
       packListItemId: self.id
       tenantId: self.tenantId
       packListId: self.packListId
       description: self.description
       reason: trim(reason)
+    }
+  }
+
+  // Put this line on a truck of its event, or take it off (empty). The seam
+  // (convex/lib/packRuleReconciliation.ts) checks the truck is on the same
+  // event. Correctable up to and during the event.
+  command assignLoad(optional loadAssignmentId: uuid) {
+    guard self.deletedAt == null
+    guard self.packList != null and self.packList.status != "cancelled"
+    mutate loadAssignmentId = loadAssignmentId
+    emit PackListItemLoadAssigned {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      loadAssignmentId: loadAssignmentId
     }
   }
 
@@ -953,6 +981,13 @@ event PackListItemKitEnsured: "pack_list_item.kit_ensured" {
   tenantId: string
   packListId: string
   serviceStyleKitItemId: string
+}
+
+event PackListItemLoadAssigned: "pack_list_item.load_assigned" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  loadAssignmentId: string?
 }
 
 event PackListItemExcluded: "pack_list_item.excluded" {

@@ -300,6 +300,21 @@ export function packFactEventId(event: {
   return typeof id === "string" && id.length > 0 ? (id as Id<"events">) : null;
 }
 
+/** PackListItem.assignLoad callback: the truck must be on the line's event
+ * now (an update command cannot read a NEW relation id). */
+export async function validatePackLoadAssignment(
+  ctx: MutationCtx,
+  itemId: Id<"packListItems">,
+): Promise<void> {
+  const item = await ctx.db.get(itemId);
+  if (!item?.loadAssignmentId) return;
+  const list = await ctx.db.get(item.packListId as Id<"packLists">);
+  const rig = await ctx.db.get(item.loadAssignmentId as Id<"eventVehicleAssignments">);
+  if (!list || !rig || rig.tenantId !== item.tenantId || rig.deletedAt != null ||
+    rig.activeEventId !== list.eventId)
+    throw new ConvexError("That truck is not on this event. Pick one of the event's trucks.");
+}
+
 /** PackList.markPacked callback: refuse while a missing or must-have line
  * has nothing covering it (AC-527/AC-539). Names every such line. */
 export async function validatePackReadiness(

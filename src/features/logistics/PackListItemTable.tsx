@@ -8,7 +8,7 @@ import {
 import { PackLineWhy } from "./PackLineWhy";
 import type { PackLineFacts } from "./packLineExplanation";
 
-interface PackListItemRow extends PackLineFacts {
+export interface PackListItemRow extends PackLineFacts {
   _id: string;
   description: string;
   note?: string | null;
@@ -17,12 +17,14 @@ interface PackListItemRow extends PackLineFacts {
   requiredQuantity: number;
   packedQuantity: number;
   packedByPersonId?: string | null;
+  missingByPersonId?: string | null;
+  sentInsteadByPersonId?: string | null;
   unit: string;
   status: unknown;
   version: number;
 }
 
-interface PackListItemTableProps {
+export interface PackListItemTableProps {
   loading: boolean;
   items: PackListItemRow[];
   canAddItems: boolean;
@@ -41,6 +43,10 @@ interface PackListItemTableProps {
   onToggleAll: (on: boolean) => void;
   selectableCount: number;
   failedItem?: { id: string; message: string } | null;
+  /** View-specific line buttons (the truck-load view adds "Truck"). */
+  extraActions?: (
+    item: PackListItemRow,
+  ) => Array<{ key: string; label: string }>;
 }
 
 export function PackListItemTable({
@@ -61,6 +67,7 @@ export function PackListItemTable({
   onToggleAll,
   selectableCount,
   failedItem,
+  extraActions,
 }: PackListItemTableProps) {
   if (loading) return <TableSkeleton rows={5} />;
   if (items.length === 0) {
@@ -108,7 +115,7 @@ export function PackListItemTable({
         </thead>
         <tbody>
           {items.map((item) => (
-            <tr key={item._id}>
+            <tr key={item._id} data-line-id={item._id}>
               <td className="w-8">
                 {canSelectItem(item) ? (
                   <input
@@ -144,6 +151,15 @@ export function PackListItemTable({
                 {item.sentInstead ? (
                   <small className="block">
                     Sent instead: {item.sentInstead}
+                    {packedByName(item.sentInsteadByPersonId)
+                      ? ` · ${packedByName(item.sentInsteadByPersonId)}`
+                      : ""}
+                  </small>
+                ) : null}
+                {String(item.status) === "missing" &&
+                packedByName(item.missingByPersonId) ? (
+                  <small className="block">
+                    Marked missing by {packedByName(item.missingByPersonId)}
                   </small>
                 ) : null}
                 <PackLineWhy line={item} />
@@ -179,6 +195,18 @@ export function PackListItemTable({
                     </button>
                   ) : null}
                   {itemActions(String(item.status)).map((action) => (
+                    <button
+                      key={action.key}
+                      className="btn btn-ghost btn-sm"
+                      disabled={busy != null}
+                      onClick={() => onInvokeItem(item, action.key)}
+                    >
+                      {busy === `${item._id}:${action.key}`
+                        ? "Working…"
+                        : action.label}
+                    </button>
+                  ))}
+                  {(extraActions?.(item) ?? []).map((action) => (
                     <button
                       key={action.key}
                       className="btn btn-ghost btn-sm"

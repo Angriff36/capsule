@@ -13,6 +13,7 @@ import {
   usePackListDispatch,
   usePackListItemAdjustQuantity,
   usePackListItemAnnotate,
+  usePackListItemAssignLoad,
   usePackListItemExclude,
   usePackListItemRemove,
   usePackListItemRestoreExcluded,
@@ -44,7 +45,9 @@ import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { PackListItemForm } from "./PackListItemForm";
-import { PackListItemTable } from "./PackListItemTable";
+import { PackListViews } from "./PackListViews";
+import type { PackViewKind } from "./packViews";
+import { usePackRigs } from "./usePackRigs";
 import { PackListKitAssistBar } from "./PackListKitAssistBar";
 import { PACK_LIST_UNITS } from "./packListUnits";
 import { useActionNotice } from "../../ui/action-result";
@@ -96,6 +99,7 @@ export function PackListDetailPage() {
   const adjustQuantity = usePackListItemAdjustQuantity();
   const annotateItem = usePackListItemAnnotate();
   const excludeItem = usePackListItemExclude();
+  const assignLoad = usePackListItemAssignLoad();
   const restoreExcluded = usePackListItemRestoreExcluded();
   const refreshPackRules = useRefreshPackRules();
   const removeItem = usePackListItemRemove();
@@ -118,6 +122,8 @@ export function PackListDetailPage() {
   const [previewTemplateId, setPreviewTemplateId] = useState<string | null>(
     null,
   );
+  const [view, setView] = useState<PackViewKind>("all");
+  const rigs = usePackRigs(packList ? packList.eventId : null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [failureItemId, setFailureItemId] = useState<string | null>(null);
@@ -515,6 +521,38 @@ export function PackListDetailPage() {
       });
       return;
     }
+    if (key === "truck") {
+      const values = await prompt.askFields({
+        title: "Which truck carries this?",
+        description: "Pick the truck, trailer or vendor drop on this event.",
+        confirmLabel: "Save",
+        fields: [
+          {
+            name: "rig",
+            label: "Truck",
+            required: false,
+            options: [
+              { value: "", label: "Not on a truck yet" },
+              ...rigs.map((rig) => ({ value: rig.id, label: rig.label })),
+            ],
+          },
+        ],
+      });
+      if (!values) return;
+      void run(`${item._id}:truck`, async () => {
+        await assignLoad({
+          docId: item._id,
+          version: item.version,
+          loadAssignmentId: values.rig || undefined,
+        });
+        setNotice(
+          values.rig
+            ? "Line placed on the truck."
+            : "Line taken off the truck.",
+        );
+      });
+      return;
+    }
     if (key === "putBack") {
       void run(`${item._id}:putBack`, async () => {
         await restoreExcluded({ docId: item._id, version: item.version });
@@ -873,7 +911,10 @@ export function PackListDetailPage() {
           </div>
           <span>{formatCountNoun(listItems.length, "item")}</span>
         </div>
-        <PackListItemTable
+        <PackListViews
+          view={view}
+          onViewChange={setView}
+          rigs={rigs}
           loading={
             items === undefined || events === undefined || dishes === undefined
           }
