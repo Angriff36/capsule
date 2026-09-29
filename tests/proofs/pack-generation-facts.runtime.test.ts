@@ -6,7 +6,15 @@
  * AC-531 (guest count + spare), AC-532 (venue and setup facts),
  * AC-533 (bar kit once).
  */
-import { beforeAll, describe, expect, it } from "vitest";
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import { api } from "../../convex/_generated/api";
 import {
   addDish,
@@ -27,6 +35,17 @@ const M = api.mutations;
 beforeAll(() => {
   process.env.CONVEX_FIELD_ENCRYPTION_KEY ||=
     "A1MKNFPVRhFaPf83T45BwooVzAogtiphQhYraAD5gqU=";
+});
+
+// A pack line added queues the company timing re-plan, which writes the event
+// and raises its version. Queued follow-ups stay queued here, so an event
+// version read before a command cannot go stale mid-test. The re-plan has its
+// own proof (timing-rules).
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ["setTimeout"] });
+});
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe("runtime proof: pack lines from event facts", () => {

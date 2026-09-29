@@ -6,7 +6,15 @@
  * (AC-399 sales_lock slice).
  */
 import { convexTest } from "convex-test";
-import { beforeAll, describe, expect, it } from "vitest";
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
@@ -33,6 +41,16 @@ beforeAll(() => {
     process.env.CONVEX_FIELD_ENCRYPTION_KEY =
       "A1MKNFPVRhFaPf83T45BwooVzAogtiphQhYraAD5gqU=";
   }
+});
+
+// Queued follow-ups (the company timing re-plan writes the event and raises
+// its version) stay queued, so this proof counts only the commands it runs.
+// The re-plan has its own proof (timing-rules).
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ["setTimeout"] });
+});
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 type Proof = ReturnType<typeof harness>;
