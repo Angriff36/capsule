@@ -88,9 +88,17 @@ describe("multiple legs (AC-429)", () => {
       arriveBeforeServeMinutes: 240,
       leaveAfterMinutes: 30,
     });
-    // ...then makes a second, later run with a shorter load.
-    const secondRun = await assign({ vehicleId: truckB });
-    await planLeg(secondRun, { arriveBeforeServeMinutes: 90, loadMinutes: 30 });
+    // ...then makes a second, later run with a shorter load. The second trip
+    // is booked with its own times: booked with the main crew's times it
+    // would need truck B while it is still out on the drop (PL-DELIVERY).
+    await expect(assign({ vehicleId: truckB })).rejects.toThrow(
+      /already out for another run of this event/,
+    );
+    const secondRun = await assign({
+      vehicleId: truckB,
+      arriveBeforeServeMinutes: 90,
+      loadMinutes: 30,
+    });
     const vendor = await assign({ vendorName: "Harbor Party Rentals" });
     await planLeg(vendor, { arriveBeforeServeMinutes: 300 });
 
@@ -214,11 +222,17 @@ describe("multiple legs (AC-429)", () => {
     await expectShifts(later, ENDS_AT);
 
     // The second run planned too early would need truck B while it is still
-    // out on the drop: shown as a clash, not hidden.
-    await planLeg(secondRun, {
-      arriveBeforeServeMinutes: 200,
-      loadMinutes: 30,
-    });
+    // out on the drop: refused, and the run keeps its times (PL-DELIVERY).
+    await expect(
+      planLeg(secondRun, { arriveBeforeServeMinutes: 200, loadMinutes: 30 }),
+    ).rejects.toThrow(/TRUCK-B is already out/);
+    expect((await legsAt()).conflicts).toEqual([]);
+    // A clash that comes from the event itself moving (not from a booking)
+    // is still shown, never hidden: the drop run is stretched in the
+    // database the way an old booking would be.
+    await t.run((ctx) =>
+      ctx.db.patch(secondRun, { arriveBeforeServeMinutes: 200 }),
+    );
     const clash = await legsAt();
     expect(clash.conflicts).toHaveLength(1);
     expect(clash.conflicts[0].legIds.sort()).toEqual(
