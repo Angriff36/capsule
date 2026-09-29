@@ -1,0 +1,32 @@
+/* Action prompt alert dialog: scrim + enter motion. Tailwind utilities on the
+   element own the panel; only ::backdrop and keyframes need real CSS. */
+.action-prompt-dialog::backdrop {
+  background: color-mix(in srgb, var(--color-ink) 30%, transparent);
+}
+
+.dark .action-prompt-dialog::backdrop {
+  background: color-mix(in srgb, var(--color-rail) 72%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .action-prompt-dialog[open] {
+    animation: action-prompt-in 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .action-prompt-dialog[open]::backdrop {
+    animation: action-prompt-fade 160ms ease-out;
+  }
+}
+
+@keyframes action-prompt-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@keyframes action-prompt-fade {
+  from {
+    opacity: 0;
+  }
+}

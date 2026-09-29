@@ -1,10 +1,26 @@
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type FormEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
+} from "react";
 import type { ActionPromptRequest } from "./ActionPromptTypes";
-import { MAX_DATETIME_LOCAL_INPUT_VALUE } from "../BoundedDateInputs";
+import { ActionPromptFields } from "./ActionPromptFields";
 import {
   ACTION_PROMPT_CONFIRM_ARM_MS,
   shouldAcceptConfirmClick,
 } from "./confirmClickArm";
+import {
+  closeModal,
+  initialFocusTarget,
+  openModal,
+  trapTab,
+} from "./dialogFocus";
+import { AlertTriangleIcon, CheckCircleIcon, FileTextIcon } from "../icons";
+import "./ActionPromptPanel.css";
 
 interface ActionPromptPanelProps {
   request: ActionPromptRequest;
@@ -16,6 +32,12 @@ interface ActionPromptPanelProps {
   }) => void;
 }
 
+/**
+ * Alert dialog for the governed-command confirm / reason step (Origin UI
+ * Alert Dialog pattern on a native modal <dialog>). The host stays inline at
+ * the call site so the DOM (and `[data-action-prompt]` lookups) are
+ * unchanged; showModal() lifts it into the top layer with a scrim.
+ */
 export function ActionPromptPanel({
   request,
   busy = false,
@@ -24,6 +46,8 @@ export function ActionPromptPanel({
 }: ActionPromptPanelProps) {
   const headingId = useId();
   const helperId = useId();
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const backdropPressRef = useRef(false);
   const returnFocusRef = useRef<HTMLElement | null>(
     typeof document === "undefined"
       ? null
@@ -51,24 +75,73 @@ export function ActionPromptPanel({
     // first prompt can never land on the second one's destructive button.
   }, [request]);
 
+  const latest = useRef({ busy, onDismiss });
+  latest.current = { busy, onDismiss };
+
+  // Open modally on mount, move focus inside, and restore it on close.
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    openModal(dialog);
+    initialFocusTarget(dialog)?.focus();
+    // The native Esc path fires `cancel`; this component owns dismissal.
+    const onNativeCancel = (event: Event) => event.preventDefault();
+    // A close we did not ask for (browser close-watcher) must not strand the
+    // pending prompt: dismiss it, or reopen while a submit is in flight.
+    let unmounting = false;
+    const onNativeClose = () => {
+      if (unmounting) return;
+      if (latest.current.busy) openModal(dialog);
+      else latest.current.onDismiss();
+    };
+    dialog.addEventListener("cancel", onNativeCancel);
+    dialog.addEventListener("close", onNativeClose);
+    return () => {
+      unmounting = true;
+      dialog.removeEventListener("cancel", onNativeCancel);
+      dialog.removeEventListener("close", onNativeClose);
+      closeModal(dialog);
+      const returnTarget = returnFocusRef.current;
+      if (returnTarget?.isConnected) returnTarget.focus();
+    };
+  }, []);
+
+  // Esc outside the dialog (fallback, non-modal environments) still cancels.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        onDismiss();
-      }
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      if (!busy) onDismiss();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onDismiss]);
+  }, [busy, onDismiss]);
 
-  useEffect(
-    () => () => {
-      const returnTarget = returnFocusRef.current;
-      if (returnTarget?.isConnected) returnTarget.focus();
-    },
-    [],
-  );
+  const onDialogKeyDown = (event: ReactKeyboardEvent<HTMLDialogElement>) => {
+    if (event.key === "Escape") {
+      // Own the press: an enclosing sheet or page editor must not also close.
+      event.preventDefault();
+      event.stopPropagation();
+      if (!busy) onDismiss();
+      return;
+    }
+    if (event.key === "Tab" && dialogRef.current) {
+      event.stopPropagation();
+      trapTab(event, dialogRef.current);
+    }
+  };
+
+  // Clicks on ::backdrop target the <dialog> itself; the form fills the box.
+  const onDialogMouseDown = (event: ReactMouseEvent<HTMLDialogElement>) => {
+    backdropPressRef.current = event.target === event.currentTarget;
+  };
+  const onDialogClick = (event: ReactMouseEvent<HTMLDialogElement>) => {
+    if (event.target !== event.currentTarget) return;
+    event.stopPropagation();
+    const pressedBackdrop = backdropPressRef.current;
+    backdropPressRef.current = false;
+    if (pressedBackdrop && !busy) onDismiss();
+  };
 
   const rejectUnarmedConfirm = (event: {
     preventDefault: () => void;
@@ -112,196 +185,125 @@ export function ActionPromptPanel({
     onDismiss();
   };
 
+  const confirmClass =
+    tone === "danger"
+      ? "btn justify-center border-danger bg-danger text-white hover:-translate-y-px hover:bg-danger/90 dark:text-canvas"
+      : "btn btn-primary justify-center";
+  const Icon =
+    tone === "danger"
+      ? AlertTriangleIcon
+      : request.kind === "confirm"
+        ? CheckCircleIcon
+        : FileTextIcon;
+
   return (
-    <form
-      data-action-prompt
-      className={`mt-3 rounded-sm border p-4 ${
-        tone === "danger"
-          ? "border-danger/40 bg-danger-soft/40"
-          : "border-line bg-inset"
-      }`}
+    <dialog
+      ref={dialogRef}
+      role="alertdialog"
+      aria-modal="true"
       aria-labelledby={headingId}
-      onSubmit={submit}
+      aria-describedby={helperId}
+      aria-busy={busy || undefined}
+      data-tone={tone}
+      className="action-prompt-dialog m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-[32rem] overflow-y-auto rounded-ledger border border-line bg-panel p-0 text-ink shadow-[0_24px_60px_-24px_rgb(15_15_17/0.45),0_2px_6px_-2px_rgb(15_15_17/0.12)]"
+      onKeyDown={onDialogKeyDown}
+      onMouseDown={onDialogMouseDown}
+      onClick={onDialogClick}
     >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="eyebrow">
-            {request.kind === "confirm" ? "Confirm action" : "Details required"}
-          </p>
-          <h3 id={headingId} className="mt-1 text-base font-semibold text-ink">
-            {request.title}
-          </h3>
-          <p id={helperId} className="mt-1 text-sm text-ink-2">
-            {request.description}
-          </p>
+      <form
+        data-action-prompt
+        className="grid gap-5 p-6"
+        aria-labelledby={headingId}
+        onSubmit={submit}
+      >
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-start sm:gap-4">
+          <div
+            className={`flex size-[36px] shrink-0 items-center justify-center rounded-full border border-line ${
+              tone === "danger" ? "text-danger" : "text-ink-2"
+            }`}
+            aria-hidden="true"
+          >
+            <Icon width={16} height={16} />
+          </div>
+          <div className="grid gap-1.5 text-center sm:pt-1 sm:text-left">
+            <h2 id={headingId} className="text-lg font-semibold text-ink">
+              {request.title}
+            </h2>
+            <p id={helperId} className="text-base text-ink-2">
+              {request.description}
+            </p>
+          </div>
         </div>
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          disabled={busy}
-          data-testid="action-prompt-cancel"
-          onClick={cancel}
-        >
-          {cancelLabel}
-        </button>
-      </div>
 
-      {request.kind === "reason" ? (
-        <>
-          <label className="field-label mt-3" htmlFor={`${headingId}-reason`}>
-            {request.label}
-          </label>
-          <textarea
-            id={`${headingId}-reason`}
-            name="reason"
-            className="input mt-1 min-h-20 py-2"
-            value={reason}
-            required
-            autoFocus
-            aria-describedby={helperId}
-            placeholder={request.placeholder}
-            onChange={(event) => setReason(event.target.value)}
-          />
-        </>
-      ) : null}
+        {request.kind === "confirm" ? null : (
+          <div className="sm:pl-[calc(36px+1rem)]">
+            <ActionPromptFields
+              request={request}
+              idPrefix={headingId}
+              describedBy={helperId}
+              reason={reason}
+              onReasonChange={setReason}
+              values={values}
+              onValuesChange={setValues}
+            />
+          </div>
+        )}
 
-      {request.kind === "fields"
-        ? request.fields.map((field, index) => {
-            const fieldId = `${headingId}-${field.name}`;
-            return (
-              <div key={field.name} className="mt-3">
-                <label className="field-label" htmlFor={fieldId}>
-                  {field.label}
-                </label>
-                {field.helper ? (
-                  <p className="mt-0.5 text-xs text-ink-3">{field.helper}</p>
-                ) : null}
-                {field.options ? (
-                  <select
-                    id={fieldId}
-                    name={field.name}
-                    className="input mt-1"
-                    value={values[field.name] ?? ""}
-                    required={field.required ?? true}
-                    autoFocus={index === 0}
-                    onChange={(event) =>
-                      setValues((current) => ({
-                        ...current,
-                        [field.name]: event.target.value,
-                      }))
-                    }
-                  >
-                    <option value="">
-                      {field.placeholder ?? "Select an option"}
-                    </option>
-                    {field.options.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                ) : field.multiline ? (
-                  <textarea
-                    id={fieldId}
-                    name={field.name}
-                    rows={3}
-                    className="input mt-1 min-h-20 py-2"
-                    value={values[field.name] ?? ""}
-                    required={field.required ?? true}
-                    autoFocus={index === 0}
-                    placeholder={field.placeholder}
-                    onChange={(event) =>
-                      setValues((current) => ({
-                        ...current,
-                        [field.name]: event.target.value,
-                      }))
-                    }
-                  />
-                ) : (
-                  <input
-                    id={fieldId}
-                    name={field.name}
-                    type={field.inputType ?? "text"}
-                    // Unbounded datetime-local years grow to six digits while
-                    // typing (issue #148); cap at 9999 so the year commits
-                    // after four digits.
-                    max={
-                      field.inputType === "datetime-local"
-                        ? MAX_DATETIME_LOCAL_INPUT_VALUE
-                        : undefined
-                    }
-                    className="input mt-1"
-                    value={values[field.name] ?? ""}
-                    required={field.required ?? true}
-                    autoFocus={index === 0}
-                    placeholder={field.placeholder}
-                    onChange={(event) =>
-                      setValues((current) => ({
-                        ...current,
-                        [field.name]: event.target.value,
-                      }))
-                    }
-                  />
-                )}
-              </div>
-            );
-          })
-        : null}
-
-      <div className="mt-3 flex flex-wrap justify-end gap-2">
-        <button
-          type="button"
-          className="btn btn-ghost"
-          disabled={busy}
-          data-testid="action-prompt-cancel"
-          onClick={cancel}
-        >
-          {cancelLabel}
-        </button>
-        {request.kind === "confirm" ? (
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <button
             type="button"
-            className={tone === "danger" ? "btn btn-danger" : "btn btn-primary"}
-            disabled={busy || !confirmArmed}
-            data-testid="action-prompt-confirm"
-            data-confirm-armed={confirmArmed ? "true" : "false"}
-            style={{ pointerEvents: confirmArmed ? "auto" : "none" }}
-            onMouseDown={rejectUnarmedConfirm}
-            onClick={() => {
-              if (
-                !shouldAcceptConfirmClick({
-                  kind: request.kind,
-                  armed: confirmArmed,
-                })
-              ) {
-                return;
+            className="btn btn-ghost justify-center"
+            disabled={busy}
+            data-testid="action-prompt-cancel"
+            onClick={cancel}
+          >
+            {cancelLabel}
+          </button>
+          {request.kind === "confirm" ? (
+            <button
+              type="button"
+              className={confirmClass}
+              disabled={busy || !confirmArmed}
+              data-testid="action-prompt-confirm"
+              data-confirm-armed={confirmArmed ? "true" : "false"}
+              style={{ pointerEvents: confirmArmed ? "auto" : "none" }}
+              onMouseDown={rejectUnarmedConfirm}
+              onClick={() => {
+                if (
+                  !shouldAcceptConfirmClick({
+                    kind: request.kind,
+                    armed: confirmArmed,
+                  })
+                ) {
+                  return;
+                }
+                onConfirm({});
+              }}
+            >
+              {busy ? "Working…" : request.confirmLabel}
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className={confirmClass}
+              disabled={
+                busy ||
+                (request.kind === "reason" && !reason.trim()) ||
+                (request.kind === "fields" &&
+                  request.fields.some(
+                    (field) =>
+                      (field.required ?? true) &&
+                      !(values[field.name] ?? "").trim(),
+                  ))
               }
-              onConfirm({});
-            }}
-          >
-            {busy ? "Working…" : request.confirmLabel}
-          </button>
-        ) : (
-          <button
-            type="submit"
-            className={tone === "danger" ? "btn btn-danger" : "btn btn-primary"}
-            disabled={
-              busy ||
-              (request.kind === "reason" && !reason.trim()) ||
-              (request.kind === "fields" &&
-                request.fields.some(
-                  (field) =>
-                    (field.required ?? true) &&
-                    !(values[field.name] ?? "").trim(),
-                ))
-            }
-            data-testid="action-prompt-confirm"
-          >
-            {busy ? "Working…" : request.confirmLabel}
-          </button>
-        )}
-      </div>
-    </form>
+              data-testid="action-prompt-confirm"
+            >
+              {busy ? "Working…" : request.confirmLabel}
+            </button>
+          )}
+        </div>
+      </form>
+    </dialog>
   );
 }
 
