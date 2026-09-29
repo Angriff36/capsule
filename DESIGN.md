@@ -565,6 +565,15 @@ Small uppercase Archivo link in brand green, often paired with a directional arr
 > color on `danger-soft`. 44px minimum height, 8px corners, dismiss button on
 > the right.
 
+### **`ledger-table`**
+
+> **Added 2026-09-29 (owner pick, component picker variant A):** working
+> tables have no header fill. The header row is an uppercase 13px bold label
+> in `ink-3`, tracked 0.04em, over a 1.5px `ink` rule; body rows are 40px with
+> a fine `line` rule between them and an `inset` hover; figures are tabular
+> and right-aligned in IBM Plex Mono. Code: `.th` / `.td`, and `.data-table` /
+> `.supply-table` on the table element.
+
 ### **`meta-chip`**
 
 28px pill on the pale inset surface with dark sentence-case text. Carries tags, allergens, dietary markers, and counts — facts that qualify an object rather than state it. Do not turn ordinary metadata into either chip; most values belong in a `fact-pair`.

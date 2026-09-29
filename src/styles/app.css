@@ -314,14 +314,20 @@
   .chip-meta {
     @apply inline-flex h-7 items-center rounded-full bg-inset px-3.5 text-base whitespace-nowrap text-ink-2;
   }
+  /* Ledger table (owner pick 2026-09-29, component picker variant A): no
+     header fill, an uppercase label row over a strong ink rule, hairline
+     rows, tabular figures so numbers compare down a column. */
   .th {
-    @apply border-b border-line-2 bg-inset px-3 py-1.5 text-left text-xs font-semibold tracking-[0.02em] whitespace-nowrap text-ink-2;
+    @apply border-b-[1.5px] border-ink px-3 pt-2 pb-2 text-left text-sm font-bold tracking-[0.04em] whitespace-nowrap text-ink-3 uppercase;
   }
   .td {
-    @apply h-8 border-b border-line px-3 py-0 align-middle whitespace-nowrap text-ink;
+    @apply h-10 border-b border-line px-3 py-2 align-middle whitespace-nowrap text-ink tabular-nums;
   }
   tbody tr:last-child > .td {
     @apply border-b-0;
+  }
+  tbody tr:hover > .td {
+    @apply bg-inset;
   }
   .kbd {
     @apply inline-flex h-[17px] min-w-[17px] items-center justify-center rounded-xs border border-line-2 bg-inset px-1 font-mono text-2xs text-ink-2;
@@ -2098,22 +2104,30 @@
   min-width: 760px;
 }
 
+/* Same ledger grammar as .th/.td (owner pick 2026-09-29). */
 .supply-table th,
 .data-table th {
-  padding: 0.7rem 0.8rem;
+  padding: 0.5rem 0.8rem;
+  border-bottom: 1.5px solid var(--color-ink);
   color: var(--color-ink-3);
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-align: left;
   text-transform: uppercase;
 }
 
 .supply-table td,
 .data-table td {
-  padding: 0.85rem 0.8rem;
+  padding: 0.65rem 0.8rem;
   border-top: 1px solid var(--color-line);
   vertical-align: middle;
+  font-variant-numeric: tabular-nums;
+}
+
+.supply-table tbody tr:first-child td,
+.data-table tbody tr:first-child td {
+  border-top: 0;
 }
 
 .supply-table tbody tr:hover,
