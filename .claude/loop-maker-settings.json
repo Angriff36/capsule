@@ -12,7 +12,11 @@
       "Edit(//c/Projects/capsule/loop-run-log.md)",
       "Edit(//c/Projects/capsule/loop-ledger.json)",
       "Bash(git mv *)",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Read(//c/Projects/capsule/.loop-worktrees/**)",
+      "Edit(//c/Projects/capsule/.loop-worktrees/**/.claude/**)",
+      "Edit(//c/Projects/capsule/.loop-worktrees/**/.githooks/**)",
+      "Bash(pwsh -NoProfile -File C:/Projects/capsule/scripts/loop-apply-patch.ps1 *)"
     ],
     "deny": [
       "Bash(git push *)",
@@ -26,15 +30,8 @@
       "Bash(bash scripts/deploy*)",
       "Bash(bunx convex deploy*)",
       "Bash(bun run deploy*)",
-      "Edit(.claude/**)",
-      "Edit(.githooks/**)",
-      "Edit(.loop-worktrees/**/.githooks/**)",
-      "Edit(.loop-worktrees/**/.claude/**)",
-      "Edit(loop-constraints.md)",
       "Edit(//c/Projects/capsule/.claude/**)",
       "Edit(//c/Projects/capsule/.githooks/**)",
-      "Edit(//c/Projects/capsule/.loop-worktrees/**/.githooks/**)",
-      "Edit(//c/Projects/capsule/.loop-worktrees/**/.claude/**)",
       "Edit(//c/Projects/capsule/loop-constraints.md)"
     ]
   }
