@@ -126,7 +126,9 @@ foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
     Keep $file.FullName; continue
   }
 
-  git -C $wt commit --amend --no-edit --quiet --trailer "Reviewed-by: $($r.reviewer) APPROVE" --trailer 'Landed-by: loop-land.ps1'
+  # A new empty commit, never --amend: every build round is already on dev (loop-publish.ps1),
+  # so amending the tip rewrote a pushed commit and every approval ended in COLLISION.
+  git -C $wt commit --allow-empty --quiet -m "[loop] Reviewed: $($h.runId)" --trailer "Reviewed-by: $($r.reviewer) APPROVE" --trailer 'Landed-by: loop-land.ps1'
   $env:LOOP_LANDER = '1'
   git -C $wt push --quiet origin HEAD:dev *>> $log
   $pushed = $LASTEXITCODE -eq 0
