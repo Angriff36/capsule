@@ -1434,6 +1434,7 @@ export const EventPacketRevisionSchema = z.object({
   createdBy: z.string().optional(),
   supersededBy: z.string().nullable().optional(),
   answersJson: z.string().nullable().optional(),
+  sectionsJson: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });

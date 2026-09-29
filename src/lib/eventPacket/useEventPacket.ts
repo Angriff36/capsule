@@ -12,7 +12,13 @@ export interface PacketView {
   /** The Final Lock answers a print made now would show. */
   finalLock: FinalLockPrint;
   finalLockFingerprint: string;
-  latestRevision: { id: string; fingerprint: string; stale: boolean } | null;
+  latestRevision: {
+    id: string;
+    fingerprint: string;
+    stale: boolean;
+    /** Packet parts that changed since that print (empty for old prints). */
+    staleSections?: string[];
+  } | null;
   nativeTargets?: Record<string, { id: string; label: string }[]>;
 }
 export interface PacketDecision {

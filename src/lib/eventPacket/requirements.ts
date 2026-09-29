@@ -215,4 +215,29 @@ export function canMarkNotApplicable(
     fact.fieldKey.startsWith("vehicle.native-"),
   );
 }
+/**
+ * Old report checks asked for an uploaded TPP / Nowsta report. When Capsule
+ * holds the event's own pack list or crew, it prints those views itself, so
+ * the check is answered without uploading anything again (spec §14.3).
+ */
+const NATIVE_REPORTS: Record<string, RegExp> = {
+  "check.report.packlist_item_type": /^packlist\.native-item-/,
+  "check.report.packlist_category": /^packlist\.native-item-/,
+  "check.report.nowsta_event_timesheet": /^crew\.native-/,
+};
+export function nativelyAnswered(
+  checkKey: string,
+  facts: Pick<EventPacketSnapshot, "facts">["facts"],
+): boolean {
+  const pattern = NATIVE_REPORTS[checkKey];
+  return (
+    !!pattern &&
+    facts.some(
+      (f) =>
+        pattern.test(f.fieldKey) &&
+        f.status === "confirmed" &&
+        f.authority === "native_finalized",
+    )
+  );
+}
 export { forms as formDefinitions };

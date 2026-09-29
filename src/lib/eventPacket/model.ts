@@ -1,3 +1,4 @@
+import type { NativePacketContent } from "./nativePacket";
 export type SourceKind =
   | "worksheet"
   | "beo"
@@ -125,6 +126,8 @@ export interface EventPacketSnapshot {
   checklistVerifications: ChecklistVerification[];
   revisions: RevisionReference[];
   stage: PacketStage;
+  /** Packet parts read from Capsule's own records (absent for import-only snapshots). */
+  native?: NativePacketContent;
 }
 export interface StoredRevision {
   id: string;

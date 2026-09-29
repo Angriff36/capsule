@@ -1315,6 +1315,7 @@ export default defineSchema({
     createdBy: v.optional(v.string()),
     supersededBy: v.optional(v.union(v.string(), v.null())),
     answersJson: v.optional(v.union(v.string(), v.null())),
+    sectionsJson: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
   })

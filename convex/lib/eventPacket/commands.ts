@@ -29,6 +29,10 @@ import { appendFinalLockPages } from "../../../src/lib/eventPacket/finalLock/pdf
 import { parsePacketSnapshot } from "../../../src/lib/eventPacket/packetContract";
 import { resolveIssue } from "../../../src/lib/eventPacket/resolveIssue";
 import {
+  partFingerprints,
+  staleParts,
+} from "../../../src/lib/eventPacket/nativePacket";
+import {
   summarizePacketRows,
   type SummaryClientLike,
   type SummaryEventLike,
@@ -182,6 +186,13 @@ export const getPacket = query({
           Number(matches(b)) - Number(matches(a)) ||
           b.createdAt - a.createdAt,
       )[0];
+    const staleSections =
+      latest && !matches(latest) && latest.sectionsJson
+        ? staleParts(
+            JSON.parse(latest.sectionsJson),
+            await partFingerprints(current.snapshot, currentJson),
+          )
+        : [];
     return clean({
       snapshot: current.snapshot,
       currentFingerprint: current.currentFingerprint,
@@ -194,6 +205,7 @@ export const getPacket = query({
             id: latest._id,
             fingerprint: latest.snapshotFingerprint,
             stale: !matches(latest),
+            staleSections,
             pdfUrl: await ctx.storage.getUrl(
               latest.pdfStorageId as Id<"_storage">,
             ),
@@ -828,6 +840,9 @@ export const recordPacketRevision = mutation({
         revisionId: id,
         ...JSON.parse(snapshotContext.finalLockJson),
       }),
+      sectionsJson: canonicalJson(
+        await partFingerprints(current.snapshot, uploadedJson),
+      ),
     });
     for (const old of current.revisionRows)
       if (!old.supersededBy)
