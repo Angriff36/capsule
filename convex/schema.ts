@@ -1637,7 +1637,8 @@ export default defineSchema({
     updatedAt: v.optional(v.number()),
     version: v.number(),
   })
-    .index("by_tenantId", ["tenantId"]),
+    .index("by_tenantId", ["tenantId"])
+    .index("by_archiveStorageId", ["archiveStorageId"]),
   incidents: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

@@ -59,7 +59,9 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   // validation for every pre-release row the moment the new schema pushes.
   // New rows are always created complete (startImport stamps the defaults);
   // read seams treat absence as 0/false/"{}".
-  property archiveStorageId: string?
+  // Indexed (PL-ARCHIVE / AC-177): inventoryArchive refuses a storage id
+  // another company's run already holds — knowing an id grants nothing.
+  property indexed archiveStorageId: string?
   property archiveChecksum: string?
   property archiveWorkbookCount: int?
   property indexWorkbookCount: int?
