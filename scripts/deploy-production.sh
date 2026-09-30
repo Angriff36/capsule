@@ -101,7 +101,20 @@ run_review() {
   # "high", not the config default "xhigh": the owner (2026-09-22) does not
   # want the release review at the highest reasoning level. It took 20-40
   # minutes a pass; the verdicts do not need it.
-  codex -c model="gpt-5.6-sol" -c model_reasoning_effort="high" review - < "$prompt" > "$log" 2>&1 || fail "the review command failed. Read $log"
+  # The review can take 20+ minutes (it may run the test suite itself): print
+  # a progress line every minute with the last command the reviewer ran, so a
+  # long review is visibly working, never a silent wait.
+  codex -c model="gpt-5.6-sol" -c model_reasoning_effort="high" review - < "$prompt" > "$log" 2>&1 &
+  local review_pid=$! started=$SECONDS last=$SECONDS every="${DEPLOY_REVIEW_PROGRESS_SECONDS:-60}"
+  while kill -0 "$review_pid" 2>/dev/null; do
+    sleep 1
+    if [ $((SECONDS - last)) -ge "$every" ]; then
+      last=$SECONDS
+      echo "deploy-production: review still running ($(( (SECONDS - started) / 60 )) min); last step: $(grep -A1 '^exec$' "$log" 2>/dev/null | tail -1 | cut -c1-120)"
+    fi
+  done
+  wait "$review_pid" || fail "the review command failed. Read $log"
+  echo "deploy-production: review finished after $(( (SECONDS - started) / 60 )) min"
   # The log echoes the prompt; the verdict is in the reviewer's last message.
   local answer
   answer="$(awk '/^codex$/ { buffer = "" ; next } { buffer = buffer "\n" $0 } END { print buffer }' "$log")"
