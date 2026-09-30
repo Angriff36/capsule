@@ -2713,6 +2713,29 @@ export const PackRuleSchema = z.object({
 
 export type PackRule = z.infer<typeof PackRuleSchema>;
 
+// Entity: PackSectionClaim
+export const PackSectionClaimSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  packListId: z.string().uuid(),
+  sectionKey: z.string().default(""),
+  personId: z.string().uuid().nullable().optional(),
+  personName: z.string().optional().default(""),
+  claimedAt: z.coerce.date().nullable().optional(),
+  releasedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+// Computed: PackSectionClaim
+export const PackSectionClaimComputedSchema = PackSectionClaimSchema.extend({
+  isLive: z.boolean(),
+});
+
+export type PackSectionClaim = z.infer<typeof PackSectionClaimSchema>;
+export type PackSectionClaimWithComputed = z.infer<typeof PackSectionClaimComputedSchema>;
+
 // Entity: Payment
 export const PaymentSchema = z.object({
   id: z.string().uuid(),
@@ -9240,6 +9263,19 @@ export const PackRuleReviseParamsSchema = z.object({
 });
 
 export type PackRuleReviseParams = z.infer<typeof PackRuleReviseParamsSchema>;
+
+// Command: release on PackSectionClaim
+export const PackSectionClaimReleaseParamsSchema = z.object({});
+
+export type PackSectionClaimReleaseParams = z.infer<typeof PackSectionClaimReleaseParamsSchema>;
+
+// Command: take on PackSectionClaim
+export const PackSectionClaimTakeParamsSchema = z.object({
+  packListId: z.string().min(1),
+  sectionKey: z.string(),
+});
+
+export type PackSectionClaimTakeParams = z.infer<typeof PackSectionClaimTakeParamsSchema>;
 
 // Command: beginProcessing on Payment
 export const PaymentBeginProcessingParamsSchema = z.object({});

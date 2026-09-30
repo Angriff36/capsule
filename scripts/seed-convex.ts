@@ -495,6 +495,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.PackRule_createViaDefine, { "trigger": "demo-trigger-1", "dishId": "dishId-pack-rule-1", "serviceStyleId": "serviceStyleId-pack-rule-1", "matchFact": "demo-matchFact-1", "matchText": "demo-matchText-1", "description": "demo-description-1", "category": "demo-category-1", "unit": "demo-unit-1", "baseQuantity": 1, "scaleBy": "demo-scaleBy-1", "perUnits": 1, "sparePercent": 1, "ownership": "demo-ownership-1", "returnRequired": false, "returnNote": "demo-returnNote-1", "requiredCapability": false, "note": "demo-note-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.PackRule_createViaDefine, { "trigger": "demo-trigger-2", "dishId": "dishId-pack-rule-2", "serviceStyleId": "serviceStyleId-pack-rule-2", "matchFact": "demo-matchFact-2", "matchText": "demo-matchText-2", "description": "demo-description-2", "category": "demo-category-2", "unit": "demo-unit-2", "baseQuantity": 2, "scaleBy": "demo-scaleBy-2", "perUnits": 2, "sparePercent": 2, "ownership": "demo-ownership-2", "returnRequired": false, "returnNote": "demo-returnNote-2", "requiredCapability": false, "note": "demo-note-2" } as any);
+  // PackSectionClaim → api.mutations.PackSectionClaim_createViaTake
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PackSectionClaim_createViaTake, { "packListId": "packListId-pack-section-claim-1", "sectionKey": "demo-sectionKey-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PackSectionClaim_createViaTake, { "packListId": "packListId-pack-section-claim-2", "sectionKey": "demo-sectionKey-2" } as any);
   // Payment → api.mutations.Payment_createViaRecord
   rowsAttempted += 1;
   await client.mutation(api.mutations.Payment_createViaRecord, { "invoiceId": "invoiceId-payment-1", "clientId": "clientId-payment-1", "eventId": "eventId-payment-1", "amount": 1, "method": "demo-method-1", "paymentMethodId": "paymentMethodId-payment-1", "notes": "demo-notes-1", "feeAmount": 1, "gratuityAmount": 1, "occurredAt": 1767268800000, "effectiveAt": 1767268800000, "providerAccount": "demo-providerAccount-1", "externalSource": "demo-externalSource-1", "externalPaymentId": "externalPaymentId-payment-1" } as any);
@@ -1419,6 +1424,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "PackRule",
       "createMutation": "PackRule_createViaDefine",
+      "rowCount": 2
+    },
+    {
+      "entity": "PackSectionClaim",
+      "createMutation": "PackSectionClaim_createViaTake",
       "rowCount": 2
     },
     {

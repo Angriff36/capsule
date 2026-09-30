@@ -26,6 +26,9 @@ import {
   usePackListItemMarkMissing,
   usePackListItemMarkPacked,
   usePackListItemRecordChecked,
+  useCreatePackSectionClaim,
+  useListPackSectionClaim,
+  usePackSectionClaimRelease,
   usePackListItemRecordLoaded,
   usePackListItemRecordPackedCount,
   usePackListItemRecordReturn,
@@ -41,6 +44,7 @@ import {
   useBulkSelection,
 } from "../../ui/bulk-select";
 import { useRouteRecord } from "../../lib/routeRecord";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip } from "../../ui/primitives";
@@ -119,6 +123,10 @@ export function PackListDetailPage() {
   const recordPackedCount = usePackListItemRecordPackedCount();
   const recordSentInstead = usePackListItemRecordSentInstead();
   const recordChecked = usePackListItemRecordChecked();
+  const sectionClaims = useListPackSectionClaim();
+  const authStatus = useAuthStatus();
+  const takeSection = useCreatePackSectionClaim();
+  const giveBackSection = usePackSectionClaimRelease();
   const recordLoaded = usePackListItemRecordLoaded();
   const recordReturn = usePackListItemRecordReturn();
   const markItemMissing = usePackListItemMarkMissing();
@@ -242,6 +250,65 @@ export function PackListDetailPage() {
     } finally {
       setBusy(null);
     }
+  };
+
+  // Who is packing which section of the warehouse walk. Taking a section
+  // stops nobody: anyone may still count a line in it.
+  const sectionAside = (group: { key: string; label: string }) => {
+    const claim = sectionClaims?.find(
+      (row) =>
+        row.deletedAt == null &&
+        row.packListId === packList._id &&
+        row.sectionKey === group.key &&
+        row.claimedAt != null &&
+        row.releasedAt == null,
+    );
+    const mine =
+      claim?.personId != null && claim.personId === authStatus?.personId;
+    const take = () =>
+      run(`section:${group.key}`, async () => {
+        if (claim)
+          await giveBackSection({ docId: claim._id, version: claim.version });
+        await takeSection({ packListId: packList._id, sectionKey: group.key });
+      });
+    return (
+      <div className="flex flex-wrap items-center gap-2 text-base text-ink-2">
+        {claim && (
+          <span>
+            {mine
+              ? "You are packing this"
+              : `${claim.personName?.trim() || packedByName(claim.personId) || "Someone"} is packing this`}
+          </span>
+        )}
+        {claim && (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            disabled={busy != null}
+            onClick={() =>
+              void run(`section:${group.key}`, async () => {
+                await giveBackSection({
+                  docId: claim._id,
+                  version: claim.version,
+                });
+              })
+            }
+          >
+            Give back
+          </button>
+        )}
+        {!mine && (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            disabled={busy != null}
+            onClick={() => void take()}
+          >
+            {claim ? "Take over" : "I will pack this"}
+          </button>
+        )}
+      </div>
+    );
   };
 
   const submitItem = (event: FormEvent<HTMLFormElement>) => {
@@ -1105,6 +1172,7 @@ export function PackListDetailPage() {
         <PackListViews
           view={view}
           onViewChange={setView}
+          sectionAside={sectionAside}
           rigs={rigs}
           transport={transport}
           loading={

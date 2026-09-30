@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   PackListItemTable,
   type PackListItemRow,
@@ -91,6 +92,7 @@ export function PackListViews({
   rigs,
   items,
   transport,
+  sectionAside,
   ...table
 }: Omit<PackListItemTableProps, "items"> & {
   view: PackViewKind;
@@ -98,6 +100,8 @@ export function PackListViews({
   rigs: PackRig[];
   items: Row[];
   transport?: PackTransport | null;
+  /** Warehouse walk only: who is packing a section, and the button to take it. */
+  sectionAside?: (group: { key: string; label: string }) => ReactNode;
 }) {
   const groups = packView(view, items, {
     dishName: (id) => table.dishName(id),
@@ -157,9 +161,12 @@ export function PackListViews({
       ) : (
         groups.map((group) => (
           <section key={group.key} className="mt-4" data-view-group={group.key}>
-            <h3 className="font-medium text-ink">
-              {group.label} · {group.lines.length}
-            </h3>
+            <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+              <h3 className="font-medium text-ink">
+                {group.label} · {group.lines.length}
+              </h3>
+              {view === "warehouse" && sectionAside?.(group)}
+            </div>
             {view === "load" && transport && group.key.startsWith("rig:") && (
               <RigSummary
                 rigId={group.key.slice(4)}

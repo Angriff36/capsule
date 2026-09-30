@@ -514,6 +514,8 @@ import {
   PackRuleReinstateParamsSchema,
   PackRuleRetireParamsSchema,
   PackRuleReviseParamsSchema,
+  PackSectionClaimReleaseParamsSchema,
+  PackSectionClaimTakeParamsSchema,
   PaymentBeginProcessingParamsSchema,
   PaymentDisputeReconciliationParamsSchema,
   PaymentFailParamsSchema,
@@ -7928,6 +7930,47 @@ export function useCreatePackRule() {
   };
 }
 
+/** Reactive list for PackSectionClaim. */
+export function useListPackSectionClaim() {
+  return useQuery(api.queries.listPackSectionClaim);
+}
+
+/** Reactive get-by-id for PackSectionClaim. Pass "skip" to suspend. */
+export function useGetPackSectionClaim(id: string | "skip") {
+  return useQuery(api.queries.getPackSectionClaim, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for PackSectionClaim.release. */
+export function usePackSectionClaimRelease() {
+  const mutate = useMutation(api.mutations.PackSectionClaim_release);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackSectionClaimReleaseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PackSectionClaim.take. */
+export function usePackSectionClaimTake() {
+  const mutate = useMutation(api.mutations.PackSectionClaim_take);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackSectionClaimTakeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for PackSectionClaim.take. */
+export function useCreatePackSectionClaim() {
+  const mutate = useMutation(api.mutations.PackSectionClaim_createViaTake);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = PackSectionClaimTakeParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for Payment. */
 export function useListPayment() {
   return useQuery(api.queries.listPayment);
@@ -13032,4 +13075,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1380 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1385 as const;
