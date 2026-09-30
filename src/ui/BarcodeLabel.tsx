@@ -3,8 +3,8 @@ import { code39Bars, code39Text } from "../lib/code39";
 const BAR_HEIGHT = 56;
 const QUIET = 10;
 
-function labelSvg(code: string): string {
-  const { bars, width } = code39Bars(code);
+function labelSvg(carried: string): string {
+  const { bars, width } = code39Bars(carried);
   const rects = bars
     .map(
       (bar) =>
@@ -37,19 +37,27 @@ export function BarcodeLabel({
   title,
   subtitle,
 }: {
-  /** What the scanner reads. Capitals, digits, space and - . $ / + %. */
+  /** The tag or number as people write it; the bars carry it without loss. */
   code: string;
   title: string;
   subtitle?: string;
 }) {
-  const text = code39Text(code);
-  const { bars, width } = code39Bars(code);
+  const text = code.trim();
+  const carried = code39Text(code);
+  if (carried == null)
+    return (
+      <p className="text-base text-ink-2">
+        A bar label can't carry "{text}". Use letters, numbers and keyboard
+        signs in the tag.
+      </p>
+    );
+  const { bars, width } = code39Bars(carried);
 
   const print = () => {
     const page = window.open("", "_blank", "width=480,height=360");
     if (!page) return;
     page.document.write(
-      `<!doctype html><html><head><title>${escapeHtml(title)}</title><style>body{font-family:Arial,sans-serif;text-align:center;padding:24px}svg{width:100%;max-width:420px;height:96px}h1{font-size:20px;margin:12px 0 4px}p{margin:0;font-size:14px}code{font-size:18px;letter-spacing:0.2em}</style></head><body>${labelSvg(code)}<p><code>${escapeHtml(text)}</code></p><h1>${escapeHtml(title)}</h1>${subtitle ? `<p>${escapeHtml(subtitle)}</p>` : ""}</body></html>`,
+      `<!doctype html><html><head><title>${escapeHtml(title)}</title><style>body{font-family:Arial,sans-serif;text-align:center;padding:24px}svg{width:100%;max-width:420px;height:96px}h1{font-size:20px;margin:12px 0 4px}p{margin:0;font-size:14px}code{font-size:18px;letter-spacing:0.2em}</style></head><body>${labelSvg(carried)}<p><code>${escapeHtml(text)}</code></p><h1>${escapeHtml(title)}</h1>${subtitle ? `<p>${escapeHtml(subtitle)}</p>` : ""}</body></html>`,
     );
     page.document.close();
     page.focus();

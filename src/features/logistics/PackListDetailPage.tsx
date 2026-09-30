@@ -1182,6 +1182,7 @@ export function PackListDetailPage() {
           canAddItems={canAddItems}
           canEditLines={listIsLive}
           canCount={String(packList.status) !== "cancelled"}
+          canCountReturn={String(packList.status) === "dispatched"}
           busy={busy}
           dishName={dishName}
           packedByName={packedByName}

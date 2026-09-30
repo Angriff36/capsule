@@ -110,6 +110,10 @@ export function PackScanPanel({
   });
 
   const save = async (line: Line, amount: number): Promise<void> => {
+    if (step === "back" && String(packList.status) !== "dispatched") {
+      say(false, `${line.description}: ${SCAN_OUTCOME_TEXT.not_out_yet}`);
+      return;
+    }
     const result = applyScan(step, line, amount, truckId || null);
     const name = line.description;
     if (result.outcome !== "ok" || !result.change) {

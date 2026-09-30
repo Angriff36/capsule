@@ -30,6 +30,8 @@ export type ScanOutcome =
   | "wrong_event"
   | "wrong_truck"
   | "not_found"
+  | "two_match"
+  | "not_out_yet"
   | "nothing_left";
 
 export const SCAN_OUTCOME_TEXT: Record<ScanOutcome, string> = {
@@ -40,6 +42,10 @@ export const SCAN_OUTCOME_TEXT: Record<ScanOutcome, string> = {
   wrong_event: "That label is for a different event.",
   wrong_truck: "This line rides on a different truck.",
   not_found: "No line on this list matches that label.",
+  two_match:
+    "Two equipment items match that label. Count the line with its button.",
+  not_out_yet:
+    "This list has not left yet. Count what came back after it is sent out.",
   nothing_left: "Everything packed on this line is already counted back.",
 };
 
@@ -48,7 +54,20 @@ export type ScanTarget =
   | { kind: "vehicle"; id: string | null; plate: string | null }
   | { kind: "equipment"; id: string | null; tag: string | null };
 
-const clean = (value: string) => code39Text(value).replace(/\s+/g, " ");
+const fold = (value: string) => value.trim().toUpperCase().replace(/\s+/g, " ");
+
+/**
+ * Is `scanned` (folded) the label of `stored`? A scanner sends either the
+ * text as written or the text the bars carry; a person types it as written.
+ */
+const sameLabel = (scanned: string, stored: string | null | undefined) => {
+  const written = fold(stored ?? "");
+  return (
+    written !== "" &&
+    scanned !== "" &&
+    (scanned === written || scanned === code39Text(written))
+  );
+};
 
 /** What a scanned or typed label points at. */
 export function parseScanLabel(raw: string): ScanTarget | null {
@@ -69,7 +88,7 @@ export function parseScanLabel(raw: string): ScanTarget | null {
     if (kind === "vehicle") return { kind: "vehicle", id, plate: null };
     return { kind: "equipment", id, tag: null };
   }
-  const upper = clean(text);
+  const upper = fold(text);
   if (upper.startsWith("EV-"))
     return { kind: "event", id: null, number: upper.slice(3).trim() };
   if (upper.startsWith("VH-"))
@@ -79,9 +98,9 @@ export function parseScanLabel(raw: string): ScanTarget | null {
 
 /** The label text printed for each kind of thing. */
 export const scanLabelFor = {
-  event: (eventNumber: string) => `EV-${clean(eventNumber)}`,
-  vehicle: (registration: string) => `VH-${clean(registration)}`,
-  equipment: (assetTag: string) => clean(assetTag),
+  event: (eventNumber: string) => `EV-${eventNumber.trim()}`,
+  vehicle: (registration: string) => `VH-${registration.trim()}`,
+  equipment: (assetTag: string) => assetTag.trim(),
 };
 
 export type ScanLine = {
@@ -135,7 +154,10 @@ export type ScanFind =
   | { found: "line"; line: ScanLine; equipmentName: string }
   | { found: "event" }
   | { found: "truck"; rigId: string }
-  | { found: "none"; outcome: "not_found" | "wrong_event" | "wrong_truck" };
+  | {
+      found: "none";
+      outcome: "not_found" | "two_match" | "wrong_event" | "wrong_truck";
+    };
 
 /** Find what a label means on this list. */
 export function findScanTarget(
@@ -146,8 +168,7 @@ export function findScanTarget(
     const same =
       target.id != null
         ? target.id === context.eventId
-        : clean(context.eventNumber ?? "") === target.number &&
-          target.number !== "";
+        : sameLabel(target.number ?? "", context.eventNumber);
     return same
       ? { found: "event" }
       : { found: "none", outcome: "wrong_event" };
@@ -156,19 +177,22 @@ export function findScanTarget(
     const rig = context.rigs.find((row) =>
       target.id != null
         ? row.vehicleId === target.id || row.id === target.id
-        : clean(row.plate ?? "") === target.plate && target.plate !== "",
+        : sameLabel(target.plate ?? "", row.plate),
     );
     return rig
       ? { found: "truck", rigId: rig.id }
       : { found: "none", outcome: "wrong_truck" };
   }
-  const piece = context.equipment.find(
+  const pieces = context.equipment.filter(
     (row) =>
       row.deletedAt == null &&
       (target.id != null
         ? row._id === target.id
-        : clean(row.assetTag) === target.tag && target.tag !== ""),
+        : sameLabel(target.tag ?? "", row.assetTag)),
   );
+  // Two tags that read the same (they differ only in capitals): never guess.
+  if (pieces.length > 1) return { found: "none", outcome: "two_match" };
+  const piece = pieces[0];
   if (!piece) return { found: "none", outcome: "not_found" };
   const holds = context.reservations.filter(
     (row) =>
@@ -181,6 +205,13 @@ export function findScanTarget(
       .filter((row) => row.eventId === context.eventId)
       .map((row) => row._id),
   );
+  // A piece held for another event and not for this one is not counted here,
+  // even when this list has a line with the same name.
+  if (
+    here.size === 0 &&
+    holds.some((row) => ["reserved", "checked_out"].includes(row.status))
+  )
+    return { found: "none", outcome: "wrong_event" };
   const live = context.lines.filter((line) => line.excludedAt == null);
   const line =
     live.find((row) =>
@@ -194,10 +225,7 @@ export function findScanTarget(
         piece.name.trim().toLowerCase(),
     );
   if (line) return { found: "line", line, equipmentName: piece.name };
-  return {
-    found: "none",
-    outcome: holds.length > 0 && here.size === 0 ? "wrong_event" : "not_found",
-  };
+  return { found: "none", outcome: "not_found" };
 }
 
 const amount = (value: number | null | undefined) => Number(value ?? 0) || 0;

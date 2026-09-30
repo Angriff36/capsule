@@ -93,6 +93,7 @@ export function PackListViews({
   items,
   transport,
   sectionAside,
+  canCountReturn,
   ...table
 }: Omit<PackListItemTableProps, "items"> & {
   view: PackViewKind;
@@ -100,6 +101,8 @@ export function PackListViews({
   rigs: PackRig[];
   items: Row[];
   transport?: PackTransport | null;
+  /** The list has left: what came back can be counted. */
+  canCountReturn?: boolean;
   /** Warehouse walk only: who is packing a section, and the button to take it. */
   sectionAside?: (group: { key: string; label: string }) => ReactNode;
 }) {
@@ -120,7 +123,7 @@ export function PackListViews({
       if (packed && table.canCount)
         actions.push({ key: "onTruck", label: "On truck" });
     } else if (view === "returns") {
-      if (packed && table.canCount)
+      if (packed && table.canCount && canCountReturn)
         actions.push({ key: "countReturn", label: "Count return" });
     } else if (packed && table.canCount) {
       actions.push({ key: "secondCheck", label: "Second check" });

@@ -38940,7 +38940,7 @@ async function __runPackListItemRecordReturn(ctx: MutationCtx, { docId, returned
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     if (!(((doc.deletedAt == null) && (doc.listedAt != null)))) throw new Error("Guard 0 failed");
-    if (!(((__rel_packList != null) && (__rel_packList.status !== "cancelled")))) throw new Error("Guard 1 failed");
+    if (!(((__rel_packList != null) && (__rel_packList.status === "dispatched")))) throw new Error("Guard 1 failed");
     if (!(((((returnedQuantity >= 0) && (usedQuantity >= 0)) && (lostQuantity >= 0)) && (damagedQuantity >= 0)))) throw new Error("A return amount can't be negative. Use zero or more.");
     if (!(((((returnedQuantity + usedQuantity) + lostQuantity) + damagedQuantity) <= doc.packedQuantity))) throw new Error("That is more than what was packed. Check the amounts.");
     if (version !== undefined && (doc as any).version !== version) {
