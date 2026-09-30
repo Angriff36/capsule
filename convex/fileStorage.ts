@@ -152,6 +152,45 @@ export async function storageReferencedByTenant(
 }
 
 /**
+ * A blob this tenant may show although no Attachment row links it yet (a
+ * field-form photo saved on the form itself). Refused when another company
+ * or a private chat already owns it, or another company's dish, ingredient or
+ * equipment uses it: knowing someone else's storage id grants nothing.
+ */
+export async function storageNotOwnedElsewhere(
+  ctx: QueryCtx,
+  tenantId: string,
+  storageId: string,
+): Promise<boolean> {
+  const first = await firstAttachmentFor(ctx, storageId);
+  if (
+    first &&
+    (first.tenantId !== tenantId || first.parentType === "staffMessage")
+  ) {
+    return false;
+  }
+  for await (const row of ctx.db
+    .query("dishes")
+    .withIndex("by_primaryImageStorageId", (q) =>
+      q.eq("primaryImageStorageId", storageId),
+    ))
+    if (row.tenantId !== tenantId) return false;
+  for await (const row of ctx.db
+    .query("ingredients")
+    .withIndex("by_primaryImageStorageId", (q) =>
+      q.eq("primaryImageStorageId", storageId),
+    ))
+    if (row.tenantId !== tenantId) return false;
+  for await (const row of ctx.db
+    .query("equipments")
+    .withIndex("by_primaryImageStorageId", (q) =>
+      q.eq("primaryImageStorageId", storageId),
+    ))
+    if (row.tenantId !== tenantId) return false;
+  return true;
+}
+
+/**
  * Resolve download URLs for dish/ingredient primary image storage ids. A
  * storage id resolves only when a live row in the caller's tenant
  * references it (see storageReferencedByTenant); anything else maps to

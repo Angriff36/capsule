@@ -30942,7 +30942,7 @@ async function __runInvoiceRecordRefund(ctx: MutationCtx, { docId, refundAmount,
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
-    if (!(((doc.status === "paid") || (doc.status === "partial")))) throw new Error("Guard 0 failed");
+    if (!((((doc.status === "paid") || (doc.status === "partial")) || (doc.status === "overdue")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((refundAmount > 0))) throw new Error("This refund amount has to be more than zero. Enter how much to refund.");
     if (!((refundAmount <= doc.amountPaid))) throw new Error("Refund amount cannot exceed amount paid");
@@ -30953,7 +30953,7 @@ async function __runInvoiceRecordRefund(ctx: MutationCtx, { docId, refundAmount,
       const __cur = doc.status;
       if (__cur !== undefined) {
         const __from = String(__cur);
-        const __to = "partial";
+        const __to = String(((doc.status === "overdue") ? "overdue" : "partial"));
         const __allowed: Record<string, string[]> = { "draft": ["sent", "voided"], "sent": ["viewed", "overdue", "partial", "paid", "voided"], "viewed": ["overdue", "partial", "paid", "voided"], "overdue": ["partial", "paid", "written_off", "voided"], "partial": ["partial", "paid", "overdue", "written_off"], "paid": ["partial"], "voided": [], "written_off": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
@@ -30967,7 +30967,7 @@ async function __runInvoiceRecordRefund(ctx: MutationCtx, { docId, refundAmount,
     const updates = {
       amountPaid: nextPaid,
       amountDue: nextDue,
-      status: "partial",
+      status: ((doc.status === "overdue") ? "overdue" : "partial"),
       paidAt: null,
       depositPaidAt: ((((doc.depositAmount != null) && (doc.depositAmount > 0)) && (nextPaid < doc.depositAmount)) ? null : doc.depositPaidAt),
       version: ((doc as any).version ?? 0) + 1
