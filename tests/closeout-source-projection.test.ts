@@ -121,7 +121,44 @@ describe("closeout source lines", () => {
     );
     const food = line(projection, "ingredient");
     expect(food).toMatchObject({ actual: 27, planned: 65, complete: false });
-    expect(food.note).toMatch(/1 order not received/);
+    expect(food.note).toMatch(/2 orders not fully received/);
+  });
+
+  it("a partly received order alone keeps food open, and capture needs a typed food cost", () => {
+    const projection = projectCloseoutSources(
+      input({
+        invoices: [{ _id: "i1", status: "paid", total: 4000, amountDue: 0 }],
+        guests: [{ _id: "g1", checkedInAt: 1 }],
+        vendorOrders: [
+          {
+            _id: "o1",
+            status: "partially_received",
+            lines: [
+              {
+                _id: "l1",
+                status: "receiving",
+                orderedQuantity: 10,
+                receivedQuantity: 6,
+                unitCost: 4.5,
+              },
+            ],
+          },
+        ],
+      }),
+    );
+    const food = line(projection, "ingredient");
+    expect(food).toMatchObject({ actual: 27, complete: false });
+    expect(food.note).toMatch(/1 order not fully received/);
+    // The received 27 alone would understate food cost: a blank total is refused.
+    expect(() =>
+      closeoutCaptureValues(projection, { labor: 0, waste: 0 }),
+    ).toThrow(/Enter food cost - .*not fully received/);
+    const { values } = closeoutCaptureValues(projection, {
+      ingredient: 45,
+      labor: 0,
+      waste: 0,
+    });
+    expect(values.actualIngredientCost).toBe(45);
   });
 
   it("staff time with a missing pay rate is open and names the person", () => {

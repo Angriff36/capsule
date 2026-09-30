@@ -253,7 +253,8 @@ function ingredientLine(input: CloseoutProjectionInput): CloseoutLine {
   for (const order of live(input.vendorOrders)) {
     if (order.status === "cancelled" || order.status === "draft") continue;
     const receiving = RECEIVING_ORDER.has(order.status);
-    if (!receiving) waiting += 1;
+    // A partly received order still counts what came, but the line stays open.
+    if (order.status !== "received") waiting += 1;
     for (const line of live(order.lines)) {
       if (line.status === "cancelled") continue;
       planned += cents(line.orderedQuantity * line.unitCost);
@@ -273,7 +274,8 @@ function ingredientLine(input: CloseoutProjectionInput): CloseoutLine {
   const notes: string[] = [];
   if (sources.length === 0)
     notes.push("No food deliveries received for this event");
-  if (waiting > 0) notes.push(`${plural(waiting, "order")} not received yet`);
+  if (waiting > 0)
+    notes.push(`${plural(waiting, "order")} not fully received yet`);
   return {
     key: "ingredient",
     label: "Food cost",
@@ -477,7 +479,13 @@ export function closeoutCaptureValues(
       enteredKeys.push(key);
       return typed;
     }
-    if (line.actual != null) return line.actual;
+    // An open line with a partial record total needs a typed total: the partial
+    // amount alone would understate the event's result.
+    if (line.actual != null && line.complete) return line.actual;
+    if (line.actual != null)
+      throw new Error(
+        `Enter ${line.label.toLowerCase()} - ${line.note ?? "the records are not complete yet"}.`,
+      );
     throw new Error(
       `Enter ${line.label.toLowerCase()} - Capsule has no records for it yet.`,
     );
