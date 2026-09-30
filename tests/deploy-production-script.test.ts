@@ -50,6 +50,8 @@ esac
 `,
   codex: `#!/usr/bin/env bash
 echo "codex $*" >> "$STUB_LOG"
+# Work landing on the branch while the review runs (frozen-candidate test).
+if [ -n "\${STUB_DURING_REVIEW:-}" ]; then bash -c "$STUB_DURING_REVIEW" >/dev/null 2>&1; fi
 cat
 echo "codex"
 printf '%b\\n' "\${STUB_REVIEW:-No blocking findings.\\nVERDICT: APPROVE}"
@@ -64,7 +66,7 @@ async function git(cwd: string, ...args: string[]): Promise<string> {
 }
 
 /** A checkout on BRANCH (one commit ahead of main), pushed to a local bare origin. */
-async function makeCheckout() {
+async function makeCheckout(branch: string = BRANCH) {
   const root = mkdtempSync(join(tmpdir(), "capsule-deploy-production-"));
   const origin = join(root, "origin.git");
   const work = join(root, "work");
@@ -91,11 +93,11 @@ async function makeCheckout() {
   await git(work, "commit", "-m", "base");
   await git(work, "remote", "add", "origin", origin.replace(/\\/g, "/"));
   await git(work, "push", "-q", "origin", "main");
-  await git(work, "checkout", "-q", "-b", BRANCH);
+  await git(work, "checkout", "-q", "-b", branch);
   writeFileSync(join(work, "feature.txt"), "x\n");
   await git(work, "add", "-A");
   await git(work, "commit", "-m", "feature");
-  await git(work, "push", "-q", "origin", BRANCH);
+  await git(work, "push", "-q", "origin", branch);
 
   const run = async (args: string[], env: Record<string, string> = {}) => {
     const launch =
@@ -128,7 +130,7 @@ async function makeCheckout() {
   const calls = () =>
     existsSync(log) ? readFileSync(log, "utf8").trim().split("\n") : [];
   const mainSha = () => git(work, "rev-parse", "origin/main");
-  return { work, log, run, calls, mainSha };
+  return { root, origin, work, log, run, calls, mainSha };
 }
 
 const BACKEND =
@@ -306,6 +308,92 @@ describe("scripts/deploy-production.sh", () => {
       expect(checkout.calls().some((call) => call.startsWith("codex"))).toBe(
         false,
       );
+    },
+    TIMEOUT,
+  );
+
+  it(
+    "freezes the release candidate: a commit landing on dev during the review waits for the next release",
+    async () => {
+      const checkout = await makeCheckout("dev");
+      const candidateA = await git(checkout.work, "rev-parse", "HEAD");
+      // A second checkout pushes commit B to dev while the review runs.
+      const other = join(checkout.root, "other");
+      const slash = (path: string) => path.split("\\").join("/");
+      await git(
+        checkout.root,
+        "clone",
+        "-q",
+        "-b",
+        "dev",
+        slash(checkout.origin),
+        other,
+      );
+      await git(other, "config", "user.email", "test@example.invalid");
+      await git(other, "config", "user.name", "Builder");
+      await git(
+        other,
+        "config",
+        "core.hooksPath",
+        join(checkout.root, "no-hooks"),
+      );
+      writeFileSync(join(other, "later.txt"), "B\n");
+      await git(other, "add", "-A");
+      await git(other, "commit", "-m", "B lands after the release starts");
+      const commitB = await git(other, "rev-parse", "HEAD");
+      const pushB = `cd "${slash(other)}" && git push -q origin dev`;
+
+      const first = await checkout.run([], { STUB_DURING_REVIEW: pushB });
+      expect(first.output).toContain(
+        `deploy-production: release candidate ${candidateA} (frozen`,
+      );
+      const released = await checkout.mainSha();
+      expect(first.lastLine).toBe(
+        `RESULT: PASS - frontend deployed at ${released}; backend unchanged`,
+      );
+      // The review looked at A; production got A and records it; B is not live.
+      const review = readFileSync(
+        join(checkout.work, ".artifacts", "deploy-production-review.log"),
+        "utf8",
+      );
+      expect(review).toContain(`git diff origin/main...${candidateA}`);
+      expect(await git(checkout.work, "rev-parse", `${released}^2`)).toBe(
+        candidateA,
+      );
+      expect(
+        await git(checkout.work, "log", "-1", "--format=%B", released),
+      ).toContain(`Release-Candidate: ${candidateA}`);
+      const bLive = await YieldingCommand.run(
+        "git",
+        ["merge-base", "--is-ancestor", commitB, released],
+        { cwd: checkout.work },
+      );
+      expect(bLive.status).toBe(1);
+      expect(checkout.calls()).toContain(
+        `bun scripts/verify-vercel-release.ts --sha ${released} --wait 900`,
+      );
+
+      // dev keeps B and now holds the release; the next release picks up B.
+      await git(checkout.work, "fetch", "-q", "origin");
+      await git(checkout.work, "checkout", "-q", "-B", "dev", "origin/dev");
+      const candidateB = await git(checkout.work, "rev-parse", "HEAD");
+      const second = await checkout.run(["--reviewer", "test-model"]);
+      const next = await checkout.mainSha();
+      expect(second.lastLine).toBe(
+        `RESULT: PASS - frontend deployed at ${next}; backend unchanged`,
+      );
+      expect(
+        (
+          await YieldingCommand.run(
+            "git",
+            ["merge-base", "--is-ancestor", commitB, next],
+            { cwd: checkout.work },
+          )
+        ).status,
+      ).toBe(0);
+      expect(
+        await git(checkout.work, "log", "-1", "--format=%B", next),
+      ).toContain(`Release-Candidate: ${candidateB}`);
     },
     TIMEOUT,
   );

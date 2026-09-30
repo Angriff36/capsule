@@ -20,10 +20,15 @@ set -euo pipefail
 
 reviewer=""
 no_review=0
+candidate=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --reviewer) reviewer="${2:-}"; shift 2 ;;
     --no-review) no_review=1; shift ;;
+    # The frozen release candidate (scripts/release-clean.sh, deploy-production.sh):
+    # the exact commit that was reviewed. The branch must be checked out at it;
+    # commits pushed to the branch after it wait for the next release.
+    --candidate) candidate="${2:-}"; shift 2 ;;
     *) echo "release: unknown argument $1"; exit 1 ;;
   esac
 done
@@ -41,10 +46,17 @@ git fetch origin --quiet
 branch_sha="$(git rev-parse "$branch")"
 remote_archive="$(git ls-remote origin "refs/heads/archive/$branch" | cut -f1 || true)"
 remote_branch="$(git ls-remote origin "refs/heads/$branch" | cut -f1 || true)"
+if [ -n "$candidate" ]; then
+  # Frozen candidate: release exactly this commit. It must be pushed (reachable
+  # from a remote branch); the branch may have moved on since it was frozen.
+  candidate="$(git rev-parse --verify -q "$candidate^{commit}" || true)"
+  [ -n "$candidate" ] || { echo "release: the release candidate is not a commit here."; exit 1; }
+  [ "$branch_sha" = "$candidate" ] || { echo "release: $branch is at $branch_sha, not at the frozen release candidate $candidate."; exit 1; }
+  [ -n "$(git branch -r --contains "$candidate" 2>/dev/null)" ] || { echo "release: the release candidate $candidate is not pushed to origin. Push it first."; exit 1; }
 # The branch must be on origin at this exact sha — unless origin already
 # holds it as archive/<branch> at this sha (a release whose local rename
 # did not finish); that case resumes below.
-if [ "$remote_branch" != "$branch_sha" ] && ! { [ -z "$remote_branch" ] && [ "$remote_archive" = "$branch_sha" ]; }; then
+elif [ "$remote_branch" != "$branch_sha" ] && ! { [ -z "$remote_branch" ] && [ "$remote_archive" = "$branch_sha" ]; }; then
   echo "release: $branch is not pushed to origin, or differs from origin/$branch. Push it first."
   exit 1
 fi
@@ -150,16 +162,18 @@ if [ -n "$reviewer" ]; then
 else
   subject="[release] $branch (no review needed)"
 fi
+# Production records the exact commit that was reviewed and released.
+body="Release-Candidate: $branch_sha"
 if git merge-base --is-ancestor "$branch" main; then
   # Already on main (e.g. a GitHub-side merge that never deployed). A real
   # [release] commit is still required: Vercel builds main only for one.
-  if ! git commit -q --allow-empty -m "$subject"; then
+  if ! git commit -q --allow-empty -m "$subject" -m "$body"; then
     git reset -q --hard "$base"
     back_to_branch
     echo "release: could not create the release commit (see above). main is unchanged."
     exit 1
   fi
-elif ! git merge --no-ff "$branch" -m "$subject"; then
+elif ! git merge --no-ff "$branch" -m "$subject" -m "$body"; then
   git merge --abort || true
   back_to_branch
   echo "release: merge conflict with main. Merge main into $branch, resolve, push, and release again."
