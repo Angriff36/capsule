@@ -138,7 +138,7 @@ describe("break classification", () => {
     expect(midweek.overtimeMinutes).toBe(10 * 60);
 
     // An overnight shift crossing the period start (Tue 22:00 - Wed 06:00)
-    // is in neither window, so it does not use up the new period's threshold.
+    // belongs to Tuesday's period: it is not paid in this one.
     const crossing = {
       personId: "p1",
       clockInAt: at("2026-03-03T22:00:00"),
@@ -165,12 +165,35 @@ describe("break classification", () => {
       timeRecords: days,
       payrollInputs: [],
     });
-    // Capsule does not guess the overtime split: the row waits for prepared pay.
+    // Capsule does not guess the overtime split: the person is named, and the
+    // file still downloads with the clocked hours.
     expect(document.rows[0]).toMatchObject({
       recordedHours: 50,
       needsPayPrep: true,
     });
     expect(document.payPrepNames).toEqual(["Pat Pay"]);
-    expect(payrollCsvDownloadAllowed(document)).toBe(false);
+    expect(payrollCsvDownloadAllowed(document)).toBe(true);
+  });
+  it("an overnight shift is paid in the period it started in; time from before approval existed still counts", () => {
+    const night = {
+      personId: "p1",
+      clockInAt: at("2026-03-03T22:00:00"),
+      clockOutAt: at("2026-03-04T06:00:00"),
+      status: "closed",
+      approvedAt: at("2026-03-04T07:00:00"),
+    };
+    const tue = [at("2026-03-03T00:00:00"), at("2026-03-04T00:00:00")] as const;
+    const wed = [at("2026-03-04T00:00:00"), at("2026-03-05T00:00:00")] as const;
+    expect(approvedPayroll([night], "p1", ...tue).approvedMinutes).toBe(480);
+    expect(approvedPayroll([night], "p1", ...wed).approvedMinutes).toBe(0);
+    // Made before approval existed: counts. Made after: needs approval.
+    const unapproved = { ...night, approvedAt: undefined };
+    const legacy = { ...unapproved, _creationTime: at("2026-03-04T08:00:00") };
+    const fresh = {
+      ...unapproved,
+      _creationTime: Date.parse("2026-10-02T00:00:00Z"),
+    };
+    expect(approvedPayroll([legacy], "p1", ...tue).approvedMinutes).toBe(480);
+    expect(approvedPayroll([fresh], "p1", ...tue).approvedMinutes).toBe(0);
   });
 });

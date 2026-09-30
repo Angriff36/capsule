@@ -26,6 +26,7 @@ export type PayTimeRecord = {
   paidBreakMinutes?: unknown;
   status?: unknown;
   approvedAt?: unknown;
+  _creationTime?: unknown;
   deletedAt?: unknown;
 };
 
@@ -51,8 +52,24 @@ export function isFinishedTime(record: PayTimeRecord): boolean {
   );
 }
 
+/**
+ * Time approval started with the 2026-09-30 release. Finished entries made
+ * before it never had an approval step, so they count as approved: no hours
+ * already ready for payroll disappear when the release goes live.
+ */
+export const TIME_APPROVAL_REQUIRED_FROM = Date.parse("2026-09-30T12:00:00Z");
+
+export function hasPayrollApproval(record: {
+  approvedAt?: unknown;
+  _creationTime?: unknown;
+}): boolean {
+  if (record.approvedAt != null) return true;
+  const created = num(record._creationTime);
+  return Number.isFinite(created) && created < TIME_APPROVAL_REQUIRED_FROM;
+}
+
 export function isApprovedTime(record: PayTimeRecord): boolean {
-  return isFinishedTime(record) && record.approvedAt != null;
+  return isFinishedTime(record) && hasPayrollApproval(record);
 }
 
 /** Real minutes between clock-in and clock-out (null while open). */
@@ -96,24 +113,26 @@ export function approvedPayroll(
     (record) =>
       String(record.personId) === personId &&
       isFinishedTime(record) &&
+      // A shift belongs to the period it started in, so an overnight shift
+      // across the period line is paid once, never dropped.
       num(record.clockInAt) >= startAt &&
-      num(record.clockOutAt) <= endExclusiveAt,
+      num(record.clockInAt) < endExclusiveAt,
   );
   const approved = inWindow
-    .filter((record) => record.approvedAt != null)
+    .filter((record) => hasPayrollApproval(record))
     .sort((a, b) => num(a.clockInAt) - num(b.clockInAt));
   const thresholdMinutes = thresholdHours * 60;
   const weekTotals = new Map<number, number>();
-  // A period that starts midweek: approved shifts that ended before it, in
-  // that same week, count toward the weekly threshold (paid in the period
-  // before). A shift crossing the period start is in neither window.
+  // A period that starts midweek: approved shifts that started before it, in
+  // that same week, count toward the weekly threshold (they are paid in the
+  // period before, which is where a shift crossing the line belongs).
   const weekStart = startOfLocalWeek(startAt);
   for (const record of records) {
     if (
       String(record.personId) !== personId ||
       !isApprovedTime(record) ||
       num(record.clockInAt) < weekStart ||
-      num(record.clockOutAt) > startAt
+      num(record.clockInAt) >= startAt
     )
       continue;
     const week = startOfLocalWeek(num(record.clockInAt));

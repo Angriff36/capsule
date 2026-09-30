@@ -84,8 +84,9 @@ export type PayrollExportRow = {
   timeRecordCount: number;
   payrollInputCount: number;
   missingEmployeeNumber: boolean;
-  /** Over 40 approved hours in a week with no prepared pay: the file waits,
-   *  because Capsule does not guess the regular/overtime split. */
+  /** Over 40 approved hours in a week with no prepared pay: a warning only.
+   *  Capsule does not guess the employer's overtime split, and it does not
+   *  hold the file (the overtime rule is not configured yet). */
   needsPayPrep: boolean;
   /** Plain warnings to check before sending (payrollReconcile). */
   warnings: string[];
@@ -101,7 +102,7 @@ export type PayrollExportDocument = {
   timeRecordCount: number;
   payrollInputCount: number;
   missingEmployeeNumberCount: number;
-  /** People whose overtime week has no prepared pay yet; the file waits. */
+  /** People whose overtime week has no prepared pay yet (a warning). */
   payPrepNames: string[];
   /** People with finished time in the period that is not approved yet and no row. */
   waitingOnlyNames: string[];
@@ -250,8 +251,7 @@ export function payrollCsvDownloadAllowed(
   return (
     document != null &&
     document.rows.length > 0 &&
-    document.missingEmployeeNumberCount === 0 &&
-    document.payPrepNames.length === 0
+    document.missingEmployeeNumberCount === 0
   );
 }
 
@@ -343,8 +343,7 @@ export function buildPayrollExport({
           .join(" ") || "Unknown person";
       const hasReviewedInput = entry.minuteInputCount > 0;
       // No prepared pay: hours go out as clocked. A week past 40 approved
-      // hours holds the row until a manager prepares the split - Capsule does
-      // not guess the employer's overtime rule, nor pay overtime as regular.
+      // hours is named so a manager can prepare the overtime split.
       const needsPayPrep =
         !hasReviewedInput &&
         approvedPayroll(

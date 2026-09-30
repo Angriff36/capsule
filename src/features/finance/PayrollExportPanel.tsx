@@ -197,7 +197,7 @@ function PayrollExportPreview({
       ) : null}
       {document.payPrepNames.length > 0 ? (
         <p className="mb-3 text-sm text-warn" role="status">
-          {`CSV download waits: ${document.payPrepNames.join(", ")} worked over 40 hours in a week. Prepare their pay (regular and overtime hours) first, so overtime is never sent as regular time.`}
+          {`Check overtime: ${document.payPrepNames.join(", ")} worked over 40 hours in a week. This file lists their clocked hours as regular until you prepare their pay with the overtime split your payroll rules use.`}
         </p>
       ) : null}
       {document.waitingOnlyNames.length > 0 ? (
