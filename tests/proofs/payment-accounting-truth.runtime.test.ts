@@ -294,7 +294,13 @@ describe("payment accounting truth (PL-ACCOUNTING)", () => {
     const tenantId = "tenant-acct-refund";
     const finance = financeOf(proof, tenantId);
     const invoice = await sentInvoice(proof, finance, tenantId, 400, "A-3");
+    await finance.run(async (ctx) =>
+      ctx.db.patch(invoice.invoiceId as never, { depositAmount: 100 } as never),
+    );
     const paymentId = await pay(proof, finance, invoice, 400);
+    expect(
+      (await read(finance, invoice.invoiceId)).depositPaidAt,
+    ).not.toBeNull();
 
     await proof.executeCommand(finance, api.mutations.Payment_refund, {
       docId: paymentId,
@@ -308,6 +314,8 @@ describe("payment accounting truth (PL-ACCOUNTING)", () => {
     expect(await read(finance, invoice.invoiceId)).toMatchObject({
       amountPaid: 0,
       amountDue: 400,
+      // Less than the deposit is paid now: the deposit is open again.
+      depositPaidAt: null,
     });
   });
 

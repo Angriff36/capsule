@@ -337,6 +337,9 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     mutate amountDue = nextDue
     mutate status = "partial"
     mutate paidAt = null
+    // A refund, chargeback or bank return that leaves less paid than the
+    // deposit reopens the deposit, so the client can pay it again.
+    mutate depositPaidAt = self.depositAmount != null and self.depositAmount > 0 and nextPaid < self.depositAmount ? null : self.depositPaidAt
     emit InvoiceRefundRecorded {
       invoiceId: self.id
       tenantId: self.tenantId

@@ -68,6 +68,7 @@ import type * as lib_clerkStaffAccount from "../lib/clerkStaffAccount.js";
 import type * as lib_clientOutreach from "../lib/clientOutreach.js";
 import type * as lib_clientPortalLinks from "../lib/clientPortalLinks.js";
 import type * as lib_clientPortalToken from "../lib/clientPortalToken.js";
+import type * as lib_clockNow from "../lib/clockNow.js";
 import type * as lib_closeoutCommercialReconciliation from "../lib/closeoutCommercialReconciliation.js";
 import type * as lib_commandIdempotency from "../lib/commandIdempotency.js";
 import type * as lib_culinaryModel_catalogReclassification from "../lib/culinaryModel/catalogReclassification.js";
@@ -305,6 +306,7 @@ declare const fullApi: ApiFromModules<{
   "lib/clientOutreach": typeof lib_clientOutreach;
   "lib/clientPortalLinks": typeof lib_clientPortalLinks;
   "lib/clientPortalToken": typeof lib_clientPortalToken;
+  "lib/clockNow": typeof lib_clockNow;
   "lib/closeoutCommercialReconciliation": typeof lib_closeoutCommercialReconciliation;
   "lib/commandIdempotency": typeof lib_commandIdempotency;
   "lib/culinaryModel/catalogReclassification": typeof lib_culinaryModel_catalogReclassification;
