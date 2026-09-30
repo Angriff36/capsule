@@ -99,8 +99,17 @@ export function EventChecklistsPage() {
     const data = new FormData(formEvent.currentTarget);
     const name = String(data.get("name") ?? "").trim();
     const category = String(data.get("category") ?? "").trim() || undefined;
+    // The text box has no place for a line's details, so a line kept by
+    // name keeps the details it already had.
+    const before = parseChecklistLines(current?.itemsJson);
     const itemsJson = checklistLinesJson(
-      checklistLinesFromText(String(data.get("lines") ?? "")),
+      checklistLinesFromText(String(data.get("lines") ?? "")).map((line) => ({
+        ...line,
+        details:
+          line.details ||
+          before.find((old) => old.key === line.key)?.details ||
+          "",
+      })),
     );
     const target = editing;
     void run(

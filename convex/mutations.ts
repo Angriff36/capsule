@@ -38704,7 +38704,7 @@ async function __runPackListItemMarkPacked(ctx: MutationCtx, { docId, packedQuan
     if (!((packedQuantity > 0))) throw new Error("Enter a packed amount more than zero.");
     if (!((packedQuantity <= doc.requiredQuantity))) throw new Error("You can't pack more than what's required. Enter a smaller amount.");
     if (!((packedQuantity === doc.requiredQuantity))) throw new Error("Save a short count on this line until you have the full amount");
-    if (!((((doc.returnCountedAt == null) || ((doc.loadedQuantity != null) && (doc.loadedQuantity > 0))) || (packedQuantity >= (((((doc.returnedQuantity != null) ? doc.returnedQuantity : 0) + ((doc.usedQuantity != null) ? doc.usedQuantity : 0)) + ((doc.lostQuantity != null) ? doc.lostQuantity : 0)) + ((doc.damagedQuantity != null) ? doc.damagedQuantity : 0)))))) throw new Error("That is less than the return already counted on this line. Correct the return count first.");
+    if (!((((doc.returnCountedAt == null) || (doc.loadedQuantity != null)) || (packedQuantity >= (((((doc.returnedQuantity != null) ? doc.returnedQuantity : 0) + ((doc.usedQuantity != null) ? doc.usedQuantity : 0)) + ((doc.lostQuantity != null) ? doc.lostQuantity : 0)) + ((doc.damagedQuantity != null) ? doc.damagedQuantity : 0)))))) throw new Error("That is less than the return already counted on this line. Correct the return count first.");
     if (!(((packedQuantity >= ((doc.checkedQuantity != null) ? doc.checkedQuantity : 0)) && (packedQuantity >= ((doc.loadedQuantity != null) ? doc.loadedQuantity : 0))))) throw new Error("That is less than what is already checked or on the truck. Correct those counts first.");
     const previousStatus = doc.status;
     const previousPacked = doc.packedQuantity;
@@ -38833,14 +38833,14 @@ async function __runPackListItemRecordLoaded(ctx: MutationCtx, { docId, loadedQu
     if (!(((__rel_packList != null) && (__rel_packList.status !== "cancelled")))) throw new Error("Guard 1 failed");
     if (!((loadedQuantity >= 0))) throw new Error("The loaded amount can't be negative. Use zero or more.");
     if (!((loadedQuantity <= doc.packedQuantity))) throw new Error("You can't load more than what is packed. Save the packed amount first.");
-    if (!(((doc.returnCountedAt == null) || (((loadedQuantity > 0) ? loadedQuantity : doc.packedQuantity) >= (((((doc.returnedQuantity != null) ? doc.returnedQuantity : 0) + ((doc.usedQuantity != null) ? doc.usedQuantity : 0)) + ((doc.lostQuantity != null) ? doc.lostQuantity : 0)) + ((doc.damagedQuantity != null) ? doc.damagedQuantity : 0)))))) throw new Error("That is less than the return already counted on this line. Correct the return count first.");
+    if (!(((doc.returnCountedAt == null) || (loadedQuantity >= (((((doc.returnedQuantity != null) ? doc.returnedQuantity : 0) + ((doc.usedQuantity != null) ? doc.usedQuantity : 0)) + ((doc.lostQuantity != null) ? doc.lostQuantity : 0)) + ((doc.damagedQuantity != null) ? doc.damagedQuantity : 0)))))) throw new Error("That is less than the return already counted on this line. Correct the return count first.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
-      loadedQuantity: ((loadedQuantity > 0) ? loadedQuantity : null),
-      lineLoadedAt: ((loadedQuantity > 0) ? Date.now() : null),
-      lineLoadedByPersonId: ((loadedQuantity > 0) ? user.personId : null),
+      loadedQuantity: loadedQuantity,
+      lineLoadedAt: Date.now(),
+      lineLoadedByPersonId: user.personId,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -38892,7 +38892,7 @@ async function __runPackListItemRecordPackedCount(ctx: MutationCtx, { docId, pac
     if (!(((__rel_packList != null) && ((((__rel_packList.status === "packing") || (__rel_packList.status === "packed")) || (__rel_packList.status === "loaded")) || (__rel_packList.status === "dispatched"))))) throw new Error("Guard 3 failed");
     if (!((packedQuantity > 0))) throw new Error("Enter a packed amount more than zero.");
     if (!((packedQuantity < doc.requiredQuantity))) throw new Error("This is the full amount. Mark the line packed.");
-    if (!((((doc.returnCountedAt == null) || ((doc.loadedQuantity != null) && (doc.loadedQuantity > 0))) || (packedQuantity >= (((((doc.returnedQuantity != null) ? doc.returnedQuantity : 0) + ((doc.usedQuantity != null) ? doc.usedQuantity : 0)) + ((doc.lostQuantity != null) ? doc.lostQuantity : 0)) + ((doc.damagedQuantity != null) ? doc.damagedQuantity : 0)))))) throw new Error("That is less than the return already counted on this line. Correct the return count first.");
+    if (!((((doc.returnCountedAt == null) || (doc.loadedQuantity != null)) || (packedQuantity >= (((((doc.returnedQuantity != null) ? doc.returnedQuantity : 0) + ((doc.usedQuantity != null) ? doc.usedQuantity : 0)) + ((doc.lostQuantity != null) ? doc.lostQuantity : 0)) + ((doc.damagedQuantity != null) ? doc.damagedQuantity : 0)))))) throw new Error("That is less than the return already counted on this line. Correct the return count first.");
     if (!(((packedQuantity >= ((doc.checkedQuantity != null) ? doc.checkedQuantity : 0)) && (packedQuantity >= ((doc.loadedQuantity != null) ? doc.loadedQuantity : 0))))) throw new Error("That is less than what is already checked or on the truck. Correct those counts first.");
     const previousPacked = doc.packedQuantity;
     if (version !== undefined && (doc as any).version !== version) {
@@ -38950,7 +38950,7 @@ async function __runPackListItemRecordReturn(ctx: MutationCtx, { docId, returned
     if (!(((__rel_packList != null) && (__rel_packList.status === "dispatched")))) throw new Error("Guard 1 failed");
     if (!(((doc.excludedAt == null) && ((doc.returnRequired != null) ? (doc.returnRequired === true) : (doc.category !== "disposable"))))) throw new Error("This line does not come back, so there is no return to count.");
     if (!(((((returnedQuantity >= 0) && (usedQuantity >= 0)) && (lostQuantity >= 0)) && (damagedQuantity >= 0)))) throw new Error("A return amount can't be negative. Use zero or more.");
-    if (!(((((returnedQuantity + usedQuantity) + lostQuantity) + damagedQuantity) <= (((doc.loadedQuantity != null) && (doc.loadedQuantity > 0)) ? doc.loadedQuantity : doc.packedQuantity)))) throw new Error("That is more than what went out. Check the amounts.");
+    if (!(((((returnedQuantity + usedQuantity) + lostQuantity) + damagedQuantity) <= ((doc.loadedQuantity != null) ? doc.loadedQuantity : doc.packedQuantity)))) throw new Error("That is more than what went out. Check the amounts.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }

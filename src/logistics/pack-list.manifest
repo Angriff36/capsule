@@ -590,7 +590,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     constraint recordPackedCountShort: packedQuantity < self.requiredQuantity "This is the full amount. Mark the line packed."
     compute previousPacked = self.packedQuantity
     // A saved return count stays true: what went out can't drop below it.
-    constraint packedCoversReturn: self.returnCountedAt == null or (self.loadedQuantity != null and self.loadedQuantity > 0) or packedQuantity >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
+    constraint packedCoversReturn: self.returnCountedAt == null or self.loadedQuantity != null or packedQuantity >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
     // A packed amount can't drop below what was already checked or put on the truck.
     constraint packedCoversCounts: packedQuantity >= (self.checkedQuantity != null ? self.checkedQuantity : 0) and packedQuantity >= (self.loadedQuantity != null ? self.loadedQuantity : 0) "That is less than what is already checked or on the truck. Correct those counts first."
     mutate packedQuantity = packedQuantity
@@ -622,7 +622,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     compute previousStatus = self.status
     compute previousPacked = self.packedQuantity
     // A saved return count stays true: what went out can't drop below it.
-    constraint packedCoversReturn: self.returnCountedAt == null or (self.loadedQuantity != null and self.loadedQuantity > 0) or packedQuantity >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
+    constraint packedCoversReturn: self.returnCountedAt == null or self.loadedQuantity != null or packedQuantity >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
     // A packed amount can't drop below what was already checked or put on the truck.
     constraint packedCoversCounts: packedQuantity >= (self.checkedQuantity != null ? self.checkedQuantity : 0) and packedQuantity >= (self.loadedQuantity != null ? self.loadedQuantity : 0) "That is less than what is already checked or on the truck. Correct those counts first."
     mutate packedQuantity = packedQuantity
@@ -922,17 +922,18 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // How much of this line is on the truck. Zero takes it back off.
+  // How much of this line is on the truck. Zero is kept: it says nothing of
+  // this line went out, which is not the same as "not counted".
   command recordLoaded(loadedQuantity: decimal(12, 4)) {
     guard self.deletedAt == null and self.listedAt != null
     guard self.packList != null and self.packList.status != "cancelled"
     constraint loadedNotNegative: loadedQuantity >= 0 "The loaded amount can't be negative. Use zero or more."
     constraint loadedNotOverPacked: loadedQuantity <= self.packedQuantity "You can't load more than what is packed. Save the packed amount first."
     // A saved return count stays true: what went out can't drop below it.
-    constraint loadedCoversReturn: self.returnCountedAt == null or (loadedQuantity > 0 ? loadedQuantity : self.packedQuantity) >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
-    mutate loadedQuantity = loadedQuantity > 0 ? loadedQuantity : null
-    mutate lineLoadedAt = loadedQuantity > 0 ? now() : null
-    mutate lineLoadedByPersonId = loadedQuantity > 0 ? user.personId : null
+    constraint loadedCoversReturn: self.returnCountedAt == null or loadedQuantity >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
+    mutate loadedQuantity = loadedQuantity
+    mutate lineLoadedAt = now()
+    mutate lineLoadedByPersonId = user.personId
     emit PackListItemLoaded {
       packListItemId: self.id
       tenantId: self.tenantId
@@ -958,8 +959,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     // marked and not a throwaway.
     constraint returnLineComesBack: self.excludedAt == null and (self.returnRequired != null ? self.returnRequired == true : self.category != "disposable") "This line does not come back, so there is no return to count."
     constraint returnAmountsNotNegative: returnedQuantity >= 0 and usedQuantity >= 0 and lostQuantity >= 0 and damagedQuantity >= 0 "A return amount can't be negative. Use zero or more."
-    // What went out is the on-truck count when one was taken, else what was packed.
-    constraint returnNotOverWentOut: returnedQuantity + usedQuantity + lostQuantity + damagedQuantity <= (self.loadedQuantity != null and self.loadedQuantity > 0 ? self.loadedQuantity : self.packedQuantity) "That is more than what went out. Check the amounts."
+    // What went out is the on-truck count when one was taken (zero included), else what was packed.
+    constraint returnNotOverWentOut: returnedQuantity + usedQuantity + lostQuantity + damagedQuantity <= (self.loadedQuantity != null ? self.loadedQuantity : self.packedQuantity) "That is more than what went out. Check the amounts."
     mutate returnedQuantity = returnedQuantity
     mutate usedQuantity = usedQuantity
     mutate lostQuantity = lostQuantity

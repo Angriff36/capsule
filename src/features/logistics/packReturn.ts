@@ -20,13 +20,13 @@ const show = (value: number) =>
 
 /**
  * What left the building on this line: the on-truck count when one was
- * taken, else what was packed.
+ * taken (zero means none went), else what was packed.
  */
 export function packWentOut(line: {
   packedQuantity?: number | null;
   loadedQuantity?: number | null;
 }): number {
-  return n(line.loadedQuantity) > 0
+  return line.loadedQuantity != null
     ? n(line.loadedQuantity)
     : n(line.packedQuantity);
 }
