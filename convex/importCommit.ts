@@ -286,6 +286,15 @@ export const countRunLinks = internalQuery({
   },
 });
 
+/**
+ * AC-271: a link keeps the normalized record (read back by later datasets,
+ * e.g. events → contact name) AND the input row exactly as received, under
+ * its own `sourceRow` key, so raw source stays apart from the interpretation.
+ */
+function withSourceRow(normalized: object, sourceRow: unknown): string {
+  return JSON.stringify({ ...normalized, sourceRow: sourceRow ?? null });
+}
+
 /** Insert or update the link for a (tenant, source, recordType, externalId) key. */
 export const upsertLink = internalMutation({
   args: {
@@ -729,7 +738,10 @@ export const commitImportRun = action({
             capsuleEntity: "client",
             capsuleId: clientId,
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(contact),
+            rawSourceData: withSourceRow(
+              contact,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "resolved",
           });
           committed += 1;
@@ -747,7 +759,10 @@ export const commitImportRun = action({
             capsuleEntity: "client",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(contact),
+            rawSourceData: withSourceRow(
+              contact,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
           });
@@ -848,7 +863,10 @@ export const commitImportRun = action({
             capsuleEntity: "event_record",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(event),
+            rawSourceData: withSourceRow(
+              event,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: `Client not imported (external ${event.clientId}); import contacts first.`,
           });
@@ -903,7 +921,10 @@ export const commitImportRun = action({
             capsuleEntity: "event_record",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(event),
+            rawSourceData: withSourceRow(
+              event,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: "Event is missing a start date (EventDate).",
           });
@@ -962,7 +983,10 @@ export const commitImportRun = action({
             capsuleEntity: "event_record",
             capsuleId: eventId,
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(event),
+            rawSourceData: withSourceRow(
+              event,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "resolved",
           });
           committed += 1;
@@ -981,7 +1005,10 @@ export const commitImportRun = action({
             capsuleEntity: "event_record",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(event),
+            rawSourceData: withSourceRow(
+              event,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
           });
@@ -1116,7 +1143,10 @@ export const commitImportRun = action({
             capsuleEntity: "lead",
             capsuleId: leadId,
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(lead),
+            rawSourceData: withSourceRow(
+              lead,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "resolved",
           });
           committed += 1;
@@ -1134,7 +1164,10 @@ export const commitImportRun = action({
             capsuleEntity: "lead",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(lead),
+            rawSourceData: withSourceRow(
+              lead,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
           });
@@ -1307,7 +1340,10 @@ export const commitImportRun = action({
           capsuleEntity: "payment",
           capsuleId: "",
           sourceImportRunId: args.importRunId,
-          rawSourceData: JSON.stringify(payment),
+          rawSourceData: withSourceRow(
+            payment,
+            args.rawRows[parsed.sourceIndexes[index]!],
+          ),
           conflictStatus: waitsForMatch ? "pending_conflict" : "resolved",
           resolutionNote: note,
         });
@@ -1423,7 +1459,10 @@ export const commitImportRun = action({
             capsuleEntity: "menu",
             capsuleId: dishId,
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(menu),
+            rawSourceData: withSourceRow(
+              menu,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "resolved",
           });
           committed += 1;
@@ -1441,7 +1480,10 @@ export const commitImportRun = action({
             capsuleEntity: "menu",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(menu),
+            rawSourceData: withSourceRow(
+              menu,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
           });
@@ -1552,7 +1594,10 @@ export const commitImportRun = action({
             capsuleEntity: "pack_list",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(packList),
+            rawSourceData: withSourceRow(
+              packList,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: `Source event not imported (external ${packList.sourceEventId}); import events first.`,
           });
@@ -1635,7 +1680,10 @@ export const commitImportRun = action({
             capsuleEntity: "pack_list",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(packList),
+            rawSourceData: withSourceRow(
+              packList,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
           });
@@ -1777,7 +1825,10 @@ export const commitImportRun = action({
           capsuleEntity: "venue",
           capsuleId: venueId,
           sourceImportRunId: args.importRunId,
-          rawSourceData: JSON.stringify(venue),
+          rawSourceData: withSourceRow(
+            venue,
+            args.rawRows[parsed.sourceIndexes[index]!],
+          ),
           conflictStatus: "resolved",
         });
         committed += 1;
@@ -1795,7 +1846,10 @@ export const commitImportRun = action({
           capsuleEntity: "venue",
           capsuleId: "",
           sourceImportRunId: args.importRunId,
-          rawSourceData: JSON.stringify(venue),
+          rawSourceData: withSourceRow(
+            venue,
+            args.rawRows[parsed.sourceIndexes[index]!],
+          ),
           conflictStatus: "pending_conflict",
           resolutionNote: note,
         });

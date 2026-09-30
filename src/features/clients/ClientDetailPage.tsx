@@ -32,6 +32,7 @@ import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import { ClientCommunicationPanel } from "./ClientCommunicationPanel";
 import { ClientContactsPanel } from "./ClientContactsPanel";
 import { ClientProfilePanel } from "./ClientProfilePanel";
+import { ClientSourceProvenancePanel } from "./ClientSourceProvenancePanel";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
@@ -397,6 +398,8 @@ export function ClientDetailPage() {
         run={run}
         onSaved={setNotice}
       />
+
+      <ClientSourceProvenancePanel clientId={client._id} />
 
       <AttachmentsSection parentType="client" parentId={client._id} />
     </div>

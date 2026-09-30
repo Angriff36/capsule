@@ -349,6 +349,8 @@ export interface ParsedCapsuleMenu {
 export interface ParserResult<T> {
   success: boolean;
   records: T[];
+  /** Input row index of each entry in `records` (rows with errors drop out). */
+  sourceIndexes: number[];
   errors: Array<{ recordIndex: number; field: string; message: string }>;
   warnings: Array<{ recordIndex: number; field: string; message: string }>;
   totalCount: number;
@@ -886,6 +888,7 @@ export function parseTppEvents(
   records: TppEventRecord[],
 ): ParserResult<ParsedCapsuleEvent> {
   const result: ParsedCapsuleEvent[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -932,6 +935,7 @@ export function parseTppEvents(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -944,6 +948,7 @@ export function parseTppEvents(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -960,6 +965,7 @@ export function parseTppContacts(
   records: TppContactRecord[],
 ): ParserResult<ParsedCapsuleContact> {
   const result: ParsedCapsuleContact[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -999,6 +1005,7 @@ export function parseTppContacts(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -1011,6 +1018,7 @@ export function parseTppContacts(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -1027,6 +1035,7 @@ export function parseTppVenues(
   records: TppVenueRecord[],
 ): ParserResult<ParsedCapsuleVenue> {
   const result: ParsedCapsuleVenue[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -1058,6 +1067,7 @@ export function parseTppVenues(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -1070,6 +1080,7 @@ export function parseTppVenues(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -1086,6 +1097,7 @@ export function parseTppPayments(
   records: TppPaymentRecord[],
 ): ParserResult<ParsedCapsulePayment> {
   const result: ParsedCapsulePayment[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -1127,6 +1139,7 @@ export function parseTppPayments(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -1139,6 +1152,7 @@ export function parseTppPayments(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -1155,6 +1169,7 @@ export function parseTppLeads(
   records: TppLeadRecord[],
 ): ParserResult<ParsedCapsuleLead> {
   const result: ParsedCapsuleLead[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -1186,6 +1201,7 @@ export function parseTppLeads(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -1198,6 +1214,7 @@ export function parseTppLeads(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -1214,6 +1231,7 @@ export function parseTppMenus(
   records: TppMenuRecord[],
 ): ParserResult<ParsedCapsuleMenu> {
   const result: ParsedCapsuleMenu[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -1246,6 +1264,7 @@ export function parseTppMenus(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -1258,6 +1277,7 @@ export function parseTppMenus(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -1273,6 +1293,7 @@ export function parseTppPackLists(
   records: TppPackListRecord[],
 ): ParserResult<ParsedCapsulePackList> {
   const result: ParsedCapsulePackList[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -1298,6 +1319,7 @@ export function parseTppPackLists(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -1310,6 +1332,7 @@ export function parseTppPackLists(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
