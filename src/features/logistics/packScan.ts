@@ -33,6 +33,7 @@ export type ScanOutcome =
   | "wrong_truck"
   | "not_found"
   | "two_match"
+  | "two_lines"
   | "not_out_yet"
   | "no_return"
   | "nothing_left";
@@ -47,6 +48,8 @@ export const SCAN_OUTCOME_TEXT: Record<ScanOutcome, string> = {
   not_found: "No line on this list matches that label.",
   two_match:
     "Two equipment items match that label. Count the line with its button.",
+  two_lines:
+    "Two lines on this list match that label. Count the line with its button.",
   not_out_yet:
     "This list has not left yet. Count what came back after it is sent out.",
   no_return: "This line does not come back, so there is no return to count.",
@@ -163,7 +166,8 @@ export type ScanFind =
   | { found: "truck"; rigId: string }
   | {
       found: "none";
-      outcome: "not_found" | "two_match" | "wrong_event" | "wrong_truck";
+      outcome:
+        "not_found" | "two_match" | "two_lines" | "wrong_event" | "wrong_truck";
     };
 
 /** Find what a label means on this list. */
@@ -220,17 +224,20 @@ export function findScanTarget(
   )
     return { found: "none", outcome: "wrong_event" };
   const live = context.lines.filter((line) => line.excludedAt == null);
-  const line =
-    live.find((row) =>
-      parsePackSources(row.sourcesJson).some(
-        (source) => source.sourceType === "rental" && here.has(source.sourceId),
-      ),
-    ) ??
-    live.find(
-      (row) =>
-        row.description.trim().toLowerCase() ===
-        piece.name.trim().toLowerCase(),
-    );
+  // The line made from this event's hold first, then a line with the same
+  // name. Two lines that fit equally: never guess.
+  const held = live.filter((row) =>
+    parsePackSources(row.sourcesJson).some(
+      (source) => source.sourceType === "rental" && here.has(source.sourceId),
+    ),
+  );
+  const named = live.filter(
+    (row) =>
+      row.description.trim().toLowerCase() === piece.name.trim().toLowerCase(),
+  );
+  const fits = held.length > 0 ? held : named;
+  if (fits.length > 1) return { found: "none", outcome: "two_lines" };
+  const line = fits[0];
   if (line) return { found: "line", line, equipmentName: piece.name };
   return { found: "none", outcome: "not_found" };
 }
