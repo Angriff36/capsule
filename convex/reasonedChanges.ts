@@ -12,9 +12,10 @@
  * a mutation inside the caller's transaction: when one step is refused,
  * nothing is kept.
  */
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { api } from "./_generated/api";
 import { mutation } from "./_generated/server";
+import { getAuthContext, requireTenant } from "./lib/authContext";
 
 const reasonArgs = {
   reason: v.string(),
@@ -100,6 +101,104 @@ export const holdEquipmentWithReason = mutation({
       reason: args.reason,
       openItems: args.openItems,
     });
+    return null;
+  },
+});
+
+/**
+ * Add what a planning suggestion asks for, and keep the answer, in one save.
+ * The answer is what stops the board from suggesting it again, so an
+ * addition without its answer would be offered (and added) a second time.
+ * Two people pressing Add at the same moment: the second is told the
+ * suggestion is already answered, and nothing of theirs is kept.
+ */
+export const acceptSuggestion = mutation({
+  args: {
+    eventId: v.id("events"),
+    suggestionKey: v.string(),
+    kind: v.union(
+      v.literal("equipment"),
+      v.literal("position"),
+      v.literal("task"),
+    ),
+    /** The equipment id, the crew position name, or the to-do title. */
+    target: v.string(),
+    /** How many to add now. */
+    add: v.number(),
+    /** The amount the rule asks for in all; kept on the answer. */
+    wanted: v.number(),
+    basis: v.optional(v.string()),
+    startsAt: v.optional(v.number()),
+    endsAt: v.optional(v.number()),
+    /** The earlier answer this one replaces, when there is one. */
+    receiptId: v.optional(v.id("planningReceipts")),
+    receiptVersion: v.optional(v.number()),
+  },
+  handler: async (ctx, args): Promise<null> => {
+    const tenantId = requireTenant(await getAuthContext(ctx));
+    const answered = (
+      await ctx.db
+        .query("planningReceipts")
+        .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+        .collect()
+    ).filter(
+      (row) =>
+        row.tenantId === tenantId &&
+        row.deletedAt == null &&
+        row.recordedAt != null &&
+        row.suggestionKey === args.suggestionKey,
+    );
+    if (answered.some((row) => row._id !== args.receiptId))
+      throw new ConvexError(
+        "Someone already answered this suggestion. The board shows the new answer.",
+      );
+
+    if (args.kind === "equipment") {
+      const equipmentId = ctx.db.normalizeId("equipments", args.target);
+      if (!equipmentId || args.startsAt == null || args.endsAt == null)
+        throw new ConvexError(
+          "Set the event's date and times before you hold equipment for it.",
+        );
+      await ctx.runMutation(api.equipmentCheckout.reserve, {
+        equipmentId,
+        eventId: args.eventId,
+        startsAt: args.startsAt,
+        endsAt: args.endsAt,
+        quantity: args.add,
+      });
+    } else if (args.kind === "position") {
+      if (!Number.isSafeInteger(args.add) || args.add < 1 || args.add > 100)
+        throw new ConvexError("Add between 1 and 100 crew positions.");
+      for (let count = 0; count < args.add; count += 1)
+        await ctx.runMutation(api.mutations.EventStaffNeed_createViaPostOpen, {
+          eventId: args.eventId,
+          role: args.target,
+        });
+    } else {
+      await ctx.runMutation(api.mutations.EventTask_createViaAdd, {
+        eventId: args.eventId,
+        title: args.target,
+        suggestionKey: args.suggestionKey,
+      });
+    }
+
+    const answer = {
+      quantity: args.wanted,
+      declined: false,
+      basis: args.basis,
+    };
+    if (args.receiptId)
+      await ctx.runMutation(api.mutations.PlanningReceipt_answerAgain, {
+        docId: args.receiptId,
+        version: args.receiptVersion,
+        ...answer,
+      });
+    else
+      await ctx.runMutation(api.mutations.PlanningReceipt_createViaRecord, {
+        eventId: args.eventId,
+        suggestionKey: args.suggestionKey,
+        ...answer,
+      });
     return null;
   },
 });

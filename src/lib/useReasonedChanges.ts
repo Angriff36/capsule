@@ -17,3 +17,8 @@ export function useAssignPersonWithReason() {
 export function useHoldEquipmentWithReason() {
   return useMutation(api.reasonedChanges.holdEquipmentWithReason);
 }
+
+/** Add what a planning suggestion asks for and keep the answer, in one save. */
+export function useAcceptSuggestion() {
+  return useMutation(api.reasonedChanges.acceptSuggestion);
+}

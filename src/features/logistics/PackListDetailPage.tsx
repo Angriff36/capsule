@@ -26,7 +26,6 @@ import {
   usePackListItemMarkMissing,
   usePackListItemMarkPacked,
   usePackListItemRecordChecked,
-  useCreatePackSectionClaim,
   useListPackSectionClaim,
   usePackSectionClaimRelease,
   usePackListItemRecordLoaded,
@@ -45,6 +44,7 @@ import {
 } from "../../ui/bulk-select";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { useAuthStatus } from "../../lib/useAuthStatus";
+import { usePackSectionTake } from "../../lib/usePackSectionTake";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip } from "../../ui/primitives";
@@ -126,7 +126,7 @@ export function PackListDetailPage() {
   const recordChecked = usePackListItemRecordChecked();
   const sectionClaims = useListPackSectionClaim();
   const authStatus = useAuthStatus();
-  const takeSection = useCreatePackSectionClaim();
+  const takeSection = usePackSectionTake();
   const giveBackSection = usePackSectionClaimRelease();
   const recordLoaded = usePackListItemRecordLoaded();
   const recordReturn = usePackListItemRecordReturn();
@@ -266,11 +266,13 @@ export function PackListDetailPage() {
     );
     const mine =
       claim?.personId != null && claim.personId === authStatus?.personId;
+    // One save: whoever had the section gives it back and you take it.
     const take = () =>
       run(`section:${group.key}`, async () => {
-        if (claim)
-          await giveBackSection({ docId: claim._id, version: claim.version });
-        await takeSection({ packListId: packList._id, sectionKey: group.key });
+        await takeSection({
+          packListId: packList._id as never,
+          sectionKey: group.key,
+        });
       });
     return (
       <div className="flex flex-wrap items-center gap-2 text-base text-ink-2">

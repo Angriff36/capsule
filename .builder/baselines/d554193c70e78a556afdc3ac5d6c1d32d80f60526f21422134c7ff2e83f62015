@@ -38702,6 +38702,7 @@ async function __runPackListItemMarkPacked(ctx: MutationCtx, { docId, packedQuan
     if (!((packedQuantity > 0))) throw new Error("Enter a packed amount more than zero.");
     if (!((packedQuantity <= doc.requiredQuantity))) throw new Error("You can't pack more than what's required. Enter a smaller amount.");
     if (!((packedQuantity === doc.requiredQuantity))) throw new Error("Save a short count on this line until you have the full amount");
+    if (!((((doc.returnCountedAt == null) || ((doc.loadedQuantity != null) && (doc.loadedQuantity > 0))) || (packedQuantity >= (((((doc.returnedQuantity != null) ? doc.returnedQuantity : 0) + ((doc.usedQuantity != null) ? doc.usedQuantity : 0)) + ((doc.lostQuantity != null) ? doc.lostQuantity : 0)) + ((doc.damagedQuantity != null) ? doc.damagedQuantity : 0)))))) throw new Error("That is less than the return already counted on this line. Correct the return count first.");
     const previousStatus = doc.status;
     const previousPacked = doc.packedQuantity;
     {
@@ -38829,6 +38830,7 @@ async function __runPackListItemRecordLoaded(ctx: MutationCtx, { docId, loadedQu
     if (!(((__rel_packList != null) && (__rel_packList.status !== "cancelled")))) throw new Error("Guard 1 failed");
     if (!((loadedQuantity >= 0))) throw new Error("The loaded amount can't be negative. Use zero or more.");
     if (!((loadedQuantity <= doc.packedQuantity))) throw new Error("You can't load more than what is packed. Save the packed amount first.");
+    if (!(((doc.returnCountedAt == null) || (((loadedQuantity > 0) ? loadedQuantity : doc.packedQuantity) >= (((((doc.returnedQuantity != null) ? doc.returnedQuantity : 0) + ((doc.usedQuantity != null) ? doc.usedQuantity : 0)) + ((doc.lostQuantity != null) ? doc.lostQuantity : 0)) + ((doc.damagedQuantity != null) ? doc.damagedQuantity : 0)))))) throw new Error("That is less than the return already counted on this line. Correct the return count first.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -38887,6 +38889,7 @@ async function __runPackListItemRecordPackedCount(ctx: MutationCtx, { docId, pac
     if (!(((__rel_packList != null) && ((((__rel_packList.status === "packing") || (__rel_packList.status === "packed")) || (__rel_packList.status === "loaded")) || (__rel_packList.status === "dispatched"))))) throw new Error("Guard 3 failed");
     if (!((packedQuantity > 0))) throw new Error("Enter a packed amount more than zero.");
     if (!((packedQuantity < doc.requiredQuantity))) throw new Error("This is the full amount. Mark the line packed.");
+    if (!((((doc.returnCountedAt == null) || ((doc.loadedQuantity != null) && (doc.loadedQuantity > 0))) || (packedQuantity >= (((((doc.returnedQuantity != null) ? doc.returnedQuantity : 0) + ((doc.usedQuantity != null) ? doc.usedQuantity : 0)) + ((doc.lostQuantity != null) ? doc.lostQuantity : 0)) + ((doc.damagedQuantity != null) ? doc.damagedQuantity : 0)))))) throw new Error("That is less than the return already counted on this line. Correct the return count first.");
     const previousPacked = doc.packedQuantity;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -43746,8 +43749,8 @@ async function __runPlanningReceiptAnswerAgain(ctx: MutationCtx, { docId, quanti
     if (!doc) throw new Error("PlanningReceipt not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PlanningReceipt not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see answered suggestions");
-    if (!(((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales, logistics and workforce staff and managers may answer suggestions");
-    if (!(((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales, logistics and workforce staff and managers may answer suggestions");
+    if (!((((((checkRole(user, "eventAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, inventory, sales, logistics and workforce staff and managers may answer suggestions");
+    if (!((((((checkRole(user, "eventAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, inventory, sales, logistics and workforce staff and managers may answer suggestions");
     if (!((doc.recordedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((quantity >= 0))) throw new Error("The amount can't be negative. Use zero or more.");
@@ -43805,8 +43808,8 @@ async function __runPlanningReceiptRecord(ctx: MutationCtx, { docId, eventId, su
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see answered suggestions");
-    if (!(((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales, logistics and workforce staff and managers may answer suggestions");
-    if (!(((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales, logistics and workforce staff and managers may answer suggestions");
+    if (!((((((checkRole(user, "eventAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, inventory, sales, logistics and workforce staff and managers may answer suggestions");
+    if (!((((((checkRole(user, "eventAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, inventory, sales, logistics and workforce staff and managers may answer suggestions");
     if (!((doc.recordedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_event != null) && (__rel_event.deletedAt == null)))) throw new Error("Guard 2 failed");
@@ -43893,8 +43896,8 @@ export const PlanningReceipt_createViaRecord = mutation({
     };
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see answered suggestions");
-    if (!(((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales, logistics and workforce staff and managers may answer suggestions");
-    if (!(((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales, logistics and workforce staff and managers may answer suggestions");
+    if (!((((((checkRole(user, "eventAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, inventory, sales, logistics and workforce staff and managers may answer suggestions");
+    if (!((((((checkRole(user, "eventAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, inventory, sales, logistics and workforce staff and managers may answer suggestions");
     if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_event != null) && (__rel_event.deletedAt == null)))) throw new Error("Guard 2 failed");

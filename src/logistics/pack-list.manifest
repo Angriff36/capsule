@@ -584,6 +584,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     constraint recordPackedCountPositive: packedQuantity > 0 "Enter a packed amount more than zero."
     constraint recordPackedCountShort: packedQuantity < self.requiredQuantity "This is the full amount. Mark the line packed."
     compute previousPacked = self.packedQuantity
+    // A saved return count stays true: what went out can't drop below it.
+    constraint packedCoversReturn: self.returnCountedAt == null or (self.loadedQuantity != null and self.loadedQuantity > 0) or packedQuantity >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
     mutate packedQuantity = packedQuantity
     mutate packedByPersonId = user.personId != null ? user.personId : self.packedByPersonId
     emit PackListItemCountRecorded {
@@ -612,6 +614,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     constraint markPackedComplete: packedQuantity == self.requiredQuantity "Save a short count on this line until you have the full amount"
     compute previousStatus = self.status
     compute previousPacked = self.packedQuantity
+    // A saved return count stays true: what went out can't drop below it.
+    constraint packedCoversReturn: self.returnCountedAt == null or (self.loadedQuantity != null and self.loadedQuantity > 0) or packedQuantity >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
     mutate packedQuantity = packedQuantity
     mutate status = "packed"
     mutate packedAt = now()
@@ -915,6 +919,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     guard self.packList != null and self.packList.status != "cancelled"
     constraint loadedNotNegative: loadedQuantity >= 0 "The loaded amount can't be negative. Use zero or more."
     constraint loadedNotOverPacked: loadedQuantity <= self.packedQuantity "You can't load more than what is packed. Save the packed amount first."
+    // A saved return count stays true: what went out can't drop below it.
+    constraint loadedCoversReturn: self.returnCountedAt == null or (loadedQuantity > 0 ? loadedQuantity : self.packedQuantity) >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
     mutate loadedQuantity = loadedQuantity > 0 ? loadedQuantity : null
     mutate lineLoadedAt = loadedQuantity > 0 ? now() : null
     mutate lineLoadedByPersonId = loadedQuantity > 0 ? user.personId : null

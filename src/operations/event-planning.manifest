@@ -225,8 +225,8 @@ entity PlanningReceipt mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
   default policy planningReceiptRead read: roleAllows(user.role, "staffAccess") "Staff may see answered suggestions"
-  default policy planningReceiptWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "manageAccess") "Event, sales, logistics and workforce staff and managers may answer suggestions"
-  default policy planningReceiptExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "manageAccess") "Event, sales, logistics and workforce staff and managers may answer suggestions"
+  default policy planningReceiptWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "manageAccess") "Event, inventory, sales, logistics and workforce staff and managers may answer suggestions"
+  default policy planningReceiptExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "manageAccess") "Event, inventory, sales, logistics and workforce staff and managers may answer suggestions"
 
   command record(
     eventId: uuid,

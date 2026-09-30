@@ -11,8 +11,6 @@ import { formatCountNoun, formatTime } from "../../../lib/format";
 import {
   useCreateEventAssignment,
   useCreateEventPlanNeeds,
-  useCreateEventStaffNeed,
-  useCreateEventTask,
   useCreateEventVehicleAssignment,
   useCreatePlanningReceipt,
   useEquipmentReservationCancel,
@@ -56,6 +54,7 @@ import { useSuccessToast } from "../../../ui/useSuccessToast";
 import { resolveManifestPolicies } from "../../admin/rolePermissionAudit";
 import { useReserveEquipment } from "../../facilities/equipmentCheckout";
 import {
+  useAcceptSuggestion,
   useAssignPersonWithReason,
   useHoldEquipmentWithReason,
 } from "../../../lib/useReasonedChanges";
@@ -151,15 +150,14 @@ export function PlanningBoardPage() {
   const assignPerson = useCreateEventAssignment();
   const unassign = useEventAssignmentUnassign();
   const chooseRide = useEventAssignmentChooseTravelLeg();
-  const postNeed = useCreateEventStaffNeed();
   const assignRig = useCreateEventVehicleAssignment();
   const releaseRig = useEventVehicleAssignmentRelease();
   const reserveEquipment = useReserveEquipment();
   const cancelHold = useEquipmentReservationCancel();
-  const addTask = useCreateEventTask();
   const noteNeeds = useCreateEventPlanNeeds();
   const reviseNeeds = useEventPlanNeedsRevise();
   const assignPersonWithReason = useAssignPersonWithReason();
+  const acceptSuggestion = useAcceptSuggestion();
   const holdEquipmentWithReason = useHoldEquipmentWithReason();
   const recordReceipt = useCreatePlanningReceipt();
   const answerAgain = usePlanningReceiptAnswerAgain();
@@ -502,34 +500,27 @@ export function PlanningBoardPage() {
       `suggest:${suggestion.key}`,
       async () => {
         if (take) {
-          if (suggestion.kind === "equipment") {
-            if (!window)
-              throw new Error(
-                "Set the event's date and times before you hold equipment for it.",
-              );
-            await reserveEquipment({
-              equipmentId: suggestion.target as never,
-              eventId: eventId as never,
-              startsAt: window.start,
-              endsAt: window.end,
-              quantity: suggestion.add,
-            });
-          } else if (suggestion.kind === "position") {
-            for (let count = 0; count < suggestion.add; count += 1)
-              await postNeed({ eventId, role: suggestion.target });
-          } else {
-            await addTask({
-              eventId,
-              title: suggestion.target,
-              suggestionKey: suggestion.key,
-            });
-          }
+          if (suggestion.kind === "equipment" && !window)
+            throw new Error(
+              "Set the event's date and times before you hold equipment for it.",
+            );
+          // What is added and the answer are one save: both or neither.
+          await acceptSuggestion({
+            eventId: eventId as never,
+            suggestionKey: suggestion.key,
+            kind: suggestion.kind,
+            target: suggestion.target,
+            add: suggestion.add,
+            wanted: suggestion.wanted,
+            basis: suggestion.basis,
+            startsAt: window?.start,
+            endsAt: window?.end,
+            receiptId: suggestion.receipt?._id as never,
+            receiptVersion: suggestion.receipt?.version,
+          });
+          return;
         }
-        const answer = {
-          quantity: take ? suggestion.wanted : 0,
-          declined: !take,
-          basis: suggestion.basis,
-        };
+        const answer = { quantity: 0, declined: true, basis: suggestion.basis };
         if (suggestion.receipt)
           await answerAgain({
             docId: suggestion.receipt._id,

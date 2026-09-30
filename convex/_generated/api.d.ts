@@ -199,6 +199,7 @@ import type * as messageInbox from "../messageInbox.js";
 import type * as mutations from "../mutations.js";
 import type * as notifications from "../notifications.js";
 import type * as openingStock from "../openingStock.js";
+import type * as packSections from "../packSections.js";
 import type * as personEmail from "../personEmail.js";
 import type * as personEmployeeNumber from "../personEmployeeNumber.js";
 import type * as personalDataExport from "../personalDataExport.js";
@@ -439,6 +440,7 @@ declare const fullApi: ApiFromModules<{
   mutations: typeof mutations;
   notifications: typeof notifications;
   openingStock: typeof openingStock;
+  packSections: typeof packSections;
   personEmail: typeof personEmail;
   personEmployeeNumber: typeof personEmployeeNumber;
   personalDataExport: typeof personalDataExport;
