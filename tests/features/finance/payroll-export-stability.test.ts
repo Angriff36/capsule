@@ -104,4 +104,33 @@ describe("payroll export stability (AC-130)", () => {
       changed: true,
     });
   });
+  it("a file for a different payroll provider is a new send with its own receipt", () => {
+    const periodKey = payrollPeriodKey(
+      "p-ada",
+      period.periodStart,
+      period.periodEnd,
+    );
+    const sentToGusto = {
+      personId: "p-ada",
+      periodKey,
+      revision: 1,
+      totalMinutes: 300,
+      status: "accepted",
+      processor: "gusto",
+    };
+    const sameProvider = planPayrollRevisions({
+      rows: [total(5)],
+      receipts: [sentToGusto],
+      ...period,
+      processor: "gusto",
+    });
+    expect(sameProvider[0]).toMatchObject({ changed: false, revision: 1 });
+    const toAdp = planPayrollRevisions({
+      rows: [total(5)],
+      receipts: [sentToGusto],
+      ...period,
+      processor: "adp",
+    });
+    expect(toAdp[0]).toMatchObject({ changed: true, revision: 2 });
+  });
 });

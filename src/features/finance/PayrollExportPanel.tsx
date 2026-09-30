@@ -239,6 +239,11 @@ function PayrollExportPreview({
           {`CSV download is off until every employee has a payroll employee number — missing for ${missingNumberNames.join(", ")}. Type the number next to their name below. Raw Capsule IDs are never sent to a payroll processor.`}
         </p>
       ) : null}
+      {document.payPrepNames.length > 0 ? (
+        <p className="mb-3 text-sm text-warn" role="status">
+          {`CSV download waits: ${document.payPrepNames.join(", ")} worked over 40 hours in a week. Prepare their pay (regular and overtime hours) first, so overtime is never sent as regular time.`}
+        </p>
+      ) : null}
       {document.waitingOnlyNames.length > 0 ? (
         <p className="mb-3 text-sm text-warn" role="status">
           {`Time waiting for approval is not in this export: ${document.waitingOnlyNames.join(", ")}. Approve it on the time sheet to include it.`}

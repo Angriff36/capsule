@@ -84,6 +84,7 @@ export type PayrollExportReceipt = {
   revision: number;
   totalMinutes: number;
   status: string;
+  processor?: string;
 };
 
 const localDate = (at: number) => {
@@ -141,11 +142,14 @@ export function planPayrollRevisions({
   receipts,
   periodStart,
   periodEnd,
+  processor,
 }: {
   rows: readonly { personId: string; totalMinutes: number }[];
   receipts: readonly PayrollExportReceipt[];
   periodStart: string;
   periodEnd: string;
+  /** A file for a different payroll provider is a new send with its own receipt. */
+  processor?: string;
 }): PayrollRevisionPlan[] {
   const totals = new Map(
     rows.map((row) => [row.personId, Math.round(row.totalMinutes)]),
@@ -170,7 +174,10 @@ export function planPayrollRevisions({
     const changed =
       history.at(-1)?.status === "rejected" ||
       previousTotalMinutes == null ||
-      previousTotalMinutes !== totalMinutes;
+      previousTotalMinutes !== totalMinutes ||
+      (processor != null &&
+        baseline?.processor != null &&
+        baseline.processor !== processor);
     return {
       personId,
       periodKey,

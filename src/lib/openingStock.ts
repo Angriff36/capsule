@@ -149,10 +149,17 @@ export function readOpeningStockRow(
     note: get("note", "notes", "comment", "comments"),
   };
   const id = get("id", "itemid", "rowid", "sku", "externalid");
-  // An item id (SKU) repeats across locations and count dates on one sheet, so
-  // the key carries both: each location's count is its own row.
+  // An item id (SKU) repeats across locations, count dates and recounts on one
+  // sheet, so the key carries them: each count is its own row, and two
+  // different counts of one place and day stay two rows that clash visibly.
   row.sourceRow = id
-    ? [`id:${id}`, slug(row.locationText), slug(row.asOfText)].join("|")
+    ? [
+        `id:${id}`,
+        slug(row.locationText),
+        slug(row.asOfText),
+        slug(row.quantityText),
+        slug(row.unitText),
+      ].join("|")
     : [
         slug(row.itemName),
         slug(row.locationText),

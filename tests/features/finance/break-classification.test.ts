@@ -4,7 +4,10 @@
  * 40 in a week into overtime.
  */
 import { describe, expect, it } from "vitest";
-import { buildPayrollExport } from "../../../src/features/finance/payrollExport";
+import {
+  buildPayrollExport,
+  payrollCsvDownloadAllowed,
+} from "../../../src/features/finance/payrollExport";
 import {
   approvedPayroll,
   overtimeWarnings,
@@ -115,7 +118,7 @@ describe("break classification", () => {
       }),
     ]);
   });
-  it("a period that starts midweek counts that week's earlier hours toward overtime, and the file splits overtime without a reviewed input", () => {
+  it("a period that starts midweek counts that week's earlier hours toward overtime, and an overtime week waits for prepared pay", () => {
     // Mon 2026-03-02 to Fri 2026-03-06, ten approved hours a day = 50 hours.
     const days = ["02", "03", "04", "05", "06"].map((day) => ({
       personId: "p1",
@@ -162,10 +165,12 @@ describe("break classification", () => {
       timeRecords: days,
       payrollInputs: [],
     });
+    // Capsule does not guess the overtime split: the row waits for prepared pay.
     expect(document.rows[0]).toMatchObject({
       recordedHours: 50,
-      regularHours: 40,
-      overtimeHours: 10,
+      needsPayPrep: true,
     });
+    expect(document.payPrepNames).toEqual(["Pat Pay"]);
+    expect(payrollCsvDownloadAllowed(document)).toBe(false);
   });
 });
