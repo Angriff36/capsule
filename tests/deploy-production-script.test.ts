@@ -52,6 +52,7 @@ esac
 echo "codex $*" >> "$STUB_LOG"
 # Work landing on the branch while the review runs (frozen-candidate test).
 if [ -n "\${STUB_DURING_REVIEW:-}" ]; then bash -c "$STUB_DURING_REVIEW" >/dev/null 2>&1; fi
+if [ -n "\${STUB_REVIEW_SLEEP:-}" ]; then printf 'exec\nbun run test\n'; sleep "$STUB_REVIEW_SLEEP"; fi
 cat
 echo "codex"
 printf '%b\\n' "\${STUB_REVIEW:-No blocking findings.\\nVERDICT: APPROVE}"
@@ -394,6 +395,25 @@ describe("scripts/deploy-production.sh", () => {
       expect(
         await git(checkout.work, "log", "-1", "--format=%B", next),
       ).toContain(`Release-Candidate: ${candidateB}`);
+    },
+    TIMEOUT,
+  );
+
+  it(
+    "a long review prints progress with the reviewer's last step instead of waiting silently",
+    async () => {
+      const checkout = await makeCheckout();
+      const result = await checkout.run([], {
+        STUB_REVIEW_SLEEP: "4",
+        DEPLOY_REVIEW_PROGRESS_SECONDS: "1",
+      });
+      expect(result.output).toMatch(
+        /deploy-production: review still running \(0 min\); last step: bun run test/,
+      );
+      expect(result.output).toContain(
+        "deploy-production: review finished after 0 min",
+      );
+      expect(result.status).toBe(0);
     },
     TIMEOUT,
   );
