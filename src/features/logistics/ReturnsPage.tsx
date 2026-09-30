@@ -13,7 +13,7 @@ import {
 import { EmptyState, PageHeader, TableSkeleton } from "../../ui/primitives";
 import { eventDetailPath } from "../events/eventRoutes";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
-import { packReturnSummary, packReturnTotals } from "./packReturn";
+import { packReturnSummary, packReturnTotals, packWentOut } from "./packReturn";
 import { comesBack } from "./packViews";
 import "./DispatchBoard.css";
 
@@ -78,7 +78,13 @@ export function ReturnsPage() {
               line.listedAt != null &&
               line.retiredAt == null &&
               listIds.has(line.packListId) &&
-              Number(line.packedQuantity) > 0 &&
+              packWentOut({
+                packedQuantity: Number(line.packedQuantity),
+                loadedQuantity:
+                  line.loadedQuantity == null
+                    ? null
+                    : Number(line.loadedQuantity),
+              }) > 0 &&
               comesBack(line),
           )
           .map((line) => ({

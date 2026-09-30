@@ -4,6 +4,7 @@ import {
   type PackListItemRow,
   type PackListItemTableProps,
 } from "./PackListItemTable";
+import { packWentOut } from "./packReturn";
 import {
   PACK_VIEWS,
   packView,
@@ -123,7 +124,7 @@ export function PackListViews({
       if (packed && table.canCount)
         actions.push({ key: "onTruck", label: "On truck" });
     } else if (view === "returns") {
-      if (packed && table.canCount && canCountReturn)
+      if (packWentOut(item) > 0 && table.canCount && canCountReturn)
         actions.push({ key: "countReturn", label: "Count return" });
     } else if (packed && table.canCount) {
       actions.push({ key: "secondCheck", label: "Second check" });

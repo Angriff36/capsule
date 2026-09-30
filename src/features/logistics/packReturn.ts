@@ -68,7 +68,7 @@ export type PackReturnTotals = {
 export function packReturnTotals(
   lines: readonly PackReturnLine[],
 ): PackReturnTotals {
-  const out = lines.filter((line) => n(line.packedQuantity) > 0);
+  const out = lines.filter((line) => packWentOut(line) > 0);
   return {
     lines: out.length,
     counted: out.filter((line) => line.returnCountedAt != null).length,
