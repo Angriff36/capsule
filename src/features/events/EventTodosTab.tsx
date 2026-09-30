@@ -30,6 +30,7 @@ import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { eventDetailPath } from "./eventRoutes";
 import { EventTabIntro } from "./EventTabIntro";
 import { FailureBanner } from "./FailureBanner";
+import { useEventChecklistApply } from "../../lib/useEventChecklistApply";
 
 type TaskRow = {
   _id: string;
@@ -85,6 +86,7 @@ export function EventTodosTab({
   const people = useListPerson();
   const checklists = useListEventChecklist();
   const addTask = useCreateEventTask();
+  const applyChecklistLines = useEventChecklistApply();
   const complete = useEventTaskComplete();
   const giveTo = useEventTaskGiveTo();
   const remove = useEventTaskRemove();
@@ -201,22 +203,14 @@ export function EventTodosTab({
 
   const applyChecklist = () => {
     if (!picked || toAdd.length === 0) return;
+    // One save: every missing line becomes a to-do, or none does.
     void run(
       "checklist",
-      async () => {
-        for (const line of toAdd)
-          await addTask({
-            eventId,
-            title: line.title,
-            details: line.details || undefined,
-            category: picked.category ?? undefined,
-            dueAt: line.dueAt,
-            priority: line.priority,
-            proofRequired: line.proofRequired,
-            checklistTemplateId: picked._id,
-            templateLineKey: line.key,
-          });
-      },
+      () =>
+        applyChecklistLines({
+          eventId: eventId as never,
+          checklistId: picked._id as never,
+        }),
       `${formatCountNoun(toAdd.length, "to-do")} added from ${picked.name}`,
     ).then((saved) => {
       if (saved) setChecklistId("");

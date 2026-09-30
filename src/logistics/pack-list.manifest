@@ -586,6 +586,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     compute previousPacked = self.packedQuantity
     // A saved return count stays true: what went out can't drop below it.
     constraint packedCoversReturn: self.returnCountedAt == null or (self.loadedQuantity != null and self.loadedQuantity > 0) or packedQuantity >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
+    // A packed amount can't drop below what was already checked or put on the truck.
+    constraint packedCoversCounts: packedQuantity >= (self.checkedQuantity != null ? self.checkedQuantity : 0) and packedQuantity >= (self.loadedQuantity != null ? self.loadedQuantity : 0) "That is less than what is already checked or on the truck. Correct those counts first."
     mutate packedQuantity = packedQuantity
     mutate packedByPersonId = user.personId != null ? user.personId : self.packedByPersonId
     emit PackListItemCountRecorded {
@@ -616,6 +618,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     compute previousPacked = self.packedQuantity
     // A saved return count stays true: what went out can't drop below it.
     constraint packedCoversReturn: self.returnCountedAt == null or (self.loadedQuantity != null and self.loadedQuantity > 0) or packedQuantity >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
+    // A packed amount can't drop below what was already checked or put on the truck.
+    constraint packedCoversCounts: packedQuantity >= (self.checkedQuantity != null ? self.checkedQuantity : 0) and packedQuantity >= (self.loadedQuantity != null ? self.loadedQuantity : 0) "That is less than what is already checked or on the truck. Correct those counts first."
     mutate packedQuantity = packedQuantity
     mutate status = "packed"
     mutate packedAt = now()

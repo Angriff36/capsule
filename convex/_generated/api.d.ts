@@ -36,6 +36,7 @@ import type * as driverAssignment from "../driverAssignment.js";
 import type * as emailNotifications from "../emailNotifications.js";
 import type * as equipmentCheckout from "../equipmentCheckout.js";
 import type * as eventActivity from "../eventActivity.js";
+import type * as eventChecklistApply from "../eventChecklistApply.js";
 import type * as eventCreateCatalog from "../eventCreateCatalog.js";
 import type * as eventDayBriefing from "../eventDayBriefing.js";
 import type * as eventReadiness from "../eventReadiness.js";
@@ -132,6 +133,7 @@ import type * as lib_lookupCostFromOpenPrices from "../lib/lookupCostFromOpenPri
 import type * as lib_lookupCostTenantFallback from "../lib/lookupCostTenantFallback.js";
 import type * as lib_materializationReceipt from "../lib/materializationReceipt.js";
 import type * as lib_nutritionUnitScaler from "../lib/nutritionUnitScaler.js";
+import type * as lib_oneOnlyRules from "../lib/oneOnlyRules.js";
 import type * as lib_openFoodFactsMapper from "../lib/openFoodFactsMapper.js";
 import type * as lib_operationalEvents from "../lib/operationalEvents.js";
 import type * as lib_operationalTransactions from "../lib/operationalTransactions.js";
@@ -277,6 +279,7 @@ declare const fullApi: ApiFromModules<{
   emailNotifications: typeof emailNotifications;
   equipmentCheckout: typeof equipmentCheckout;
   eventActivity: typeof eventActivity;
+  eventChecklistApply: typeof eventChecklistApply;
   eventCreateCatalog: typeof eventCreateCatalog;
   eventDayBriefing: typeof eventDayBriefing;
   eventReadiness: typeof eventReadiness;
@@ -373,6 +376,7 @@ declare const fullApi: ApiFromModules<{
   "lib/lookupCostTenantFallback": typeof lib_lookupCostTenantFallback;
   "lib/materializationReceipt": typeof lib_materializationReceipt;
   "lib/nutritionUnitScaler": typeof lib_nutritionUnitScaler;
+  "lib/oneOnlyRules": typeof lib_oneOnlyRules;
   "lib/openFoodFactsMapper": typeof lib_openFoodFactsMapper;
   "lib/operationalEvents": typeof lib_operationalEvents;
   "lib/operationalTransactions": typeof lib_operationalTransactions;
