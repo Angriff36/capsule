@@ -115,4 +115,39 @@ describe("break classification", () => {
       }),
     ]);
   });
+  it("a period that starts midweek counts that week's earlier hours toward overtime, and the file splits overtime without a reviewed input", () => {
+    // Mon 2026-03-02 to Fri 2026-03-06, ten approved hours a day = 50 hours.
+    const days = ["02", "03", "04", "05", "06"].map((day) => ({
+      personId: "p1",
+      clockInAt: at(`2026-03-${day}T08:00:00`),
+      clockOutAt: at(`2026-03-${day}T18:00:00`),
+      status: "closed",
+      approvedAt: at(`2026-03-${day}T19:00:00`),
+    }));
+    // Period Wed-Fri: 30 hours, but 20 were already worked Mon-Tue.
+    const midweek = approvedPayroll(
+      days,
+      "p1",
+      at("2026-03-04T00:00:00"),
+      at("2026-03-07T00:00:00"),
+    );
+    expect(midweek.regularMinutes).toBe(20 * 60);
+    expect(midweek.overtimeMinutes).toBe(10 * 60);
+
+    const document = buildPayrollExport({
+      processor: "gusto",
+      periodStart: "2026-03-02",
+      periodEnd: "2026-03-06",
+      people: [
+        { _id: "p1", givenName: "Pat", familyName: "Pay", employeeNumber: "7" },
+      ],
+      timeRecords: days,
+      payrollInputs: [],
+    });
+    expect(document.rows[0]).toMatchObject({
+      recordedHours: 50,
+      regularHours: 40,
+      overtimeHours: 10,
+    });
+  });
 });

@@ -70,25 +70,44 @@ export function PayrollExportPanel({
 
   const downloadExport = () => {
     if (!payrollCsvDownloadAllowed(document) || !document) return;
-    const url = URL.createObjectURL(
-      new Blob([document.csv], { type: "text/csv;charset=utf-8" }),
-    );
-    const link = window.document.createElement("a");
-    link.href = url;
-    link.download = document.filename;
-    link.click();
-    window.setTimeout(() => URL.revokeObjectURL(url), 0);
     const label =
       PAYROLL_PROCESSORS.find((item) => item.value === processor)?.label ??
       processor;
-    // Keep a receipt per person whose hours changed since the last send.
+    // Receipts first: the file downloads only once every changed person's
+    // receipt is saved, so the file and Capsule's record never disagree.
+    // A correction carries full totals that replace the earlier send, and
+    // its file name says which revision it is.
+    const revision = Math.max(
+      1,
+      ...receipts.plans
+        .filter((plan) => plan.changed)
+        .map((plan) => plan.revision),
+    );
+    const filename =
+      revision > 1
+        ? document.filename.replace(/\.csv$/i, `-revision-${revision}.csv`)
+        : document.filename;
     receipts
       .recordSend()
-      .then((written) =>
+      .then((written) => {
+        const url = URL.createObjectURL(
+          new Blob([document.csv], { type: "text/csv;charset=utf-8" }),
+        );
+        const link = window.document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(url), 0);
         onNotice(
-          `${document.rows.length} payroll row${document.rows.length === 1 ? "" : "s"} exported for ${label}. ${written === 0 ? "Nothing changed since the last send." : `${written} receipt${written === 1 ? "" : "s"} saved.`}`,
-        ),
-      )
+          `${document.rows.length} payroll row${document.rows.length === 1 ? "" : "s"} exported for ${label}. ${
+            written === 0
+              ? "Nothing changed since the last send."
+              : revision > 1
+                ? `Revision ${revision}: this file has full totals and replaces the earlier import. ${written} receipt${written === 1 ? "" : "s"} saved.`
+                : `${written} receipt${written === 1 ? "" : "s"} saved.`
+          }`,
+        );
+      })
       .catch(onFailure);
   };
 

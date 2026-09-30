@@ -104,6 +104,23 @@ export function approvedPayroll(
     .sort((a, b) => num(a.clockInAt) - num(b.clockInAt));
   const thresholdMinutes = thresholdHours * 60;
   const weekTotals = new Map<number, number>();
+  // A period that starts midweek: approved hours earlier in that same week
+  // count toward the weekly threshold, though they are paid in the period before.
+  const weekStart = startOfLocalWeek(startAt);
+  for (const record of records) {
+    if (
+      String(record.personId) !== personId ||
+      !isApprovedTime(record) ||
+      num(record.clockInAt) < weekStart ||
+      num(record.clockInAt) >= startAt
+    )
+      continue;
+    const week = startOfLocalWeek(num(record.clockInAt));
+    weekTotals.set(
+      week,
+      (weekTotals.get(week) ?? 0) + (paidMinutes(record) ?? 0),
+    );
+  }
   let regularMinutes = 0;
   let overtimeMinutes = 0;
   for (const record of approved) {

@@ -9,7 +9,11 @@ import {
 } from "./payrollPeriod";
 import { parseTipPayrollNote, payrollNoteDisplayText } from "./tipDistribution";
 import { payrollRowWarnings } from "./payrollReconcile";
-import { isFinishedTime } from "../workforce/timePay";
+import {
+  approvedPayroll,
+  isFinishedTime,
+  type PayTimeRecord,
+} from "../workforce/timePay";
 
 export type PayrollProcessor = "gusto" | "adp" | "paychex";
 
@@ -332,10 +336,25 @@ export function buildPayrollExport({
           .filter(Boolean)
           .join(" ") || "Unknown person";
       const hasReviewedInput = entry.minuteInputCount > 0;
+      // No reviewed input yet: approved time is still split by the weekly
+      // overtime rule, so the file never pays overtime hours as regular.
+      const clockedOvertime = hasReviewedInput
+        ? 0
+        : Math.min(
+            entry.recordedMinutes,
+            approvedPayroll(
+              timeRecords as readonly PayTimeRecord[],
+              entry.personId,
+              startAt,
+              endExclusiveAt,
+            ).overtimeMinutes,
+          );
       const regularMinutes = hasReviewedInput
         ? entry.inputRegularMinutes
-        : entry.recordedMinutes;
-      const overtimeMinutes = hasReviewedInput ? entry.inputOvertimeMinutes : 0;
+        : entry.recordedMinutes - clockedOvertime;
+      const overtimeMinutes = hasReviewedInput
+        ? entry.inputOvertimeMinutes
+        : clockedOvertime;
       const manualAdjustmentMinutes =
         regularMinutes + overtimeMinutes - entry.recordedMinutes;
       const sourceSummary = `${entry.timeRecordCount} approved time ${entry.timeRecordCount === 1 ? "entry" : "entries"}; ${entry.payrollInputCount} finalized payroll input${entry.payrollInputCount === 1 ? "" : "s"}`;
