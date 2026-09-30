@@ -550,6 +550,11 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     constraint fluidCorrectionSourceRequired: length(trim(sourceReference)) > 0 "Say where this fluid-ounce fix came from."
     mutate requiredQuantity = self.requiredQuantity / 8
     mutate packedQuantity = self.packedQuantity / 8
+    // The second check and the on-truck count are in the same unit as the
+    // packed amount, so they change with it. No return is counted yet: the
+    // list has not left.
+    mutate checkedQuantity = self.checkedQuantity != null ? self.checkedQuantity / 8 : null
+    mutate loadedQuantity = self.loadedQuantity != null ? self.loadedQuantity / 8 : null
     mutate unit = "cup"
     mutate unitCorrectionSource = sourceReference
   }

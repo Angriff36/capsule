@@ -38278,6 +38278,8 @@ async function __runPackListItemCorrectImportedFluidOunces(ctx: MutationCtx, { d
     const updates = {
       requiredQuantity: (doc.requiredQuantity / 8),
       packedQuantity: (doc.packedQuantity / 8),
+      checkedQuantity: ((doc.checkedQuantity != null) ? (doc.checkedQuantity / 8) : null),
+      loadedQuantity: ((doc.loadedQuantity != null) ? (doc.loadedQuantity / 8) : null),
       unit: "cup",
       unitCorrectionSource: sourceReference,
       version: ((doc as any).version ?? 0) + 1
