@@ -104,15 +104,16 @@ export function approvedPayroll(
     .sort((a, b) => num(a.clockInAt) - num(b.clockInAt));
   const thresholdMinutes = thresholdHours * 60;
   const weekTotals = new Map<number, number>();
-  // A period that starts midweek: approved hours earlier in that same week
-  // count toward the weekly threshold, though they are paid in the period before.
+  // A period that starts midweek: approved shifts that ended before it, in
+  // that same week, count toward the weekly threshold (paid in the period
+  // before). A shift crossing the period start is in neither window.
   const weekStart = startOfLocalWeek(startAt);
   for (const record of records) {
     if (
       String(record.personId) !== personId ||
       !isApprovedTime(record) ||
       num(record.clockInAt) < weekStart ||
-      num(record.clockInAt) >= startAt
+      num(record.clockOutAt) > startAt
     )
       continue;
     const week = startOfLocalWeek(num(record.clockInAt));

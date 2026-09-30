@@ -471,5 +471,24 @@ describe("payment accounting truth (PL-ACCOUNTING)", () => {
       status: "paid",
       amountDue: 0,
     });
+
+    // A second paid checkout on the now-closed invoice still lands in the
+    // ledger as money received, all of it left over, so it can be refunded.
+    const second = (await finance.mutation(
+      internal.lib.invoiceStripeReconcile.recordPaidSession,
+      { ...args, sessionId: "cs_replay_2" },
+    )) as Row;
+    expect(second).toMatchObject({ recorded: true, applied: 0, overpaid: 300 });
+    const extra = (await finance.run(async (ctx) =>
+      (await ctx.db.query("payments").collect()).find(
+        (row) => row.externalPaymentId === "cs_replay_2",
+      ),
+    )) as Row;
+    expect(extra).toMatchObject({
+      amount: 300,
+      appliedAmount: 0,
+      unappliedAmount: 300,
+      status: "completed",
+    });
   });
 });

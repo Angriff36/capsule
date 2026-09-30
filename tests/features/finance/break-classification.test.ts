@@ -134,6 +134,24 @@ describe("break classification", () => {
     expect(midweek.regularMinutes).toBe(20 * 60);
     expect(midweek.overtimeMinutes).toBe(10 * 60);
 
+    // An overnight shift crossing the period start (Tue 22:00 - Wed 06:00)
+    // is in neither window, so it does not use up the new period's threshold.
+    const crossing = {
+      personId: "p1",
+      clockInAt: at("2026-03-03T22:00:00"),
+      clockOutAt: at("2026-03-04T06:00:00"),
+      status: "closed",
+      approvedAt: at("2026-03-04T07:00:00"),
+    };
+    const withCrossing = approvedPayroll(
+      [...days.slice(2), crossing],
+      "p1",
+      at("2026-03-04T00:00:00"),
+      at("2026-03-07T00:00:00"),
+    );
+    expect(withCrossing.regularMinutes).toBe(30 * 60);
+    expect(withCrossing.overtimeMinutes).toBe(0);
+
     const document = buildPayrollExport({
       processor: "gusto",
       periodStart: "2026-03-02",

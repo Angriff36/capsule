@@ -103,7 +103,10 @@ export const recordPaidSession = internalMutation({
     const overpaid = roundMoney(args.amount - applied);
 
     let paymentId: string | null = null;
-    if (applied > 0) {
+    // The Payment holds the full amount Stripe took; settle splits what pays
+    // the invoice from what is left over, so a second paid checkout on a
+    // closed invoice still lands in the ledger and can be refunded.
+    if (args.amount > 0) {
       const system = TenantSystemCommandRunner.forTenant(
         ctx,
         invoice.tenantId,
@@ -115,7 +118,7 @@ export const recordPaidSession = internalMutation({
         {
           invoiceId: String(invoice._id),
           clientId: String(invoice.clientId),
-          amount: applied,
+          amount: roundMoney(args.amount),
           method: args.method,
           ...(invoice.eventId ? { eventId: String(invoice.eventId) } : {}),
           // The session id is the provider id: a second record of the same
