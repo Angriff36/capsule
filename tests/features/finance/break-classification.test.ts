@@ -49,7 +49,7 @@ describe("break classification", () => {
     expect(document.rows[0]?.recordedHours).toBe(7.5);
   });
 
-  it("payroll counts only approved time and names what still waits", () => {
+  it("payroll counts finished time, approved or not, while approval is off (Ryan 2026-09-29)", () => {
     const day = {
       personId: "p1",
       clockInAt: at("2026-03-03T09:00:00"),
@@ -70,11 +70,11 @@ describe("break classification", () => {
       at("2026-03-09T00:00:00"),
     );
     expect(result).toEqual({
-      approvedMinutes: 240,
-      regularMinutes: 240,
+      approvedMinutes: 480,
+      regularMinutes: 480,
       overtimeMinutes: 0,
-      approvedCount: 1,
-      waitingApprovalCount: 1,
+      approvedCount: 2,
+      waitingApprovalCount: 0,
       approvedIds: [],
     });
     const document = buildPayrollExport({
@@ -88,7 +88,7 @@ describe("break classification", () => {
       ].map((row) => ({ ...row, clockOutAt: row.clockInAt + 4 * 3_600_000 })),
       payrollInputs: [],
     });
-    expect(document.rows[0]?.recordedHours).toBe(4);
+    expect(document.rows[0]?.recordedHours).toBe(8);
   });
 
   it("hours past 40 in one week are overtime and raise a warning", () => {
@@ -174,7 +174,7 @@ describe("break classification", () => {
     expect(document.payPrepNames).toEqual(["Pat Pay"]);
     expect(payrollCsvDownloadAllowed(document)).toBe(true);
   });
-  it("an overnight shift is paid in the period it started in; time from before approval existed still counts", () => {
+  it("an overnight shift is paid in the period it started in; an unapproved finished entry still counts while approval is off", () => {
     const night = {
       personId: "p1",
       clockInAt: at("2026-03-03T22:00:00"),
@@ -186,14 +186,10 @@ describe("break classification", () => {
     const wed = [at("2026-03-04T00:00:00"), at("2026-03-05T00:00:00")] as const;
     expect(approvedPayroll([night], "p1", ...tue).approvedMinutes).toBe(480);
     expect(approvedPayroll([night], "p1", ...wed).approvedMinutes).toBe(0);
-    // Made before approval existed: counts. Made after: needs approval.
+    // Approval is off: a finished entry with no approval still counts.
     const unapproved = { ...night, approvedAt: undefined };
-    const legacy = { ...unapproved, _creationTime: at("2026-03-04T08:00:00") };
-    const fresh = {
-      ...unapproved,
-      _creationTime: Date.parse("2026-10-02T00:00:00Z"),
-    };
-    expect(approvedPayroll([legacy], "p1", ...tue).approvedMinutes).toBe(480);
-    expect(approvedPayroll([fresh], "p1", ...tue).approvedMinutes).toBe(0);
+    expect(approvedPayroll([unapproved], "p1", ...tue).approvedMinutes).toBe(
+      480,
+    );
   });
 });

@@ -37,11 +37,11 @@ describe("payroll export anomalies (AC-128)", () => {
         entry("2026-03-02T09:00:00", "2026-03-02T13:00:00"),
         // Overlaps the first entry by an hour.
         entry("2026-03-02T12:00:00", "2026-03-02T15:00:00"),
-        // Finished but not approved: not counted, named.
+        // Finished but not approved: counted while approval is off.
         entry("2026-03-03T09:00:00", "2026-03-03T11:00:00", {
           approvedAt: null,
         }),
-        // Bo only has unapproved time: no row, but named.
+        // Bo only has unapproved time: counted too while approval is off.
         entry("2026-03-03T09:00:00", "2026-03-03T11:00:00", {
           personId: "p-bo",
           approvedAt: null,
@@ -51,14 +51,14 @@ describe("payroll export anomalies (AC-128)", () => {
       hourlyRateByPersonId: new Map([["p-ada", null]]),
     });
     const ada = document.rows.find((row) => row.personId === "p-ada")!;
-    // Approved actual time only: 4 h + 3 h, never planned hours.
-    expect(ada.recordedHours).toBe(7);
+    // Finished actual time (approval off, Ryan 2026-09-29): 4 h + 3 h + 2 h,
+    // never planned hours.
+    expect(ada.recordedHours).toBe(9);
     expect(ada.warnings).toEqual([
       "1 approved time entry overlaps another — check before sending, or the hours count twice.",
-      "1 time entry is not approved yet and not in this total.",
       "No hourly rate on file — pay can't be estimated.",
     ]);
-    expect(document.waitingOnlyNames).toEqual(["Bo Wait"]);
+    expect(document.waitingOnlyNames).toEqual([]);
 
     // Sent once; then a manager corrects Ada's time down by an hour.
     const receipts = [

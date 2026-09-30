@@ -11,6 +11,7 @@ import { parseTipPayrollNote, payrollNoteDisplayText } from "./tipDistribution";
 import { payrollRowWarnings } from "./payrollReconcile";
 import {
   approvedPayroll,
+  hasPayrollApproval,
   isFinishedTime,
   type PayTimeRecord,
 } from "../workforce/timePay";
@@ -421,7 +422,7 @@ export function buildPayrollExport({
           .filter(
             (record) =>
               isFinishedTime(record) &&
-              record.approvedAt == null &&
+              !hasPayrollApproval(record) &&
               timestamp(record.clockInAt) >= startAt &&
               timestamp(record.clockInAt) < endExclusiveAt &&
               !accumulators.has(cleanText(record.personId)),

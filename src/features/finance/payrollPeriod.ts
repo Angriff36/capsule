@@ -24,7 +24,6 @@ export type ClockedTimeRecord = {
   breakMinutes?: unknown;
   status?: unknown;
   approvedAt?: unknown;
-  _creationTime?: unknown;
   deletedAt?: unknown;
 };
 

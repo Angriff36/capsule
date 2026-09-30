@@ -6,6 +6,7 @@
  * silent rewrite. A provider rejection never touches the approved time.
  */
 import {
+  hasPayrollApproval,
   isApprovedTime,
   isFinishedTime,
   type PayTimeRecord,
@@ -60,7 +61,7 @@ export function payrollRowWarnings({
       `${overlaps} approved time ${overlaps === 1 ? "entry overlaps" : "entries overlap"} another — check before sending, or the hours count twice.`,
     );
   const waiting = mine.filter(
-    (record) => isFinishedTime(record) && record.approvedAt == null,
+    (record) => isFinishedTime(record) && !hasPayrollApproval(record),
   ).length;
   if (waiting > 0)
     warnings.push(

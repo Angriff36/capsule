@@ -26,7 +26,6 @@ export type PayTimeRecord = {
   paidBreakMinutes?: unknown;
   status?: unknown;
   approvedAt?: unknown;
-  _creationTime?: unknown;
   deletedAt?: unknown;
 };
 
@@ -53,19 +52,16 @@ export function isFinishedTime(record: PayTimeRecord): boolean {
 }
 
 /**
- * Time approval started with the 2026-09-30 release. Finished entries made
- * before it never had an approval step, so they count as approved: no hours
- * already ready for payroll disappear when the release goes live.
+ * Whether approval decides if finished time is paid. Off, by Ryan's decision
+ * (2026-09-29: "req approval or dont i dont fucking care no ones fucking using
+ * it"): payroll counts finished time as live Capsule does today, and approval
+ * still shows on the time sheet. Older entries have no approvedAt, so turning
+ * this on needs a release step that approves them first.
  */
-export const TIME_APPROVAL_REQUIRED_FROM = Date.parse("2026-09-30T12:00:00Z");
+export const PAYROLL_REQUIRES_APPROVAL = false;
 
-export function hasPayrollApproval(record: {
-  approvedAt?: unknown;
-  _creationTime?: unknown;
-}): boolean {
-  if (record.approvedAt != null) return true;
-  const created = num(record._creationTime);
-  return Number.isFinite(created) && created < TIME_APPROVAL_REQUIRED_FROM;
+export function hasPayrollApproval(record: { approvedAt?: unknown }): boolean {
+  return !PAYROLL_REQUIRES_APPROVAL || record.approvedAt != null;
 }
 
 export function isApprovedTime(record: PayTimeRecord): boolean {
