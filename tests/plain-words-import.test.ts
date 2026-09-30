@@ -291,11 +291,16 @@ describe("plain words on leftover import manifests", () => {
       "Items marked",
       "Select multiple items",
       "Skipped while matching leftover items",
-      "Matched to a Capsule payment while matching leftover items",
     ]) {
       expect(visible).toContain(fresh);
       expectPlain(fresh);
     }
+    // Matching a leftover payment moved to the server step; its saved note stays plain.
+    const matchNote = "Matched by hand to imported payment";
+    expect(readFileSync("convex/importPaymentMatch.ts", "utf8")).toContain(
+      matchNote,
+    );
+    expectPlain(matchNote);
 
     expect(visible).toContain(
       'formatCountNoun(unresolvedMappings.length, "item")',
