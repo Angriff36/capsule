@@ -43626,8 +43626,8 @@ async function __runPlanningOverrideRecord(ctx: MutationCtx, { docId, eventId, a
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see why a plan change was made");
-    if (!(((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales, logistics and workforce staff and managers may save a plan change with open items");
-    if (!(((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales, logistics and workforce staff and managers may save a plan change with open items");
+    if (!((((((checkRole(user, "eventAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, inventory, sales, logistics and workforce staff and managers may save a plan change with open items");
+    if (!((((((checkRole(user, "eventAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, inventory, sales, logistics and workforce staff and managers may save a plan change with open items");
     if (!((doc.recordedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_event != null) && (__rel_event.deletedAt == null)))) throw new Error("Guard 2 failed");
@@ -43709,8 +43709,8 @@ export const PlanningOverride_createViaRecord = mutation({
     };
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see why a plan change was made");
-    if (!(((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales, logistics and workforce staff and managers may save a plan change with open items");
-    if (!(((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales, logistics and workforce staff and managers may save a plan change with open items");
+    if (!((((((checkRole(user, "eventAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, inventory, sales, logistics and workforce staff and managers may save a plan change with open items");
+    if (!((((((checkRole(user, "eventAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "workforceAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, inventory, sales, logistics and workforce staff and managers may save a plan change with open items");
     if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_event != null) && (__rel_event.deletedAt == null)))) throw new Error("Guard 2 failed");

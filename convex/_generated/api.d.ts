@@ -208,6 +208,7 @@ import type * as qboSync from "../qboSync.js";
 import type * as queries from "../queries.js";
 import type * as quickImport from "../quickImport.js";
 import type * as quoteBuilder from "../quoteBuilder.js";
+import type * as reasonedChanges from "../reasonedChanges.js";
 import type * as recurringEvents from "../recurringEvents.js";
 import type * as runOfShowAlerts from "../runOfShowAlerts.js";
 import type * as runOfShowAlertsSend from "../runOfShowAlertsSend.js";
@@ -447,6 +448,7 @@ declare const fullApi: ApiFromModules<{
   queries: typeof queries;
   quickImport: typeof quickImport;
   quoteBuilder: typeof quoteBuilder;
+  reasonedChanges: typeof reasonedChanges;
   recurringEvents: typeof recurringEvents;
   runOfShowAlerts: typeof runOfShowAlerts;
   runOfShowAlertsSend: typeof runOfShowAlertsSend;

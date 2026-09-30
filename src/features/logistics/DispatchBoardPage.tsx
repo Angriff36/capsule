@@ -2,8 +2,8 @@ import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { useAuthStatus } from "../../lib/useAuthStatus";
+import { useSendOutWithReason } from "../../lib/useReasonedChanges";
 import {
-  useCreateDepartureOverride,
   useListDepartureOverride,
   useListEvent,
   useListEventAssignment,
@@ -77,7 +77,7 @@ export function DispatchBoardPage() {
   const overrides = useListDepartureOverride();
   const markLoaded = usePackListMarkLoaded();
   const dispatch = usePackListDispatch();
-  const recordOverride = useCreateDepartureOverride();
+  const sendOutWithReason = useSendOutWithReason();
 
   const [params, setParams] = useSearchParams();
   const rangeKey: RangeKey =
@@ -206,18 +206,17 @@ export function DispatchBoardPage() {
       if (!reason) return;
     }
     void run(`${list._id}:dispatch`, async () => {
-      // The list leaves first. The reason is kept only for a list that did
-      // leave, so a send-out that fails never shows as "sent out with open
-      // items".
-      await dispatch({ docId: list._id, version: list.version });
-      setNotice(`${list.name || "Pack list"} sent out.`);
+      // The send-out and its reason are saved together: both or neither.
       if (reason)
-        await recordOverride({
-          eventId,
-          packListId: list._id,
+        await sendOutWithReason({
+          packListId: list._id as never,
+          version: list.version,
+          eventId: eventId as never,
           reason,
           openItems: open.map((item) => item.text).join("\n"),
         });
+      else await dispatch({ docId: list._id, version: list.version });
+      setNotice(`${list.name || "Pack list"} sent out.`);
     });
   };
 

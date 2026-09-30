@@ -14,7 +14,6 @@ import {
   useCreateEventStaffNeed,
   useCreateEventTask,
   useCreateEventVehicleAssignment,
-  useCreatePlanningOverride,
   useCreatePlanningReceipt,
   useEquipmentReservationCancel,
   useEventAssignmentChooseTravelLeg,
@@ -56,6 +55,10 @@ import { useSlowQuery } from "../../../ui/useSlowQuery";
 import { useSuccessToast } from "../../../ui/useSuccessToast";
 import { resolveManifestPolicies } from "../../admin/rolePermissionAudit";
 import { useReserveEquipment } from "../../facilities/equipmentCheckout";
+import {
+  useAssignPersonWithReason,
+  useHoldEquipmentWithReason,
+} from "../../../lib/useReasonedChanges";
 import { addDays, DAY_MS, startOfDay } from "../../home/homeCalendar";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { eventDetailPath } from "../eventRoutes";
@@ -156,7 +159,8 @@ export function PlanningBoardPage() {
   const addTask = useCreateEventTask();
   const noteNeeds = useCreateEventPlanNeeds();
   const reviseNeeds = useEventPlanNeedsRevise();
-  const recordOverride = useCreatePlanningOverride();
+  const assignPersonWithReason = useAssignPersonWithReason();
+  const holdEquipmentWithReason = useHoldEquipmentWithReason();
   const recordReceipt = useCreatePlanningReceipt();
   const answerAgain = usePlanningReceiptAnswerAgain();
 
@@ -246,6 +250,14 @@ export function PlanningBoardPage() {
     "logisticsAccess",
     "eventManageAccess",
   );
+  // The same people the equipment hold lets book an out-of-service unit.
+  const canBookOutOfService = [
+    "inventory_manager",
+    "logistics_manager",
+    "admin",
+    "owner",
+    "system",
+  ].includes(authStatus?.role ?? "");
   const canNeeds = canRigs;
   const canPut = (kind: Draft["kind"]) =>
     kind === "person" ? canCrew : kind === "equipment" ? canEquipment : canRigs;
@@ -380,6 +392,18 @@ export function PlanningBoardPage() {
     setDraft(value);
   };
 
+  // Which open items a reason can answer. Capsule has a kept reason for a
+  // person on two events, for a power, fuel or water gap, and (managers only)
+  // for equipment that is out of service. For every other item - a truck on
+  // two runs, a person on approved leave, more than we own - there is nothing
+  // to approve: the save is tried and Capsule says why when it can't be done.
+  const answerable = (kind: Draft["kind"], issue: PlanIssue) =>
+    issue.level === "fix" &&
+    ((kind === "person" && issue.check === "double_booked") ||
+      (kind === "equipment" &&
+        (issue.check === "supply" ||
+          (issue.check === "not_available" && canBookOutOfService))));
+
   const savePutOn = async (formEvent: FormEvent<HTMLFormElement>) => {
     formEvent.preventDefault();
     if (!draft || !selected) return;
@@ -390,7 +414,7 @@ export function PlanningBoardPage() {
       eventId,
       candidateOf(draft),
       levels,
-    ).filter((issue) => issue.level === "fix");
+    ).filter((issue) => answerable(draft.kind, issue));
     let reason: string | null = null;
     if (open.length > 0) {
       reason = await prompt.askReason({
@@ -402,16 +426,32 @@ export function PlanningBoardPage() {
       });
       if (!reason) return;
     }
+    // The change and its reason are saved together: both or neither.
+    const kept = reason
+      ? {
+          action: `Put ${name} on the event`,
+          reason,
+          openItems: open.map((issue) => issue.text).join("\n"),
+        }
+      : null;
     const window = eventWindow(selected);
     const saved = await run(
       "put",
       async () => {
         if (draft.kind === "person") {
-          await assignPerson({
-            eventId,
-            personId: draft.personId,
-            role: draft.role.trim(),
-          });
+          if (kept)
+            await assignPersonWithReason({
+              eventId: eventId as never,
+              personId: draft.personId as never,
+              role: draft.role.trim(),
+              ...kept,
+            });
+          else
+            await assignPerson({
+              eventId,
+              personId: draft.personId,
+              role: draft.role.trim(),
+            });
         } else if (draft.kind === "truck") {
           await assignRig({
             eventId,
@@ -420,65 +460,38 @@ export function PlanningBoardPage() {
             trailerId: draft.trailerId || undefined,
           });
         } else if (draft.kind === "trailer") {
-          if (draft.pulledBy.startsWith("rig:")) {
-            // A rig's truck, trailer and driver are set when it is made, so
-            // hitching a trailer makes the new rig and takes the old one off.
-            const old = rigs.find((row) => `rig:${row._id}` === draft.pulledBy);
-            if (!old?.vehicleId)
-              throw new Error("Pick the truck that pulls it.");
-            await assignRig({
-              eventId,
-              vehicleId: old.vehicleId,
-              trailerId: draft.trailerId,
-              driverId: old.driverId ?? undefined,
-              arriveBeforeServeMinutes:
-                old.arriveBeforeServeMinutes ?? undefined,
-              loadMinutes: old.loadMinutes ?? undefined,
-              leaveAfterMinutes: old.leaveAfterMinutes ?? undefined,
-            });
-            await releaseRig({ docId: old._id });
-          } else {
-            await assignRig({
-              eventId,
-              vehicleId: draft.pulledBy.replace(/^vehicle:/, ""),
-              trailerId: draft.trailerId,
-              driverId: draft.driverId || undefined,
-            });
-          }
+          await assignRig({
+            eventId,
+            vehicleId: draft.pulledBy,
+            trailerId: draft.trailerId,
+            driverId: draft.driverId || undefined,
+          });
         } else {
           if (!window)
             throw new Error(
               "Set the event's date and times before you hold equipment for it.",
             );
-          await reserveEquipment({
+          const hold = {
             equipmentId: draft.equipmentId as never,
             eventId: eventId as never,
             startsAt: window.start,
             endsAt: window.end,
             quantity: Math.max(1, Math.round(Number(draft.quantity) || 1)),
-          });
+          };
+          if (kept)
+            await holdEquipmentWithReason({
+              ...hold,
+              bookOutOfService: open.some(
+                (issue) => issue.check === "not_available",
+              ),
+              ...kept,
+            });
+          else await reserveEquipment(hold);
         }
       },
       `${name} is on the event`,
     );
-    if (!saved) return;
-    setDraft(null);
-    // The reason is kept only for a change that was saved, so a change that
-    // fails never shows under "Changes saved with open items".
-    if (reason) {
-      const kept = reason;
-      await run(
-        "put",
-        () =>
-          recordOverride({
-            eventId,
-            action: `Put ${name} on the event`,
-            reason: kept,
-            openItems: open.map((issue) => issue.text).join("\n"),
-          }),
-        `${name} is on the event`,
-      );
-    }
+    if (saved) setDraft(null);
   };
 
   const accept = (suggestion: PlanSuggestion, take: boolean) => {
@@ -1158,13 +1171,6 @@ export function PlanningBoardPage() {
                       }
                     >
                       <option value="">Pick a truck</option>
-                      {rigs
-                        .filter((rig) => rig.vehicleId && !rig.trailerId)
-                        .map((rig) => (
-                          <option key={rig._id} value={`rig:${rig._id}`}>
-                            {rigLabel(rig)} (on this event)
-                          </option>
-                        ))}
                       {snap.vehicles
                         .filter(
                           (row) =>
@@ -1173,13 +1179,17 @@ export function PlanningBoardPage() {
                             !rigs.some((rig) => rig.vehicleId === row._id),
                         )
                         .map((row) => (
-                          <option key={row._id} value={`vehicle:${row._id}`}>
+                          <option key={row._id} value={row._id}>
                             {rigName(row, "Truck")}
                           </option>
                         ))}
                     </select>
+                    <small className="text-sm text-ink-2">
+                      A truck already on this event is not listed. To give it a
+                      trailer, change that truck on the Event tracker sheet.
+                    </small>
                   </label>
-                  {draft.pulledBy.startsWith("vehicle:") ? (
+                  {draft.pulledBy ? (
                     <label className="field-label">
                       <span>Driver</span>
                       <select
@@ -1243,7 +1253,7 @@ export function PlanningBoardPage() {
                 >
                   {busy === "put"
                     ? "Saving…"
-                    : draftIssues.some((issue) => issue.level === "fix")
+                    : draftIssues.some((issue) => answerable(draft.kind, issue))
                       ? "Put on anyway"
                       : "Put on the event"}
                 </button>

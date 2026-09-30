@@ -286,9 +286,12 @@ export function PlanningSetupPage() {
           <em>How loud each one is</em>
         </div>
         <p className="mt-2 max-w-[72ch] text-base text-ink-2">
-          No check stops a save. “Fix first” asks for a reason before a change
-          that leaves it open is saved, and the reason is kept on the event.
-          “Worth a look” only shows. “Off” hides it.
+          No check here stops a save. “Fix first” asks for a reason where a
+          reason can answer it (a person on two events, a power, fuel or water
+          gap, a manager booking equipment that is out of service), and the
+          reason is kept on the event. “Worth a look” only shows. “Off” hides
+          it. Capsule’s own booking rules still apply: a truck can’t be on two
+          runs at the same time, and a person on approved leave can’t be put on.
         </p>
         {loading ? (
           <TableSkeleton rows={4} />

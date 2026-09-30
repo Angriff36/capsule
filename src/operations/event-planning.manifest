@@ -305,8 +305,8 @@ entity PlanningOverride mixin TenantScoped, SoftDeletable {
   constraint planningOverrideReasonPresent: self.recordedAt == null or length(trim(self.reason)) > 0 "Say why this change is fine."
 
   default policy planningOverrideRead read: roleAllows(user.role, "staffAccess") "Staff may see why a plan change was made"
-  default policy planningOverrideWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "manageAccess") "Event, sales, logistics and workforce staff and managers may save a plan change with open items"
-  default policy planningOverrideExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "manageAccess") "Event, sales, logistics and workforce staff and managers may save a plan change with open items"
+  default policy planningOverrideWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "manageAccess") "Event, inventory, sales, logistics and workforce staff and managers may save a plan change with open items"
+  default policy planningOverrideExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "manageAccess") "Event, inventory, sales, logistics and workforce staff and managers may save a plan change with open items"
 
   command record(
     eventId: uuid,
