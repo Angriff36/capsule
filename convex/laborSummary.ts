@@ -225,53 +225,68 @@ export const eventLaborSummary = query({
     const event = await ctx.db.get(args.eventId);
     if (!event || event.tenantId !== auth.tenantId || event.deletedAt != null)
       return null;
-    const eventId = String(args.eventId);
-    const [people, records, shifts] = await Promise.all([
-      tenantPeople(ctx, auth.tenantId),
-      tenantTimeRecords(ctx, auth.tenantId),
-      ctx.db
-        .query("shifts")
-        .withIndex("by_tenantId", (q: any) => q.eq("tenantId", auth.tenantId))
-        .collect() as Promise<Doc<"shifts">[]>,
-    ]);
-    const shiftEventById = new Map(
-      shifts.map((shift) => [String(shift._id), String(shift.eventId ?? "")]),
-    );
-    const matching = records.filter((record) => {
-      const direct = String(record.eventId ?? "");
-      if (direct) return direct === eventId;
-      const viaShift = record.shiftId
-        ? shiftEventById.get(String(record.shiftId))
-        : undefined;
-      return viaShift === eventId;
-    });
-
-    // Scheduled-labor forecast: committed shifts × person rates. This is the
-    // pre-event labor picture (the worksheet's "Scheduled Cost") — clocked
-    // time replaces it as reality once people punch in.
-    // Same rule as src/features/finance/laborCost (AC-510).
-    const labor = plannedVsActualLabor({
-      eventId,
-      shifts,
-      records: matching,
-      people: new Map(
-        [...people.entries()].map(([id, person]) => [
-          id,
-          { name: personName(person, id), hourlyRate: person.hourlyRate },
-        ]),
-      ),
-    });
-
-    return {
-      ...summarize(matching, people),
-      scheduledMinutes: labor.plannedMinutes,
-      scheduledCost: labor.plannedCost,
-      scheduledShiftCount: labor.plannedShiftCount,
-      unpricedScheduledMinutes: labor.unpricedPlannedMinutes,
-      varianceCost: labor.varianceCost,
-    };
+    const summary: EventLaborSummary & { records?: unknown } =
+      await loadEventLabor(ctx, auth.tenantId, String(args.eventId));
+    delete summary.records;
+    return summary;
   },
 });
+
+/**
+ * Event labor with the time records behind it. Shared with the closeout
+ * source read (convex/closeoutSources.ts); the caller checks access.
+ */
+export async function loadEventLabor(
+  ctx: { db: any },
+  tenantId: string,
+  eventId: string,
+): Promise<EventLaborSummary & { records: Doc<"timeRecords">[] }> {
+  const [people, records, shifts] = await Promise.all([
+    tenantPeople(ctx, tenantId),
+    tenantTimeRecords(ctx, tenantId),
+    ctx.db
+      .query("shifts")
+      .withIndex("by_tenantId", (q: any) => q.eq("tenantId", tenantId))
+      .collect() as Promise<Doc<"shifts">[]>,
+  ]);
+  const shiftEventById = new Map(
+    shifts.map((shift) => [String(shift._id), String(shift.eventId ?? "")]),
+  );
+  const matching = records.filter((record) => {
+    const direct = String(record.eventId ?? "");
+    if (direct) return direct === eventId;
+    const viaShift = record.shiftId
+      ? shiftEventById.get(String(record.shiftId))
+      : undefined;
+    return viaShift === eventId;
+  });
+
+  // Scheduled-labor forecast: committed shifts × person rates. This is the
+  // pre-event labor picture (the worksheet's "Scheduled Cost") — clocked
+  // time replaces it as reality once people punch in.
+  // Same rule as src/features/finance/laborCost (AC-510).
+  const labor = plannedVsActualLabor({
+    eventId,
+    shifts,
+    records: matching,
+    people: new Map(
+      [...people.entries()].map(([id, person]) => [
+        id,
+        { name: personName(person, id), hourlyRate: person.hourlyRate },
+      ]),
+    ),
+  });
+
+  return {
+    ...summarize(matching, people),
+    scheduledMinutes: labor.plannedMinutes,
+    scheduledCost: labor.plannedCost,
+    scheduledShiftCount: labor.plannedShiftCount,
+    unpricedScheduledMinutes: labor.unpricedPlannedMinutes,
+    varianceCost: labor.varianceCost,
+    records: matching.filter((record) => workedMinutes(record) != null),
+  };
+}
 
 /**
  * Clocked minutes + estimated pay for one person over an exact window, plus

@@ -25,6 +25,7 @@ import type * as catalogReclassification from "../catalogReclassification.js";
 import type * as chatNotifyPreference from "../chatNotifyPreference.js";
 import type * as clientPortal from "../clientPortal.js";
 import type * as clientPortalPayments from "../clientPortalPayments.js";
+import type * as closeoutSources from "../closeoutSources.js";
 import type * as computed from "../computed.js";
 import type * as crons from "../crons.js";
 import type * as culinaryDemand from "../culinaryDemand.js";
@@ -261,6 +262,7 @@ declare const fullApi: ApiFromModules<{
   chatNotifyPreference: typeof chatNotifyPreference;
   clientPortal: typeof clientPortal;
   clientPortalPayments: typeof clientPortalPayments;
+  closeoutSources: typeof closeoutSources;
   computed: typeof computed;
   crons: typeof crons;
   culinaryDemand: typeof culinaryDemand;

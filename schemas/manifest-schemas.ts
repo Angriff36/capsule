@@ -1174,6 +1174,10 @@ export const EventCloseoutSchema = z.object({
   status: z.enum(["draft", "finalized"]).default("draft"),
   capturedAt: z.coerce.date().nullable().optional(),
   finalizedAt: z.coerce.date().nullable().optional(),
+  sourceSnapshot: z.string().nullable().optional(),
+  revision: z.number().int().default(0),
+  correctionReason: z.string().nullable().optional(),
+  correctedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -6484,9 +6488,31 @@ export const EventCloseoutCaptureParamsSchema = z.object({
   unresolvedIssues: z.string().optional(),
   performanceNotes: z.string().optional(),
   notes: z.string().optional(),
+  sourceSnapshot: z.string().optional(),
 });
 
 export type EventCloseoutCaptureParams = z.infer<typeof EventCloseoutCaptureParamsSchema>;
+
+// Command: correct on EventCloseout
+export const EventCloseoutCorrectParamsSchema = z.object({
+  reason: z.string(),
+  actualRevenue: z.number(),
+  budgetedRevenue: z.number(),
+  revenueVariance: z.number(),
+  actualIngredientCost: z.number(),
+  actualWasteCost: z.number(),
+  actualLaborCost: z.number(),
+  actualVendorCost: z.number(),
+  budgetedCost: z.number(),
+  totalActualCost: z.number(),
+  costVariance: z.number(),
+  grossProfit: z.number(),
+  expectedHeadcount: z.number(),
+  actualHeadcount: z.number(),
+  sourceSnapshot: z.string().optional(),
+});
+
+export type EventCloseoutCorrectParams = z.infer<typeof EventCloseoutCorrectParamsSchema>;
 
 // Command: finalize on EventCloseout
 export const EventCloseoutFinalizeParamsSchema = z.object({});

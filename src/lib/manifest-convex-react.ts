@@ -193,6 +193,7 @@ import {
   EventClearBinderBuiltParamsSchema,
   EventCloseOutParamsSchema,
   EventCloseoutCaptureParamsSchema,
+  EventCloseoutCorrectParamsSchema,
   EventCloseoutFinalizeParamsSchema,
   EventCloseoutFollowEventCommercialParamsSchema,
   EventCompleteParamsSchema,
@@ -3858,6 +3859,16 @@ export function useEventCloseoutCapture() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventCloseoutCaptureParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventCloseout.correct. */
+export function useEventCloseoutCorrect() {
+  const mutate = useMutation(api.mutations.EventCloseout_correct);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventCloseoutCorrectParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -12534,4 +12545,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1326 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1327 as const;
