@@ -1,12 +1,6 @@
 import { formatCountNoun } from "../../lib/format";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { PersonEmployeeNumberField } from "../admin/PersonEmployeeNumberField";
-import type { PayrollRevisionPlan } from "./payrollReconcile";
-import {
-  PayrollPlanNote,
-  PayrollReceiptsList,
-  usePayrollReceipts,
-} from "./PayrollReceipts";
 import {
   PAYROLL_PROCESSORS,
   payrollCsvDownloadAllowed,
@@ -64,51 +58,27 @@ export function PayrollExportPanel({
   const missingNumberNames = (document?.rows ?? [])
     .filter((row) => row.missingEmployeeNumber)
     .map((row) => row.employeeName);
-  const receipts = usePayrollReceipts(document);
-  const downloadDisabled =
-    loading || receipts.loading || !payrollCsvDownloadAllowed(document);
+  // Payroll receipts (who was sent what, revision by revision) are held back
+  // until they record the exact time entries each file carried in one saved
+  // step (release review 2026-09-29). The download itself is unchanged.
+  const downloadDisabled = loading || !payrollCsvDownloadAllowed(document);
 
   const downloadExport = () => {
     if (!payrollCsvDownloadAllowed(document) || !document) return;
+    const url = URL.createObjectURL(
+      new Blob([document.csv], { type: "text/csv;charset=utf-8" }),
+    );
+    const link = window.document.createElement("a");
+    link.href = url;
+    link.download = document.filename;
+    link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
     const label =
       PAYROLL_PROCESSORS.find((item) => item.value === processor)?.label ??
       processor;
-    // Receipts first: the file downloads only once every changed person's
-    // receipt is saved, so the file and Capsule's record never disagree.
-    // A correction carries full totals that replace the earlier send, and
-    // its file name says which revision it is.
-    const revision = Math.max(
-      1,
-      ...receipts.plans
-        .filter((plan) => plan.changed)
-        .map((plan) => plan.revision),
+    onNotice(
+      `${document.rows.length} payroll row${document.rows.length === 1 ? "" : "s"} exported for ${label}.`,
     );
-    const filename =
-      revision > 1
-        ? document.filename.replace(/\.csv$/i, `-revision-${revision}.csv`)
-        : document.filename;
-    receipts
-      .recordSend()
-      .then((written) => {
-        const url = URL.createObjectURL(
-          new Blob([document.csv], { type: "text/csv;charset=utf-8" }),
-        );
-        const link = window.document.createElement("a");
-        link.href = url;
-        link.download = filename;
-        link.click();
-        window.setTimeout(() => URL.revokeObjectURL(url), 0);
-        onNotice(
-          `${document.rows.length} payroll row${document.rows.length === 1 ? "" : "s"} exported for ${label}. ${
-            written === 0
-              ? "Nothing changed since the last send."
-              : revision > 1
-                ? `Revision ${revision}: this file has full totals and replaces the earlier import. ${written} receipt${written === 1 ? "" : "s"} saved.`
-                : `${written} receipt${written === 1 ? "" : "s"} saved.`
-          }`,
-        );
-      })
-      .catch(onFailure);
   };
 
   return (
@@ -190,18 +160,6 @@ export function PayrollExportPanel({
           estimatedGross={estimatedGross}
           onNotice={onNotice}
           onFailure={onFailure}
-          plans={receipts.plans}
-        />
-      ) : null}
-      {document ? (
-        <PayrollReceiptsList
-          document={document}
-          receipts={receipts.receipts}
-          personName={(personId) =>
-            document.rows.find((row) => row.personId === personId)
-              ?.employeeName ?? "Someone with no approved hours now"
-          }
-          onFailure={onFailure}
         />
       ) : null}
     </section>
@@ -215,7 +173,6 @@ function PayrollExportPreview({
   estimatedGross,
   onNotice,
   onFailure,
-  plans,
 }: {
   document: PayrollExportDocument;
   missingNumberNames: readonly string[];
@@ -223,7 +180,6 @@ function PayrollExportPreview({
   estimatedGross: (personId: string, totalHours: number) => number | null;
   onNotice: (message: string) => void;
   onFailure: (error: unknown) => void;
-  plans: readonly PayrollRevisionPlan[];
 }) {
   return (
     <>
@@ -305,11 +261,6 @@ function PayrollExportPreview({
                       ) : (
                         <small>{row.employeeId}</small>
                       )}
-                      <PayrollPlanNote
-                        plan={plans.find(
-                          (plan) => plan.personId === row.personId,
-                        )}
-                      />
                     </td>
                     <td>{row.regularHours.toFixed(2)} h</td>
                     <td>{row.overtimeHours.toFixed(2)} h</td>

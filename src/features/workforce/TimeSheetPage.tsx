@@ -5,7 +5,6 @@ import {
   useCreateTimeRecord,
   useListAvailabilityWindow,
   useListEvent,
-  useListPayrollExportRecord,
   useListPerson,
   useListShift,
   useListTimeRecord,
@@ -14,7 +13,6 @@ import {
   useTimeRecordCorrect,
 } from "../../lib/manifest-convex-react";
 import { TimeAttentionPanel } from "./TimeAttentionPanel";
-import { payrollInclusionLabel } from "../finance/payrollReconcile";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import {
@@ -278,8 +276,6 @@ export function PlannedVsRecorded({
 
 export function TimeSheetPage() {
   const records = useListTimeRecord();
-  const receipts = useListPayrollExportRecord();
-  const liveReceipts = (receipts ?? []).filter((row) => row.deletedAt == null);
   const windows = useListAvailabilityWindow();
   const people = useListPerson();
   const events = useListEvent();
@@ -724,11 +720,7 @@ export function TimeSheetPage() {
                     </td>
                     <td>
                       <TimeSheetRecordState row={row} />
-                      <TimeSheetReview
-                        row={row}
-                        personName={personName}
-                        payroll={payrollInclusionLabel(row, liveReceipts)}
-                      />
+                      <TimeSheetReview row={row} personName={personName} />
                     </td>
                     <td>
                       <div className="supply-row-actions">
