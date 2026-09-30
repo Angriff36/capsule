@@ -14,6 +14,7 @@
  * who may read the event.
  */
 import { v } from "convex/values";
+import { api } from "./_generated/api";
 import { query, type QueryCtx } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 
@@ -182,6 +183,11 @@ export const listEventActivity = query({
     const event = await ctx.db.get(id);
     if (!event || event.tenantId !== auth.tenantId || event.deletedAt != null)
       return null;
+    // History shows crew, trucks, packing and reasons, so it follows the
+    // event's own read rule: the generated event read decides, not a copy
+    // of the role list kept here.
+    const readable: unknown = await ctx.runQuery(api.queries.getEvent, { id });
+    if (readable == null) return null;
     const tenantId = auth.tenantId;
 
     // The event's day-of records, read by event and kept to this workspace.

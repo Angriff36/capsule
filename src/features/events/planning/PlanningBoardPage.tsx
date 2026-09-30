@@ -391,8 +391,9 @@ export function PlanningBoardPage() {
       candidateOf(draft),
       levels,
     ).filter((issue) => issue.level === "fix");
+    let reason: string | null = null;
     if (open.length > 0) {
-      const reason = await prompt.askReason({
+      reason = await prompt.askReason({
         title: `Put ${name} on the event anyway`,
         description: `${open.map((issue) => issue.text).join(" ")} Say why this is fine; the reason is kept on the event.`,
         label: "Why is this fine?",
@@ -400,18 +401,6 @@ export function PlanningBoardPage() {
         tone: "danger",
       });
       if (!reason) return;
-      const kept = await run(
-        "put",
-        () =>
-          recordOverride({
-            eventId,
-            action: `Put ${name} on the event`,
-            reason,
-            openItems: open.map((issue) => issue.text).join("\n"),
-          }),
-        "Reason saved",
-      );
-      if (!kept) return;
     }
     const window = eventWindow(selected);
     const saved = await run(
@@ -472,7 +461,24 @@ export function PlanningBoardPage() {
       },
       `${name} is on the event`,
     );
-    if (saved) setDraft(null);
+    if (!saved) return;
+    setDraft(null);
+    // The reason is kept only for a change that was saved, so a change that
+    // fails never shows under "Changes saved with open items".
+    if (reason) {
+      const kept = reason;
+      await run(
+        "put",
+        () =>
+          recordOverride({
+            eventId,
+            action: `Put ${name} on the event`,
+            reason: kept,
+            openItems: open.map((issue) => issue.text).join("\n"),
+          }),
+        `${name} is on the event`,
+      );
+    }
   };
 
   const accept = (suggestion: PlanSuggestion, take: boolean) => {

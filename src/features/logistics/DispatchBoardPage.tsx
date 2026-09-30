@@ -206,6 +206,11 @@ export function DispatchBoardPage() {
       if (!reason) return;
     }
     void run(`${list._id}:dispatch`, async () => {
+      // The list leaves first. The reason is kept only for a list that did
+      // leave, so a send-out that fails never shows as "sent out with open
+      // items".
+      await dispatch({ docId: list._id, version: list.version });
+      setNotice(`${list.name || "Pack list"} sent out.`);
       if (reason)
         await recordOverride({
           eventId,
@@ -213,8 +218,6 @@ export function DispatchBoardPage() {
           reason,
           openItems: open.map((item) => item.text).join("\n"),
         });
-      await dispatch({ docId: list._id, version: list.version });
-      setNotice(`${list.name || "Pack list"} sent out.`);
     });
   };
 
