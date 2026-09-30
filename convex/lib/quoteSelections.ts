@@ -317,21 +317,31 @@ export const quoteConversionPlan = internalQuery({
     const plan = quoteProposalPlan(current, guestCount);
     const live = <T extends { deletedAt?: number | null }>(rows: T[]) =>
       rows.filter((row) => row.deletedAt == null);
-    const hasLines =
-      live(
-        await ctx.db
-          .query("proposalLineItems")
-          .withIndex("by_proposalId", (q) => q.eq("proposalId", proposalId))
-          .collect(),
-      ).length > 0;
+    // A retried conversion adds only the lines still missing: a line is
+    // already there when a live line has the same place, text and dish.
+    const saved = live(
+      await ctx.db
+        .query("proposalLineItems")
+        .withIndex("by_proposalId", (q) => q.eq("proposalId", proposalId))
+        .collect(),
+    );
+    const isSaved = (line: (typeof plan.lines)[number], sortOrder: number) =>
+      saved.some(
+        (row) =>
+          row.sortOrder === sortOrder &&
+          row.description === line.description &&
+          (row.menuDishId ?? null) === (line.menuDishId ?? null),
+      );
 
     return {
-      lines: hasLines
-        ? []
-        : plan.lines.map((line) => ({
-            ...line,
-            menuDishId: line.menuDishId as Id<"menuDishes"> | undefined,
-          })),
+      lines: plan.lines
+        .map((line, sortOrder) => ({ line, sortOrder }))
+        .filter(({ line, sortOrder }) => !isSaved(line, sortOrder))
+        .map(({ line, sortOrder }) => ({
+          ...line,
+          sortOrder,
+          menuDishId: line.menuDishId as Id<"menuDishes"> | undefined,
+        })),
       enhancements: plan.enhancements,
       dishSelections: current.lines
         .filter((line) => line.kind === "menu")

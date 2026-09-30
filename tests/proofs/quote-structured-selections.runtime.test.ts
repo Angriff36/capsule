@@ -315,6 +315,24 @@ describe("structured quote picks reach the sales record (AC-095/AC-243/AC-244/AC
       } as never,
     )) as { lines: unknown[] };
     expect(plan.lines).toEqual([]);
+
+    // A conversion that stopped after the first line: the retry plan holds
+    // only the missing line, in its own place.
+    const lines = await count("proposalLineItems");
+    const second = lines.find((line) => line.sortOrder === 1)!;
+    await owner.run(async (ctx: any) => ctx.db.delete(second._id));
+    const partial = (await owner.query(
+      internal.lib.quoteSelections.quoteConversionPlan as never,
+      {
+        proposalId: first.proposalId,
+        submissionId: submitted.submissionId,
+      } as never,
+    )) as { lines: { sortOrder: number; description: string }[] };
+    expect(partial.lines).toHaveLength(1);
+    expect(partial.lines[0]).toMatchObject({
+      sortOrder: 1,
+      description: second.description,
+    });
   });
 
   it("dedups by the form visit's key and by contact + event date", async () => {

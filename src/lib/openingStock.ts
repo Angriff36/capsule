@@ -149,8 +149,10 @@ export function readOpeningStockRow(
     note: get("note", "notes", "comment", "comments"),
   };
   const id = get("id", "itemid", "rowid", "sku", "externalid");
+  // An item id (SKU) repeats across locations and count dates on one sheet, so
+  // the key carries both: each location's count is its own row.
   row.sourceRow = id
-    ? `id:${id}`
+    ? [`id:${id}`, slug(row.locationText), slug(row.asOfText)].join("|")
     : [
         slug(row.itemName),
         slug(row.locationText),
