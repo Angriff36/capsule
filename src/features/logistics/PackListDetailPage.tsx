@@ -59,6 +59,7 @@ import { usePackRigs } from "./usePackRigs";
 import { useEventTransport } from "../../lib/useEventRouteLegs";
 import { PackListKitAssistBar } from "./PackListKitAssistBar";
 import { PackScanPanel } from "./PackScanPanel";
+import { packWentOut } from "./packReturn";
 import { PACK_LIST_UNITS } from "./packListUnits";
 import { useActionNotice } from "../../ui/action-result";
 import {
@@ -562,7 +563,7 @@ export function PackListDetailPage() {
       return;
     }
     if (key === "countReturn") {
-      const packed = Number(item.packedQuantity ?? 0);
+      const packed = packWentOut(item);
       const values = await prompt.askFields({
         title: "Count the return",
         description: `${packed} went out. Enter what came back, what was used up, what was lost and what came back broken. You can save this again later.`,

@@ -5,6 +5,7 @@
 
 export type PackReturnLine = {
   packedQuantity: number;
+  loadedQuantity?: number | null;
   returnedQuantity?: number | null;
   usedQuantity?: number | null;
   lostQuantity?: number | null;
@@ -17,14 +18,27 @@ const n = (value: number | null | undefined) => Number(value ?? 0) || 0;
 const show = (value: number) =>
   Number.isInteger(value) ? String(value) : String(Number(value.toFixed(2)));
 
-/** Packed amount no return count accounts for yet. Never below zero. */
+/**
+ * What left the building on this line: the on-truck count when one was
+ * taken, else what was packed.
+ */
+export function packWentOut(line: {
+  packedQuantity?: number | null;
+  loadedQuantity?: number | null;
+}): number {
+  return n(line.loadedQuantity) > 0
+    ? n(line.loadedQuantity)
+    : n(line.packedQuantity);
+}
+
+/** Amount that went out and no return count accounts for yet. Never below zero. */
 export function packReturnOutstanding(line: PackReturnLine): number {
   const counted =
     n(line.returnedQuantity) +
     n(line.usedQuantity) +
     n(line.lostQuantity) +
     n(line.damagedQuantity);
-  return Math.max(0, n(line.packedQuantity) - counted);
+  return Math.max(0, packWentOut(line) - counted);
 }
 
 /** "Back 8 · used 1 · lost 1" - zero amounts after "back" are left out. */

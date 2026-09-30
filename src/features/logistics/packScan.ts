@@ -1,5 +1,7 @@
 import { parsePackSources } from "../../lib/packRules";
 import { code39Text } from "../../lib/code39";
+import { packWentOut } from "./packReturn";
+import { comesBack } from "./packViews";
 
 /**
  * Scanning on a load sheet: read a label, find the pack line it means, and
@@ -32,6 +34,7 @@ export type ScanOutcome =
   | "not_found"
   | "two_match"
   | "not_out_yet"
+  | "no_return"
   | "nothing_left";
 
 export const SCAN_OUTCOME_TEXT: Record<ScanOutcome, string> = {
@@ -46,7 +49,9 @@ export const SCAN_OUTCOME_TEXT: Record<ScanOutcome, string> = {
     "Two equipment items match that label. Count the line with its button.",
   not_out_yet:
     "This list has not left yet. Count what came back after it is sent out.",
-  nothing_left: "Everything packed on this line is already counted back.",
+  no_return: "This line does not come back, so there is no return to count.",
+  nothing_left:
+    "Everything that went out on this line is already counted back.",
 };
 
 export type ScanTarget =
@@ -118,6 +123,8 @@ export type ScanLine = {
   loadAssignmentId?: string | null;
   sourcesJson?: string | null;
   excludedAt?: number | null;
+  returnRequired?: boolean | null;
+  category?: string | null;
 };
 
 export type ScanEquipment = {
@@ -282,13 +289,16 @@ export function applyScan(
       change: { step, loadedQuantity: loaded + quantity },
     };
   }
+  // Came back: only lines that come back, against what went out.
   const counted =
     amount(line.returnedQuantity) +
     amount(line.usedQuantity) +
     amount(line.lostQuantity) +
     amount(line.damagedQuantity);
-  if (counted >= packed) return { outcome: "nothing_left" };
-  if (counted + quantity > packed) return { outcome: "too_many" };
+  if (!comesBack(line)) return { outcome: "no_return" };
+  const out = packWentOut(line);
+  if (counted >= out) return { outcome: "nothing_left" };
+  if (counted + quantity > out) return { outcome: "too_many" };
   return {
     outcome: "ok",
     change: {

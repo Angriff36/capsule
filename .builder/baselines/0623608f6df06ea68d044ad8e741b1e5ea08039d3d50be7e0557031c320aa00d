@@ -38941,8 +38941,9 @@ async function __runPackListItemRecordReturn(ctx: MutationCtx, { docId, returned
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     if (!(((doc.deletedAt == null) && (doc.listedAt != null)))) throw new Error("Guard 0 failed");
     if (!(((__rel_packList != null) && (__rel_packList.status === "dispatched")))) throw new Error("Guard 1 failed");
+    if (!(((doc.excludedAt == null) && ((doc.returnRequired != null) ? (doc.returnRequired === true) : (doc.category !== "disposable"))))) throw new Error("This line does not come back, so there is no return to count.");
     if (!(((((returnedQuantity >= 0) && (usedQuantity >= 0)) && (lostQuantity >= 0)) && (damagedQuantity >= 0)))) throw new Error("A return amount can't be negative. Use zero or more.");
-    if (!(((((returnedQuantity + usedQuantity) + lostQuantity) + damagedQuantity) <= doc.packedQuantity))) throw new Error("That is more than what was packed. Check the amounts.");
+    if (!(((((returnedQuantity + usedQuantity) + lostQuantity) + damagedQuantity) <= (((doc.loadedQuantity != null) && (doc.loadedQuantity > 0)) ? doc.loadedQuantity : doc.packedQuantity)))) throw new Error("That is more than what went out. Check the amounts.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }

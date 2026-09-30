@@ -927,8 +927,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   }
 
   // The return count after the event. It can be saved again: a crate turns up
-  // the next morning. The four amounts together can't be more than what was
-  // packed. Only a list that has left can have a return: a count saved before
+  // the next morning. The four amounts together can't be more than what
+  // went out. Only a list that has left can have a return: a count saved before
   // that would make the returns page show the list as already counted.
   command recordReturn(
     returnedQuantity: decimal(12, 4),
@@ -939,8 +939,12 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null and self.listedAt != null
     guard self.packList != null and self.packList.status == "dispatched"
+    // Same rule as the "Coming back" view: marked to come back, or not
+    // marked and not a throwaway.
+    constraint returnLineComesBack: self.excludedAt == null and (self.returnRequired != null ? self.returnRequired == true : self.category != "disposable") "This line does not come back, so there is no return to count."
     constraint returnAmountsNotNegative: returnedQuantity >= 0 and usedQuantity >= 0 and lostQuantity >= 0 and damagedQuantity >= 0 "A return amount can't be negative. Use zero or more."
-    constraint returnNotOverPacked: returnedQuantity + usedQuantity + lostQuantity + damagedQuantity <= self.packedQuantity "That is more than what was packed. Check the amounts."
+    // What went out is the on-truck count when one was taken, else what was packed.
+    constraint returnNotOverWentOut: returnedQuantity + usedQuantity + lostQuantity + damagedQuantity <= (self.loadedQuantity != null and self.loadedQuantity > 0 ? self.loadedQuantity : self.packedQuantity) "That is more than what went out. Check the amounts."
     mutate returnedQuantity = returnedQuantity
     mutate usedQuantity = usedQuantity
     mutate lostQuantity = lostQuantity
