@@ -1740,6 +1740,36 @@
       "category": "command-parameter-added",
       "reason": "PL-ACCOUNTING 2026-09-29: Payment.refund takes an optional accounting date; callers without it keep working.",
       "acknowledgedAt": "2026-09-29"
+    },
+    {
+      "path": "EventCloseout.correctedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-CLOSEOUT: optional closeout fields (records behind the numbers, version number, correction reason and time); saved closeouts need no backfill."
+    },
+    {
+      "path": "EventCloseout.correctionReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-CLOSEOUT: optional closeout fields (records behind the numbers, version number, correction reason and time); saved closeouts need no backfill."
+    },
+    {
+      "path": "EventCloseout.revision",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-CLOSEOUT: optional closeout fields (records behind the numbers, version number, correction reason and time); saved closeouts need no backfill."
+    },
+    {
+      "path": "EventCloseout.sourceSnapshot",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-CLOSEOUT: optional closeout fields (records behind the numbers, version number, correction reason and time); saved closeouts need no backfill."
+    },
+    {
+      "path": "EventCloseoutFinalized.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-09-29",
+      "reason": "Batch 2026-09-29 PL-CLOSEOUT: the finalized event now also carries every closeout number and the record list, so each final result stays readable from the ledger. Fields were only added."
     }
   ]
 }

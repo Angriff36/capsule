@@ -1085,7 +1085,7 @@ export default defineSchema({
     capturedAt: v.optional(v.union(v.number(), v.null())),
     finalizedAt: v.optional(v.union(v.number(), v.null())),
     sourceSnapshot: v.optional(v.union(v.string(), v.null())),
-    revision: v.number(),
+    revision: v.optional(v.union(v.number(), v.null())),
     correctionReason: v.optional(v.union(v.string(), v.null())),
     correctedAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),

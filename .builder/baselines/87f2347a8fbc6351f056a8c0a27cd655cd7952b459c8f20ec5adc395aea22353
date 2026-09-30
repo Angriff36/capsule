@@ -14514,7 +14514,6 @@ async function __runEventCloseOut(ctx: MutationCtx, { docId, version }: any, __c
         expectedHeadcount: 0,
         actualHeadcount: 0,
         status: "draft",
-        revision: 0,
         createdAt: Date.now(),
         updatedAt: Date.now(),
         version: 0,
@@ -17448,7 +17447,6 @@ export const EventCloseout_createViaCapture = mutation({
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       status: "draft",
-      revision: 0,
       createdAt: Date.now(),
       updatedAt: Date.now(),
       actualHeadcount: args.actualHeadcount,
@@ -17540,7 +17538,7 @@ async function __runEventCloseoutCorrect(ctx: MutationCtx, { docId, reason, actu
     if (!((costVariance === (budgetedCost - totalActualCost)))) throw new Error("This closeout's cost variance has to equal budgeted cost minus total actual cost.");
     if (!((grossProfit === (actualRevenue - totalActualCost)))) throw new Error("This closeout's gross profit has to equal actual revenue minus total actual cost.");
     if (!(((expectedHeadcount >= 0) && (actualHeadcount >= 0)))) throw new Error("This closeout's headcount numbers can't be negative. Use zero or more.");
-    const nextRevision = (doc.revision + 1);
+    const nextRevision = (((doc.revision != null) ? doc.revision : 1) + 1);
     const previousActualRevenue = doc.actualRevenue;
     const previousTotalActualCost = doc.totalActualCost;
     const previousGrossProfit = doc.grossProfit;

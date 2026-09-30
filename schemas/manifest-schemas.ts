@@ -1175,7 +1175,7 @@ export const EventCloseoutSchema = z.object({
   capturedAt: z.coerce.date().nullable().optional(),
   finalizedAt: z.coerce.date().nullable().optional(),
   sourceSnapshot: z.string().nullable().optional(),
-  revision: z.number().int().default(0),
+  revision: z.number().int().nullable().optional(),
   correctionReason: z.string().nullable().optional(),
   correctedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
