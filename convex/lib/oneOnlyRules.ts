@@ -9,7 +9,8 @@ import type { MutationCtx } from "../_generated/server";
  * at the same moment):
  * - one live packer for each section of a pack list;
  * - one answer for each planning suggestion on an event;
- * - one to-do for each checklist line on an event.
+ * - one to-do for each checklist line on an event;
+ * - one "what this event needs" record for each event.
  * The generated create cannot read the other rows of its own table, so the
  * check runs here, after the row is written; a refusal rolls the write back.
  */
@@ -62,6 +63,26 @@ export async function enforceOneOnly(
     if (other)
       throw new ConvexError(
         "Someone already answered this suggestion. The board shows the new answer.",
+      );
+    return;
+  }
+  if (event.entity === "EventPlanNeeds" && event.type === "EventPlanNeedsNoted") {
+    const row = await ctx.db.get(event.entityId as Id<"eventPlanNeeds">);
+    if (!row) return;
+    const other = (
+      await ctx.db
+        .query("eventPlanNeeds")
+        .withIndex("by_eventId", (q) => q.eq("eventId", row.eventId))
+        .collect()
+    ).some(
+      (needs) =>
+        needs._id !== row._id &&
+        needs.tenantId === row.tenantId &&
+        needs.deletedAt == null,
+    );
+    if (other)
+      throw new ConvexError(
+        "Someone just saved what this event needs. Their answer now shows; make your change again.",
       );
     return;
   }

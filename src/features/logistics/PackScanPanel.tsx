@@ -38,7 +38,11 @@ interface BarcodeDetectorConstructor {
   new (): BarcodeDetectorInstance;
 }
 
-type Line = ScanLine & { version: number; unit: string };
+type Line = ScanLine & {
+  version: number;
+  unit: string;
+  returnFinding?: string | null;
+};
 type Entry = { at: number; ok: boolean; text: string };
 
 const QUICK_AMOUNTS = [1, 5, 10];
@@ -160,6 +164,8 @@ export function PackScanPanel({
           usedQuantity: Number(line.usedQuantity ?? 0),
           lostQuantity: Number(line.lostQuantity ?? 0),
           damagedQuantity: Number(line.damagedQuantity ?? 0),
+          // Left out, the saved note would be cleared.
+          finding: line.returnFinding?.trim() || undefined,
         });
         say(
           true,
