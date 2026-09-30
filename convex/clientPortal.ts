@@ -60,9 +60,9 @@ export const turnOffShare = action({
 
 /** Anonymous, token-authorized projection for the account-free client view. */
 export const getEvent = query({
-  args: { token: v.string() },
-  handler: async (ctx, { token }) => {
-    const access = await resolveClientPortalAccess(ctx, token);
+  args: { token: v.string(), clock: v.optional(v.number()) },
+  handler: async (ctx, { token, clock }) => {
+    const access = await resolveClientPortalAccess(ctx, token, clock);
     if (!access) return null;
 
     const eventId = ctx.db.normalizeId("events", access.eventId);

@@ -22,6 +22,7 @@ import {
   type QuoteSelections,
 } from "../../src/lib/quoteSelections";
 import { resolveCatalogPrice } from "./proposalPricing";
+import { clockNow } from "./clockNow";
 
 export const quotePickValidator = v.object({
   menuDishId: v.id("menuDishes"),
@@ -74,6 +75,9 @@ export async function resolveQuoteSelections(
     extras?: QuotePick[];
     eventDate: number;
     guestCount: number;
+    /** The page's current minute (see clockNow): a scheduled price switches
+     *  on an open page too, not only on the next load. */
+    clock?: number;
   },
 ): Promise<QuoteSelections> {
   const picks = args.picks ?? [];
@@ -84,7 +88,7 @@ export async function resolveQuoteSelections(
   if (picks.length > 0 && !args.menuId) {
     throw new ConvexError("Pick a menu before picking its dishes.");
   }
-  const now = Date.now();
+  const now = clockNow(args.clock);
   const refuseIneligible = (menu: Doc<"menus">) => {
     const reasons = menuIneligibleReasons(menu, {
       eventDate: args.eventDate,
@@ -181,6 +185,7 @@ export const estimateQuote = query({
     menuId: v.optional(v.id("menus")),
     picks: v.optional(v.array(quotePickValidator)),
     extras: v.optional(v.array(quotePickValidator)),
+    clock: v.optional(v.number()),
   },
   handler: async (
     ctx,

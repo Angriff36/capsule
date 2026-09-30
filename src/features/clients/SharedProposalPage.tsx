@@ -4,6 +4,7 @@ import { api } from "../../lib/api";
 import { formatDate, formatMoneyExact, formatTime } from "../../lib/format";
 import { proposalSectionSequence } from "../../lib/proposalSectionOrder";
 import { ErrorState, TableSkeleton } from "../../ui/primitives";
+import { useLatestDefined, useMinuteClock } from "../../lib/useMinuteClock";
 
 /**
  * Client-facing shared proposal view (spec §4.6).
@@ -36,9 +37,12 @@ function formatTimelineWindow(startsAt: number, endsAt: number | null) {
 // would stay skipped forever — an endless skeleton. Same pattern as
 // ClientPortalPage.
 export function SharedProposalPage({ token }: { token: string }) {
-  const data = useQuery(
-    api.shareLinks.getSharedProposal,
-    token ? { token } : "skip",
+  const clock = useMinuteClock();
+  const data = useLatestDefined(
+    useQuery(
+      api.shareLinks.getSharedProposal,
+      token ? { token, clock } : "skip",
+    ),
   );
   const recordView = useMutation(api.shareLinks.recordShareView);
   const recordedRef = useRef<string | null>(null);
