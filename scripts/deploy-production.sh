@@ -95,6 +95,8 @@ run_review() {
       echo "This diff touches authored UI. Read DESIGN.md in the repository root and apply the 'If the diff touches authored UI' review text in AGENTS.md (section 'Merge gate') in full: DESIGN.md is the presentation authority; an unamended DESIGN.md plus a changed visual language is a REJECT."
     fi
     echo ""
+    echo "How to review: inspect the diff and the tests it adds or changes. Do NOT run the full test suite, coverage, the build, Storybook, \`bun run check\` or any other full gate: this release runs the complete production gate once, right after your APPROVE. You MAY run a focused test (one file or one test name) to confirm or rule out a specific suspected blocker. If you cannot approve without broader execution, say exactly what must be run and why, instead of running it."
+    echo ""
     echo "A rejection must identify a concrete problem in the changed code and a plausible user or production failure. End with exactly one line: \`VERDICT: APPROVE\` or \`VERDICT: REJECT\`."
   } > "$prompt"
   echo "deploy-production: independent review by Codex gpt-5.6-sol (log: $log)"
