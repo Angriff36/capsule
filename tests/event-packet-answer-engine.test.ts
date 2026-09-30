@@ -838,7 +838,7 @@ describe("Final Lock answer engine", () => {
     );
   });
 
-  it("names the outside chat channel event-number-event-name and checks a recorded one still matches", () => {
+  it("names the outside chat channel event-number-event-name and never blocks on it", () => {
     expect(externalChannelName("6014", "Ashley's Wedding")).toBe(
       "6014-ashley-s-wedding",
     );
@@ -874,13 +874,11 @@ describe("Final Lock answer engine", () => {
       field: "externalChannel",
     });
 
-    // The event was renamed after the channel was made: the name must follow.
+    // The event was renamed after the channel was made: no outside channel
+    // name is checked (Ryan 2026-09-29: Capsule chat is the event channel).
     linked.event.title = "Ashley and Sam's Wedding";
     const renamed = get(run(linked).answers, "communication.channel");
-    expect(renamed.result).toBe("unresolved");
-    expect(renamed.missing).toEqual([
-      'The outside chat channel is named "6014-ashley-s-wedding"; it should be "6014-ashley-and-sam-s-wedding".',
-    ]);
+    expect(renamed.result).toBe("answered");
   });
 
   it("shows truck availability and load grouping, and names what is missing", () => {

@@ -238,15 +238,18 @@ export const captureCloseoutFromSources = mutation({
       args.entered ?? {},
     );
     const eventId = String(args.eventId);
+    const existing = await eventCloseoutRow(ctx, scope.tenantId, eventId);
+    // A recapture keeps the saved notes unless the person typed new ones.
     const params = {
       eventId,
       ...values,
-      unresolvedIssues: args.unresolvedIssues,
-      performanceNotes: args.performanceNotes,
-      notes: args.notes,
+      unresolvedIssues:
+        args.unresolvedIssues ?? existing?.unresolvedIssues ?? undefined,
+      performanceNotes:
+        args.performanceNotes ?? existing?.performanceNotes ?? undefined,
+      notes: args.notes ?? existing?.notes ?? undefined,
       sourceSnapshot,
     };
-    const existing = await eventCloseoutRow(ctx, scope.tenantId, eventId);
     if (existing?.status === "finalized") {
       throw new ConvexError(
         "This closeout is final. Use Correct to change it with a reason.",

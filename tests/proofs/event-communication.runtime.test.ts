@@ -91,10 +91,8 @@ describe("event communication", () => {
     const moved = channel(
       await manager.query(finalLock.getFinalLock, { eventId }),
     );
-    expect(moved.result).toBe("unresolved");
-    expect(moved.action).toBe(
-      'Rename the outside channel to "6020-ashley-s-wedding" and record the new name on the event.',
-    );
+    // No outside channel name is checked (Ryan 2026-09-29).
+    expect(moved.result).toBe("answered");
 
     await manager.mutation(api.mutations.Event_unlinkExternalChannel, {
       docId: eventId,
