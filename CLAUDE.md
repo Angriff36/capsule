@@ -61,6 +61,8 @@ Behavioral rules for automated contributors. Commands live in `AGENTS.md`. Syste
   ignores non-`main` refs (`vercel.json` `ignoreCommand`), so it builds nothing
   and never runs `convex deploy`. Dev work talks to the LOCAL Convex backend.
   **Release only when the owner says "release" in the current conversation.**
+  Exception: the product builder's approved daily review releases on its own
+  (Ryan, 2026-09-28: "once the reviewer clears it it should go to production").
   A release merges `dev` into `main`, via
   `bash scripts/release.sh --reviewer <model>` after the cross-model review APPROVES
   (only when the merge gate requires a review).
