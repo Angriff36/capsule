@@ -1,11 +1,14 @@
 import { buildWorkbook } from "./buildWorkbook";
 import { renderWorkbook } from "./renderWorkbook";
 import { canonicalJson, type EventPacketSnapshot } from "./model";
+import type { FinalLockPrint } from "./finalLock/evaluate";
 
 export interface PacketPreparationPorts {
   read(): Promise<{
     snapshot: EventPacketSnapshot;
     currentFingerprint: string;
+    finalLock: FinalLockPrint;
+    finalLockFingerprint: string;
     latestRevision: { id: string; fingerprint: string; stale: boolean } | null;
   }>;
   upload(file: {
@@ -14,15 +17,17 @@ export interface PacketPreparationPorts {
     mimeType: string;
     name: string;
     inputFingerprint?: string;
+    finalLockFingerprint?: string;
   }): Promise<{ storageId: string }>;
   record(input: {
     inputFingerprint: string;
+    finalLockFingerprint: string;
     pdfStorageId: string;
     snapshotStorageId: string;
   }): Promise<{ id: string }>;
 }
 
-/** Read immediately before rendering; the server rechecks the same fingerprint at commit. */
+/** Read immediately before rendering; the server rechecks the same fingerprints at commit. */
 export async function prepareNativeWorkbook(ports: PacketPreparationPorts) {
   const current = await ports.read();
   const previous = current.latestRevision;
@@ -35,6 +40,7 @@ export async function prepareNativeWorkbook(ports: PacketPreparationPorts) {
   const workbook = buildWorkbook(current.snapshot, {
     revision: current.snapshot.revisions.length + 1,
     generatedAt: new Date().toISOString(),
+    finalLock: current.finalLock.lines,
   });
   const rendered = await renderWorkbook(workbook);
   if (rendered.audit.violations.length)
@@ -48,15 +54,21 @@ export async function prepareNativeWorkbook(ports: PacketPreparationPorts) {
     mimeType: "application/pdf",
     name: `${name}.pdf`,
     inputFingerprint: current.currentFingerprint,
+    finalLockFingerprint: current.finalLockFingerprint,
   });
+  // The Final Lock answers the PDF shows travel with the snapshot, so the
+  // revision stores exactly what was printed.
   const snapshot = await ports.upload({
-    bytes: new TextEncoder().encode(canonicalJson(current.snapshot)),
+    bytes: new TextEncoder().encode(
+      canonicalJson({ ...current.snapshot, finalLock: current.finalLock }),
+    ),
     purpose: "snapshot",
     mimeType: "application/json",
     name: `${name}.snapshot.json`,
   });
   const revision = await ports.record({
     inputFingerprint: current.currentFingerprint,
+    finalLockFingerprint: current.finalLockFingerprint,
     pdfStorageId: pdf.storageId,
     snapshotStorageId: snapshot.storageId,
   });

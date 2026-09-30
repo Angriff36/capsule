@@ -9,6 +9,9 @@ import {
   useSavedReportDefinitionUpdateDefinition,
 } from "../../lib/manifest-convex-react";
 import { formatStatusLabel } from "../../lib/statusLabels";
+import { formatDate } from "../../lib/format";
+import { readSavedReconciliation } from "../../lib/financeReconciliation";
+import { ReconciliationTables } from "../finance/ReconciliationTables";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useActionNotice } from "../../ui/action-result";
 import { useActionPrompt } from "../../ui/action-prompt";
@@ -440,6 +443,18 @@ function SelectedReport({
     personId: authStatus?.personId,
     role: authStatus?.role,
   });
+  const savedCheck = readSavedReconciliation(report.definition);
+  if (savedCheck) {
+    return (
+      <section className="live-report" aria-label="Saved money check">
+        <p className="mb-3 text-base text-ink-2">
+          Saved copy made {formatDate(savedCheck.generatedAt)}. It shows the
+          money as it was then; open Finance, Money check for today's numbers.
+        </p>
+        <ReconciliationTables report={savedCheck} />
+      </section>
+    );
+  }
   const subject = normalizeReportSubject(report.subjectArea);
   if (!subject) {
     return (

@@ -6,6 +6,7 @@
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 import { getAuthContext, type AppAuthContext } from "./authContext";
+import { firstAttachmentFor } from "./blobs";
 import { decrypt, encrypt } from "./encryption";
 import { orgCapabilityDeniesAction } from "./orgCapabilityGate";
 import { chatPreviewText } from "../../src/features/chat/chatLinkTokens";
@@ -218,7 +219,12 @@ export async function attachmentsFor(
         // minted from an id that does not parse: the whole channel query
         // would fail for every reader.
         const storageId = ctx.db.system.normalizeId("_storage", row.storageId);
-        return storageId ? await ctx.storage.getUrl(storageId) : null;
+        if (!storageId) return null;
+        // Only the file this message uploaded: a row naming a blob some
+        // earlier row owns (another message's photo, another company's
+        // file) shows its name, never the file.
+        const first = await firstAttachmentFor(ctx, row.storageId);
+        return first?._id === row._id ? await ctx.storage.getUrl(storageId) : null;
       })(),
     })),
   );

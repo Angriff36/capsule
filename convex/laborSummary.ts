@@ -26,6 +26,14 @@ import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import type { Doc } from "./_generated/dataModel";
+import { plannedVsActualLabor } from "../src/features/finance/laborCost";
+import {
+  approvedPayroll,
+  attendanceAlerts as findAttendanceAlerts,
+  overtimeWarnings,
+  type AttendanceAlert,
+  type OvertimeWarning,
+} from "../src/features/workforce/timePay";
 
 /** Mirrors financeManageAccess | workforceManageAccess (+ admin tier). */
 function canReadRates(role: string): boolean {
@@ -72,6 +80,10 @@ type EventLaborSummary = LaborSummary & {
   scheduledMinutes: number;
   scheduledCost: number;
   scheduledShiftCount: number;
+  /** Scheduled minutes of people with no rate (not priced). */
+  unpricedScheduledMinutes: number;
+  /** Clocked cost minus scheduled cost (priced minutes). */
+  varianceCost: number;
 };
 
 function personName(person: Doc<"people"> | undefined, id: string): string {
@@ -154,7 +166,54 @@ async function tenantTimeRecords(
     .collect();
 }
 
-const SCHEDULED_SHIFT_STATUSES = new Set(["scheduled", "started", "completed"]);
+/**
+ * PL-TIME (AC-509): late clock-ins, people not in yet, no-shows, entries
+ * still open, and weeks past 40 h - for the people who run labor, never for
+ * a worker. `now` comes from the caller so the answer is stable per minute.
+ */
+export const attendanceAlerts = query({
+  args: { now: v.number() },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{
+    alerts: Array<AttendanceAlert & { personName: string }>;
+    overtime: Array<OvertimeWarning & { personName: string }>;
+  } | null> => {
+    const auth = await getAuthContext(ctx);
+    if (!canReadLaborAggregates(auth.role)) return null;
+    const [people, records, shifts] = await Promise.all([
+      tenantPeople(ctx, auth.tenantId),
+      tenantTimeRecords(ctx, auth.tenantId),
+      ctx.db
+        .query("shifts")
+        .withIndex("by_tenantId", (q: any) => q.eq("tenantId", auth.tenantId))
+        .collect() as Promise<Doc<"shifts">[]>,
+    ]);
+    const nameOf = (personId: string) => {
+      const person = people.get(personId);
+      return person
+        ? `${person.givenName} ${person.familyName}`.trim()
+        : "Someone";
+    };
+    const recent = records.filter(
+      (record) =>
+        record.clockInAt != null &&
+        record.clockInAt >= args.now - 21 * 24 * 60 * 60_000,
+    );
+    return {
+      alerts: findAttendanceAlerts({
+        shifts: shifts.map((shift) => ({ ...shift, _id: String(shift._id) })),
+        records: recent,
+        now: args.now,
+      }).map((alert) => ({ ...alert, personName: nameOf(alert.personId) })),
+      overtime: overtimeWarnings(recent).map((warning) => ({
+        ...warning,
+        personName: nameOf(warning.personId),
+      })),
+    };
+  },
+});
 
 /** Aggregate labor for one event (direct eventId or via the record's shift). */
 export const eventLaborSummary = query({
@@ -166,61 +225,68 @@ export const eventLaborSummary = query({
     const event = await ctx.db.get(args.eventId);
     if (!event || event.tenantId !== auth.tenantId || event.deletedAt != null)
       return null;
-    const eventId = String(args.eventId);
-    const [people, records, shifts] = await Promise.all([
-      tenantPeople(ctx, auth.tenantId),
-      tenantTimeRecords(ctx, auth.tenantId),
-      ctx.db
-        .query("shifts")
-        .withIndex("by_tenantId", (q: any) => q.eq("tenantId", auth.tenantId))
-        .collect() as Promise<Doc<"shifts">[]>,
-    ]);
-    const shiftEventById = new Map(
-      shifts.map((shift) => [String(shift._id), String(shift.eventId ?? "")]),
-    );
-    const matching = records.filter((record) => {
-      const direct = String(record.eventId ?? "");
-      if (direct) return direct === eventId;
-      const viaShift = record.shiftId
-        ? shiftEventById.get(String(record.shiftId))
-        : undefined;
-      return viaShift === eventId;
-    });
-
-    // Scheduled-labor forecast: committed shifts × person rates. This is the
-    // pre-event labor picture (the worksheet's "Scheduled Cost") — clocked
-    // time replaces it as reality once people punch in.
-    let scheduledMinutes = 0;
-    let scheduledCost = 0;
-    let scheduledShiftCount = 0;
-    for (const shift of shifts) {
-      if (
-        shift.deletedAt != null ||
-        String(shift.eventId ?? "") !== eventId ||
-        !SCHEDULED_SHIFT_STATUSES.has(String(shift.status)) ||
-        shift.startsAt == null ||
-        shift.endsAt == null ||
-        shift.endsAt <= shift.startsAt
-      ) {
-        continue;
-      }
-      const minutes = (shift.endsAt - shift.startsAt) / 60_000;
-      scheduledMinutes += minutes;
-      scheduledShiftCount += 1;
-      const rate = people.get(String(shift.personId))?.hourlyRate;
-      if (typeof rate === "number" && Number.isFinite(rate) && rate >= 0) {
-        scheduledCost += (minutes / 60) * rate;
-      }
-    }
-
-    return {
-      ...summarize(matching, people),
-      scheduledMinutes: Math.round(scheduledMinutes),
-      scheduledCost: Math.round((scheduledCost + Number.EPSILON) * 100) / 100,
-      scheduledShiftCount,
-    };
+    const summary: EventLaborSummary & { records?: unknown } =
+      await loadEventLabor(ctx, auth.tenantId, String(args.eventId));
+    delete summary.records;
+    return summary;
   },
 });
+
+/**
+ * Event labor with the time records behind it. Shared with the closeout
+ * source read (convex/closeoutSources.ts); the caller checks access.
+ */
+export async function loadEventLabor(
+  ctx: { db: any },
+  tenantId: string,
+  eventId: string,
+): Promise<EventLaborSummary & { records: Doc<"timeRecords">[] }> {
+  const [people, records, shifts] = await Promise.all([
+    tenantPeople(ctx, tenantId),
+    tenantTimeRecords(ctx, tenantId),
+    ctx.db
+      .query("shifts")
+      .withIndex("by_tenantId", (q: any) => q.eq("tenantId", tenantId))
+      .collect() as Promise<Doc<"shifts">[]>,
+  ]);
+  const shiftEventById = new Map(
+    shifts.map((shift) => [String(shift._id), String(shift.eventId ?? "")]),
+  );
+  const matching = records.filter((record) => {
+    const direct = String(record.eventId ?? "");
+    if (direct) return direct === eventId;
+    const viaShift = record.shiftId
+      ? shiftEventById.get(String(record.shiftId))
+      : undefined;
+    return viaShift === eventId;
+  });
+
+  // Scheduled-labor forecast: committed shifts × person rates. This is the
+  // pre-event labor picture (the worksheet's "Scheduled Cost") — clocked
+  // time replaces it as reality once people punch in.
+  // Same rule as src/features/finance/laborCost (AC-510).
+  const labor = plannedVsActualLabor({
+    eventId,
+    shifts,
+    records: matching,
+    people: new Map(
+      [...people.entries()].map(([id, person]) => [
+        id,
+        { name: personName(person, id), hourlyRate: person.hourlyRate },
+      ]),
+    ),
+  });
+
+  return {
+    ...summarize(matching, people),
+    scheduledMinutes: labor.plannedMinutes,
+    scheduledCost: labor.plannedCost,
+    scheduledShiftCount: labor.plannedShiftCount,
+    unpricedScheduledMinutes: labor.unpricedPlannedMinutes,
+    varianceCost: labor.varianceCost,
+    records: matching.filter((record) => workedMinutes(record) != null),
+  };
+}
 
 /**
  * Clocked minutes + estimated pay for one person over an exact window, plus
@@ -240,6 +306,11 @@ export const personPeriodLaborSummary = query({
     | (LaborSummary & {
         hourlyRate: number | null;
         overlappingInputCount: number;
+        approvedMinutes: number;
+        approvedOvertimeMinutes: number;
+        approvedCount: number;
+        waitingApprovalCount: number;
+        approvedTimeRecordIds: string[];
       })
     | null
   > => {
@@ -272,11 +343,22 @@ export const personPeriodLaborSummary = query({
         input.periodStart <= args.periodEnd &&
         input.periodEnd >= args.periodStart,
     ).length;
+    const approved = approvedPayroll(
+      records,
+      personId,
+      args.periodStart,
+      args.periodEnd,
+    );
     return {
       ...summary,
       hourlyRate:
         typeof rate === "number" && Number.isFinite(rate) ? rate : null,
       overlappingInputCount,
+      approvedMinutes: approved.approvedMinutes,
+      approvedOvertimeMinutes: approved.overtimeMinutes,
+      approvedCount: approved.approvedCount,
+      approvedTimeRecordIds: approved.approvedIds,
+      waitingApprovalCount: approved.waitingApprovalCount,
     };
   },
 });
@@ -318,6 +400,7 @@ export const payrollTimeRecords = query({
     clockOutAt: number;
     breakMinutes: number;
     status: string;
+    approvedAt: number | null;
   }> | null> => {
     const auth = await getAuthContext(ctx);
     if (!canReadRates(auth.role)) return null;
@@ -336,6 +419,7 @@ export const payrollTimeRecords = query({
         clockOutAt: record.clockOutAt!,
         breakMinutes: Number(record.breakMinutes ?? 0),
         status: String(record.status),
+        approvedAt: record.approvedAt ?? null,
       }));
   },
 });

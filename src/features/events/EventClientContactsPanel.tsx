@@ -63,9 +63,7 @@ export function EventClientContactsPanel({ eventContact, contacts }: Props) {
           <span className="text-base font-semibold text-ink">
             {eventContact.name || "No event contact named"}
           </span>
-          <span className="chip border-brand/30 bg-panel text-brand">
-            Event contact
-          </span>
+          <span className="chip chip-tone-brand">Event contact</span>
         </div>
         <ContactLines email={eventContact.email} phone={eventContact.phone} />
       </div>
@@ -85,14 +83,10 @@ export function EventClientContactsPanel({ eventContact, contacts }: Props) {
                   {contactName(contact)}
                 </span>
                 {contact.isPrimary ? (
-                  <span className="chip border-line-2 bg-inset text-ink-2">
-                    Primary
-                  </span>
+                  <span className="chip chip-tone-mute">Primary</span>
                 ) : null}
                 {contact.isBillingContact ? (
-                  <span className="chip border-line-2 bg-inset text-ink-2">
-                    Billing
-                  </span>
+                  <span className="chip chip-tone-mute">Billing</span>
                 ) : null}
                 {contact.title ? (
                   <span className="text-sm text-ink-3">{contact.title}</span>

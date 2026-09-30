@@ -44,9 +44,8 @@ cp .env.example .env.local
 bun run convex:env-set -- CLERK_JWT_ISSUER_DOMAIN https://YOUR.clerk.accounts.dev
 bun run convex:env-set -- CONVEX_FIELD_ENCRYPTION_KEY <32-byte-secret>
 
-# 3. Run (two terminals)
-bun run dev:convex    # terminal 1 — Convex sync
-bun run dev           # terminal 2 — Vite → http://localhost:7811
+# 3. Run (one terminal)
+bun run dev          # Convex backend + Vite frontend → http://localhost:7811
 
 # 4. Optional seed (needs deployment URL)
 bun run seed
@@ -78,8 +77,7 @@ builder generate convex \
 # Post-generate (in the app)
 bun install
 bun run codegen
-bun run dev:convex
-bun run dev
+bun run dev          # Convex backend + Vite frontend → http://localhost:7811
 ```
 
 Capsule itself is already initialized — use section **2** for regen, not initial mode.
@@ -308,8 +306,7 @@ bunx vitest run tests/proofs/<your-proof>.runtime.test.ts
 ### E. Local dev (daily)
 
 ```bash
-bun run dev:convex             # terminal 1
-bun run dev                    # terminal 2
+bun run dev          # Convex backend + Vite frontend → http://localhost:7811
 ```
 
 ---
@@ -319,7 +316,7 @@ bun run dev                    # terminal 2
 | Intent             | Command                              |
 | ------------------ | ------------------------------------ |
 | Install deps       | `bun install --frozen-lockfile`      |
-| Start app          | `bun run dev` + `bun run dev:convex` |
+| Start app          | `bun run dev` |
 | Plan Builder regen | `bun run manifest:regen`             |
 | Convex codegen     | `bun run codegen`                    |
 | Emit proof kit     | `bun run proof:emit`                 |

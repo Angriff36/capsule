@@ -52,6 +52,9 @@ entity Incident mixin TenantScoped, SoftDeletable {
   // Auth subject (user.id), not a Person doc id — a belongsTo Person here
   // makes the column v.id("people") and every report fails (issue #35 class).
   property reportedById: string?
+  // The reporter's staff profile, when the account is linked to one
+  // (PL-DELIVERY). Set by the server, never sent by the screen.
+  property reportedByPersonId: uuid?
   property required status: IncidentStatus = "open"
   // Allergen response lock: true while a required corrective action is open.
   // Nullable (not required+default) so pre-existing rows pass Convex schema validation.
@@ -96,6 +99,8 @@ entity Incident mixin TenantScoped, SoftDeletable {
     constraint reportDeliveryMatch: deliveryId == null or self.deliveryId == null or deliveryId == self.deliveryId "This incident is for a different delivery. Pick the delivery already on this incident, or leave that blank."
     constraint reportShiftMatch: shiftId == null or self.shiftId == null or shiftId == self.shiftId "This incident is for a different shift. Pick the shift already on this incident, or leave that blank."
     constraint reportDescriptionPresent: length(trim(description)) > 0 "Say what happened."
+    // A delivery problem stays on the event the delivery belongs to.
+    constraint reportDeliveryEvent: deliveryId == null or (self.delivery != null and self.delivery.eventId == eventId) "That delivery is for another event. Pick a delivery of this event."
     mutate eventId = eventId
     mutate prepTaskId = prepTaskId != null ? prepTaskId : self.prepTaskId
     mutate deliveryId = deliveryId != null ? deliveryId : self.deliveryId
@@ -105,6 +110,7 @@ entity Incident mixin TenantScoped, SoftDeletable {
     mutate description = description
     mutate correctiveActionRequired = category == "allergen"
     mutate reportedById = user.id
+    mutate reportedByPersonId = user.personId
     mutate reportedAt = now()
     emit IncidentReported {
       incidentId: self.id

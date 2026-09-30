@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { canonicalJson, type EventPacketSnapshot } from "./model";
+import { nativelyAnswered } from "./requirements";
 const text = z.string().min(1);
 const hash = z.string().regex(/^[a-f0-9]{64}$/);
 const time = z.string().datetime({ offset: true });
@@ -23,6 +24,88 @@ const evidence = z
     sourceTime: time.optional(),
   })
   .strict();
+const maybe = z.string().nullable();
+const count = z.number().finite();
+/** Packet parts the server read from Capsule's own records (nativePacket.ts). */
+const nativeSchema = z
+  .object({
+    eventNumber: z.string(),
+    serviceStyle: maybe,
+    barService: maybe,
+    menu: z.array(
+      z
+        .object({
+          name: z.string(),
+          course: maybe,
+          servings: count.nullable(),
+          notes: maybe,
+          sortOrder: count.nullable(),
+        })
+        .strict(),
+    ),
+    pack: z.array(
+      z
+        .object({
+          description: z.string(),
+          quantity: count,
+          unit: z.string(),
+          category: maybe,
+          food: z.boolean(),
+          ownership: z.enum(["owned", "rented", "client"]).nullable(),
+          leftOff: z.boolean(),
+        })
+        .strict(),
+    ),
+    staff: z.array(
+      z
+        .object({
+          name: z.string(),
+          role: z.string(),
+          callTime: maybe,
+          endTime: maybe,
+          phone: maybe,
+          status: z.string(),
+        })
+        .strict(),
+    ),
+    pullSheet: z.array(
+      z
+        .object({
+          description: z.string(),
+          quantity: count,
+          unit: z.string(),
+          source: z.enum(["ours", "vendor"]),
+          decor: z.boolean(),
+          vendor: maybe,
+          returnOwner: maybe,
+          returnBy: maybe,
+          status: z.string(),
+        })
+        .strict(),
+    ),
+    route: z
+      .object({
+        venueAddress: maybe,
+        mapLink: maybe,
+        loadIn: z.array(z.string()),
+        runs: z.array(
+          z
+            .object({
+              vehicle: maybe,
+              trailer: maybe,
+              driver: maybe,
+              loadingZone: maybe,
+              notes: maybe,
+            })
+            .strict(),
+        ),
+        diagrams: z.array(
+          z.object({ name: z.string(), instructions: maybe }).strict(),
+        ),
+      })
+      .strict(),
+  })
+  .strict();
 export const artifactSchema = z
   .object({
     fingerprint: hash,
@@ -43,6 +126,7 @@ export const artifactSchema = z
       "training",
       "nowsta_event_timesheet",
       "kitchen_shift",
+      "diagram",
       "unknown",
     ]),
     parserVersion: text,
@@ -177,6 +261,7 @@ export const snapshotSchema = z
         .strict(),
     ),
     stage,
+    native: nativeSchema.optional(),
   })
   .strict();
 export function validateSnapshot(input: unknown): EventPacketSnapshot {
@@ -260,6 +345,7 @@ export function validateSnapshot(input: unknown): EventPacketSnapshot {
   for (const issue of packet.issues)
     if (
       issue.status === "resolved" &&
+      !nativelyAnswered(issue.key, packet.facts) &&
       !packet.resolutions.some(
         (r) =>
           r.issueId === issue.id &&

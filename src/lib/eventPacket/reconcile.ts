@@ -13,6 +13,7 @@ import {
   requirements,
   sectionFor,
   matchesRequired,
+  nativelyAnswered,
 } from "./requirements";
 const hash = (v: unknown) =>
   fingerprintBytes(new TextEncoder().encode(canonicalJson(v)));
@@ -134,26 +135,28 @@ export function readiness(
       ) &&
     requirements
       .filter((r) => !section || r.section === section)
-      .every((r) =>
-        snapshot.issues.some(
-          (i) =>
-            i.key === r.key &&
-            i.status === "resolved" &&
-            snapshot.resolutions.some(
-              (d) =>
-                d.issueId === i.id &&
-                d.evidenceFingerprint === i.evidenceFingerprint &&
-                snapshot.checklistVerifications.some(
-                  (c) =>
-                    c.checkKey === r.key &&
-                    c.actor === d.actor &&
-                    c.at === d.at &&
-                    (c.answer === "yes" ||
-                      (c.answer === "not_applicable" &&
-                        canMarkNotApplicable(r, snapshot))),
-                ),
-            ),
-        ),
+      .every(
+        (r) =>
+          nativelyAnswered(r.key, snapshot.facts) ||
+          snapshot.issues.some(
+            (i) =>
+              i.key === r.key &&
+              i.status === "resolved" &&
+              snapshot.resolutions.some(
+                (d) =>
+                  d.issueId === i.id &&
+                  d.evidenceFingerprint === i.evidenceFingerprint &&
+                  snapshot.checklistVerifications.some(
+                    (c) =>
+                      c.checkKey === r.key &&
+                      c.actor === d.actor &&
+                      c.at === d.at &&
+                      (c.answer === "yes" ||
+                        (c.answer === "not_applicable" &&
+                          canMarkNotApplicable(r, snapshot))),
+                  ),
+              ),
+          ),
       ) &&
     !snapshot.issues.some(
       (i) =>
@@ -356,14 +359,16 @@ export async function reconcile(
     const check = snapshot.checklistVerifications.find(
       (c) => c.checkKey === r.key,
     );
+    const byNative = nativelyAnswered(r.key, facts);
     const resolved =
-      !!resolution &&
-      !!check &&
-      resolution.actor === check.actor &&
-      resolution.at === check.at &&
-      (check.answer === "yes" ||
-        (check.answer === "not_applicable" &&
-          canMarkNotApplicable(r, snapshot)));
+      byNative ||
+      (!!resolution &&
+        !!check &&
+        resolution.actor === check.actor &&
+        resolution.at === check.at &&
+        (check.answer === "yes" ||
+          (check.answer === "not_applicable" &&
+            canMarkNotApplicable(r, snapshot))));
     const relevant = checkObservations(r.key, r.section, snapshot.observations);
     const context = [
       "check.timeline.load-travel",
@@ -396,11 +401,13 @@ export async function reconcile(
       section: r.section,
       printSection: r.printSection,
       owner: r.owner,
-      message: r.message + (context ? " — " + context : ""),
+      message: byNative
+        ? "Capsule prints this report from the event's own records; no upload needed"
+        : r.message + (context ? " — " + context : ""),
       status: resolved ? "resolved" : "open",
       evidence: uniqueEvidence(relevant),
       evidenceFingerprint,
-      ...(resolved ? { verifiedAt: resolution!.at } : {}),
+      ...(resolved && resolution ? { verifiedAt: resolution.at } : {}),
     });
   }
   // Keep retired issues for audit references; no historical resolution becomes dangling.

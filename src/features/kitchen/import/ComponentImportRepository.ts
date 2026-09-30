@@ -15,6 +15,7 @@ import type {
   ReviewIngredientLine,
 } from "./ComponentImportTypes";
 import { reviewIsReady } from "./ComponentImportTypes";
+import { stripSubrecipeMarker } from "./ComponentTextParser";
 import type { UnitOfMeasure } from "./UnitOfMeasureMapper";
 import { SourceFingerprint } from "./SourceFingerprint";
 
@@ -61,6 +62,7 @@ export interface CreateComponentImportReviewRequest {
     match?: {
       matchStatus: IngredientMatchStatus;
       matchedIngredientId?: string;
+      matchedComponentId?: string;
       possibleMatchIngredientIds?: string[];
     };
   }[];
@@ -74,6 +76,8 @@ function durableMatch(line: ReviewIngredientLine) {
       line.matchStatus === "exact" || line.matchStatus === "confirmed_existing"
         ? line.matchedIngredientId
         : undefined,
+    matchedComponentId:
+      line.matchStatus === "subrecipe" ? line.matchedComponentId : undefined,
     possibleMatchIngredientIds:
       line.matchStatus === "possible" ? line.possibleMatchIds : undefined,
   };
@@ -151,6 +155,7 @@ export interface StoredComponentImportLineRow {
   preparationNote?: string | null;
   matchStatus: string;
   matchedIngredientId?: string | null;
+  matchedComponentId?: string | null;
 }
 
 const MATCH_STATUSES: ReadonlySet<string> = new Set([
@@ -160,6 +165,7 @@ const MATCH_STATUSES: ReadonlySet<string> = new Set([
   "new",
   "confirmed_existing",
   "confirmed_new",
+  "subrecipe",
 ]);
 
 /**
@@ -200,6 +206,12 @@ export function mapStoredReview(
         ? line.matchStatus
         : "unresolved") as ReviewIngredientLine["matchStatus"],
       matchedIngredientId: line.matchedIngredientId ?? undefined,
+      matchedComponentId: line.matchedComponentId ?? undefined,
+      // The source line still carries any "see recipe" marker, so a marked
+      // line that is not linked yet reopens as a sub-recipe to link.
+      subrecipeHint:
+        line.matchStatus === "subrecipe" ||
+        stripSubrecipeMarker(line.sourceLine).hint,
       possibleMatchIds: [],
       possibleMatchNames: [],
       createNew: line.matchStatus === "confirmed_new",
@@ -237,8 +249,10 @@ export interface SaveComponentImportReviewRequest {
         | "possible"
         | "new"
         | "confirmed_existing"
-        | "confirmed_new";
+        | "confirmed_new"
+        | "subrecipe";
       matchedIngredientId?: string;
+      matchedComponentId?: string;
       possibleMatchIngredientIds?: string[];
     };
   }[];

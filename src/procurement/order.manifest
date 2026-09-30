@@ -165,18 +165,20 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Tax and shipping are what the buyer types from the vendor's bill. The
+  // subtotal is never typed: it stays the sum of the order lines that the
+  // line reactions keep (syncLineTotals), so a typed subtotal cannot slip an
+  // order under the spend-approval limit (AC-372).
   command updateTotals(
-    subtotal: money(12, 2),
     taxAmount: money(12, 2),
     shippingAmount: money(12, 2)
   ) {
     guard self.openedAt != null
     guard self.status == "draft" or self.status == "submitted"
     guard self.deletedAt == null
-    constraint totalsNonnegative: subtotal >= 0 and taxAmount >= 0 and shippingAmount >= 0 "Order money amounts can't be negative. Use zero or more."
+    constraint totalsNonnegative: taxAmount >= 0 and shippingAmount >= 0 "Order money amounts can't be negative. Use zero or more."
     compute previousTotal = self.totalAmount
-    compute nextTotal = subtotal + taxAmount + shippingAmount
-    mutate subtotal = subtotal
+    compute nextTotal = self.subtotal + taxAmount + shippingAmount
     mutate taxAmount = taxAmount
     mutate shippingAmount = shippingAmount
     mutate totalAmount = nextTotal
@@ -186,7 +188,7 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
       vendorId: self.vendorId
       eventId: self.eventId
       previousTotalAmount: previousTotal
-      subtotal: subtotal
+      subtotal: self.subtotal
       taxAmount: taxAmount
       shippingAmount: shippingAmount
       totalAmount: nextTotal
@@ -203,8 +205,9 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   // (Re-deriving the sum from self.lines inside this command — no param at
   // all — is blocked at Manifest 3.6.45: the Convex projection only preloads
   // hasMany for count_of, and sum(self.lines, …) in a command body
-  // fail-closes with a denying throw.)
-  command syncLineTotals(lineSubtotal: money(12, 2)) {
+  // fail-closes with a denying throw.) Server-only (private): only the line
+  // reactions below run it, so no person can send a lineSubtotal (AC-372).
+  private command syncLineTotals(lineSubtotal: money(12, 2)) {
     guard self.deletedAt == null
     guard self.status == "draft" or self.status == "submitted"
     constraint syncLineSubtotalNonnegative: lineSubtotal >= 0 "Order money amounts can't be negative. Use zero or more."
@@ -468,6 +471,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   belongsTo ingredientDemand: IngredientDemand fields [tenantId, ingredientDemandId] references [tenantId, id]
   belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
   hasMany demandLinks: VendorOrderLineDemand
+  hasMany receiptLots: InventoryLot
 
   computed lineTotal: money(12, 2) = self.orderedQuantity * self.unitCost
   computed remainingQuantity: decimal(12, 4) = self.orderedQuantity - self.receivedQuantity
@@ -679,12 +683,16 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     unitPrice: money(12, 2),
     supplierLotNumber: string,
     optional discrepancyQuantity: decimal(12, 4),
-    optional discrepancyNotes: string
+    optional discrepancyNotes: string,
+    optional deliveryReference: string
   ) {
     guard self.addedAt != null
     guard self.status == "added" or self.status == "receiving"
     guard self.deletedAt == null
     guard self.vendorOrder != null and (self.vendorOrder.status == "confirmed" or self.vendorOrder.status == "partially_received")
+    // The vendor's delivery slip identifies one delivery. Sending the same slip
+    // again (a retry, or a second person) never counts it twice.
+    constraint receiptDeliveryNotRepeated: deliveryReference == null or count_of(self.receiptLots, (lot) => lot.deletedAt == null and lot.deliveryReference == deliveryReference) == 0 "This delivery slip is already counted on this line. To change the count, fix the received count instead."
     constraint receiptLocationMatch: self.locationId == null or locationId == self.locationId "This receipt is for a different location. Pick the location already set on this line."
     constraint receiptQuantityPositive: quantity > 0 "This order line's received amount has to be more than zero. Enter how much arrived."
     constraint receiptNotOver: self.receivedQuantity + quantity <= self.orderedQuantity "This order line can't receive more than was ordered. Enter a smaller amount."
@@ -713,6 +721,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
       eventId: self.vendorOrder.eventId
       locationId: locationId
       supplierLotNumber: supplierLotNumber
+      deliveryReference: deliveryReference
       previousReceivedQuantity: previousReceived
       receivedQuantity: nextReceived
       receiptQuantity: quantity
@@ -825,6 +834,8 @@ entity InventoryLot mixin TenantScoped, SoftDeletable {
   versionProperty version: number
 
   property indexed required supplierLotNumber: string = ""
+  // The vendor's delivery slip number, when the receiver typed one.
+  property deliveryReference: string?
   property indexed required vendorOrderLineId: uuid
   property required vendorOrderId: uuid
   property indexed required vendorId: uuid
@@ -865,9 +876,10 @@ entity InventoryLot mixin TenantScoped, SoftDeletable {
     receiptQuantity: decimal(12, 4),
     cumulativeReceivedQuantity: decimal(12, 4),
     unit: UnitOfMeasure,
-    unitCost: money(12, 2)
+    unitCost: money(12, 2),
+    optional deliveryReference: string
   ) {
-    guard self.receivedAt == null or (self.supplierLotNumber == supplierLotNumber and self.vendorOrderLineId == vendorOrderLineId and self.vendorOrderId == vendorOrderId and self.vendorId == vendorId and self.ingredientId == ingredientId and self.ingredientDemandId == ingredientDemandId and self.eventId == eventId and self.locationId == locationId and self.receiptQuantity == receiptQuantity and self.cumulativeReceivedQuantity == cumulativeReceivedQuantity and self.unit == unit and self.unitCost == unitCost)
+    guard self.receivedAt == null or (self.supplierLotNumber == supplierLotNumber and self.deliveryReference == deliveryReference and self.vendorOrderLineId == vendorOrderLineId and self.vendorOrderId == vendorOrderId and self.vendorId == vendorId and self.ingredientId == ingredientId and self.ingredientDemandId == ingredientDemandId and self.eventId == eventId and self.locationId == locationId and self.receiptQuantity == receiptQuantity and self.cumulativeReceivedQuantity == cumulativeReceivedQuantity and self.unit == unit and self.unitCost == unitCost)
     guard self.deletedAt == null
     constraint recordInventoryLotNumberRequired: length(trim(supplierLotNumber)) > 0 "Enter the supplier's lot number so this delivery can be traced."
     constraint recordInventoryLotReceiptPositive: receiptQuantity > 0 "This receipt's quantity has to be more than zero."
@@ -886,6 +898,7 @@ entity InventoryLot mixin TenantScoped, SoftDeletable {
     mutate cumulativeReceivedQuantity = cumulativeReceivedQuantity
     mutate unit = unit
     mutate unitCost = unitCost
+    mutate deliveryReference = deliveryReference
     mutate receivedAt = self.receivedAt == null ? now() : self.receivedAt
     emit InventoryLotStockRecorded {
       tenantId: self.tenantId
@@ -1322,6 +1335,7 @@ event VendorOrderLineReceived: "vendor_order_line.received" {
   eventId: string?
   locationId: string
   supplierLotNumber: string
+  deliveryReference: string?
   previousReceivedQuantity: decimal(12, 4)
   receivedQuantity: decimal(12, 4)
   receiptQuantity: decimal(12, 4)
@@ -1468,6 +1482,7 @@ on VendorOrderLineReceived run InventoryLot.record
     cumulativeReceivedQuantity: payload.receivedQuantity
     unit: payload.unit
     unitCost: payload.unitCost
+    deliveryReference: payload.deliveryReference
   }
 
 on VendorOrderLineReceiptCorrected run ReceiptCorrection.record

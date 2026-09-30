@@ -34,6 +34,9 @@ entity ProposalTemplate mixin TenantScoped, SoftDeletable {
 
   // Section visibility configuration (JSON array of section IDs to show)
   property visibleSections: list<string> = []
+  // PL-PROPOSAL-DRAFT (AC-259/AC-096): the order staff put the sections in.
+  // Empty = the standard order, so templates saved before this keep their look.
+  property sectionOrder: list<string> = []
 
   // Default proposal content
   property defaultTerms: string?
@@ -79,7 +82,8 @@ entity ProposalTemplate mixin TenantScoped, SoftDeletable {
     optional defaultNotes: string,
     optional defaultTaxRate: decimal(7, 4),
     optional defaultServiceChargePercent: decimal(7, 4),
-    optional validityDays: int
+    optional validityDays: int,
+    optional sectionOrder: list<string>
   ) {
     guard self.definedAt == null
     guard self.deletedAt == null
@@ -91,6 +95,7 @@ entity ProposalTemplate mixin TenantScoped, SoftDeletable {
     mutate name = name
     mutate description = description
     mutate visibleSections = visibleSections != null ? visibleSections : []
+    mutate sectionOrder = sectionOrder != null ? sectionOrder : []
     mutate defaultTerms = defaultTerms
     mutate defaultNotes = defaultNotes
     mutate defaultTaxRate = defaultTaxRate
@@ -114,7 +119,8 @@ entity ProposalTemplate mixin TenantScoped, SoftDeletable {
     optional defaultNotes: string,
     optional defaultTaxRate: decimal(7, 4),
     optional defaultServiceChargePercent: decimal(7, 4),
-    optional validityDays: int
+    optional validityDays: int,
+    optional sectionOrder: list<string>
   ) {
     guard self.definedAt != null
     guard self.status == "active"
@@ -127,6 +133,7 @@ entity ProposalTemplate mixin TenantScoped, SoftDeletable {
     mutate name = name
     mutate description = description
     mutate visibleSections = visibleSections != null ? visibleSections : self.visibleSections
+    mutate sectionOrder = sectionOrder != null ? sectionOrder : self.sectionOrder
     mutate defaultTerms = defaultTerms != null ? defaultTerms : self.defaultTerms
     mutate defaultNotes = defaultNotes != null ? defaultNotes : self.defaultNotes
     mutate defaultTaxRate = defaultTaxRate

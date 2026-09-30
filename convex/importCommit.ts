@@ -115,7 +115,10 @@ import {
   type TppVenueRecord,
 } from "./tppParser";
 import type { Doc, Id } from "./_generated/dataModel";
+import { FINANCIAL_ROW_LABEL } from "../src/lib/financialRowClass";
 import { buildLinkKey } from "./lib/culinaryModel/importMapping";
+import { SERVICE_STYLE_RECORD_TYPE } from "./importServiceStyle";
+import { commitStockRows } from "./openingStock";
 
 /**
  * Canonical ExternalRecordLink key for an import-commit identity. Commit links
@@ -282,6 +285,15 @@ export const countRunLinks = internalQuery({
     };
   },
 });
+
+/**
+ * AC-271: a link keeps the normalized record (read back by later datasets,
+ * e.g. events → contact name) AND the input row exactly as received, under
+ * its own `sourceRow` key, so raw source stays apart from the interpretation.
+ */
+function withSourceRow(normalized: object, sourceRow: unknown): string {
+  return JSON.stringify({ ...normalized, sourceRow: sourceRow ?? null });
+}
 
 /** Insert or update the link for a (tenant, source, recordType, externalId) key. */
 export const upsertLink = internalMutation({
@@ -629,6 +641,20 @@ export const commitImportRun = action({
       });
     };
 
+    // PL-ARCHIVE: a report-archive run with no rows to bring in finishes on
+    // accounting alone. ImportRun_commit still refuses until every file is
+    // accounted for and any report-list gap is explained; finishing creates
+    // no records, and the run keeps each file's outcome visible.
+    if (args.rawRows.length === 0 && importRun.archiveStorageId) {
+      const none = { committed: 0, skipped: 0, pending: 0 };
+      await completeRun(none);
+      return {
+        ...none,
+        parseErrors: 0,
+        processedCount: mergeCheckpoint(checkpoint, none).processedCount,
+      };
+    }
+
     // ponytail: a TPP contact (a person we cater for) → a person-type Client
     // account. We deliberately do NOT create a ClientContact here: that entity
     // requires a parent clientId (the TPP CompanyID → Capsule Client resolution
@@ -686,7 +712,7 @@ export const commitImportRun = action({
           continue;
         }
 
-        const idempotencyKey = `import:${args.importRunId}:contact:${contact.externalId}`;
+        const idempotencyKey = `tenant-shared/import:${args.importRunId}:contact:${contact.externalId}`;
         const notes =
           [contact.title, contact.notes].filter(Boolean).join(" — ") ||
           undefined;
@@ -712,7 +738,10 @@ export const commitImportRun = action({
             capsuleEntity: "client",
             capsuleId: clientId,
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(contact),
+            rawSourceData: withSourceRow(
+              contact,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "resolved",
           });
           committed += 1;
@@ -730,7 +759,10 @@ export const commitImportRun = action({
             capsuleEntity: "client",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(contact),
+            rawSourceData: withSourceRow(
+              contact,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
           });
@@ -831,7 +863,10 @@ export const commitImportRun = action({
             capsuleEntity: "event_record",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(event),
+            rawSourceData: withSourceRow(
+              event,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: `Client not imported (external ${event.clientId}); import contacts first.`,
           });
@@ -886,7 +921,10 @@ export const commitImportRun = action({
             capsuleEntity: "event_record",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(event),
+            rawSourceData: withSourceRow(
+              event,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: "Event is missing a start date (EventDate).",
           });
@@ -901,7 +939,17 @@ export const commitImportRun = action({
         const budgetAmount = Math.max(0, event.budgetAmount ?? 0);
         const quotedPrice = Math.max(0, event.quotedRevenue ?? 0);
 
-        const idempotencyKey = `import:${args.importRunId}:event:${event.externalId}`;
+        // Service style (AC-064): use the matching Capsule style; an unknown
+        // one never blocks the event — it waits on the matching screen.
+        const styleMatch = event.serviceStyleId
+          ? await ctx.runQuery(internal.importServiceStyle.matchServiceStyle, {
+              tenantId,
+              sourceSystem,
+              code: event.serviceStyleId,
+            })
+          : null;
+
+        const idempotencyKey = `tenant-shared/import:${args.importRunId}:event:${event.externalId}`;
         try {
           const created = await ctx.runMutation(
             api.mutations.Event_createViaPlanEngagement,
@@ -916,6 +964,8 @@ export const commitImportRun = action({
               budgetAmount,
               quotedPrice,
               venueId,
+              serviceStyleId: styleMatch?._id,
+              serviceStyleName: styleMatch?.name,
               venueName: event.venueName,
               venueAddress: event.venueAddress,
               accessibilityNeeds: event.accessibilityNeeds,
@@ -933,7 +983,10 @@ export const commitImportRun = action({
             capsuleEntity: "event_record",
             capsuleId: eventId,
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(event),
+            rawSourceData: withSourceRow(
+              event,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "resolved",
           });
           committed += 1;
@@ -952,11 +1005,32 @@ export const commitImportRun = action({
             capsuleEntity: "event_record",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(event),
+            rawSourceData: withSourceRow(
+              event,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
           });
           pending += 1;
+        }
+        // One matching-screen item per unknown old style; the event itself
+        // imports either way.
+        if (event.serviceStyleId && !styleMatch) {
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: SERVICE_STYLE_RECORD_TYPE,
+            externalId: event.serviceStyleId,
+            capsuleEntity: SERVICE_STYLE_RECORD_TYPE,
+            capsuleId: "",
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify({
+              serviceStyle: event.serviceStyleId,
+            }),
+            conflictStatus: "pending_conflict",
+            resolutionNote: `Service style "${event.serviceStyleId.replace(/_/g, " ")}" is not in your service styles. Match it to one; the imported events that use it get that style.`,
+          });
         }
       }
 
@@ -1039,7 +1113,7 @@ export const commitImportRun = action({
         // hardcodes stage "new" with no stage arg). Linking the lead to a
         // Capsule Client is the conversion workflow (stageConversion →
         // confirmConversion), a separate operator action.
-        const idempotencyKey = `import:${args.importRunId}:lead:${lead.externalId}`;
+        const idempotencyKey = `tenant-shared/import:${args.importRunId}:lead:${lead.externalId}`;
         const notes =
           [
             lead.stage !== "new" ? `TPP stage: ${lead.stage}` : null,
@@ -1069,7 +1143,10 @@ export const commitImportRun = action({
             capsuleEntity: "lead",
             capsuleId: leadId,
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(lead),
+            rawSourceData: withSourceRow(
+              lead,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "resolved",
           });
           committed += 1;
@@ -1087,7 +1164,10 @@ export const commitImportRun = action({
             capsuleEntity: "lead",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(lead),
+            rawSourceData: withSourceRow(
+              lead,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
           });
@@ -1201,8 +1281,30 @@ export const commitImportRun = action({
             resolvedEventNote = `external event ${payment.eventId} (imported but unresolved)`;
           }
         }
+        // AC-084: only money moving on its own waits for a match; the same
+        // accounting transaction seen in an overlapping report counts once.
+        let sameMoneyAs: string | null = null;
+        if (payment.movesMoney && payment.providerTransactionId) {
+          const counted = await ctx.runQuery(internal.importCommit.findLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "payment_transaction",
+            externalId: payment.providerTransactionId,
+          });
+          const countedAs = counted
+            ? (JSON.parse(counted.rawSourceData ?? "{}").paymentId as string)
+            : null;
+          if (countedAs && countedAs !== payment.externalId)
+            sameMoneyAs = countedAs;
+        }
+        const waitsForMatch = payment.movesMoney && !sameMoneyAs;
+        const label = FINANCIAL_ROW_LABEL[payment.rowClass];
         const note = [
-          "Imported TPP payment — reconciliation reference (match via markMatched on a Capsule payment)",
+          sameMoneyAs
+            ? `Same money as payment ${sameMoneyAs} (same accounting transaction ${payment.providerTransactionId}) — counted once, kept for the record`
+            : waitsForMatch
+              ? `Imported TPP ${label} — reconciliation reference (match via markMatched on a Capsule payment)`
+              : `Imported TPP ${label} — reference only, not money of its own, not counted`,
           payment.invoiceId
             ? `external invoice ${payment.invoiceId} (no invoice import)`
             : null,
@@ -1215,6 +1317,21 @@ export const commitImportRun = action({
           .filter(Boolean)
           .join(" — ");
 
+        // The transaction marker goes first: a run that stops between the
+        // two writes resumes to the same result.
+        if (waitsForMatch && payment.providerTransactionId)
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "payment_transaction",
+            externalId: payment.providerTransactionId,
+            capsuleEntity: "payment",
+            capsuleId: "",
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify({ paymentId: payment.externalId }),
+            conflictStatus: "resolved",
+            resolutionNote: `Accounting transaction counted once, as payment ${payment.externalId}`,
+          });
         await ctx.runMutation(internal.importCommit.upsertLink, {
           tenantId,
           sourceSystem,
@@ -1223,8 +1340,11 @@ export const commitImportRun = action({
           capsuleEntity: "payment",
           capsuleId: "",
           sourceImportRunId: args.importRunId,
-          rawSourceData: JSON.stringify(payment),
-          conflictStatus: "pending_conflict",
+          rawSourceData: withSourceRow(
+            payment,
+            args.rawRows[parsed.sourceIndexes[index]!],
+          ),
+          conflictStatus: waitsForMatch ? "pending_conflict" : "resolved",
           resolutionNote: note,
         });
         committed += 1;
@@ -1314,7 +1434,7 @@ export const commitImportRun = action({
           continue;
         }
 
-        const idempotencyKey = `import:${args.importRunId}:menu:${menu.externalId}`;
+        const idempotencyKey = `tenant-shared/import:${args.importRunId}:menu:${menu.externalId}`;
         try {
           const created = await ctx.runMutation(
             api.mutations.Dish_createViaIntroduce,
@@ -1339,7 +1459,10 @@ export const commitImportRun = action({
             capsuleEntity: "menu",
             capsuleId: dishId,
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(menu),
+            rawSourceData: withSourceRow(
+              menu,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "resolved",
           });
           committed += 1;
@@ -1357,7 +1480,10 @@ export const commitImportRun = action({
             capsuleEntity: "menu",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(menu),
+            rawSourceData: withSourceRow(
+              menu,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
           });
@@ -1468,7 +1594,10 @@ export const commitImportRun = action({
             capsuleEntity: "pack_list",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(packList),
+            rawSourceData: withSourceRow(
+              packList,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: `Source event not imported (external ${packList.sourceEventId}); import events first.`,
           });
@@ -1477,7 +1606,7 @@ export const commitImportRun = action({
         }
         const eventId: string = eventLink.capsuleId;
 
-        const idempotencyKey = `import:${args.importRunId}:pack_list:${packList.externalId}`;
+        const idempotencyKey = `tenant-shared/import:${args.importRunId}:pack_list:${packList.externalId}`;
         try {
           const created = await ctx.runMutation(
             api.mutations.PackList_createViaOpen,
@@ -1510,7 +1639,7 @@ export const commitImportRun = action({
                   // §6.3 idempotent-import requirement. Run-scoped to match the
                   // PackList/Dish create-key convention; cross-run dedup is the
                   // pack-list link check's job (findLink above).
-                  idempotencyKey: `import:${args.importRunId}:pack_list:${packList.externalId}:item:${itemIndex}`,
+                  idempotencyKey: `tenant-shared/import:${args.importRunId}:pack_list:${packList.externalId}:item:${itemIndex}`,
                 },
               );
               itemsAdded += 1;
@@ -1551,7 +1680,10 @@ export const commitImportRun = action({
             capsuleEntity: "pack_list",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(packList),
+            rawSourceData: withSourceRow(
+              packList,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
           });
@@ -1582,8 +1714,37 @@ export const commitImportRun = action({
       };
     }
 
+    if (importRun.datasetType === "stock") {
+      // Opening stock count sheets (PL-OPENING-STOCK): each row is staged as
+      // an OpeningStockRecord for review; on-hand stock is never written here.
+      if (args.rawRows.length === 0) {
+        throw new ConvexError("No source rows provided — nothing to commit.");
+      }
+      const result = await commitStockRows(ctx, {
+        importRunId: args.importRunId,
+        tenantId,
+        sourceSystem: importRun.sourceSystem,
+        rawRows: args.rawRows,
+        maxRecords: args.maxRecords,
+      });
+      const invocation = {
+        committed: result.committed,
+        skipped: result.skipped,
+        pending: result.pending,
+      };
+      if (result.stoppedEarly) {
+        return await stopEarly(result.parseErrors, invocation);
+      }
+      await completeRun(invocation);
+      return {
+        ...invocation,
+        parseErrors: result.parseErrors,
+        processedCount: mergeCheckpoint(checkpoint, invocation).processedCount,
+      };
+    }
+
     // ImportDatasetType is a closed union (contacts/events/leads/payments/menus/
-    // pack_list/venues); the six branches above each return, so TS narrows
+    // pack_list/stock/venues); the seven branches above each return, so TS narrows
     // importRun.datasetType to "venues" here — this fall-through is exhaustive.
     // A future member added without a branch would fall through to venue parsing
     // and fail loudly ("No valid venue records parsed") rather than misroute.
@@ -1635,7 +1796,7 @@ export const commitImportRun = action({
         continue;
       }
 
-      const idempotencyKey = `import:${args.importRunId}:venue:${venue.externalId}`;
+      const idempotencyKey = `tenant-shared/import:${args.importRunId}:venue:${venue.externalId}`;
       try {
         const created = await ctx.runMutation(
           api.mutations.Venue_createViaRegister,
@@ -1664,7 +1825,10 @@ export const commitImportRun = action({
           capsuleEntity: "venue",
           capsuleId: venueId,
           sourceImportRunId: args.importRunId,
-          rawSourceData: JSON.stringify(venue),
+          rawSourceData: withSourceRow(
+            venue,
+            args.rawRows[parsed.sourceIndexes[index]!],
+          ),
           conflictStatus: "resolved",
         });
         committed += 1;
@@ -1682,7 +1846,10 @@ export const commitImportRun = action({
           capsuleEntity: "venue",
           capsuleId: "",
           sourceImportRunId: args.importRunId,
-          rawSourceData: JSON.stringify(venue),
+          rawSourceData: withSourceRow(
+            venue,
+            args.rawRows[parsed.sourceIndexes[index]!],
+          ),
           conflictStatus: "pending_conflict",
           resolutionNote: note,
         });

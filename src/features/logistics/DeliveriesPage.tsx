@@ -191,15 +191,33 @@ export function DeliveriesPage() {
         });
         return;
       }
+      if (key === "confirmDelivery") {
+        const values = await prompt.askFields({
+          title: "Delivered",
+          description: "Say who took it at the venue, if someone did.",
+          confirmLabel: "Confirm delivery",
+          fields: [
+            { name: "receivedBy", label: "Taken by", required: false },
+            { name: "note", label: "Note", required: false },
+          ],
+        });
+        if (!values) return;
+        void run(`${row._id}:${key}`, async () => {
+          await confirmDelivery({
+            docId: row._id,
+            version: row.version,
+            receivedByName: values.receivedBy?.trim() || undefined,
+            note: values.note?.trim() || undefined,
+          });
+          setNotice("Delivery confirmed.");
+        });
+        return;
+      }
       void run(`${row._id}:${key}`, async () => {
         const args = { docId: row._id, version: row.version };
         if (key === "startTransit") {
           await startTransit(args);
           setNotice("Delivery is on the way.");
-        }
-        if (key === "confirmDelivery") {
-          await confirmDelivery(args);
-          setNotice("Delivery confirmed.");
         }
       });
     })();
@@ -489,6 +507,23 @@ export function DeliveriesPage() {
                         <StatusChip status={String(row.status)} />
                         {row.failureReason ? (
                           <small>{row.failureReason}</small>
+                        ) : null}
+                        {row.departedByPersonId ? (
+                          <small>
+                            Left with {personName(row.departedByPersonId)}
+                          </small>
+                        ) : null}
+                        {row.deliveredAt ? (
+                          <small>
+                            Handed over by{" "}
+                            {row.deliveredByPersonId
+                              ? personName(row.deliveredByPersonId)
+                              : "the office"}
+                            {row.receivedByName
+                              ? `, taken by ${row.receivedByName}`
+                              : ""}
+                            {row.deliveryNote ? `. ${row.deliveryNote}` : ""}
+                          </small>
                         ) : null}
                       </td>
                       <td>

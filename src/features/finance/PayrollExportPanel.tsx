@@ -58,6 +58,9 @@ export function PayrollExportPanel({
   const missingNumberNames = (document?.rows ?? [])
     .filter((row) => row.missingEmployeeNumber)
     .map((row) => row.employeeName);
+  // Payroll receipts (who was sent what, revision by revision) are held back
+  // until they record the exact time entries each file carried in one saved
+  // step (release review 2026-09-29). The download itself is unchanged.
   const downloadDisabled = loading || !payrollCsvDownloadAllowed(document);
 
   const downloadExport = () => {
@@ -70,8 +73,11 @@ export function PayrollExportPanel({
     link.download = document.filename;
     link.click();
     window.setTimeout(() => URL.revokeObjectURL(url), 0);
+    const label =
+      PAYROLL_PROCESSORS.find((item) => item.value === processor)?.label ??
+      processor;
     onNotice(
-      `${document.rows.length} payroll row${document.rows.length === 1 ? "" : "s"} exported for ${PAYROLL_PROCESSORS.find((item) => item.value === processor)?.label ?? processor}.`,
+      `${document.rows.length} payroll row${document.rows.length === 1 ? "" : "s"} exported for ${label}.`,
     );
   };
 
@@ -96,9 +102,10 @@ export function PayrollExportPanel({
         </button>
       </div>
       <p className="text-base text-ink-2">
-        Completed time entries supply clocked hours. A finalized payroll input
-        becomes the reviewed total for that person and period; its difference
-        from clocked time is shown as the manual adjustment.
+        Approved time entries supply clocked hours (unpaid lunch taken off, paid
+        breaks kept). A finalized payroll input becomes the reviewed total for
+        that person and period; its difference from clocked time is shown as the
+        manual adjustment.
       </p>
       <div className="supply-form-grid mt-3">
         <label className="field-label">
@@ -188,12 +195,22 @@ function PayrollExportPreview({
           {`CSV download is off until every employee has a payroll employee number — missing for ${missingNumberNames.join(", ")}. Type the number next to their name below. Raw Capsule IDs are never sent to a payroll processor.`}
         </p>
       ) : null}
+      {document.payPrepNames.length > 0 ? (
+        <p className="mb-3 text-sm text-warn" role="status">
+          {`Check overtime: ${document.payPrepNames.join(", ")} worked over 40 hours in a week. This file lists their clocked hours as regular until you prepare their pay with the overtime split your payroll rules use.`}
+        </p>
+      ) : null}
+      {document.waitingOnlyNames.length > 0 ? (
+        <p className="mb-3 text-sm text-warn" role="status">
+          {`Time waiting for approval is not in this export: ${document.waitingOnlyNames.join(", ")}. Approve it on the time sheet to include it.`}
+        </p>
+      ) : null}
       {document.rows.length === 0 ? (
         <div className="document-empty">
           <p>No payroll-ready data in this period.</p>
           <span>
-            Close time entries or finalize payroll inputs, then refresh this pay
-            period.
+            Approve time entries on the time sheet or finalize payroll inputs,
+            then refresh this pay period.
           </span>
         </div>
       ) : (
@@ -222,6 +239,11 @@ function PayrollExportPreview({
                       {missingRate(row.personId) ? (
                         <small className="text-warn">No hourly rate set</small>
                       ) : null}
+                      {row.warnings.map((warning) => (
+                        <small key={warning} className="block text-warn">
+                          {warning}
+                        </small>
+                      ))}
                       {row.missingEmployeeNumber ? (
                         <PersonEmployeeNumberField
                           personId={row.personId}

@@ -288,16 +288,16 @@ describe("runtime proof: PO lines price from catalog and the header total tracks
     );
     expect(await readLiveHeader(draft._id)).toBe(80);
 
-    // The totals command accepts a valid draft; later refusals must be
-    // lifecycle guards rather than a broken command or missing permission.
-    await proof.executeCommand(
-      procurement,
-      api.mutations.VendorOrder_syncLineTotals,
-      {
-        docId: draft._id,
-        lineSubtotal: 80,
-      },
-    );
+    // The line-total step is server-only (AC-372): a buyer who sends a
+    // lineSubtotal of their own is refused, even on a draft, and the stored
+    // header stays the line sum the reactions keep.
+    await expect(
+      proof.executeCommand(
+        procurement,
+        api.mutations.VendorOrder_syncLineTotals,
+        { docId: draft._id, lineSubtotal: 1 },
+      ),
+    ).rejects.toThrow(/can't be started by hand/);
     expect(await readLiveHeader(draft._id)).toBe(80);
 
     // Submit → confirm.
@@ -316,7 +316,7 @@ describe("runtime proof: PO lines price from catalog and the header total tracks
         api.mutations.VendorOrder_syncLineTotals,
         { docId: draft._id, lineSubtotal: 0 },
       ),
-    ).rejects.toThrow(/Guard/);
+    ).rejects.toThrow(/can't be started by hand/);
     expect(await readLiveHeader(draft._id)).toBe(80);
 
     // Record receipt at the real $6.25: the header must move from $80 to
@@ -361,7 +361,7 @@ describe("runtime proof: PO lines price from catalog and the header total tracks
           lineSubtotal: 0,
         },
       ),
-    ).rejects.toThrow(/Guard/);
+    ).rejects.toThrow(/can't be started by hand/);
     expect(await readLiveHeader(draft._id)).toBe(100);
   });
 });

@@ -3,13 +3,26 @@ import { api, type Id } from "../api";
 import { importSources } from "./importSources";
 import { prepareNativeWorkbook } from "./prepareNativeWorkbook";
 import type { EventPacketSnapshot, FieldValue } from "./model";
+import type { FinalLockPrint } from "./finalLock/evaluate";
 import type { PacketWorkbookSummary } from "./summaryProjection";
+import type { SourceProvenance } from "./sourceProvenance";
 
 export interface PacketView {
   snapshot: EventPacketSnapshot;
   currentFingerprint: string;
-  latestRevision: { id: string; fingerprint: string; stale: boolean } | null;
+  /** The Final Lock answers a print made now would show. */
+  finalLock: FinalLockPrint;
+  finalLockFingerprint: string;
+  latestRevision: {
+    id: string;
+    fingerprint: string;
+    stale: boolean;
+    /** Packet parts that changed since that print (empty for old prints). */
+    staleSections?: string[];
+  } | null;
   nativeTargets?: Record<string, { id: string; label: string }[]>;
+  /** Kept source files with who uploaded them, when, and their checksum. */
+  sources?: SourceProvenance[];
 }
 export interface PacketDecision {
   issueId: string;
@@ -50,6 +63,7 @@ export function useEventPacket(eventId: Id<"events">) {
     name: string;
     purpose: "source" | "pdf" | "snapshot";
     inputFingerprint?: string;
+    finalLockFingerprint?: string;
   }) => {
     const uploadUrl = await generateUploadUrl({ eventId });
     const response = await fetch(uploadUrl, {
@@ -69,6 +83,7 @@ export function useEventPacket(eventId: Id<"events">) {
       mimeType: file.mimeType,
       purpose: file.purpose,
       inputFingerprint: file.inputFingerprint,
+      finalLockFingerprint: file.finalLockFingerprint,
     });
   };
   return {

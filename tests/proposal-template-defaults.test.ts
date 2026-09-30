@@ -12,6 +12,7 @@ describe("proposal template defaults", () => {
           defaultServiceChargePercent: 0.2,
           validityDays: 21,
           visibleSections: ["event_summary", "pricing_summary", "terms"],
+          sectionOrder: ["terms", "event_summary"],
         },
         1000,
         new Date("2026-09-06T12:00:00"),
@@ -22,6 +23,7 @@ describe("proposal template defaults", () => {
       expiresOn: "2026-09-27",
       taxAmount: 99,
       visibleSections: ["event_summary", "pricing_summary", "terms"],
+      sectionOrder: ["terms", "event_summary"],
       serviceChargeLine: {
         description: "Service charge",
         pricingBasis: "percentage",
@@ -41,6 +43,7 @@ describe("proposal template defaults", () => {
       expiresOn: "2026-09-20",
       taxAmount: 0,
       visibleSections: [],
+      sectionOrder: [],
       serviceChargeLine: null,
     });
   });

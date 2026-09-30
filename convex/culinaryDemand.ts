@@ -40,7 +40,16 @@ import {
   type PortionSpecLike,
   type RoundingRule,
   type RoundingScope,
+  type UnresolvedItem,
 } from "./lib/culinaryModel/demand";
+import {
+  eventFoodCost,
+  type EventFoodCost,
+  type EventFoodCostInput,
+} from "./lib/culinaryModel/eventFoodCost";
+import { observationsByIngredient } from "./lib/culinaryModel/pricing";
+import { editionInUse } from "./lib/culinaryModel/recipeEdition";
+import { withUnresolvedText } from "./lib/culinaryModel/unresolvedText";
 import {
   isUnitCode,
   type ItemUnitMappingLike,
@@ -75,12 +84,17 @@ async function byTenant<
     | "componentComponents"
     | "componentPortionSpecs"
     | "componentSteps"
+    | "componentSnapshots"
     | "dishIngredients"
     | "dishComponents"
     | "dishTasks"
     | "dishTaskMaterials"
     | "ingredients"
     | "itemUnitMappings"
+    | "ingredientPriceObservations"
+    | "wasteRecords"
+    | "eventCloseouts"
+    | "invoices"
     | "eventDishLineOverrides"
     | "prepTasks"
     | "eventDishes"
@@ -121,6 +135,7 @@ async function loadCatalog(ctx: Ctx, tenantId: string): Promise<Catalog> {
     dishTaskMaterials,
     ingredients,
     mappings,
+    priceRows,
   ] = await Promise.all([
     byTenant(ctx, "dishes", tenantId),
     byTenant(ctx, "components", tenantId),
@@ -133,7 +148,19 @@ async function loadCatalog(ctx: Ctx, tenantId: string): Promise<Catalog> {
     byTenant(ctx, "dishTaskMaterials", tenantId),
     byTenant(ctx, "ingredients", tenantId),
     byTenant(ctx, "itemUnitMappings", tenantId),
+    byTenant(ctx, "ingredientPriceObservations", tenantId),
   ]);
+  const pricesByIngredient = observationsByIngredient(
+    priceRows.map((o) => ({
+      id: String(o._id),
+      ingredientId: String(o.ingredientId),
+      vendorId: o.vendorId ? String(o.vendorId) : null,
+      vendorOrderId: o.vendorOrderId ? String(o.vendorOrderId) : null,
+      unit: unitOf(o.unit),
+      unitPrice: Number(o.unitPrice),
+      observedAt: typeof o.observedAt === "number" ? o.observedAt : null,
+    })),
+  );
   const stepCounts = new Map<string, number>();
   const steps = await byTenant(ctx, "componentSteps", tenantId);
   for (const step of steps) {
@@ -143,14 +170,58 @@ async function loadCatalog(ctx: Ctx, tenantId: string): Promise<Catalog> {
       (stepCounts.get(String(step.componentId)) ?? 0) + 1,
     );
   }
+  // A recipe taken back to draft keeps feeding events its last published
+  // edition until the draft is published (recipeEdition.ts).
+  const savedByRecipe = new Map<string, Doc<"componentSnapshots">[]>();
+  for (const row of await byTenant(ctx, "componentSnapshots", tenantId)) {
+    const list = savedByRecipe.get(String(row.componentId)) ?? [];
+    list.push(row);
+    savedByRecipe.set(String(row.componentId), list);
+  }
   const componentMap = new Map<string, ComponentLike>();
   for (const c of components) {
+    const edition = editionInUse(
+      { status: String(c.status), versionNumber: Number(c.versionNumber) },
+      (savedByRecipe.get(String(c._id)) ?? []).map((row) => ({
+        versionNumber: Number(row.versionNumber),
+        snapshot: row.snapshot,
+      })),
+    );
+    if (edition) {
+      componentMap.set(String(c._id), {
+        id: String(c._id),
+        name: c.name,
+        yieldQuantity: Number(edition.yieldQuantity),
+        yieldUnit: unitOf(edition.yieldUnit, "portion"),
+        instructions: edition.instructions || null,
+        stepCount: stepCounts.get(String(c._id)) ?? 0,
+        editionVersion: edition.versionNumber,
+        ingredientLines: edition.lines.map((l) => ({
+          id: l.id,
+          ingredientId: l.ingredientId,
+          quantity: Number(l.quantity),
+          unit: unitOf(l.unit),
+          wasteFactor: l.wasteFactor ?? 1,
+          quantityBasis: basisOf(l.quantityBasis),
+        })),
+        componentLines: edition.componentLines.map((l) => ({
+          id: l.id,
+          childComponentId: l.childComponentId,
+          quantity: Number(l.quantity),
+          unit: unitOf(l.unit),
+          wasteFactor: l.wasteFactor ?? 1,
+          quantityBasis: basisOf(l.quantityBasis),
+        })),
+      });
+      continue;
+    }
     componentMap.set(String(c._id), {
       id: String(c._id),
       name: c.name,
       yieldQuantity: Number(c.yieldQuantity ?? 0),
       yieldUnit: unitOf(c.yieldUnit, "portion"),
       instructions: c.instructions ?? null,
+      editionVersion: Number(c.versionNumber),
       stepCount: stepCounts.get(String(c._id)) ?? 0,
       ingredientLines: componentIngredients
         .filter(
@@ -186,6 +257,7 @@ async function loadCatalog(ctx: Ctx, tenantId: string): Promise<Catalog> {
         name: i.name,
         unit: unitOf(i.unit),
         costPerUnit: i.costPerUnit == null ? null : Number(i.costPerUnit),
+        observations: pricesByIngredient.get(String(i._id)) ?? [],
       },
     ]),
   );
@@ -402,7 +474,7 @@ function canReadCulinaryReports(role: string): boolean {
   );
 }
 
-function requireCulinaryReader(auth: AppAuthContext): string {
+export function requireCulinaryReader(auth: AppAuthContext): string {
   const tenantId = requireTenant(auth);
   if (!canReadCulinaryReports(auth.role)) {
     throw new Error(
@@ -485,12 +557,28 @@ async function reviewEvent(
       demand.contributions = demand.contributions.filter(
         (c) => !(c.componentPath.length && satisfied.has(c.componentPath[0])),
       );
+    demand.recipeNeeds = demand.recipeNeeds.map((need) => ({
+      ...need,
+      editionVersion:
+        catalog.lookups.components.get(need.componentId)?.editionVersion ??
+        null,
+    }));
     return {
       ...demand,
       dishName: catalog.lookups.dishes.get(ed.dishId)?.name ?? ed.dishId,
       quantityServings: ed.quantityServings,
     };
   });
+  const names = {
+    ...catalog.lookups,
+    removedNames: await removedRecordNames(
+      ctx,
+      tenantId,
+      results.flatMap((r) => r.unresolved),
+    ),
+  };
+  for (const result of results)
+    result.unresolved = withUnresolvedText(result.unresolved, names);
   const all = results.flatMap((r) => r.contributions);
   return {
     eventId: String(eventId),
@@ -500,6 +588,39 @@ async function reviewEvent(
     batchSatisfied,
     activeAllocationIds,
   };
+}
+
+/**
+ * Names of removed recipes, ingredients and dishes that unresolved items still
+ * point at (soft-deleted rows keep their name), so notices can say what went.
+ */
+async function removedRecordNames(
+  ctx: Ctx,
+  tenantId: string,
+  items: UnresolvedItem[],
+): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  for (const item of items) {
+    if (item.kind !== "missing_reference" || out.has(item.refId)) continue;
+    const row =
+      item.detail === "ingredient not found"
+        ? await getIfId(ctx, "ingredients", item.refId)
+        : item.detail === "dish not found"
+          ? await getIfId(ctx, "dishes", item.refId)
+          : await getIfId(ctx, "components", item.refId);
+    if (row && row.tenantId === tenantId && row.name)
+      out.set(item.refId, String(row.name));
+  }
+  return out;
+}
+
+async function getIfId<T extends "ingredients" | "dishes" | "components">(
+  ctx: Ctx,
+  table: T,
+  id: string,
+) {
+  const normalized = ctx.db.normalizeId(table, id);
+  return normalized ? await ctx.db.get(normalized) : null;
 }
 
 /** Full demand review for one event: contributions, recipe needs, unresolved items, purchasing totals. */
@@ -594,7 +715,11 @@ export const kitchenUnresolvedReport = query({
       const demands = eventDishes.map((ed) =>
         expandEventDish(ed, catalog.lookups),
       );
-      const unresolved = demands.flatMap((d) => d.unresolved);
+      const found = demands.flatMap((d) => d.unresolved);
+      const unresolved = withUnresolvedText(found, {
+        ...catalog.lookups,
+        removedNames: await removedRecordNames(ctx, tenantId, found),
+      });
       const purchasing = purchasingTotals(
         demands.flatMap((d) => d.contributions),
       );
@@ -624,6 +749,103 @@ export const kitchenUnresolvedReport = query({
     }
     recipes.sort((a, b) => a.name.localeCompare(b.name));
     return { events: eventRows, recipes };
+  },
+});
+
+/** Closeout read tier (financeAccess | eventManageAccess): revenue and actuals. */
+function canReadEventMoney(role: string): boolean {
+  return (
+    role === "finance_staff" ||
+    role === "manager" ||
+    role.endsWith("_manager") ||
+    role === "admin" ||
+    role === "owner" ||
+    role === "system"
+  );
+}
+
+const BILLED_INVOICE_STATUSES = new Set([
+  "sent",
+  "viewed",
+  "overdue",
+  "partial",
+  "paid",
+]);
+
+/**
+ * Event food cost: the estimate priced at the event date with its coverage,
+ * and (for money readers) the closeout actual incl. recorded waste, variance,
+ * cost per guest and food-cost % on the reporting revenue basis. Read only.
+ */
+export const eventFoodCostReport = query({
+  args: { eventId: v.id("events") },
+  handler: async (ctx, args): Promise<EventFoodCost> => {
+    const auth = await getAuthContext(ctx);
+    const tenantId = requireTenant(auth);
+    if (!canReadCulinaryReports(auth.role) && !canReadEventMoney(auth.role))
+      throw new Error(
+        "Kitchen, finance and managers may read an event's food cost",
+      );
+    const event = await requireEvent(ctx, tenantId, args.eventId);
+    const catalog = await loadCatalog(ctx, tenantId);
+    const eventDishes = await loadEventDishes(ctx, tenantId, args.eventId);
+    // Every menu amount counts, including parts a shared batch makes: the
+    // event eats that food whichever batch cooks it.
+    const demands = eventDishes.map((ed) =>
+      expandEventDish(ed, catalog.lookups),
+    );
+    const asOf = typeof event.startsAt === "number" ? event.startsAt : null;
+    const expectedHeadcount = Number(event.expectedHeadcount ?? 0);
+    let revenue: EventFoodCostInput["revenue"] = null;
+    let actual: EventFoodCostInput["actual"] = null;
+    let recordedWasteCost = 0;
+    if (canReadEventMoney(auth.role)) {
+      const closeout = (await byTenant(ctx, "eventCloseouts", tenantId)).find(
+        (c) => String(c.eventId) === String(args.eventId),
+      );
+      const finalized = closeout?.status === "finalized";
+      const ingredientCost = Number(closeout?.actualIngredientCost ?? 0);
+      // A draft seeded with $0 is not an actual yet.
+      if (closeout && (finalized || ingredientCost > 0))
+        actual = {
+          ingredientCost,
+          actualHeadcount: Number(closeout.actualHeadcount ?? 0),
+          finalized,
+        };
+      recordedWasteCost = (await byTenant(ctx, "wasteRecords", tenantId))
+        .filter(
+          (w) =>
+            String(w.eventId ?? "") === String(args.eventId) &&
+            w.status === "recorded",
+        )
+        .reduce((sum, w) => sum + Number(w.quantity) * Number(w.unitCost), 0);
+      const billed = (await byTenant(ctx, "invoices", tenantId))
+        .filter(
+          (i) =>
+            String(i.eventId ?? "") === String(args.eventId) &&
+            BILLED_INVOICE_STATUSES.has(String(i.status)),
+        )
+        .reduce((sum, i) => sum + Number(i.total ?? 0), 0);
+      revenue =
+        finalized && Number(closeout?.actualRevenue ?? 0) > 0
+          ? { amount: Number(closeout?.actualRevenue), source: "closeout" }
+          : billed > 0
+            ? { amount: billed, source: "invoices" }
+            : Number(event.quotedPrice ?? 0) > 0
+              ? { amount: Number(event.quotedPrice), source: "quote" }
+              : null;
+    }
+    return eventFoodCost({
+      contributions: demands.flatMap((d) => d.contributions),
+      unresolvedItems: demands.reduce((n, d) => n + d.unresolved.length, 0),
+      ingredients: catalog.lookups.ingredients,
+      mappings: catalog.lookups.mappings,
+      asOf,
+      expectedHeadcount,
+      revenue,
+      actual,
+      recordedWasteCost,
+    });
   },
 });
 
@@ -665,7 +887,16 @@ export interface ReconcileEventDemandResult {
   unchanged: number;
   unresolvedCount: number;
   purchasingComplete: boolean;
+  /** True when the event is finished or cancelled: its demand is history and was left as it was. */
+  historyKept?: boolean;
 }
+
+/** Stages whose demand is history: later recipe edits never rewrite it. */
+export const FINISHED_EVENT_STAGES = new Set([
+  "completed",
+  "closed_out",
+  "cancelled",
+]);
 
 /** Write the authoritative demand for an event: idempotent replace by sourceKey. */
 export async function writeReconciledEventDemand(
@@ -674,6 +905,17 @@ export async function writeReconciledEventDemand(
 ): Promise<ReconcileEventDemandResult> {
   const tenantId = requireTenant(await getAuthContext(ctx));
   const event = await requireEvent(ctx, tenantId, eventId);
+  if (FINISHED_EVENT_STAGES.has(String(event.stage)))
+    return {
+      eventId: String(eventId),
+      created: 0,
+      updated: 0,
+      superseded: 0,
+      unchanged: 0,
+      unresolvedCount: 0,
+      purchasingComplete: true,
+      historyKept: true,
+    };
   const review = await reviewEvent(ctx, tenantId, eventId);
   const existingRows = (
     await byTenant(ctx, "eventIngredientContributions", tenantId)
@@ -984,6 +1226,39 @@ export const planSharedRecipeBatch = mutation({
   },
 });
 
+/**
+ * The chain of recipes from `childId` down to `parentId` when `childId`
+ * already uses `parentId` somewhere inside it (so putting it under
+ * `parentId` would loop), else null.
+ */
+export function nestedRecipeLoop(
+  children: ReadonlyMap<string, readonly string[]>,
+  parentId: string,
+  childId: string,
+): string[] | null {
+  const cameFrom = new Map<string, string | null>([[childId, null]]);
+  const queue = [childId];
+  while (queue.length) {
+    const current = queue.shift() as string;
+    if (current === parentId) {
+      const path: string[] = [];
+      for (
+        let at: string | null = current;
+        at != null;
+        at = cameFrom.get(at) ?? null
+      )
+        path.unshift(at);
+      return path;
+    }
+    for (const next of children.get(current) ?? []) {
+      if (cameFrom.has(next)) continue;
+      cameFrom.set(next, current);
+      queue.push(next);
+    }
+  }
+  return null;
+}
+
 /** Add a sub-recipe line after walking the child's tree for a cycle. */
 export const addNestedRecipeLine = mutation({
   args: {
@@ -1003,20 +1278,26 @@ export const addNestedRecipeLine = mutation({
     const lines = await byTenant(ctx, "componentComponents", tenantId);
     const children = new Map<string, string[]>();
     for (const l of lines) {
-      if (l.addedAt == null) continue;
+      if (l.addedAt == null || l.deletedAt != null) continue;
       const list = children.get(String(l.componentId)) ?? [];
       list.push(String(l.childComponentId));
       children.set(String(l.componentId), list);
     }
-    const stack = [String(args.childComponentId)];
-    const seen = new Set<string>();
-    while (stack.length) {
-      const current = stack.pop() as string;
-      if (current === String(args.componentId))
-        throw new Error("Adding this sub-recipe would create a cycle");
-      if (seen.has(current)) continue;
-      seen.add(current);
-      for (const next of children.get(current) ?? []) stack.push(next);
+    const loop = nestedRecipeLoop(
+      children,
+      String(args.componentId),
+      String(args.childComponentId),
+    );
+    if (loop) {
+      const names = await Promise.all(
+        loop.map(async (id) => {
+          const row = await ctx.db.get(id as Id<"components">);
+          return row && row.tenantId === tenantId ? row.name : "another recipe";
+        }),
+      );
+      throw new Error(
+        `${names[0]} already uses ${names[names.length - 1]} (${names.join(" → ")}), so it cannot go inside ${names[names.length - 1]}. That would make a loop. Pick a different recipe.`,
+      );
     }
     return await ctx.runMutation(
       api.mutations.ComponentComponent_createViaAdd,

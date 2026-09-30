@@ -45,6 +45,8 @@ import { CulinaryRecordPicker } from "../kitchen/CulinaryRecordPicker";
 import { EventMenuStockShortageBanner } from "../kitchen/EventMenuStockShortageBanner";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { dishPath } from "../kitchen/kitchenRoutes";
+import { EventMenuLineKitchen } from "./EventMenuLineKitchen";
+import { EventUnresolvedMaterialsNotice } from "./EventUnresolvedMaterialsNotice";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { ActionMenu, ActionMenuRule, Skeleton } from "../../ui/primitives";
@@ -630,6 +632,8 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
         </button>
       </div>
 
+      <EventUnresolvedMaterialsNotice eventId={eventId} />
+
       <CateringPackagePicker
         eventId={eventId}
         headcount={expectedHeadcount}
@@ -1075,6 +1079,13 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                                 setFailure(classifyCommandFailure(error))
                               }
                             />
+                            <EventMenuLineKitchen
+                              eventId={eventId}
+                              eventDishId={selection._id}
+                              followsEventHeadcount={
+                                selection.followsEventHeadcount
+                              }
+                            />
                             <p className="mt-1 text-sm text-ink-2 xl:hidden">
                               {selection.quantityServings} servings
                               {" · est. "}
@@ -1388,6 +1399,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
         totals={
           nutrition.totals.componentCount > 0 ? nutrition.totals.perGuest : null
         }
+        coverage={nutrition.totals.coverage}
         coverageNote={nutrition.coverageNote}
         loading={nutrition.loading}
       />

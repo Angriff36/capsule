@@ -18,7 +18,12 @@
     },
     {
       "code": "DOMAIN_UNWIRED_FK",
-      "key": "EventDishComponentSeed.componentId",
+      "key": "EquipmentIssue.equipmentReservationId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "EquipmentIssue.rentalOrderLineId",
       "issue": "https://github.com/Angriff36/capsule/issues/402"
     },
     {
@@ -63,12 +68,42 @@
     },
     {
       "code": "DOMAIN_UNWIRED_FK",
+      "key": "EventStaffNeed.staffingTemplateId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
       "key": "EventTemplate.menuId",
       "issue": "https://github.com/Angriff36/capsule/issues/402"
     },
     {
       "code": "DOMAIN_UNWIRED_FK",
+      "key": "Invoice.proposalId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "Invoice.proposalRevisionId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
       "key": "ItemUnitMapping.componentId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "OpeningStockRecord.componentId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "OpeningStockRecord.importRunId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "PackListItem.packListTemplateId",
       "issue": "https://github.com/Angriff36/capsule/issues/402"
     },
     {
@@ -113,7 +148,17 @@
     },
     {
       "code": "DOMAIN_UNWIRED_FK",
+      "key": "ProposalLineItem.equipmentId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
       "key": "ProposalLineItem.menuDishId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "QuoteSubmission.menuId",
       "issue": "https://github.com/Angriff36/capsule/issues/402"
     },
     {

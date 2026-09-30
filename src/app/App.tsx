@@ -4,6 +4,7 @@ import { ClientPortalPage } from "../features/clientPortal/ClientPortalPage";
 import { ProposalAcceptancePage } from "../features/clients/ProposalAcceptancePage";
 import { SharedProposalPage } from "../features/clients/SharedProposalPage";
 import { QuoteSubmissionPage } from "../features/sales/QuoteSubmissionPage";
+import { PublicMenuPage } from "../features/sales/PublicMenuPage";
 import { EventAllergenBriefingPage } from "../features/events/EventAllergenBriefingPage";
 import { EventCapacityPlannerPage } from "../features/events/EventCapacityPlannerPage";
 import { EventCreatePage } from "../features/events/EventCreatePage";
@@ -46,6 +47,11 @@ const StockBookPage = lazy(() =>
 const StockCountPage = lazy(() =>
   import("../features/inventory/StockCountPage").then((module) => ({
     default: module.StockCountPage,
+  })),
+);
+const OpeningStockPage = lazy(() =>
+  import("../features/inventory/OpeningStockPage").then((module) => ({
+    default: module.OpeningStockPage,
   })),
 );
 const InventoryAuditLogPage = lazy(() =>
@@ -184,6 +190,11 @@ const RoleScorecardsPage = lazy(() =>
     default: module.RoleScorecardsPage,
   })),
 );
+const StaffingTemplatesPage = lazy(() =>
+  import("../features/workforce/StaffingTemplatesPage").then((module) => ({
+    default: module.StaffingTemplatesPage,
+  })),
+);
 const OneOnOnesPage = lazy(() =>
   import("../features/workforce/OneOnOnesPage").then((module) => ({
     default: module.OneOnOnesPage,
@@ -202,6 +213,11 @@ const PackListsPage = lazy(() =>
 const PackListDetailPage = lazy(() =>
   import("../features/logistics/PackListDetailPage").then((module) => ({
     default: module.PackListDetailPage,
+  })),
+);
+const PackRulesPage = lazy(() =>
+  import("../features/logistics/PackRulesPage").then((module) => ({
+    default: module.PackRulesPage,
   })),
 );
 const ServiceStyleKitsPage = lazy(() =>
@@ -257,6 +273,11 @@ const RevenueTrendsPage = lazy(() =>
 const FoodCostPercentagePage = lazy(() =>
   import("../features/finance/FoodCostPercentagePage").then((module) => ({
     default: module.FoodCostPercentagePage,
+  })),
+);
+const FinanceReconciliationPage = lazy(() =>
+  import("../features/finance/FinanceReconciliationPage").then((module) => ({
+    default: module.FinanceReconciliationPage,
   })),
 );
 const ProfitMarginReportsPage = lazy(() =>
@@ -455,6 +476,11 @@ const BrandingPage = lazy(() =>
     default: module.BrandingPage,
   })),
 );
+const KitchensPage = lazy(() =>
+  import("../features/admin/KitchensPage").then((module) => ({
+    default: module.KitchensPage,
+  })),
+);
 const CatalogsPage = lazy(() =>
   import("../features/admin/CatalogsPage").then((module) => ({
     default: module.CatalogsPage,
@@ -569,6 +595,7 @@ export function App() {
   const acceptanceMatch = useMatch("/accept/:callbackToken");
   const shareMatch = useMatch("/share/:token");
   const quoteMatch = useMatch("/quote");
+  const publicMenuMatch = useMatch("/menu");
 
   if (clientPortalMatch?.params.token) {
     return (
@@ -604,6 +631,14 @@ export function App() {
       <AppErrorBoundary>
         <ActionResultHost />
         <QuoteSubmissionPage />
+      </AppErrorBoundary>
+    );
+  }
+
+  if (publicMenuMatch) {
+    return (
+      <AppErrorBoundary>
+        <PublicMenuPage />
       </AppErrorBoundary>
     );
   }
@@ -793,6 +828,14 @@ export function App() {
               }
             />
             <Route
+              path="/inventory/opening-stock"
+              element={
+                <SupplyRoute>
+                  <OpeningStockPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/inventory/audit"
               element={
                 <SupplyRoute>
@@ -937,6 +980,14 @@ export function App() {
               }
             />
             <Route
+              path="/staff/crew-templates"
+              element={
+                <SupplyRoute>
+                  <StaffingTemplatesPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/staff/one-on-ones"
               element={
                 <SupplyRoute>
@@ -1013,6 +1064,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <ServiceStyleKitsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/logistics/pack-rules"
+              element={
+                <SupplyRoute>
+                  <PackRulesPage />
                 </SupplyRoute>
               }
             />
@@ -1101,6 +1160,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <ProfitMarginReportsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/money-check"
+              element={
+                <SupplyRoute>
+                  <FinanceReconciliationPage />
                 </SupplyRoute>
               }
             />
@@ -1413,6 +1480,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <BrandingPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin/kitchens"
+              element={
+                <SupplyRoute>
+                  <KitchensPage />
                 </SupplyRoute>
               }
             />

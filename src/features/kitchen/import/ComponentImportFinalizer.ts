@@ -88,7 +88,7 @@ export class ComponentImportFinalizer {
     const unresolved = countUnresolvedLines(review.lines);
     if (unresolved > 0) {
       throw new Error(
-        `${unresolved} ingredient line${unresolved === 1 ? "" : "s"} still need review`,
+        `${unresolved} recipe line${unresolved === 1 ? "" : "s"} still need review`,
       );
     }
     const measuredLines = review.lines.map((line) => ({
@@ -127,12 +127,19 @@ export class ComponentImportFinalizer {
           instructions: review.instructions?.trim() || undefined,
           lines: measuredLines.map(({ line, quantity, unit }, index) => ({
             name: line.name.trim(),
+            componentId:
+              line.matchStatus === "subrecipe"
+                ? line.matchedComponentId
+                : undefined,
             ingredientId:
-              line.createNew || line.matchStatus === "confirmed_new"
+              line.matchStatus === "subrecipe" ||
+              line.createNew ||
+              line.matchStatus === "confirmed_new"
                 ? undefined
                 : line.matchedIngredientId,
             createNew:
-              line.createNew || line.matchStatus === "confirmed_new"
+              line.matchStatus !== "subrecipe" &&
+              (line.createNew || line.matchStatus === "confirmed_new")
                 ? true
                 : undefined,
             quantity,
@@ -147,6 +154,11 @@ export class ComponentImportFinalizer {
     const createdIngredientIds: string[] = [];
     const ingredientIds: string[] = [];
 
+    if (measuredLines.some(({ line }) => line.matchStatus === "subrecipe")) {
+      throw new Error(
+        "Save this review first; recipes with sub-recipes are finished from a saved review.",
+      );
+    }
     for (const { line, unit } of measuredLines) {
       if (line.createNew || line.matchStatus === "confirmed_new") {
         const created = await this.ports.createIngredient({

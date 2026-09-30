@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { applyOwnWorkspaceLinks } from "./apply-own-workspace-links.ts";
 import { ManifestLineEndingNormalizer } from "./normalizeManifestLineEndings.ts";
 import { syncBuilderBaselines } from "./sync-builder-baselines.ts";
 
@@ -35,7 +36,22 @@ export function runBuilder(args: string[]): number {
 export function regenerate(passthrough: string[] = []): number {
   const status = runBuilder(["generate", "convex", "--apply", ...passthrough]);
   if (status !== 0) return status;
-  // Keep the baseline store exactly the blobs the ledger names.
+  // The patches below read generated/ir/merged.ir.json, which is gitignored:
+  // rebuild it so a new command from another checkout is never "missing".
+  const compiled = spawnSync(process.execPath, ["run", "manifest:compile"], {
+    stdio: "inherit",
+    cwd: CAPSULE_ROOT,
+  });
+  if (compiled.status !== 0) return compiled.status ?? 1;
+  // Make generated mutations refuse other-workspace record ids, refreshing
+  // ownership digests.
+  const touched = [...applyOwnWorkspaceLinks(CAPSULE_ROOT)];
+  if (touched.length > 0) {
+    console.log(
+      `manifest-regen: applied generated runtime patches (${touched.join(", ")})`,
+    );
+  }
+  // The patches moved ledger digests after Builder's own baseline prune.
   const synced = syncBuilderBaselines(CAPSULE_ROOT);
   if (synced.written + synced.removed > 0) {
     console.log(

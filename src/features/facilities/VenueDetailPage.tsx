@@ -6,7 +6,9 @@ import {
   useVenueChangeCapacity,
   useVenueDeactivate,
   useVenueActivate,
+  useVenueSetTimeZone,
 } from "../../lib/manifest-convex-react";
+import { isValidTimeZone } from "../../lib/routeFacts";
 import {
   venueLayoutTemplatesListPath,
   venueListPath,
@@ -73,6 +75,7 @@ export function VenueDetailPage() {
   const venue = useRouteRecord(useGetVenue, id);
 
   const updateDetails = useVenueUpdateDetails();
+  const setTimeZone = useVenueSetTimeZone();
   const changeCapacity = useVenueChangeCapacity();
   const deactivate = useVenueDeactivate();
   const activate = useVenueActivate();
@@ -127,6 +130,15 @@ export function VenueDetailPage() {
       setFailure(new Error(coordinates.error));
       return;
     }
+    const timeZone = String(data.get("timeZone") ?? "").trim();
+    if (timeZone && !isValidTimeZone(timeZone)) {
+      setFailure(
+        new Error(
+          `"${timeZone}" is not a time zone. Use a name like America/New_York, or leave it empty to use your kitchen's.`,
+        ),
+      );
+      return;
+    }
     void run("updateDetails", async () => {
       await updateDetails({
         docId: venue._id,
@@ -170,6 +182,14 @@ export function VenueDetailPage() {
         contactPhone:
           String(data.get("contactPhone") ?? "").trim() || undefined,
       });
+      // Its own step so older venue forms never clear it; runs after the
+      // details save, which already moved the version on.
+      if (timeZone !== (venue.timeZone ?? "")) {
+        await setTimeZone({
+          docId: venue._id,
+          timeZone: timeZone || undefined,
+        });
+      }
       setShowEditForm(false);
     });
   };
@@ -448,6 +468,18 @@ export function VenueDetailPage() {
                 type="text"
                 name="country"
                 defaultValue={venue.countryCode ?? ""}
+                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-ink-2">
+                Time zone
+              </label>
+              <input
+                type="text"
+                name="timeZone"
+                placeholder="Same as your kitchen"
+                defaultValue={venue.timeZone ?? ""}
                 className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
               />
             </div>

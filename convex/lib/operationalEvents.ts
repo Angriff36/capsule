@@ -1,4 +1,5 @@
 import type { ConvexCommandEvent } from "@angriff36/manifest/projections/convex";
+import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { reconcileEventPrepWork } from "./prepWorkReconciliation";
@@ -9,7 +10,13 @@ import { reconcileEventTiming } from "./eventTimingOperations";
 import { eventStaffingReconciliation } from "./staffingReconciliation";
 import { eventHeadcountReconciliation } from "./headcountReconciliation";
 import { eventPackReconciliation } from "./packReconciliation";
+import {
+  packFactEventId, reconcileEventPackRules, validatePackLoadAssignment, validatePackReadiness,
+} from "./packRuleReconciliation";
 import { eventDemandReconciliation } from "./demandReconciliation";
+import {
+  checkOutDispatchedEquipment, raiseReturnIssues, raiseVendorReturnIssue,
+} from "./equipmentReturns";
 import { eventPrepReconciliation } from "./prepReconciliation";
 import { eventHeadcountStaffingReconciliation } from "./headcountStaffingReconciliation";
 import { eventProposalReconciliation } from "./proposalReconciliation";
@@ -18,7 +25,9 @@ import { eventRecipeReconciliation } from "./recipeReconciliation";
 import { eventVenueReconciliation } from "./venueReconciliation";
 import { eventStyleReconciliation } from "./styleReconciliation";
 import { eventRentalReconciliation } from "./rentalReconciliation";
-import { eventInvoicePricingReconciliation } from "./invoicePricingReconciliation";
+import {
+  assertInvoiceCommercialSource, ensureEventDraftInvoice, eventInvoicePricingReconciliation,
+} from "./invoicePricingReconciliation";
 import { eventCloseoutCommercialReconciliation } from "./closeoutCommercialReconciliation";
 import {
   reconcileEventStaffing, reflectManualEventShiftTiming, validateAutomaticEventShift,
@@ -28,24 +37,111 @@ import {
   prepareStaffNeedCoverageChange, validatePreparedStaffNeedCoverage, finishPostedStaffNeedContinuation,
   validateFilledCoverageCredentials,
 } from "./eventStaffingOperations";
-import { validateScheduledShift, validateShiftWindow } from "./shiftSchedulingEvents";
+import {
+  ensureTemplateStaffNeeds, placeFromWaitlist, validateDescribedDemand, validateWaitlistJoin,
+  validateNewEventStaffing, validateScheduledShift, validateShiftWindow,
+  validatePayrollInputSources, validateTimeRecordClockIn,
+} from "./shiftSchedulingEvents";
 import {
   adoptLegacyDraftQuantity,
   reconcileCancelledPurchaseDrafts,
+  retireCoveredZeroLine,
   retireUnusedAutomaticDraft,
 } from "./purchasingEvents";
 import { moveEventPurchasingWeek } from "./purchasingReschedule";
 import { lineOverridePurchasingFollowThrough } from "./lineOverridePurchasing";
 import { ensureUniqueInvoiceNumber } from "./invoiceNumbering";
+import { assertInvoiceIssueTotals } from "./invoiceIssueTotals";
+import { assertProposalFollowTotals } from "./proposalFollowTotals";
 import { ensureEventNumber } from "./eventNumbering";
 import { recordAcceptedProposalRevision } from "./proposalAcceptanceRevision";
 import { deleteBlobIfOrphan } from "./blobs";
+import { queueRouteRefresh } from "./routeFollowUp";
+import { queueTimingRecalculation } from "./timingFollowUp";
+import { handleTravelLegEvent } from "./travelLegEvents";
+import { validateEventVehicleAssignment, validateRigLoadForLine } from "./eventRouteLegRead";
+import { assertSignInUnclaimed } from "./personAuthPick";
+import { assertHireNotDuplicate } from "../personEmail";
+import {
+  assertImportedPaymentMatchedOnce, assertMatchedPaymentUnclaimed, assertProviderPaymentUnused,
+} from "./paymentAccounting";
 
 /** Runs after declared reactions, inside the originating command transaction. */
 export async function handleManifestEvent(
   ctx: MutationCtx,
   event: ConvexCommandEvent,
 ): Promise<void> {
+  await queueRouteRefresh(ctx, event);
+  await queueTimingRecalculation(ctx, event);
+  // Pack lines follow every event fact that asks for equipment (spec §13.2).
+  const packEventId = packFactEventId(event);
+  if (packEventId) await reconcileEventPackRules(ctx, packEventId);
+  if (event.entity === "PackListItem" && event.type === "PackListItemLoadAssigned") {
+    await validatePackLoadAssignment(ctx, event.entityId as Id<"packListItems">);
+    await validateRigLoadForLine(ctx, event.entityId as Id<"packListItems">);
+    return;
+  }
+  // PL-DELIVERY: a truck is booked only when it can go and is free; a load
+  // never goes past what the truck can carry.
+  if (event.entity === "PackListItem" && event.type === "PackListItemWeightSet") {
+    await validateRigLoadForLine(ctx, event.entityId as Id<"packListItems">);
+    return;
+  }
+  if (event.entity === "EventVehicleAssignment" &&
+    (event.type === "EventVehicleAssigned" || event.type === "EventVehicleLegPlanned")) {
+    await validateEventVehicleAssignment(ctx, event.entityId as Id<"eventVehicleAssignments">);
+  }
+  if (event.entity === "PackList" && event.type === "PackListPacked") {
+    await validatePackReadiness(ctx, event.entityId as Id<"packLists">);
+    return;
+  }
+  // PL-RETURNS: the truck leaving, the return check and the vendor return.
+  if (event.entity === "PackList" && event.type === "PackListDispatched") {
+    await checkOutDispatchedEquipment(ctx, event.entityId as Id<"packLists">);
+    return;
+  }
+  if (event.entity === "EquipmentReservation" && event.type === "EquipmentReturned") {
+    await raiseReturnIssues(ctx, event.entityId as Id<"equipmentReservations">);
+    return;
+  }
+  if (event.entity === "RentalOrderLine" && event.type === "RentalOrderLineReturned") {
+    await raiseVendorReturnIssue(ctx, event.entityId as Id<"rentalOrderLines">);
+    return;
+  }
+  // PL-FIELD-CONFIRMATION: a day-of form's photo has to be a real upload.
+  if (event.entity === "FieldConfirmation" && event.type === "FieldConfirmationCompleted") {
+    const storageId = event.payload.photoStorageId;
+    if (typeof storageId === "string" && storageId.trim()) {
+      const id = ctx.db.system.normalizeId("_storage", storageId);
+      if (!id || !(await ctx.db.system.get(id)))
+        throw new Error("That photo didn't upload. Take or pick the photo again.");
+    }
+    return;
+  }
+  if (await handleTravelLegEvent(ctx, event)) return;
+  if (event.entity === "WeeklyScheduleNotice" &&
+    (event.type === "WeeklySchedulePublished" || event.type === "WeeklyScheduleRepublished")) {
+    // The person's phone notice for a new or changed week (AC-326/AC-508).
+    await ctx.scheduler.runAfter(0, internal.schedulePushSend.deliver, {
+      noticeId: event.entityId as Id<"weeklyScheduleNotices">,
+    });
+    return;
+  }
+  if (event.entity === "Event" && event.type === "EventApproved") {
+    // One unsent draft invoice when the quoted price is above zero (AC-618).
+    await ensureEventDraftInvoice(ctx, event.entityId as Id<"events">);
+    await ensureTemplateStaffNeeds(ctx, event.entityId as Id<"events">);
+  }
+  if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedDemandDescribed") {
+    await validateDescribedDemand(ctx, event.entityId as Id<"eventStaffNeeds">);
+    await reconcileEventStaffing(ctx, event.payload.eventId as Id<"events">);
+    return;
+  }
+  if (event.entity === "Person" && (event.type === "PersonHired" || event.type === "PersonAccountLinked")) {
+    await assertSignInUnclaimed(ctx, event.entityId as Id<"people">);
+    if (event.type === "PersonHired") await assertHireNotDuplicate(ctx, event.entityId as Id<"people">);
+    return;
+  }
   if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedCoverageChangeRequested") {
     await prepareStaffNeedCoverageChange(ctx, event.entityId as Id<"eventStaffNeeds">);
     return;
@@ -97,6 +193,21 @@ export async function handleManifestEvent(
   if ((event.entity === "EventAssignment" && event.type === "EventAssignmentAssigned") ||
     (event.entity === "EventStaffNeed" && ["EventStaffNeedPosted", "EventStaffNeedClaimed", "EventStaffNeedFilled"].includes(event.type))) {
     await validateEventStaffingReferences(ctx, event.payload.eventId as Id<"events">, event.payload.personId as Id<"people"> | undefined);
+    await validateNewEventStaffing(ctx, event.entity, event.entityId, event.payload.personId as Id<"people"> | undefined);
+    if (event.type === "EventStaffNeedClaimed" || event.type === "EventStaffNeedFilled")
+      await placeFromWaitlist(ctx, event.entityId as Id<"eventStaffNeeds">, event.payload.personId as Id<"people"> | undefined);
+  }
+  if (event.entity === "PayrollInput" && event.type === "PayrollInputPrepared") {
+    await validatePayrollInputSources(ctx, event.entityId as Id<"payrollInputs">);
+    return;
+  }
+  if (event.entity === "TimeRecord" && event.type === "TimeRecordClockedIn") {
+    await validateTimeRecordClockIn(ctx, event.entityId as Id<"timeRecords">);
+    return;
+  }
+  if (event.entity === "StaffNeedWaitlistEntry" && event.type === "StaffNeedWaitlistJoined") {
+    await validateWaitlistJoin(ctx, event.entityId as Id<"staffNeedWaitlistEntries">);
+    return;
   }
   if ((event.entity === "EventAssignment" && event.type === "EventAssignmentTimingChanged") ||
     (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedTimingChanged")) {
@@ -156,8 +267,9 @@ export async function handleManifestEvent(
         newHeadcount: Number(event.payload.newHeadcount),
       },
     );
-    // Staffing does not scale with guest count: live staff needs keep their
-    // role, status, and window — this records the §8.2 staffing receipt only.
+    // Hand-posted staff needs do not scale with guest count; a crew
+    // template's open slots do (AC-495). Then the §8.2 staffing receipt.
+    await ensureTemplateStaffNeeds(ctx, event.entityId as Id<"events">);
     await eventHeadcountStaffingReconciliation.run(
       ctx,
       event.entityId as Id<"events">,
@@ -235,6 +347,7 @@ export async function handleManifestEvent(
     return;
   }
   if (event.entity === "Event" && event.type === "EventServiceStyleChanged") {
+    await ensureTemplateStaffNeeds(ctx, event.entityId as Id<"events">);
     // Style snapshot already written by Event.changeServiceStyle. The
     // generated pack-kit fanOut already ran. This records one §8.2 style
     // receipt and flags the issued packet stale without rewriting it.
@@ -261,6 +374,8 @@ export async function handleManifestEvent(
       { triggerEventId: String(event.eventId), triggerType: event.type },
       Number(event.payload.quotedPrice),
     );
+    // Approved at no price and priced now: the draft appears (AC-618).
+    await ensureEventDraftInvoice(ctx, event.entityId as Id<"events">);
     return;
   }
   if (event.entity === "Event" && event.type === "EventCommercialCorrected") {
@@ -284,6 +399,18 @@ export async function handleManifestEvent(
       await deleteBlobIfOrphan(ctx, previous);
     return;
   }
+  if (event.entity === "Payment" &&
+    (event.type === "PaymentRecorded" || event.type === "PaymentMatched")) {
+    if (event.type === "PaymentMatched")
+      await assertMatchedPaymentUnclaimed(ctx, event.entityId as Id<"payments">);
+    await assertProviderPaymentUnused(ctx, event.entityId as Id<"payments">);
+    return;
+  }
+  if (event.entity === "ExternalRecordLink" &&
+    (event.type === "ExternalRecordLinked" || event.type === "ExternalRecordCapsuleIdUpdated")) {
+    await assertImportedPaymentMatchedOnce(ctx, event.entityId as Id<"externalRecordLinks">);
+    return;
+  }
   if (event.entity === "Event" && event.type === "EventPurchasingWeekChanged") {
     if (event.payload.previousPurchasingWeekStart !== event.payload.purchasingWeekStart)
       await moveEventPurchasingWeek(ctx, event.entityId as Id<"events">);
@@ -295,6 +422,13 @@ export async function handleManifestEvent(
     await ensureEventNumber(ctx, event.entityId as Id<"events">);
     return;
   }
+  if (event.entity === "Proposal" && event.type === "ProposalEventHeadcountFollowed") {
+    // A person may run this from the readiness list; its money is checked
+    // against the priced lines (AC-372).
+    await assertProposalFollowTotals(ctx, event.entityId as Id<"proposals">,
+      event.payload.previousTotal);
+    return;
+  }
   if (event.entity === "Proposal" && event.type === "ProposalAccepted") {
     // The acceptance transaction records WHICH revision was accepted
     // (AC-413/AC-434); a validation failure here rolls the acceptance — and
@@ -304,6 +438,11 @@ export async function handleManifestEvent(
   }
   if (event.entity === "Invoice" &&
     (event.type === "InvoiceIssued" || event.type === "InvoiceNumberAssigned")) {
+    // Line money is worked out on the server, first issue only (AC-372).
+    if (event.type === "InvoiceIssued" && event.payload.newlyIssued === true) {
+      await assertInvoiceIssueTotals(ctx, event.entityId as Id<"invoices">);
+      await assertInvoiceCommercialSource(ctx, event.entityId as Id<"invoices">);
+    }
     // A manually assigned number is validated exactly like an explicit one at issue.
     await ensureUniqueInvoiceNumber(
       ctx,
@@ -321,7 +460,7 @@ export async function handleManifestEvent(
     return;
   }
   if ((event.entity === "EventAssignment" &&
-    ["EventAssignmentAssigned", "EventAssignmentUnassigned", "EventAssignmentTimingChanged"].includes(event.type)) ||
+    ["EventAssignmentAssigned", "EventAssignmentUnassigned", "EventAssignmentDeclined", "EventAssignmentTimingChanged"].includes(event.type)) ||
     (event.entity === "EventStaffNeed" &&
     ["EventStaffNeedPosted", "EventStaffNeedFilled", "EventStaffNeedCancelled", "EventStaffNeedTimingChanged"].includes(event.type)) ||
     (event.entity === "EventTimelineActivity" &&
@@ -349,6 +488,7 @@ export async function handleManifestEvent(
       event.entityId as Id<"vendorOrderLines">,
       event.eventId,
     );
+    await retireCoveredZeroLine(ctx, event.entityId as Id<"vendorOrderLines">);
     return;
   }
   if (

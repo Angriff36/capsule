@@ -1,13 +1,16 @@
 import { mutation, type MutationCtx } from "../_generated/server";
-import type { Id } from "../_generated/dataModel";
+import type { Doc, Id } from "../_generated/dataModel";
 import { api } from "../_generated/api";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
+import { parseTemplateLines } from "../../src/lib/packTemplateLines";
+import { PACK_LIST_UNITS } from "../../src/features/logistics/packListUnits";
 import { getAuthContext, requireTenant } from "./authContext";
 import { orgCapabilityDeniesAction } from "./orgCapabilityGate";
 import {
   readMaterializationReceipt,
   writeMaterializationReceipt,
 } from "./materializationReceipt";
+import { canWritePackLists, reconcileEventPackRules } from "./packRuleReconciliation";
 
 const DRAFTABLE_EVENT_STAGES = new Set(["planning", "quote", "sales_lock"]);
 const LOGISTICS_ROLES = new Set([
@@ -60,6 +63,10 @@ export const applyPackTemplate = mutation({
   args: {
     packListId: v.id("packLists"),
     operationKey: v.string(),
+    // With a template id the lines come from the saved template and carry its
+    // lineage: one list line per template line, a re-apply updates lines
+    // nobody set by hand and never duplicates (AC-132/AC-340).
+    packListTemplateId: v.optional(v.id("packListTemplates")),
     items: v.array(v.object({
       description: v.string(),
       requiredQuantity: v.number(),
@@ -70,9 +77,14 @@ export const applyPackTemplate = mutation({
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
     requireRole(auth, "logisticsAccess");
-    await ownedLive(ctx, args.packListId, tenantId, "PackList");
+    const list = await ownedLive(ctx, args.packListId, tenantId, "PackList");
     const prior = await readMaterializationReceipt<{ itemCount: number }>(ctx, tenantId, "pack", args.operationKey, args);
     if (prior) return { ...prior, recovered: true };
+    if (args.packListTemplateId) {
+      const output = await applyTemplateLines(ctx, list, args.packListTemplateId, tenantId);
+      await writeMaterializationReceipt(ctx, tenantId, "pack", args.operationKey, args, output);
+      return { ...output, recovered: false };
+    }
     for (let index = 0; index < args.items.length; index++) {
       const item = args.items[index];
       await ctx.runMutation(api.mutations.PackListItem_createViaAddItem, {
@@ -85,6 +97,63 @@ export const applyPackTemplate = mutation({
     const output = { itemCount: args.items.length };
     await writeMaterializationReceipt(ctx, tenantId, "pack", args.operationKey, args, output);
     return { ...output, recovered: false };
+  },
+});
+
+async function applyTemplateLines(
+  ctx: MutationCtx,
+  list: Doc<"packLists">,
+  templateId: Id<"packListTemplates">,
+  tenantId: string,
+): Promise<{ itemCount: number }> {
+  const template = await ctx.db.get(templateId);
+  if (!template || template.tenantId !== tenantId || template.deletedAt != null || template.status !== "active")
+    throw new ConvexError("This template is not available. Pick an active template.");
+  // A packed, loaded or sent list is the record of what went; a later
+  // template edit never rewrites it.
+  if (list.status !== "draft" && list.status !== "packing")
+    throw new ConvexError("This pack list is already packed. A template only changes a list that is still being packed.");
+  const lines = parseTemplateLines(template.items, PACK_LIST_UNITS);
+  if (lines.length === 0) throw new ConvexError("This template has no lines to add.");
+  const existing = (await ctx.db.query("packListItems")
+    .withIndex("by_packListId", (q) => q.eq("packListId", list._id)).collect())
+    .filter((row) => row.tenantId === tenantId && row.deletedAt == null && row.packListTemplateId === templateId);
+  const byKey = new Map(existing.map((row) => [row.templateLineKey ?? "", row]));
+  for (const line of lines) {
+    const row = byKey.get(line.key);
+    if (row && Number(row.requiredQuantity) === line.requiredQuantity && row.templateVersion === template.version)
+      continue;
+    const docId = row?._id ?? ((await ctx.runMutation(api.mutations.PackListItem_createViaAddItem, {
+      packListId: list._id,
+      description: line.description,
+      requiredQuantity: line.requiredQuantity,
+      unit: line.unit,
+    })) as { docId: Id<"packListItems"> }).docId;
+    await ctx.runMutation(api.mutations.PackListItem_ensureTemplateLine, {
+      docId,
+      packListId: list._id,
+      packListTemplateId: templateId,
+      templateLineKey: line.key,
+      templateVersion: template.version,
+      requiredQuantity: line.requiredQuantity,
+    });
+  }
+  return { itemCount: lines.length };
+}
+
+/** "Update from the event": bring the pack list in step with the event's
+ * facts and the current pack rules (after a rule change, for example). */
+export const refreshPackRules = mutation({
+  args: { packListId: v.id("packLists") },
+  handler: async (ctx, args): Promise<{ refreshed: boolean }> => {
+    const auth = await getAuthContext(ctx);
+    const tenantId = requireTenant(auth);
+    // The same people who may change pack lines may refresh them.
+    if (!canWritePackLists(auth.role))
+      throw new ConvexError("Kitchen, logistics, event or sales staff, or a manager, can update a pack list.");
+    const list = await ownedLive(ctx, args.packListId, tenantId, "PackList");
+    await reconcileEventPackRules(ctx, list.eventId as Id<"events">);
+    return { refreshed: true };
   },
 });
 

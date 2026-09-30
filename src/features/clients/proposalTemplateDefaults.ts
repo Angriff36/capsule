@@ -7,6 +7,7 @@ export type ProposalTemplateDefaultsSource = {
   defaultServiceChargePercent?: number | null;
   validityDays?: number | null;
   visibleSections?: string[] | null;
+  sectionOrder?: string[] | null;
 };
 
 const dateInput = (date: Date) => {
@@ -58,6 +59,7 @@ export function proposalTemplateDefaults(
       Math.round(subtotalWithService * (template?.defaultTaxRate ?? 0) * 100) /
       100,
     visibleSections: [...(template?.visibleSections ?? [])],
+    sectionOrder: [...(template?.sectionOrder ?? [])],
     serviceChargeLine,
   };
 }

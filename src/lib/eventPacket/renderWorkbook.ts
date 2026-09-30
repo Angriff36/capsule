@@ -1,6 +1,8 @@
 import { jsPDF } from "jspdf";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import type { Workbook, WorkbookOverlay } from "./buildWorkbook";
+import { finalLockPageCount } from "./finalLock/answersPage";
+import { printableText } from "./printableText";
 import overlaysMeta from "./fixtures/event-forms-one-print.overlays.json";
 import { EVENT_FORMS_ONE_PRINT_B64 } from "./fixtures/event-forms-one-print.b64";
 export interface LayoutRecord {
@@ -33,24 +35,7 @@ interface PageInsertion {
   page: number;
   overlays: WorkbookOverlay[];
 }
-/** Explicit ASCII fallbacks prevent built-in PDF font missing glyphs. Unknown characters stay visible as codepoints. */
-export function printableText(input: string): string {
-  return input
-    .normalize("NFKC")
-    .replace(/[‐-―−]/g, "-")
-    .replace(/[‘’]/g, "'")
-    .replace(/[“”]/g, '"')
-    .replace(/…/g, "...")
-    .replace(/•/g, "-")
-    .replace(/☐/g, "[ ]")
-    .replace(/ /g, " ")
-    .replace(/\r/g, "")
-    .replace(/\t/g, " ")
-    .replace(
-      /[^\x20-\x7e\n]/gu,
-      (c) => `[U+${c.codePointAt(0)!.toString(16).toUpperCase()}]`,
-    );
-}
+export { printableText };
 export function validateLayout(
   records: LayoutRecord[],
   pageCount: number,
@@ -298,7 +283,10 @@ export async function renderWorkbook(
   }
   // Footer page numbers count the merged binder; source-form pages stay
   // chrome-free, so only generated pages carry the footer.
-  const finalCount = merged.getPageCount();
+  // The server adds the Final Lock answer pages at the end; count them too.
+  const finalCount =
+    merged.getPageCount() +
+    (workbook.finalLock ? await finalLockPageCount(workbook.finalLock) : 0);
   const finalIndexOf = new Map<number, number>();
   {
     let generatedSeen = 0,

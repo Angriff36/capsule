@@ -34,6 +34,22 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
   property assignedAt: datetime?
   property preloadedAt: datetime?
   property releasedAt: datetime?
+  // An outside vendor's own truck (a rental drop): named, not one of ours.
+  property vendorName: string?
+  // This run's own times (PL-ROUTE-LEGS). Unset = with the main crew: on site
+  // at the event's setup time, the event's load time, stays to the end. Every
+  // time still comes from the same event facts, so a change moves all runs.
+  property arriveBeforeServeMinutes: float?
+  property loadMinutes: float?
+  // A drop run leaves this long after arriving; the truck can then do a
+  // second trip (another row for the same truck).
+  property leaveAfterMinutes: float?
+  // Where this rig is loaded at the kitchen ("dock 2", "back lot"). Shown on
+  // every pack line that rides on it (PL-DELIVERY).
+  property loadingZone: string?
+  // Staff profile that said the load is in the vehicle. Missing when that
+  // account is not linked to a profile.
+  property preloadedByPersonId: uuid?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo vehicle: Vehicle fields [tenantId, vehicleId] references [tenantId, id]
@@ -43,7 +59,7 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
   computed isPreloaded: boolean = self.preloadedAt != null
   computed isReleased: boolean = self.releasedAt != null
 
-  constraint assignmentHasRig: self.assignedAt == null or self.vehicleId != null or self.trailerId != null "An assignment needs a vehicle or a trailer"
+  constraint assignmentHasRig: self.assignedAt == null or self.vehicleId != null or self.trailerId != null or (self.vendorName != null and length(trim(self.vendorName)) > 0) "An assignment needs a vehicle, a trailer or a vendor name"
 
   // The crew needs to know which truck they are on; the people who run events
   // and logistics set it from the tracker.
@@ -57,7 +73,12 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     optional trailerId: uuid,
     optional driverId: uuid,
     optional notes: string,
-    optional preloaded: boolean
+    optional preloaded: boolean,
+    optional vendorName: string,
+    optional arriveBeforeServeMinutes: float,
+    optional loadMinutes: float,
+    optional leaveAfterMinutes: float,
+    optional loadingZone: string
   ) {
     guard self.assignedAt == null
     guard self.deletedAt == null
@@ -67,14 +88,25 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     guard vehicleId == null or self.vehicle != null
     guard trailerId == null or self.trailer != null
     guard driverId == null or self.driver != null
-    constraint assignHasRig: vehicleId != null or trailerId != null "Select a vehicle or a trailer"
+    constraint assignHasRig: vehicleId != null or trailerId != null or (vendorName != null and length(trim(vendorName)) > 0) "Select a vehicle or a trailer, or name the vendor"
+    // A second trip on the same truck is booked with its own times, so the
+    // booking check sees the real window (PL-DELIVERY).
+    constraint assignArriveNotNegative: arriveBeforeServeMinutes == null or arriveBeforeServeMinutes >= 0 "Arrival before serve cannot be negative"
+    constraint assignLoadNotNegative: loadMinutes == null or loadMinutes >= 0 "Load time cannot be negative"
+    constraint assignLeaveAfterPositive: leaveAfterMinutes == null or leaveAfterMinutes > 0 "Time on site before leaving has to be more than zero"
     mutate eventId = eventId
     mutate activeEventId = eventId
     mutate vehicleId = vehicleId
     mutate trailerId = trailerId
     mutate driverId = driverId
+    mutate vendorName = vendorName
     mutate notes = notes
+    mutate arriveBeforeServeMinutes = arriveBeforeServeMinutes
+    mutate loadMinutes = loadMinutes
+    mutate leaveAfterMinutes = leaveAfterMinutes
+    mutate loadingZone = loadingZone
     mutate preloadedAt = preloaded == true ? now() : null
+    mutate preloadedByPersonId = preloaded == true ? user.personId : null
     mutate assignedAt = now()
     emit EventVehicleAssigned {
       eventVehicleAssignmentId: self.id
@@ -92,6 +124,7 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     guard self.releasedAt == null
     guard self.deletedAt == null
     mutate preloadedAt = now()
+    mutate preloadedByPersonId = user.personId
     emit EventVehiclePreloaded {
       eventVehicleAssignmentId: self.id
       tenantId: self.tenantId
@@ -103,7 +136,43 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     guard self.preloadedAt != null
     guard self.deletedAt == null
     mutate preloadedAt = null
+    mutate preloadedByPersonId = null
     emit EventVehiclePreloadCleared {
+      eventVehicleAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  // This run's own times. An omitted value goes back to the main crew's.
+  command planLeg(
+    optional arriveBeforeServeMinutes: float,
+    optional loadMinutes: float,
+    optional leaveAfterMinutes: float
+  ) {
+    guard self.assignedAt != null
+    guard self.releasedAt == null
+    guard self.deletedAt == null
+    constraint legArriveNotNegative: arriveBeforeServeMinutes == null or arriveBeforeServeMinutes >= 0 "Arrival before serve cannot be negative"
+    constraint legLoadNotNegative: loadMinutes == null or loadMinutes >= 0 "Load time cannot be negative"
+    constraint legLeaveAfterPositive: leaveAfterMinutes == null or leaveAfterMinutes > 0 "Time on site before leaving has to be more than zero"
+    mutate arriveBeforeServeMinutes = arriveBeforeServeMinutes
+    mutate loadMinutes = loadMinutes
+    mutate leaveAfterMinutes = leaveAfterMinutes
+    emit EventVehicleLegPlanned {
+      eventVehicleAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  // Where this rig loads at the kitchen. Empty clears it.
+  command setLoadingZone(optional loadingZone: string) {
+    guard self.assignedAt != null
+    guard self.releasedAt == null
+    guard self.deletedAt == null
+    mutate loadingZone = loadingZone != null and length(trim(loadingZone)) > 0 ? loadingZone : null
+    emit EventVehicleLoadingZoneSet {
       eventVehicleAssignmentId: self.id
       tenantId: self.tenantId
       eventId: self.eventId
@@ -145,6 +214,18 @@ event EventVehiclePreloaded: "event_vehicle.preloaded" {
 }
 
 event EventVehiclePreloadCleared: "event_vehicle.preload_cleared" {
+  eventVehicleAssignmentId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventVehicleLegPlanned: "event_vehicle.leg_planned" {
+  eventVehicleAssignmentId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventVehicleLoadingZoneSet: "event_vehicle.loading_zone_set" {
   eventVehicleAssignmentId: string
   tenantId: string
   eventId: string

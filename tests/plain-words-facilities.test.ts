@@ -120,7 +120,10 @@ describe("plain words on leftover facilities equipment manifests", () => {
       "Equipment marked out of service cannot be checked out",
     );
     expect(visible).toContain(
-      "This equipment is marked out of service, so it can't be checked out. Pick other equipment.",
+      "This equipment is marked out of service, so it can't be checked out. Pick other equipment, or ask a manager to book it anyway with a reason.",
+    );
+    expectPlain(
+      "This equipment is marked out of service, so it can't be checked out. Pick other equipment, or ask a manager to book it anyway with a reason.",
     );
   });
 });

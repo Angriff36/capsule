@@ -6,6 +6,7 @@ import {
   useCreateComponentIngredient,
   useGetComponentImport,
   useListComponentImport,
+  useListComponent,
   useListComponentImportLine,
   useListIngredient,
 } from "../../../lib/manifest-convex-react";
@@ -76,6 +77,7 @@ export function ComponentImportPage() {
   const importIdParam = searchParams.get("importId");
   const liveRef = useRef<HTMLDivElement>(null);
   const ingredients = useListIngredient();
+  const components = useListComponent();
   const allImports = useListComponentImport();
   const allImportLines = useListComponentImportLine();
   // Generated id queries throw on malformed ids, so an implausible ?importId
@@ -162,6 +164,14 @@ export function ComponentImportPage() {
           deletedAt: item.deletedAt as number | null | undefined,
         })),
     [ingredients],
+  );
+  const recipes = useMemo(
+    () =>
+      (components ?? [])
+        .filter((item) => item.deletedAt == null)
+        .map((item) => ({ id: String(item._id), name: String(item.name) }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    [components],
   );
 
   const resumableImports = useMemo(
@@ -279,15 +289,23 @@ export function ComponentImportPage() {
           catalog,
           sheetFilename,
           linesFilename,
+          recipes,
         );
       } else if (readiness.kind === "text_file") {
         next = coordinator.parseTextFile(
           source,
           textFilename ?? "component.txt",
           catalog,
+          recipes,
         );
       } else {
-        next = coordinator.parseText(source, catalog, "pasted_text");
+        next = coordinator.parseText(
+          source,
+          catalog,
+          "pasted_text",
+          undefined,
+          recipes,
+        );
       }
       setReview(next);
       markClean();
@@ -611,6 +629,11 @@ export function ComponentImportPage() {
                   status={
                     storedImport == null ? undefined : storedImport.status
                   }
+                  duplicateOutcome={
+                    storedImport == null
+                      ? undefined
+                      : (storedImport.duplicateOutcome ?? undefined)
+                  }
                 />
               ) : (
                 <ComponentImportSourcePane
@@ -692,6 +715,7 @@ export function ComponentImportPage() {
                   review={review}
                   coordinator={coordinator}
                   catalog={catalog}
+                  recipes={recipes}
                   busy={busy}
                   unresolvedCount={unresolvedCount}
                   saveState={saveState}

@@ -91,6 +91,7 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
+  belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
 
   // Seeds follow menu, recipe, headcount and schedule changes made by any
   // staff role (reactions run as the acting user), so the gate is staff, not
@@ -108,6 +109,15 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
     batchMultiplier: decimal(10, 4),
     optional purchasingWeekStart: datetime
   ) {
+    // Seeds come from menu, proposal and recipe changes; the same people who
+    // may change event dishes may start them (see EventDish policies).
+    guard roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "kitchenAccess")
+    // The event, its dish line and the recipe part must all be this
+    // workspace's: the recipe lines below are read by component alone.
+    guard self.event != null and self.eventDish != null and self.component != null
+    // A seed may not be pointed at other records: the links sent must be the
+    // seed's own (checked above). Automatic seeds always send the same links.
+    guard eventId == self.eventId and eventDishId == self.eventDishId and dishId == self.dishId and componentId == self.componentId
     guard self.seededAt == null
     guard self.deletedAt == null
     mutate eventId = eventId

@@ -8,6 +8,16 @@ import {
 } from "./_generated/server";
 import { Doc, Id } from "./_generated/dataModel";
 import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
+import {
+  quotePickValidator,
+  resolveQuoteSelections,
+} from "./lib/quoteSelections";
+import {
+  buildQuoteEstimate,
+  parseQuoteEstimate,
+  QUOTE_MARKETING_NOTICE,
+  QUOTE_PRIVACY_NOTICE,
+} from "../src/lib/quoteSelections";
 
 // Event-authorized, deliberately narrow view of the booking details operations
 // needs. Generated reads remain the authority for event and sales permissions.
@@ -228,6 +238,18 @@ export const ingressQuoteSubmission = internalMutation({
     guestCount: v.number(),
     serviceStyleId: v.optional(v.id("serviceStyles")),
     occasionId: v.optional(v.id("occasions")),
+    menuId: v.optional(v.id("menus")),
+    picks: v.optional(v.array(quotePickValidator)),
+    extras: v.optional(v.array(quotePickValidator)),
+    submissionKey: v.string(),
+    referralSourceId: v.optional(v.id("referralSources")),
+    howHeardText: v.string(),
+    utmSource: v.string(),
+    utmMedium: v.string(),
+    utmCampaign: v.string(),
+    referrer: v.string(),
+    landingPage: v.string(),
+    marketingConsent: v.boolean(),
     serviceStyleText: v.string(),
     occasionText: v.string(),
     venueName: v.string(),
@@ -277,6 +299,17 @@ export const ingressQuoteSubmission = internalMutation({
         throw new ConvexError("Invalid occasion selection");
       }
     }
+    if (args.referralSourceId) {
+      const rs = await ctx.db.get(args.referralSourceId);
+      if (
+        !rs ||
+        rs.tenantId !== tenantId ||
+        rs.deletedAt != null ||
+        rs.status !== "active"
+      ) {
+        throw new ConvexError("Pick how you heard about us again.");
+      }
+    }
 
     // Dedup: a prior active submission for the same key is returned as-is so a
     // repeat submit is a no-op (submit-once). Dismissed rows still count — the
@@ -290,7 +323,17 @@ export const ingressQuoteSubmission = internalMutation({
         q.eq("tenantId", tenantId).eq("dedupKey", dedupKey),
       )
       .collect();
-    const existing = candidates.find(
+    // A repeat of the same form visit (double tap, lost response) carries the
+    // same submission key, even if a field was changed in between.
+    const submissionKey = args.submissionKey.trim();
+    const sameVisit = submissionKey
+      ? await ctx.db
+          .query("quoteSubmissions")
+          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+          .filter((q) => q.eq(q.field("submissionKey"), submissionKey))
+          .collect()
+      : [];
+    const existing = [...sameVisit, ...candidates].find(
       (sub) =>
         sub.deletedAt == null &&
         (sub.status === "pending" ||
@@ -306,6 +349,17 @@ export const ingressQuoteSubmission = internalMutation({
         status: existing.status,
       };
     }
+
+    // Picks are checked and priced after dedup: a repeat returns the first
+    // request even if the menu changed since.
+    const selections = await resolveQuoteSelections(ctx, tenantId, {
+      menuId: args.menuId,
+      picks: args.picks,
+      extras: args.extras,
+      eventDate: args.eventDate,
+      guestCount: args.guestCount,
+    });
+    const hasPicks = selections.menu != null || selections.lines.length > 0;
 
     // Blank optional answers are stored as null, not as empty strings.
     const text = (value: string) => value.trim() || null;
@@ -327,6 +381,21 @@ export const ingressQuoteSubmission = internalMutation({
         guestCount: args.guestCount,
         serviceStyleId: args.serviceStyleId ?? null,
         occasionId: args.occasionId ?? null,
+        menuId: args.menuId ?? null,
+        selectionsJson: hasPicks ? JSON.stringify(selections) : null,
+        estimateJson: hasPicks
+          ? JSON.stringify(buildQuoteEstimate(selections, args.guestCount))
+          : null,
+        submissionKey: submissionKey || null,
+        referralSourceId: args.referralSourceId ?? null,
+        howHeardText: text(args.howHeardText),
+        utmSource: text(args.utmSource),
+        utmMedium: text(args.utmMedium),
+        utmCampaign: text(args.utmCampaign),
+        referrer: text(args.referrer),
+        landingPage: text(args.landingPage),
+        consentNotice: QUOTE_PRIVACY_NOTICE,
+        marketingConsent: args.marketingConsent,
         // Free-text answers from the empty-catalog fallback inputs (A5): stored
         // as text because no catalog row exists to reference.
         serviceStyleText: text(args.serviceStyleText),
@@ -358,14 +427,15 @@ export const getQuoteFormOptions = query({
   ): Promise<{
     serviceStyles: { _id: Id<"serviceStyles">; name: string }[];
     occasions: { _id: Id<"occasions">; name: string }[];
+    referralSources: { _id: Id<"referralSources">; name: string }[];
   }> => {
     const org = await ctx.db
       .query("organizations")
       .filter((q) => q.eq(q.field("status"), "active"))
       .first();
-    if (!org) return { serviceStyles: [], occasions: [] };
+    if (!org) return { serviceStyles: [], occasions: [], referralSources: [] };
     const tenantId = org.tenantId;
-    const [serviceStyles, occasions] = await Promise.all([
+    const [serviceStyles, occasions, referralSources] = await Promise.all([
       ctx.db
         .query("serviceStyles")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
@@ -373,6 +443,11 @@ export const getQuoteFormOptions = query({
         .collect(),
       ctx.db
         .query("occasions")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .filter((q) => q.eq(q.field("status"), "active"))
+        .collect(),
+      ctx.db
+        .query("referralSources")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
         .filter((q) => q.eq(q.field("status"), "active"))
         .collect(),
@@ -385,6 +460,10 @@ export const getQuoteFormOptions = query({
         .sort(bySort),
       occasions: occasions
         .map((o) => ({ _id: o._id, name: o.name, sortOrder: o.sortOrder }))
+        .sort(bySort),
+      referralSources: referralSources
+        .filter((r) => r.deletedAt == null)
+        .map((r) => ({ _id: r._id, name: r.name, sortOrder: r.sortOrder }))
         .sort(bySort),
     };
   },
@@ -410,6 +489,18 @@ export const submitQuote = action({
     consent: v.boolean(),
     serviceStyleId: v.optional(v.id("serviceStyles")),
     occasionId: v.optional(v.id("occasions")),
+    menuId: v.optional(v.id("menus")),
+    picks: v.optional(v.array(quotePickValidator)),
+    extras: v.optional(v.array(quotePickValidator)),
+    submissionKey: v.optional(v.string()),
+    referralSourceId: v.optional(v.id("referralSources")),
+    howHeardText: v.optional(v.string()),
+    utmSource: v.optional(v.string()),
+    utmMedium: v.optional(v.string()),
+    utmCampaign: v.optional(v.string()),
+    referrer: v.optional(v.string()),
+    landingPage: v.optional(v.string()),
+    marketingConsent: v.optional(v.boolean()),
     serviceStyleText: v.optional(v.string()),
     occasionText: v.optional(v.string()),
     venueName: v.optional(v.string()),
@@ -470,6 +561,18 @@ export const submitQuote = action({
         guestCount: args.guestCount,
         serviceStyleId: args.serviceStyleId,
         occasionId: args.occasionId,
+        menuId: args.menuId,
+        picks: args.picks,
+        extras: args.extras,
+        submissionKey: bounded(args.submissionKey),
+        referralSourceId: args.referralSourceId,
+        howHeardText: bounded(args.howHeardText),
+        utmSource: bounded(args.utmSource),
+        utmMedium: bounded(args.utmMedium),
+        utmCampaign: bounded(args.utmCampaign),
+        referrer: bounded(args.referrer, MAX_LONG),
+        landingPage: bounded(args.landingPage, MAX_LONG),
+        marketingConsent: args.marketingConsent === true,
         serviceStyleText: bounded(args.serviceStyleText),
         occasionText: bounded(args.occasionText),
         venueName: bounded(args.venueName),
@@ -490,6 +593,33 @@ export const submitQuote = action({
     };
   },
 });
+
+/**
+ * Attribution and consent from the quote form, as the lead's notes, so sales
+ * sees where the request came from without opening the raw submission.
+ */
+function quoteLeadNotes(submission: Doc<"quoteSubmissions">): string | null {
+  const parts: string[] = [];
+  if (submission.howHeardText) {
+    parts.push(`How they heard about us: ${submission.howHeardText}.`);
+  }
+  const campaign = [
+    submission.utmSource,
+    submission.utmMedium,
+    submission.utmCampaign,
+  ].filter(Boolean);
+  if (campaign.length > 0) parts.push(`Campaign: ${campaign.join(" / ")}.`);
+  if (submission.referrer) parts.push(`Came from: ${submission.referrer}.`);
+  if (submission.landingPage) {
+    parts.push(`First page: ${submission.landingPage}.`);
+  }
+  parts.push(
+    submission.marketingConsent
+      ? `Offers and news: yes ("${QUOTE_MARKETING_NOTICE}").`
+      : "Offers and news: no.",
+  );
+  return parts.join(" ");
+}
 
 /**
  * Authenticated operator path: converts a captured QuoteSubmission into the
@@ -533,6 +663,8 @@ export const processQuoteSubmission = action({
     const clientName = submission.clientName ?? "Quote Lead";
     const email = submission.email ?? "";
     const phone = submission.phone ?? undefined;
+
+    const leadNotes = quoteLeadNotes(submission);
 
     // Move into processing (salesAccess write — caller is authorized).
     await ctx.runMutation(api.mutations.QuoteSubmission_startProcessing, {
@@ -578,7 +710,12 @@ export const processQuoteSubmission = action({
             {
               leadType: "company",
               source: "quote-builder",
-              estimatedValue: 0,
+              estimatedValue:
+                parseQuoteEstimate(submission.estimateJson)?.total ?? 0,
+              ...(submission.referralSourceId
+                ? { referralSourceId: submission.referralSourceId }
+                : {}),
+              ...(leadNotes ? { notes: leadNotes } : {}),
               companyName: clientName,
               email,
               phone,
@@ -767,6 +904,53 @@ export const processQuoteSubmission = action({
       } catch (error) {
         errors.push(
           `proposal: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+
+    // Picks (AC-095/AC-241): the chosen menu and dishes become priced lines
+    // and dish choices, extras become offered enhancements — all from the
+    // same catalog and price rule the visitor saw. A retry adds only the
+    // lines still missing; dish choices and extras are keyed to this
+    // submission, so a retried conversion fills gaps without doubling.
+    if (proposalId && (submission.menuId || submission.selectionsJson)) {
+      try {
+        const plan = await ctx.runQuery(
+          internal.lib.quoteSelections.quoteConversionPlan,
+          { proposalId, submissionId },
+        );
+        for (const line of plan.lines) {
+          await ctx.runMutation(
+            api.lib.proposalPricing.addProposalLineAndRecompute,
+            { proposalId, ...line },
+          );
+        }
+        for (const pick of plan.dishSelections) {
+          await ctx.runMutation(
+            api.mutations.ProposalDishSelection_createViaSelect,
+            {
+              proposalId,
+              ...pick,
+              idempotencyKey: `quote:${submissionId}:dish:${pick.dishId}`,
+            },
+          );
+        }
+        for (const [sortOrder, offer] of plan.enhancements.entries()) {
+          await ctx.runMutation(
+            api.mutations.ProposalEnhancement_createViaOffer,
+            {
+              proposalId,
+              name: offer.name,
+              description: offer.description,
+              price: offer.price,
+              sortOrder,
+              idempotencyKey: `quote:${submissionId}:extra:${offer.menuDishId}`,
+            },
+          );
+        }
+      } catch (error) {
+        errors.push(
+          `menu: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     }

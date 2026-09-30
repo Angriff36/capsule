@@ -18,6 +18,11 @@ import type {
 } from "../events/beoPdf";
 import { STAGE_LABEL, type EventStage } from "../events/eventStatus";
 import type { InvoicePdfClient, InvoicePdfRecord } from "../finance/invoicePdf";
+import {
+  ClientPortalPayments,
+  type PortalPayableInvoice,
+} from "./ClientPortalPayments";
+import { useLatestDefined, useMinuteClock } from "../../lib/useMinuteClock";
 import "./clientPortal.css";
 
 const PORTAL_STAGES: EventStage[] = [
@@ -69,12 +74,13 @@ export interface ClientPortalSnapshot {
     serviceStyle: string | null;
     quantityServings: number;
   }>;
+  payments?: { online: boolean };
   documents?: {
     client: ContractPdfClient & InvoicePdfClient;
     clientName: string;
     contracts: ContractPdfRecord[];
     proposals: Array<ProposalPdfRecord & { acceptedAt?: number | null }>;
-    invoices: InvoicePdfRecord[];
+    invoices: Array<InvoicePdfRecord & PortalPayableInvoice>;
     beo: {
       event: BeoEventRecord;
       dishes: BeoDishLine[];
@@ -98,17 +104,23 @@ type PortalStyle = CSSProperties & {
 export function ClientPortalPage({ token: tokenProp }: { token?: string }) {
   const { token: routeToken } = useParams();
   const token = tokenProp ?? routeToken;
-  const portal = useQuery(
-    api.clientPortal.getEvent,
-    token ? { token } : "skip",
+  const clock = useMinuteClock();
+  const portal = useLatestDefined(
+    useQuery(api.clientPortal.getEvent, token ? { token, clock } : "skip"),
   ) as ClientPortalSnapshot | null | undefined;
 
   if (!token || portal === null) return <ClientPortalUnavailable />;
   if (portal === undefined) return <ClientPortalLoading />;
-  return <ClientPortalView portal={portal} />;
+  return <ClientPortalView portal={portal} token={token} />;
 }
 
-export function ClientPortalView({ portal }: { portal: ClientPortalSnapshot }) {
+export function ClientPortalView({
+  portal,
+  token,
+}: {
+  portal: ClientPortalSnapshot;
+  token?: string;
+}) {
   const primary = validBrandColor(
     portal.organization.primaryColor,
     DEFAULT_PRIMARY,
@@ -227,6 +239,15 @@ export function ClientPortalView({ portal }: { portal: ClientPortalSnapshot }) {
             </ol>
           )}
         </section>
+
+        {token && portal.documents ? (
+          <ClientPortalPayments
+            token={token}
+            invoices={portal.documents.invoices}
+            online={portal.payments?.online ?? false}
+            companyName={portal.organization.displayName}
+          />
+        ) : null}
 
         <ClientPortalDocumentLibrary portal={portal} />
 
@@ -462,7 +483,7 @@ function ClientPortalDocumentLibrary({
               kind="invoice"
               eyebrow={`${humanize(invoice.status)} invoice`}
               title={invoice.invoiceNumber || "Current invoice"}
-              reference={`${formatMoney(invoice.amountDue)} balance`}
+              reference={`${formatMoney(invoice.amountDue, invoice.currencyCode)} balance`}
               detail={`Issued ${formatDocumentDate(invoice.issuedAt ?? invoice.createdAt)}`}
               state={downloadState}
               onDownload={() =>
@@ -643,9 +664,9 @@ function formatDocumentDate(value: number | null | undefined): string {
   }).format(value);
 }
 
-function formatMoney(value: number): string {
+function formatMoney(value: number, currency = "USD"): string {
   return new Intl.NumberFormat(undefined, {
     style: "currency",
-    currency: "USD",
+    currency,
   }).format(value);
 }

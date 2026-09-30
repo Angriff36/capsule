@@ -13,6 +13,11 @@ entity MenuDish mixin TenantScoped, SoftDeletable {
   property required dishId: uuid
   property required sortOrder: int = 0
   property sellingPrice: money(12, 2)?
+  // A dated price change: from scheduledPriceEffectiveAt on, new quotes and
+  // the public menu use scheduledSellingPrice. Published proposal revisions
+  // keep the price they were sent with.
+  property scheduledSellingPrice: money(12, 2)?
+  property scheduledPriceEffectiveAt: datetime?
   property course: string?
   property serviceStyle: string?
   property specialInstructions: string?
@@ -94,6 +99,11 @@ entity MenuDish mixin TenantScoped, SoftDeletable {
     constraint sellingPriceNonnegative: sellingPrice >= 0 "This menu dish's price can't be negative. Use zero or more."
     compute previousSellingPrice = self.sellingPrice
     mutate sellingPrice = sellingPrice
+    // A dated change whose day has already come is replaced by this price;
+    // one still in the future stays planned.
+    compute scheduleStillAhead = self.scheduledPriceEffectiveAt != null and self.scheduledPriceEffectiveAt > now()
+    mutate scheduledSellingPrice = scheduleStillAhead ? self.scheduledSellingPrice : null
+    mutate scheduledPriceEffectiveAt = scheduleStillAhead ? self.scheduledPriceEffectiveAt : null
     emit MenuDishSellingPriceUpdated {
       menuDishId: self.id
       tenantId: self.tenantId
@@ -101,6 +111,28 @@ entity MenuDish mixin TenantScoped, SoftDeletable {
       dishId: self.dishId
       previousSellingPrice: previousSellingPrice
       sellingPrice: sellingPrice
+    }
+  }
+
+  // Plan a new price from a date. A planned change whose day has already
+  // come first becomes the current price, so no earlier change is lost.
+  command schedulePriceChange(sellingPrice: money(12, 2), effectiveAt: datetime) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard self.menu != null and (self.menu.status == "draft" or self.menu.status == "published")
+    guard roleAllows(user.role, "kitchenManageAccess")
+    constraint scheduledPriceNonnegative: sellingPrice >= 0 "This menu dish's price can't be negative. Use zero or more."
+    compute earlierChangeDue = self.scheduledPriceEffectiveAt != null and self.scheduledPriceEffectiveAt <= now()
+    mutate sellingPrice = earlierChangeDue ? self.scheduledSellingPrice : self.sellingPrice
+    mutate scheduledSellingPrice = sellingPrice
+    mutate scheduledPriceEffectiveAt = effectiveAt
+    emit MenuDishPriceChangeScheduled {
+      menuDishId: self.id
+      tenantId: self.tenantId
+      menuId: self.menuId
+      dishId: self.dishId
+      sellingPrice: sellingPrice
+      effectiveAt: effectiveAt
     }
   }
 
@@ -143,7 +175,16 @@ event MenuDishSellingPriceUpdated: "menu_dish.selling_price_updated" {
   sellingPrice: money(12, 2)
 }
 
-event MenuDishDetailsUpdated: "menu_dish.details_updated" {
+event MenuDishPriceChangeScheduled: "menu_dish.price_change_scheduled" {
+  menuDishId: string
+  tenantId: string
+  menuId: string
+  dishId: string
+  sellingPrice: money(12, 2)
+  effectiveAt: datetime
+}
+
+event MenuDishDetailsUpdated:"menu_dish.details_updated" {
   menuDishId: string
   tenantId: string
   menuId: string

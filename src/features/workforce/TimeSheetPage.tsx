@@ -8,9 +8,11 @@ import {
   useListPerson,
   useListShift,
   useListTimeRecord,
+  useTimeRecordApprove,
   useTimeRecordClockOut,
   useTimeRecordCorrect,
 } from "../../lib/manifest-convex-react";
+import { TimeAttentionPanel } from "./TimeAttentionPanel";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import {
@@ -24,7 +26,9 @@ import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import {
+  BREAK_PROMPT_FIELDS,
   CLOCK_OUT_PROMPT_FIELDS,
+  breakMinutesInput,
   currentShiftFor,
   persistClockOut,
   persistPrimaryTimeRecord,
@@ -32,7 +36,12 @@ import {
   type TimeRecordLedgerRow,
 } from "./timeRecordEntry";
 import { useWorkingEventId } from "../events/workingEvent";
-import { hoursLabel, workedShifts, workedWeeks } from "../staff/workedShifts";
+import {
+  hoursLabel,
+  plannedComparison,
+  workedShifts,
+  workedWeeks,
+} from "../staff/workedShifts";
 
 const policy = new WorkforceLifecyclePolicy();
 
@@ -154,13 +163,114 @@ export function timeRecordBreakLabel(breakMinutes: unknown): string {
   return `${minutes} min`;
 }
 
+/** Lunch (unpaid) first; paid breaks underneath, since they stay in pay. */
 export function TimeSheetBreakCell({
   breakMinutes,
+  paidBreakMinutes,
 }: {
   breakMinutes?: unknown;
+  paidBreakMinutes?: unknown;
 }) {
+  const paid = Number(paidBreakMinutes);
   return (
-    <td className="supply-number">{timeRecordBreakLabel(breakMinutes)}</td>
+    <td className="supply-number">
+      {timeRecordBreakLabel(breakMinutes)}
+      {Number.isFinite(paid) && paid > 0 ? (
+        <small className="block text-ink-3">{paid} min paid breaks</small>
+      ) : null}
+    </td>
+  );
+}
+
+/** Approved or waiting, and who changed the entry and why. */
+export function TimeSheetReview({
+  row,
+  personName,
+  payroll,
+}: {
+  row: {
+    status?: unknown;
+    approvedAt?: number | null;
+    correctionReason?: string | null;
+    correctedById?: string | null;
+  };
+  personName: (id: string) => string;
+  /** Sent to payroll or not (approved entries only). */
+  payroll?: string | null;
+}) {
+  const finished = ["closed", "corrected"].includes(String(row.status));
+  return (
+    <>
+      {finished ? (
+        <small
+          className={`block ${row.approvedAt ? "text-ink-3" : "text-warn"}`}
+        >
+          {row.approvedAt ? "Approved for payroll" : "Waiting for approval"}
+        </small>
+      ) : null}
+      {payroll ? (
+        <small className="block text-ink-3" data-testid="payroll-inclusion">
+          {payroll}
+        </small>
+      ) : null}
+      {row.correctionReason ? (
+        <small className="block text-ink-3">
+          Changed
+          {row.correctedById
+            ? ` by ${personName(row.correctedById)}`
+            : ""}: {row.correctionReason}
+        </small>
+      ) : null}
+    </>
+  );
+}
+
+/** Where the clock-in came from: the phone's time zone and location. */
+export function punchEvidenceLabel(row: {
+  timeZone?: string | null;
+  clockInLatitude?: number | null;
+  clockInLongitude?: number | null;
+  clockInAccuracyMeters?: number | null;
+}): string | null {
+  const parts: string[] = [];
+  if (row.clockInLatitude != null && row.clockInLongitude != null)
+    parts.push(
+      `Phone location ${row.clockInLatitude.toFixed(4)}, ${row.clockInLongitude.toFixed(4)}${row.clockInAccuracyMeters != null ? ` (±${Math.round(row.clockInAccuracyMeters)} m)` : ""}`,
+    );
+  if (row.timeZone) parts.push(row.timeZone.replace(/_/g, " "));
+  return parts.length ? parts.join(" · ") : null;
+}
+
+/** Under the hours: the planned shift and how the recorded time compares. */
+export function PlannedVsRecorded({
+  row,
+  planned,
+}: {
+  row: {
+    clockInAt?: number | null;
+    clockOutAt?: number | null;
+    breakMinutes?: number | null;
+  };
+  planned?: { startsAt?: number | null; endsAt?: number | null };
+}) {
+  if (
+    planned?.startsAt == null ||
+    planned.endsAt == null ||
+    row.clockInAt == null ||
+    row.clockOutAt == null ||
+    row.clockOutAt < row.clockInAt
+  )
+    return null;
+  const hours = Math.max(
+    0,
+    (row.clockOutAt - row.clockInAt) / 3_600_000 -
+      Math.max(0, row.breakMinutes ?? 0) / 60,
+  );
+  return (
+    <small className="block text-ink-3" data-testid="planned-vs-recorded">
+      Planned {formatTime(planned.startsAt)} – {formatTime(planned.endsAt)} ·{" "}
+      {plannedComparison({ hours }, planned)}
+    </small>
   );
 }
 
@@ -173,6 +283,7 @@ export function TimeSheetPage() {
   const clockIn = useCreateTimeRecord();
   const clockOut = useTimeRecordClockOut();
   const correct = useTimeRecordCorrect();
+  const approve = useTimeRecordApprove();
   const declare = useCreateAvailabilityWindow();
   const withdraw = useAvailabilityWindowWithdraw();
   const { prompt, host } = useActionPrompt();
@@ -276,6 +387,7 @@ export function TimeSheetPage() {
               ...CLOCK_OUT_PROMPT_FIELDS[0],
               defaultValue: toDatetimeLocalValue(Date.now()),
             },
+            ...BREAK_PROMPT_FIELDS,
           ],
           confirmLabel: "Clock out",
         });
@@ -284,6 +396,8 @@ export function TimeSheetPage() {
           ...args,
           existingClockInAt: Number(row.clockInAt),
           clockOutAt: values.clockOutAt,
+          breakMinutes: breakMinutesInput(values.breakMinutes),
+          paidBreakMinutes: breakMinutesInput(values.paidBreakMinutes),
         });
       }
       if (key === "correct") {
@@ -309,6 +423,20 @@ export function TimeSheetPage() {
                 : undefined,
               required: true,
             },
+            {
+              ...BREAK_PROMPT_FIELDS[0],
+              defaultValue: String(row.breakMinutes ?? 0),
+            },
+            {
+              ...BREAK_PROMPT_FIELDS[1],
+              defaultValue: String(row.paidBreakMinutes ?? 0),
+            },
+            {
+              name: "reason",
+              label: "Why is it changing?",
+              placeholder: "For example: forgot to clock out after load-out",
+              required: true,
+            },
           ],
           confirmLabel: "Save correction",
         });
@@ -316,8 +444,30 @@ export function TimeSheetPage() {
         const clockInAt = new Date(String(values.clockInAt)).getTime();
         const clockOutAt = new Date(String(values.clockOutAt)).getTime();
         if (!Number.isFinite(clockInAt) || !Number.isFinite(clockOutAt)) return;
-        await correct({ ...args, clockInAt, clockOutAt });
+        await correct({
+          ...args,
+          clockInAt,
+          clockOutAt,
+          reason: String(values.reason ?? "").trim(),
+          breakMinutes: breakMinutesInput(values.breakMinutes),
+          paidBreakMinutes: breakMinutesInput(values.paidBreakMinutes),
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        });
       }
+      if (key === "approve") await approve(args);
+    });
+  };
+
+  const waitingApproval = activeRecords.filter(
+    (row) =>
+      ["closed", "corrected"].includes(String(row.status)) &&
+      row.clockOutAt != null &&
+      row.approvedAt == null,
+  );
+  const approveAll = () => {
+    void run("approve-all", async () => {
+      for (const row of waitingApproval)
+        await approve({ docId: row._id, version: row.version });
     });
   };
 
@@ -366,6 +516,7 @@ export function TimeSheetPage() {
       </header>
       <WorkforceWorkspaceNav />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
+      <TimeAttentionPanel shifts={shifts} onFailure={setFailure} />
 
       {showForm === "clockIn" ? (
         <TimeSheetClockInForm
@@ -464,6 +615,18 @@ export function TimeSheetPage() {
               "time entry",
               "time entries",
             )}
+            {waitingApproval.length > 0 ? (
+              <button
+                className="btn btn-primary btn-sm"
+                disabled={busy != null}
+                onClick={approveAll}
+                data-testid="approve-all-time"
+              >
+                {busy === "approve-all"
+                  ? "Approving…"
+                  : `Approve ${formatCountNoun(waitingApproval.length, "finished entry", "finished entries")}`}
+              </button>
+            ) : null}
           </span>
         </div>
         {personFilter && filteredWeeks.length > 0 ? (
@@ -497,7 +660,7 @@ export function TimeSheetPage() {
                   <th>Event</th>
                   <th>Clock in</th>
                   <th>Clock out</th>
-                  <th>Break</th>
+                  <th>Lunch (unpaid)</th>
                   <th>Hours</th>
                   <th>State</th>
                   <th aria-label="Actions" />
@@ -514,13 +677,24 @@ export function TimeSheetPage() {
                       {row.clockInAt
                         ? `${formatDate(row.clockInAt)} ${formatTime(row.clockInAt)}`
                         : "—"}
+                      {punchEvidenceLabel(row) ? (
+                        <small
+                          className="block text-ink-3"
+                          data-testid="punch-evidence"
+                        >
+                          {punchEvidenceLabel(row)}
+                        </small>
+                      ) : null}
                     </td>
                     <td>
                       {row.clockOutAt
                         ? `${formatDate(row.clockOutAt)} ${formatTime(row.clockOutAt)}`
                         : "—"}
                     </td>
-                    <TimeSheetBreakCell breakMinutes={row.breakMinutes} />
+                    <TimeSheetBreakCell
+                      breakMinutes={row.breakMinutes}
+                      paidBreakMinutes={row.paidBreakMinutes}
+                    />
                     <td>
                       {row.clockInAt != null &&
                       row.clockOutAt != null &&
@@ -533,26 +707,40 @@ export function TimeSheetPage() {
                             ),
                           )
                         : "—"}
+                      <PlannedVsRecorded
+                        row={row}
+                        planned={
+                          row.shiftId
+                            ? (shifts ?? []).find(
+                                (shift) => shift._id === row.shiftId,
+                              )
+                            : undefined
+                        }
+                      />
                     </td>
                     <td>
                       <TimeSheetRecordState row={row} />
+                      <TimeSheetReview row={row} personName={personName} />
                     </td>
                     <td>
                       <div className="supply-row-actions">
-                        {policy
-                          .timeActions(String(row.status))
-                          .map((action) => (
-                            <button
-                              key={action.key}
-                              className="btn btn-ghost btn-sm"
-                              disabled={busy != null}
-                              onClick={() => invokeTime(row, action.key)}
-                            >
-                              {busy === `${row._id}:${action.key}`
-                                ? "Working…"
-                                : action.label}
-                            </button>
-                          ))}
+                        {[
+                          ...policy.timeActions(String(row.status)),
+                          ...(waitingApproval.includes(row)
+                            ? [{ key: "approve", label: "Approve" }]
+                            : []),
+                        ].map((action) => (
+                          <button
+                            key={action.key}
+                            className="btn btn-ghost btn-sm"
+                            disabled={busy != null}
+                            onClick={() => invokeTime(row, action.key)}
+                          >
+                            {busy === `${row._id}:${action.key}`
+                              ? "Working…"
+                              : action.label}
+                          </button>
+                        ))}
                       </div>
                     </td>
                   </tr>

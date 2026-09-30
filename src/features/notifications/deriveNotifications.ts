@@ -1,6 +1,7 @@
 import type { Doc } from "../../lib/api";
 import { formatDate, formatMoney } from "../../lib/format";
 import { isBelowReorder, stockLineLink } from "../inventory/stockLevels";
+import { findRosterConflicts } from "../workforce/rosterConflicts";
 
 /**
  * Client-derived notifications. Capsule reads are live Convex queries, so
@@ -402,31 +403,22 @@ export function deriveNotifications(
     });
   }
 
-  const byPerson = new Map<string, Doc<"shifts">[]>();
-  for (const shift of src.shifts ?? []) {
-    if (shift.deletedAt != null) continue;
-    if (shift.status !== "scheduled" && shift.status !== "started") continue;
-    if (shift.startsAt == null || shift.endsAt == null) continue;
-    const key = shift.personId as string;
-    const list = byPerson.get(key);
-    if (list) list.push(shift);
-    else byPerson.set(key, [shift]);
-  }
-  for (const [personId, shifts] of byPerson) {
-    shifts.sort((a, b) => (a.startsAt ?? 0) - (b.startsAt ?? 0));
-    for (let i = 1; i < shifts.length; i++) {
-      const prev = shifts[i - 1];
-      const cur = shifts[i];
-      if ((cur.startsAt ?? 0) >= (prev.endsAt ?? 0)) continue;
-      const who = personNames.get(personId) ?? "A staff member";
-      out.push({
-        id: `shift-conflict:${prev._id}:${cur._id}`,
-        kind: "shift_conflict",
-        message: `${who} has overlapping shifts on ${formatDate(cur.startsAt)}`,
-        link: "/staff/roster",
-        at: cur.startsAt ?? now,
-      });
-    }
+  // Double bookings name the worker, both events and the shared window.
+  const overlaps = findRosterConflicts({
+    shifts: src.shifts ?? [],
+    timeOff: [],
+    qualifications: [],
+    eventTitle: (id) => (id && eventTitles.get(id)) || "another event",
+    personName: (id) => personNames.get(id) ?? "A staff member",
+  }).filter((conflict) => conflict.kind === "overlap");
+  for (const conflict of overlaps) {
+    out.push({
+      id: conflict.id.replace(/^overlap:/, "shift-conflict:"),
+      kind: "shift_conflict",
+      message: conflict.message,
+      link: "/staff/roster",
+      at: conflict.startsAt,
+    });
   }
 
   out.sort((a, b) => b.at - a.at);

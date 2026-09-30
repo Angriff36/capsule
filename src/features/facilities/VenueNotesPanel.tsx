@@ -16,6 +16,7 @@ import {
   type CommandFailure,
 } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
+import { authorLabel } from "../events/timelineCommentAuthor";
 
 // Roles carrying adminAccess (base.manifest: admin → owner → system).
 const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
@@ -111,8 +112,6 @@ export function VenueNotesPanel({ venueId }: Props) {
             void run("post", async () => {
               await postNote({
                 venueId,
-                authorPersonId: me._id,
-                authorName: myName,
                 category: category as any,
                 content: noteContent.trim(),
                 visibility: visibility as any,
@@ -204,7 +203,7 @@ export function VenueNotesPanel({ venueId }: Props) {
                 </div>
                 <p className="text-base text-ink mt-1">{note.content}</p>
                 <p className="mt-1 font-mono text-xs text-ink-3">
-                  {note.authorName}
+                  {authorLabel(people, note)}
                   {note.postedAt
                     ? ` · ${formatDate(note.postedAt)} ${formatTime(note.postedAt)}`
                     : ""}

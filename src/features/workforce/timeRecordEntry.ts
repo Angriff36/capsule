@@ -35,14 +35,22 @@ export type TimeRecordWriteApi = {
   clockOut: (args: {
     docId: string;
     version?: number;
+    breakMinutes?: number;
+    paidBreakMinutes?: number;
   }) => Promise<{ version?: number } | void>;
   correct: (args: {
     docId: string;
     version?: number;
     clockInAt: number;
     clockOutAt: number;
+    reason: string;
   }) => Promise<unknown>;
 };
+
+/** Correction reasons the time sheet writes when it saves typed times. */
+export const TYPED_WINDOW_REASON = "Hours typed in on the time sheet";
+export const TYPED_CLOCK_OUT_REASON =
+  "Clock-out time typed in on the time sheet";
 
 const SHIFT_SLACK_MS = 2 * 60 * 60 * 1000;
 
@@ -175,6 +183,7 @@ export async function persistPrimaryTimeRecord(
       ...(closed && closed.version != null ? { version: closed.version } : {}),
       clockInAt: window.clockInAt,
       clockOutAt: window.clockOutAt,
+      reason: TYPED_WINDOW_REASON,
     });
   }
   return {
@@ -195,6 +204,10 @@ export async function persistClockOut(
     version?: number;
     existingClockInAt: number;
     clockOutAt?: unknown;
+    /** Unpaid lunch minutes. */
+    breakMinutes?: number;
+    /** Other breaks; they stay paid. */
+    paidBreakMinutes?: number;
   },
 ): Promise<void> {
   // Check before closing: a refused time must leave the entry open, not
@@ -208,6 +221,10 @@ export async function persistClockOut(
   const closed = await api.clockOut({
     docId: input.docId,
     version: input.version,
+    ...(input.breakMinutes ? { breakMinutes: input.breakMinutes } : {}),
+    ...(input.paidBreakMinutes
+      ? { paidBreakMinutes: input.paidBreakMinutes }
+      : {}),
   });
   if (desiredOut == null) return;
   await api.correct({
@@ -215,6 +232,7 @@ export async function persistClockOut(
     ...(closed && closed.version != null ? { version: closed.version } : {}),
     clockInAt: input.existingClockInAt,
     clockOutAt: desiredOut,
+    reason: TYPED_CLOCK_OUT_REASON,
   });
 }
 
@@ -287,3 +305,26 @@ export const CLOCK_OUT_PROMPT_FIELDS = [
     required: true,
   },
 ];
+
+/** Lunch is unpaid; other breaks stay paid (spec §12.2). */
+export const BREAK_PROMPT_FIELDS = [
+  {
+    name: "breakMinutes",
+    label: "Lunch minutes (unpaid)",
+    inputType: "number" as const,
+    helper: "Taken off paid time.",
+  },
+  {
+    name: "paidBreakMinutes",
+    label: "Other break minutes (paid)",
+    inputType: "number" as const,
+    helper: "Kept in paid time.",
+  },
+];
+
+/** Minutes typed in a break box; blank or bad input reads as none. */
+export function breakMinutesInput(value: unknown): number | undefined {
+  const minutes = Math.trunc(Number(String(value ?? "").trim()));
+  if (!Number.isFinite(minutes) || minutes < 0) return undefined;
+  return minutes;
+}

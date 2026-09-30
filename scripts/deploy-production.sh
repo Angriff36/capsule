@@ -35,6 +35,7 @@ VERCEL_WAIT_SECONDS=900
 
 reviewer=""
 no_review=0
+candidate=""
 fail() {
   echo ""
   echo "RESULT: FAIL - $1"
@@ -46,6 +47,9 @@ while [ $# -gt 0 ]; do
     # Ryan, 2026-09-24: "dont need to do another code review for such a small change".
     --no-review) no_review=1; shift ;;
     --ssh-host) PROD_SSH="${2:-}"; shift 2 ;;
+    # The frozen release candidate. Without it, the commit checked out now is
+    # frozen: review, gate, merge and deploy all use that one commit.
+    --candidate) candidate="${2:-}"; [ -n "$candidate" ] || fail "--candidate needs a commit"; shift 2 ;;
     *) fail "unknown argument $1" ;;
   esac
 done
@@ -54,6 +58,16 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.." || fail "cannot go to the repository root
 mkdir -p .artifacts
 branch="$(git symbolic-ref --short -q HEAD || true)"
 [ -n "$branch" ] || fail "detached HEAD. Check out the branch to release"
+if [ "$branch" != "main" ]; then
+  head_sha="$(git rev-parse HEAD)"
+  if [ -n "$candidate" ]; then
+    candidate="$(git rev-parse --verify -q "$candidate^{commit}" || true)"
+    [ "$candidate" = "$head_sha" ] || fail "$branch is at $head_sha, not at the release candidate. Check out the candidate to release it"
+  else
+    candidate="$head_sha"
+  fi
+  echo "deploy-production: release candidate $candidate (frozen; later commits wait for the next release)"
+fi
 
 # The mandated review text (AGENTS.md, merge gate). The reviewer is a model
 # that did not write the diff, so Codex never reviews Codex commits.
@@ -113,7 +127,7 @@ else
     [ -n "$reviewer" ] || run_review
     release_args=(--reviewer "$reviewer")
   fi
-  bash scripts/release.sh "${release_args[@]}" || fail "scripts/release.sh failed (above). Nothing after it ran"
+  bash scripts/release.sh "${release_args[@]}" --candidate "$candidate" || fail "scripts/release.sh failed (above). Nothing after it ran"
   git fetch origin --quiet || fail "git fetch failed after the release"
 fi
 sha="$(git rev-parse origin/main)"
@@ -122,6 +136,13 @@ case "$(git log -1 --format=%s "$sha")" in
   "[release] "*) ;;
   *) fail "origin/main ($sha) is not a [release] commit" ;;
 esac
+if [ -n "$candidate" ]; then
+  # The release commit must carry the frozen candidate, not newer branch work.
+  git log -1 --format=%B "$sha" | grep -qx "Release-Candidate: $candidate" || fail "the release commit $sha does not record the candidate $candidate"
+  # The shared branch may have taken newer work after the merge; the rest of
+  # this run uses the release commit itself.
+  git checkout -q -B main "$sha" || fail "cannot check out the release commit $sha"
+fi
 [ "$(git rev-parse HEAD)" = "$sha" ] || fail "the working tree is not at the release commit $sha"
 echo "deploy-production: release commit $sha"
 

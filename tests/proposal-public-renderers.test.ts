@@ -96,6 +96,32 @@ describe("proposal public renderers", () => {
     expect(text).toContain("Frozen client note");
     expect(text).toContain("Frozen terms");
     expect(text).not.toContain("Hidden timeline activity");
+    // No saved order (older revisions): the standard layout.
+    expect(text.indexOf("Event Details")).toBeLessThan(
+      text.indexOf("Roasted carrots"),
+    );
+    expect(text.indexOf("Roasted carrots")).toBeLessThan(
+      text.indexOf("Frozen terms"),
+    );
+
+    // AC-259: the client page shows sections in the saved order.
+    queryResult = {
+      ...queryResult,
+      proposal: {
+        ...queryResult.proposal,
+        sectionOrder: ["terms", "menu_sections"],
+      },
+    };
+    const ordered = await mountedText(
+      createElement(SharedProposalPage, { token: "token" }),
+    );
+    expect(ordered.indexOf("Frozen terms")).toBeGreaterThan(-1);
+    expect(ordered.indexOf("Frozen terms")).toBeLessThan(
+      ordered.indexOf("Roasted carrots"),
+    );
+    expect(ordered.indexOf("Roasted carrots")).toBeLessThan(
+      ordered.indexOf("Event Details"),
+    );
   });
 
   it("keeps the signing control available when presentation hides the acceptance CTA and terms", async () => {

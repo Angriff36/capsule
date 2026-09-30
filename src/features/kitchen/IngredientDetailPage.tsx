@@ -539,9 +539,7 @@ export function IngredientDetailPage() {
             <dt>Allergens</dt>
             <dd>
               {ingredient.isGlutenFree ? (
-                <span className="chip border-ok/40 bg-ok-soft text-ok mr-2">
-                  Gluten free
-                </span>
+                <span className="chip chip-tone-ok mr-2">Gluten free</span>
               ) : null}
               {(ingredient.allergens ?? []).length
                 ? (ingredient.allergens ?? []).join(", ")

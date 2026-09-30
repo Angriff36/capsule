@@ -212,7 +212,7 @@ describe("Stripe outbox records each paid session once", () => {
       amount: 400,
       method: "card",
       notes: `Stripe Checkout ${link.sessionId}`,
-      idempotencyKey: `stripe-checkout/${link.sessionId}/record`,
+      idempotencyKey: `tenant-shared/stripe-checkout/${link.sessionId}/record`,
     });
 
     expect(
@@ -225,6 +225,44 @@ describe("Stripe outbox records each paid session once", () => {
       { status: "completed", amount: 400, invoiceId: String(env.invoiceId) },
     ]);
     expect(after.invoice).toMatchObject({ amountPaid: 400, amountDue: 0 });
+  });
+
+  it("a record or settle receipt saved under the old unprefixed key is refused, never run twice", async () => {
+    for (const step of ["record", "settle"] as const) {
+      const env = await setup();
+      stubStripe({ lookup: "paid" });
+      const link = await env.finance.action(
+        api.invoicePayments.createPaymentLink,
+        { invoiceId: env.invoiceId },
+      );
+      // The earlier version finished this step under the key without the
+      // tenant-shared/ prefix.
+      await env.t.run((ctx) =>
+        ctx.db.insert("commandIdempotencyKeys", {
+          key: `stripe-checkout/${link.sessionId}/${step}`,
+          command:
+            step === "record" ? "Payment_createViaRecord" : "Payment_settle",
+          result: { docId: "payment-from-old-version" },
+          createdAt: Date.now(),
+        } as never),
+      );
+
+      const synced = await env.finance.action(
+        api.invoicePayments.syncStripePayments,
+        { invoiceId: env.invoiceId },
+      );
+      expect(synced.recorded).toBe(0);
+      expect(synced.failures).toHaveLength(1);
+      expect(synced.failures[0]).toContain("earlier version of the app");
+      // Nothing was settled a second time: the invoice balance is untouched.
+      const after = await paymentsAndInvoice(env);
+      expect(after.invoice).toMatchObject({ amountPaid: 0, amountDue: 400 });
+      expect(after.payments.filter((p) => p.status === "completed")).toEqual(
+        [],
+      );
+      // A refused record step records no payment at all.
+      if (step === "record") expect(after.payments).toEqual([]);
+    }
   });
 
   it("a user from another tenant can never create or sync payments on the invoice", async () => {

@@ -119,13 +119,23 @@ describe("runtime proof: Event.changeServiceStyle reference check", () => {
       },
     );
 
-    for (const refused of [mine.retired, theirs.active, "not-a-style-id"]) {
+    await expect(
+      run(proof, owner, api.mutations.Event_changeServiceStyle, {
+        docId: event.docId,
+        serviceStyleId: mine.retired,
+      }),
+    ).rejects.toThrow("Pick a service style that is still offered.");
+    // Another workspace's style or a made-up id is stopped earlier by the
+    // own-workspace link check (convex/lib/ownWorkspaceLinks.ts, PL-AUTH).
+    for (const refused of [theirs.active, "not-a-style-id"]) {
       await expect(
         run(proof, owner, api.mutations.Event_changeServiceStyle, {
           docId: event.docId,
           serviceStyleId: refused,
         }),
-      ).rejects.toThrow("Pick a service style that is still offered.");
+      ).rejects.toThrow(
+        /Pick a service style that is still offered\.|A linked record was not found/,
+      );
     }
     const unchanged = await owner.run(async (ctx) =>
       ctx.db.get(event.docId as never),

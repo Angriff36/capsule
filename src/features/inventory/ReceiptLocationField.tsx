@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { ADD_NEW_CHOICE } from "./inlineCatalogChoice";
 
 export type ReceivableLocation = {
   readonly _id: string;
@@ -23,8 +24,8 @@ export function activeLocations(
  * required select with only its placeholder is a dead end behind a native
  * "select an item" tooltip (#143). With nothing to choose, the field becomes
  * a name box: the receipt creates that location first, then records against
- * it. Existing locations still get the plain select plus a shortcut to add
- * more in the Stock book.
+ * it. With locations, "New location…" swaps in the same name box in place,
+ * so the typed receipt is never lost to another page (PR04-09).
  */
 export function ReceiptLocationField({
   locations,
@@ -33,8 +34,9 @@ export function ReceiptLocationField({
   readonly locations: readonly ReceivableLocation[] | undefined;
   readonly defaultLocationId?: string | null;
 }) {
+  const [adding, setAdding] = useState(false);
   const options = activeLocations(locations);
-  if (locations !== undefined && options.length === 0) {
+  if (locations !== undefined && (options.length === 0 || adding)) {
     return (
       <label className="field-label">
         Location
@@ -44,28 +46,45 @@ export function ReceiptLocationField({
           placeholder="e.g. Walk-in cooler"
           autoComplete="off"
           required
+          autoFocus={adding}
           data-testid="receipt-new-location"
         />
         <span className="field-hint">
-          No storage locations yet. Name one here and this receipt creates it;
-          you can add more later in{" "}
-          <Link to="/inventory/stock" className="underline font-medium">
-            Inventory → Stock book
-          </Link>
-          .
+          {options.length === 0
+            ? "No storage locations yet. Name one here and this receipt creates it."
+            : "Name the new location. This receipt creates it and stays filled in."}
+          {options.length > 0 ? (
+            <>
+              {" "}
+              <button
+                type="button"
+                className="underline font-medium"
+                onClick={() => setAdding(false)}
+              >
+                Pick an existing location
+              </button>
+            </>
+          ) : null}
         </span>
       </label>
     );
   }
+  // One location is the obvious place; preselect it rather than make the
+  // receiver pick the only choice.
+  const initial =
+    defaultLocationId ?? (options.length === 1 ? options[0]!._id : "");
   return (
     <label className="field-label">
       Location
       <select
         name="locationId"
         className="input"
-        defaultValue={defaultLocationId ?? ""}
+        defaultValue={initial}
         required
         disabled={locations === undefined}
+        onChange={(event) => {
+          if (event.target.value === ADD_NEW_CHOICE) setAdding(true);
+        }}
       >
         <option value="">
           {locations === undefined ? "Loading locations…" : "Select location"}
@@ -75,14 +94,10 @@ export function ReceiptLocationField({
             {item.name}
           </option>
         ))}
+        {locations !== undefined ? (
+          <option value={ADD_NEW_CHOICE}>New location…</option>
+        ) : null}
       </select>
-      <span className="field-hint">
-        Need another?{" "}
-        <Link to="/inventory/stock" className="underline font-medium">
-          New location in the Stock book
-        </Link>
-        .
-      </span>
     </label>
   );
 }

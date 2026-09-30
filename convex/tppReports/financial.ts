@@ -9,6 +9,7 @@ import type {
 } from "../../src/features/reports/tpp/types";
 import { query } from "../_generated/server";
 import { getAuthContext } from "../lib/authContext";
+import { canRead } from "../search";
 import {
   REPORT_ROW_LIMIT,
   decryptReportFields,
@@ -26,14 +27,46 @@ const BILLED_STATUSES = new Set([
   "partial",
   "paid",
 ]);
-const EARNINGS_ROLES = new Set([
-  "owner",
-  "admin",
-  "manager",
-  "finance_manager",
-  "workforce_manager",
-]);
 type Parameters = Record<string, string | string[] | boolean | number>;
+
+// Generated read policies (convex/queries.ts) of the records these reports
+// show. A report opens only for a caller who may read its main records; names
+// joined in from other records show only when the caller may read those too,
+// and removed records never show.
+const INVOICE_READ = ["financeAccess", "manageAccess"];
+const PAYMENT_READ = ["financeAccess"];
+const PROPOSAL_READ = ["salesAccess"];
+const PRICE_OBSERVATION_READ = [
+  "kitchenAccess",
+  "procurementAccess",
+  "manageAccess",
+];
+const CLOSEOUT_READ = ["financeAccess", "eventManageAccess"];
+const PAYROLL_READ = ["financeManageAccess"];
+const EVENT_READ = ["staffAccess"];
+const VENUE_READ = ["eventAccess"];
+const CLIENT_READ = ["salesAccess", "financeAccess"];
+const PERSON_READ = ["staffAccess"];
+const INGREDIENT_READ = ["kitchenAccess", "inventoryAccess", "manageAccess"];
+const VENDOR_READ = ["procurementAccess"];
+const PAYMENT_REPORTS = new Set([
+  "contact-payments",
+  "credit-card-transactions",
+  "payment-totals",
+]);
+const CLOSEOUT_REPORTS = new Set([
+  "profit-summary",
+  "event-food-costing-summary",
+]);
+function reportRead(reportId: string): string[] {
+  if (PAYMENT_REPORTS.has(reportId)) return PAYMENT_READ;
+  if (CLOSEOUT_REPORTS.has(reportId)) return CLOSEOUT_READ;
+  if (reportId === "outstanding-proposals") return PROPOSAL_READ;
+  if (reportId === "inventory-cost-changes") return PRICE_OBSERVATION_READ;
+  if (reportId === "staff-earnings") return PAYROLL_READ;
+  if (reportId === "lost-revenue-by-cancellation-reason") return EVENT_READ;
+  return INVOICE_READ;
+}
 
 function reportTitle(reportId: string): string {
   return (
@@ -134,6 +167,14 @@ export const run = query({
     const tenantId = await requireReportTenant(ctx);
     if (!REPORT_IDS.has(args.reportId))
       throw new Error("Unknown Financial report");
+    const auth = await getAuthContext(ctx);
+    if (!canRead(auth, reportRead(args.reportId)))
+      throw new Error(
+        "Your role can't open this money report. Ask someone who works with these records to run it.",
+      );
+    const seeEvents = canRead(auth, EVENT_READ);
+    const seeVenues = canRead(auth, VENUE_READ);
+    const seeClients = canRead(auth, CLIENT_READ);
     const parameters = (args.parameters ?? {}) as Parameters;
     const [rawEvents, invoices, clients] = await Promise.all([
       ctx.db
@@ -149,24 +190,20 @@ export const run = query({
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
         .take(REPORT_ROW_LIMIT),
     ]);
+    // The event's own venue snapshot follows eventRead; filling it from the
+    // Venue record follows venueRead.
     const events = await Promise.all(
-      rawEvents.map(async (event) =>
-        resolveReportEventVenue(
+      rawEvents.map(async (event) => {
+        const plain = await decryptReportFields(
           ctx,
-          tenantId,
-          await decryptReportFields(
-            ctx,
-            "Event",
-            [
-              "primaryContactName",
-              "primaryContactEmail",
-              "primaryContactPhone",
-            ],
-            event,
-          ),
-          false,
-        ),
-      ),
+          "Event",
+          ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
+          event,
+        );
+        return seeVenues
+          ? resolveReportEventVenue(ctx, tenantId, plain, false)
+          : plain;
+      }),
     );
     const eventById = new Map(
       events
@@ -178,6 +215,11 @@ export const run = query({
         .filter((row) => isLiveTenantRow(row, tenantId))
         .map((row) => [String(row._id), row]),
     );
+    // Joined names: blank when the caller may not read the joined record.
+    const contactOf = (clientId: unknown) =>
+      seeClients ? clientName(clientById.get(String(clientId))) : "";
+    const shownEvent = (eventId: unknown) =>
+      seeEvents && eventId ? eventById.get(String(eventId)) : undefined;
     const [start, end] = range(parameters);
     const billed = invoices.filter(
       (row) =>
@@ -225,7 +267,7 @@ export const run = query({
           return {
             id: row._id,
             values: {
-              contact: clientName(clientById.get(String(row.clientId))),
+              contact: contactOf(row.clientId),
               invoice: row.invoiceNumber ?? "",
               issued: row.issuedAt ?? null,
               due: row.dueDate ?? null,
@@ -299,7 +341,7 @@ export const run = query({
         id: row._id,
         values: {
           date: row.settledAt ?? row.recordedAt ?? null,
-          contact: clientName(clientById.get(String(row.clientId))),
+          contact: contactOf(row.clientId),
           method: row.method,
           amount: row.amount,
           source: row.externalSource ?? "",
@@ -332,13 +374,9 @@ export const run = query({
         .map((row) => ({
           id: row._id,
           values: {
-            event: row.eventId
-              ? (eventById.get(String(row.eventId))?.title ?? "")
-              : "",
-            contact: clientName(clientById.get(String(row.clientId))),
-            date: row.eventId
-              ? (eventById.get(String(row.eventId))?.startsAt ?? null)
-              : null,
+            event: shownEvent(row.eventId)?.title ?? "",
+            contact: contactOf(row.clientId),
+            date: shownEvent(row.eventId)?.startsAt ?? null,
             deposit: row.depositAmount ?? 0,
             due: row.dueDate ?? null,
             status: row.status,
@@ -375,7 +413,7 @@ export const run = query({
           id: row._id,
           values: {
             proposal: row.proposalNumber ?? row.title,
-            contact: clientName(clientById.get(String(row.clientId))),
+            contact: contactOf(row.clientId),
             date: row.eventDate ?? null,
             guests: row.guestCount,
             total: row.total,
@@ -415,10 +453,18 @@ export const run = query({
           .take(REPORT_ROW_LIMIT),
       ]);
       const ingredientById = new Map(
-        ingredients.map((row) => [String(row._id), row.name]),
+        canRead(auth, INGREDIENT_READ)
+          ? ingredients
+              .filter((row) => isLiveTenantRow(row, tenantId))
+              .map((row) => [String(row._id), row.name])
+          : [],
       );
       const vendorById = new Map(
-        vendors.map((row) => [String(row._id), row.name]),
+        canRead(auth, VENDOR_READ)
+          ? vendors
+              .filter((row) => isLiveTenantRow(row, tenantId))
+              .map((row) => [String(row._id), row.name])
+          : [],
       );
       const grouped = new Map<string, typeof observations>();
       for (const item of observations.filter(
@@ -485,8 +531,8 @@ export const run = query({
         .map((row) => ({
           id: row._id,
           values: {
-            event: eventById.get(String(row.eventId))?.title ?? "",
-            date: eventById.get(String(row.eventId))?.startsAt ?? null,
+            event: shownEvent(row.eventId)?.title ?? "",
+            date: shownEvent(row.eventId)?.startsAt ?? null,
             revenue: row.actualRevenue,
             foodCost: row.actualIngredientCost,
             wasteCost: row.actualWasteCost,
@@ -557,11 +603,6 @@ export const run = query({
     }
 
     if (args.reportId === "staff-earnings") {
-      const auth = await getAuthContext(ctx);
-      if (!EARNINGS_ROLES.has(auth.role))
-        throw new Error(
-          "Staff earnings are available to workforce and finance managers",
-        );
       const [payroll, people, eventRows] = await Promise.all([
         ctx.db
           .query("payrollInputs")
@@ -576,9 +617,19 @@ export const run = query({
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
           .take(REPORT_ROW_LIMIT),
       ]);
-      const peopleById = new Map(people.map((row) => [String(row._id), row]));
+      const peopleById = new Map(
+        canRead(auth, PERSON_READ)
+          ? people
+              .filter((row) => isLiveTenantRow(row, tenantId))
+              .map((row) => [String(row._id), row])
+          : [],
+      );
       const eventsById = new Map(
-        eventRows.map((row) => [String(row._id), row.title]),
+        seeEvents
+          ? eventRows
+              .filter((row) => isLiveTenantRow(row, tenantId))
+              .map((row) => [String(row._id), row.title])
+          : [],
       );
       const rows = payroll
         .filter(
@@ -654,10 +705,8 @@ export const run = query({
         invoiceLines(invoice.lineItems).map((line, index) => ({
           id: `${invoice._id}-${index}`,
           values: {
-            event: invoice.eventId
-              ? (eventById.get(String(invoice.eventId))?.title ?? "")
-              : "",
-            contact: clientName(clientById.get(String(invoice.clientId))),
+            event: shownEvent(invoice.eventId)?.title ?? "",
+            contact: contactOf(invoice.clientId),
             invoice: invoice.invoiceNumber ?? "",
             date: invoice.issuedAt ?? null,
             item: line.description,
@@ -685,10 +734,8 @@ export const run = query({
           .map((invoice) => ({
             id: invoice._id,
             values: {
-              event: invoice.eventId
-                ? (eventById.get(String(invoice.eventId))?.title ?? "")
-                : "",
-              contact: clientName(clientById.get(String(invoice.clientId))),
+              event: shownEvent(invoice.eventId)?.title ?? "",
+              contact: contactOf(invoice.clientId),
               invoice: invoice.invoiceNumber ?? "",
               date: invoice.issuedAt ?? null,
               item: "Discount",
@@ -775,15 +822,13 @@ export const run = query({
     }
 
     const revenueRows: TppRow[] = rangedInvoices.map((invoice) => {
-      const event = invoice.eventId
-        ? eventById.get(String(invoice.eventId))
-        : undefined;
+      const event = shownEvent(invoice.eventId);
       return {
         id: invoice._id,
         values: {
           date: invoice.issuedAt ?? event?.startsAt ?? null,
           event: event?.title ?? "",
-          contact: clientName(clientById.get(String(invoice.clientId))),
+          contact: contactOf(invoice.clientId),
           venue: event?.venueName ?? "",
           referral: event?.referralSourceId
             ? String(event.referralSourceId)
@@ -810,15 +855,13 @@ export const run = query({
         ...billed
           .filter((row) => (row.issuedAt ?? row.createdAt ?? 0) <= asOf)
           .map((invoice) => {
-            const event = invoice.eventId
-              ? eventById.get(String(invoice.eventId))
-              : undefined;
+            const event = shownEvent(invoice.eventId);
             return {
               id: invoice._id,
               values: {
                 date: invoice.issuedAt ?? null,
                 event: event?.title ?? "",
-                contact: clientName(clientById.get(String(invoice.clientId))),
+                contact: contactOf(invoice.clientId),
                 venue: event?.venueName ?? "",
                 referral: event?.referralSourceId
                   ? String(event.referralSourceId)
@@ -844,6 +887,7 @@ export const run = query({
         ...events
           .filter(
             (event) =>
+              seeEvents &&
               isLiveTenantRow(event, tenantId) &&
               !["cancelled", "closed_out"].includes(event.stage) &&
               inDateRange(event.startsAt, start, end) &&

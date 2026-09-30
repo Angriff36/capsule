@@ -71,6 +71,7 @@ import "./command-deck/KitchenCommandDeck.css";
 import "./command-deck/KitchenCommandDeckSurfaces.css";
 import { useEventMenuSync } from "./useEventMenuSync";
 import { EventPrepWorkNotice } from "../events/EventPrepWorkNotice";
+import { prepTimeLabel } from "./prepTiming";
 
 /** Kitchen command deck: 7-day horizon, assign cooks to dishes/steps, crew load. */
 export function KitchenDashboardPage() {
@@ -1060,10 +1061,11 @@ export function KitchenDashboardPage() {
         <div className="font-display text-2xl leading-tight text-ink">
           {sentenceCase(row.task.name)}
         </div>
-        {/* The service time IS the deadline: prepTasks.dueAt is null on every
-            row, so a "Due" field here would be invented. State it once. */}
+        {/* The event's service time is context, not the prep deadline: a task
+            with no prep time says so instead of borrowing the event start. */}
         <div className="mt-1 text-base text-ink-2">
-          {String(row.event.title)} · service {dueLabel(row.event.startsAt)}
+          {String(row.event.title)} · service {dueLabel(row.event.startsAt)} ·{" "}
+          {prepTimeLabel((row.task as { dueAt?: number | null }).dueAt)}
         </div>
         <div className="mt-2 text-base text-ink-2">
           {row.task.quantity != null

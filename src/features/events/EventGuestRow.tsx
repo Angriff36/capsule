@@ -81,9 +81,7 @@ export function EventGuestRow({
         </td>
         <td className="td">
           {allergens.length ? (
-            <span className="chip border-warn/40 bg-warn-soft text-warn">
-              {allergens.join(", ")}
-            </span>
+            <span className="chip chip-tone-warn">{allergens.join(", ")}</span>
           ) : (
             <span className="text-sm text-ink-3">—</span>
           )}

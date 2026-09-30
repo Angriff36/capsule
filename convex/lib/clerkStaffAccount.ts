@@ -147,6 +147,15 @@ export class ClerkStaffAccountDirectory {
     }
   }
 
+  /** Undo an account this run just created when the Capsule link then fails,
+   * so a failed hire never leaves a stray sign-in holding the address. */
+  async deleteUser(userId: string): Promise<void> {
+    await this.request(
+      `https://api.clerk.com/v1/users/${encodeURIComponent(userId)}`,
+      { method: "DELETE" },
+    );
+  }
+
   async setPassword(userId: string, password: string): Promise<void> {
     await this.request<ClerkUserPayload>(
       `https://api.clerk.com/v1/users/${encodeURIComponent(userId)}`,

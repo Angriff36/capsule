@@ -4,12 +4,19 @@ Catering / event ops app: Vite + React, Convex, Clerk. Assembled from Manifest p
 
 ## Ralph loop (this checkout)
 
-This checkout is a Ralph worktree on branch `ralph/wiggum-loop` (sibling of the
-main capsule checkout, which this loop never touches).
+This checkout is the main capsule checkout on branch `dev`, not a Ralph
+worktree. The loop builds in a worktree under `.loop-worktrees/` (or the sibling
+`C:/Projects/capsule-ralph` on `ralph/wiggum-loop`) and never edits files here.
+The product builder's publisher (`.claude/loop-publish.ps1`) pushes each round
+to `dev` and then pulls `dev` into this checkout, so the owner tests the newest
+work here (Ryan, 2026-09-28: "why doesnt it go to dev? i need to be able to
+test the changes myself too").
 
 - `./loop.sh plan` → studies `specs/ralph/` + `src/`, writes IMPLEMENTATION_PLAN.md
   + ACCEPTANCE_TESTS.md. Human reviews the plan. Then `./loop.sh 20` builds one
-  plan item per iteration, commits and pushes this branch every iteration.
+  plan item per iteration, commits and pushes this branch every iteration —
+  except under `.loop-worktrees/`, where `.githooks/pre-push` blocks the push and
+  `.claude/loop-land.ps1` lands the work after an independent APPROVE.
 - State files: `IMPLEMENTATION_PLAN.md` (the plan — disposable, regenerate freely),
   `ACCEPTANCE_TESTS.md` (the completion contract; `AC-###` ids never renumbered),
   `.ralph.env` (loop config). Telemetry: `.ralph-telemetry.jsonl`; failures:
@@ -18,7 +25,7 @@ main capsule checkout, which this loop never touches).
   `specs/capsule-complete-feature-spec.*` is reference context for planning, not a
   ralph spec. Docs truth: `docs/architecture/*.md` still binds every iteration.
 - Validation commands (also in `.ralph.env`): tests `bun run test`; lint
-  `bun run typecheck && bun run format:check`; build `bunx vite build`.
+  `bun run typecheck && bun run format:check`; build `bun run build`.
   `bun run build` is frontend-only. NEVER `bun run deploy:production` or
   `npx convex deploy` in this loop. NEVER push `main` (this branch only).
 - Tests: capsule's "don't add tests unless the owner asks" rule is satisfied for
@@ -48,7 +55,7 @@ RYAN_APPROVED 7-23-2026 Created by Ryan
 | `convex/_generated/**`                                           | Convex codegen — do not edit                                              |
 | `src/generated/**`, `src/lib/manifest-convex-react.ts`           | Manifest client wiring — do not edit                                      |
 | `schemas/`, `wiring/`, `scripts/seed-convex.ts`                  | Manifest assembly — do not edit                                           |
-| `tests/`                                                         | Vitest (authored policy/seam + generated contract tests)                  |
+| `tests/`                                                         | Vitest (authored policy/seam tests; no generated contract tests)          |
 | `docs/`                                                          | Architecture / systems / generation truth                                 |
 | `diagrams/`                                                      | Opted out (`skipDocsDiagrams` in `manifest.config.yaml`) — do not rebuild |
 | `.artifacts/`, `graphify-out/`                                   | Ignored scratch only                                                      |
@@ -65,7 +72,7 @@ bun run typecheck
 bun run format           # prettier --write .
 bun run format:check     # prettier --check .
 bun run secrets
-bun run test
+bun run test             # or bunx vitest run <files>; bare bun test cannot run tests/proofs (no vite import.meta.glob)
 bun run test:coverage    # vitest + coverage ratchet
 bun run build
 bun run baseline:decay   # monthly hygiene checks
@@ -73,7 +80,7 @@ bun run check            # toolchain + ownership + proof:emit + check:proof + ma
 bun run codegen          # convex codegen
 bun run manifest:regen      # only regen entry — Builder apply when conflict-free
 bun run seed             # requires Convex URL
-bun run agent:mint-jwt   # write CAPSULE_AGENT_JWT (UI session + org first)
+bun run agent:mint-jwt   # write CAPSULE_AGENT_JWT (UI session first; org optional for person-first accounts)
 bun run agent:enter-component -- <component.txt>
 bun run agent:mcp        # Capsule MCP stdio host for Cursor (idle in a TTY is expected; needs CAPSULE_AGENT_JWT)
 # Note: agent:llm-tools / agent:mcp:verify are documented in docs/generation/capsule-agent-mcp.md
@@ -184,7 +191,7 @@ Workarounds are temporary bridges — they do not replace the issue.
 bun run manifest:regen
 ```
 
-Builder plans, applies when conflict-free, and updates `.builder/ownership.json` in one transaction. Optional flags after `--` (e.g. `--install`).
+Builder plans, applies when conflict-free, and updates `.builder/ownership.json` in one transaction. Optional flags after `--` (e.g. `--install`). On Windows, if Bun segfaults during manifest:regen, run the same command once more before treating it as a failure.
 
 Do **not** use bare `manifest generate` / `manifest build`, `bun run manifest:build`, or `place-manifest-convex-react.ts` — they bypass Builder ownership. Preset may still emit `manifest:build` / `manifest:compile` in `package.json`; only `place-manifest-convex-react` is deny-guarded today. Regen path: `bun run manifest:regen` only.
 
@@ -310,12 +317,18 @@ Convex agent skills for common tasks can be installed by running
 
 ## Deploying (agents: read before touching anything deploy-shaped)
 
-**Branch and release rule (owner, 2026-08-25).** Direct pushes to `main`
-are blocked by `.githooks/pre-push`. Every task works on a branch and pushes
-to that branch immediately and often; those pushes are chores — `vercel.json`
-`ignoreCommand` skips every non-`main` ref, so nothing builds and nothing
-deploys. Dev work uses the LOCAL Convex backend (`bun run dev:convex`,
-127.0.0.1:3210). ONE merge to `main` happens at the end of the branch:
+**ONE shared branch: `dev` (owner, 2026-09-20; replaces branch-per-task).**
+Direct pushes to `main` are blocked by `.githooks/pre-push`. Every agent works
+on `dev`: `git pull --no-rebase origin dev`, stage only your own paths, commit,
+`git push origin dev`, immediately and often. Never create a branch, never
+switch the checkout, never make a worktree unless the owner asks. Those pushes
+are chores — `vercel.json` `ignoreCommand` skips every non-`main` ref, so
+nothing builds and nothing deploys. Dev work uses the LOCAL Convex backend
+(`bun run dev:convex`, 127.0.0.1:3210). Release ONLY when the owner says
+"release" in the current conversation — except the product builder: when its
+daily review APPROVES, `.claude/loop-land.ps1` releases on its own (Ryan,
+2026-09-28: "once the reviewer clears it it should go to production"). A
+release merges `dev` into `main`:
 
 ```text
 bash scripts/release.sh --reviewer <model>
@@ -328,8 +341,9 @@ refuses `main` without proof of that run), pushes `main`
 once with `CAPSULE_RELEASE=1` (the only Vercel production build and the only
 Convex prod deploy for that branch — Vercel builds `main` only for a commit
 whose subject starts with `[release]`, so a merge made on GitHub, PR button
-or auto-merge, lands but never deploys), then renames the branch to
-`archive/<branch>` locally and on origin. Start the next task from `main`.
+or auto-merge, lands but never deploys), then moves `dev` to the release
+commit and pushes it. `dev` is permanent and is never archived; keep working
+on it. (Any other branch name is still renamed to `archive/<branch>`.)
 After the main push it also produces the release receipt (PR13-06/AC-030):
 `bun scripts/release-receipt.ts` writes `.artifacts/release/receipt-<sha>.{json,md}`.
 Set `CAPSULE_RELEASE_URL` (canonical production URL) and optionally

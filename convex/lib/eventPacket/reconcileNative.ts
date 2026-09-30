@@ -19,6 +19,11 @@ import {
   requirements,
   sectionFor,
 } from "../../../src/lib/eventPacket/requirements";
+import {
+  permittedPhone,
+  type NativePacketContent,
+  type NativePullLine,
+} from "../../../src/lib/eventPacket/nativePacket";
 type Ctx = QueryCtx | MutationCtx;
 export const sections: Section[] = [
   "venue",
@@ -117,9 +122,12 @@ export async function readCurrentPacket(
   const event = await scopedEvent(ctx, tenantId, eventId);
   const files = await eventRows(ctx, "eventPacketArtifacts", tenantId, eventId);
   const sources = files.filter((f) => f.purpose === "source" && f.metadataJson);
-  const context = sources[0]?.contextJson
-    ? JSON.parse(sources[0].contextJson)
-    : {};
+  // Reference files (diagrams, forms) carry only a time zone, no identity.
+  const contexts = sources.map((s) => JSON.parse(s.contextJson ?? "{}"));
+  const context = {
+    ...(contexts.find((c) => c.timeZone) ?? {}),
+    ...(contexts.find((c) => c.invoiceNumber) ?? {}),
+  };
   const zone = context.timeZone ?? "UTC";
   const artifactMetadata = sources.map((s) => JSON.parse(s.metadataJson));
   const observations = sources
@@ -283,6 +291,8 @@ export async function readCurrentPacket(
       }
     }
   }
+  const invoiceNumber: string =
+    event.eventNumber?.trim() || context.invoiceNumber || String(eventId);
   const snapshot: EventPacketSnapshot = {
     schemaVersion: 1,
     identity: {
@@ -293,6 +303,12 @@ export async function readCurrentPacket(
         context.eventDate ??
         (event.startsAt ? localDate(event.startsAt, zone) : "1970-01-01"),
     },
+    native: await readNativeContent(ctx, tenantId, event, {
+      eventNumber: invoiceNumber,
+      serviceStyle: style?.name ?? null,
+      venue,
+      zone,
+    }),
     artifacts: artifactMetadata,
     observations,
     facts: [],
@@ -370,6 +386,172 @@ export async function readCurrentPacket(
     timeZone: zone,
     files,
     revisionRows,
+  };
+}
+const text = (value: unknown) =>
+  typeof value === "string" && value.trim() ? value.trim() : null;
+const personName = (p: any) =>
+  p ? [p.givenName, p.familyName].filter(Boolean).join(" ") : null;
+/** The packet parts Capsule prints from its own records (spec §14.1). */
+async function readNativeContent(
+  ctx: Ctx,
+  tenantId: string,
+  event: any,
+  known: { eventNumber: string; serviceStyle: string | null; venue: any; zone: string },
+): Promise<NativePacketContent> {
+  const eventId = event._id as string;
+  const when = (ms: unknown) =>
+    typeof ms === "number"
+      ? `${localDate(ms, known.zone)} ${localTime(ms, known.zone)}`
+      : null;
+  const menu = [];
+  for (const line of await eventRows(ctx, "eventDishes", tenantId, eventId)) {
+    if (line.removedAt != null) continue;
+    const dish = await related(ctx, "dishes", line.dishId, tenantId);
+    menu.push({
+      name: text(line.dishName) ?? dish?.name ?? "Dish",
+      course: text(line.course),
+      servings: typeof line.quantityServings === "number" ? line.quantityServings : null,
+      notes: text(line.specialInstructions),
+      sortOrder: typeof line.sortOrder === "number" ? line.sortOrder : null,
+    });
+  }
+  const pack = [];
+  for (const list of await eventRows(ctx, "packLists", tenantId, eventId)) {
+    const items = await ctx.db
+      .query("packListItems")
+      .withIndex("by_packListId", (q) => q.eq("packListId", list._id))
+      .collect();
+    for (const item of items) {
+      if (item.tenantId !== tenantId || item.deletedAt != null || item.retiredAt != null)
+        continue;
+      pack.push({
+        description: item.description,
+        quantity: item.requiredQuantity,
+        unit: item.unit,
+        category: item.category ?? null,
+        food: !!(item.eventDishId || item.dishId || item.dishContainerId || item.productionBatchId),
+        ownership: item.ownership ?? null,
+        leftOff: item.excludedAt != null,
+      });
+    }
+  }
+  const rigs = await eventRows(ctx, "eventVehicleAssignments", tenantId, eventId);
+  const drivers = new Set(rigs.map((r) => r.driverId).filter(Boolean));
+  const staff = [];
+  for (const a of await eventRows(ctx, "eventAssignments", tenantId, eventId)) {
+    if (a.status === "unassigned" || a.status === "no_show" || a.declinedAt != null)
+      continue;
+    const person = await related(ctx, "people", a.personId, tenantId);
+    const phone = permittedPhone(a.role, drivers.has(a.personId))
+      ? text(await plain(ctx, person?.phone, "Person", "phone"))
+      : null;
+    staff.push({
+      name: personName(person) ?? "Unnamed",
+      role: a.role,
+      callTime: typeof a.startsAt === "number" ? localTime(a.startsAt, known.zone) : null,
+      endTime: typeof a.endsAt === "number" ? localTime(a.endsAt, known.zone) : null,
+      phone,
+      status: a.status,
+    });
+  }
+  const pullSheet: NativePullLine[] = [];
+  for (const r of await eventRows(ctx, "equipmentReservations", tenantId, eventId)) {
+    if (r.status === "cancelled") continue;
+    const item = await related(ctx, "equipments", r.equipmentId, tenantId);
+    pullSheet.push({
+      description: item?.name ?? "Equipment",
+      quantity: r.quantity,
+      unit: "each",
+      source: "ours",
+      decor: /decor/i.test(item?.category ?? ""),
+      vendor: null,
+      returnOwner: r.status === "returned" ? "Back in" : "Our crew",
+      returnBy: r.status === "returned" ? null : when(r.endsAt),
+      status: r.status,
+    });
+  }
+  for (const r of await eventRows(ctx, "rentalOrderLines", tenantId, eventId)) {
+    if (r.status === "cancelled") continue;
+    const vendor = await related(ctx, "vendors", r.vendorId, tenantId);
+    const name = vendor?.name ?? "Vendor";
+    pullSheet.push({
+      description: r.description,
+      quantity: r.quantity,
+      unit: r.countUnit,
+      source: "vendor",
+      decor: /decor/i.test(r.description),
+      vendor: name,
+      returnOwner:
+        r.status === "returned"
+          ? "Returned to vendor"
+          : r.pickupAt != null
+            ? `${name} picks up`
+            : null,
+      returnBy: r.status === "returned" ? null : when(r.pickupAt),
+      status: r.status,
+    });
+  }
+  const venue = known.venue;
+  const address =
+    text(event.venueAddress) ??
+    ([venue?.addressLine1, venue?.addressLine2].filter(text).join(", ") || null);
+  const runs = [];
+  for (const rig of rigs) {
+    const [vehicle, trailer, driver] = await Promise.all([
+      related(ctx, "vehicles", rig.vehicleId, tenantId),
+      related(ctx, "trailers", rig.trailerId, tenantId),
+      related(ctx, "people", rig.driverId, tenantId),
+    ]);
+    const label = (v: any) =>
+      v ? [v.make, v.model, v.registration].filter(Boolean).join(" ") : null;
+    runs.push({
+      vehicle: label(vehicle) ?? (text(rig.vendorName) ? `Vendor: ${rig.vendorName}` : null),
+      trailer: label(trailer),
+      driver: personName(driver),
+      loadingZone: text(rig.loadingZone),
+      notes: text(rig.notes),
+    });
+  }
+  const diagrams = (await eventRows(ctx, "eventLayoutSections", tenantId, eventId))
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((s) => ({ name: s.type, instructions: text(s.instructions) }));
+  const files = await ctx.db
+    .query("attachments")
+    .withIndex("by_parentId", (q) => q.eq("parentId", eventId))
+    .collect();
+  for (const f of files)
+    if (
+      f.tenantId === tenantId &&
+      f.deletedAt == null &&
+      f.parentType === "eventRecord" &&
+      (f.evidenceType === "setup" || /diagram|layout|floor|plan|map|drawing/i.test(f.fileName))
+    )
+      diagrams.push({ name: f.fileName, instructions: null });
+  return {
+    eventNumber: known.eventNumber,
+    serviceStyle: known.serviceStyle,
+    barService: text(event.barService),
+    menu,
+    pack,
+    staff,
+    pullSheet,
+    route: {
+      venueAddress: address,
+      mapLink: address
+        ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+        : null,
+      loadIn: [
+        venue?.loadInInstructions,
+        venue?.accessNotes,
+        venue?.logisticsNotes,
+        event.accessibilityNeeds,
+      ]
+        .map(text)
+        .filter((t): t is string => !!t),
+      runs,
+      diagrams,
+    },
   };
 }
 export function projectPacketReadiness(snapshot: EventPacketSnapshot) {

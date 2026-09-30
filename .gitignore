@@ -11,6 +11,8 @@ dist/
 coverage/
 test-results/
 .artifacts/
+# Loop maker test output (the maker session cannot delete files).
+/.artifacts-*.txt
 .pw-verify/
 graphify-out/
 
@@ -74,3 +76,9 @@ storybook-static/
 # a clean CI checkout)
 .mcp.json
 .playwright-cli/
+
+# Builder notes for this computer only (Ryan 2026-09-29: "do it"). The builder
+# rewrites them every round; tracked, they kept the main checkout dirty.
+/STATE.md
+/loop-ledger.json
+/loop-run-log.md

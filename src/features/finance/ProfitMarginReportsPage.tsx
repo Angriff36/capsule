@@ -61,6 +61,12 @@ function MetricsCells({ metrics }: { metrics: ProfitMetrics }) {
       <td>{percent(metrics.grossMarginPercent)}</td>
       <td className={metrics.netProfit < 0 ? "is-negative" : "is-positive"}>
         {formatMoney(metrics.netProfit)}
+        {metrics.costMissingCount > 0 ? (
+          <small data-testid="profit-cost-missing">
+            Not fully known · cost missing on{" "}
+            {formatCountNoun(metrics.costMissingCount, "event")}
+          </small>
+        ) : null}
       </td>
       <td className={metrics.netProfit < 0 ? "is-negative" : "is-positive"}>
         {percent(metrics.netMarginPercent)}
@@ -333,7 +339,12 @@ export function ProfitMarginDashboard({
               <strong data-testid="profit-net-margin">
                 {percent(report.summary.netMarginPercent)}
               </strong>
-              <small>{formatMoney(report.summary.netProfit)} net profit</small>
+              <small>
+                {formatMoney(report.summary.netProfit)} net profit
+                {report.summary.costMissingCount > 0
+                  ? ` · not fully known, ${formatCountNoun(report.summary.costMissingCount, "event")} missing food or labor cost`
+                  : ""}
+              </small>
             </div>
           </section>
 
@@ -485,6 +496,15 @@ export function ProfitMarginDashboard({
           miscellaneous spend as one number, so this report shows that combined
           bucket as overheads.
         </p>
+        {report.summary.costMissingCount > 0 ? (
+          <p role="note" data-testid="profit-cost-missing-note">
+            Profit is not fully known for{" "}
+            {formatCountNoun(report.summary.costMissingCount, "event")}: each
+            has revenue but no food cost or no labor cost on its closeout, so
+            the profit shown is too high. Add the missing cost on the closeout
+            to fix it.
+          </p>
+        ) : null}
         {report.excludedCloseoutCount > 0 ? (
           <p role="note">
             {report.excludedCloseoutCount} finalized closeout

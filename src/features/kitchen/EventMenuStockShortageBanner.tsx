@@ -106,15 +106,15 @@ export function EventMenuStockShortageBanner({
                             <span
                               className={
                                 suggestion.allergenCompatible
-                                  ? "chip border-ok/30 bg-ok-soft text-ok"
-                                  : "chip border-warn/30 bg-warn-soft text-warn"
+                                  ? "chip chip-tone-ok"
+                                  : "chip chip-tone-warn"
                               }
                             >
                               {suggestion.allergenCompatible
                                 ? "No new allergens"
                                 : `Adds ${suggestion.newAllergens.join(", ")}`}
                             </span>
-                            <span className="chip border-line-2 bg-inset text-ink-2">
+                            <span className="chip chip-tone-mute">
                               {costDeltaLabel(
                                 suggestion.costDelta,
                                 suggestion.unit,

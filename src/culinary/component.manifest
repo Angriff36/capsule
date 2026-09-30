@@ -21,6 +21,10 @@ entity Component mixin TenantScoped, SoftDeletable {
   property instructions: string?
   property recipeSourceFingerprint: string?
   property recipeSourceText: string?
+  // Normalized formula identity (src/lib/recipeIdentity.ts): per-yield amounts
+  // of each line. Two imports of the same formula — even scaled — share it, so
+  // a repeated export links to this recipe instead of making a copy.
+  property indexed recipeIdentityFingerprint: string?
   property required versionNumber: int = 1
   property required yieldQuantity: decimal(10, 2) = 1
   property required yieldUnit: UnitOfMeasure = "portion"
@@ -76,7 +80,8 @@ entity Component mixin TenantScoped, SoftDeletable {
     optional description: string,
     optional instructions: string,
     optional sourceFingerprint: string,
-    optional sourceText: string
+    optional sourceText: string,
+    optional recipeIdentityFingerprint: string
   ) {
     guard self.draftedAt == null
     guard self.deletedAt == null
@@ -95,6 +100,7 @@ entity Component mixin TenantScoped, SoftDeletable {
     mutate instructions = instructions
     mutate recipeSourceFingerprint = sourceFingerprint
     mutate recipeSourceText = sourceText
+    mutate recipeIdentityFingerprint = recipeIdentityFingerprint
     mutate versionNumber = 1
     mutate draftedAt = now()
     emit ComponentDrafted {
@@ -450,8 +456,9 @@ entity ComponentSnapshot mixin TenantScoped, SoftDeletable {
 
   property required componentId: uuid
   property required versionNumber: int = 1
+  // Name and auth subject are stamped from trusted auth context on capture;
+  // never accepted from the browser.
   property required capturedByName: string = ""
-  // Stamped from trusted auth context on capture; never accepted from browser.
   property capturedByAuthSubjectId: string?
   property required changeSummary: string = ""
   // JSON blob of the full component at capture time: name, category, cuisine,
@@ -468,7 +475,6 @@ entity ComponentSnapshot mixin TenantScoped, SoftDeletable {
   command capture(
     componentId: uuid,
     versionNumber: int,
-    capturedByName: string,
     changeSummary: string,
     snapshot: string
   ) {
@@ -478,7 +484,7 @@ entity ComponentSnapshot mixin TenantScoped, SoftDeletable {
     constraint captureSnapshotPayload: length(trim(snapshot)) > 0 "This recipe version has nothing to save."
     mutate componentId = componentId
     mutate versionNumber = versionNumber
-    mutate capturedByName = capturedByName
+    mutate capturedByName = user.personName != null ? user.personName : ""
     mutate capturedByAuthSubjectId = user.id
     mutate changeSummary = changeSummary
     mutate snapshot = snapshot

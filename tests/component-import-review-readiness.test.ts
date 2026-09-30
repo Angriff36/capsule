@@ -74,9 +74,11 @@ describe("review measurement issues (paste source)", () => {
     expect(issues).toContainEqual(
       expect.objectContaining({ lineIndex: 0, field: "unit" }),
     );
-    // "fl oz", "case", "salt to taste" — no recognized unit at all.
+    // "case", "salt to taste" — no recognized unit at all. "2 fl oz" is a
+    // known volume unit (fluid_ounce) and needs no correction.
     const unitIssues = issues.filter((issue) => issue.field === "unit");
-    expect(unitIssues).toHaveLength(4);
+    expect(unitIssues).toHaveLength(3);
+    expect(unitIssues.some((issue) => issue.lineIndex === 1)).toBe(false);
     const quantityIssues = issues.filter((issue) => issue.field === "quantity");
     expect(quantityIssues).toHaveLength(2);
     expect(issues.every((issue) => issue.message.length > 0)).toBe(true);

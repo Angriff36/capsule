@@ -30,6 +30,7 @@ import { MenuDishManager } from "./MenuDishManager";
 import { buildMenuProfitability } from "./MenuProfitabilityAnalysis";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import { MenuProfitabilityPanel } from "./MenuProfitabilityPanel";
+import { MenuPriceChangePlanner } from "./MenuPriceChangePlanner";
 import {
   calculateComponentNutrition,
   sumPerGuestNutrition,
@@ -508,6 +509,8 @@ export function MenuDetailPage() {
           minGuests: Number(menu.minGuests),
           maxGuests: Number(menu.maxGuests),
           status: String(menu.status),
+          availableFrom: menu.availableFrom,
+          availableUntil: menu.availableUntil,
         }}
         onFailure={setFailure}
       />
@@ -529,6 +532,23 @@ export function MenuDetailPage() {
           canonicalDishId: dish.canonicalDishId,
         }))}
         onError={setFailure}
+      />
+
+      <MenuPriceChangePlanner
+        lines={selectedMenuDishes.map((selection) => ({
+          _id: selection._id,
+          version: selection.version,
+          dishName: String(
+            (dishes ?? []).find((dish) => dish._id === selection.dishId)
+              ?.name ?? "Dish",
+          ),
+          sellingPrice: selection.sellingPrice,
+          scheduledSellingPrice: selection.scheduledSellingPrice,
+          scheduledPriceEffectiveAt: selection.scheduledPriceEffectiveAt,
+        }))}
+        canEdit={menu.status === "draft" || menu.status === "published"}
+        onFailure={setFailure}
+        onDone={setNotice}
       />
 
       <MenuProfitabilityPanel
@@ -564,6 +584,7 @@ export function MenuDetailPage() {
         totals={
           menuNutrition.componentCount > 0 ? menuNutrition.perGuest : null
         }
+        coverage={menuNutrition.coverage}
         coverageNote={menuNutritionNote}
         loading={nutritionLoading}
       />

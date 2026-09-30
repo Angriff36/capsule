@@ -1,7 +1,11 @@
 import { ConvexError, v } from "convex/values";
+import { internal } from "./_generated/api";
 import { mutation } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
-import { conflictingVehicleDeliveries } from "./lib/vehicleDeliveryAvailability";
+import {
+  conflictingVehicleDeliveries,
+  vehicleStatusProblem,
+} from "./lib/vehicleDeliveryAvailability";
 
 // Delivery write policy: logisticsAccess or manageAccess (base.manifest roles).
 const DELIVERY_ROLES = new Set([
@@ -77,9 +81,10 @@ export const assign = mutation({
     ) {
       throw new ConvexError("Vehicle is unavailable in this workspace.");
     }
-    if (vehicle.operationalStatus === "retired") {
+    const unusable = vehicleStatusProblem(vehicle.operationalStatus);
+    if (unusable) {
       throw new ConvexError(
-        `${vehicle.registration} is retired and cannot take deliveries.`,
+        `${vehicle.registration} is ${unusable} and cannot take deliveries. Pick another vehicle or change its status first.`,
       );
     }
 
@@ -122,6 +127,11 @@ export const assign = mutation({
         windowEndsAt: delivery.windowEndsAt,
       },
       createdAt: now,
+    });
+    // The truck count can pick another company load rule (PL-TIMING).
+    await ctx.scheduler.runAfter(0, internal.eventTimingRules.recalculate, {
+      tenantId,
+      eventId: delivery.eventId,
     });
 
     return { deliveryId: args.deliveryId, vehicleId: args.vehicleId };
@@ -182,6 +192,11 @@ export const unassign = mutation({
         eventId: delivery.eventId,
       },
       createdAt: now,
+    });
+    // The truck count can pick another company load rule (PL-TIMING).
+    await ctx.scheduler.runAfter(0, internal.eventTimingRules.recalculate, {
+      tenantId,
+      eventId: delivery.eventId,
     });
 
     return { deliveryId: args.deliveryId, vehicleId: null };

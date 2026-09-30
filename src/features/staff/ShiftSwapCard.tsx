@@ -15,6 +15,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { EmptyState, StatusChip } from "../../ui/primitives";
 import { WorkforceFailureBanner } from "../workforce/WorkforceFailureBanner";
+import { SwapCandidateExclusions } from "./SwapCandidateExclusions";
 
 type ShiftSwapCardProps = {
   person: Record<string, any>;
@@ -310,6 +311,9 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
                             "No linked staff are free and credentialed for this time.")}
                       </p>
                     ) : null}
+                    <SwapCandidateExclusions
+                      excluded={candidateResult?.excluded ?? []}
+                    />
                     <label className="field-label">
                       Note <span className="text-ink-3">(optional)</span>
                       <input

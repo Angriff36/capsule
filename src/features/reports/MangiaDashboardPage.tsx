@@ -9,6 +9,7 @@ import {
   type DashboardGridSize,
 } from "@/ui/charts/DashboardGrid";
 import { StatCard } from "@/ui/charts/StatCard";
+import { trendFromSeries } from "@/ui/charts/Sparkline";
 import { BarChart } from "@/ui/charts/BarChart";
 import { LineChart } from "@/ui/charts/LineChart";
 import { PageHeader } from "@/ui/primitives";
@@ -300,6 +301,14 @@ export function MangiaDashboardPage() {
           ]}
           tone="brand"
           isLive
+          trend={trendFromSeries(
+            dailyTrendData,
+            (day) => day.guests,
+            (day) =>
+              day === dailyTrendData[dailyTrendData.length - 1]
+                ? "Today"
+                : day.day,
+          )}
         />
       ),
     },

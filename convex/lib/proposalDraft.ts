@@ -20,7 +20,7 @@ import { v } from "convex/values";
 import type { Id } from "../_generated/dataModel";
 import { computeProposalPricing, type PricingBasis } from "../../src/lib/pricing";
 import { getAuthContext, requireTenant } from "./authContext";
-import { assertValidCatalogLink } from "./proposalPricing";
+import { assertValidCatalogLink, assertValidRentalLink } from "./proposalPricing";
 
 export const draftProposalWithLines = mutation({
   args: {
@@ -42,6 +42,7 @@ export const draftProposalWithLines = mutation({
     notes: v.optional(v.string()),
     terms: v.optional(v.string()),
     visibleSections: v.optional(v.array(v.string())),
+    sectionOrder: v.optional(v.array(v.string())),
     eventId: v.optional(v.id("events")),
     lines: v.array(
       v.object({
@@ -52,6 +53,7 @@ export const draftProposalWithLines = mutation({
         unit: v.optional(v.string()),
         menuDishId: v.optional(v.id("menuDishes")),
         overrideReason: v.optional(v.string()),
+        equipmentId: v.optional(v.id("equipments")),
       }),
     ),
   },
@@ -88,6 +90,7 @@ export const draftProposalWithLines = mutation({
       notes: args.notes,
       terms: args.terms,
       visibleSections: args.visibleSections,
+      sectionOrder: args.sectionOrder,
       eventId: args.eventId,
     });
     const proposalId = created.docId as Id<"proposals">;
@@ -97,6 +100,7 @@ export const draftProposalWithLines = mutation({
     for (let i = 0; i < args.lines.length; i++) {
       const line = args.lines[i];
       await assertValidCatalogLink(ctx, line.menuDishId, tenantId);
+      await assertValidRentalLink(ctx, line.equipmentId, tenantId);
       await ctx.runMutation(api.mutations.ProposalLineItem_createViaAddLine, {
         proposalId,
         description: line.description,
@@ -108,6 +112,7 @@ export const draftProposalWithLines = mutation({
         sortOrder: i,
         menuDishId: line.menuDishId,
         overrideReason: line.overrideReason,
+        equipmentId: line.equipmentId,
       });
     }
     // No return: an untyped `any` return here would cascade through the `api`

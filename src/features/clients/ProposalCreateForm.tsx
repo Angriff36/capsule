@@ -152,6 +152,8 @@ export function ProposalCreateForm({
   const [draftVisibleSections, setDraftVisibleSections] = useState<string[]>(
     [],
   );
+  // AC-259: the template's section order, copied onto the proposal.
+  const [draftSectionOrder, setDraftSectionOrder] = useState<string[]>([]);
   const [templateTaxRate, setTemplateTaxRate] = useState<number | null>(null);
   const [templateServiceLineKey, setTemplateServiceLineKey] = useState<
     string | null
@@ -198,6 +200,7 @@ export function ProposalCreateForm({
         lines.filter((line) => line.key !== templateServiceLineKey),
       );
       setDraftVisibleSections([]);
+      setDraftSectionOrder([]);
       setTemplateTaxRate(null);
       setTemplateServiceLineKey(null);
       return;
@@ -222,6 +225,7 @@ export function ProposalCreateForm({
     setDraftExpiresOn(defaults.expiresOn);
     setTemplateTaxRate(template.defaultTaxRate ?? null);
     setDraftVisibleSections(defaults.visibleSections);
+    setDraftSectionOrder(defaults.sectionOrder);
     const serviceChargeLine = defaults.serviceChargeLine;
     let nextLines = baseLines;
     let nextServiceLineKey: string | null = null;
@@ -278,6 +282,7 @@ export function ProposalCreateForm({
       const metadata = JSON.parse(saved.values.proposalDraftState ?? "{}") as {
         lines?: DraftLine[];
         visibleSections?: string[];
+        sectionOrder?: string[];
         templateTaxRate?: number | null;
         templateServiceLineKey?: string | null;
       };
@@ -285,11 +290,15 @@ export function ProposalCreateForm({
       setDraftVisibleSections(
         Array.isArray(metadata.visibleSections) ? metadata.visibleSections : [],
       );
+      setDraftSectionOrder(
+        Array.isArray(metadata.sectionOrder) ? metadata.sectionOrder : [],
+      );
       setTemplateTaxRate(metadata.templateTaxRate ?? null);
       setTemplateServiceLineKey(metadata.templateServiceLineKey ?? null);
     } catch {
       setDraftLines([]);
       setDraftVisibleSections([]);
+      setDraftSectionOrder([]);
       setTemplateTaxRate(null);
       setTemplateServiceLineKey(null);
     }
@@ -414,6 +423,7 @@ export function ProposalCreateForm({
         notes: String(data.get("notes") || "").trim() || undefined,
         terms: String(data.get("terms") || "").trim() || undefined,
         visibleSections: draftVisibleSections,
+        sectionOrder: draftSectionOrder,
         eventId: eventIdRaw ? (eventIdRaw as Id<"events">) : undefined,
         lines: validLines.map((line, i) => ({
           description: line.description.trim(),
@@ -436,6 +446,7 @@ export function ProposalCreateForm({
       setDraftNotes("");
       setDraftExpiresOn(defaultValidityDate());
       setDraftVisibleSections([]);
+      setDraftSectionOrder([]);
       setTemplateTaxRate(null);
       setTemplateServiceLineKey(null);
       onClose();
@@ -494,6 +505,7 @@ export function ProposalCreateForm({
             value={JSON.stringify({
               lines: draftLines,
               visibleSections: draftVisibleSections,
+              sectionOrder: draftSectionOrder,
               templateTaxRate,
               templateServiceLineKey,
             })}

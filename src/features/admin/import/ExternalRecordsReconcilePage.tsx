@@ -1,16 +1,19 @@
 import { useMemo, useState } from "react";
-import { useUser } from "@clerk/react";
 import {
   useListExternalRecordLink,
   useListInvoice,
   useListPayment,
   useExternalRecordLinkResolveConflict,
-  useExternalRecordLinkUpdateCapsuleId,
   useExternalRecordLinkVerifyLink,
 } from "../../../lib/manifest-convex-react";
 import { ErrorState, StatusChip, TableSkeleton } from "../../../ui/primitives";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionNotice, useActionFailure } from "../../../ui/action-result";
+import { ImportedPaymentMatch } from "./ImportedPaymentMatch";
+import { OldInvoiceRebuild } from "./OldInvoiceRebuild";
+import { SameIdPaymentMatch } from "./SameIdPaymentMatch";
+import { ServiceStyleMatch } from "./ServiceStyleMatch";
+import { referenceOnlyMoneyRows } from "./referenceOnlyRows";
 
 // Source system labels
 const SOURCE_SYSTEM_LABELS: Record<string, string> = {
@@ -44,6 +47,7 @@ const RECORD_TYPE_LABELS: Record<string, string> = {
   stock: "Stock",
   location: "Location",
   pack_list: "Pack List",
+  service_style: "Service style",
 };
 
 // Conflict status labels
@@ -54,8 +58,6 @@ const CONFLICT_STATUS_LABELS: Record<string, string> = {
 };
 
 export function ExternalRecordsReconcilePage() {
-  const { user } = useUser();
-  const operatorId = user?.id ?? "";
   const [selectedSourceSystem, setSelectedSourceSystem] = useState<
     string | null
   >(null);
@@ -63,9 +65,6 @@ export function ExternalRecordsReconcilePage() {
   const [busy, setBusy] = useState(false);
   const { error, setError } = useActionFailure();
   const { notice, setNotice } = useActionNotice();
-  // Per-row "Match to Capsule payment" picker state.
-  const [matchingId, setMatchingId] = useState<string | null>(null);
-  const [matchPaymentId, setMatchPaymentId] = useState("");
 
   // Query for all external records + Capsule payments (for the §6.4 match flow).
   const allRecords = useListExternalRecordLink();
@@ -75,7 +74,6 @@ export function ExternalRecordsReconcilePage() {
   // Commands for resolving records.
   const verifyLink = useExternalRecordLinkVerifyLink();
   const resolveConflict = useExternalRecordLinkResolveConflict();
-  const updateCapsuleId = useExternalRecordLinkUpdateCapsuleId();
 
   // ponytail: the queue is records still needing action. Filtering on
   // `verified === false` was wrong — resolveConflict/updateCapsuleId never set
@@ -92,9 +90,31 @@ export function ExternalRecordsReconcilePage() {
     return records;
   }, [allRecords, selectedSourceSystem]);
 
+  const referenceOnly = useMemo(
+    () => referenceOnlyMoneyRows(allRecords ?? []),
+    [allRecords],
+  );
+
   const candidatePayments = useMemo(
     () => (payments ?? []).filter((p) => p.deletedAt == null),
     [payments],
+  );
+  // A Capsule payment already matched by an imported row is not offered again.
+  const takenPaymentIds = useMemo(
+    () =>
+      new Set(
+        (allRecords ?? [])
+          .filter(
+            (r) =>
+              r.deletedAt == null &&
+              r.recordType === "payment" &&
+              r.capsuleEntity === "payment" &&
+              r.conflictStatus !== "superseded" &&
+              r.capsuleId,
+          )
+          .map((r) => String(r.capsuleId)),
+      ),
+    [allRecords],
   );
 
   const invoiceNumber = (id: string) =>
@@ -125,11 +145,10 @@ export function ExternalRecordsReconcilePage() {
     setNotice(null);
   }
 
-  // Verify selected records. The generated hook reads `docId` (not `id`) and
-  // verifyLink requires a non-empty `verifiedByUserId`; both were missing before,
-  // so every click threw before reaching the mutation.
+  // Verify selected records. The generated hook reads `docId` (not `id`); the
+  // server records the signed-in person as the one who checked each record.
   async function verifySelected() {
-    if (selectedIds.size === 0 || !operatorId) return;
+    if (selectedIds.size === 0) return;
     setBusy(true);
     setError(null);
     setNotice(null);
@@ -138,7 +157,6 @@ export function ExternalRecordsReconcilePage() {
       for (const id of selectedIds) {
         await verifyLink({
           docId: id,
-          verifiedByUserId: operatorId,
           verified: true,
         });
       }
@@ -155,7 +173,7 @@ export function ExternalRecordsReconcilePage() {
 
   // Skip selected records (mark as resolved with note).
   async function skipSelected() {
-    if (selectedIds.size === 0 || !operatorId) return;
+    if (selectedIds.size === 0) return;
     setBusy(true);
     setError(null);
     setNotice(null);
@@ -165,7 +183,6 @@ export function ExternalRecordsReconcilePage() {
         await resolveConflict({
           docId: id,
           conflictStatus: "resolved",
-          resolvedByUserId: operatorId,
           resolutionNote: "Skipped while matching leftover items",
         });
       }
@@ -174,37 +191,6 @@ export function ExternalRecordsReconcilePage() {
     } catch (cause: unknown) {
       setError(
         cause instanceof Error ? cause.message : "Couldn't skip those items.",
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  // §6.4 match flow for an imported payment reference: link it to an existing
-  // Capsule payment, then mark the conflict resolved. The import stages payments
-  // as pending_conflict links with capsuleId "" and a note saying "match via
-  // markMatched" — this is the UI that finally performs that match.
-  async function matchPayment(linkId: string) {
-    if (!matchPaymentId || !operatorId) return;
-    setBusy(true);
-    setError(null);
-    setNotice(null);
-
-    try {
-      await updateCapsuleId({ docId: linkId, capsuleId: matchPaymentId });
-      await resolveConflict({
-        docId: linkId,
-        conflictStatus: "resolved",
-        resolvedByUserId: operatorId,
-        resolutionNote:
-          "Matched to a Capsule payment while matching leftover items",
-      });
-      setNotice("Payment linked and resolved.");
-      setMatchingId(null);
-      setMatchPaymentId("");
-    } catch (cause: unknown) {
-      setError(
-        cause instanceof Error ? cause.message : "Failed to match payment.",
       );
     } finally {
       setBusy(false);
@@ -222,6 +208,15 @@ export function ExternalRecordsReconcilePage() {
             matches the right thing in Capsule. Anything still waiting shows
             here.
           </p>
+          {referenceOnly > 0 ? (
+            <p className="mt-2 max-w-160 text-sm text-ink-3">
+              {referenceOnly} old money{" "}
+              {referenceOnly === 1 ? "line is" : "lines are"} kept for the
+              record only (quotes, invoices, report totals, balances, credits,
+              $0 lines and the same money seen twice). They are not counted in
+              any total.
+            </p>
+          ) : null}
         </div>
       </header>
 
@@ -271,6 +266,12 @@ export function ExternalRecordsReconcilePage() {
               ))}
             </select>
           </div>
+
+          <SameIdPaymentMatch
+            disabled={busy}
+            onDone={setNotice}
+            onError={setError}
+          />
 
           <div className="ml-auto">
             <p className="text-xs text-ink-2">
@@ -409,66 +410,22 @@ export function ExternalRecordsReconcilePage() {
                     </td>
                     <td className="py-3 px-4">
                       {record.capsuleEntity === "payment" ? (
-                        matchingId === record._id ? (
-                          <div className="flex flex-wrap items-center gap-2">
-                            {/* ponytail: native select scales to hundreds of payments;
-                                a searchable combobox is the upgrade path for high-volume tenants. */}
-                            <select
-                              value={matchPaymentId}
-                              onChange={(e) =>
-                                setMatchPaymentId(e.target.value)
-                              }
-                              disabled={busy}
-                              className="px-2 py-1 border border-line-2 rounded-sm text-2xs min-w-56"
-                            >
-                              <option value="">Select Capsule payment…</option>
-                              {candidatePayments.map((payment) => (
-                                <option key={payment._id} value={payment._id}>
-                                  {invoiceNumber(String(payment.invoiceId))} ·{" "}
-                                  {Number(payment.amount ?? 0).toLocaleString(
-                                    undefined,
-                                    {
-                                      style: "currency",
-                                      currency: "USD",
-                                    },
-                                  )}{" "}
-                                  · {String(payment.status)}
-                                </option>
-                              ))}
-                            </select>
-                            <button
-                              type="button"
-                              onClick={() => void matchPayment(record._id)}
-                              disabled={busy || !matchPaymentId}
-                              className="btn btn-primary btn-sm"
-                            >
-                              Link
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setMatchingId(null);
-                                setMatchPaymentId("");
-                              }}
-                              disabled={busy}
-                              className="btn btn-ghost btn-sm"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setMatchingId(record._id);
-                              setMatchPaymentId("");
-                            }}
-                            disabled={busy}
-                            className="btn btn-secondary btn-sm"
-                          >
-                            Match
-                          </button>
-                        )
+                        <ImportedPaymentMatch
+                          link={record}
+                          payments={candidatePayments}
+                          takenPaymentIds={takenPaymentIds}
+                          invoiceLabel={invoiceNumber}
+                          disabled={busy}
+                          onDone={setNotice}
+                          onError={setError}
+                        />
+                      ) : record.capsuleEntity === "service_style" ? (
+                        <ServiceStyleMatch
+                          linkId={record._id}
+                          disabled={busy}
+                          onDone={setNotice}
+                          onError={setError}
+                        />
                       ) : (
                         <span className="text-ink-3">—</span>
                       )}
@@ -480,6 +437,8 @@ export function ExternalRecordsReconcilePage() {
           </table>
         </div>
       </div>
+
+      <OldInvoiceRebuild onDone={setNotice} onError={setError} />
 
       {/* Help text */}
       <div className="card mt-4">
@@ -493,7 +452,9 @@ export function ExternalRecordsReconcilePage() {
           <ul className="text-xs text-ink-2 space-y-1">
             <li>
               • <strong>Match</strong>: Link an imported payment to an existing
-              Capsule payment, then mark it resolved.
+              Capsule payment, then mark it resolved. A payment with the same id
+              is safe to match; a payment that only has the same amount is a
+              guess, so check it first. One payment is matched only once.
             </li>
             <li>
               • <strong>Verify</strong>: Confirm a match is correct; the item is

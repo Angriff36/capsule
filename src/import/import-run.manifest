@@ -14,6 +14,8 @@ enum ImportDatasetType {
   venues
   payments
   pack_list
+  // Opening stock count sheets (PL-OPENING-STOCK): staged for review only.
+  stock
 }
 
 enum ImportRunStatus {
@@ -57,7 +59,9 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   // validation for every pre-release row the moment the new schema pushes.
   // New rows are always created complete (startImport stamps the defaults);
   // read seams treat absence as 0/false/"{}".
-  property archiveStorageId: string?
+  // Indexed (PL-ARCHIVE / AC-177): inventoryArchive refuses a storage id
+  // another company's run already holds — knowing an id grants nothing.
+  property indexed archiveStorageId: string?
   property archiveChecksum: string?
   property archiveWorkbookCount: int?
   property indexWorkbookCount: int?
@@ -104,15 +108,13 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   command start(
     sourceSystem: ImportSourceSystem,
     datasetType: ImportDatasetType,
-    optional actorId: string,
     optional checksum: string
   ) {
     guard self.deletedAt == null
     guard self.status == "started"
-    constraint startActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     mutate sourceSystem = sourceSystem
     mutate datasetType = datasetType
-    mutate actorId = actorId != null ? actorId : ""
+    mutate actorId = user.id
     mutate checksum = checksum
     mutate startTime = now()
     mutate status = "started"
@@ -121,78 +123,72 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       sourceSystem: sourceSystem
       datasetType: datasetType
-      actorId: actorId != null ? actorId : ""
+      actorId: user.id
     }
   }
 
   command recordParse(
-    recordCounts: string,
-    optional actorId: string
+    recordCounts: string
   ) {
     guard self.status == "started"
     guard self.deletedAt == null
     constraint recordParseCountsPresent: recordCounts != null "This import needs its item counts."
-    constraint recordParseActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     mutate recordCounts = recordCounts
-    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate actorId = user.id
     mutate parsedAt = now()
     mutate status = "parsing"
     emit ImportRunParsed {
       importRunId: self.id
       tenantId: self.tenantId
       recordCounts: recordCounts
-      actorId: actorId != null ? actorId : self.actorId
+      actorId: user.id
     }
   }
 
-  command validate(optional actorId: string) {
+  command validate() {
     guard self.status == "parsing"
     guard self.parsedAt != null
     guard self.deletedAt == null
-    constraint validateActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
-    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate actorId = user.id
     mutate validatedAt = now()
     mutate status = "validating"
     emit ImportRunValidated {
       importRunId: self.id
       tenantId: self.tenantId
-      actorId: actorId != null ? actorId : self.actorId
+      actorId: user.id
     }
   }
 
-  command beginReview(optional actorId: string) {
+  command beginReview() {
     guard self.status == "validating"
     guard self.validatedAt != null
     guard self.deletedAt == null
-    constraint beginReviewActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
-    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate actorId = user.id
     mutate reviewStartedAt = now()
     mutate status = "reviewing"
     emit ImportRunReviewStarted {
       importRunId: self.id
       tenantId: self.tenantId
-      actorId: actorId != null ? actorId : self.actorId
+      actorId: user.id
     }
   }
 
   command approveReview(
-    finalRecordCounts: string,
-    optional actorId: string
+    finalRecordCounts: string
   ) {
     guard self.status == "reviewing"
     guard self.reviewStartedAt != null
     guard self.deletedAt == null
     constraint approveReviewCountsPresent: finalRecordCounts != null "This import needs its final item counts."
-    constraint approveReviewActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     mutate recordCounts = finalRecordCounts
-    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate actorId = user.id
     mutate reviewApprovedAt = now()
     mutate status = "committing"
     emit ImportRunReviewApproved {
       importRunId: self.id
       tenantId: self.tenantId
       finalRecordCounts: finalRecordCounts
-      actorId: actorId != null ? actorId : self.actorId
+      actorId: user.id
     }
   }
 
@@ -206,7 +202,7 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   // and reference-only dispositions count as accounted for and stay visible
   // in dispositionCounts — completion never implies all source data became
   // operational records.
-  command commit(optional actorId: string) {
+  command commit() {
     guard self.status == "committing"
     guard self.reviewApprovedAt != null
     guard self.archiveWorkbookCount == self.indexWorkbookCount or self.discrepancyExplained == true
@@ -216,8 +212,7 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     // the read seams apply; a pre-release run must stay completable.
     guard (self.unaccountedRecordCount != null ? self.unaccountedRecordCount : 0) == 0
     guard self.deletedAt == null
-    constraint commitActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
-    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate actorId = user.id
     mutate commitStartedAt = now()
     mutate completionTime = now()
     mutate endTime = now()
@@ -226,22 +221,20 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
       importRunId: self.id
       tenantId: self.tenantId
       recordCounts: self.recordCounts
-      actorId: actorId != null ? actorId : self.actorId
+      actorId: user.id
     }
   }
 
   command markFailed(
-    failureDetails: string,
-    optional actorId: string
+    failureDetails: string
   ) {
     guard self.status != "completed"
     guard self.status != "reverted"
     guard self.deletedAt == null
     constraint markFailedDetailsPresent: length(trim(failureDetails)) > 0 "Say what went wrong."
-    constraint markFailedActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     compute previousStatus = self.status
     mutate failureDetails = failureDetails
-    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate actorId = user.id
     mutate endTime = now()
     mutate status = "failed"
     emit ImportRunFailed {
@@ -249,23 +242,22 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       previousStatus: previousStatus
       failureDetails: failureDetails
-      actorId: actorId != null ? actorId : self.actorId
+      actorId: user.id
     }
   }
 
-  command revert(optional actorId: string) {
+  command revert() {
     guard self.status == "completed"
     guard self.completionTime != null
     guard self.deletedAt == null
-    constraint revertActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
-    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate actorId = user.id
     mutate revertedAt = now()
     mutate endTime = now()
     mutate status = "reverted"
     emit ImportRunReverted {
       importRunId: self.id
       tenantId: self.tenantId
-      actorId: actorId != null ? actorId : self.actorId
+      actorId: user.id
     }
   }
 
@@ -306,21 +298,19 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   // explainArchiveDiscrepancy - Operator explains an index-vs-archive count
   // mismatch (the 90-vs-70 case) before commit may proceed (R2-4).
   command explainArchiveDiscrepancy(
-    note: string,
-    optional actorId: string
+    note: string
   ) {
     guard self.deletedAt == null
     guard self.createdAt != null
     constraint explainDiscrepancyNotePresent: length(trim(note)) > 0 "Say why the file counts don't match."
-    constraint explainDiscrepancyActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
-    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate actorId = user.id
     mutate discrepancyExplained = true
     mutate discrepancyNote = note
     emit ImportRunArchiveDiscrepancyExplained {
       importRunId: self.id
       tenantId: self.tenantId
       note: note
-      actorId: actorId != null ? actorId : self.actorId
+      actorId: user.id
     }
   }
 
@@ -332,24 +322,22 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   // by classifying — the gate is commit, not review approval.
   command recordDispositionSummary(
     dispositionCounts: string,
-    unaccountedRecordCount: int,
-    optional actorId: string
+    unaccountedRecordCount: int
   ) {
     guard self.deletedAt == null
     guard self.createdAt != null
     guard self.status == "started" or self.status == "parsing" or self.status == "validating" or self.status == "reviewing" or self.status == "committing"
     constraint dispositionSummaryCountsPresent: length(trim(dispositionCounts)) > 0 "This import needs its file outcome counts."
     constraint dispositionSummaryUnaccountedNonNegative: unaccountedRecordCount >= 0 "This import's count of files not yet accounted for can't be negative. Use zero or more."
-    constraint dispositionSummaryActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     mutate dispositionCounts = dispositionCounts
     mutate unaccountedRecordCount = unaccountedRecordCount
-    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate actorId = user.id
     emit ImportRunDispositionSummaryRecorded {
       importRunId: self.id
       tenantId: self.tenantId
       dispositionCounts: dispositionCounts
       unaccountedRecordCount: unaccountedRecordCount
-      actorId: actorId != null ? actorId : self.actorId
+      actorId: user.id
     }
   }
 
@@ -360,21 +348,19 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   // would orphan crash-window records), so re-invoking the commit action is
   // the resume.
   command recordCommitCheckpoint(
-    commitCheckpoint: string,
-    optional actorId: string
+    commitCheckpoint: string
   ) {
     guard self.deletedAt == null
     guard self.createdAt != null
     guard self.status == "committing"
     constraint commitCheckpointPresent: length(trim(commitCheckpoint)) > 0 "This import needs to say how far its committing has gotten."
-    constraint commitCheckpointActorPresent: actorId == null or length(trim(actorId)) > 0 "If you name who's doing this, that name can't be blank."
     mutate commitCheckpoint = commitCheckpoint
-    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate actorId = user.id
     emit ImportRunCommitCheckpointRecorded {
       importRunId: self.id
       tenantId: self.tenantId
       commitCheckpoint: commitCheckpoint
-      actorId: actorId != null ? actorId : self.actorId
+      actorId: user.id
     }
   }
 

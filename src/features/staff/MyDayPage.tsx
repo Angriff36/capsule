@@ -14,6 +14,7 @@ import {
   useListPackListItem,
   useListPerson,
   useListPrepTask,
+  useListPrepTaskDependency,
   useListShift,
   useListTimeRecord,
   useListWeeklyScheduleNotice,
@@ -27,7 +28,11 @@ import {
   useShiftStart,
   useTimeRecordClockOut,
   useWeeklyScheduleNoticeAcknowledge,
+  useEventAssignmentConfirm,
+  useListEventAssignment,
+  useListEventStaffNeed,
 } from "../../lib/manifest-convex-react";
+import { MyShiftWorkDetails, shiftWorkDetails } from "./MyShiftWorkDetails";
 import { formatDate, formatTime } from "../../lib/format";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import {
@@ -40,6 +45,8 @@ import {
   discardUnscopedQueuedWork,
   hasUnscopedQueuedWork,
   enqueueAction,
+  removeAction,
+  sendAction,
   useCachedRead,
   useOfflineSync,
   useOnlineStatus,
@@ -58,7 +65,10 @@ import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 import { MyDayCalendar, MyDaySection as Section } from "./MyDayDashboard";
 import { MyDayPrepList } from "./MyDayPrepList";
+import { MyDayFieldForms } from "./MyDayFieldForms";
 import { MyPastShiftsCard } from "./MyPastShiftsCard";
+import { readClockEvidence } from "./clockLocation";
+import { breakMinutesInput } from "../workforce/timeRecordEntry";
 import { buildStaffUtilizationReport } from "../workforce/staffUtilization";
 
 const dayLabel = (ms?: number | null) =>
@@ -103,6 +113,11 @@ export function MyDayPage() {
     offlineScope,
   );
   const tasks = useCachedRead("prepTasks", useListPrepTask(), offlineScope);
+  const prepLinks = useCachedRead(
+    "prepTaskDependencies",
+    useListPrepTaskDependency(),
+    offlineScope,
+  );
   const dishes = useCachedRead("prepDishes", useListDish(), offlineScope);
   const eventDishes = useCachedRead(
     "prepEventDishes",
@@ -131,6 +146,16 @@ export function MyDayPage() {
     useListAvailabilityWindow(),
     offlineScope,
   );
+  const assignments = useCachedRead(
+    "eventAssignments",
+    useListEventAssignment(),
+    offlineScope,
+  );
+  const staffNeeds = useCachedRead(
+    "eventStaffNeeds",
+    useListEventStaffNeed(),
+    offlineScope,
+  );
 
   const clockIn = useCreateTimeRecord();
   const clockOut = useTimeRecordClockOut();
@@ -145,9 +170,17 @@ export function MyDayPage() {
   const markItemMissing = usePackListItemMarkMissing();
   const declareWindow = useCreateAvailabilityWindow();
   const withdrawWindow = useAvailabilityWindowWithdraw();
+  const confirmAssignment = useEventAssignmentConfirm();
 
   const online = useOnlineStatus();
   const pending = useQueuedActions(offlineScope);
+  // A tap on this record saved on the phone but not yet answered.
+  const waitingOn = (docId: string) =>
+    pending.find((action) => action.args.docId === docId);
+  // A clock tap saved on the phone but not yet answered by the server.
+  const waitingClock = pending.find(
+    (action) => action.runKey === "clock-in" || action.runKey === "clock-out",
+  );
 
   // Registry of queueable mutations keyed by a stable runKey. Held in a ref so
   // the drain effect doesn't re-run on every render, while always calling the
@@ -166,6 +199,7 @@ export function MyDayPage() {
     "pack-mark-missing": markItemMissing,
     "availability-declare": declareWindow,
     "availability-withdraw": withdrawWindow,
+    "assignment-confirm": confirmAssignment,
   });
   runnersRef.current = {
     "clock-in": clockIn,
@@ -181,6 +215,7 @@ export function MyDayPage() {
     "pack-mark-missing": markItemMissing,
     "availability-declare": declareWindow,
     "availability-withdraw": withdrawWindow,
+    "assignment-confirm": confirmAssignment,
   };
 
   const userId = user?.id;
@@ -197,6 +232,8 @@ export function MyDayPage() {
   const [showDeclare, setShowDeclare] = useState(false);
   const [openPhotoKey, setOpenPhotoKey] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [lunchMinutes, setLunchMinutes] = useState("");
+  const [paidBreakMinutes, setPaidBreakMinutes] = useState("");
   const [now, setNow] = useState(Date.now);
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 30_000);
@@ -232,11 +269,13 @@ export function MyDayPage() {
   };
 
   /**
-   * Queueable write: when offline, append to the pending queue (each entry
-   * carries its own idempotencyKey so a replay can't double-apply) and return
-   * immediately; when online, run the mutation now. `afterSuccess` only fires
-   * for the online path — the queue path drains later and the optimistic UI
-   * already reflects the user's intent.
+   * Queueable write: when offline, or while earlier work still waits, append
+   * to the pending queue (each entry carries its own idempotencyKey so a
+   * replay can't double-apply) and return immediately. When online, send now
+   * through the same queue (sendAction): the entry is saved on the phone
+   * first, so a reload or a dropped connection before the answer resends the
+   * same key instead of losing or doubling the work. `afterSuccess` only
+   * fires when the server has answered.
    */
   const perform = (
     busyKey: string,
@@ -245,7 +284,7 @@ export function MyDayPage() {
     args: Record<string, unknown>,
     afterSuccess?: () => void,
   ) => {
-    if (!online) {
+    if (!online || (offlineScope && pending.length > 0)) {
       setFailure(null);
       try {
         enqueueAction({ runKey, label, args }, offlineScope);
@@ -258,7 +297,11 @@ export function MyDayPage() {
     if (!runner) return;
     setFailure(null);
     setBusy(busyKey);
-    void Promise.resolve(runner(args))
+    void Promise.resolve(
+      offlineScope
+        ? sendAction({ runKey, label, args }, runner, offlineScope)
+        : runner(args),
+    )
       .then(() => afterSuccess?.())
       .catch(setFailure)
       .finally(() => setBusy(null));
@@ -382,6 +425,13 @@ export function MyDayPage() {
         (a.dueAt ?? Number.MAX_SAFE_INTEGER) -
         (b.dueAt ?? Number.MAX_SAFE_INTEGER),
     );
+
+  // A Done saved offline shows ticked until the queue sends it.
+  const queuedCompleteIds = new Set(
+    pending
+      .filter((action) => action.runKey === "task-complete")
+      .map((action) => String(action.args.docId)),
+  );
 
   const packingLists = (packLists ?? []).filter(
     (list) =>
@@ -548,6 +598,7 @@ export function MyDayPage() {
         online={online}
         pending={pending}
         onRetry={retryPending}
+        onDrop={(id) => offlineScope && removeAction(id, offlineScope)}
       />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
       {loading ? (
@@ -563,8 +614,20 @@ export function MyDayPage() {
                   <div className="my-day-clock-status">
                     <span>Status</span>
                     <StatusChip
-                      status={openRecord ? "started" : "closed"}
-                      label={openRecord ? "Clocked in" : "Clocked out"}
+                      status={
+                        waitingClock
+                          ? "pending"
+                          : openRecord
+                            ? "started"
+                            : "closed"
+                      }
+                      label={
+                        waitingClock
+                          ? "Waiting to send"
+                          : openRecord
+                            ? "Clocked in"
+                            : "Clocked out"
+                      }
                     />
                   </div>
                   <div className="my-day-current-time">
@@ -593,36 +656,97 @@ export function MyDayPage() {
                       ? `Clocked in at ${timeLabel(openRecord.clockInAt)}`
                       : "You are not clocked in."}
                   </p>
-                  {openRecord ? (
-                    <button
-                      className={BLOCK_BTN}
-                      disabled={busy != null}
-                      onClick={() =>
-                        perform("clock-out", "clock-out", "Clock out", {
-                          docId: openRecord._id,
-                          version: openRecord.version,
-                        })
-                      }
+                  {waitingClock ? (
+                    <p
+                      className="text-base text-warn"
+                      role="status"
+                      data-testid="clock-waiting"
                     >
-                      {busy === "clock-out" ? "Clocking out…" : "Clock out"}
-                    </button>
+                      {waitingClock.label} saved on this phone at{" "}
+                      {timeLabel(waitingClock.queuedAt)}, waiting to send. It
+                      counts once the office has it — do not tap again.
+                    </p>
+                  ) : openRecord ? (
+                    <>
+                      <div
+                        className="grid grid-cols-2 gap-2"
+                        data-testid="my-day-breaks"
+                      >
+                        <label className="field-label">
+                          Lunch minutes (unpaid)
+                          <input
+                            className="input"
+                            type="number"
+                            min="0"
+                            inputMode="numeric"
+                            value={lunchMinutes}
+                            onChange={(event) =>
+                              setLunchMinutes(event.target.value)
+                            }
+                          />
+                        </label>
+                        <label className="field-label">
+                          Other breaks (paid)
+                          <input
+                            className="input"
+                            type="number"
+                            min="0"
+                            inputMode="numeric"
+                            value={paidBreakMinutes}
+                            onChange={(event) =>
+                              setPaidBreakMinutes(event.target.value)
+                            }
+                          />
+                        </label>
+                      </div>
+                      <button
+                        className={BLOCK_BTN}
+                        disabled={busy != null}
+                        onClick={() => {
+                          const lunch = breakMinutesInput(lunchMinutes);
+                          const paid = breakMinutesInput(paidBreakMinutes);
+                          perform(
+                            "clock-out",
+                            "clock-out",
+                            "Clock out",
+                            {
+                              docId: openRecord._id,
+                              version: openRecord.version,
+                              ...(lunch ? { breakMinutes: lunch } : {}),
+                              ...(paid ? { paidBreakMinutes: paid } : {}),
+                            },
+                            () => {
+                              setLunchMinutes("");
+                              setPaidBreakMinutes("");
+                            },
+                          );
+                        }}
+                      >
+                        {busy === "clock-out" ? "Clocking out…" : "Clock out"}
+                      </button>
+                    </>
                   ) : (
                     <button
                       className={BLOCK_BTN}
                       disabled={busy != null}
-                      onClick={() =>
-                        perform("clock-in", "clock-in", "Clock in", {
-                          personId: me._id,
-                          ...(clockInShift
-                            ? {
-                                shiftId: clockInShift._id,
-                                ...(clockInShift.eventId
-                                  ? { eventId: clockInShift.eventId }
-                                  : {}),
-                              }
-                            : {}),
-                        })
-                      }
+                      onClick={() => {
+                        setBusy("clock-in");
+                        void readClockEvidence().then((evidence) => {
+                          setBusy(null);
+                          perform("clock-in", "clock-in", "Clock in", {
+                            personId: me._id,
+                            ...evidence,
+                            ...(clockInShift
+                              ? {
+                                  shiftId: clockInShift._id,
+                                  ...(clockInShift.eventId
+                                    ? { eventId: clockInShift.eventId }
+                                    : {}),
+                                }
+                              : {}),
+                          });
+                        });
+                      }}
                     >
                       {busy === "clock-in" ? "Clocking in…" : "Clock in"}
                     </button>
@@ -689,6 +813,27 @@ export function MyDayPage() {
                             {timeLabel(shift.endsAt)}
                             {shift.role ? ` · ${shift.role}` : ""}
                           </p>
+                          {shift.eventId ? (
+                            <MyShiftWorkDetails
+                              details={shiftWorkDetails(
+                                shift,
+                                assignments ?? [],
+                                staffNeeds ?? [],
+                                (events ?? []).find(
+                                  (row) => row._id === shift.eventId,
+                                ) ?? null,
+                              )}
+                              busy={busy != null}
+                              onConfirm={(target) =>
+                                perform(
+                                  `assignment:${target.docId}`,
+                                  "assignment-confirm",
+                                  "Confirm shift",
+                                  target,
+                                )
+                              }
+                            />
+                          ) : null}
                         </div>
                         <StatusChip status={String(shift.status)} />
                         {String(shift.status) === "scheduled" &&
@@ -745,19 +890,30 @@ export function MyDayPage() {
                   <MyDayPrepList
                     tasks={myTasks}
                     allTasks={myRelevantTasks}
+                    everyTask={tasks ?? []}
+                    dependencies={prepLinks ?? []}
                     dishes={dishes}
                     eventDishes={eventDishes}
                     events={events}
                     busy={busy}
+                    now={now}
+                    queuedCompleteIds={queuedCompleteIds}
                     perform={perform}
                   />
                 )}
               </Section>
             </div>
+            <MyDayFieldForms personId={me._id} />
           </div>
           <div className="my-day-secondary-grid">
             <div className="my-day-section-stack">
-              <MyPastShiftsCard records={myRecords} eventTitle={eventTitle} />
+              <MyPastShiftsCard
+                records={myRecords}
+                eventTitle={eventTitle}
+                plannedFor={(shiftId) =>
+                  (shifts ?? []).find((row) => row._id === shiftId) ?? null
+                }
+              />
               <div data-testid="staff-schedule-notices">
                 <Section
                   title="Published schedule"
@@ -799,12 +955,26 @@ export function MyDayPage() {
                                     label="Received"
                                   />
                                 ) : (
-                                  <StatusChip status="pending" label="New" />
+                                  <StatusChip
+                                    status="pending"
+                                    label={notice.changedAt ? "Changed" : "New"}
+                                  />
                                 )}
                               </div>
                               <p className="schedule-notice-summary">
                                 {notice.shiftSummary}
                               </p>
+                              {notice.changedAt &&
+                                notice.previousShiftSummary && (
+                                  <p
+                                    className="schedule-notice-summary text-ink-2"
+                                    data-testid="schedule-notice-was"
+                                  >
+                                    Changed {dayLabel(notice.changedAt)} at{" "}
+                                    {timeLabel(notice.changedAt)}. Before it
+                                    was: {notice.previousShiftSummary}
+                                  </p>
+                                )}
                               {notice.acknowledgedAt ? (
                                 <p className="schedule-notice-confirmation">
                                   Acknowledged {dayLabel(notice.acknowledgedAt)}{" "}
@@ -864,10 +1034,19 @@ export function MyDayPage() {
                             {listName(item.packListId)} ·{" "}
                             {item.requiredQuantity} {item.unit}
                           </p>
+                          {waitingOn(item._id) ? (
+                            <p
+                              className="text-sm text-warn"
+                              data-testid="pack-waiting"
+                            >
+                              {waitingOn(item._id)!.label} saved on this phone —
+                              not done until the office has it.
+                            </p>
+                          ) : null}
                         </div>
                         <button
                           className={ROW_BTN_PRIMARY}
-                          disabled={busy != null}
+                          disabled={busy != null || !!waitingOn(item._id)}
                           onClick={() =>
                             perform(
                               `pack:${item._id}`,
@@ -885,7 +1064,7 @@ export function MyDayPage() {
                         </button>
                         <button
                           className={ROW_BTN}
-                          disabled={busy != null}
+                          disabled={busy != null || !!waitingOn(item._id)}
                           onClick={() =>
                             perform(
                               `pack:${item._id}:missing`,

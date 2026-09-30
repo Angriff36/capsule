@@ -235,6 +235,17 @@ export const PAGE_GUIDES: PageGuide[] = [
     ],
   },
   {
+    prefix: "/inventory/opening-stock",
+    title: "Opening stock",
+    purpose:
+      "Bring in a stock count sheet and pick which counts become the stock on hand.",
+    steps: [
+      "Choose the count sheet (CSV). Every row lands here; stock on hand does not change yet.",
+      "Fix the rows that need it, or set them aside.",
+      "Press Use as opening stock on each food row you want to start from.",
+    ],
+  },
+  {
     prefix: "/inventory/audit",
     title: "Stock history",
     purpose:
@@ -332,6 +343,17 @@ export const PAGE_GUIDES: PageGuide[] = [
     purpose:
       "Reusable load lists for event types you run often, so packing is never from memory.",
     steps: ["Build a template once; new pack lists start from it."],
+  },
+  {
+    prefix: "/logistics/pack-rules",
+    title: "Pack rules",
+    purpose:
+      "What an event puts on its pack list: a dish's tools, what a dish note asks for, napkins per guest, flooring for a grass venue, the bar kit.",
+    steps: [
+      "Pick when the rule applies, the item, and how many. Use spare % for napkins and cups.",
+      "Mark must-haves: leaving one off a list then needs a stand-in or someone who brings it.",
+      "On a pack list, open Why under a line to see which rules and facts set its amount.",
+    ],
   },
   {
     prefix: "/logistics/style-kits",
@@ -467,6 +489,16 @@ export const PAGE_GUIDES: PageGuide[] = [
     title: "Role scorecards",
     purpose: 'What "good" looks like for each role, written down.',
     steps: ["Define the measurables per role; reviews use them."],
+  },
+  {
+    prefix: "/staff/crew-templates",
+    title: "Crew templates",
+    purpose:
+      "The crew each kind of event needs, posted as open shifts when the event is approved.",
+    steps: [
+      "Make a template for a service style and guest range; list each role and how many.",
+      "Approve an event: its open shifts appear on the event's Staff tab.",
+    ],
   },
   {
     prefix: "/staff/one-on-ones",
@@ -630,6 +662,15 @@ export const PAGE_GUIDES: PageGuide[] = [
     title: "Profit margins",
     purpose: "What each event and service line actually makes.",
     steps: ["Find the low-margin work and reprice or drop it."],
+  },
+  {
+    prefix: "/finance/money-check",
+    title: "Money check",
+    purpose:
+      "Old-system payments next to Capsule payments, by month, with every row that does not agree.",
+    steps: [
+      "Pick the dates, read each month's difference, and save a copy when it is right.",
+    ],
   },
   {
     prefix: "/reports",

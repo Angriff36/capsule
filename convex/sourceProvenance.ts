@@ -55,24 +55,40 @@ export const listByCapsuleId = query({
       .withIndex("by_tenantId", (q) => q.eq("tenantId", auth.tenantId))
       .collect();
 
-    return rows
+    const links = rows
       .filter(
         (row) =>
           row.deletedAt == null &&
           row.conflictStatus !== "superseded" &&
           row.capsuleId === capsuleId,
       )
-      .sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0))
-      .map((row) => ({
-        sourceSystem: row.sourceSystem,
-        recordType: row.recordType,
-        externalId: row.externalId,
-        conflictStatus: row.conflictStatus,
-        verified: row.verified,
-        sourceImportRunId: row.sourceImportRunId ?? null,
-        importedAt: row.createdAt ?? null,
-        resolutionNote: row.resolutionNote ?? null,
-        rawSourceData: row.rawSourceData ?? null,
-      }));
+      .sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+
+    // AC-271: an archive-sourced record points the operator at its run, where
+    // the per-cell provenance (coordinates, raw serial, parser version) is kept
+    // apart from the normalized value. Only the tenant's own runs count.
+    const archiveRuns = new Set<string>();
+    for (const runId of new Set(links.map((row) => row.sourceImportRunId))) {
+      if (!runId) continue;
+      const run = await ctx.db.get(runId);
+      if (run && run.tenantId === auth.tenantId && run.archiveStorageId) {
+        archiveRuns.add(runId);
+      }
+    }
+
+    return links.map((row) => ({
+      sourceSystem: row.sourceSystem,
+      recordType: row.recordType,
+      externalId: row.externalId,
+      conflictStatus: row.conflictStatus,
+      verified: row.verified,
+      sourceImportRunId: row.sourceImportRunId ?? null,
+      fromReportFile: row.sourceImportRunId
+        ? archiveRuns.has(row.sourceImportRunId)
+        : false,
+      importedAt: row.createdAt ?? null,
+      resolutionNote: row.resolutionNote ?? null,
+      rawSourceData: row.rawSourceData ?? null,
+    }));
   },
 });

@@ -6,10 +6,9 @@ import { Id } from "./_generated/dataModel";
 // §4.4 retryable sync-error queue: record an ingest/parse failure as a SyncError.
 // Tenant-scoped find-or-upsert — REOPEN (bump attempts, refresh, return to
 // pending) an existing error with the SAME (sourceSystem, recordType, externalId),
-// else create. The generated command-idempotency cache is keyed by the key string
-// ALONE (commandIdempotencyKeys.by_key, no tenantId), so an idempotency key would
-// collide across tenants and suppress recurrences after dismissal — find-or-upsert
-// avoids that data loss. Only reopens when externalId (provider message id) is
+// else create. The cached create result is immutable, so an idempotency key
+// would suppress recurrences after dismissal — find-or-upsert avoids that
+// data loss. Only reopens when externalId (provider message id) is
 // present: two DISTINCT no-message-id failures must NOT collapse onto one row
 // (that would overwrite and lose the independent failure). The verbatim input is
 // stored as rawPayload ONLY when it fits under the cap — a truncated JSON blob
@@ -116,14 +115,13 @@ export const ingestInboundMessage = action({
     // verbatim input (rawPayload) so it can be retried or dismissed from the
     // inbox. Recording is best-effort and never masks the original error.
     //
-    // TENANT-SCOPED FIND-OR-UPSERT (not a global create-idempotency key): the
-    // generated command-idempotency cache is keyed by the key string ALONE
-    // (commandIdempotencyKeys.by_key, no tenantId), so a key like
-    // `syncerr:message:<providerMessageId>` would collide across tenants and
-    // suppress a recurrence after dismissal (the cached create result is
-    // immutable). Instead we look up an existing tenant error by
-    // (sourceSystem, recordType, externalId) and REOPEN it (bump attempts,
-    // refresh message/payload, return to pending), else create a new row.
+    // TENANT-SCOPED FIND-OR-UPSERT (not a create-idempotency key): the
+    // cached create result is immutable, so a key like
+    // `syncerr:message:<providerMessageId>` would suppress a recurrence of
+    // the same failure after dismissal. Instead we look up an existing tenant
+    // error by (sourceSystem, recordType, externalId) and REOPEN it (bump
+    // attempts, refresh message/payload, return to pending), else create a
+    // new row.
     // Find-then-(reopen|create) in an action is not atomic, so two concurrent
     // identical failures could create two rows — acceptable for an error queue
     // (a rare duplicate is far less bad than silently dropping a failure).
@@ -198,7 +196,7 @@ export const ingestInboundMessage = action({
             subject: args.subject,
             senderIdentity: args.senderIdentity,
             contactId: args.contactId,
-            idempotencyKey: `mt:${provider}:${account}:${providerThreadId}`,
+            idempotencyKey: `tenant-shared/mt:${provider}:${account}:${providerThreadId}`,
           },
         );
         // Literal `create` allocating mutations return { _id, ...doc }.
@@ -239,7 +237,7 @@ export const ingestInboundMessage = action({
           senderIdentity: args.senderIdentity,
           sentAt: args.sentAt,
           rawPayload: args.rawPayload,
-          idempotencyKey: `msg:${threadId}:${providerMessageId}`,
+          idempotencyKey: `tenant-shared/msg:${threadId}:${providerMessageId}`,
         },
       );
 
@@ -428,7 +426,7 @@ const LEAD_SOURCE_BY_PROVIDER: Record<string, string> = {
 //
 // Idempotent by construction:
 //  - thread already has a leadId → return it (no create, no relink);
-//  - the Lead create carries idempotencyKey `qualify:<threadId>`, so a double
+//  - the Lead create carries idempotencyKey `tenant-shared/qualify:<threadId>`, so a double
 //    click or two concurrent qualifies resolve to ONE lead;
 //  - linkLead is called without a version (idempotent set of leadId), so the
 //    second of two concurrent qualifies harmlessly re-sets the same id.
@@ -467,7 +465,7 @@ export const qualifyThreadAsLead = action({
       notes: subject
         ? `From ${source} thread "${subject}"`
         : `From ${source} thread`,
-      idempotencyKey: `qualify:${args.threadId}`,
+      idempotencyKey: `tenant-shared/qualify:${args.threadId}`,
     });
     const leadId = created.docId as Id<"leads">;
 

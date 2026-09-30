@@ -82,6 +82,8 @@ entity MessageThread mixin TenantScoped, SoftDeletable {
     mutate senderIdentity = senderIdentity
     mutate contactId = contactId
     mutate openedByAuthSubjectId = user.id
+    mutate status = "active"
+    mutate leadId = null
     emit MessageThreadCreated {
       threadId: self.id
       tenantId: self.tenantId

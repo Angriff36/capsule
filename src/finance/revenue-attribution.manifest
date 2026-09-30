@@ -180,6 +180,7 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard user.id != null
+    constraint createNeedsStaffProfile: user.personId != null "Link your account to a staff profile before you add a revenue attribution."
 
     mutate eventId = eventId
     mutate attributionType = attributionType
@@ -195,8 +196,14 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
     mutate effectiveEndDate = effectiveEndDate
     mutate reason = reason
     mutate status = "draft"
-    mutate requestedById = user.id
+    mutate requestedById = user.personId
     mutate requestedAt = now()
+    // Approval and the applied amount belong to approve/apply, never the caller.
+    mutate allocatedAmount = 0
+    mutate approvedById = null
+    mutate approvedAt = null
+    mutate rejectionReason = null
+    mutate appliedAt = null
   }
 
   command requestApproval() {
@@ -211,9 +218,10 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
     guard self.status == "pending_approval"
     guard roleAllows(user.role, "financeAccess") or roleAllows(user.role, "salesManageAccess")
     guard user.id != null
+    constraint approveNeedsStaffProfile: user.personId != null "Link your account to a staff profile before you approve a revenue attribution."
 
     mutate status = "approved"
-    mutate approvedById = user.id
+    mutate approvedById = user.personId
     mutate approvedAt = now()
   }
 

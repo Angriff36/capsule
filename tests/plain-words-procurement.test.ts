@@ -127,8 +127,8 @@ describe("plain words on leftover procurement manifests", () => {
       "Procurement and managers may see order demand links",
       "Procurement and managers may see weekly purchasing config",
       "Inventory and managers may see event ingredient contributions",
-      "Procurement staff may see vendors",
-      "Procurement staff may see vendor contacts",
+      "Procurement staff and event managers may see vendors",
+      "Procurement staff and event managers may see vendor contacts",
       "Procurement staff may see vendor contracts",
       "Procurement staff may see contract price tiers",
     ]) {

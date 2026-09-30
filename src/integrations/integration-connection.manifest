@@ -87,20 +87,19 @@ entity IntegrationConnection mixin TenantScoped, SoftDeletable {
 
   // Begin an onboarding/authorization attempt. Creates the row.
   // Named `authorize`, not `connect` — `connect` is a Manifest reserved word.
+  // PL-AUTH (AC-372): the provider account id and granted scopes are the
+  // provider's answer, not the caller's; the server records them through the
+  // private linkAccount / markConnected steps.
   command authorize(
     provider: IntegrationProvider,
-    optional externalAccountId: string,
     optional displayName: string,
-    optional scopes: string,
     optional credentialRef: string
   ) {
     guard self.connectedAt == null
     guard self.deletedAt == null
     guard user.id != null
     mutate provider = provider
-    mutate externalAccountId = externalAccountId
     mutate displayName = displayName
-    mutate scopes = scopes
     mutate credentialRef = credentialRef
     mutate status = "pending"
     mutate connectedAt = now()
@@ -108,8 +107,17 @@ entity IntegrationConnection mixin TenantScoped, SoftDeletable {
       connectionId: self.id
       tenantId: self.tenantId
       provider: provider
-      externalAccountId: externalAccountId
     }
+  }
+
+  // The provider created (or handed back) the account this connection binds
+  // to. Server-only: an account id typed by hand could point the workspace's
+  // payments at someone else's account.
+  private command linkAccount(externalAccountId: string) {
+    guard self.connectedAt != null
+    guard self.deletedAt == null
+    constraint integrationAccountId: length(trim(externalAccountId)) > 0 "The provider did not name an account."
+    mutate externalAccountId = externalAccountId
   }
 
   // Re-open onboarding on an existing row. Without this, a connection that was
@@ -132,8 +140,9 @@ entity IntegrationConnection mixin TenantScoped, SoftDeletable {
 
   // Provider confirmed the account. For Stripe this carries the account's real
   // charges/payouts capability so the UI never sends customers to a connected
-  // account that cannot take money yet.
-  command markConnected(
+  // account that cannot take money yet. Server-only (PL-AUTH AC-372): only
+  // the provider's own answer may say an account can take money.
+  private command markConnected(
     optional externalAccountId: string,
     optional displayName: string,
     optional scopes: string,
@@ -161,8 +170,8 @@ entity IntegrationConnection mixin TenantScoped, SoftDeletable {
   }
 
   // §12.1 "visible pending/failed integration state" — a provider outage marks
-  // the connection, it never rolls back unrelated user work.
-  command recordFailure(reason: string) {
+  // the connection, it never rolls back unrelated user work. Server-only.
+  private command recordFailure(reason: string) {
     guard self.connectedAt != null
     guard self.deletedAt == null
     constraint integrationFailureReason: length(trim(reason)) > 0 "Say why the connection failed."
@@ -177,8 +186,8 @@ entity IntegrationConnection mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // §12.1 "last successful sync".
-  command recordSyncSuccess() {
+  // §12.1 "last successful sync". Server-only.
+  private command recordSyncSuccess() {
     guard self.connectedAt != null
     guard self.deletedAt == null
     mutate status = "connected"

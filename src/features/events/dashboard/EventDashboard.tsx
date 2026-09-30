@@ -78,9 +78,24 @@ export function EventDashboard(props: Props) {
         />
         {props.notices}
         <EventDashPipeline
-          stage={overview.stage}
+          eventId={overview.eventId}
+          facts={{
+            stage: overview.stage,
+            plannedAt: overview.event.plannedAt,
+            clientId: overview.clientId,
+            hasAssignedClient: overview.event.hasAssignedClient,
+            startsAt: overview.startsAt,
+            endsAt: overview.endsAt,
+            expectedHeadcount: overview.expectedHeadcount,
+            hasMenuDishes: overview.event.hasMenuDishes,
+            hasStaffAssigned: overview.event.hasStaffAssigned,
+            hasServiceStyle: overview.event.hasServiceStyle,
+            hasFinalLockTiming: overview.event.hasFinalLockTiming,
+          }}
           openQuestions={flags.loading ? undefined : flags.openFlags.length}
           onOpenStage={() => setSheet("stage")}
+          onTab={onTab}
+          onOpenSheet={setSheet}
         />
         <EventDashNav active={props.activeTab} onChange={onTab} />
         {props.activeTab === "overview" ? (

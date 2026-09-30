@@ -12,6 +12,7 @@ import {
   useInventoryItemUpdateLevels,
   useInventoryReservationConsume,
   useInventoryReservationRelease,
+  useInventoryReservationReturnUnused,
   useInventorySettingsSetStockTracking,
   useListEvent,
   useListIngredient,
@@ -35,6 +36,11 @@ import { catalogUnitForStockLine, isBelowReorder } from "./stockLevels";
 import { IngredientCatalogLabel } from "../kitchen/IngredientCatalogLabel";
 import { IngredientCatalogImageProvider } from "../../lib/IngredientCatalogImageContext";
 import { useWorkingEventId } from "../events/workingEvent";
+import {
+  reservedOn,
+  stockBalance,
+  stockQuantity,
+} from "../../lib/stockBalance";
 
 const policy = new SupplyLifecyclePolicy();
 
@@ -109,6 +115,7 @@ export function StockBookPage() {
   const updateLevels = useInventoryItemUpdateLevels();
   const consumeReservation = useInventoryReservationConsume();
   const releaseReservation = useInventoryReservationRelease();
+  const returnUnused = useInventoryReservationReturnUnused();
   const createInventorySettings = useCreateInventorySettings();
   const setStockTracking = useInventorySettingsSetStockTracking();
   const [form, setForm] = useState<
@@ -150,13 +157,7 @@ export function StockBookPage() {
   const eventName = (id: string) =>
     events?.find((item) => item._id === id)?.title ?? "Unknown event";
   const reservedFor = (itemId: string) =>
-    activeReservations
-      .filter(
-        (reservation) =>
-          reservation.inventoryItemId === itemId &&
-          reservation.status === "active",
-      )
-      .reduce((sum, reservation) => sum + reservation.quantity, 0);
+    reservedOn(itemId, activeReservations);
   // The generated remove guard rejects while any hold is still active.
   const activeHoldCount = (itemId: string) =>
     activeReservations.filter(
@@ -165,10 +166,9 @@ export function StockBookPage() {
         reservation.status === "active",
     ).length;
 
-  // decimal(12, 4) projection — trim float noise from derived quantities.
-  const qty4 = (value: number) => Math.round(value * 10000) / 10000;
+  const qty4 = stockQuantity;
   const availableFor = (item: any) =>
-    qty4(item.quantityOnHand - reservedFor(item._id));
+    stockBalance(item._id, item.quantityOnHand, activeReservations).available;
   const belowPar = (item: any) =>
     item.parLevel > 0 && availableFor(item) < item.parLevel;
   const suggestedPurchase = (item: any) =>
@@ -493,6 +493,53 @@ export function StockBookPage() {
       const args = { docId: reservation._id, version: reservation.version };
       if (key === "consume") await consumeReservation(args);
     });
+  };
+
+  const unusedLeft = (reservation: any) =>
+    stockQuantity(
+      Number(reservation.quantity) - Number(reservation.returnedQuantity ?? 0),
+    );
+
+  const returnAction = (reservation: any) => {
+    void (async () => {
+      const item = activeItems.find(
+        (candidate) => candidate._id === reservation.inventoryItemId,
+      );
+      const values = await prompt.askFields({
+        title: "Send unused stock back",
+        description: `${eventName(reservation.eventId)} used ${reservation.quantity} ${
+          item ? unitFor(item) : ""
+        }. What came back goes on the shelf again.`,
+        fields: [
+          {
+            name: "quantity",
+            label: "Amount that came back",
+            defaultValue: String(unusedLeft(reservation)),
+            inputType: "number",
+            required: true,
+          },
+          {
+            name: "reason",
+            label: "Why it came back",
+            placeholder: "Guest count was lower",
+            required: true,
+          },
+        ],
+        confirmLabel: "Put back on the shelf",
+      });
+      if (!values) return;
+      const quantity = Number(values.quantity);
+      const reason = String(values.reason ?? "").trim();
+      if (!Number.isFinite(quantity) || quantity <= 0 || !reason) return;
+      void run(`${reservation._id}:return`, async () => {
+        await returnUnused({
+          docId: reservation._id,
+          version: reservation.version,
+          quantity,
+          reason,
+        });
+      });
+    })();
   };
 
   return (
@@ -919,6 +966,9 @@ export function StockBookPage() {
                         </td>
                         <td className="supply-number">
                           {reservation.quantity}
+                          {Number(reservation.returnedQuantity ?? 0) > 0
+                            ? ` (${reservation.returnedQuantity} sent back)`
+                            : ""}
                         </td>
                         <td>
                           <StatusChip status={String(reservation.status)} />
@@ -949,6 +999,19 @@ export function StockBookPage() {
                                     : action.label}
                                 </button>
                               ))}
+                            {reservation.status === "consumed" &&
+                            item != null &&
+                            unusedLeft(reservation) > 0 ? (
+                              <button
+                                className="btn btn-ghost btn-sm"
+                                disabled={busy != null}
+                                onClick={() => returnAction(reservation)}
+                              >
+                                {busy === `${reservation._id}:return`
+                                  ? "Working…"
+                                  : "Send back unused"}
+                              </button>
+                            ) : null}
                           </div>
                         </td>
                       </tr>

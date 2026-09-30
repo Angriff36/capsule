@@ -55,8 +55,6 @@ describe("runtime proof: venue note post/pin/revise/remove (AC-316)", () => {
       proof,
       staff,
       venueId,
-      authorHire.personId,
-      "Riley Author",
       "Dock is on the alley",
       {
         eventId,
@@ -69,7 +67,8 @@ describe("runtime proof: venue note post/pin/revise/remove (AC-316)", () => {
     expect(posted.venueId).toBe(venueId);
     expect(posted.eventId).toBe(eventId);
     expect(posted.authorPersonId).toBe(authorHire.personId);
-    expect(posted.authorName).toBe("Riley Author");
+    // The name comes from the author's own staff profile, not the caller.
+    expect(posted.authorName).toBe("Riley author");
     expect(posted.category).toBe("logistics");
     expect(posted.content).toBe("Dock is on the alley");
     expect(posted.visibility).toBe("internal");
@@ -160,20 +159,11 @@ describe("runtime proof: venue note post/pin/revise/remove (AC-316)", () => {
     });
 
     const venueId = await registerVenue(proof, manager, "Peer proof hall", 60);
-    const noteA = await postNote(
-      proof,
-      author,
-      venueId,
-      authorHire.personId,
-      "Riley Author",
-      "Side gate sticks",
-    );
+    const noteA = await postNote(proof, author, venueId, "Side gate sticks");
     const noteB = await postNote(
       proof,
       author,
       venueId,
-      authorHire.personId,
-      "Riley Author",
       "Elevator needs a key",
     );
 
@@ -241,8 +231,6 @@ describe("runtime proof: venue note post/pin/revise/remove (AC-316)", () => {
     await expect(
       proof.executeCommand(staff, M.VenueNote_createViaPost, {
         venueId,
-        authorPersonId: authorHire.personId,
-        authorName: "Riley Author",
         category: "other" as const,
         content: "",
       }),
@@ -250,8 +238,6 @@ describe("runtime proof: venue note post/pin/revise/remove (AC-316)", () => {
     await expect(
       proof.executeCommand(staff, M.VenueNote_createViaPost, {
         venueId,
-        authorPersonId: authorHire.personId,
-        authorName: "Riley Author",
         category: "other" as const,
         content: "   ",
       }),
@@ -266,8 +252,6 @@ describe("runtime proof: venue note post/pin/revise/remove (AC-316)", () => {
       proof,
       staff,
       venueId,
-      authorHire.personId,
-      "Riley Author",
       "Gate code changed to 7712",
     );
     expect((await readNote(staff, noteId)).content).toBe(

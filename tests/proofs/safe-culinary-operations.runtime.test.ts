@@ -474,7 +474,6 @@ describe("runtime proof: safe culinary operations", () => {
         {
           componentId: component.docId,
           versionNumber: 1,
-          capturedByName: "Chef",
           changeSummary: name,
           snapshot: JSON.stringify({
             name,
@@ -604,7 +603,6 @@ describe("runtime proof: safe culinary operations", () => {
       {
         componentId: component.docId,
         versionNumber: 1,
-        capturedByName: "Chef",
         changeSummary: "Exact",
         snapshot: JSON.stringify(capturedShape),
       },
@@ -663,7 +661,6 @@ describe("runtime proof: safe culinary operations", () => {
       {
         componentId: component.docId,
         versionNumber: 2,
-        capturedByName: "Chef",
         changeSummary: "Different target",
         snapshot: JSON.stringify({ ...capturedShape, name: "Different" }),
       },
@@ -1046,6 +1043,8 @@ Warm oil gently and steep herbs.`;
     ).toMatchObject({ status: "ready" });
 
     // Recovery: correct the stored measurement, re-approve, finalize once.
+    // The same pasted text already finished as "House Herb Oil" with other
+    // amounts, so this finish is renamed (AC-067: rename or fix the lines).
     await proof.executeCommand(
       kitchen,
       api.mutations.ComponentImport_resumeReview,
@@ -1080,6 +1079,7 @@ Warm oil gently and steep herbs.`;
         operationKey: "durable-review:broken",
         projection: {
           ...brokenProjection,
+          name: "House Herb Oil (small batch)",
           lines: brokenProjection.lines.map((line) =>
             line.createNew ? { ...line, quantity: 0.5 } : line,
           ),

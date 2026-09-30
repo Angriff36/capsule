@@ -1,4 +1,7 @@
-// Start a commercial change from an accepted proposal.
+// Start a commercial change from an accepted proposal, or revise a proposal
+// that was sent and not yet answered (AC-256/AC-257). A revised sent proposal
+// is replaced when its new version is sent
+// (proposalRevision.sendProposalWithRevisionCapture supersedes it then).
 //
 // Accepted proposals are frozen. supersede only rewrites sent or viewed
 // copies, so it must not be used here. This mutation opens a new draft that
@@ -15,6 +18,7 @@ import { api } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import { v } from "convex/values";
 import { getAuthContext } from "./authContext";
+import { followGuestCount } from "./proposalGenerate";
 
 export interface StartProposalChangeResult {
   docId: Id<"proposals">;
@@ -46,6 +50,7 @@ function changeDraftArgs(proposal: Doc<"proposals">) {
     notes: presentText(proposal.notes),
     terms: presentText(proposal.terms),
     visibleSections: proposal.visibleSections ?? undefined,
+    sectionOrder: proposal.sectionOrder ?? undefined,
     eventId: proposal.eventId ?? undefined,
   };
 }
@@ -98,6 +103,7 @@ async function copyLivePricedLines(
       notes: presentText(line.notes),
       menuDishId: presentText(line.menuDishId),
       overrideReason: presentText(line.overrideReason),
+      equipmentId: presentText(line.equipmentId),
     });
   }
 }
@@ -202,8 +208,11 @@ export const startProposalChange = mutation({
       throw new Error("Proposal not found");
     }
     if (proposal.deletedAt != null) throw new Error("Proposal not found");
-    if (proposal.status !== "accepted") {
-      throw new Error("Only an accepted proposal can start a change.");
+    const accepted = proposal.status === "accepted";
+    if (!accepted && proposal.status !== "sent" && proposal.status !== "viewed") {
+      throw new Error(
+        "Only a sent or accepted proposal can be changed. Edit a draft directly.",
+      );
     }
     const existing = await openChangeDraft(ctx, proposal);
     if (existing) {
@@ -218,11 +227,14 @@ export const startProposalChange = mutation({
       api.mutations.Proposal_createViaDraft,
       changeDraftArgs(proposal),
     );
-    // A draft just created by that command is version 1.
-    await ctx.runMutation(api.mutations.Proposal_confirmChangeSource, {
-      docId: created.docId,
-      version: 1,
-    });
+    // A draft just created by that command is version 1. The accepted-source
+    // check applies to changes of an accepted proposal only.
+    if (accepted) {
+      await ctx.runMutation(api.mutations.Proposal_confirmChangeSource, {
+        docId: created.docId,
+        version: 1,
+      });
+    }
     await copyLivePricedLines(ctx, proposal._id, created.docId);
     const leftOffDishNames = await copyLiveMenuChoices(
       ctx,
@@ -230,6 +242,19 @@ export const startProposalChange = mutation({
       created.docId,
     );
     await copyLiveExtras(ctx, proposal._id, created.docId);
+    // AC-378: a change usually exists because the event moved on (150 → 175
+    // guests). The new draft starts at the event's current guest count, priced
+    // by the central calc; the accepted proposal keeps its own count.
+    const event = proposal.eventId ? await ctx.db.get(proposal.eventId) : null;
+    if (
+      event &&
+      event.tenantId === proposal.tenantId &&
+      event.deletedAt == null &&
+      typeof event.expectedHeadcount === "number" &&
+      event.expectedHeadcount !== proposal.guestCount
+    ) {
+      await followGuestCount(ctx, created.docId, event.expectedHeadcount);
+    }
     return { docId: created.docId, alreadyStarted: false, leftOffDishNames };
   },
 });

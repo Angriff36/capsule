@@ -8,6 +8,13 @@ import {
   timestamp,
 } from "./payrollPeriod";
 import { parseTipPayrollNote, payrollNoteDisplayText } from "./tipDistribution";
+import { payrollRowWarnings } from "./payrollReconcile";
+import {
+  approvedPayroll,
+  hasPayrollApproval,
+  isFinishedTime,
+  type PayTimeRecord,
+} from "../workforce/timePay";
 
 export type PayrollProcessor = "gusto" | "adp" | "paychex";
 
@@ -46,7 +53,9 @@ type TimeRecordRow = {
   clockInAt?: unknown;
   clockOutAt?: unknown;
   breakMinutes?: unknown;
+  paidBreakMinutes?: unknown;
   status?: unknown;
+  approvedAt?: unknown;
   deletedAt?: unknown;
 };
 
@@ -76,6 +85,12 @@ export type PayrollExportRow = {
   timeRecordCount: number;
   payrollInputCount: number;
   missingEmployeeNumber: boolean;
+  /** Over 40 approved hours in a week with no prepared pay: a warning only.
+   *  Capsule does not guess the employer's overtime split, and it does not
+   *  hold the file (the overtime rule is not configured yet). */
+  needsPayPrep: boolean;
+  /** Plain warnings to check before sending (payrollReconcile). */
+  warnings: string[];
 };
 
 export type PayrollExportDocument = {
@@ -88,6 +103,10 @@ export type PayrollExportDocument = {
   timeRecordCount: number;
   payrollInputCount: number;
   missingEmployeeNumberCount: number;
+  /** People whose overtime week has no prepared pay yet (a warning). */
+  payPrepNames: string[];
+  /** People with finished time in the period that is not approved yet and no row. */
+  waitingOnlyNames: string[];
 };
 
 type BuildPayrollExportInput = {
@@ -97,6 +116,8 @@ type BuildPayrollExportInput = {
   people: readonly PersonRow[];
   timeRecords: readonly TimeRecordRow[];
   payrollInputs: readonly PayrollInputRow[];
+  /** When known: hourly rate per person (null = none on file). */
+  hourlyRateByPersonId?: ReadonlyMap<string, number | null>;
 };
 
 type Accumulator = {
@@ -247,6 +268,7 @@ export function buildPayrollExport({
   people,
   timeRecords,
   payrollInputs,
+  hourlyRateByPersonId,
 }: BuildPayrollExportInput): PayrollExportDocument {
   const startAt = localDayStart(periodStart);
   const endAt = localDayStart(periodEnd);
@@ -321,13 +343,23 @@ export function buildPayrollExport({
           .filter(Boolean)
           .join(" ") || "Unknown person";
       const hasReviewedInput = entry.minuteInputCount > 0;
+      // No prepared pay: hours go out as clocked. A week past 40 approved
+      // hours is named so a manager can prepare the overtime split.
+      const needsPayPrep =
+        !hasReviewedInput &&
+        approvedPayroll(
+          timeRecords as readonly PayTimeRecord[],
+          entry.personId,
+          startAt,
+          endExclusiveAt,
+        ).overtimeMinutes > 0;
       const regularMinutes = hasReviewedInput
         ? entry.inputRegularMinutes
         : entry.recordedMinutes;
       const overtimeMinutes = hasReviewedInput ? entry.inputOvertimeMinutes : 0;
       const manualAdjustmentMinutes =
         regularMinutes + overtimeMinutes - entry.recordedMinutes;
-      const sourceSummary = `${entry.timeRecordCount} completed time ${entry.timeRecordCount === 1 ? "entry" : "entries"}; ${entry.payrollInputCount} finalized payroll input${entry.payrollInputCount === 1 ? "" : "s"}`;
+      const sourceSummary = `${entry.timeRecordCount} approved time ${entry.timeRecordCount === 1 ? "entry" : "entries"}; ${entry.payrollInputCount} finalized payroll input${entry.payrollInputCount === 1 ? "" : "s"}`;
       const memo = [sourceSummary, ...entry.notes].join(" | ");
       return {
         personId: entry.personId,
@@ -346,6 +378,16 @@ export function buildPayrollExport({
         timeRecordCount: entry.timeRecordCount,
         payrollInputCount: entry.payrollInputCount,
         missingEmployeeNumber: !employeeNumber,
+        needsPayPrep,
+        warnings: payrollRowWarnings({
+          records: timeRecords,
+          personId: entry.personId,
+          startAt,
+          endExclusiveAt,
+          hourlyRate: hourlyRateByPersonId
+            ? (hourlyRateByPersonId.get(entry.personId) ?? null)
+            : undefined,
+        }),
       };
     })
     .sort(
@@ -371,5 +413,29 @@ export function buildPayrollExport({
     ),
     missingEmployeeNumberCount: rows.filter((row) => row.missingEmployeeNumber)
       .length,
+    payPrepNames: rows
+      .filter((row) => row.needsPayPrep)
+      .map((row) => row.employeeName),
+    waitingOnlyNames: [
+      ...new Set(
+        timeRecords
+          .filter(
+            (record) =>
+              isFinishedTime(record) &&
+              !hasPayrollApproval(record) &&
+              timestamp(record.clockInAt) >= startAt &&
+              timestamp(record.clockInAt) < endExclusiveAt &&
+              !accumulators.has(cleanText(record.personId)),
+          )
+          .map((record) => {
+            const person = peopleById.get(cleanText(record.personId));
+            return (
+              [cleanText(person?.givenName), cleanText(person?.familyName)]
+                .filter(Boolean)
+                .join(" ") || "Unknown person"
+            );
+          }),
+      ),
+    ].sort((a, b) => a.localeCompare(b)),
   };
 }

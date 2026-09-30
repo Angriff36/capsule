@@ -2,6 +2,10 @@
 // Handles data type conversions and field mappings defined in import-dataset.manifest.
 
 import { v } from "convex/values";
+import {
+  classifyFinancialRow,
+  type FinancialRowClass,
+} from "../src/lib/financialRowClass";
 
 /**
  * TPP field mapping types from ImportDataset manifest
@@ -228,6 +232,13 @@ export interface ParsedCapsulePayment {
   amount: number;
   method: string;
   notes?: string;
+  /** The source's own type column, kept as written. */
+  paymentType?: string;
+  /** The accounting system's transaction id: the same money in any report. */
+  providerTransactionId?: string;
+  rowClass: FinancialRowClass;
+  /** Money moving on its own; only these wait to be matched (AC-084). */
+  movesMoney: boolean;
 }
 
 export interface ParsedCapsuleLead {
@@ -338,6 +349,8 @@ export interface ParsedCapsuleMenu {
 export interface ParserResult<T> {
   success: boolean;
   records: T[];
+  /** Input row index of each entry in `records` (rows with errors drop out). */
+  sourceIndexes: number[];
   errors: Array<{ recordIndex: number; field: string; message: string }>;
   warnings: Array<{ recordIndex: number; field: string; message: string }>;
   totalCount: number;
@@ -379,7 +392,9 @@ export function parseTppMoney(value?: string | number): number | undefined {
   if (typeof value === "number") return value;
 
   const cleaned = String(value).replace(/[$,]/g, "").trim();
-  const parsed = parseFloat(cleaned);
+  // Accounting reports write a negative amount in brackets: (50.00).
+  const bracketed = /^\((.*)\)$/.exec(cleaned);
+  const parsed = bracketed ? -parseFloat(bracketed[1]) : parseFloat(cleaned);
   return isNaN(parsed) ? undefined : parsed;
 }
 
@@ -597,14 +612,30 @@ export function parseTppVenue(record: TppVenueRecord): ParsedCapsuleVenue {
 export function parseTppPayment(
   record: TppPaymentRecord,
 ): ParsedCapsulePayment {
+  const amount = parseTppMoney(record.PaymentAmount) ?? Number.NaN;
+  const { rowClass, movesMoney } = classifyFinancialRow({
+    type: record.PaymentType,
+    id: record.PaymentID,
+    amount: Number.isFinite(amount) ? amount : 0,
+  });
+  // Report lines (totals, balances) often have no id of their own.
+  const externalId =
+    record.PaymentID ||
+    (rowClass === "aggregate_report" || rowClass === "balance_snapshot"
+      ? `report-line:${record.PaymentDate ?? ""}:${record.PaymentType ?? rowClass}:${amount}`
+      : "");
   return {
-    externalId: record.PaymentID,
+    externalId,
     invoiceId: record.InvoiceID,
     eventId: record.EventID,
     recordedAt: parseTppDateTime(record.PaymentDate),
-    amount: parseTppMoney(record.PaymentAmount) || 0,
-    method: mapTppPaymentMethod(record.PaymentMethod),
+    amount,
+    method: mapTppPaymentMethod(record.PaymentMethod ?? ""),
     notes: [record.Reference, record.Notes].filter(Boolean).join(" | "),
+    paymentType: record.PaymentType,
+    providerTransactionId: record.QuickBooksTransactionId,
+    rowClass,
+    movesMoney,
   };
 }
 
@@ -857,6 +888,7 @@ export function parseTppEvents(
   records: TppEventRecord[],
 ): ParserResult<ParsedCapsuleEvent> {
   const result: ParsedCapsuleEvent[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -903,6 +935,7 @@ export function parseTppEvents(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -915,6 +948,7 @@ export function parseTppEvents(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -931,6 +965,7 @@ export function parseTppContacts(
   records: TppContactRecord[],
 ): ParserResult<ParsedCapsuleContact> {
   const result: ParsedCapsuleContact[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -970,6 +1005,7 @@ export function parseTppContacts(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -982,6 +1018,7 @@ export function parseTppContacts(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -998,6 +1035,7 @@ export function parseTppVenues(
   records: TppVenueRecord[],
 ): ParserResult<ParsedCapsuleVenue> {
   const result: ParsedCapsuleVenue[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -1029,6 +1067,7 @@ export function parseTppVenues(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -1041,6 +1080,7 @@ export function parseTppVenues(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -1057,6 +1097,7 @@ export function parseTppPayments(
   records: TppPaymentRecord[],
 ): ParserResult<ParsedCapsulePayment> {
   const result: ParsedCapsulePayment[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -1078,7 +1119,9 @@ export function parseTppPayments(
         });
         return;
       }
-      if (!parsed.amount) {
+      // Zero and negative amounts are kept (PR05-02); only a missing or
+      // unreadable amount is an error.
+      if (!Number.isFinite(parsed.amount)) {
         errors.push({
           recordIndex: index,
           field: "PaymentAmount",
@@ -1086,7 +1129,7 @@ export function parseTppPayments(
         });
         return;
       }
-      if (!parsed.method) {
+      if (parsed.movesMoney && !parsed.method) {
         errors.push({
           recordIndex: index,
           field: "PaymentMethod",
@@ -1096,6 +1139,7 @@ export function parseTppPayments(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -1108,6 +1152,7 @@ export function parseTppPayments(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -1124,6 +1169,7 @@ export function parseTppLeads(
   records: TppLeadRecord[],
 ): ParserResult<ParsedCapsuleLead> {
   const result: ParsedCapsuleLead[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -1155,6 +1201,7 @@ export function parseTppLeads(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -1167,6 +1214,7 @@ export function parseTppLeads(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -1183,6 +1231,7 @@ export function parseTppMenus(
   records: TppMenuRecord[],
 ): ParserResult<ParsedCapsuleMenu> {
   const result: ParsedCapsuleMenu[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -1215,6 +1264,7 @@ export function parseTppMenus(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -1227,6 +1277,7 @@ export function parseTppMenus(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -1242,6 +1293,7 @@ export function parseTppPackLists(
   records: TppPackListRecord[],
 ): ParserResult<ParsedCapsulePackList> {
   const result: ParsedCapsulePackList[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -1267,6 +1319,7 @@ export function parseTppPackLists(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -1279,6 +1332,7 @@ export function parseTppPackLists(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,

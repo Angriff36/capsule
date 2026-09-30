@@ -5,7 +5,7 @@ import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import { mutation, query, type QueryCtx } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
-import { deleteBlobIfOrphan } from "./lib/blobs";
+import { deleteBlobIfOrphan, firstAttachmentFor } from "./lib/blobs";
 
 /** Short-lived URL the browser POSTs the file bytes to. Staff only. */
 export const generateUploadUrl = mutation({
@@ -58,6 +58,7 @@ export const listForParent = query({
       v.literal("closeout"),
       v.literal("dish"),
       v.literal("ingredient"),
+      v.literal("equipment"),
       // No "staffMessage": chat files are private to the message's readers
       // and are hydrated only by convex/teamChat.ts.
     ),
@@ -79,18 +80,27 @@ export const listForParent = query({
     return Promise.all(
       live.map(async (r) => ({
         ...r,
-        url: await ctx.storage.getUrl(r.storageId as Id<"_storage">),
+        // A row that names a file another company (or a private chat
+        // message) uploaded shows its name, never the file.
+        url: (await storageReferencedByTenant(ctx, auth.tenantId, r.storageId))
+          ? await ctx.storage.getUrl(r.storageId as Id<"_storage">)
+          : null,
       })),
     );
   },
 });
 
 /**
- * True when a live row in this tenant references the blob: an Attachment
- * row (any parent type) or a Dish/Ingredient whose primary image it is —
- * the same reference walk as convex/lib/blobs.ts, tenant-scoped and
- * live-only. URL retrieval needs an authorized parent record (PR12-05);
- * a bare storage id, or one only another tenant references, is not enough.
+ * True when this tenant owns the blob and a live row in this tenant
+ * references it: an Attachment row (any parent type) or a Dish/Ingredient
+ * whose primary image it is — the same reference walk as
+ * convex/lib/blobs.ts, tenant-scoped and live-only. URL retrieval needs an
+ * authorized parent record (PR12-05); a bare storage id, or one only
+ * another tenant references, is not enough. Ownership: the first Attachment
+ * row for the blob (firstAttachmentFor) must be this tenant's and not a
+ * private chat file; a blob with no Attachment row at all (older dish or
+ * ingredient images) is owned only while no other tenant references it.
+ * Linking another company's storage id to your own record grants nothing.
  */
 /** Also used by convex/assistantConfig.ts to scope assistant attachments. */
 export async function storageReferencedByTenant(
@@ -98,28 +108,86 @@ export async function storageReferencedByTenant(
   tenantId: string,
   storageId: string,
 ): Promise<boolean> {
+  const first = await firstAttachmentFor(ctx, storageId);
+  if (
+    first &&
+    (first.tenantId !== tenantId || first.parentType === "staffMessage")
+  ) {
+    return false;
+  }
+  let live = false;
   for await (const row of ctx.db
     .query("attachments")
     .withIndex("by_storageId", (q) => q.eq("storageId", storageId))) {
-    if (row.tenantId === tenantId && row.deletedAt == null) return true;
+    if (row.tenantId === tenantId && row.deletedAt == null) live = true;
   }
   for await (const dish of ctx.db
     .query("dishes")
     .withIndex("by_primaryImageStorageId", (q) =>
       q.eq("primaryImageStorageId", storageId),
     )) {
-    if (dish.tenantId === tenantId && dish.deletedAt == null) return true;
+    if (dish.tenantId !== tenantId) {
+      if (!first) return false;
+    } else if (dish.deletedAt == null) live = true;
   }
   for await (const ingredient of ctx.db
     .query("ingredients")
     .withIndex("by_primaryImageStorageId", (q) =>
       q.eq("primaryImageStorageId", storageId),
     )) {
-    if (ingredient.tenantId === tenantId && ingredient.deletedAt == null) {
-      return true;
-    }
+    if (ingredient.tenantId !== tenantId) {
+      if (!first) return false;
+    } else if (ingredient.deletedAt == null) live = true;
   }
-  return false;
+  for await (const equipment of ctx.db
+    .query("equipments")
+    .withIndex("by_primaryImageStorageId", (q) =>
+      q.eq("primaryImageStorageId", storageId),
+    )) {
+    if (equipment.tenantId !== tenantId) {
+      if (!first) return false;
+    } else if (equipment.deletedAt == null) live = true;
+  }
+  return live;
+}
+
+/**
+ * A blob this tenant may show although no Attachment row links it yet (a
+ * field-form photo saved on the form itself). Refused when another company
+ * or a private chat already owns it, or another company's dish, ingredient or
+ * equipment uses it: knowing someone else's storage id grants nothing.
+ */
+export async function storageNotOwnedElsewhere(
+  ctx: QueryCtx,
+  tenantId: string,
+  storageId: string,
+): Promise<boolean> {
+  const first = await firstAttachmentFor(ctx, storageId);
+  if (
+    first &&
+    (first.tenantId !== tenantId || first.parentType === "staffMessage")
+  ) {
+    return false;
+  }
+  for await (const row of ctx.db
+    .query("dishes")
+    .withIndex("by_primaryImageStorageId", (q) =>
+      q.eq("primaryImageStorageId", storageId),
+    ))
+    if (row.tenantId !== tenantId) return false;
+  for await (const row of ctx.db
+    .query("ingredients")
+    .withIndex("by_primaryImageStorageId", (q) =>
+      q.eq("primaryImageStorageId", storageId),
+    ))
+    if (row.tenantId !== tenantId) return false;
+  for await (const row of ctx.db
+    .query("equipments")
+    .withIndex("by_primaryImageStorageId", (q) =>
+      q.eq("primaryImageStorageId", storageId),
+    ))
+    if (row.tenantId !== tenantId) return false;
+  return true;
 }
 
 /**

@@ -10,6 +10,7 @@ import {
   readMaterializationReceipt,
   writeMaterializationReceipt,
 } from "./materializationReceipt";
+import { recipeIdentityFingerprint } from "../../src/lib/recipeIdentity";
 
 export const reconcileImportedEventRecipeSync = mutation({
   args: { eventId: v.id("events"), expectedEventVersion: v.number() },
@@ -324,6 +325,8 @@ export const cloneMenu = mutation({
 const importLine = v.object({
   name: v.string(),
   ingredientId: v.optional(v.id("ingredients")),
+  /** A sub-recipe line: the recipe-book recipe this line uses. */
+  componentId: v.optional(v.id("components")),
   createNew: v.optional(v.boolean()),
   quantity: v.number(),
   unit,
@@ -356,14 +359,16 @@ export const importComponent = mutation({
     );
     if (prior) return { ...prior, recovered: true };
     for (const line of args.projection.lines) {
-      if (line.ingredientId) await ownedLive(ctx, line.ingredientId, tenantId, "Ingredient");
+      if (line.componentId) await ownedLive(ctx, line.componentId, tenantId, "Recipe");
+      else if (line.ingredientId) await ownedLive(ctx, line.ingredientId, tenantId, "Ingredient");
       else if (!line.createNew) throw new Error(`${line.name} is missing a matched ingredient`);
     }
     const createdIngredientIds: string[] = [];
-    const ingredientIds: Id<"ingredients">[] = [];
+    const ingredientIds: (Id<"ingredients"> | null)[] = [];
     for (let index = 0; index < args.projection.lines.length; index++) {
       const line = args.projection.lines[index];
-      if (line.ingredientId) ingredientIds.push(line.ingredientId);
+      if (line.componentId) ingredientIds.push(null);
+      else if (line.ingredientId) ingredientIds.push(line.ingredientId);
       else {
         const created = await ctx.runMutation(api.mutations.Ingredient_createViaIntroduce, {
           name: line.name.trim(), unit: line.unit as never, costPerUnit: 0, allergens: [],
@@ -375,16 +380,7 @@ export const importComponent = mutation({
     const component = await ctx.runMutation(api.mutations.Component_createViaDraft, {
       ...args.projection, lines: undefined, yieldUnit: args.projection.yieldUnit as never,
     });
-    const lineIds: string[] = [];
-    for (let index = 0; index < args.projection.lines.length; index++) {
-      const line = args.projection.lines[index];
-      const created = await ctx.runMutation(api.mutations.ComponentIngredient_createViaAdd, {
-        componentId: component.docId, ingredientId: ingredientIds[index], quantity: line.quantity,
-        unit: line.unit as never, sortOrder: line.sortOrder, wasteFactor: line.wasteFactor,
-        prepNotes: line.prepNotes,
-      });
-      lineIds.push(String(created.docId));
-    }
+    const lineIds = await addRecipeLines(ctx, component.docId, args.projection.lines, ingredientIds);
     const output = { componentId: String(component.docId), createdIngredientIds, lineIds };
     await writeMaterializationReceipt(ctx, tenantId, "componentImport", args.operationKey, args.projection, output);
     return { ...output, recovered: false };
@@ -403,6 +399,7 @@ type ImportProjection = {
   lines: {
     name: string;
     ingredientId?: Id<"ingredients">;
+    componentId?: Id<"components">;
     createNew?: boolean;
     quantity: number;
     unit: string;
@@ -412,7 +409,108 @@ type ImportProjection = {
   }[];
 };
 
+/**
+ * Writes the finished recipe's lines in source order: a sub-recipe line becomes
+ * a nested recipe line (ComponentComponent), every other line an ingredient
+ * line. The new recipe has no parents yet, so linking existing recipes under
+ * it cannot close a cycle.
+ */
+async function addRecipeLines(
+  ctx: MutationCtx,
+  componentId: Id<"components">,
+  lines: ImportProjection["lines"],
+  ingredientIds: (Id<"ingredients"> | null)[],
+): Promise<string[]> {
+  const lineIds: string[] = [];
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index];
+    const ingredientId = ingredientIds[index];
+    const created = line.componentId
+      ? await ctx.runMutation(api.mutations.ComponentComponent_createViaAdd, {
+          componentId, childComponentId: line.componentId, quantity: line.quantity,
+          unit: line.unit as never, sortOrder: line.sortOrder, wasteFactor: line.wasteFactor,
+          prepNotes: line.prepNotes,
+        })
+      : await ctx.runMutation(api.mutations.ComponentIngredient_createViaAdd, {
+          componentId, ingredientId: ingredientId as Id<"ingredients">, quantity: line.quantity,
+          unit: line.unit as never, sortOrder: line.sortOrder, wasteFactor: line.wasteFactor,
+          prepNotes: line.prepNotes,
+        });
+    lineIds.push(String(created.docId));
+  }
+  return lineIds;
+}
+
 type ReviewedImportResult = { componentId: string; createdIngredientIds: string[]; lineIds: string[]; request: unknown };
+
+/**
+ * What finalize should do with a finished formula that may already be in the
+ * book (AC-067). Precedence:
+ *  1. Same source text — the same exported row. Formula finished the same way
+ *     → link (identical_source); finished differently → conflict, because the
+ *     two readings of one source must be settled by a person, not duplicated.
+ *  2. Same normalized formula (a scaled copy) under the same name → link
+ *     (scaled_copy); the book recipe keeps its original serving amounts.
+ *  3. Same formula under a different name, or the same name with a different
+ *     formula → create, and record the pairing so both stay distinguishable.
+ * Only live, non-deleted recipes in the tenant take part.
+ */
+type RecipeDuplicateDecision =
+  | { action: "link"; recipe: Doc<"components">; outcome: "identical_source" | "scaled_copy"; identity: string }
+  | { action: "conflict"; recipe: Doc<"components">; identity: string }
+  | {
+      action: "create";
+      identity: string;
+      note?: { recipeId: Id<"components">; outcome: "same_formula_other_name" | "same_name_other_formula" };
+    };
+
+async function decideRecipeDuplicate(
+  ctx: MutationCtx,
+  tenantId: string,
+  candidate: { identity: string; sourceFingerprint: string; name: string },
+): Promise<RecipeDuplicateDecision> {
+  const live = (
+    await ctx.db
+      .query("components")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .collect()
+  ).filter((row) => row.deletedAt == null && row.status != "retired");
+  const normalizedName = candidate.name.trim().toLowerCase();
+  const nameEquals = (row: Doc<"components">) => row.name.trim().toLowerCase() === normalizedName;
+  const sameSource = live.find(
+    (row) => row.recipeSourceFingerprint != null && row.recipeSourceFingerprint === candidate.sourceFingerprint,
+  );
+  if (sameSource) {
+    if (sameSource.recipeIdentityFingerprint === candidate.identity) {
+      return { action: "link", recipe: sameSource, outcome: "identical_source", identity: candidate.identity };
+    }
+    // Same text finished differently under the same name is a conflict. A new
+    // name is the person's answer ("rename this recipe"): it stands on its own.
+    if (nameEquals(sameSource)) {
+      return { action: "conflict", recipe: sameSource, identity: candidate.identity };
+    }
+  }
+  const sameIdentity = live.find((row) => row.recipeIdentityFingerprint === candidate.identity);
+  if (sameIdentity) {
+    if (nameEquals(sameIdentity)) {
+      return { action: "link", recipe: sameIdentity, outcome: "scaled_copy", identity: candidate.identity };
+    }
+    return {
+      action: "create",
+      identity: candidate.identity,
+      note: { recipeId: sameIdentity._id, outcome: "same_formula_other_name" },
+    };
+  }
+  const sameName = live.find(nameEquals);
+  if (sameName) {
+    return {
+      action: "create",
+      identity: candidate.identity,
+      note: { recipeId: sameName._id, outcome: "same_name_other_formula" },
+    };
+  }
+  return { action: "create", identity: candidate.identity };
+}
 
 /**
  * Atomic finalize for a durable ComponentImport review (PR03-01 + PR13 recovery).
@@ -473,13 +571,25 @@ async function finalizeReviewedImport(
     const requested = projection.lines[index];
     if (stored.parsedQuantity == null) throw new Error(`line ${index + 1} quantity needs correction before finalization`);
     if (stored.parsedUnit == null) throw new Error(`line ${index + 1} unit needs correction before finalization`);
+    // A line's own bad amount is the first thing to fix; it must not be hidden
+    // behind the recipe-book duplicate check below.
+    if (!(stored.parsedQuantity > 0)) {
+      throw new Error(`Line ${index + 1}'s amount has to be more than zero. Fix it before finishing this recipe.`);
+    }
     if (stored.parsedQuantity !== requested.quantity) {
       throw new Error(`line ${index + 1} quantity does not match the saved review`);
     }
     if (stored.parsedUnit !== requested.unit) {
       throw new Error(`line ${index + 1} unit does not match the saved review`);
     }
-    if (stored.matchStatus === "exact" || stored.matchStatus === "confirmed_existing") {
+    if (stored.matchStatus === "subrecipe") {
+      if (stored.matchedComponentId == null || requested.componentId !== stored.matchedComponentId) {
+        throw new Error(`line ${index + 1} must keep its linked sub-recipe`);
+      }
+      await ownedLive(ctx, stored.matchedComponentId, tenantId, "Recipe");
+    } else if (requested.componentId != null) {
+      throw new Error(`line ${index + 1} is not a sub-recipe in the saved review`);
+    } else if (stored.matchStatus === "exact" || stored.matchStatus === "confirmed_existing") {
       if (stored.matchedIngredientId == null || requested.ingredientId !== stored.matchedIngredientId) {
         throw new Error(`line ${index + 1} must keep its confirmed ingredient`);
       }
@@ -495,12 +605,62 @@ async function finalizeReviewedImport(
       throw new Error(`line ${index + 1} still needs review`);
     }
   }
+  // AC-067: reconcile the finished formula against the recipe book BEFORE any
+  // row is created. Identity is the normalized per-yield formula
+  // (src/lib/recipeIdentity.ts), so a repeated category export and an
+  // identical scaled copy both match, while a corrected quantity no longer
+  // does. Distinct same-name formulas are never merged — both stay in the
+  // book and the import records the pairing for a person to resolve.
+  const decision = await decideRecipeDuplicate(ctx, tenantId, {
+    identity: recipeIdentityFingerprint({
+      yieldQuantity: row.parsedYieldQuantity,
+      yieldUnit: row.parsedYieldUnit,
+      lines: lines.map((stored, index) =>
+        stored.matchStatus === "subrecipe"
+          ? {
+              kind: "subrecipe" as const,
+              refId: String(stored.matchedComponentId),
+              quantity: stored.parsedQuantity as number,
+              unit: stored.parsedUnit as string,
+              wasteFactor: projection.lines[index].wasteFactor,
+            }
+          : {
+              kind: "ingredient" as const,
+              refId: projection.lines[index].name,
+              quantity: stored.parsedQuantity as number,
+              unit: stored.parsedUnit as string,
+              wasteFactor: projection.lines[index].wasteFactor,
+            },
+      ),
+    }),
+    sourceFingerprint: row.sourceFingerprint,
+    name: projection.name,
+  });
+  if (decision.action === "conflict") {
+    throw new Error(
+      `This exact recipe text is already in the recipe book as "${decision.recipe.name}", and this review finished it differently. Compare the two in the recipe book, then fix the lines here or rename this recipe.`,
+    );
+  }
+  if (decision.action === "link") {
+    await ctx.runMutation(api.mutations.ComponentImport_recordDuplicateComponent, {
+      docId: review.importId,
+      resultingComponentId: decision.recipe._id,
+      matchedComponentId: decision.recipe._id,
+      outcome: decision.outcome,
+    });
+    await ctx.runMutation(api.mutations.ComponentImport_complete, { docId: review.importId });
+    const output = { componentId: String(decision.recipe._id), createdIngredientIds: [] as string[], lineIds: [] as string[], request };
+    await writeMaterializationReceipt(ctx, tenantId, "componentImportReview", operationKey, request, output);
+    return { componentId: output.componentId, createdIngredientIds: [], lineIds: [], recovered: false };
+  }
   const createdIngredientIds: string[] = [];
-  const ingredientIds: Id<"ingredients">[] = [];
+  const ingredientIds: (Id<"ingredients"> | null)[] = [];
   for (let index = 0; index < lines.length; index++) {
     const stored = lines[index];
     const requested = projection.lines[index];
-    if (stored.matchStatus === "confirmed_new") {
+    if (stored.matchStatus === "subrecipe") {
+      ingredientIds.push(null);
+    } else if (stored.matchStatus === "confirmed_new") {
       const created = await ctx.runMutation(api.mutations.Ingredient_createViaIntroduce, {
         name: requested.name.trim(), unit: requested.unit as never, costPerUnit: 0, allergens: [],
       });
@@ -515,20 +675,28 @@ async function finalizeReviewedImport(
   }
   const component = await ctx.runMutation(api.mutations.Component_createViaDraft, {
     ...projection, lines: undefined, yieldUnit: projection.yieldUnit as never,
+    recipeIdentityFingerprint: decision.identity,
+    // Provenance the duplicate check reads back: which export this recipe
+    // came from and the normalized formula identity computed above.
+    sourceFingerprint: row.sourceFingerprint,
+    sourceText: row.rawSourceText,
   });
-  const lineIds: string[] = [];
-  for (let index = 0; index < projection.lines.length; index++) {
-    const requested = projection.lines[index];
-    const created = await ctx.runMutation(api.mutations.ComponentIngredient_createViaAdd, {
-      componentId: component.docId, ingredientId: ingredientIds[index], quantity: requested.quantity,
-      unit: requested.unit as never, sortOrder: requested.sortOrder, wasteFactor: requested.wasteFactor,
-      prepNotes: requested.prepNotes,
+  const lineIds = await addRecipeLines(ctx, component.docId, projection.lines, ingredientIds);
+  if (decision.note) {
+    // Same formula under a new name, or the same name with a different
+    // formula: the new recipe stands on its own and the pairing is stored so
+    // the book can show both versions to a person.
+    await ctx.runMutation(api.mutations.ComponentImport_recordDuplicateComponent, {
+      docId: review.importId,
+      resultingComponentId: component.docId,
+      matchedComponentId: decision.note.recipeId,
+      outcome: decision.note.outcome,
     });
-    lineIds.push(String(created.docId));
+  } else {
+    await ctx.runMutation(api.mutations.ComponentImport_recordComponent, {
+      docId: review.importId, resultingComponentId: component.docId,
+    });
   }
-  await ctx.runMutation(api.mutations.ComponentImport_recordComponent, {
-    docId: review.importId, resultingComponentId: component.docId,
-  });
   await ctx.runMutation(api.mutations.ComponentImport_complete, { docId: review.importId });
   const output = { componentId: String(component.docId), createdIngredientIds, lineIds, request };
   await writeMaterializationReceipt(ctx, tenantId, "componentImportReview", operationKey, request, output);
@@ -549,16 +717,18 @@ const reviewSourceInput = v.object({
 const lineMatchInput = v.object({
   matchStatus: v.string(),
   matchedIngredientId: v.optional(v.id("ingredients")),
+  matchedComponentId: v.optional(v.id("components")),
   possibleMatchIngredientIds: v.optional(v.array(v.string())),
 });
 
-type LineMatchTarget = { matchStatus: string; matchedIngredientId?: Id<"ingredients">; possibleMatchIngredientIds?: string[] };
-type StoredLineMatch = { matchStatus: string; matchedIngredientId?: Id<"ingredients"> | null; possibleMatchIngredientIds?: string[]; resolvedAt?: number | null };
+type LineMatchTarget = { matchStatus: string; matchedIngredientId?: Id<"ingredients">; matchedComponentId?: Id<"components">; possibleMatchIngredientIds?: string[] };
+type StoredLineMatch = { matchStatus: string; matchedIngredientId?: Id<"ingredients"> | null; matchedComponentId?: Id<"components"> | null; possibleMatchIngredientIds?: string[]; resolvedAt?: number | null };
 
 function sameLineMatch(stored: StoredLineMatch, target: LineMatchTarget): boolean {
   const storedId = stored.matchedIngredientId ?? null;
   const targetId = target.matchedIngredientId ?? null;
   if (stored.matchStatus !== target.matchStatus || storedId !== targetId) return false;
+  if ((stored.matchedComponentId ?? null) !== (target.matchedComponentId ?? null)) return false;
   const storedPossible = JSON.stringify(stored.possibleMatchIngredientIds ?? []);
   const targetPossible = JSON.stringify(target.possibleMatchIngredientIds ?? []);
   return storedPossible === targetPossible;
@@ -575,13 +745,14 @@ function sameLineMatch(stored: StoredLineMatch, target: LineMatchTarget): boolea
  */
 async function applyLineMatch(
   ctx: MutationCtx,
+  tenantId: string,
   lineId: Id<"componentImportLines">,
   stored: StoredLineMatch,
   target: LineMatchTarget,
 ) {
   if (sameLineMatch(stored, target)) return;
   if (target.matchStatus === "unresolved") {
-    if (stored.matchStatus !== "unresolved" || stored.matchedIngredientId != null || (stored.possibleMatchIngredientIds ?? []).length > 0) {
+    if (stored.matchStatus !== "unresolved" || stored.matchedIngredientId != null || stored.matchedComponentId != null || (stored.possibleMatchIngredientIds ?? []).length > 0) {
       await ctx.runMutation(api.mutations.ComponentImportLine_resetResolution, { docId: lineId });
     }
     return;
@@ -589,7 +760,15 @@ async function applyLineMatch(
   if (stored.resolvedAt != null) {
     await ctx.runMutation(api.mutations.ComponentImportLine_resetResolution, { docId: lineId });
   }
-  if (target.matchStatus === "exact" || target.matchStatus === "confirmed_existing") {
+  if (target.matchStatus === "subrecipe") {
+    if (target.matchedComponentId == null) throw new Error("A sub-recipe line needs a recipe from the recipe book");
+    await ownedLive(ctx, target.matchedComponentId, tenantId, "Recipe");
+    await ctx.runMutation(api.mutations.ComponentImportLine_linkSubrecipe, {
+      docId: lineId, matchedComponentId: target.matchedComponentId,
+    });
+    return;
+  }
+  if (target.matchStatus === "exact"|| target.matchStatus === "confirmed_existing") {
     if (target.matchedIngredientId == null) {
       throw new Error(`Line match ${target.matchStatus} requires an ingredient`);
     }
@@ -678,7 +857,7 @@ export const createComponentImportReview = mutation({
     approveWhenReady: v.optional(v.boolean()),
   },
   handler: async (ctx, args): Promise<{ importId: string; reviewRevision: number; lineIds: string[] }> => {
-    await authorize(ctx);
+    const tenantId = await authorize(ctx);
     if (args.parsed.lineCount !== args.lines.length) {
       throw new Error(`parsed line count ${args.parsed.lineCount} does not match ${args.lines.length} staged lines`);
     }
@@ -719,7 +898,7 @@ export const createComponentImportReview = mutation({
       // The workbench match already knows exact/possible/new confidence; store
       // it with the staged line so a saved review reopens with its decisions.
       if (line.match) {
-        await applyLineMatch(ctx, staged.docId, {
+        await applyLineMatch(ctx, tenantId, staged.docId, {
           matchStatus: "unresolved",
           matchedIngredientId: null,
           possibleMatchIngredientIds: [],
@@ -823,7 +1002,7 @@ export const saveComponentImportReview = mutation({
     for (const line of args.lines) {
       if (!line.match) continue;
       const stored = storedLines.get(String(line.lineId))!;
-      await applyLineMatch(ctx, line.lineId, stored, line.match);
+      await applyLineMatch(ctx, tenantId, line.lineId, stored, line.match);
     }
     for (const discard of args.discardedLines ?? []) {
       await ctx.runMutation(api.mutations.ComponentImportLine_discard, {

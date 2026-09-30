@@ -124,4 +124,155 @@ describe("published proposal PDF projection", () => {
     expect(rendered).not.toContain("/ person");
     expect(rendered).not.toContain("Total estimate");
   });
+
+  // AC-260 (CF-5-2-required-sections): with every section shown, each
+  // required section renders with its own content.
+  it("renders every required section with content", () => {
+    const doc = buildProposalPdf({
+      clientName: "Harbor Lights Foundation",
+      branding: {
+        displayName: "Proof Kitchen Catering",
+        address: "12 Dock St",
+        primaryColor: "#243B31",
+        accentColor: "#B7791F",
+      },
+      proposal: {
+        _id: "proposal-sections",
+        title: "Harbor gala",
+        eventDate: Date.UTC(2026, 10, 2, 17),
+        eventType: "gala dinner",
+        guestCount: 40,
+        venueName: "Old Mill Barn",
+        venueAddress: "4 Mill Rd",
+        subtotal: 1100,
+        taxAmount: 88,
+        discountAmount: 50,
+        total: 1138,
+        expiresAt: Date.UTC(2026, 9, 20),
+        terms: "Deposit of 30% holds the date; balance due 7 days before.",
+        dishSelections: [
+          { dishName: "Cedar salmon", dishDescription: "Lemon butter, dill" },
+        ],
+        pricingLines: [
+          {
+            description: "Cedar salmon",
+            pricingBasis: "per_unit",
+            unitPrice: 24,
+            quantity: 40,
+          },
+          {
+            description: "Service staff",
+            pricingBasis: "flat",
+            unitPrice: 140,
+          },
+        ],
+        timelineItems: [{ time: "6:00 PM", activity: "Guests arrive" }],
+        venueLogistics: {
+          loadIn: "Back dock after 2 PM",
+          contact: "Pat Mill",
+        },
+        enhancements: [
+          { name: "Oyster bar", description: "Shucked to order", price: 400 },
+        ],
+        acceptanceUrl: "https://capsule.example/accept/token-1",
+      },
+    });
+    const rendered = JSON.stringify((doc as any).internal.pages);
+    for (const expected of [
+      "Proof Kitchen Catering",
+      "Harbor Lights Foundation",
+      "Old Mill Barn",
+      "PROPOSED MENU",
+      "Cedar salmon",
+      "Lemon butter, dill",
+      "PRICING BREAKDOWN",
+      "Service staff",
+      "TIMELINE",
+      "Guests arrive",
+      "VENUE LOGISTICS",
+      "Back dock after 2 PM",
+      "OPTIONAL ENHANCEMENTS",
+      "Oyster bar",
+      "ESTIMATE",
+      "Discount",
+      "Tax",
+      "Total estimate",
+      "TERMS",
+      "Deposit of 30% holds the date",
+      "NEXT STEPS",
+      "capsule.example/accept/token-1",
+    ]) {
+      expect(rendered, expected).toContain(expected);
+    }
+  });
+
+  // AC-259 / AC-096: staff reorder sections on the template; the PDF follows
+  // the saved order, and a proposal with no saved order keeps its layout.
+  it("prints sections in the saved order and keeps the standard order without one", () => {
+    const build = (sectionOrder?: string[]) =>
+      JSON.stringify(
+        (
+          buildProposalPdf({
+            clientName: "Client",
+            branding: {
+              displayName: "Capsule Catering",
+              address: "",
+              primaryColor: "#243B31",
+              accentColor: "#B7791F",
+            },
+            proposal: {
+              ...live,
+              sectionOrder,
+              dishSelections: [{ dishName: "Roasted carrots" }],
+              pricingLines: [
+                { description: "Buffet", pricingBasis: "flat", unitPrice: 999 },
+              ],
+              terms: "Deposit holds the date",
+            },
+          }) as any
+        ).internal.pages,
+      );
+    const at = (rendered: string, text: string) => {
+      const index = rendered.indexOf(text);
+      expect(index, text).toBeGreaterThan(-1);
+      return index;
+    };
+    const standard = build();
+    expect(at(standard, "PROPOSED MENU")).toBeLessThan(at(standard, "TERMS"));
+    expect(at(standard, "PRICING BREAKDOWN")).toBeLessThan(
+      at(standard, "TERMS"),
+    );
+    expect(build([])).toBe(standard);
+
+    const moved = build(["terms", "pricing_summary", "menu_sections"]);
+    expect(at(moved, "TERMS")).toBeLessThan(at(moved, "PRICING BREAKDOWN"));
+    expect(at(moved, "PRICING BREAKDOWN")).toBeLessThan(at(moved, "ESTIMATE"));
+    expect(at(moved, "ESTIMATE")).toBeLessThan(at(moved, "PROPOSED MENU"));
+    // Sections staff did not place still print, after the placed ones.
+    expect(at(moved, "PROPOSED MENU")).toBeLessThan(at(moved, "TIMELINE"));
+  });
+
+  it("carries the frozen section order into the PDF record", () => {
+    const result = projectProposalPdf(live, "Client", {
+      snapshot: JSON.stringify({
+        proposal: {
+          title: "Frozen title",
+          guestCount: 10,
+          subtotal: 100,
+          taxAmount: 0,
+          discountAmount: 0,
+          total: 100,
+          visibleSections: [],
+          sectionOrder: ["terms", "menu_sections"],
+        },
+        client: { name: "Frozen client" },
+        venue: null,
+        dishSelections: [],
+        lineItems: [],
+        enhancements: [],
+        timeline: [],
+      }),
+    });
+    expect(result.proposal.sectionOrder).toEqual(["terms", "menu_sections"]);
+  });
 });

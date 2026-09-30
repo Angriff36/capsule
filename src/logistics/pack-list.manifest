@@ -3,6 +3,14 @@
 // Vehicle + Return/loss deferred. Delivery lives in delivery.manifest.
 
 use "../workforce/assignment.manifest"
+use "./pack-rule.manifest"
+
+// Who covers a must-have item that is not going on the truck.
+enum PackCoverage {
+  equivalent
+  client
+  vendor
+}
 
 enum PackListStatus {
   draft
@@ -41,6 +49,11 @@ entity PackList mixin TenantScoped, SoftDeletable {
   property packedAt: datetime?
   property loadedAt: datetime?
   property dispatchedAt: datetime?
+  // Who said it is loaded and who sent it out, and where it went (PL-DELIVERY,
+  // AC-135). Missing person = that account is not linked to a staff profile.
+  property loadedByPersonId: uuid?
+  property dispatchedByPersonId: uuid?
+  property dispatchDestination: string?
   property cancelledAt: datetime?
   property cancellationReason: string?
   // Event Tracker call-out: the packer is stuck and needs a hand. Shown as
@@ -210,6 +223,7 @@ entity PackList mixin TenantScoped, SoftDeletable {
     compute previousStatus = self.status
     mutate status = "loaded"
     mutate loadedAt = now()
+    mutate loadedByPersonId = user.personId
     emit PackListLoaded {
       packListId: self.id
       tenantId: self.tenantId
@@ -218,6 +232,7 @@ entity PackList mixin TenantScoped, SoftDeletable {
       previousStatus: previousStatus
       status: "loaded"
       loadedAt: self.loadedAt
+      loadedByPersonId: user.personId
     }
   }
 
@@ -226,9 +241,12 @@ entity PackList mixin TenantScoped, SoftDeletable {
     guard self.loadedAt != null
     guard self.deletedAt == null
     compute previousStatus = self.status
+    compute destination = self.event != null and self.event.venueAddress != null and length(trim(self.event.venueAddress)) > 0 ? self.event.venueAddress : (self.event != null and self.event.venueName != null and length(trim(self.event.venueName)) > 0 ? self.event.venueName : "Event site")
     mutate status = "dispatched"
     mutate activeEventId = null
     mutate dispatchedAt = now()
+    mutate dispatchedByPersonId = user.personId
+    mutate dispatchDestination = destination
     emit PackListDispatched {
       packListId: self.id
       tenantId: self.tenantId
@@ -237,6 +255,8 @@ entity PackList mixin TenantScoped, SoftDeletable {
       previousStatus: previousStatus
       status: "dispatched"
       dispatchedAt: self.dispatchedAt
+      dispatchedByPersonId: user.personId
+      destination: destination
     }
   }
 
@@ -320,6 +340,40 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   property indexed serviceStyleKitItemId: uuid?
   property unitCorrectionSource: string?
   property associationSource: string?
+  // Pack-rule line (src/lib/packRules.ts): the stable key of the merged item
+  // (item + unit + owner + return need), every source that asked for it with
+  // its rule version and amount (JSON), and the amount the rules give now.
+  // requiredQuantity follows generatedQuantity until someone sets the amount
+  // by hand (followsDishServings = false).
+  property generationKey: string?
+  property sourcesJson: string?
+  property generatedQuantity: decimal(12, 4)?
+  // No source asks for this line any more and nothing was packed. The line
+  // keeps its identity so it comes back if a source returns.
+  property retiredAt: datetime?
+  property category: PackCategory?
+  property ownership: PackOwnership?
+  property returnRequired: boolean?
+  property returnNote: string?
+  property requiredCapability: boolean?
+  // Pack list template lineage: which template, which line of it, and the
+  // template version that set the amount.
+  property packListTemplateId: uuid?
+  property templateLineKey: string?
+  property templateVersion: int?
+  // Not going on the truck, on purpose. A must-have item also says what
+  // stands in for it or who covers it.
+  property excludedAt: datetime?
+  property exclusionReason: string?
+  property replacementDescription: string?
+  property coveredBy: PackCoverage?
+  // Which truck, trailer or vendor drop on the event carries this line (the
+  // truck-load view). Empty = not placed; with one truck on the event it
+  // rides on that one.
+  property loadAssignmentId: uuid?
+  // About how heavy one unit is, so a truck is not loaded past what it can
+  // carry (PL-DELIVERY). Empty = not known; not counted.
+  property unitWeightKg: float?
   property required requiredQuantity: decimal(12, 4) = 0
   property required packedQuantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
@@ -330,12 +384,18 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   // account is not linked to a profile. Saving a count is never blocked for that.
   property packedByPersonId: uuid?
   property missingAt: datetime?
+  // Who marked it missing, recorded what went instead, and left it off
+  // (AC-134). Missing when the account is not linked to a staff profile.
+  property missingByPersonId: uuid?
+  property sentInsteadByPersonId: uuid?
+  property excludedByPersonId: uuid?
 
   belongsTo packList: PackList fields [tenantId, packListId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
   belongsTo dishContainer: DishContainer fields [tenantId, dishContainerId] references [tenantId, id]
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
   belongsTo productionBatch: ProductionBatch fields [tenantId, productionBatchId] references [tenantId, id]
+  belongsTo loadAssignment: EventVehicleAssignment fields [tenantId, loadAssignmentId] references [tenantId, id]
 
   constraint itemListedComplete: self.listedAt == null or (length(trim(self.description)) > 0 and self.requiredQuantity >= 0) "Give this pack item a description, and make sure the amount needed isn't negative."
   constraint itemPackedNonnegative: self.packedQuantity >= 0 "This item's packed amount can't be negative. Use zero or more."
@@ -477,10 +537,16 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
 
   command syncContainerServings(quantityServings: number) {
     // Active planning only: list not terminal, line still follows, EventDish still live. Event.changeHeadcount already refuses completed/closed_out/cancelled — do not use self.packList.event (generator never loads that hop).
-    compute eligible = self.deletedAt == null and self.followsDishServings == true and self.dishContainer != null and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled" and self.eventDish != null and self.eventDish.deletedAt == null and self.eventDish.removedAt == null
-    compute planned = quantityServings > 0 and self.dishContainer != null and self.dishContainer.deletedAt == null and self.dishContainer.status == "active" ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
+    compute live = self.deletedAt == null and self.followsDishServings == true and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    // A removed dish zeroes its following container line (AC-524).
+    compute dishGone = self.eventDish == null or self.eventDish.deletedAt != null or self.eventDish.removedAt != null
+    compute eligible = live and (dishGone or self.dishContainer != null)
+    compute planned = not dishGone and quantityServings > 0 and self.dishContainer != null and self.dishContainer.deletedAt == null and self.dishContainer.status == "active" ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
     mutate requiredQuantity = eligible ? planned : self.requiredQuantity
-    mutate containerServings = eligible ? quantityServings : self.containerServings
+    mutate containerServings = eligible and not dishGone ? quantityServings : self.containerServings
+    // A dish taken off the menu retires its unpacked container line; a packed
+    // count keeps the line so the packer sees what to bring back.
+    mutate retiredAt = eligible ? (planned == 0 and self.packedQuantity == 0 ? (self.retiredAt != null ? self.retiredAt : now()) : null) : self.retiredAt
     mutate status = eligible and self.status == "packed" and planned > self.packedQuantity ? "listed" : self.status
     emit PackListItemRequirementSynced {
       packListId: self.packListId
@@ -555,6 +621,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     compute previousStatus = self.status
     mutate status = "missing"
     mutate missingAt = now()
+    mutate missingByPersonId = user.personId
     emit PackListItemMissing {
       packListItemId: self.id
       tenantId: self.tenantId
@@ -647,15 +714,175 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // PL-ASSET-CATALOG (AC-548): say who supplies a hand-added line - ours,
+  // rented from a vendor, or the client's - and whether it must come back.
+  // Pack-rule lines take this from their rule, so they are changed there.
+  command setResponsibility(ownership: PackOwnership, returnRequired: boolean, optional returnNote: string) {
+    guard self.deletedAt == null and self.listedAt != null
+    constraint responsibilityManualLine: self.generationKey == null "This line comes from a pack rule. Change who supplies it on the rule."
+    mutate ownership = ownership
+    mutate returnRequired = returnRequired
+    mutate returnNote = returnNote != null and length(trim(returnNote)) > 0 ? trim(returnNote) : null
+    emit PackListItemResponsibilitySet {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      ownership: ownership
+      returnRequired: returnRequired
+    }
+  }
+
   // Record a stand-in without rewriting the listed item. A blank entry clears it.
   command recordSentInstead(optional sentInstead: string) {
     guard self.deletedAt == null
     mutate sentInstead = sentInstead != null and length(trim(sentInstead)) > 0 ? trim(sentInstead) : null
+    mutate sentInsteadByPersonId = user.personId
     emit PackListItemSentInsteadRecorded {
       packListItemId: self.id
       tenantId: self.tenantId
       packListId: self.packListId
       sentInstead: sentInstead != null and length(trim(sentInstead)) > 0 ? trim(sentInstead) : null
+    }
+  }
+
+  // Pack-rule line (convex/lib/packRuleReconciliation.ts). The seam lists a
+  // new line with addItem, then this stamps and keeps it in step. A line
+  // whose amount was set by hand keeps it; a line with no source left and
+  // nothing packed retires; a packed count never changes. Update-only, so
+  // addItem stays the one way to create a pack line.
+  command applyGenerated(
+    packListId: uuid,
+    generationKey: string,
+    category: PackCategory,
+    ownership: PackOwnership,
+    returnRequired: boolean,
+    optional returnNote: string,
+    requiredCapability: boolean,
+    generatedQuantity: decimal(12, 4),
+    sourcesJson: string
+  ) {
+    guard self.deletedAt == null and self.listedAt != null
+    guard self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    constraint generatedReferencesMatch: self.packListId == packListId and (self.generationKey == null or self.generationKey == generationKey) "This packing line is for a different item. Refresh and try again."
+    constraint generatedQuantityValid: generatedQuantity >= 0 "A pack amount can't be negative."
+    compute follows = self.followsDishServings != false
+    compute nothingPacked = self.packedQuantity == 0
+    mutate generationKey = generationKey
+    mutate category = category
+    mutate ownership = ownership
+    mutate returnRequired = returnRequired
+    mutate returnNote = returnNote
+    mutate requiredCapability = requiredCapability
+    mutate generatedQuantity = generatedQuantity
+    mutate sourcesJson = sourcesJson
+    mutate requiredQuantity = follows ? generatedQuantity : self.requiredQuantity
+    mutate retiredAt = generatedQuantity == 0 and follows and nothingPacked ? (self.retiredAt != null ? self.retiredAt : now()) : null
+    mutate status = follows and self.status == "packed" and generatedQuantity > self.packedQuantity ? "listed" : self.status
+    emit PackListItemRequirementSynced {
+      packListId: packListId
+      tenantId: self.tenantId
+      additionalRequired: self.excludedAt == null and self.retiredAt == null and self.requiredQuantity > self.packedQuantity
+    }
+  }
+
+  // Kit line that grows with guests: the seam sends the new amount after a
+  // guest count or kit change. A hand-set amount stays.
+  command syncKitGuests(requiredQuantity: decimal(12, 4)) {
+    guard self.deletedAt == null and self.serviceStyleKitItemId != null
+    compute eligible = self.followsDishServings != false and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    mutate requiredQuantity = eligible ? requiredQuantity : self.requiredQuantity
+    mutate status = eligible and self.status == "packed" and requiredQuantity > self.packedQuantity ? "listed" : self.status
+    emit PackListItemRequirementSynced {
+      packListId: self.packListId
+      tenantId: self.tenantId
+      additionalRequired: eligible and requiredQuantity > self.packedQuantity
+    }
+  }
+
+  // Template line, applied through convex/lib/safeMaterialization.ts: the
+  // seam lists a new line with addItem, then this stamps its lineage. The
+  // same template line on the same list stays one pack line: a retry or a
+  // second apply updates it, and only while nobody set its amount by hand.
+  command ensureTemplateLine(packListId: uuid, packListTemplateId: uuid, templateLineKey: string, templateVersion: int, requiredQuantity: decimal(12, 4)) {
+    guard self.deletedAt == null and self.listedAt != null
+    guard self.packList != null and (self.packList.status == "draft" or self.packList.status == "packing")
+    constraint templateReferencesMatch: self.packListId == packListId and (self.packListTemplateId == null or (self.packListTemplateId == packListTemplateId and self.templateLineKey == templateLineKey)) "This packing line came from a different template line. Refresh and try again."
+    constraint templateLineAmount: requiredQuantity > 0 "A template line needs an amount more than zero."
+    compute follows = self.followsDishServings != false
+    mutate packListTemplateId = packListTemplateId
+    mutate templateLineKey = templateLineKey
+    mutate requiredQuantity = follows ? requiredQuantity : self.requiredQuantity
+    mutate templateVersion = follows or self.templateVersion == null ? templateVersion : self.templateVersion
+    mutate status = follows and self.status == "packed" and requiredQuantity > self.packedQuantity ? "listed" : self.status
+    emit PackListItemRequirementSynced {
+      packListId: packListId
+      tenantId: self.tenantId
+      additionalRequired: self.requiredQuantity > self.packedQuantity
+    }
+  }
+
+  // Not going on the truck, on purpose (spec §13.2): the line stays on the
+  // list with the reason. A must-have item also names its stand-in or who
+  // covers it; without one, the list cannot be marked packed.
+  command exclude(reason: string, optional replacementDescription: string, optional coveredBy: PackCoverage) {
+    guard self.deletedAt == null
+    guard self.packList != null and self.packList.status != "cancelled"
+    constraint excludeReasonPresent: length(trim(reason)) > 0 "Say why this item is not going."
+    mutate excludedAt = now()
+    mutate exclusionReason = trim(reason)
+    mutate replacementDescription = replacementDescription != null and length(trim(replacementDescription)) > 0 ? trim(replacementDescription) : null
+    mutate coveredBy = coveredBy
+    mutate excludedByPersonId = user.personId
+    emit PackListItemExcluded {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      description: self.description
+      reason: trim(reason)
+    }
+  }
+
+  // Put this line on a truck of its event, or take it off (empty). The seam
+  // (convex/lib/packRuleReconciliation.ts) checks the truck is on the same
+  // event. Correctable up to and during the event.
+  command assignLoad(optional loadAssignmentId: uuid) {
+    guard self.deletedAt == null
+    guard self.packList != null and self.packList.status != "cancelled"
+    mutate loadAssignmentId = loadAssignmentId
+    emit PackListItemLoadAssigned {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      loadAssignmentId: loadAssignmentId
+    }
+  }
+
+  // Weight of one unit. Empty clears it. The seam checks the truck it rides on
+  // can still carry the load.
+  command setUnitWeight(optional unitWeightKg: float) {
+    guard self.deletedAt == null
+    guard self.packList != null and self.packList.status != "cancelled"
+    constraint unitWeightNotNegative: unitWeightKg == null or unitWeightKg >= 0 "Weight cannot be negative."
+    mutate unitWeightKg = unitWeightKg
+    emit PackListItemWeightSet {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      unitWeightKg: unitWeightKg
+    }
+  }
+
+  command restoreExcluded() {
+    guard self.deletedAt == null and self.excludedAt != null
+    guard self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    mutate excludedAt = null
+    mutate exclusionReason = null
+    mutate replacementDescription = null
+    mutate coveredBy = null
+    emit PackListItemRequirementSynced {
+      packListId: self.packListId
+      tenantId: self.tenantId
+      additionalRequired: self.requiredQuantity > self.packedQuantity
     }
   }
 
@@ -701,6 +928,7 @@ event PackListLoaded: "pack_list.loaded" {
   previousStatus: PackListStatus
   status: PackListStatus
   loadedAt: datetime?
+  loadedByPersonId: string?
 }
 
 event PackListDispatched: "pack_list.dispatched" {
@@ -711,6 +939,8 @@ event PackListDispatched: "pack_list.dispatched" {
   previousStatus: PackListStatus
   status: PackListStatus
   dispatchedAt: datetime?
+  dispatchedByPersonId: string?
+  destination: string?
 }
 
 event PackListCancelled: "pack_list.cancelled" {
@@ -804,6 +1034,28 @@ event PackListItemKitEnsured: "pack_list_item.kit_ensured" {
   serviceStyleKitItemId: string
 }
 
+event PackListItemLoadAssigned: "pack_list_item.load_assigned" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  loadAssignmentId: string?
+}
+
+event PackListItemWeightSet: "pack_list_item.weight_set" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  unitWeightKg: float?
+}
+
+event PackListItemExcluded: "pack_list_item.excluded" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  description: string
+  reason: string
+}
+
 event PackListItemRemoved: "pack_list_item.removed" {
   packListItemId: string
   tenantId: string
@@ -815,6 +1067,14 @@ event PackListItemAnnotated: "pack_list_item.annotated" {
   packListItemId: string
   tenantId: string
   packListId: string
+}
+
+event PackListItemResponsibilitySet: "pack_list_item.responsibility_set" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  ownership: PackOwnership
+  returnRequired: boolean
 }
 
 event PackListItemSentInsteadRecorded: "pack_list_item.sent_instead_recorded" {
@@ -858,7 +1118,8 @@ on PackListKitRequested fanOut ServiceStyleKitItem where activeKitKey = payload.
     packListId: payload.packListId
     serviceStyleKitItemId: self.id
     description: self.description
-    requiredQuantity: self.baseQuantity + (self.guestsPerUnit != null ? ceil(payload.expectedHeadcount / self.guestsPerUnit) : 0)
+    // Same formula as kitLineQuantity in src/lib/packRules.ts.
+    requiredQuantity: self.baseQuantity + (self.guestsPerUnit != null ? ceil(ceil(payload.expectedHeadcount / self.guestsPerUnit) * (100 + (self.sparePercent != null ? self.sparePercent : 0)) / 100) : 0)
     unit: self.unit
     note: self.note
   }
