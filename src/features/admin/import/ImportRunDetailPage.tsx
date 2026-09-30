@@ -264,7 +264,10 @@ export function ImportRunDetailPage() {
       setError(`Invalid JSON for ${commitNoun} source rows`);
       return;
     }
-    if (rows.length === 0) {
+    // A report-archive run may finish on its file accounting alone.
+    const archiveOnly =
+      rows.length === 0 && Boolean(importRun.archiveStorageId);
+    if (rows.length === 0 && !archiveOnly) {
       setError(`Paste at least one ${commitNoun} source row (JSON array)`);
       return;
     }
@@ -278,6 +281,12 @@ export function ImportRunDetailPage() {
       });
       setShowSourceForm(false);
       setSourceRowsInput("[]");
+      if (archiveOnly) {
+        setNotice(
+          "Import finished. Every archive file is accounted for; no new records were made.",
+        );
+        return;
+      }
       setNotice(
         `Imported ${result.committed} ${commitNoun}(s)` +
           (result.skipped ? `, ${result.skipped} already linked` : "") +
@@ -640,6 +649,9 @@ export function ImportRunDetailPage() {
                           : "Venue"}
               , and tied to this import. Running it again is safe (rows already
               brought in are skipped).
+              {importRun.archiveStorageId
+                ? " To finish with only the report archive, leave the rows as [] — no new records are made."
+                : ""}
             </p>
             <div className="mt-4 flex gap-3">
               <button

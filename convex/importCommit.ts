@@ -632,6 +632,20 @@ export const commitImportRun = action({
       });
     };
 
+    // PL-ARCHIVE: a report-archive run with no rows to bring in finishes on
+    // accounting alone. ImportRun_commit still refuses until every file is
+    // accounted for and any report-list gap is explained; finishing creates
+    // no records, and the run keeps each file's outcome visible.
+    if (args.rawRows.length === 0 && importRun.archiveStorageId) {
+      const none = { committed: 0, skipped: 0, pending: 0 };
+      await completeRun(none);
+      return {
+        ...none,
+        parseErrors: 0,
+        processedCount: mergeCheckpoint(checkpoint, none).processedCount,
+      };
+    }
+
     // ponytail: a TPP contact (a person we cater for) → a person-type Client
     // account. We deliberately do NOT create a ClientContact here: that entity
     // requires a parent clientId (the TPP CompanyID → Capsule Client resolution
