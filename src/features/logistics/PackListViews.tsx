@@ -103,6 +103,26 @@ export function PackListViews({
     dishName: (id) => table.dishName(id),
     rigs,
   });
+  // Counts stay open after the list has gone out: a straggler is loaded late
+  // and the return is counted the next day. Truck and weight are planning.
+  const lineActions = (item: Row) => {
+    const packed = Number(item.packedQuantity) > 0;
+    const actions: Array<{ key: string; label: string }> = [];
+    if (view === "load") {
+      if (table.canEditLines) {
+        if (rigs.length > 1) actions.push({ key: "truck", label: "Truck" });
+        actions.push({ key: "weight", label: "Weight" });
+      }
+      if (packed && table.canCount)
+        actions.push({ key: "onTruck", label: "On truck" });
+    } else if (view === "returns") {
+      if (packed && table.canCount)
+        actions.push({ key: "countReturn", label: "Count return" });
+    } else if (packed && table.canCount) {
+      actions.push({ key: "secondCheck", label: "Second check" });
+    }
+    return actions;
+  };
   return (
     <>
       <nav className="fact-row mt-2" aria-label="Pack list views">
@@ -123,7 +143,11 @@ export function PackListViews({
         ))}
       </nav>
       {view === "all" || table.loading || items.length === 0 ? (
-        <PackListItemTable {...table} items={items} />
+        <PackListItemTable
+          {...table}
+          items={items}
+          extraActions={(item) => lineActions(item)}
+        />
       ) : groups.length === 0 ? (
         <p className="mt-3 text-base text-ink-2">
           {view === "returns"
@@ -147,16 +171,7 @@ export function PackListViews({
               {...table}
               items={group.lines}
               selectableCount={group.lines.filter(table.canSelectItem).length}
-              extraActions={
-                view === "load" && table.canEditLines
-                  ? () => [
-                      ...(rigs.length > 1
-                        ? [{ key: "truck", label: "Truck" }]
-                        : []),
-                      { key: "weight", label: "Weight" },
-                    ]
-                  : undefined
-              }
+              extraActions={(item) => lineActions(item)}
             />
           </section>
         ))

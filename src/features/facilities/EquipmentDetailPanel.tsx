@@ -12,12 +12,15 @@ import {
 } from "../../lib/manifest-convex-react";
 import { uploadCatalogPrimaryImage } from "../attachments/catalogPrimaryImageUpload";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
+import { BarcodeLabel } from "../../ui/BarcodeLabel";
+import { scanLabelFor } from "../logistics/packScan";
 import type { VendorChoice } from "./EquipmentForm";
 
 type CatalogItem = {
   _id: string;
   version: number;
   name: string;
+  assetTag?: string | null;
   ownership: string;
   trackingMode?: string | null;
   serialNumber?: string | null;
@@ -198,6 +201,13 @@ export function EquipmentDetailPanel({
               </button>
             ) : null}
           </div>
+          {item.assetTag?.trim() ? (
+            <BarcodeLabel
+              code={scanLabelFor.equipment(item.assetTag)}
+              title={item.name}
+              subtitle={item.homeLocation?.trim() || undefined}
+            />
+          ) : null}
         </div>
         <div className="space-y-4">
           <dl className="grid gap-2 sm:grid-cols-2">

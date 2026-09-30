@@ -276,6 +276,24 @@
     @apply rounded-md border border-line bg-panel shadow-[0_1px_2px_rgb(30_40_36/0.05),0_2px_8px_-2px_rgb(30_40_36/0.08)];
   }
 
+  /* barcode-label: a printable bar label. The bars stay black on white in
+     both schemes so a scanner can read them off the screen. */
+  .barcode-label {
+    @apply inline-grid max-w-72 justify-items-start gap-1;
+  }
+  .barcode-label > svg {
+    @apply h-16 w-full rounded-xs border border-line bg-white;
+  }
+  .barcode-label-code {
+    @apply font-mono text-base tracking-[0.2em] text-ink;
+  }
+  .barcode-label-title {
+    @apply text-base font-semibold text-ink;
+  }
+  .barcode-label-subtitle {
+    @apply text-sm text-ink-2;
+  }
+
   /* --- DESIGN.md document grammar -------------------------------------- */
 
   /* fact-pair: `VENUE: Willow Barn`. The default way a value is shown. */

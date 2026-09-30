@@ -35,6 +35,7 @@ import type * as deploymentProbe from "../deploymentProbe.js";
 import type * as driverAssignment from "../driverAssignment.js";
 import type * as emailNotifications from "../emailNotifications.js";
 import type * as equipmentCheckout from "../equipmentCheckout.js";
+import type * as eventActivity from "../eventActivity.js";
 import type * as eventCreateCatalog from "../eventCreateCatalog.js";
 import type * as eventDayBriefing from "../eventDayBriefing.js";
 import type * as eventReadiness from "../eventReadiness.js";
@@ -273,6 +274,7 @@ declare const fullApi: ApiFromModules<{
   driverAssignment: typeof driverAssignment;
   emailNotifications: typeof emailNotifications;
   equipmentCheckout: typeof equipmentCheckout;
+  eventActivity: typeof eventActivity;
   eventCreateCatalog: typeof eventCreateCatalog;
   eventDayBriefing: typeof eventDayBriefing;
   eventReadiness: typeof eventReadiness;

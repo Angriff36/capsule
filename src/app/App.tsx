@@ -13,6 +13,8 @@ import { EventImportPage } from "../features/events/import/EventImportPage";
 import { EventWorkbooksPage } from "../features/events/packet/EventWorkbooksPage";
 import { EventsListPage } from "../features/events/EventsListPage";
 import { EventTrackerHome } from "../features/events/tracker/EventTrackerHome";
+import { EventChecklistsPage } from "../features/events/EventChecklistsPage";
+import { PlanningSetupPage } from "../features/events/planning/PlanningSetupPage";
 import { EventTemplatesPage } from "../features/events/EventTemplatesPage";
 import { eventMenuRedirectPath } from "../features/events/eventRoutes";
 import { WorkingEventRouteSync } from "../features/events/workingEvent";
@@ -238,6 +240,21 @@ const DeliveriesPage = lazy(() =>
 const VehicleFleetPage = lazy(() =>
   import("../features/logistics/VehicleFleetPage").then((module) => ({
     default: module.VehicleFleetPage,
+  })),
+);
+const DispatchBoardPage = lazy(() =>
+  import("../features/logistics/DispatchBoardPage").then((module) => ({
+    default: module.DispatchBoardPage,
+  })),
+);
+const ReturnsPage = lazy(() =>
+  import("../features/logistics/ReturnsPage").then((module) => ({
+    default: module.ReturnsPage,
+  })),
+);
+const PackingFloorPage = lazy(() =>
+  import("../features/logistics/PackingFloorPage").then((module) => ({
+    default: module.PackingFloorPage,
   })),
 );
 const VehicleSchedulePage = lazy(() =>
@@ -713,6 +730,14 @@ export function App() {
             <Route path="/events/import" element={<EventImportPage />} />
             <Route path="/events/templates" element={<EventTemplatesPage />} />
             <Route
+              path="/events/checklists"
+              element={<EventChecklistsPage />}
+            />
+            <Route
+              path="/events/planning/setup"
+              element={<PlanningSetupPage />}
+            />
+            <Route
               path="/events/capacity"
               element={<EventCapacityPlannerPage />}
             />
@@ -1080,6 +1105,30 @@ export function App() {
               element={
                 <SupplyRoute>
                   <DeliveriesPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/logistics/dispatch"
+              element={
+                <SupplyRoute>
+                  <DispatchBoardPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/logistics/returns"
+              element={
+                <SupplyRoute>
+                  <ReturnsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/logistics/floor"
+              element={
+                <SupplyRoute>
+                  <PackingFloorPage />
                 </SupplyRoute>
               }
             />

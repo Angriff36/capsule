@@ -22,6 +22,7 @@ the Storybook build; this checks compilation, not visual or interaction behavior
 | Action result notice | `src/ui/action-result/ActionResultHost.tsx` | `src/ui/action-result/ActionResultHost.stories.tsx` |
 | Event stage and readiness checks | `src/features/events/dashboard/EventStageRail.tsx` | Colocated `EventStageRail.stories.tsx` |
 | Kitchen prep checklist row | `src/features/kitchen/PrepTaskRow.tsx` | Colocated `PrepTaskRow.stories.tsx` |
+| Printable bar label for equipment, trucks and events | `src/ui/BarcodeLabel.tsx` | `src/ui/BarcodeLabel.stories.tsx` |
 
 ## Dropdown usage
 

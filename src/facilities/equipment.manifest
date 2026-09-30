@@ -81,6 +81,14 @@ entity Equipment mixin TenantScoped, SoftDeletable {
   property vendorId: uuid?
   property indexed primaryImageStorageId: string?
   property primaryImageFileName: string?
+  // Planning board facts, read by src/lib/planningCapabilities.ts.
+  // provides: what this item supplies to others, a list of {key, amount}
+  // (a generator gives power:240v x 2). needs: what it has to have to work,
+  // a list of {label, anyOf, amount} (an oven needs power:240v or
+  // fuel:propane). Empty = nothing. checkedAt = someone looked and saved.
+  property providesJson: string?
+  property needsJson: string?
+  property operatingFactsCheckedAt: datetime?
 
   belongsTo vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
   hasMany reservations: EquipmentReservation
@@ -197,6 +205,19 @@ entity Equipment mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       name: name
       category: category
+    }
+  }
+
+  // Saves both lists; an empty one clears it.
+  command setOperatingFacts(optional providesJson: string, optional needsJson: string) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    mutate providesJson = providesJson
+    mutate needsJson = needsJson
+    mutate operatingFactsCheckedAt = now()
+    emit EquipmentOperatingFactsSet {
+      equipmentId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -325,6 +346,11 @@ event EquipmentDetailsRevised: "equipment.details_revised" {
   tenantId: string
   name: string
   category: string
+}
+
+event EquipmentOperatingFactsSet: "equipment.operating_facts_set" {
+  equipmentId: string
+  tenantId: string
 }
 
 event EquipmentConditionUpdated: "equipment.condition_updated" {

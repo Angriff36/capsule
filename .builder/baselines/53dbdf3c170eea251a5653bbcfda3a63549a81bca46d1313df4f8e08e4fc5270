@@ -147,6 +147,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.Delivery_createViaSchedule, { "packListId": "packListId-delivery-1", "eventId": "eventId-delivery-1", "driverId": "driverId-delivery-1", "destination": "demo-destination-1", "windowStartsAt": 1767268800000, "windowEndsAt": 1767268800000, "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.Delivery_createViaSchedule, { "packListId": "packListId-delivery-2", "eventId": "eventId-delivery-2", "driverId": "driverId-delivery-2", "destination": "demo-destination-2", "windowStartsAt": 1767355200000, "windowEndsAt": 1767355200000, "notes": "demo-notes-2" } as any);
+  // DepartureOverride → api.mutations.DepartureOverride_createViaRecord
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.DepartureOverride_createViaRecord, { "eventId": "eventId-departure-override-1", "packListId": "packListId-departure-override-1", "reason": "demo-reason-1", "openItems": "demo-openItems-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.DepartureOverride_createViaRecord, { "eventId": "eventId-departure-override-2", "packListId": "packListId-departure-override-2", "reason": "demo-reason-2", "openItems": "demo-openItems-2" } as any);
   // Dish has multiple initialization commands (introduce, mergeInto, purge, retire); using the selected initialization command: introduce.
   // Dish → api.mutations.Dish_createViaIntroduce
   rowsAttempted += 1;
@@ -229,6 +234,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.EventAssignment_createViaAssign, { "eventId": "eventId-event-assignment-1", "personId": "personId-event-assignment-1", "role": "demo-role-1", "startsAt": 1767268800000, "endsAt": 1767268800000, "notes": "demo-notes-1", "overrideReason": "demo-overrideReason-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.EventAssignment_createViaAssign, { "eventId": "eventId-event-assignment-2", "personId": "personId-event-assignment-2", "role": "demo-role-2", "startsAt": 1767355200000, "endsAt": 1767355200000, "notes": "demo-notes-2", "overrideReason": "demo-overrideReason-2" } as any);
+  // EventChecklist → api.mutations.EventChecklist_createViaDefine
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EventChecklist_createViaDefine, { "name": "EventChecklist 1", "category": "demo-category-1", "itemsJson": "demo-itemsJson-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EventChecklist_createViaDefine, { "name": "EventChecklist 2", "category": "demo-category-2", "itemsJson": "demo-itemsJson-2" } as any);
   // EventCloseout → api.mutations.EventCloseout_createViaCapture
   rowsAttempted += 1;
   await client.mutation(api.mutations.EventCloseout_createViaCapture, { "eventId": "eventId-event-closeout-1", "actualRevenue": 1, "budgetedRevenue": 1, "revenueVariance": 1, "actualIngredientCost": 1, "actualWasteCost": 1, "actualLaborCost": 1, "actualVendorCost": 1, "budgetedCost": 1, "totalActualCost": 1, "costVariance": 1, "grossProfit": 1, "expectedHeadcount": 1, "actualHeadcount": 1, "unresolvedIssues": "demo-unresolvedIssues-1", "performanceNotes": "demo-performanceNotes-1", "notes": "demo-notes-1", "sourceSnapshot": "demo-sourceSnapshot-1" } as any);
@@ -276,12 +286,23 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip EventPacketIssue: no creation command in IR (2 rows unused)
   // skip EventPacketResolution: no creation command in IR (2 rows unused)
   // skip EventPacketRevision: no creation command in IR (2 rows unused)
+  // EventPlanNeeds → api.mutations.EventPlanNeeds_createViaNote
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EventPlanNeeds_createViaNote, { "eventId": "eventId-event-plan-needs-1", "trucksNeeded": 1, "siteProvidesJson": "demo-siteProvidesJson-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EventPlanNeeds_createViaNote, { "eventId": "eventId-event-plan-needs-2", "trucksNeeded": 2, "siteProvidesJson": "demo-siteProvidesJson-2" } as any);
   // EventStaffNeed has multiple initialization commands (changeCoverage, postOpen); using the selected initialization command: postOpen.
   // EventStaffNeed → api.mutations.EventStaffNeed_createViaPostOpen
   rowsAttempted += 1;
   await client.mutation(api.mutations.EventStaffNeed_createViaPostOpen, { "eventId": "eventId-event-staff-need-1", "role": "demo-role-1", "description": "demo-description-1", "startsAt": 1767268800000, "endsAt": 1767268800000, "followsEventTiming": false, "notes": "demo-notes-1", "previousStaffNeedId": "previousStaffNeedId-event-staff-need-1", "continuationSlot": 1, "skills": "demo-skills-1", "qualificationName": "EventStaffNeed 1", "certificationType": "demo-certificationType-1", "uniform": "demo-uniform-1", "workLocation": "demo-workLocation-1", "payBasis": "demo-payBasis-1", "budgetHourlyRate": 1, "staffingTemplateId": "staffingTemplateId-event-staff-need-1", "templateLineKey": "demo-templateLineKey-1", "templateSlot": 1 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.EventStaffNeed_createViaPostOpen, { "eventId": "eventId-event-staff-need-2", "role": "demo-role-2", "description": "demo-description-2", "startsAt": 1767355200000, "endsAt": 1767355200000, "followsEventTiming": false, "notes": "demo-notes-2", "previousStaffNeedId": "previousStaffNeedId-event-staff-need-2", "continuationSlot": 2, "skills": "demo-skills-2", "qualificationName": "EventStaffNeed 2", "certificationType": "demo-certificationType-2", "uniform": "demo-uniform-2", "workLocation": "demo-workLocation-2", "payBasis": "demo-payBasis-2", "budgetHourlyRate": 2, "staffingTemplateId": "staffingTemplateId-event-staff-need-2", "templateLineKey": "demo-templateLineKey-2", "templateSlot": 2 } as any);
+  // EventTask has multiple initialization commands (add, remove); using the selected initialization command: add.
+  // EventTask → api.mutations.EventTask_createViaAdd
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EventTask_createViaAdd, { "eventId": "eventId-event-task-1", "title": "EventTask 1", "details": "demo-details-1", "category": "demo-category-1", "ownerPersonId": "ownerPersonId-event-task-1", "dueAt": 1767268800000, "priority": "demo-priority-1", "waitsForTaskId": "waitsForTaskId-event-task-1", "proofRequired": false, "checklistTemplateId": "checklistTemplateId-event-task-1", "templateLineKey": "demo-templateLineKey-1", "suggestionKey": "demo-suggestionKey-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EventTask_createViaAdd, { "eventId": "eventId-event-task-2", "title": "EventTask 2", "details": "demo-details-2", "category": "demo-category-2", "ownerPersonId": "ownerPersonId-event-task-2", "dueAt": 1767355200000, "priority": "demo-priority-2", "waitsForTaskId": "waitsForTaskId-event-task-2", "proofRequired": false, "checklistTemplateId": "checklistTemplateId-event-task-2", "templateLineKey": "demo-templateLineKey-2", "suggestionKey": "demo-suggestionKey-2" } as any);
   // EventTemplate → api.mutations.EventTemplate_createViaDefine
   rowsAttempted += 1;
   await client.mutation(api.mutations.EventTemplate_createViaDefine, { "name": "EventTemplate 1", "clientType": "demo-clientType-1", "eventType": "demo-eventType-1", "defaultHeadcount": 1, "menuId": "menuId-event-template-1", "defaultStaffRoles": "demo-defaultStaffRoles-1", "typicalEquipment": "demo-typicalEquipment-1", "notes": "demo-notes-1", "sourceEventId": "sourceEventId-event-template-1" } as any);
@@ -505,6 +526,21 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.Person_createViaHire, { "givenName": "Person 1", "familyName": "Person 1", "email": "user1@example.com", "phone": "demo-phone-1", "role": "demo-role-1", "authSubjectId": "authSubjectId-person-1", "employeeNumber": "demo-employeeNumber-1", "employmentType": "demo-employmentType-1", "staffingVendor": "demo-staffingVendor-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.Person_createViaHire, { "givenName": "Person 2", "familyName": "Person 2", "email": "user2@example.com", "phone": "demo-phone-2", "role": "demo-role-2", "authSubjectId": "authSubjectId-person-2", "employeeNumber": "demo-employeeNumber-2", "employmentType": "demo-employmentType-2", "staffingVendor": "demo-staffingVendor-2" } as any);
+  // PlanningOverride → api.mutations.PlanningOverride_createViaRecord
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PlanningOverride_createViaRecord, { "eventId": "eventId-planning-override-1", "action": "demo-action-1", "reason": "demo-reason-1", "openItems": "demo-openItems-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PlanningOverride_createViaRecord, { "eventId": "eventId-planning-override-2", "action": "demo-action-2", "reason": "demo-reason-2", "openItems": "demo-openItems-2" } as any);
+  // PlanningReceipt → api.mutations.PlanningReceipt_createViaRecord
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PlanningReceipt_createViaRecord, { "eventId": "eventId-planning-receipt-1", "suggestionKey": "demo-suggestionKey-1", "quantity": 1, "declined": false, "basis": "demo-basis-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PlanningReceipt_createViaRecord, { "eventId": "eventId-planning-receipt-2", "suggestionKey": "demo-suggestionKey-2", "quantity": 2, "declined": false, "basis": "demo-basis-2" } as any);
+  // PlanningRule → api.mutations.PlanningRule_createViaDefine
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PlanningRule_createViaDefine, { "name": "PlanningRule 1", "trigger": "demo-trigger-1", "triggerEquipmentId": "triggerEquipmentId-planning-rule-1", "triggerEquipmentKind": "demo-triggerEquipmentKind-1", "actionsJson": "demo-actionsJson-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PlanningRule_createViaDefine, { "name": "PlanningRule 2", "trigger": "demo-trigger-2", "triggerEquipmentId": "triggerEquipmentId-planning-rule-2", "triggerEquipmentKind": "demo-triggerEquipmentKind-2", "actionsJson": "demo-actionsJson-2" } as any);
   // PrepTask → api.mutations.PrepTask_createViaOpen
   rowsAttempted += 1;
   await client.mutation(api.mutations.PrepTask_createViaOpen, { "eventDishId": "eventDishId-prep-task-1", "eventId": "eventId-prep-task-1", "name": "PrepTask 1", "dishTaskId": "dishTaskId-prep-task-1", "ingredientId": "ingredientId-prep-task-1", "ingredientDemandId": "ingredientDemandId-prep-task-1", "dishId": "dishId-prep-task-1", "componentId": "componentId-prep-task-1", "category": "demo-category-1", "taskType": "demo-taskType-1", "specialInstructions": "demo-specialInstructions-1", "isGenerated": false, "quantity": 1, "unit": "demo-unit-1", "station": "demo-station-1", "dueAt": 1767268800000, "notes": "demo-notes-1", "resolution": "demo-resolution-1", "choiceOptions": "demo-choiceOptions-1" } as any);
@@ -777,6 +813,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.VehicleServiceEntry_createViaRecord, { "maintenanceScheduleId": "maintenanceScheduleId-vehicle-service-entry-1", "vehicleId": "vehicleId-vehicle-service-entry-1", "vendor": "demo-vendor-1", "cost": 1, "odometer": 1, "notes": "demo-notes-1", "completedAt": 1767268800000, "nextDueAt": 1767268800000, "nextDueMileage": 1 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.VehicleServiceEntry_createViaRecord, { "maintenanceScheduleId": "maintenanceScheduleId-vehicle-service-entry-2", "vehicleId": "vehicleId-vehicle-service-entry-2", "vendor": "demo-vendor-2", "cost": 2, "odometer": 2, "notes": "demo-notes-2", "completedAt": 1767355200000, "nextDueAt": 1767355200000, "nextDueMileage": 2 } as any);
+  // VehicleTripCheck → api.mutations.VehicleTripCheck_createViaRecord
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.VehicleTripCheck_createViaRecord, { "eventVehicleAssignmentId": "eventVehicleAssignmentId-vehicle-trip-check-1", "kind": "demo-kind-1", "tires": "demo-tires-1", "brakes": "demo-brakes-1", "lights": "demo-lights-1", "fluids": "demo-fluids-1", "bodywork": "demo-bodywork-1", "interior": "demo-interior-1", "refrigeration": "demo-refrigeration-1", "odometer": 1, "fuelLevel": "demo-fuelLevel-1", "damageNote": "demo-damageNote-1", "notes": "demo-notes-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.VehicleTripCheck_createViaRecord, { "eventVehicleAssignmentId": "eventVehicleAssignmentId-vehicle-trip-check-2", "kind": "demo-kind-2", "tires": "demo-tires-2", "brakes": "demo-brakes-2", "lights": "demo-lights-2", "fluids": "demo-fluids-2", "bodywork": "demo-bodywork-2", "interior": "demo-interior-2", "refrigeration": "demo-refrigeration-2", "odometer": 2, "fuelLevel": "demo-fuelLevel-2", "damageNote": "demo-damageNote-2", "notes": "demo-notes-2" } as any);
   // Vendor has multiple initialization commands (onboard, terminate, updateDetails); using the selected initialization command: onboard.
   // Vendor → api.mutations.Vendor_createViaOnboard
   rowsAttempted += 1;
@@ -1011,6 +1052,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "DepartureOverride",
+      "createMutation": "DepartureOverride_createViaRecord",
+      "rowCount": 2
+    },
+    {
       "entity": "Dish",
       "createMutation": "Dish_createViaIntroduce",
       "rowCount": 2
@@ -1091,6 +1137,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "EventChecklist",
+      "createMutation": "EventChecklist_createViaDefine",
+      "rowCount": 2
+    },
+    {
       "entity": "EventCloseout",
       "createMutation": "EventCloseout_createViaCapture",
       "rowCount": 2
@@ -1156,8 +1207,18 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "EventPlanNeeds",
+      "createMutation": "EventPlanNeeds_createViaNote",
+      "rowCount": 2
+    },
+    {
       "entity": "EventStaffNeed",
       "createMutation": "EventStaffNeed_createViaPostOpen",
+      "rowCount": 2
+    },
+    {
+      "entity": "EventTask",
+      "createMutation": "EventTask_createViaAdd",
       "rowCount": 2
     },
     {
@@ -1388,6 +1449,21 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "Person",
       "createMutation": "Person_createViaHire",
+      "rowCount": 2
+    },
+    {
+      "entity": "PlanningOverride",
+      "createMutation": "PlanningOverride_createViaRecord",
+      "rowCount": 2
+    },
+    {
+      "entity": "PlanningReceipt",
+      "createMutation": "PlanningReceipt_createViaRecord",
+      "rowCount": 2
+    },
+    {
+      "entity": "PlanningRule",
+      "createMutation": "PlanningRule_createViaDefine",
       "rowCount": 2
     },
     {
@@ -1663,6 +1739,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "VehicleServiceEntry",
       "createMutation": "VehicleServiceEntry_createViaRecord",
+      "rowCount": 2
+    },
+    {
+      "entity": "VehicleTripCheck",
+      "createMutation": "VehicleTripCheck_createViaRecord",
       "rowCount": 2
     },
     {

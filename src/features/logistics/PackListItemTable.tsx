@@ -7,6 +7,7 @@ import {
 } from "../../lib/packingDisplay";
 import { PackLineWhy } from "./PackLineWhy";
 import type { PackLineFacts } from "./packLineExplanation";
+import { packReturnSummary } from "./packReturn";
 
 export interface PackListItemRow extends PackLineFacts {
   _id: string;
@@ -19,6 +20,16 @@ export interface PackListItemRow extends PackLineFacts {
   packedByPersonId?: string | null;
   missingByPersonId?: string | null;
   sentInsteadByPersonId?: string | null;
+  checkedQuantity?: number | null;
+  checkedByPersonId?: string | null;
+  loadedQuantity?: number | null;
+  returnedQuantity?: number | null;
+  usedQuantity?: number | null;
+  lostQuantity?: number | null;
+  damagedQuantity?: number | null;
+  returnFinding?: string | null;
+  returnCountedAt?: number | null;
+  returnCountedByPersonId?: string | null;
   unit: string;
   status: unknown;
   version: number;
@@ -30,6 +41,8 @@ export interface PackListItemTableProps {
   canAddItems: boolean;
   /** Note and remove stay available until the list is dispatched or cancelled. */
   canEditLines: boolean;
+  /** Second check, on-truck and return counts: any list that is not cancelled. */
+  canCount?: boolean;
   busy: string | null;
   dishName: (dishId?: string | null) => string | null;
   packedByName: (personId?: string | null) => string | null;
@@ -178,6 +191,30 @@ export function PackListItemTable({
                   <small className="block">
                     {packedByName(item.packedByPersonId)}
                   </small>
+                ) : null}
+                {item.checkedQuantity != null ? (
+                  <small className="block">
+                    Checked {item.checkedQuantity}
+                    {packedByName(item.checkedByPersonId)
+                      ? ` · ${packedByName(item.checkedByPersonId)}`
+                      : ""}
+                  </small>
+                ) : null}
+                {item.loadedQuantity != null ? (
+                  <small className="block">
+                    On truck {item.loadedQuantity}
+                  </small>
+                ) : null}
+                {item.returnCountedAt != null ? (
+                  <small className="block">
+                    {packReturnSummary(item)}
+                    {packedByName(item.returnCountedByPersonId)
+                      ? ` · ${packedByName(item.returnCountedByPersonId)}`
+                      : ""}
+                  </small>
+                ) : null}
+                {item.returnFinding ? (
+                  <small className="block">Found: {item.returnFinding}</small>
                 ) : null}
               </td>
               <td>

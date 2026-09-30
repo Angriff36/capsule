@@ -21,20 +21,29 @@ export const DASH_GROUPS: readonly {
   tabs: readonly EventDetailTab[];
 }[] = [
   { key: "overview", label: "Overview", tabs: ["overview"] },
-  { key: "plan", label: "Plan", tabs: ["timeline", "layouts", "recurring"] },
+  {
+    key: "plan",
+    label: "Plan",
+    tabs: ["timeline", "todos", "layouts", "recurring"],
+  },
   { key: "food", label: "Food", tabs: ["menu", "prep", "inventory"] },
   {
     key: "people",
     label: "People",
     tabs: ["chat", "client", "guests", "staffing"],
   },
-  { key: "site", label: "Site", tabs: ["equipment", "photos", "incidents"] },
+  {
+    key: "site",
+    label: "Site",
+    tabs: ["equipment", "photos", "incidents", "history"],
+  },
   { key: "money", label: "Money", tabs: ["margin"] },
 ];
 
 export const DASH_TAB_LABEL: Record<EventDetailTab, string> = {
   overview: "Overview",
   timeline: "Timeline",
+  todos: "To-dos",
   layouts: "Layouts",
   recurring: "Recurring",
   menu: "Menu",
@@ -47,6 +56,7 @@ export const DASH_TAB_LABEL: Record<EventDetailTab, string> = {
   equipment: "Equipment",
   photos: "Photos",
   incidents: "Incidents",
+  history: "History",
   margin: "Margin",
 };
 
