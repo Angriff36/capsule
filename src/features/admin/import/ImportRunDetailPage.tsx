@@ -14,6 +14,7 @@ import { formatDate, formatTime } from "../../../lib/format";
 import { useRouteRecord } from "../../../lib/routeRecord";
 import { importRunsListPath } from "./importRoutes";
 import { ImportProvenancePanel } from "./ImportProvenancePanel";
+import { ArchiveIntakePanel } from "./ArchiveIntakePanel";
 import { StatusChip } from "../../../ui/primitives";
 import { useActionPrompt } from "../../../ui/action-prompt";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
@@ -484,6 +485,9 @@ export function ImportRunDetailPage() {
           ) : null}
         </div>
       </div>
+
+      {/* Report archive intake: upload, list, sort, explain (PL-ARCHIVE) */}
+      <ArchiveIntakePanel run={importRun} />
 
       {/* Record Counts Form */}
       {showRecordCountsForm ? (
