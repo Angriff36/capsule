@@ -140,7 +140,12 @@ export const takeBackLink = internalMutation({
       home && link.capsuleId
         ? ctx.db.normalizeId(home.table, link.capsuleId)
         : null;
-    if (!home || !recordId || link.conflictStatus !== "resolved") {
+    // A look-alike record the run made (PL-SOURCE-IDENTITY) waits on the match
+    // list but is still the run's own record, so it carries a made snapshot.
+    const runMadeRecord =
+      link.conflictStatus === "resolved" ||
+      readMadeSnapshot(link.metadata).madeVersion !== undefined;
+    if (!home || !recordId || !runMadeRecord) {
       await retireLink("Retired: the import was stopped.");
       return { kind: "retired" };
     }

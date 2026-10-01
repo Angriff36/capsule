@@ -122,6 +122,12 @@ import {
 import type { Doc, Id } from "./_generated/dataModel";
 import { FINANCIAL_ROW_LABEL } from "../src/lib/financialRowClass";
 import { buildLinkKey } from "./lib/culinaryModel/importMapping";
+import {
+  clientLookAlikeNote,
+  venueLookAlikeNote,
+  type LookAlikeClient,
+  type LookAlikeVenue,
+} from "./lib/importIdentity";
 import { SERVICE_STYLE_RECORD_TYPE } from "./importServiceStyle";
 import { commitStockRows } from "./openingStock";
 import { reconcileExistingLink, type DeltaOutcome } from "./importSourceDelta";
@@ -335,6 +341,9 @@ export const upsertLink = internalMutation({
     // run can tell a source change from a person's edit.
     appliedValues: v.optional(v.string()),
     sourceVersion: v.optional(v.string()),
+    // PL-SOURCE-IDENTITY: this run made the record, but it waits for a person
+    // (a look-alike), so the link is pending yet keeps the made snapshot.
+    madeRecord: v.optional(v.boolean()),
   },
   handler: async (ctx, args): Promise<Id<"externalRecordLinks">> => {
     const linkKey = commitLinkKey(args);
@@ -353,7 +362,7 @@ export const upsertLink = internalMutation({
     // AC-631: the record as this run finished it, so a stopped run can tell
     // an untouched record from one a person changed.
     const made =
-      args.conflictStatus === "resolved"
+      args.conflictStatus === "resolved" || args.madeRecord === true
         ? await madeSnapshot(ctx.db, args.recordType, args.capsuleId)
         : undefined;
     const madeMetadata = made !== undefined ? { metadata: made } : {};
@@ -822,6 +831,19 @@ export const commitImportRun = action({
       let skipped = 0;
       let pending = 0;
       const delta: DeltaTally = { updated: 0, conflicted: 0 };
+      // PL-SOURCE-IDENTITY (AC-058): a new client with the same name or email
+      // as one Capsule has is still made on its own; only that record waits
+      // on the match list for a person to say same or different.
+      let clientPool: LookAlikeClient[] | null = null;
+      const lookAlike = async (made: LookAlikeClient) => {
+        clientPool ??= (await ctx.runQuery(
+          api.queries.listClient,
+          {},
+        )) as LookAlikeClient[];
+        const note = clientLookAlikeNote(made, clientPool);
+        clientPool.push(made);
+        return note;
+      };
       for (const [index, contact] of parsed.records.entries()) {
         // R2-6 batch stop: halt before the next record once maxRecords
         // records reached a terminal outcome this invocation.
@@ -850,6 +872,7 @@ export const commitImportRun = action({
               contact,
               rawRows[parsed.sourceIndexes[index]!],
             ),
+            lookAlike,
           });
           if (outcome === "committed") committed += 1;
           else if (outcome === "skipped") skipped += 1;
@@ -926,6 +949,13 @@ export const commitImportRun = action({
               idempotencyKey: `${idempotencyKey}:birthday`,
             });
           }
+          const lookAlikeNote = await lookAlike({
+            _id: clientId,
+            clientType: "person",
+            givenName: contact.givenName,
+            familyName: contact.familyName,
+            email: contact.email,
+          });
           await ctx.runMutation(internal.importCommit.upsertLink, {
             tenantId,
             sourceSystem,
@@ -938,10 +968,17 @@ export const commitImportRun = action({
               contact,
               rawRows[parsed.sourceIndexes[index]!],
             ),
-            conflictStatus: "resolved",
+            ...(lookAlikeNote
+              ? {
+                  conflictStatus: "pending_conflict" as const,
+                  resolutionNote: lookAlikeNote,
+                  madeRecord: true,
+                }
+              : { conflictStatus: "resolved" as const }),
             ...sourceBaseline("contacts", contact),
           });
-          committed += 1;
+          if (lookAlikeNote) pending += 1;
+          else committed += 1;
         } catch (cause) {
           // Per-record failure (e.g. salesAccess denied) → review queue.
           const note =
@@ -2044,6 +2081,9 @@ export const commitImportRun = action({
     let skipped = 0;
     let pending = 0;
     const delta: DeltaTally = { updated: 0, conflicted: 0 };
+    // PL-SOURCE-IDENTITY (AC-058): same name, or same address under a new
+    // name (a renamed venue), waits on the match list; nothing is joined.
+    let venuePool: LookAlikeVenue[] | null = null;
 
     for (const [index, venue] of parsed.records.entries()) {
       // R2-6 batch stop (see the contacts branch).
@@ -2113,6 +2153,18 @@ export const commitImportRun = action({
           },
         );
         const venueId: string = (created as { docId: string }).docId;
+        venuePool ??= (await ctx.runQuery(
+          api.queries.listVenue,
+          {},
+        )) as LookAlikeVenue[];
+        const made: LookAlikeVenue = {
+          _id: venueId,
+          name: venue.name,
+          addressLine1: venue.addressLine1,
+          postalCode: venue.postalCode,
+        };
+        const lookAlikeNote = venueLookAlikeNote(made, venuePool);
+        venuePool.push(made);
         await ctx.runMutation(internal.importCommit.upsertLink, {
           tenantId,
           sourceSystem,
@@ -2125,10 +2177,17 @@ export const commitImportRun = action({
             venue,
             rawRows[parsed.sourceIndexes[index]!],
           ),
-          conflictStatus: "resolved",
+          ...(lookAlikeNote
+            ? {
+                conflictStatus: "pending_conflict" as const,
+                resolutionNote: lookAlikeNote,
+                madeRecord: true,
+              }
+            : { conflictStatus: "resolved" as const }),
           ...sourceBaseline("venues", venue),
         });
-        committed += 1;
+        if (lookAlikeNote) pending += 1;
+        else committed += 1;
       } catch (cause) {
         // Per-record failure (e.g. eventManageAccess denied) → review queue.
         const note =

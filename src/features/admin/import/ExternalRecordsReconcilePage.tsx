@@ -15,6 +15,7 @@ import { SameIdPaymentMatch } from "./SameIdPaymentMatch";
 import { ServiceStyleMatch } from "./ServiceStyleMatch";
 import { SourceChangeReview } from "./SourceChangeReview";
 import { referenceOnlyMoneyRows } from "./referenceOnlyRows";
+import { isDerivedSourceId } from "../../../../convex/lib/importIdentity";
 
 // Source system labels
 const SOURCE_SYSTEM_LABELS: Record<string, string> = {
@@ -379,7 +380,9 @@ export function ExternalRecordsReconcilePage() {
                         record.capsuleEntity}
                     </td>
                     <td className="py-3 px-4 font-mono text-2xs">
-                      {record.externalId}
+                      {isDerivedSourceId(record.externalId)
+                        ? "None — known by its name and details"
+                        : record.externalId}
                     </td>
                     <td className="py-3 px-4">
                       {RECORD_TYPE_LABELS[record.capsuleEntity] ||
@@ -403,6 +406,13 @@ export function ExternalRecordsReconcilePage() {
                       ) : (
                         <span className="text-ink-2">—</span>
                       )}
+                      {/* PL-SOURCE-IDENTITY: why this item waits (for example
+                          the same name as a client Capsule already has). */}
+                      {record.resolutionNote ? (
+                        <p className="mt-1 max-w-80 text-2xs text-ink-2">
+                          {record.resolutionNote}
+                        </p>
+                      ) : null}
                     </td>
                     <td className="py-3 px-4 text-ink-2">
                       {record.createdAt
@@ -466,6 +476,13 @@ export function ExternalRecordsReconcilePage() {
             <li>
               • <strong>Verify</strong>: Confirm a match is correct; the item is
               marked done and leaves this list.
+            </li>
+            <li>
+              • <strong>Same name or email</strong>: An imported client or venue
+              that looks like one you already have is added on its own and waits
+              here. Verify it if it is a different one. If it is the same, merge
+              the two on the Clients page; the old names and old-system links
+              stay on the client you keep.
             </li>
             <li>
               • <strong>Skip</strong>: Mark as resolved with a note. Use this

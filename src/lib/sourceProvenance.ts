@@ -17,3 +17,11 @@ export function useSourceLinksByCapsuleId(
     capsuleId ? { capsuleId } : "skip",
   );
 }
+
+/** AC-181: the clients merged into this one (their earlier names). */
+export function useMergedClients(clientId: string | undefined | null) {
+  return useQuery(
+    api.sourceProvenance.listMergedClients,
+    clientId ? { clientId } : "skip",
+  );
+}

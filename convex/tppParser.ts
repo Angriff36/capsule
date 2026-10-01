@@ -6,6 +6,7 @@ import {
   classifyFinancialRow,
   type FinancialRowClass,
 } from "../src/lib/financialRowClass";
+import { derivedSourceId } from "./lib/importIdentity";
 
 /**
  * TPP field mapping types from ImportDataset manifest
@@ -75,9 +76,10 @@ export interface ParsedEventFile {
 }
 
 export interface TppContactRecord {
-  ContactID: string;
-  FirstName: string;
-  LastName: string;
+  // PL-SOURCE-IDENTITY: a row may lack its id or one of its names.
+  ContactID?: string;
+  FirstName?: string;
+  LastName?: string;
   Email?: string;
   Phone?: string;
   Mobile?: string;
@@ -127,7 +129,7 @@ export interface TppLeadRecord {
 }
 
 export interface TppVenueRecord {
-  VenueID: string;
+  VenueID?: string;
   VenueName: string;
   VenueType?: string;
   Address?: string;
@@ -220,6 +222,8 @@ export interface ParsedCapsuleEvent {
 
 export interface ParsedCapsuleContact {
   externalId: string;
+  /** "derived": the row had no old-system id; externalId is built from it. */
+  identitySource?: "derived";
   givenName: string;
   familyName: string;
   email?: string;
@@ -251,6 +255,8 @@ export interface ParsedCapsuleContact {
 
 export interface ParsedCapsuleVenue {
   externalId: string;
+  /** "derived": the row had no VenueID; externalId is built from it. */
+  identitySource?: "derived";
   name: string;
   venueType?: string;
   addressLine1?: string;
@@ -643,10 +649,28 @@ function parseTppEventFiles(files: TppEventFile[]): ParsedEventFile[] {
 export function parseTppContact(
   record: TppContactRecord,
 ): ParsedCapsuleContact {
+  // A single-name person keeps that one name as the given name; the family
+  // name stays empty, never made up (AC-060).
+  const first = record.FirstName?.trim() ?? "";
+  const last = record.LastName?.trim() ?? "";
+  const givenName = first || last;
+  const familyName = first ? last : "";
+  const sourceId = record.ContactID?.trim() ?? "";
   return {
-    externalId: record.ContactID,
-    givenName: record.FirstName,
-    familyName: record.LastName,
+    // AC-179: a row with no ContactID gets a stable id from its own details.
+    externalId:
+      sourceId ||
+      derivedSourceId([
+        givenName,
+        familyName,
+        record.CompanyID,
+        record.Email,
+        record.Phone || record.Mobile,
+        record.ZipCode,
+      ]),
+    ...(sourceId ? {} : { identitySource: "derived" as const }),
+    givenName,
+    familyName,
     email: record.Email,
     phone: record.Phone,
     mobile: record.Mobile,
@@ -688,7 +712,8 @@ export function isTppCompanyRow(record: Record<string, unknown>): boolean {
     typeof record.CompanyName === "string" &&
     record.CompanyName.trim().length > 0 &&
     !record.ContactID &&
-    !record.FirstName
+    !record.FirstName &&
+    !record.LastName
   );
 }
 
@@ -721,8 +746,15 @@ export function parseTppCompany(
  * Parse TPP Venue record to Capsule format
  */
 export function parseTppVenue(record: TppVenueRecord): ParsedCapsuleVenue {
+  const sourceId = record.VenueID?.trim() ?? "";
   return {
-    externalId: record.VenueID,
+    // AC-179: a row with no VenueID gets a stable id from its name + address.
+    externalId:
+      sourceId ||
+      (record.VenueName?.trim()
+        ? derivedSourceId([record.VenueName, record.Address, record.ZipCode])
+        : ""),
+    ...(sourceId ? {} : { identitySource: "derived" as const }),
     name: record.VenueName,
     venueType: mapTppVenueType(record.VenueType),
     addressLine1: record.Address,
@@ -1132,30 +1164,30 @@ export function parseTppContacts(
       }
       const parsed = parseTppContact(record);
 
-      // Validate required fields
-      if (!parsed.externalId) {
-        errors.push({
-          recordIndex: index,
-          field: "ContactID",
-          message: "ContactID is required",
-        });
-        return;
-      }
+      // AC-060: only a row with no name at all cannot become a person. A
+      // single name or a missing ContactID is kept and noted, never filled in.
       if (!parsed.givenName) {
         errors.push({
           recordIndex: index,
           field: "FirstName",
-          message: "FirstName is required",
+          message: "This contact has no name",
         });
         return;
       }
+      if (parsed.identitySource === "derived") {
+        warnings.push({
+          recordIndex: index,
+          field: "ContactID",
+          message:
+            "No contact id in the old system; Capsule knows this row by its name and details",
+        });
+      }
       if (!parsed.familyName) {
-        errors.push({
+        warnings.push({
           recordIndex: index,
           field: "LastName",
-          message: "LastName is required",
+          message: "Only one name; the family name is left empty",
         });
-        return;
       }
 
       result.push(parsed);
@@ -1203,14 +1235,6 @@ export function parseTppVenues(
       const parsed = parseTppVenue(record);
 
       // Validate required fields
-      if (!parsed.externalId) {
-        errors.push({
-          recordIndex: index,
-          field: "VenueID",
-          message: "VenueID is required",
-        });
-        return;
-      }
       if (!parsed.name) {
         errors.push({
           recordIndex: index,
@@ -1218,6 +1242,14 @@ export function parseTppVenues(
           message: "VenueName is required",
         });
         return;
+      }
+      if (parsed.identitySource === "derived") {
+        warnings.push({
+          recordIndex: index,
+          field: "VenueID",
+          message:
+            "No venue id in the old system; Capsule knows this row by its name and address",
+        });
       }
 
       result.push(parsed);

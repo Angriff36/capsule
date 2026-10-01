@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useSourceLinksByCapsuleId } from "../../lib/sourceProvenance";
 import { importRunDetailPath } from "../admin/import/importRoutes";
+import { isDerivedSourceId } from "../../../convex/lib/importIdentity";
 
 export type SourceLink = NonNullable<
   ReturnType<typeof useSourceLinksByCapsuleId>
@@ -59,13 +60,22 @@ export function SourceLinkList({
           <dl className="mt-2 grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
             <div>
               <dt className="text-ink-3">ID in the old system</dt>
-              <dd className="break-all text-ink-2">{link.externalId || "—"}</dd>
+              <dd className="break-all text-ink-2">
+                {isDerivedSourceId(link.externalId)
+                  ? "None — known by its name and details"
+                  : link.externalId || "—"}
+              </dd>
             </div>
             <div>
               <dt className="text-ink-3">Imported as</dt>
               <dd className="text-ink-2">{link.recordType || "—"}</dd>
             </div>
           </dl>
+          {link.mergedFromName ? (
+            <p className="mt-2 text-ink-2">
+              Came in as {link.mergedFromName}, merged into this client.
+            </p>
+          ) : null}
           {link.resolutionNote ? (
             <p className="mt-2 text-ink-2">Note: {link.resolutionNote}</p>
           ) : null}

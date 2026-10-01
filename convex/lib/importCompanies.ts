@@ -6,6 +6,7 @@ import type { ActionCtx } from "../_generated/server";
 import { api, internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import type { ParsedCapsuleContact } from "../tppParser";
+import type { LookAlikeClient } from "./importIdentity";
 
 type SourceSystem = "tpp_legacy" | "csv_export" | "api_sync";
 
@@ -20,6 +21,8 @@ export async function commitImportedCompany(
     importRunId: Id<"importRuns">;
     company: ParsedCapsuleContact;
     rawSourceData: string;
+    /** PL-SOURCE-IDENTITY: why the new company may be one Capsule has. */
+    lookAlike?: (made: LookAlikeClient) => Promise<string | null>;
   },
 ): Promise<"committed" | "skipped" | "pending" | "resumed"> {
   const { company } = args;
@@ -60,12 +63,26 @@ export async function commitImportedCompany(
         idempotencyKey: `tenant-shared/import:${args.importRunId}:company:${company.externalId}`,
       },
     );
+    const capsuleId = (created as { docId: string }).docId;
+    const lookAlikeNote = args.lookAlike
+      ? await args.lookAlike({
+          _id: capsuleId,
+          clientType: "company",
+          companyName: details.name,
+        })
+      : null;
     await ctx.runMutation(internal.importCommit.upsertLink, {
       ...link,
-      capsuleId: (created as { docId: string }).docId,
-      conflictStatus: "resolved",
+      capsuleId,
+      ...(lookAlikeNote
+        ? {
+            conflictStatus: "pending_conflict" as const,
+            resolutionNote: lookAlikeNote,
+            madeRecord: true,
+          }
+        : { conflictStatus: "resolved" as const }),
     });
-    return "committed";
+    return lookAlikeNote ? "pending" : "committed";
   } catch (cause) {
     await ctx.runMutation(internal.importCommit.upsertLink, {
       ...link,
