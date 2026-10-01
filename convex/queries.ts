@@ -9104,7 +9104,7 @@ export const listLead = query({
     let rows = await ctx.db.query("leads").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Lead", ["email","phone"], row)));
-    return (__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).leadType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); return { ...(__row as any), displayName: (__row as any).displayName }; });
+    return (__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).leadType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); (__row as any).isClosed = ((__row as any).closedAt != null); return { ...(__row as any), displayName: (__row as any).displayName, isClosed: (__row as any).isClosed }; });
   },
 });
 
@@ -9122,7 +9122,8 @@ export const getLead = query({
     if (!__rawDoc) return __rawDoc;
     const __doc = await __decryptDoc(ctx, "Lead", ["email","phone"], __rawDoc);
     (__doc as any).displayName = (((__doc as any).leadType === "company") ? (__doc as any).companyName : (((__doc as any).givenName + " ") + (__doc as any).familyName));
-    const __hydrated = { ...(__doc as any), displayName: (__doc as any).displayName };
+    (__doc as any).isClosed = ((__doc as any).closedAt != null);
+    const __hydrated = { ...(__doc as any), displayName: (__doc as any).displayName, isClosed: (__doc as any).isClosed };
     return __hydrated;
   },
 });
@@ -9138,7 +9139,7 @@ export const listLeadByTenantId = query({
     let rows = await ctx.db.query("leads").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Lead", ["email","phone"], row)));
-    return (__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).leadType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); return { ...(__row as any), displayName: (__row as any).displayName }; });
+    return (__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).leadType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); (__row as any).isClosed = ((__row as any).closedAt != null); return { ...(__row as any), displayName: (__row as any).displayName, isClosed: (__row as any).isClosed }; });
   },
 });
 
@@ -9154,7 +9155,7 @@ export const listLeadByClientId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Lead", ["email","phone"], row)));
-    return (__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).leadType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); return { ...(__row as any), displayName: (__row as any).displayName }; });
+    return (__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).leadType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); (__row as any).isClosed = ((__row as any).closedAt != null); return { ...(__row as any), displayName: (__row as any).displayName, isClosed: (__row as any).isClosed }; });
   },
 });
 
@@ -9170,7 +9171,7 @@ export const listLeadByClientContactId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Lead", ["email","phone"], row)));
-    return (__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).leadType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); return { ...(__row as any), displayName: (__row as any).displayName }; });
+    return (__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).leadType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); (__row as any).isClosed = ((__row as any).closedAt != null); return { ...(__row as any), displayName: (__row as any).displayName, isClosed: (__row as any).isClosed }; });
   },
 });
 
@@ -9186,7 +9187,7 @@ export const listLeadByProposalId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Lead", ["email","phone"], row)));
-    return (__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).leadType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); return { ...(__row as any), displayName: (__row as any).displayName }; });
+    return (__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).leadType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); (__row as any).isClosed = ((__row as any).closedAt != null); return { ...(__row as any), displayName: (__row as any).displayName, isClosed: (__row as any).isClosed }; });
   },
 });
 
@@ -9202,7 +9203,7 @@ export const listLeadByReferralSourceId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Lead", ["email","phone"], row)));
-    return (__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).leadType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); return { ...(__row as any), displayName: (__row as any).displayName }; });
+    return (__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).leadType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); (__row as any).isClosed = ((__row as any).closedAt != null); return { ...(__row as any), displayName: (__row as any).displayName, isClosed: (__row as any).isClosed }; });
   },
 });
 

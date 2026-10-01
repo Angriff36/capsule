@@ -31,6 +31,12 @@ entity Lead mixin TenantScoped, SoftDeletable {
   property capturedAt: datetime?
   property convertedAt: datetime?
   property proposalLinkedAt: datetime?
+  // An imported lead's history from the old system (PL-SOURCE-DATASETS,
+  // AC-276): its stage word for word, its event date, and the day it closed.
+  // A lead with a close date is closed (won or lost); without one it is open.
+  property sourceStage: string?
+  property eventDate: datetime?
+  property closedAt: datetime?
 
   ref client: Client fields [tenantId, clientId] references [tenantId, id]
   ref clientContact: ClientContact fields [tenantId, clientContactId] references [tenantId, id]
@@ -38,6 +44,7 @@ entity Lead mixin TenantScoped, SoftDeletable {
   ref referralSource: ReferralSource fields [tenantId, referralSourceId] references [tenantId, id]
 
   computed displayName: string = self.leadType == "company" ? self.companyName : self.givenName + " " + self.familyName
+  computed isClosed: boolean = self.closedAt != null
 
   constraint leadIdentityComplete: self.capturedAt == null or (self.leadType == "company" and self.companyName != null and length(trim(self.companyName)) > 0) or (self.leadType == "person" and self.givenName != null and length(trim(self.givenName)) > 0) "Give a company name for a company lead, or a given name for a person lead"
   constraint leadSourceComplete: self.capturedAt == null or length(trim(self.source)) > 0 "Say where this lead came from"
@@ -139,6 +146,29 @@ entity Lead mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The import writes what the old system knew about the lead right after it
+  // captures it: the mapped stage, the stage word for word, the event date and
+  // the close date.
+  command recordSourceHistory(
+    stage: LeadStage,
+    sourceStage: string,
+    optional eventDate: datetime,
+    optional closedAt: datetime
+  ) {
+    guard self.capturedAt != null
+    guard self.deletedAt == null
+    mutate stage = stage
+    mutate sourceStage = sourceStage
+    mutate eventDate = eventDate
+    mutate closedAt = closedAt
+    emit LeadSourceHistoryRecorded {
+      leadId: self.id
+      tenantId: self.tenantId
+      stage: stage
+      sourceStage: sourceStage
+    }
+  }
+
   // Two command steps let generated Convex hydrate and validate the newly
   // linked tenant-scoped records. The UI performs both behind one button.
   command stageConversion(clientId: uuid, optional clientContactId: uuid) {
@@ -211,6 +241,13 @@ event LeadPipelineUpdated: "lead.pipeline_updated" {
   stage: LeadStage
   estimatedValue: decimal(12, 2)
   probability: int
+}
+
+event LeadSourceHistoryRecorded: "lead.source_history_recorded" {
+  leadId: string
+  tenantId: string
+  stage: LeadStage
+  sourceStage: string
 }
 
 event LeadConverted: "lead.converted" {

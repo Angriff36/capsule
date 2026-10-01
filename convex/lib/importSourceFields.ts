@@ -64,6 +64,8 @@ const VENUE_TEXT = [
   "contactEmail",
   "accessNotes",
   "cateringNotes",
+  "loadInInstructions",
+  "logisticsNotes",
 ] as const;
 
 const VENUE_FIELDS: SourceFieldMap = {
@@ -80,6 +82,8 @@ const VENUE_FIELDS: SourceFieldMap = {
     contactEmail: "Venue contact email",
     accessNotes: "Access notes",
     cateringNotes: "Catering notes",
+    loadInInstructions: "Load-in instructions",
+    logisticsNotes: "Parking",
     capacity: "Capacity",
   },
   fromSource: (row) => ({
@@ -93,9 +97,20 @@ const VENUE_FIELDS: SourceFieldMap = {
   }),
 };
 
+/**
+ * TPP SpecialRequirements and EventNotes both land in the event's
+ * requirements (Event has no second notes field), so neither is lost.
+ */
+export function eventRequirementsText(row: Row): string | undefined {
+  const parts = [text(row.operationalRequirements), text(row.notes)].filter(
+    (part): part is string => typeof part === "string",
+  );
+  return parts.length > 0 ? [...new Set(parts)].join("\n\n") : undefined;
+}
+
 // Events: the same shaping importCommit applies at create (a missing or
-// backwards end is one hour after the start; at least one guest; notes stand
-// in for requirements). Money fields are not compared here.
+// backwards end is one hour after the start; at least one guest; special
+// requirements and notes together). Money fields are not compared here.
 const HOUR = 3_600_000;
 const EVENT_FIELDS: SourceFieldMap = {
   fields: [
@@ -139,8 +154,7 @@ const EVENT_FIELDS: SourceFieldMap = {
       expectedHeadcount: Math.max(1, typeof guests === "number" ? guests : 1),
       venueName: text(row.venueName),
       venueAddress: text(row.venueAddress),
-      operationalRequirements:
-        text(row.operationalRequirements) ?? text(row.notes),
+      operationalRequirements: eventRequirementsText(row) ?? null,
     };
   },
   fromCapsule: (doc) => ({

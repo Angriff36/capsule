@@ -241,6 +241,9 @@ export interface ParsedCapsuleVenue {
   contactEmail?: string;
   accessNotes?: string;
   cateringNotes?: string;
+  loadInInstructions?: string;
+  /** TPP ParkingInfo: Venue keeps parking in its logistics notes. */
+  logisticsNotes?: string;
   createdAt?: number;
 }
 
@@ -388,7 +391,13 @@ export function parseTppDateTime(
   if (!dateStr) return undefined;
 
   try {
-    const date = new Date(dateStr);
+    // A bare "YYYY-MM-DD" is read as that calendar day on the same clock the
+    // time below is set on (new Date("YYYY-MM-DD") is UTC midnight, which
+    // setHours then moved to the day before west of UTC).
+    const day = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr.trim());
+    const date = day
+      ? new Date(Number(day[1]), Number(day[2]) - 1, Number(day[3]))
+      : new Date(dateStr);
     if (isNaN(date.getTime())) return undefined;
 
     if (timeStr) {
@@ -646,6 +655,8 @@ export function parseTppVenue(record: TppVenueRecord): ParsedCapsuleVenue {
     contactEmail: record.ContactEmail,
     accessNotes: record.AccessNotes,
     cateringNotes: record.CateringNotes,
+    loadInInstructions: record.LoadInInstructions,
+    logisticsNotes: record.ParkingInfo,
     createdAt: parseTppDateTime(record.CreatedDate),
   };
 }

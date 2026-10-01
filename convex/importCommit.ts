@@ -129,6 +129,7 @@ import { attachImportedEventFiles } from "./lib/importEventFiles";
 import { compensateStoppedRun } from "./importCancel";
 import { madeSnapshot } from "./lib/importRecordHomes";
 import {
+  eventRequirementsText,
   SOURCE_FIELD_MAPS,
   sourceVersionOf,
   type SourceDeltaDataset,
@@ -1137,8 +1138,9 @@ export const commitImportRun = action({
               venueName: event.venueName,
               venueAddress: event.venueAddress,
               accessibilityNeeds: event.accessibilityNeeds,
-              operationalRequirements:
-                event.operationalRequirements ?? event.notes,
+              operationalRequirements: eventRequirementsText({
+                ...event,
+              }),
               idempotencyKey,
             },
           );
@@ -1315,13 +1317,7 @@ export const commitImportRun = action({
         // Capsule Client is the conversion workflow (stageConversion →
         // confirmConversion), a separate operator action.
         const idempotencyKey = `tenant-shared/import:${args.importRunId}:lead:${lead.externalId}`;
-        const notes =
-          [
-            lead.stage !== "new" ? `TPP stage: ${lead.stage}` : null,
-            lead.clientId ? `TPP client ${lead.clientId}` : null,
-          ]
-            .filter(Boolean)
-            .join(" — ") || undefined;
+        const notes = lead.clientId ? `TPP client ${lead.clientId}` : undefined;
         try {
           const created = await ctx.runMutation(
             api.mutations.Lead_createViaCapture,
@@ -1336,6 +1332,16 @@ export const commitImportRun = action({
             },
           );
           const leadId: string = (created as { docId: string }).docId;
+          // AC-276: the old stage, event date and close date go on the lead
+          // itself (a close date means the deal is closed), before the link.
+          await ctx.runMutation(api.mutations.Lead_recordSourceHistory, {
+            docId: leadId as Id<"leads">,
+            stage: lead.stage,
+            sourceStage: lead.rawStage,
+            eventDate: lead.eventDate,
+            closedAt: lead.closeDate,
+            idempotencyKey: `${idempotencyKey}:history`,
+          });
           await ctx.runMutation(internal.importCommit.upsertLink, {
             tenantId,
             sourceSystem,
@@ -2048,6 +2054,8 @@ export const commitImportRun = action({
             contactPhone: venue.contactPhone,
             accessNotes: venue.accessNotes,
             cateringNotes: venue.cateringNotes,
+            loadInInstructions: venue.loadInInstructions,
+            logisticsNotes: venue.logisticsNotes,
             idempotencyKey,
           },
         );

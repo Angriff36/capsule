@@ -2245,6 +2245,9 @@ export const LeadSchema = z.object({
   capturedAt: z.coerce.date().nullable().optional(),
   convertedAt: z.coerce.date().nullable().optional(),
   proposalLinkedAt: z.coerce.date().nullable().optional(),
+  sourceStage: z.string().nullable().optional(),
+  eventDate: z.coerce.date().nullable().optional(),
+  closedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2252,6 +2255,7 @@ export const LeadSchema = z.object({
 // Computed: Lead
 export const LeadComputedSchema = LeadSchema.extend({
   displayName: z.string(),
+  isClosed: z.boolean(),
 });
 
 export type Lead = z.infer<typeof LeadSchema>;
@@ -8423,6 +8427,16 @@ export type LeadConfirmConversionParams = z.infer<typeof LeadConfirmConversionPa
 export const LeadConfirmProposalSentParamsSchema = z.object({});
 
 export type LeadConfirmProposalSentParams = z.infer<typeof LeadConfirmProposalSentParamsSchema>;
+
+// Command: recordSourceHistory on Lead
+export const LeadRecordSourceHistoryParamsSchema = z.object({
+  stage: z.enum(["new", "qualified", "proposalSent", "negotiating"]),
+  sourceStage: z.string(),
+  eventDate: z.coerce.date().optional(),
+  closedAt: z.coerce.date().optional(),
+});
+
+export type LeadRecordSourceHistoryParams = z.infer<typeof LeadRecordSourceHistoryParamsSchema>;
 
 // Command: reviseDetails on Lead
 export const LeadReviseDetailsParamsSchema = z.object({

@@ -908,8 +908,11 @@ export function computeInvoice(doc: Record<string, any>): Record<string, any> {
 export function computeLead(doc: Record<string, any>): Record<string, any> {
   const __displayName = ((doc.leadType === "company") ? doc.companyName : ((doc.givenName + " ") + doc.familyName));
   doc.displayName = __displayName;
+  const __isClosed = (doc.closedAt != null);
+  doc.isClosed = __isClosed;
   return {
     displayName: __displayName,
+    isClosed: __isClosed,
   };
 }
 

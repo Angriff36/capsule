@@ -419,6 +419,7 @@ import {
   LeadCaptureParamsSchema,
   LeadConfirmConversionParamsSchema,
   LeadConfirmProposalSentParamsSchema,
+  LeadRecordSourceHistoryParamsSchema,
   LeadReviseDetailsParamsSchema,
   LeadStageConversionParamsSchema,
   LeadStageProposalParamsSchema,
@@ -6654,6 +6655,16 @@ export function useLeadConfirmProposalSent() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = LeadConfirmProposalSentParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Lead.recordSourceHistory. */
+export function useLeadRecordSourceHistory() {
+  const mutate = useMutation(api.mutations.Lead_recordSourceHistory);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadRecordSourceHistoryParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -13108,4 +13119,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1388 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1389 as const;

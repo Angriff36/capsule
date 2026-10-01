@@ -1772,6 +1772,24 @@
       "reason": "Batch 2026-10-01 PL-IMPORT-CANCEL: optional; what Stop this import did. Stored runs need no backfill."
     },
     {
+      "path": "Lead.sourceStage",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-DATASETS: optional; an imported lead's stage in the old system, word for word. Stored leads need no backfill."
+    },
+    {
+      "path": "Lead.eventDate",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-DATASETS: optional; an imported lead's event date. Stored leads need no backfill."
+    },
+    {
+      "path": "Lead.closedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-DATASETS: optional; the day the old system closed the deal. Stored leads stay open (no backfill)."
+    },
+    {
       "path": "EventCloseout.sourceSnapshot",
       "category": "property-added",
       "acknowledgedAt": "2026-09-29",
