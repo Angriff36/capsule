@@ -152,6 +152,13 @@ export function summarizeDelivery(
   });
   const current = sorted.slice(resetIndex + 1);
   const failures = current.filter((row) => row.outcome === "failed");
+  // A started send with no result after it is a lost try: it counts, so a
+  // crash after the provider took it never hands out a fresh budget.
+  const lostStarts = current.filter(
+    (row, index) =>
+      row.outcome === "started" && current[index + 1]?.outcome !== "failed",
+  ).length;
+  const tries = failures.length + lostStarts;
   const last = current.at(-1);
 
   if (!last) {
@@ -164,27 +171,22 @@ export function summarizeDelivery(
     };
   }
   if (last.outcome === "started") {
-    // A started send with no result counts as a try: a crash after the
-    // provider took it must not hand out a fresh budget.
     const expired = now - last.at >= policy.leaseMs;
     return {
       ...base,
       state: expired ? "uncertain" : "processing",
-      attemptCount: failures.length + 1,
+      attemptCount: tries,
       nextRetryAt: null,
       errorClass: failures.at(-1)?.errorClass ?? null,
     };
   }
   const lastFailure = failures.at(-1)!;
   const errorClass = lastFailure.errorClass ?? "unknown";
-  if (
-    failures.length >= policy.maxAttempts ||
-    isPermanentError(errorClass)
-  ) {
+  if (tries >= policy.maxAttempts || isPermanentError(errorClass)) {
     return {
       ...base,
       state: "terminal_failed",
-      attemptCount: failures.length,
+      attemptCount: tries,
       nextRetryAt: null,
       errorClass,
     };
@@ -192,8 +194,8 @@ export function summarizeDelivery(
   return {
     ...base,
     state: "retryable_failed",
-    attemptCount: failures.length,
-    nextRetryAt: lastFailure.at + retryDelayMs(failures.length, policy),
+    attemptCount: tries,
+    nextRetryAt: lastFailure.at + retryDelayMs(tries, policy),
     errorClass,
   };
 }

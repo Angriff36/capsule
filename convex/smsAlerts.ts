@@ -470,6 +470,19 @@ export const scanTenant = internalAction({
           continue;
         }
         if (result.sent >= MAX_SENDS_PER_SCAN) break outer;
+        // A scan running at the same moment may have claimed this text.
+        const claim = await ctx.runMutation(
+          internal.smsAlertClaims.claimAlert,
+          {
+            tenantId: args.tenantId,
+            triggerKey: trigger.triggerKey,
+            personId: recipient.personId,
+          },
+        );
+        if (!claim.claimed) {
+          result.skipped += 1;
+          continue;
+        }
         try {
           const messageSid = await sendSms({
             config,

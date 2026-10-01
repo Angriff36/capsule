@@ -78,7 +78,11 @@ async function emitApproved(
  * two) has passed, as it would between real ticks. */
 async function ageTicks(t: TestConvex): Promise<void> {
   await t.run(async (ctx) => {
-    for (const entity of ["WebhookDispatchTick", "WebhookDelivery"]) {
+    for (const entity of [
+      "WebhookDispatchTick",
+      "WebhookDelivery",
+      "WebhookDeliveryClaim",
+    ]) {
       const rows = await ctx.db
         .query("manifestEvents")
         .withIndex("by_entity", (q) => q.eq("entity", entity))

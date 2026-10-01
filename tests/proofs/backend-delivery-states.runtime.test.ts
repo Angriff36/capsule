@@ -129,6 +129,25 @@ describe("AC-634 delivery states", () => {
     const summary = summarizeDelivery(rows, NOW);
     expect(summary).toMatchObject({ state: "uncertain", attemptCount: 2 });
     expect(isDue(summary, NOW)).toBe(false);
+
+    // Every lost send counts, so lost sends can never repeat forever; a
+    // claim followed by its own failure is one try, not two.
+    expect(
+      summarizeDelivery(
+        [
+          { outcome: "started", at: NOW - 30 * MINUTE },
+          { outcome: "started", at: NOW - 20 * MINUTE },
+          { outcome: "started", at: NOW - 10 * MINUTE },
+        ],
+        NOW,
+      ),
+    ).toMatchObject({ state: "uncertain", attemptCount: 3 });
+    expect(
+      summarizeDelivery(
+        [{ outcome: "started", at: NOW - 3 * MINUTE }, { ...failed(2.9) }],
+        NOW,
+      ),
+    ).toMatchObject({ state: "retryable_failed", attemptCount: 1 });
   });
 
   it("classifies errors safely and stops at once on errors that will not fix themselves", () => {

@@ -13,8 +13,10 @@ import {
 } from "./lib/deliveryState";
 import {
   activeEndpointsFor,
+  CLAIM_ENTITY,
   deliveryHistoryFor,
   deliveryKey,
+  loadDeliveryRows,
   requireManager,
   SUBSCRIBABLE_EVENTS,
   WEBHOOK_DELIVERY_POLICY,
@@ -47,10 +49,14 @@ export const listDeliveryStates = query({
     if (!auth.tenantId) return [];
     const tenantId = auth.tenantId;
     const limit = Math.max(1, Math.min(50, args.limit ?? 20));
-    const [deliveryRows, endpointRows] = await Promise.all([
+    const [deliveryRows, claimRows, endpointRows] = await Promise.all([
       ctx.db
         .query("manifestEvents")
         .withIndex("by_entity", (q) => q.eq("entity", "WebhookDelivery"))
+        .collect(),
+      ctx.db
+        .query("manifestEvents")
+        .withIndex("by_entity", (q) => q.eq("entity", CLAIM_ENTITY))
         .collect(),
       ctx.db
         .query("manifestEvents")
@@ -62,34 +68,35 @@ export const listDeliveryStates = query({
       labels.set(endpoint.endpointId, endpoint.label || endpoint.url);
     }
     const now = Date.now();
-    const views = deliveryHistoryFor(deliveryRows, tenantId).map(
-      (entry): DeliveryStateView => {
-        const summary = summarizeDelivery(
-          entry.rows,
-          now,
-          WEBHOOK_DELIVERY_POLICY,
-        );
-        return {
-          key: entry.key,
-          endpointId: entry.endpointId,
-          endpointLabel: labels.get(entry.endpointId) ?? "Removed endpoint",
-          sourceEventId: entry.sourceEventId,
-          eventType: entry.eventType,
-          eventLabel:
-            EVENT_LABELS.get(entry.eventType) ??
-            (entry.eventType === "WebhookTest" ? "Test" : entry.eventType),
-          state: summary.state,
-          attemptCount: summary.attemptCount,
-          maxAttempts: WEBHOOK_DELIVERY_POLICY.maxAttempts,
-          nextRetryAt: summary.nextRetryAt,
-          lastHttpStatus: summary.lastHttpStatus,
-          lastAttemptAt: summary.lastAttemptAt,
-          problem: summary.errorClass
-            ? deliveryErrorLabel(summary.errorClass)
-            : null,
-        };
-      },
-    );
+    const views = deliveryHistoryFor(
+      [...deliveryRows, ...claimRows],
+      tenantId,
+    ).map((entry): DeliveryStateView => {
+      const summary = summarizeDelivery(
+        entry.rows,
+        now,
+        WEBHOOK_DELIVERY_POLICY,
+      );
+      return {
+        key: entry.key,
+        endpointId: entry.endpointId,
+        endpointLabel: labels.get(entry.endpointId) ?? "Removed endpoint",
+        sourceEventId: entry.sourceEventId,
+        eventType: entry.eventType,
+        eventLabel:
+          EVENT_LABELS.get(entry.eventType) ??
+          (entry.eventType === "WebhookTest" ? "Test" : entry.eventType),
+        state: summary.state,
+        attemptCount: summary.attemptCount,
+        maxAttempts: WEBHOOK_DELIVERY_POLICY.maxAttempts,
+        nextRetryAt: summary.nextRetryAt,
+        lastHttpStatus: summary.lastHttpStatus,
+        lastAttemptAt: summary.lastAttemptAt,
+        problem: summary.errorClass
+          ? deliveryErrorLabel(summary.errorClass)
+          : null,
+      };
+    });
     views.sort(
       (left, right) => (right.lastAttemptAt ?? 0) - (left.lastAttemptAt ?? 0),
     );
@@ -130,16 +137,14 @@ export const retryDelivery = mutation({
       args.sourceEventId,
       args.eventType,
     );
-    const rows = await ctx.db
-      .query("manifestEvents")
-      .withIndex("by_entityId", (q) =>
-        q.eq("entityId", `${args.endpointId}:${args.sourceEventId}`),
-      )
-      .collect();
-    const history = deliveryHistoryFor(
-      rows.filter((row) => row.entity === "WebhookDelivery"),
-      tenantId,
-    ).find((entry) => entry.key === key);
+    const rows = await loadDeliveryRows(
+      ctx.db,
+      args.endpointId,
+      args.sourceEventId,
+    );
+    const history = deliveryHistoryFor(rows, tenantId).find(
+      (entry) => entry.key === key,
+    );
     if (!history) {
       throw new ConvexError("Capsule has not tried to send this one yet.");
     }
@@ -150,6 +155,9 @@ export const retryDelivery = mutation({
     );
     if (summary.state === "delivered") {
       throw new ConvexError("This one was already delivered.");
+    }
+    if (summary.state === "processing") {
+      throw new ConvexError("Capsule is sending this one right now.");
     }
     await ctx.db.insert("manifestEvents", {
       type: "WebhookDeliveryRetryRequested",

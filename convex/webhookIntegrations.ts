@@ -1,5 +1,7 @@
 import { ConvexError, v } from "convex/values";
+import type { GenericDatabaseReader } from "convex/server";
 import { internal } from "./_generated/api";
+import type { DataModel } from "./_generated/dataModel";
 import {
   action,
   internalAction,
@@ -29,6 +31,8 @@ import { decrypt, encrypt } from "./lib/encryption";
 
 const ENDPOINT_ENTITY = "WebhookEndpoint";
 const DELIVERY_ENTITY = "WebhookDelivery";
+/** One row per send a dispatch run claimed, written before it posts. */
+export const CLAIM_ENTITY = "WebhookDeliveryClaim";
 const TICK_ENTITY = "WebhookDispatchTick";
 const CHAIN_START_TYPE = "WebhookDispatchChainStarted";
 
@@ -294,11 +298,22 @@ const DELIVERY_ERROR_CLASSES = new Set<string>([
 
 /** Group the tenant's webhook ledger rows into one history per delivery. */
 export function deliveryHistoryFor(
-  rows: ReadonlyArray<{ payload: unknown; createdAt: number }>,
+  rows: ReadonlyArray<{
+    payload: unknown;
+    createdAt: number;
+    _creationTime?: number;
+  }>,
   tenantId: string,
 ): DeliveryHistory[] {
   const byKey = new Map<string, DeliveryHistory>();
-  for (const row of rows) {
+  // Claims and results come from two ledgers; put them back in the order
+  // they were written so a result always follows its own claim.
+  const ordered = [...rows].sort(
+    (left, right) =>
+      left.createdAt - right.createdAt ||
+      (left._creationTime ?? 0) - (right._creationTime ?? 0),
+  );
+  for (const row of ordered) {
     const payload = asRecord(row.payload);
     if (payload.tenantId !== tenantId) continue;
     const endpointId = stringValue(payload.endpointId);
@@ -307,6 +322,7 @@ export function deliveryHistoryFor(
     const status = stringValue(payload.status);
     if (!endpointId || !sourceEventId || !eventType) continue;
     if (
+      status !== "started" &&
       status !== "succeeded" &&
       status !== "failed" &&
       status !== "retry_requested"
@@ -344,6 +360,90 @@ export const WEBHOOK_DELIVERY_POLICY = {
   ...DEFAULT_DELIVERY_POLICY,
   maxAttempts: MAX_ATTEMPTS,
 };
+
+/**
+ * Whether a webhook may be sent now. A send whose answer was lost
+ * ("uncertain") may go again while tries are left: it carries the same
+ * delivery id, so the receiver drops the repeat.
+ */
+export function webhookSendIsDue(rows: DeliveryAttemptRow[], now: number) {
+  const summary = summarizeDelivery(rows, now, WEBHOOK_DELIVERY_POLICY);
+  if (isDue(summary, now)) return { due: true, summary };
+  return {
+    due:
+      summary.state === "uncertain" &&
+      summary.attemptCount < WEBHOOK_DELIVERY_POLICY.maxAttempts,
+    summary,
+  };
+}
+
+/** Both ledgers of one delivery: claims (sends begun) and results. */
+export async function loadDeliveryRows(
+  db: GenericDatabaseReader<DataModel>,
+  endpointId: string,
+  sourceEventId: string,
+) {
+  const rows = await db
+    .query("manifestEvents")
+    .withIndex("by_entityId", (q) =>
+      q.eq("entityId", `${endpointId}:${sourceEventId}`),
+    )
+    .collect();
+  return rows.filter(
+    (row) => row.entity === DELIVERY_ENTITY || row.entity === CLAIM_ENTITY,
+  );
+}
+
+/**
+ * Claim one send before posting. Convex runs mutations one at a time per
+ * record set, so of two dispatch runs that reach the same delivery together
+ * only one gets the claim and posts; the other skips it.
+ */
+export const claimDelivery = internalMutation({
+  args: {
+    tenantId: v.string(),
+    endpointId: v.string(),
+    sourceEventId: v.string(),
+    eventType: v.string(),
+    occurredAt: v.number(),
+  },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{ claimed: boolean; attempt: number }> => {
+    const key = deliveryKey(
+      args.endpointId,
+      args.sourceEventId,
+      args.eventType,
+    );
+    const rows = await loadDeliveryRows(
+      ctx.db,
+      args.endpointId,
+      args.sourceEventId,
+    );
+    const history = deliveryHistoryFor(rows, args.tenantId).find(
+      (entry) => entry.key === key,
+    );
+    const now = Date.now();
+    const { due, summary } = webhookSendIsDue(history?.rows ?? [], now);
+    if (!due) return { claimed: false, attempt: summary.attemptCount };
+    await ctx.db.insert("manifestEvents", {
+      type: "WebhookDeliveryStarted",
+      entity: CLAIM_ENTITY,
+      entityId: `${args.endpointId}:${args.sourceEventId}`,
+      payload: {
+        tenantId: args.tenantId,
+        endpointId: args.endpointId,
+        sourceEventId: args.sourceEventId,
+        eventType: args.eventType,
+        status: "started",
+        occurredAt: args.occurredAt,
+      },
+      createdAt: now,
+    });
+    return { claimed: true, attempt: summary.attemptCount + 1 };
+  },
+});
 
 export const getCatalog = query({
   args: {},
@@ -603,20 +703,26 @@ export const loadSourceEvent = internalQuery({
 export const loadDispatchContext = internalQuery({
   args: { tenantId: v.string() },
   handler: async (ctx, args): Promise<DispatchContext> => {
-    const [endpointRows, deliveryRows, tickRows] = await Promise.all([
-      ctx.db
-        .query("manifestEvents")
-        .withIndex("by_entity", (q) => q.eq("entity", ENDPOINT_ENTITY))
-        .collect(),
-      ctx.db
-        .query("manifestEvents")
-        .withIndex("by_entity", (q) => q.eq("entity", DELIVERY_ENTITY))
-        .collect(),
-      ctx.db
-        .query("manifestEvents")
-        .withIndex("by_entity", (q) => q.eq("entity", TICK_ENTITY))
-        .collect(),
-    ]);
+    const [endpointRows, deliveryRows, claimRows, tickRows] = await Promise.all(
+      [
+        ctx.db
+          .query("manifestEvents")
+          .withIndex("by_entity", (q) => q.eq("entity", ENDPOINT_ENTITY))
+          .collect(),
+        ctx.db
+          .query("manifestEvents")
+          .withIndex("by_entity", (q) => q.eq("entity", DELIVERY_ENTITY))
+          .collect(),
+        ctx.db
+          .query("manifestEvents")
+          .withIndex("by_entity", (q) => q.eq("entity", CLAIM_ENTITY))
+          .collect(),
+        ctx.db
+          .query("manifestEvents")
+          .withIndex("by_entity", (q) => q.eq("entity", TICK_ENTITY))
+          .collect(),
+      ],
+    );
 
     const endpoints = activeEndpointsFor(
       endpointRows.map((row) => ({
@@ -627,7 +733,10 @@ export const loadDispatchContext = internalQuery({
       args.tenantId,
     );
 
-    const history = deliveryHistoryFor(deliveryRows, args.tenantId);
+    const history = deliveryHistoryFor(
+      [...deliveryRows, ...claimRows],
+      args.tenantId,
+    );
     const successWatermarkByEndpoint = new Map<string, number>();
     for (const entry of history) {
       if (!entry.rows.some((row) => row.outcome === "succeeded")) continue;
@@ -968,12 +1077,7 @@ export const dispatchPending = internalAction({
         if (entry.endpointId !== endpoint.endpointId) continue;
         if (seen.has(entry.key)) continue;
         if (!endpoint.events.includes(entry.eventType)) continue;
-        const summary = summarizeDelivery(
-          entry.rows,
-          now,
-          WEBHOOK_DELIVERY_POLICY,
-        );
-        if (!isDue(summary, now)) continue;
+        if (!webhookSendIsDue(entry.rows, now).due) continue;
         const source = await ctx.runQuery(
           internal.webhookIntegrations.loadSourceEvent,
           {
@@ -991,12 +1095,22 @@ export const dispatchPending = internalAction({
           candidate.sourceEventId,
           candidate.eventType,
         );
-        const summary = summarizeDelivery(
-          historyByKey.get(key)?.rows ?? [],
-          now,
-          WEBHOOK_DELIVERY_POLICY,
+        if (!webhookSendIsDue(historyByKey.get(key)?.rows ?? [], now).due) {
+          continue;
+        }
+        // The claim reads the ledger again inside one mutation: a second
+        // dispatch run that got here at the same time is refused.
+        const claim = await ctx.runMutation(
+          internal.webhookIntegrations.claimDelivery,
+          {
+            tenantId: args.tenantId,
+            endpointId: endpoint.endpointId,
+            sourceEventId: candidate.sourceEventId,
+            eventType: candidate.eventType,
+            occurredAt: candidate.occurredAt,
+          },
         );
-        if (!isDue(summary, now)) continue;
+        if (!claim.claimed) continue;
         attempted += 1;
         const result = await postToEndpoint(
           endpoint.url,
@@ -1012,12 +1126,13 @@ export const dispatchPending = internalAction({
           sourceEventId: candidate.sourceEventId,
           eventType: candidate.eventType,
           status: result.ok ? "succeeded" : "failed",
-          attempt: summary.attemptCount + 1,
+          attempt: claim.attempt,
           httpStatus: result.httpStatus,
           error: result.error,
           errorClass: result.errorClass ?? undefined,
           occurredAt: candidate.occurredAt,
-          deliveredAt: now,
+          // After the claim's time, so the result sorts after its claim.
+          deliveredAt: Date.now(),
         });
         if (result.ok) delivered += 1;
       }

@@ -390,7 +390,9 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
                           : ""}
                       </p>
                     ) : null}
-                    {delivery.state === "terminal_failed" &&
+                    {(delivery.state === "terminal_failed" ||
+                      (delivery.state === "uncertain" &&
+                        delivery.attemptCount >= delivery.maxAttempts)) &&
                     delivery.eventType !== "WebhookTest" &&
                     delivery.endpointLabel !== "Removed endpoint" ? (
                       <button
