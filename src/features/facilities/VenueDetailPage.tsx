@@ -671,7 +671,7 @@ export function VenueDetailPage() {
           <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
             <dt className="text-xs font-medium text-ink-3">Capacity</dt>
             <dd className="col-span-2 text-xs text-ink">
-              {venue.capacity ?? "Not set"}
+              {venue.capacity ? venue.capacity : "Not known"}
             </dd>
           </div>
           {/* Logistics features */}

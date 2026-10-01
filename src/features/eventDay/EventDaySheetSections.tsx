@@ -178,7 +178,7 @@ export function VenueSheet({ data }: { data: EventDayDetailData }) {
     <div>
       <Row
         title={String(name)}
-        sub={venue?.capacity != null ? `Capacity ${venue.capacity}` : undefined}
+        sub={venue?.capacity ? `Capacity ${venue.capacity}` : undefined}
       />
       {address ? <p className="evd-note">{address}</p> : null}
       {traits.length > 0 ? (
