@@ -56,6 +56,7 @@ import { useReserveEquipment } from "../../facilities/equipmentCheckout";
 import {
   useAcceptSuggestion,
   useAssignPersonWithReason,
+  useAssignRigWithReason,
   useHoldEquipmentWithReason,
 } from "../../../lib/useReasonedChanges";
 import { addDays, DAY_MS, startOfDay } from "../../home/homeCalendar";
@@ -159,6 +160,7 @@ export function PlanningBoardPage() {
   const assignPersonWithReason = useAssignPersonWithReason();
   const acceptSuggestion = useAcceptSuggestion();
   const holdEquipmentWithReason = useHoldEquipmentWithReason();
+  const assignRigWithReason = useAssignRigWithReason();
   const recordReceipt = useCreatePlanningReceipt();
   const answerAgain = usePlanningReceiptAnswerAgain();
 
@@ -390,14 +392,17 @@ export function PlanningBoardPage() {
     setDraft(value);
   };
 
-  // Which open items a reason can answer. Capsule has a kept reason for a
-  // person on two events, for a power, fuel or water gap, and (managers only)
-  // for equipment that is out of service. For every other item - a truck on
-  // two runs, a person on approved leave, more than we own - there is nothing
-  // to approve: the save is tried and Capsule says why when it can't be done.
+  // Which open items a reason can answer. A person on two events or on
+  // approved leave, a truck or trailer on two runs, a power, fuel or water
+  // gap, and (managers only) equipment that is out of service: the change is
+  // saved with its reason, both or neither. A truck or trailer in the shop,
+  // or equipment beyond what we own, is refused by the save itself, which
+  // says why.
   const answerable = (kind: Draft["kind"], issue: PlanIssue) =>
     issue.level === "fix" &&
-    ((kind === "person" && issue.check === "double_booked") ||
+    (kind === "person" ||
+      ((kind === "truck" || kind === "trailer") &&
+        issue.check === "double_booked") ||
       (kind === "equipment" &&
         (issue.check === "supply" ||
           (issue.check === "not_available" && canBookOutOfService))));
@@ -450,20 +455,28 @@ export function PlanningBoardPage() {
               personId: draft.personId,
               role: draft.role.trim(),
             });
-        } else if (draft.kind === "truck") {
-          await assignRig({
-            eventId,
-            vehicleId: draft.vehicleId,
-            driverId: draft.driverId || undefined,
-            trailerId: draft.trailerId || undefined,
-          });
-        } else if (draft.kind === "trailer") {
-          await assignRig({
-            eventId,
-            vehicleId: draft.pulledBy,
-            trailerId: draft.trailerId,
-            driverId: draft.driverId || undefined,
-          });
+        } else if (draft.kind === "truck" || draft.kind === "trailer") {
+          const rig =
+            draft.kind === "truck"
+              ? {
+                  vehicleId: draft.vehicleId,
+                  driverId: draft.driverId || undefined,
+                  trailerId: draft.trailerId || undefined,
+                }
+              : {
+                  vehicleId: draft.pulledBy,
+                  trailerId: draft.trailerId,
+                  driverId: draft.driverId || undefined,
+                };
+          if (kept)
+            await assignRigWithReason({
+              eventId: eventId as never,
+              vehicleId: (rig.vehicleId || undefined) as never,
+              trailerId: (rig.trailerId || undefined) as never,
+              driverId: rig.driverId as never,
+              ...kept,
+            });
+          else await assignRig({ eventId, ...rig });
         } else {
           if (!window)
             throw new Error(

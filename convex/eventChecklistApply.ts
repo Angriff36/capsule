@@ -33,6 +33,10 @@ export const apply = mutation({
       checklist.deletedAt != null
     )
       throw new ConvexError("This checklist is not in your workspace.");
+    if (checklist.status !== "active")
+      throw new ConvexError(
+        "This checklist was retired. Bring it back before you add it to an event.",
+      );
     const tasks = (
       await ctx.db
         .query("eventTasks")

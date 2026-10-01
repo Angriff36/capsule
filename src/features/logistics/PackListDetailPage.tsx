@@ -283,7 +283,7 @@ export function PackListDetailPage() {
               : `${claim.personName?.trim() || packedByName(claim.personId) || "Someone"} is packing this`}
           </span>
         )}
-        {claim && (
+        {claim && mine && (
           <button
             type="button"
             className="btn btn-ghost btn-sm"

@@ -14,6 +14,10 @@ export function useAssignPersonWithReason() {
   return useMutation(api.reasonedChanges.assignPersonWithReason);
 }
 
+export function useAssignRigWithReason() {
+  return useMutation(api.reasonedChanges.assignRigWithReason);
+}
+
 export function useHoldEquipmentWithReason() {
   return useMutation(api.reasonedChanges.holdEquipmentWithReason);
 }

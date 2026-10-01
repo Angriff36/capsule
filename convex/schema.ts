@@ -2485,13 +2485,16 @@ export default defineSchema({
     personName: v.optional(v.string()),
     claimedAt: v.optional(v.union(v.number(), v.null())),
     releasedAt: v.optional(v.union(v.number(), v.null())),
+    takenOverByPersonId: v.optional(v.union(v.id("people"), v.null())),
+    takenOverByName: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_packListId", ["packListId"])
-    .index("by_personId", ["personId"]),
+    .index("by_personId", ["personId"])
+    .index("by_takenOverByPersonId", ["takenOverByPersonId"]),
   payments: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

@@ -515,6 +515,7 @@ import {
   PackRuleRetireParamsSchema,
   PackRuleReviseParamsSchema,
   PackSectionClaimReleaseParamsSchema,
+  PackSectionClaimTakeOverParamsSchema,
   PackSectionClaimTakeParamsSchema,
   PaymentBeginProcessingParamsSchema,
   PaymentDisputeReconciliationParamsSchema,
@@ -7960,6 +7961,16 @@ export function usePackSectionClaimTake() {
   };
 }
 
+/** Mutation hook for PackSectionClaim.takeOver. */
+export function usePackSectionClaimTakeOver() {
+  const mutate = useMutation(api.mutations.PackSectionClaim_takeOver);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackSectionClaimTakeOverParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Governed creation hook for PackSectionClaim.take. */
 export function useCreatePackSectionClaim() {
   const mutate = useMutation(api.mutations.PackSectionClaim_createViaTake);
@@ -13075,4 +13086,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1385 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1386 as const;
