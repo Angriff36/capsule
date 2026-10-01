@@ -65,7 +65,8 @@ RYAN_APPROVED 7-23-2026 Created by Ryan
 
 ```bash
 bun install --frozen-lockfile
-bun run dev              # Vite → http://localhost:7811
+bun run dev              # local Convex backend + Vite → http://localhost:7811
+bun run dev:frontend     # Vite only
 bun run dev:convex       # Convex sync
 bun run toolchain        # Bun/Node pin check
 bun run typecheck
@@ -76,7 +77,7 @@ bun run test             # or bunx vitest run <files>; bare bun test cannot run 
 bun run test:coverage    # vitest + coverage ratchet
 bun run build
 bun run baseline:decay   # monthly hygiene checks
-bun run check            # toolchain + ownership + proof:emit + check:proof + manifest-registry + manifest-breaking (vs last [release], acks in scripts/manifest-breaking-acks.json) + manifest-fmt (--check) + manifest-scan (--strict) + manifest-completeness (validate-ai domain/reaction; tracked list in scripts/manifest-completeness-tracked.json) + manifest-integration (all domain guards, generated/proof/guard.*.json) + design-vocab + typecheck + format:check + secrets + test:coverage + build + baseline:decay
+bun run check            # toolchain + ownership + proof:emit + check:proof + manifest-registry + manifest-breaking (vs last [release], acks in scripts/manifest-breaking-acks.json) + manifest-fmt (--check) + manifest-scan (--strict) + manifest-completeness (validate-ai domain/reaction; tracked list in scripts/manifest-completeness-tracked.json) + wiring-drift + manifest-integration (all domain guards, generated/proof/guard.*.json) + design-vocab + typecheck + format:check + secrets + test:coverage + build + storybook (check:storybook builds into .artifacts/storybook-static) + baseline:decay
 bun run codegen          # convex codegen
 bun run manifest:regen      # only regen entry — Builder apply when conflict-free
 bun run seed             # requires Convex URL
