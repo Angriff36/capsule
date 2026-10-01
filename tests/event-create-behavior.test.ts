@@ -65,9 +65,11 @@ it("renders empty catalog recovery links and updates the selectors when live cat
   await mount(createElement(EventCreatePage));
   expect(container.textContent).toContain("No occasions yet");
   expect(button("Add the standard list").disabled).toBe(false);
+  // Occasions and referral sources each point to Admin → Catalogs.
   expect(container.querySelectorAll('a[href="/admin/catalogs"]')).toHaveLength(
-    1,
+    2,
   );
+  expect(container.textContent).toContain("No referral sources yet.");
   expect(selectWith("Full Service").required).toBe(false);
   expect(selectWith("Select an occasion").required).toBe(false);
   backend.values.set("useListServiceStyle", [
