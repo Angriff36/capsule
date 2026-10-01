@@ -17,8 +17,9 @@
 #    then npx convex deploy -y.
 # 4. Verifies runtime: POST <CONVEX_SELF_HOSTED_URL>/api/query (the SAME
 #    backend the deploy used; this script holds no second backend address) for
-#    a baseline query and every --verify query, then the production frontend
-#    returns HTTP 200.
+#    a baseline query and every --verify query, then deploymentProbe:health
+#    must name the release sha (the deployed code is the release's code), then
+#    the production frontend returns HTTP 200.
 # 5. Prints RESULT: PASS or RESULT: FAIL with the sha.
 #
 # --verify takes zero-argument queries as a comma list (listA,listB). A query
@@ -29,12 +30,16 @@
 # test uses it; also for an address change).
 # --dry-run runs only the local checks of 1 and 2 (no fetch, no checkout, no
 # install, no deploy, no network) and prints what a real run would do.
-# This script never rolls back Vercel, never edits settings, never edits code.
+# This script never rolls back Vercel and never edits settings. The only code
+# it touches is the release stamp (convex/lib/backendRelease.ts), for the
+# deploy only; it puts the committed file back right after.
 set -uo pipefail
 
 FRONTEND_URL="https://capsule-tau-eight.vercel.app/"
 ORIGIN_MATCH="Angriff36/capsule"
 BASELINE_QUERY="queries:listEvent"
+IDENTITY_QUERY="deploymentProbe:health"
+RELEASE_STAMP="convex/lib/backendRelease.ts"
 CREDENTIAL_NAMES="CONVEX_SELF_HOSTED_URL CONVEX_SELF_HOSTED_ADMIN_KEY"
 
 expected=""
@@ -176,9 +181,15 @@ if [ "$dry_run" = 1 ]; then
   exit 0
 fi
 
-# 3. The documented deploy.
+# 3. The documented deploy. The deployed code names its release commit:
+#    the committed "unreleased" in RELEASE_STAMP becomes this sha for the
+#    deploy only (the release receipt reads it back from deploymentProbe:health).
 bun install --frozen-lockfile || fail "bun install failed"
+grep -q '"unreleased"' "$RELEASE_STAMP" 2>/dev/null || fail "$RELEASE_STAMP is missing or has no \"unreleased\" marker to stamp"
+trap 'git checkout -- "$RELEASE_STAMP" 2>/dev/null || true' EXIT
+sed -i "s/\"unreleased\"/\"$head_sha\"/" "$RELEASE_STAMP" || fail "cannot stamp $RELEASE_STAMP"
 npx convex deploy -y || fail "convex deploy failed"
+git checkout -- "$RELEASE_STAMP" 2>/dev/null || true
 # The Convex CLI rewrites its own generated files on every deploy. They are
 # tracked, so the next release would refuse this "dirty" checkout: put the
 # committed versions back so the box is clean for the next run.
@@ -199,6 +210,12 @@ for i in "${!verify_queries[@]}"; do
   esac
 done
 [ "$bad" = 0 ] || fail "a production query does not respond after the deploy"
+identity="$(curl -s -m 30 -X POST "$backend_url/api/query" -H 'Content-Type: application/json' -d "{\"path\":\"$IDENTITY_QUERY\",\"args\":{},\"format\":\"json\"}" || true)"
+if printf '%s' "$identity" | grep -Eq "\"releaseSha\"[[:space:]]*:[[:space:]]*\"$head_sha\""; then
+  echo "  ok    $IDENTITY_QUERY names $head_sha"
+else
+  fail "the deployed backend does not name the release $head_sha ($IDENTITY_QUERY -> $identity)"
+fi
 
 # Secondary only: the deployed function spec. A miss here is a warning; the
 # runtime probe above is the proof.
