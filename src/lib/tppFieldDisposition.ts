@@ -179,6 +179,21 @@ const PAYMENT: DatasetDispositions = Object.fromEntries(
   ].map((field) => [field, PAYMENT_REFERENCE]),
 );
 
+const HISTORY: DatasetDispositions = {
+  HistoryID: OLD_ID,
+  ContactID: rec("ClientCommunication", "clientId"),
+  CompanyID: rec("ClientCommunication", "clientId"),
+  EventID: rec("ClientCommunication", "eventId"),
+  HistoryDate: rec("ClientCommunication", "occurredAt"),
+  HistoryType: rec("ClientCommunication", "medium"),
+  Subject: rec("ClientCommunication", "summary"),
+  Notes: rec("ClientCommunication", "summary"),
+  CreatedBy: rec("ClientCommunication", "authorName"),
+  DueDate: rec("ClientCommunication", "dueAt"),
+  CompletedDate: rec("ClientCommunication", "completedAt"),
+  Status: rec("ClientCommunication", "taskDone"),
+};
+
 /** Keyed by the documented block name in import-dataset.manifest. */
 export const TPP_FIELD_DISPOSITIONS: Record<string, DatasetDispositions> = {
   TPP_EVENT_MAPPINGS: EVENT,
@@ -187,4 +202,5 @@ export const TPP_FIELD_DISPOSITIONS: Record<string, DatasetDispositions> = {
   TPP_LEAD_MAPPINGS: LEAD,
   TPP_VENUE_MAPPINGS: VENUE,
   TPP_PAYMENT_MAPPINGS: PAYMENT,
+  TPP_HISTORY_MAPPINGS: HISTORY,
 };

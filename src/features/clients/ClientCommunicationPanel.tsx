@@ -17,6 +17,8 @@ export type ClientCommunicationTarget =
   | {
       kind: "contacts";
       contacts: Array<Doc<"clientContacts">>;
+      /** History brought in from the old system sits on the client itself. */
+      clientId?: string;
     }
   | {
       kind: "event";
@@ -53,6 +55,23 @@ function occurredLabel(value?: number | null): string {
   return value == null
     ? "No date on file"
     : `${formatDate(value)} ${formatTime(value)}`;
+}
+
+/** An old-system task's state, exactly as the old system had it. */
+function taskStateLabel(row: Doc<"clientCommunications">): string | null {
+  if (String(row.medium) !== "task") return null;
+  const state =
+    row.completedAt != null
+      ? `Done ${formatDate(row.completedAt)}`
+      : row.taskDone === true
+        ? "Done"
+        : row.taskDone === false
+          ? "Not done in the old system"
+          : null;
+  const due = row.dueAt != null ? `due ${formatDate(row.dueAt)}` : null;
+  if (state && due) return `${state} · ${due}`;
+  if (due) return `Due ${formatDate(row.dueAt!)}`;
+  return state;
 }
 
 /** Shared manual communication timeline for Contact and Event detail surfaces. */
@@ -98,6 +117,7 @@ export function ClientCommunicationPanelView({
   const [showForm, setShowForm] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
+  const [search, setSearch] = useState("");
   const { notice, setNotice } = useActionNotice();
 
   const contacts = target.kind === "contacts" ? target.contacts : [];
@@ -115,8 +135,9 @@ export function ClientCommunicationPanelView({
       .filter((row) =>
         target.kind === "event"
           ? row.eventId === target.eventId
-          : row.clientContactId != null &&
-            contactIds.has(row.clientContactId as Id<"clientContacts">),
+          : (row.clientContactId != null &&
+              contactIds.has(row.clientContactId as Id<"clientContacts">)) ||
+            (target.clientId != null && row.clientId === target.clientId),
       )
       .filter((row) => row.recordedAt != null)
       .sort(
@@ -125,6 +146,14 @@ export function ClientCommunicationPanelView({
           (left.occurredAt ?? left.recordedAt ?? 0),
       );
   }, [contacts, rows, target]);
+  const query = search.trim().toLowerCase();
+  const shown = query
+    ? communications.filter((row) =>
+        `${row.summary} ${row.authorName} ${String(row.medium)}`
+          .toLowerCase()
+          .includes(query),
+      )
+    : communications;
 
   const canRecord =
     authorLoaded &&
@@ -293,10 +322,27 @@ export function ClientCommunicationPanelView({
           />
         ) : (
           <div className="ml-2 border-l border-line">
-            {communications.map((communication) => {
+            <label className="field-label block px-5 pb-3">
+              Search history
+              <input
+                type="search"
+                className="input"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Words, names, calls, tasks…"
+              />
+            </label>
+            {shown.length === 0 ? (
+              <p className="px-5 pb-4 text-sm text-ink-2">
+                Nothing in this history matches “{search.trim()}”.
+              </p>
+            ) : null}
+            {shown.map((communication) => {
               const contact = communication.clientContactId
                 ? contactById.get(communication.clientContactId)
                 : undefined;
+              const fromOldSystem = communication.importedFrom != null;
+              const taskState = taskStateLabel(communication);
               return (
                 <article
                   key={communication._id}
@@ -318,12 +364,19 @@ export function ClientCommunicationPanelView({
                         with {contactName(contact)}
                       </span>
                     ) : null}
+                    {fromOldSystem ? (
+                      <span className="chip">From the old system</span>
+                    ) : null}
                   </div>
+                  {taskState ? (
+                    <p className="mt-1 text-xs text-ink-2">{taskState}</p>
+                  ) : null}
                   <p className="mt-2 whitespace-pre-wrap text-base leading-relaxed text-ink">
                     {communication.summary}
                   </p>
                   <p className="mt-2 text-2xs font-medium uppercase tracking-[0.08em] text-ink-3">
-                    Added by {communication.authorName}
+                    {fromOldSystem ? "Written by" : "Added by"}{" "}
+                    {communication.authorName}
                   </p>
                 </article>
               );

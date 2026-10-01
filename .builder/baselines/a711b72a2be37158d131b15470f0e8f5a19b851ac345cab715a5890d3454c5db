@@ -184,11 +184,19 @@ export const ClientCommunicationSchema = z.object({
   clientContactId: z.string().uuid().nullable().optional(),
   eventId: z.string().uuid().nullable().optional(),
   occurredAt: z.coerce.date().nullable().optional(),
-  medium: z.enum(["call", "email", "meeting"]).default("call"),
+  medium: z.enum(["call", "email", "meeting", "note", "task"]).default("call"),
   summary: z.string().default(""),
   authorId: z.string().nullable().optional(),
   authorName: z.string().default(""),
   recordedAt: z.coerce.date().nullable().optional(),
+  clientId: z.string().uuid().nullable().optional(),
+  importRunId: z.string().uuid().nullable().optional(),
+  importedFrom: z.string().nullable().optional(),
+  dueAt: z.coerce.date().nullable().optional(),
+  completedAt: z.coerce.date().nullable().optional(),
+  taskDone: z.boolean().nullable().optional(),
+  clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
+  mergeTargetClientId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1689,7 +1697,7 @@ export const ExternalRecordLinkSchema = z.object({
   sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync", "quickbooks_online", "google_calendar", "stripe", "other"]).default("tpp_legacy"),
   recordType: z.string().default(""),
   externalId: z.string(),
-  capsuleEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style"]).default("contact"),
+  capsuleEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]).default("contact"),
   capsuleId: z.string(),
   sourceAccount: z.string().nullable().optional(),
   role: z.string().nullable().optional(),
@@ -1809,7 +1817,7 @@ export const ImportDatasetSchema = z.object({
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   datasetCategory: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "invoices", "proposals"]).default("events"),
-  targetEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style"]).default("event_record"),
+  targetEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]).default("event_record"),
   config: z.string().default("{}"),
   active: z.boolean().default(true),
   importOrder: z.number().int().min(1).default(1),
@@ -1832,7 +1840,7 @@ export const ImportRunSchema = z.object({
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync"]).default("tpp_legacy"),
-  datasetType: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "pack_list", "stock"]).default("events"),
+  datasetType: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "pack_list", "stock", "history"]).default("events"),
   status: z.enum(["started", "parsing", "validating", "reviewing", "committing", "completed", "failed", "reverted"]).default("started"),
   startTime: z.coerce.date().nullable().optional(),
   endTime: z.coerce.date().nullable().optional(),
@@ -4987,16 +4995,29 @@ export const ClientStageClientMergeParamsSchema = z.object({
 
 export type ClientStageClientMergeParams = z.infer<typeof ClientStageClientMergeParamsSchema>;
 
+// Command: reassignClient on ClientCommunication
+export const ClientCommunicationReassignClientParamsSchema = z.object({});
+
+export type ClientCommunicationReassignClientParams = z.infer<typeof ClientCommunicationReassignClientParamsSchema>;
+
 // Command: record on ClientCommunication
 export const ClientCommunicationRecordParamsSchema = z.object({
   clientContactId: z.string().min(1).optional(),
   eventId: z.string().min(1).optional(),
   occurredAt: z.coerce.date(),
-  medium: z.enum(["call", "email", "meeting"]),
+  medium: z.enum(["call", "email", "meeting", "note", "task"]),
   summary: z.string(),
 });
 
 export type ClientCommunicationRecordParams = z.infer<typeof ClientCommunicationRecordParamsSchema>;
+
+// Command: stageClientMerge on ClientCommunication
+export const ClientCommunicationStageClientMergeParamsSchema = z.object({
+  clientMergeId: z.string().uuid(),
+  clientId: z.string().min(1),
+});
+
+export type ClientCommunicationStageClientMergeParams = z.infer<typeof ClientCommunicationStageClientMergeParamsSchema>;
 
 // Command: add on ClientContact
 export const ClientContactAddParamsSchema = z.object({
@@ -7465,7 +7486,7 @@ export const ExternalRecordLinkLinkParamsSchema = z.object({
   sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync", "quickbooks_online", "google_calendar", "stripe", "other"]),
   recordType: z.string(),
   externalId: z.string(),
-  capsuleEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style"]),
+  capsuleEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]),
   capsuleId: z.string(),
   verified: z.boolean().optional(),
   sourceImportRunId: z.string().optional(),
@@ -7669,7 +7690,7 @@ export type ImportDatasetRecordLastImportParams = z.infer<typeof ImportDatasetRe
 // Command: register on ImportDataset
 export const ImportDatasetRegisterParamsSchema = z.object({
   datasetCategory: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "invoices", "proposals"]),
-  targetEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style"]),
+  targetEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]),
   config: z.string(),
   name: z.string().optional(),
   description: z.string().optional(),
@@ -7777,7 +7798,7 @@ export type ImportRunRevertParams = z.infer<typeof ImportRunRevertParamsSchema>;
 // Command: start on ImportRun
 export const ImportRunStartParamsSchema = z.object({
   sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync"]),
-  datasetType: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "pack_list", "stock"]),
+  datasetType: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "pack_list", "stock", "history"]),
   checksum: z.string().optional(),
 });
 

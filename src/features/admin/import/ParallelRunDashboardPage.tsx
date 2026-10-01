@@ -34,6 +34,7 @@ const DATASET_TYPE_LABELS: Record<string, string> = {
   venues: "Venues",
   payments: "Payments",
   pack_list: "Pack Lists",
+  history: "Messages and tasks",
 };
 
 // Item type labels
@@ -57,6 +58,7 @@ const RECORD_TYPE_LABELS: Record<string, string> = {
   stock: "Stock",
   location: "Location",
   pack_list: "Pack List",
+  client_communication: "Message or task",
 };
 
 // This dashboard compares the events dataset — events are the spine every

@@ -53,6 +53,8 @@ enum CapsuleEntityType {
   prep_task
   // An old-system service style matched to a Capsule service style (AC-064).
   service_style
+  // Old-system message or task brought in as client history (PL-SOURCE-HISTORY).
+  client_communication
 }
 
 // Revision-2: whether a link is a machine suggestion, an approved identity, or

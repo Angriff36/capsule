@@ -16,6 +16,8 @@ enum ImportDatasetType {
   pack_list
   // Opening stock count sheets (PL-OPENING-STOCK): staged for review only.
   stock
+  // Old-system messages and tasks (PL-SOURCE-HISTORY): history only.
+  history
 }
 
 enum ImportRunStatus {

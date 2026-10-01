@@ -36,6 +36,7 @@ const DATASET_TYPE_LABELS: Record<string, string> = {
   venues: "Venues",
   payments: "Payments",
   pack_list: "Pack Lists",
+  history: "Messages and tasks",
   stock: "Opening stock",
 };
 
@@ -180,7 +181,8 @@ export function ImportRunDetailPage() {
     importRun.datasetType === "leads" ||
     importRun.datasetType === "payments" ||
     importRun.datasetType === "menus" ||
-    importRun.datasetType === "pack_list";
+    importRun.datasetType === "pack_list" ||
+    importRun.datasetType === "history";
   const commitNoun =
     importRun.datasetType === "contacts"
       ? "contact"
@@ -194,7 +196,9 @@ export function ImportRunDetailPage() {
               ? "menu"
               : importRun.datasetType === "pack_list"
                 ? "pack list"
-                : "venue";
+                : importRun.datasetType === "history"
+                  ? "message or task"
+                  : "venue";
   const commitNounLabel =
     commitNoun.charAt(0).toUpperCase() + commitNoun.slice(1);
 

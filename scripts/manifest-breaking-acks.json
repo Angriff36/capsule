@@ -1766,6 +1766,54 @@
       "reason": "Batch 2026-10-01 PL-IMPORT-CANCEL: optional; the rows a run was given, kept so anyone can continue it. Stored runs need no backfill."
     },
     {
+      "path": "ClientCommunication.clientId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-HISTORY: optional; old-system history sits on its client. Stored notes need no backfill."
+    },
+    {
+      "path": "ClientCommunication.clientMergeAuthorizationId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-HISTORY: optional; set only while a client merge moves the history. Stored notes need no backfill."
+    },
+    {
+      "path": "ClientCommunication.completedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-HISTORY: optional; an old task's done date. Stored notes need no backfill."
+    },
+    {
+      "path": "ClientCommunication.dueAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-HISTORY: optional; an old task's due date. Stored notes need no backfill."
+    },
+    {
+      "path": "ClientCommunication.importedFrom",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-HISTORY: optional; set only on old-system history. Stored notes need no backfill."
+    },
+    {
+      "path": "ClientCommunication.importRunId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-HISTORY: optional; the import that brought the history in. Stored notes need no backfill."
+    },
+    {
+      "path": "ClientCommunication.mergeTargetClientId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-HISTORY: optional; set only while a client merge moves the history. Stored notes need no backfill."
+    },
+    {
+      "path": "ClientCommunication.taskDone",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-HISTORY: optional; an old task's done state. Stored notes need no backfill."
+    },
+    {
       "path": "ImportRun.stopReport",
       "category": "property-added",
       "acknowledgedAt": "2026-10-01",

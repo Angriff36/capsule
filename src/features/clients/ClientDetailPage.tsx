@@ -348,7 +348,11 @@ export function ClientDetailPage() {
       />
 
       <ClientCommunicationPanel
-        target={{ kind: "contacts", contacts: clientContacts }}
+        target={{
+          kind: "contacts",
+          contacts: clientContacts,
+          clientId: client._id,
+        }}
       />
 
       <form className="supply-form" onSubmit={submitAccountContact}>

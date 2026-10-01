@@ -60,6 +60,7 @@ const RECORD_TYPE_LABELS: Record<string, string> = {
   location: "Location",
   pack_list: "Pack List",
   service_style: "Service style",
+  client_communication: "Message or task",
 };
 
 // Conflict status labels

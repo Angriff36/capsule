@@ -100,6 +100,11 @@ on ClientMergeCompleted fanOut QuoteSubmission where clientId = payload.duplicat
   run stageClientMerge
   params { clientMergeId: payload.clientMergeId, clientId: payload.primaryClientId }
 
+// PL-SOURCE-HISTORY: old-system history filed under the client moves too.
+on ClientMergeCompleted fanOut ClientCommunication where clientId = payload.duplicateClientId
+  run stageClientMerge
+  params { clientMergeId: payload.clientMergeId, clientId: payload.primaryClientId }
+
 on ClientMergeCompleted fanOut Client where id = payload.duplicateClientId
   run stageClientMerge
   params { clientMergeId: payload.clientMergeId, primaryClientId: payload.primaryClientId }
@@ -136,6 +141,9 @@ on ClientOutreachTaskClientMergeStaged run ClientOutreachTask.reassignClient
 
 on QuoteSubmissionClientMergeStaged run QuoteSubmission.reassignClient
   resolve payload.submissionId
+
+on ClientCommunicationClientMergeStaged run ClientCommunication.reassignClient
+  resolve payload.clientCommunicationId
 
 on ClientMergeStaged run Client.markMerged
   resolve payload.duplicateClientId

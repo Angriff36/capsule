@@ -22,7 +22,8 @@ type DatasetType =
   | "menus"
   | "venues"
   | "payments"
-  | "pack_list";
+  | "pack_list"
+  | "history";
 
 // Source system labels
 const SOURCE_SYSTEM_LABELS: Record<string, string> = {
@@ -40,6 +41,7 @@ const DATASET_TYPE_LABELS: Record<string, string> = {
   venues: "Venues",
   payments: "Payments",
   pack_list: "Pack Lists",
+  history: "Messages and tasks",
 };
 
 // Status labels

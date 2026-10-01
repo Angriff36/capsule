@@ -167,16 +167,28 @@ export default defineSchema({
     clientContactId: v.optional(v.union(v.id("clientContacts"), v.null())),
     eventId: v.optional(v.union(v.id("events"), v.null())),
     occurredAt: v.optional(v.union(v.number(), v.null())),
-    medium: v.union(v.literal("call"), v.literal("email"), v.literal("meeting")),
+    medium: v.union(v.literal("call"), v.literal("email"), v.literal("meeting"), v.literal("note"), v.literal("task")),
     summary: v.string(),
     authorId: v.optional(v.union(v.string(), v.null())),
     authorName: v.string(),
     recordedAt: v.optional(v.union(v.number(), v.null())),
+    clientId: v.optional(v.union(v.id("clients"), v.null())),
+    importRunId: v.optional(v.union(v.id("importRuns"), v.null())),
+    importedFrom: v.optional(v.union(v.string(), v.null())),
+    dueAt: v.optional(v.union(v.number(), v.null())),
+    completedAt: v.optional(v.union(v.number(), v.null())),
+    taskDone: v.optional(v.union(v.boolean(), v.null())),
+    clientMergeAuthorizationId: v.optional(v.union(v.id("clientMerges"), v.null())),
+    mergeTargetClientId: v.optional(v.union(v.id("clients"), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
+    .index("by_clientId", ["clientId"])
+    .index("by_importRunId", ["importRunId"])
+    .index("by_clientMergeAuthorizationId", ["clientMergeAuthorizationId"])
+    .index("by_mergeTargetClientId", ["mergeTargetClientId"])
     .index("by_clientContactId", ["clientContactId"])
     .index("by_eventId", ["eventId"]),
   clientContacts: defineTable({
@@ -1555,7 +1567,7 @@ export default defineSchema({
     sourceSystem: v.union(v.literal("tpp_legacy"), v.literal("csv_export"), v.literal("api_sync"), v.literal("quickbooks_online"), v.literal("google_calendar"), v.literal("stripe"), v.literal("other")),
     recordType: v.string(),
     externalId: v.string(),
-    capsuleEntity: v.union(v.literal("event_record"), v.literal("contact"), v.literal("lead"), v.literal("menu"), v.literal("venue"), v.literal("payment"), v.literal("invoice"), v.literal("contract"), v.literal("proposal"), v.literal("client"), v.literal("vendor"), v.literal("person"), v.literal("task"), v.literal("batch"), v.literal("order"), v.literal("delivery"), v.literal("stock"), v.literal("location"), v.literal("pack_list"), v.literal("ingredient"), v.literal("component"), v.literal("component_portion_spec"), v.literal("component_ingredient"), v.literal("component_component"), v.literal("dish"), v.literal("dish_ingredient"), v.literal("dish_component"), v.literal("dish_task"), v.literal("dish_container"), v.literal("station"), v.literal("unit"), v.literal("event_dish"), v.literal("prep_task"), v.literal("service_style")),
+    capsuleEntity: v.union(v.literal("event_record"), v.literal("contact"), v.literal("lead"), v.literal("menu"), v.literal("venue"), v.literal("payment"), v.literal("invoice"), v.literal("contract"), v.literal("proposal"), v.literal("client"), v.literal("vendor"), v.literal("person"), v.literal("task"), v.literal("batch"), v.literal("order"), v.literal("delivery"), v.literal("stock"), v.literal("location"), v.literal("pack_list"), v.literal("ingredient"), v.literal("component"), v.literal("component_portion_spec"), v.literal("component_ingredient"), v.literal("component_component"), v.literal("dish"), v.literal("dish_ingredient"), v.literal("dish_component"), v.literal("dish_task"), v.literal("dish_container"), v.literal("station"), v.literal("unit"), v.literal("event_dish"), v.literal("prep_task"), v.literal("service_style"), v.literal("client_communication")),
     capsuleId: v.string(),
     sourceAccount: v.optional(v.union(v.string(), v.null())),
     role: v.optional(v.union(v.string(), v.null())),
@@ -1671,7 +1683,7 @@ export default defineSchema({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
     datasetCategory: v.union(v.literal("events"), v.literal("contacts"), v.literal("leads"), v.literal("menus"), v.literal("venues"), v.literal("payments"), v.literal("invoices"), v.literal("proposals")),
-    targetEntity: v.union(v.literal("event_record"), v.literal("contact"), v.literal("lead"), v.literal("menu"), v.literal("venue"), v.literal("payment"), v.literal("invoice"), v.literal("contract"), v.literal("proposal"), v.literal("client"), v.literal("vendor"), v.literal("person"), v.literal("task"), v.literal("batch"), v.literal("order"), v.literal("delivery"), v.literal("stock"), v.literal("location"), v.literal("pack_list"), v.literal("ingredient"), v.literal("component"), v.literal("component_portion_spec"), v.literal("component_ingredient"), v.literal("component_component"), v.literal("dish"), v.literal("dish_ingredient"), v.literal("dish_component"), v.literal("dish_task"), v.literal("dish_container"), v.literal("station"), v.literal("unit"), v.literal("event_dish"), v.literal("prep_task"), v.literal("service_style")),
+    targetEntity: v.union(v.literal("event_record"), v.literal("contact"), v.literal("lead"), v.literal("menu"), v.literal("venue"), v.literal("payment"), v.literal("invoice"), v.literal("contract"), v.literal("proposal"), v.literal("client"), v.literal("vendor"), v.literal("person"), v.literal("task"), v.literal("batch"), v.literal("order"), v.literal("delivery"), v.literal("stock"), v.literal("location"), v.literal("pack_list"), v.literal("ingredient"), v.literal("component"), v.literal("component_portion_spec"), v.literal("component_ingredient"), v.literal("component_component"), v.literal("dish"), v.literal("dish_ingredient"), v.literal("dish_component"), v.literal("dish_task"), v.literal("dish_container"), v.literal("station"), v.literal("unit"), v.literal("event_dish"), v.literal("prep_task"), v.literal("service_style"), v.literal("client_communication")),
     config: v.string(),
     active: v.boolean(),
     importOrder: v.number(),
@@ -1691,7 +1703,7 @@ export default defineSchema({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
     sourceSystem: v.union(v.literal("tpp_legacy"), v.literal("csv_export"), v.literal("api_sync")),
-    datasetType: v.union(v.literal("events"), v.literal("contacts"), v.literal("leads"), v.literal("menus"), v.literal("venues"), v.literal("payments"), v.literal("pack_list"), v.literal("stock")),
+    datasetType: v.union(v.literal("events"), v.literal("contacts"), v.literal("leads"), v.literal("menus"), v.literal("venues"), v.literal("payments"), v.literal("pack_list"), v.literal("stock"), v.literal("history")),
     status: v.union(v.literal("started"), v.literal("parsing"), v.literal("validating"), v.literal("reviewing"), v.literal("committing"), v.literal("completed"), v.literal("failed"), v.literal("reverted")),
     startTime: v.optional(v.union(v.number(), v.null())),
     endTime: v.optional(v.union(v.number(), v.null())),

@@ -89,12 +89,13 @@
  * caller-supplied (TPP has no bulk export, spec §6.3), so this is the manual/
  * JSON-paste migration path.
  */
-import { ConvexError, v } from "convex/values";
+import { ConvexError, v, type ObjectType } from "convex/values";
 import {
   action,
   internalMutation,
   internalQuery,
   type ActionCtx,
+  type MutationCtx,
 } from "./_generated/server";
 import { api, internal } from "./_generated/api";
 import { getAuthContext } from "./lib/authContext";
@@ -130,6 +131,7 @@ import {
 } from "./lib/importIdentity";
 import { SERVICE_STYLE_RECORD_TYPE } from "./importServiceStyle";
 import { commitStockRows } from "./openingStock";
+import { commitHistoryRows } from "./importHistory";
 import { reconcileExistingLink, type DeltaOutcome } from "./importSourceDelta";
 import { attachImportedEventFiles } from "./lib/importEventFiles";
 import {
@@ -342,107 +344,112 @@ export const survivingClientId = internalQuery({
 });
 
 /** Insert or update the link for a (tenant, source, recordType, externalId) key. */
+export const upsertLinkArgs = {
+  tenantId: v.string(),
+  sourceSystem: v.string(),
+  recordType: v.string(),
+  externalId: v.string(),
+  capsuleEntity: v.string(),
+  capsuleId: v.string(),
+  sourceImportRunId: v.id("importRuns"),
+  rawSourceData: v.string(),
+  conflictStatus: v.union(v.literal("resolved"), v.literal("pending_conflict")),
+  resolutionNote: v.optional(v.string()),
+  // PL-SOURCE-DELTA: the values this import wrote into Capsule, so a later
+  // run can tell a source change from a person's edit.
+  appliedValues: v.optional(v.string()),
+  sourceVersion: v.optional(v.string()),
+  // PL-SOURCE-IDENTITY: this run made the record, but it waits for a person
+  // (a look-alike), so the link is pending yet keeps the made snapshot.
+  madeRecord: v.optional(v.boolean()),
+};
+
 export const upsertLink = internalMutation({
-  args: {
-    tenantId: v.string(),
-    sourceSystem: v.string(),
-    recordType: v.string(),
-    externalId: v.string(),
-    capsuleEntity: v.string(),
-    capsuleId: v.string(),
-    sourceImportRunId: v.id("importRuns"),
-    rawSourceData: v.string(),
-    conflictStatus: v.union(
-      v.literal("resolved"),
-      v.literal("pending_conflict"),
-    ),
-    resolutionNote: v.optional(v.string()),
-    // PL-SOURCE-DELTA: the values this import wrote into Capsule, so a later
-    // run can tell a source change from a person's edit.
-    appliedValues: v.optional(v.string()),
-    sourceVersion: v.optional(v.string()),
-    // PL-SOURCE-IDENTITY: this run made the record, but it waits for a person
-    // (a look-alike), so the link is pending yet keeps the made snapshot.
-    madeRecord: v.optional(v.boolean()),
-  },
-  handler: async (ctx, args): Promise<Id<"externalRecordLinks">> => {
-    const linkKey = commitLinkKey(args);
-    const baseline =
-      args.appliedValues !== undefined
-        ? {
-            appliedValues: args.appliedValues,
-            appliedSourceVersion: args.sourceVersion,
-            appliedAt: Date.now(),
-            appliedImportRunId: String(args.sourceImportRunId),
-            sourceVersion: args.sourceVersion,
-            lastSeenAt: Date.now(),
-            lastSeenImportRunId: String(args.sourceImportRunId),
-          }
-        : {};
-    // AC-631: the record as this run finished it, so a stopped run can tell
-    // an untouched record from one a person changed.
-    const made =
-      args.conflictStatus === "resolved" || args.madeRecord === true
-        ? await madeSnapshot(ctx.db, args.recordType, args.capsuleId)
-        : undefined;
-    const madeMetadata = made !== undefined ? { metadata: made } : {};
-    const existing = await ctx.db
-      .query("externalRecordLinks")
-      .withIndex("by_linkKey", (q) => q.eq("linkKey", linkKey))
-      .filter((q) =>
-        q.and(
-          q.eq(q.field("tenantId"), args.tenantId),
-          q.eq(q.field("deletedAt"), null),
-        ),
-      )
-      .first();
+  args: upsertLinkArgs,
+  handler: (ctx, args) => writeLink(ctx, args),
+});
 
-    const now = Date.now();
-    if (existing) {
-      await ctx.db.patch(existing._id, {
-        capsuleEntity:
-          args.capsuleEntity as Doc<"externalRecordLinks">["capsuleEntity"],
-        capsuleId: args.capsuleId,
-        sourceImportRunId: args.sourceImportRunId,
-        rawSourceData: args.rawSourceData,
-        conflictStatus: args.conflictStatus,
-        resolutionNote: args.resolutionNote ?? existing.resolutionNote,
-        ...baseline,
-        ...madeMetadata,
-        updatedAt: now,
-        version: existing.version + 1,
-      });
-      return existing._id;
-    }
+/** upsertLink's write, for a seam that links inside its own transaction. */
+export async function writeLink(
+  ctx: MutationCtx,
+  args: ObjectType<typeof upsertLinkArgs>,
+): Promise<Id<"externalRecordLinks">> {
+  const linkKey = commitLinkKey(args);
+  const baseline =
+    args.appliedValues !== undefined
+      ? {
+          appliedValues: args.appliedValues,
+          appliedSourceVersion: args.sourceVersion,
+          appliedAt: Date.now(),
+          appliedImportRunId: String(args.sourceImportRunId),
+          sourceVersion: args.sourceVersion,
+          lastSeenAt: Date.now(),
+          lastSeenImportRunId: String(args.sourceImportRunId),
+        }
+      : {};
+  // AC-631: the record as this run finished it, so a stopped run can tell
+  // an untouched record from one a person changed.
+  const made =
+    args.conflictStatus === "resolved" || args.madeRecord === true
+      ? await madeSnapshot(ctx.db, args.recordType, args.capsuleId)
+      : undefined;
+  const madeMetadata = made !== undefined ? { metadata: made } : {};
+  const existing = await ctx.db
+    .query("externalRecordLinks")
+    .withIndex("by_linkKey", (q) => q.eq("linkKey", linkKey))
+    .filter((q) =>
+      q.and(
+        q.eq(q.field("tenantId"), args.tenantId),
+        q.eq(q.field("deletedAt"), null),
+      ),
+    )
+    .first();
 
-    return await ctx.db.insert("externalRecordLinks", {
-      tenantId: args.tenantId,
-      sourceSystem:
-        args.sourceSystem as Doc<"externalRecordLinks">["sourceSystem"],
-      recordType: args.recordType,
-      externalId: args.externalId,
-      linkKey,
+  const now = Date.now();
+  if (existing) {
+    await ctx.db.patch(existing._id, {
       capsuleEntity:
         args.capsuleEntity as Doc<"externalRecordLinks">["capsuleEntity"],
       capsuleId: args.capsuleId,
-      verified: false,
       sourceImportRunId: args.sourceImportRunId,
       rawSourceData: args.rawSourceData,
       conflictStatus: args.conflictStatus,
-      resolutionNote: args.resolutionNote,
+      resolutionNote: args.resolutionNote ?? existing.resolutionNote,
       ...baseline,
       ...madeMetadata,
-      // SoftDeletable shape: generated creates stamp deletedAt: null, and
-      // findLink/linksForRun filter q.eq(deletedAt, null) — an insert without
-      // the key leaves it undefined and every cross-dataset findLink
-      // (events→contact, payments→event, pack_list→event) silently misses.
-      deletedAt: null,
-      createdAt: now,
       updatedAt: now,
-      version: 0,
+      version: existing.version + 1,
     });
-  },
-});
+    return existing._id;
+  }
+
+  return await ctx.db.insert("externalRecordLinks", {
+    tenantId: args.tenantId,
+    sourceSystem:
+      args.sourceSystem as Doc<"externalRecordLinks">["sourceSystem"],
+    recordType: args.recordType,
+    externalId: args.externalId,
+    linkKey,
+    capsuleEntity:
+      args.capsuleEntity as Doc<"externalRecordLinks">["capsuleEntity"],
+    capsuleId: args.capsuleId,
+    verified: false,
+    sourceImportRunId: args.sourceImportRunId,
+    rawSourceData: args.rawSourceData,
+    conflictStatus: args.conflictStatus,
+    resolutionNote: args.resolutionNote,
+    ...baseline,
+    ...madeMetadata,
+    // SoftDeletable shape: generated creates stamp deletedAt: null, and
+    // findLink/linksForRun filter q.eq(deletedAt, null) — an insert without
+    // the key leaves it undefined and every cross-dataset findLink
+    // (events→contact, payments→event, pack_list→event) silently misses.
+    deletedAt: null,
+    createdAt: now,
+    updatedAt: now,
+    version: 0,
+  });
+}
 
 /**
  * One-time migration: stamp the canonical linkKey on link rows written before
@@ -2107,8 +2114,46 @@ export const commitImportRun = action({
       };
     }
 
+    if (importRun.datasetType === "history") {
+      // PL-SOURCE-HISTORY (AC-062, AC-111): old messages and tasks become
+      // client/event history only (convex/importHistory.ts).
+      if (rawRows.length === 0) {
+        throw new ConvexError("No source rows provided — nothing to commit.");
+      }
+      const result = await commitHistoryRows(ctx, {
+        importRunId: args.importRunId,
+        tenantId,
+        actorId: runCtx.actorId,
+        sourceSystem: importRun.sourceSystem,
+        rawRows,
+        maxRecords: args.maxRecords,
+        beforeEach: stopIfStopped,
+      });
+      const invocation = {
+        committed: result.committed,
+        skipped: result.skipped,
+        pending: result.pending,
+      };
+      if (result.stoppedEarly) {
+        return await stopEarly(result.parseErrors, invocation);
+      }
+      if (result.committed === 0 && result.skipped === 0) {
+        throw new ConvexError(
+          result.pending > 0
+            ? `No history brought in (${result.pending} waiting on the match list). Bring in the contacts and events first.`
+            : `No history rows could be read (${result.parseErrors} row(s) with problems). Nothing to commit.`,
+        );
+      }
+      await completeRun(invocation);
+      return {
+        ...invocation,
+        parseErrors: result.parseErrors,
+        processedCount: mergeCheckpoint(checkpoint, invocation).processedCount,
+      };
+    }
+
     // ImportDatasetType is a closed union (contacts/events/leads/payments/menus/
-    // pack_list/stock/venues); the seven branches above each return, so TS narrows
+    // pack_list/stock/history/venues); the branches above each return, so TS narrows
     // importRun.datasetType to "venues" here — this fall-through is exhaustive.
     // A future member added without a branch would fall through to venue parsing
     // and fail loudly ("No valid venue records parsed") rather than misroute.

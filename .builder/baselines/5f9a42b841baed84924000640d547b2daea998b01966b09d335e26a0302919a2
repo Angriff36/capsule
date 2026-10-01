@@ -20,7 +20,9 @@ import {
   ClientAssignOwnerParamsSchema,
   ClientChangeBillingProfileParamsSchema,
   ClientChangeContactParamsSchema,
+  ClientCommunicationReassignClientParamsSchema,
   ClientCommunicationRecordParamsSchema,
+  ClientCommunicationStageClientMergeParamsSchema,
   ClientContactAddParamsSchema,
   ClientContactReassignClientParamsSchema,
   ClientContactRemoveParamsSchema,
@@ -1293,12 +1295,32 @@ export function useGetClientCommunication(id: string | "skip") {
   return useQuery(api.queries.getClientCommunication, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for ClientCommunication.reassignClient. */
+export function useClientCommunicationReassignClient() {
+  const mutate = useMutation(api.mutations.ClientCommunication_reassignClient);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ClientCommunicationReassignClientParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for ClientCommunication.record. */
 export function useClientCommunicationRecord() {
   const mutate = useMutation(api.mutations.ClientCommunication_record);
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ClientCommunicationRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ClientCommunication.stageClientMerge. */
+export function useClientCommunicationStageClientMerge() {
+  const mutate = useMutation(api.mutations.ClientCommunication_stageClientMerge);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ClientCommunicationStageClientMergeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -13185,4 +13207,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1395 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1397 as const;
