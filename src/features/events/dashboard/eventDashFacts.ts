@@ -24,7 +24,7 @@ export const DASH_GROUPS: readonly {
   {
     key: "plan",
     label: "Plan",
-    tabs: ["timeline", "todos", "layouts", "recurring"],
+    tabs: ["timeline", "todos", "layouts"],
   },
   { key: "food", label: "Food", tabs: ["menu", "prep", "inventory"] },
   {
@@ -45,7 +45,6 @@ export const DASH_TAB_LABEL: Record<EventDetailTab, string> = {
   timeline: "Timeline",
   todos: "To-dos",
   layouts: "Layouts",
-  recurring: "Recurring",
   menu: "Menu",
   prep: "Prep",
   inventory: "Inventory",

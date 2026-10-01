@@ -99,7 +99,7 @@ channel. Domain and seam: `docs/systems/workforce.md` § Team chat.
 
 ## Recurring events
 
-The Event dossier can turn a planned Event into a recurring source. Operators choose weekly, monthly, or annual cadence and one of two explicit end conditions:
+The event page has no recurring screen (removed 2026-10-01 at Ryan's request, issue #419); the backend below still runs for any Event already set to repeat. A recurring source chooses weekly, monthly, or annual cadence and one of two explicit end conditions:
 
 - An inclusive final Event date.
 - A total number of Events in the series, including the source Event, from 2 to 1000.
@@ -198,7 +198,6 @@ An event manager can select the Northstar Events Client and Harborview Loft Venu
 | Index                      | `C:\projects\capsule\src\features\events\EventsListPage.tsx`                   |
 | Creation                   | `C:\projects\capsule\src\features\events\EventCreatePage.tsx`                  |
 | Dossier and lifecycle      | `C:\projects\capsule\src\features\events\EventDetailPage.tsx`                  |
-| Recurrence UI              | `C:\projects\capsule\src\features\events\RecurringEventPanel.tsx`              |
 | Recurrence calendar math   | `C:\projects\capsule\src\lib\eventRecurrence.ts`                               |
 | Scheduled Draft bridge     | `C:\projects\capsule\convex\recurringEvents.ts`                                |
 | Guest workflow             | `C:\projects\capsule\src\features\events\EventGuestPanel.tsx`                  |

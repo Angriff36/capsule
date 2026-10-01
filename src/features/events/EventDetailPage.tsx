@@ -81,7 +81,6 @@ import { EventTodosTab } from "./EventTodosTab";
 import { EventHistoryTab } from "./EventHistoryTab";
 import { EventTimelineStaffRoster } from "./eventTimelineStaffRoster";
 import { FailureBanner } from "./FailureBanner";
-import { RecurringEventPanel } from "./RecurringEventPanel";
 import {
   eventDetailPath,
   type EventDetailTab,
@@ -627,27 +626,6 @@ function EventDetailContent({
       {activeTab === "layouts" ? (
         <EventTabErrorBoundary tabLabel="Layouts" key="layouts">
           <EventLayoutsTab eventId={event._id} />
-        </EventTabErrorBoundary>
-      ) : null}
-      {activeTab === "recurring" ? (
-        <EventTabErrorBoundary tabLabel="Recurring Schedule" key="recurring">
-          <RecurringEventPanel
-            eventId={event._id}
-            startsAt={event.startsAt}
-            version={version}
-            canConfigure={canRevise}
-            recurrenceFrequency={event.recurrenceFrequency}
-            recurrenceEndCondition={event.recurrenceEndCondition}
-            recurrenceEndsAt={event.recurrenceEndsAt}
-            recurrenceOccurrenceLimit={event.recurrenceOccurrenceLimit}
-            recurrenceNextStartsAt={event.recurrenceNextStartsAt}
-            recurrenceGeneratedCount={event.recurrenceGeneratedCount}
-            recurrenceActive={event.recurrenceActive ?? undefined}
-            recurrenceStoppedAt={event.recurrenceStoppedAt}
-            recurrenceCompletedAt={event.recurrenceCompletedAt}
-            recurrenceTemplateEventId={event.recurrenceTemplateEventId}
-            recurrenceSequence={event.recurrenceSequence}
-          />
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "staffing" ? (

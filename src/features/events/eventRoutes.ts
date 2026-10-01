@@ -16,7 +16,6 @@ export type EventDetailTab =
   | "timeline"
   | "todos"
   | "layouts"
-  | "recurring"
   | "staffing"
   | "inventory"
   | "incidents"
@@ -38,7 +37,6 @@ export const EVENT_DETAIL_TABS: readonly {
   { key: "timeline", label: "Timeline" },
   { key: "todos", label: "To-dos" },
   { key: "layouts", label: "Layouts" },
-  { key: "recurring", label: "Recurring Schedule" },
   { key: "staffing", label: "Staffing" },
   { key: "inventory", label: "Inventory" },
   { key: "incidents", label: "Incidents" },
@@ -59,7 +57,7 @@ export const EVENT_TAB_GROUPS: readonly {
   {
     key: "plan",
     label: "Plan",
-    tabs: ["overview", "chat", "client", "guests", "recurring"],
+    tabs: ["overview", "chat", "client", "guests"],
   },
   { key: "food", label: "Food", tabs: ["menu", "prep", "inventory"] },
   {
