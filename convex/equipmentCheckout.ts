@@ -13,6 +13,7 @@ import {
 import { reconcileEventPackRules } from "./lib/packRuleReconciliation";
 import { eventCancellationObligations } from "./lib/eventCancellation";
 import { summarizeEquipmentProblems } from "./lib/equipmentReturns";
+import { insertStepEvent } from "./lib/commandAudit";
 
 const day = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -216,7 +217,7 @@ export const reserve = mutation({
         version: 0,
       },
     );
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "EquipmentReserved",
       entity: "EquipmentReservation",
       entityId: equipmentReservationId,

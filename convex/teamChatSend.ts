@@ -30,6 +30,7 @@ import {
 } from "./lib/blobs";
 import { commandIdempotencyScope } from "./lib/commandIdempotency";
 import { chatAuth, encryptField, live } from "./lib/teamChatRead";
+import { insertStepEvent } from "./lib/commandAudit";
 
 /** Files per message; mirrors src/features/chat/chatTypes.ts CHAT_MAX_FILES. */
 const MAX_FILES = 20;
@@ -194,7 +195,7 @@ export const sendWithFiles = mutation({
           uploadedAt: now,
           version: 1,
         });
-        await ctx.db.insert("manifestEvents", {
+        await insertStepEvent(ctx, {
           type: "AttachmentAdded",
           entity: "Attachment",
           entityId: attachmentId,

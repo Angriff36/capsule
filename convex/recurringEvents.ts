@@ -11,6 +11,7 @@ import {
   type EventRecurrenceEndCondition,
   type EventRecurrenceFrequency,
 } from "../src/lib/eventRecurrence";
+import { insertStepEvent } from "./lib/commandAudit";
 
 const frequency = v.union(
   v.literal("weekly"),
@@ -247,7 +248,7 @@ export const materializeDue = internalMutation({
           now,
         );
         const eventId = await ctx.db.insert("events", draft);
-        await ctx.db.insert("manifestEvents", {
+        await insertStepEvent(ctx, {
           type: "EventPlanned",
           entity: "Event",
           entityId: eventId,

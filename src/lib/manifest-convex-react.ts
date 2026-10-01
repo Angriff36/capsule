@@ -1549,6 +1549,16 @@ export function useClientPortalLinkRevoke() {
   };
 }
 
+/** Reactive list for CommandAuditRecord. */
+export function useListCommandAuditRecord() {
+  return useQuery(api.queries.listCommandAuditRecord);
+}
+
+/** Reactive get-by-id for CommandAuditRecord. Pass "skip" to suspend. */
+export function useGetCommandAuditRecord(id: string | "skip") {
+  return useQuery(api.queries.getCommandAuditRecord, id === "skip" ? "skip" : { id: id as any });
+}
+
 /** Reactive list for Component. */
 export function useListComponent() {
   return useQuery(api.queries.listComponent);
@@ -13207,4 +13217,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1397 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1399 as const;

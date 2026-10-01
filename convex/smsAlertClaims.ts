@@ -11,6 +11,7 @@ import {
   summarizeDelivery,
   type DeliveryAttemptRow,
 } from "./lib/deliveryState";
+import { insertStepEvent } from "./lib/commandAudit";
 
 const ALERT_ENTITY = "SmsAlert";
 const CLAIM_ENTITY = "SmsAlertClaim";
@@ -75,7 +76,7 @@ export const claimAlert = internalMutation({
     if (!isDue(summarizeDelivery(rows, now, SMS_POLICY), now)) {
       return { claimed: false };
     }
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "SmsAlertStarted",
       entity: CLAIM_ENTITY,
       entityId: args.tenantId,

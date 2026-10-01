@@ -144,6 +144,10 @@ entity ReviewFlag mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint reviseQuestionPresent: length(trim(question)) > 0 "Say what needs a decision"
     mutate question = question
+    emit ReviewFlagQuestionRevised {
+      reviewFlagId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   store ReviewFlag in durable
@@ -171,4 +175,10 @@ event ReviewFlagReopened: "review_flag.reopened" {
   tenantId: string
   eventId: string
   targetKind: ReviewFlagTarget
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event ReviewFlagQuestionRevised: "review.flag.question.revised" {
+  reviewFlagId: string
+  tenantId: string
 }

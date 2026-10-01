@@ -19,6 +19,7 @@ import {
   type DeliveryErrorClass,
 } from "./lib/deliveryState";
 import { decrypt, encrypt } from "./lib/encryption";
+import { insertStepEvent } from "./lib/commandAudit";
 
 // Outbound webhook integrations. Operators register HTTP endpoints that receive
 // a structured JSON payload when a subscribed domain event fires
@@ -427,7 +428,7 @@ export const claimDelivery = internalMutation({
     const now = Date.now();
     const { due, summary } = webhookSendIsDue(history?.rows ?? [], now);
     if (!due) return { claimed: false, attempt: summary.attemptCount };
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "WebhookDeliveryStarted",
       entity: CLAIM_ENTITY,
       entityId: `${args.endpointId}:${args.sourceEventId}`,
@@ -891,7 +892,7 @@ export const recordEndpoint = internalMutation({
     registeredBy: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: args.type,
       entity: ENDPOINT_ENTITY,
       entityId: args.endpointId,
@@ -926,7 +927,7 @@ export const recordDelivery = internalMutation({
     deliveredAt: v.number(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type:
         args.status === "succeeded"
           ? "WebhookDeliverySucceeded"
@@ -954,7 +955,7 @@ export const recordDelivery = internalMutation({
 export const recordTick = internalMutation({
   args: { tenantId: v.string(), tickAt: v.number() },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "WebhookDispatchTick",
       entity: TICK_ENTITY,
       entityId: args.tenantId,
@@ -967,7 +968,7 @@ export const recordTick = internalMutation({
 export const recordChainStart = internalMutation({
   args: { tenantId: v.string(), chainId: v.string() },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: CHAIN_START_TYPE,
       entity: TICK_ENTITY,
       entityId: args.tenantId,

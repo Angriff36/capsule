@@ -126,6 +126,10 @@ entity Attachment mixin TenantScoped, SoftDeletable {
   command setSurveySelection(included: boolean) {
     guard self.deletedAt == null
     mutate inFeedbackSurvey = included
+    emit AttachmentSurveySelectionSet {
+      attachmentId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command remove() {
@@ -138,4 +142,10 @@ entity Attachment mixin TenantScoped, SoftDeletable {
   }
 
   store Attachment in durable
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event AttachmentSurveySelectionSet: "attachment.survey.selection.set" {
+  attachmentId: string
+  tenantId: string
 }

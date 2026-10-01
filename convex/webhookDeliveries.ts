@@ -21,6 +21,7 @@ import {
   SUBSCRIBABLE_EVENTS,
   WEBHOOK_DELIVERY_POLICY,
 } from "./webhookIntegrations";
+import { insertStepEvent } from "./lib/commandAudit";
 
 export interface DeliveryStateView {
   key: string;
@@ -159,7 +160,7 @@ export const retryDelivery = mutation({
     if (summary.state === "processing") {
       throw new ConvexError("Capsule is sending this one right now.");
     }
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "WebhookDeliveryRetryRequested",
       entity: "WebhookDelivery",
       entityId: `${args.endpointId}:${args.sourceEventId}`,

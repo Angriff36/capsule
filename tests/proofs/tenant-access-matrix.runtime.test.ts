@@ -144,6 +144,9 @@ const LINK_TABLE: Record<string, string> = {
   activeServiceStyleId: "serviceStyles",
   activityId: "eventTimelineActivities",
   actorId: "@sign-in",
+  // PL-AUDIT step history: who ran the step, and the step's event row.
+  actorPersonId: "people",
+  actorUserId: "@sign-in",
   apiKeyId: "@outside",
   appliedById: "@sign-in",
   appliedImportRunId: "importRuns",
@@ -212,6 +215,7 @@ const LINK_TABLE: Record<string, string> = {
   locationId: "storageLocations",
   locationIds: "storageLocations",
   maintenanceScheduleId: "vehicleMaintenanceSchedules",
+  manifestEventId: "@outside",
   maintenanceTaskId: "equipmentMaintenanceTasks",
   makeUpForBatchId: "productionBatches",
   matchedComponentId: "components",

@@ -418,6 +418,10 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     compute reopen = lineStillShort and self.status == "received"
     mutate status = reopen ? "partially_received" : self.status
     mutate receivedAt = reopen ? null : self.receivedAt
+    emit VendorOrderReceiptCorrectionNoted {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   store VendorOrder in durable
@@ -608,6 +612,10 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     guard self.vendorOrder != null and self.vendorOrder.status != "draft" and self.vendorOrder.status != "cancelled"
     mutate supplyWeekStart = purchasingWeekStart != null ? purchasingWeekStart : self.vendorOrder.sourceRangeStart
     mutate pendingSupplyQuantity = self.status == "cancelled" ? 0 : max(0, self.orderedQuantity - self.receivedQuantity)
+    emit VendorOrderLineSupplyCommitted {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command releaseSupply() {
@@ -615,6 +623,10 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     // A cancelled order no longer holds stock for its week; a draft reopened
     // for changes keeps its claim until the next weekly recalculation.
     mutate stockAppliedQuantity = self.vendorOrder != null and self.vendorOrder.status == "cancelled" ? 0 : self.stockAppliedQuantity
+    emit VendorOrderLineSupplyReleased {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command reviseQuantity(
@@ -1067,6 +1079,10 @@ entity IngredientPriceObservation mixin TenantScoped, SoftDeletable {
     mutate unit = unit
     mutate unitPrice = unitPrice
     mutate observedAt = self.observedAt == null ? now() : self.observedAt
+    emit IngredientPriceObserved {
+      ingredientPriceObservationId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   store IngredientPriceObservation in durable
@@ -1527,3 +1543,24 @@ on ReceiptCorrectionStock run InventoryItem.applyReceiptCorrection
     unit: payload.unit
     reason: payload.reason
   }
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event IngredientPriceObserved: "ingredient.price.observed" {
+  ingredientPriceObservationId: string
+  tenantId: string
+}
+
+event VendorOrderReceiptCorrectionNoted: "vendor.order.receipt.correction.noted" {
+  vendorOrderId: string
+  tenantId: string
+}
+
+event VendorOrderLineSupplyCommitted: "vendor.order.line.supply.committed" {
+  vendorOrderLineId: string
+  tenantId: string
+}
+
+event VendorOrderLineSupplyReleased: "vendor.order.line.supply.released" {
+  vendorOrderLineId: string
+  tenantId: string
+}

@@ -68,6 +68,10 @@ entity Station mixin TenantScoped, SoftDeletable {
     constraint retireStationReason: length(trim(reason)) > 0 "Say why you're retiring this station."
     mutate status = "retired"
     mutate retiredAt = now()
+    emit StationRetired {
+      stationId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command reinstate() {
@@ -75,6 +79,10 @@ entity Station mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate status = "active"
     mutate retiredAt = null
+    emit StationReinstated {
+      stationId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   store Station in durable
@@ -90,4 +98,15 @@ event StationRenamed: "station.renamed" {
   stationId: string
   tenantId: string
   name: string
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event StationReinstated: "station.reinstated" {
+  stationId: string
+  tenantId: string
+}
+
+event StationRetired: "station.retired" {
+  stationId: string
+  tenantId: string
 }

@@ -34,6 +34,7 @@ import {
   sendSms,
   twilioConfigured,
 } from "./lib/twilio";
+import { insertStepEvent } from "./lib/commandAudit";
 
 const CONFIG_ENTITY = "SmsAlertConfig";
 const ALERT_ENTITY = "SmsAlert";
@@ -239,7 +240,7 @@ export const recordConfigEvent = internalMutation({
     payload: v.optional(v.any()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: args.type,
       entity: CONFIG_ENTITY,
       entityId: args.tenantId,
@@ -264,7 +265,7 @@ export const recordAlert = internalMutation({
     error: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: args.status === "sent" ? "SmsAlertSent" : "SmsAlertFailed",
       entity: ALERT_ENTITY,
       entityId: args.tenantId,

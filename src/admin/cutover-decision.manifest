@@ -42,6 +42,10 @@ entity CutoverDecision mixin TenantScoped {
     mutate reason = reason
     mutate rollbackPlan = rollbackPlan
     mutate businessApproved = businessApproved != null ? businessApproved : false
+    emit CutoverDecisionCreated {
+      cutoverDecisionId: self.id
+      tenantId: self.tenantId
+    }
   }
   // Entity commands stamp time with now() (→ Date.now()). Do NOT use
   // now(): the generator emits `const context = (ctx as any)` and
@@ -54,6 +58,10 @@ entity CutoverDecision mixin TenantScoped {
     mutate rollbackPlan = rollbackPlan
     mutate decidedAt = now()
     mutate decidedBy = user.id
+    emit CutoverDecisionApprovalsRecorded {
+      cutoverDecisionId: self.id
+      tenantId: self.tenantId
+    }
   }
   command execute(decision: CutoverDecisionType, reason: string) {
     guard roleAllows(user.role, "adminAccess")
@@ -61,11 +69,19 @@ entity CutoverDecision mixin TenantScoped {
     mutate reason = reason
     mutate decidedAt = now()
     mutate decidedBy = user.id
+    emit CutoverDecisionExecuted {
+      cutoverDecisionId: self.id
+      tenantId: self.tenantId
+    }
   }
   command setTppReadOnly(reason: string) {
     guard status == "go"
     guard roleAllows(user.role, "adminAccess")
     mutate tppReadOnlyAt = now()
+    emit CutoverDecisionTppReadOnlySet {
+      cutoverDecisionId: self.id
+      tenantId: self.tenantId
+    }
   }
   command rollback(reason: string) {
     guard status == "go"
@@ -74,6 +90,36 @@ entity CutoverDecision mixin TenantScoped {
     mutate reason = reason
     mutate decidedAt = now()
     mutate decidedBy = user.id
+    emit CutoverDecisionRolledBack {
+      cutoverDecisionId: self.id
+      tenantId: self.tenantId
+    }
   }
   store CutoverDecision in durable
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event CutoverDecisionCreated: "cutover.decision.created" {
+  cutoverDecisionId: string
+  tenantId: string
+}
+
+event CutoverDecisionExecuted: "cutover.decision.executed" {
+  cutoverDecisionId: string
+  tenantId: string
+}
+
+event CutoverDecisionApprovalsRecorded: "cutover.decision.approvals.recorded" {
+  cutoverDecisionId: string
+  tenantId: string
+}
+
+event CutoverDecisionRolledBack: "cutover.decision.rolled.back" {
+  cutoverDecisionId: string
+  tenantId: string
+}
+
+event CutoverDecisionTppReadOnlySet: "cutover.decision.tpp.read.only.set" {
+  cutoverDecisionId: string
+  tenantId: string
 }

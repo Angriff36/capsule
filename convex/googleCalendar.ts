@@ -25,6 +25,7 @@ import {
   verifyGoogleOAuthState,
   type GoogleOAuthConfig,
 } from "./lib/googleCalendar";
+import { insertStepEvent } from "./lib/commandAudit";
 
 const CONNECTION_ENTITY = "GoogleCalendarConnection";
 const CALENDAR_EVENT_ENTITY = "GoogleCalendarEvent";
@@ -455,7 +456,7 @@ export const recordConnection = internalMutation({
     refreshToken: v.object({ ciphertext: v.string(), keyId: v.string() }),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "GoogleCalendarConnected",
       entity: CONNECTION_ENTITY,
       entityId: args.tenantId,
@@ -472,7 +473,7 @@ export const recordDisconnection = internalMutation({
     disconnectedBy: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "GoogleCalendarDisconnected",
       entity: CONNECTION_ENTITY,
       entityId: args.tenantId,
@@ -498,7 +499,7 @@ export const recordEventSync = internalMutation({
     error: v.union(v.string(), v.null()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type:
         args.status === "synced"
           ? "GoogleCalendarEventSynced"
@@ -526,7 +527,7 @@ export const recordReconciliation = internalMutation({
     reconciledAt: v.number(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "GoogleCalendarReconciled",
       entity: CONNECTION_ENTITY,
       entityId: args.tenantId,

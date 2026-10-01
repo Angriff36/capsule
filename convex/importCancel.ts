@@ -28,6 +28,7 @@ import {
 import { api, internal } from "./_generated/api";
 import type { Id, TableNames } from "./_generated/dataModel";
 import { IMPORT_RECORD_HOMES, readMadeSnapshot } from "./lib/importRecordHomes";
+import { insertStepEvent } from "./lib/commandAudit";
 
 /** Mirrors importCommit.canImport (managers + system). */
 function canImport(role: string): boolean {
@@ -241,7 +242,7 @@ export const takeBackLink = internalMutation({
       }
     }
     await ctx.db.patch(recordId, { deletedAt: now, updatedAt: now } as never);
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "ImportRecordTakenBack",
       entity: home.entity,
       entityId: link.capsuleId,

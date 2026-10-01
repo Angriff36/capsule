@@ -266,6 +266,10 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     // Runs before PurchaseNeed.create in the approve transaction, so needs open
     // on the event's current week even after a reschedule (#328).
     mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
+    emit IngredientDemandPurchaseEligibilityEnsured {
+      ingredientDemandId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Reschedule moves live demand onto the event's week. Fulfilled and
@@ -276,6 +280,10 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     guard self.event != null
     guard self.event.purchasingWeekStart != null
     mutate purchasingWeekStart = self.event.purchasingWeekStart
+    emit IngredientDemandPurchasingWeekAligned {
+      ingredientDemandId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command recalculate(newQuantity: decimal(12, 4), reason: string) {
@@ -562,3 +570,14 @@ on WasteVoided run InventoryItem.adjustQuantity
     delta: payload.quantity,
     reason: payload.reason
   }
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event IngredientDemandPurchasingWeekAligned: "ingredient.demand.purchasing.week.aligned" {
+  ingredientDemandId: string
+  tenantId: string
+}
+
+event IngredientDemandPurchaseEligibilityEnsured: "ingredient.demand.purchase.eligibility.ensured" {
+  ingredientDemandId: string
+  tenantId: string
+}

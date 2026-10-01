@@ -76,6 +76,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.ClientPortalLink_create, { "eventId": "eventId-client-portal-link-1", "expiresAt": 1767268800000 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.ClientPortalLink_create, { "eventId": "eventId-client-portal-link-2", "expiresAt": 1767355200000 } as any);
+  // skip CommandAuditRecord: no creation command in IR (2 rows unused)
   // Component has multiple initialization commands (draft, purge, retire); using the selected initialization command: draft.
   // Component → api.mutations.Component_createViaDraft
   rowsAttempted += 1;
@@ -989,6 +990,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "ClientPortalLink",
       "createMutation": "ClientPortalLink_create",
+      "rowCount": 2
+    },
+    {
+      "entity": "CommandAuditRecord",
+      "createMutation": null,
       "rowCount": 2
     },
     {

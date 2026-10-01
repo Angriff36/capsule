@@ -57,6 +57,7 @@ import { ensureEventNumber } from "./eventNumbering";
 import { recordAcceptedProposalRevision } from "./proposalAcceptanceRevision";
 import { deleteBlobIfOrphan } from "./blobs";
 import { enforceOneOnly } from "./oneOnlyRules";
+import { recordCommandAudit } from "./commandAudit";
 import { queueRouteRefresh } from "./routeFollowUp";
 import { queueTimingRecalculation } from "./timingFollowUp";
 import { handleTravelLegEvent } from "./travelLegEvents";
@@ -72,6 +73,8 @@ export async function handleManifestEvent(
   ctx: MutationCtx,
   event: ConvexCommandEvent,
 ): Promise<void> {
+  // PL-AUDIT: who ran this step, for which company, when (never undoes it).
+  await recordCommandAudit(ctx, event);
   await enforceOneOnly(ctx, event);
   await queueRouteRefresh(ctx, event);
   await queueTimingRecalculation(ctx, event);

@@ -131,6 +131,10 @@ entity RentalOrderLine mixin TenantScoped, SoftDeletable {
     mutate deliverBy = deliverBy != null ? deliverBy : self.deliverBy
     mutate pickupAt = pickupAt != null ? pickupAt : self.pickupAt
     mutate note = note != null ? note : self.note
+    emit RentalOrderLineRevised {
+      rentalOrderLineId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command confirm(optional vendorReference: string) {
@@ -237,4 +241,10 @@ event RentalOrderLineCancelled: "rental_order_line.cancelled" {
   tenantId: string
   eventId: string
   reason: string?
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event RentalOrderLineRevised: "rental.order.line.revised" {
+  rentalOrderLineId: string
+  tenantId: string
 }

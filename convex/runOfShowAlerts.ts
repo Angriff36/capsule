@@ -30,6 +30,7 @@ import { getAuthContext, requireTenant } from "./lib/authContext";
 import { RunAlertLoopLedger } from "./lib/runOfShowAlertLoop";
 import { live, tenantPerson } from "./lib/teamChatRead";
 import type { PushPayload, PushTarget } from "./teamChatPush";
+import { insertStepEvent } from "./lib/commandAudit";
 
 const SENT_ENTITY = "RunAlert";
 const SCAN_INTERVAL_MS = 60_000;
@@ -363,7 +364,7 @@ export const recordRunPushResults = internalMutation({
     // full soft failure (network, 5xx on every target) must stay unsent so
     // the next scan retries it inside the fire window.
     if (args.used.length > 0) {
-      await ctx.db.insert("manifestEvents", {
+      await insertStepEvent(ctx, {
         type: "RunAlertSent",
         entity: SENT_ENTITY,
         entityId: args.alertKey.activityId,

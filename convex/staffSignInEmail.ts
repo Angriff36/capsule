@@ -15,6 +15,7 @@ import {
   type DeliveryState,
 } from "./lib/deliveryState";
 import { ClerkStaffAccountError } from "./lib/clerkStaffAccount";
+import { insertStepEvent } from "./lib/commandAudit";
 
 const ENTITY = "StaffSignInEmail";
 const CAN_SEE = new Set(["admin", "owner", "system", "workforce_manager"]);
@@ -47,7 +48,7 @@ export const recordSignInEmail = internalMutation({
     requestedBy: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type:
         args.outcome === "started"
           ? "StaffSignInEmailStarted"

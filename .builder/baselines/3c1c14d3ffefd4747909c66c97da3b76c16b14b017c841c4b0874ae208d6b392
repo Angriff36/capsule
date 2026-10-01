@@ -278,6 +278,29 @@ export const ClientPortalLinkSchema = z.object({
 
 export type ClientPortalLink = z.infer<typeof ClientPortalLinkSchema>;
 
+// Entity: CommandAuditRecord
+export const CommandAuditRecordSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  occurredAt: z.number().int().optional(),
+  lastOccurredAt: z.number().int().nullable().optional(),
+  stepName: z.string().nullable().optional(),
+  subjectEntity: z.string().nullable().optional(),
+  subjectId: z.string().nullable().optional(),
+  eventType: z.string().nullable().optional(),
+  manifestEventId: z.string().nullable().optional(),
+  eventCount: z.number().int().nullable().optional(),
+  versionAfter: z.number().int().nullable().optional(),
+  actorUserId: z.string().nullable().optional(),
+  actorPersonId: z.string().nullable().optional(),
+  actorRole: z.string().nullable().optional(),
+  idempotencyKey: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type CommandAuditRecord = z.infer<typeof CommandAuditRecordSchema>;
+
 // Entity: Component
 export const ComponentSchema = z.object({
   id: z.string().uuid(),

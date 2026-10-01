@@ -232,6 +232,10 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null "Cannot process a deleted quote submission"
 
     mutate status = "processing"
+    emit QuoteSubmissionProcessingStarted {
+      quoteSubmissionId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command complete(
@@ -289,6 +293,10 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
 
     mutate status = "dismissed"
     mutate errorMessage = reason
+    emit QuoteSubmissionDismissed {
+      quoteSubmissionId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Staff retries a failed conversion: the row reopens as pending with the
@@ -302,6 +310,10 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     mutate status = "pending"
     mutate errorMessage = null
     mutate processingErrors = null
+    emit QuoteSubmissionRetried {
+      quoteSubmissionId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command stageClientMerge(clientMergeId: uuid, clientId: uuid) {
@@ -375,4 +387,20 @@ event QuoteProcessingFailed: "quote.processing_failed" {
   submissionId: string
   tenantId: string
   errorMessage: string
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event QuoteSubmissionDismissed: "quote.submission.dismissed" {
+  quoteSubmissionId: string
+  tenantId: string
+}
+
+event QuoteSubmissionRetried: "quote.submission.retried" {
+  quoteSubmissionId: string
+  tenantId: string
+}
+
+event QuoteSubmissionProcessingStarted: "quote.submission.processing.started" {
+  quoteSubmissionId: string
+  tenantId: string
 }

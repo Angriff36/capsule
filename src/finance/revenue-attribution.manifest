@@ -52,6 +52,7 @@ entity VenueCommissionTerm mixin TenantScoped, SoftDeletable {
     mutate effectiveEndDate = effectiveEndDate
     mutate notes = notes
     mutate definedAt = now()
+    emit VenueCommissionTermDefined
   }
 
   command revise(
@@ -67,6 +68,7 @@ entity VenueCommissionTerm mixin TenantScoped, SoftDeletable {
     mutate commissionPercent = commissionPercent != null ? commissionPercent : self.commissionPercent
     mutate effectiveEndDate = effectiveEndDate != null ? effectiveEndDate : self.effectiveEndDate
     mutate notes = notes != null ? notes : self.notes
+    emit VenueCommissionTermRevised
   }
 
   command retire() {
@@ -77,6 +79,7 @@ entity VenueCommissionTerm mixin TenantScoped, SoftDeletable {
     mutate retiredAt = now()
     mutate effectiveEndDate = now()
     mutate status = "retired"
+    emit VenueCommissionTermRetired
   }
 
   store VenueCommissionTerm in durable
@@ -204,6 +207,7 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
     mutate approvedAt = null
     mutate rejectionReason = null
     mutate appliedAt = null
+    emit RevenueAttributionCreated
   }
 
   command requestApproval() {
@@ -211,6 +215,7 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
     guard self.status == "draft"
 
     mutate status = "pending_approval"
+    emit RevenueAttributionApprovalRequested
   }
 
   command approve() {
@@ -223,6 +228,7 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
     mutate status = "approved"
     mutate approvedById = user.personId
     mutate approvedAt = now()
+    emit RevenueAttributionApproved
   }
 
   command reject(rejectionReason: string) {
@@ -233,6 +239,7 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
 
     mutate status = "rejected"
     mutate rejectionReason = rejectionReason
+    emit RevenueAttributionRejected
   }
 
   command apply(eventRevenue: money(12, 2)) {
@@ -245,6 +252,7 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
     mutate allocatedAmount = allocation
     mutate appliedAt = now()
     mutate status = "applied"
+    emit RevenueAttributionApplied
   }
 
   command update(
@@ -266,6 +274,7 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
     mutate effectiveEndDate = effectiveEndDate != null ? effectiveEndDate : self.effectiveEndDate
     mutate reason = reason != null ? reason : self.reason
     mutate notes = notes != null ? notes : self.notes
+    emit RevenueAttributionUpdated
   }
 
   store RevenueAttribution in durable
@@ -335,3 +344,4 @@ event RevenueAttributionApplied: "revenue_attribution.applied" {
   eventRevenue: money(12, 2)
   allocatedAmount: money(12, 2)
 }
+
