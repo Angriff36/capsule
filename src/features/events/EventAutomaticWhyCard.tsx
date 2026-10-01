@@ -6,7 +6,7 @@ import {
   ORIGIN_LABEL,
   groupAutomaticWhy,
   lastUpdatedLine,
-  needsAttention,
+  sourceLine,
   type AutomaticWhyGroup,
 } from "./eventAutomaticWhy";
 
@@ -113,18 +113,8 @@ function WhyItem({ item }: { readonly item: AutomaticExplanation }) {
               {item.blocking.reason} {item.blocking.action}
             </p>
           ) : null}
-          {item.sources.length > 0 ? (
-            <p>
-              Comes from {item.sources.length}{" "}
-              {item.sources.length === 1 ? "record" : "records"}
-              {item.ruleVersion ? `, rule ${item.ruleVersion}` : ""}.
-            </p>
-          ) : item.ruleVersion ? (
-            <p>Rule {item.ruleVersion}.</p>
-          ) : null}
-          {needsAttention(item) || item.origin === "generated" ? (
-            <p>{lastUpdatedLine(item.lastReconciledAt)}</p>
-          ) : null}
+          <p>{sourceLine(item)}</p>
+          <p>{lastUpdatedLine(item.lastReconciledAt)}</p>
         </div>
       </details>
     </li>

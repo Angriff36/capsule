@@ -68,6 +68,48 @@ export function groupAutomaticWhy(
   });
 }
 
+/** Plain names for the records an automatic item can come from. */
+const SOURCE_LABEL: Record<string, string> = {
+  components: "a recipe part",
+  dishComponents: "a dish's recipe",
+  dishIngredients: "a dish's ingredients",
+  dishTasks: "a dish's prep steps",
+  dishes: "a dish",
+  eventDishes: "the event menu",
+  events: "the event details",
+  ingredientDemands: "the ingredient totals",
+  ingredients: "an ingredient",
+  packListTemplates: "a pack list template",
+  packLists: "the pack list",
+  planningRules: "a planning rule",
+  productionBatches: "a cooking batch",
+  proposals: "the proposal",
+  serviceStyleKitItems: "the service style kit",
+  staffingTemplates: "a crew template",
+};
+
+/** "Comes from the event menu and a dish; rule proposal-plan v2." — always
+ * says something, so a person never wonders whether the line was left out. */
+export function sourceLine(
+  item: Pick<AutomaticExplanation, "sources" | "ruleVersion" | "origin">,
+): string {
+  const names = [
+    ...new Set(
+      item.sources.map((s) => SOURCE_LABEL[s.table] ?? "another record"),
+    ),
+  ];
+  const from =
+    names.length > 0
+      ? `Comes from ${names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}` : names[0]}`
+      : item.origin === "manual"
+        ? "A person added this by hand"
+        : "Capsule did not keep what this came from";
+  const rule = item.ruleVersion
+    ? `rule ${item.ruleVersion}`
+    : "not made from a saved rule";
+  return `${from}; ${rule}.`;
+}
+
 /** "Last brought up to date 3 Oct, 14:05" in the viewer's own time. */
 export function lastUpdatedLine(at: number | null): string {
   if (at == null) return "Capsule has not brought this up to date yet.";
