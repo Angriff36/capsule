@@ -3643,6 +3643,13 @@ Screens (19): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
   - refusals (role, stage and rules): "Logistics, inventory or event staff may see rentals from vendors"; "Logistics, inventory or event staff may update rentals from vendors"; "Logistics, inventory or event staff may change rentals from vendors"; "Guard 0 failed"; "Guard 1 failed"; "The amount sent back can't be negative. Use zero or more."; and 3 more
   - effects: RentalOrderLineReturned
   - refresh: live reads update by themselves; reads affected: RentalOrderLine.list, RentalOrderLine.get, Equipment.list, Equipment.get, Event.list, Event.get, Vendor.list, Vendor.get
+- `mutations.Vendor_createViaOnboard` (Vendor.onboard)
+  - inputs from the screen: name, email, phone, addressLine1, city, region, postalCode, countryCode, paymentTermsDays, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Procurement staff and event managers may see vendors"; "Procurement staff may update vendors"; "Procurement staff may change vendors"; "Guard 0 failed"; "Guard 1 failed"; "Give this vendor a name."; and 2 more
+  - effects: VendorOnboarded
+  - refresh: live reads update by themselves; reads affected: Vendor.list, Vendor.get, Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, IngredientPriceObservation.list, IngredientPriceObservation.get and 16 more
 
 ### Authored reads and steps
 

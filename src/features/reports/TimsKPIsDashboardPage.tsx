@@ -6,6 +6,10 @@ import {
   useListVenue,
 } from "@/lib/manifest-convex-react";
 import {
+  eventServiceStyleKey,
+  eventServiceStyleLabel,
+} from "../events/eventServiceStyle";
+import {
   DashboardGrid,
   type DashboardGridSize,
 } from "@/ui/charts/DashboardGrid";
@@ -203,14 +207,21 @@ export function TimsKPIsDashboardPage() {
   const serviceStyleData = useMemo(() => {
     if (!events) return [];
 
-    const styleMap = new Map<string, { revenue: number; eventCount: number }>();
+    const styleMap = new Map<
+      string,
+      { label: string; revenue: number; eventCount: number }
+    >();
 
     events.forEach((event) => {
       if (event.quotedPrice == null) return;
-      const style = event.serviceStyle || "Unknown";
+      const style = eventServiceStyleKey(event);
 
       if (!styleMap.has(style)) {
-        styleMap.set(style, { revenue: 0, eventCount: 0 });
+        styleMap.set(style, {
+          label: eventServiceStyleLabel(event),
+          revenue: 0,
+          eventCount: 0,
+        });
       }
 
       const data = styleMap.get(style)!;
@@ -218,9 +229,9 @@ export function TimsKPIsDashboardPage() {
       data.eventCount += 1;
     });
 
-    return Array.from(styleMap.entries())
-      .map(([style, data]) => ({
-        serviceStyle: style,
+    return Array.from(styleMap.values())
+      .map((data) => ({
+        serviceStyle: data.label,
         revenue: data.revenue,
         eventCount: data.eventCount,
       }))

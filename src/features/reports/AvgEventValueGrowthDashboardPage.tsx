@@ -7,6 +7,10 @@ import {
   useListPerson,
 } from "@/lib/manifest-convex-react";
 import {
+  eventServiceStyleKey,
+  eventServiceStyleLabel,
+} from "../events/eventServiceStyle";
+import {
   DashboardGrid,
   type DashboardGridSize,
 } from "@/ui/charts/DashboardGrid";
@@ -156,13 +160,19 @@ export function AvgEventValueGrowthDashboardPage() {
 
     const styleMap = new Map<
       string,
-      { totalRevenue: number; eventCount: number; totalHeadcount: number }
+      {
+        label: string;
+        totalRevenue: number;
+        eventCount: number;
+        totalHeadcount: number;
+      }
     >();
 
     completedEvents.forEach((event) => {
-      const styleId = event.serviceStyle || "unknown";
+      const styleId = eventServiceStyleKey(event);
       if (!styleMap.has(styleId)) {
         styleMap.set(styleId, {
+          label: eventServiceStyleLabel(event),
           totalRevenue: 0,
           eventCount: 0,
           totalHeadcount: 0,
@@ -178,7 +188,7 @@ export function AvgEventValueGrowthDashboardPage() {
       .map(([styleId, data]) => {
         const style = serviceStyles.find((s) => s._id === styleId);
         return {
-          serviceStyle: style?.name || styleId,
+          serviceStyle: style?.name || data.label,
           avgEventValue: data.totalRevenue / data.eventCount,
           eventCount: data.eventCount,
           totalRevenue: data.totalRevenue,

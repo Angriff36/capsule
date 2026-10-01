@@ -1106,10 +1106,16 @@ export function PackListDetailPage() {
           {activeTemplates.length === 0 ? (
             <p className="mt-2 text-base text-ink-3">
               No active pack list templates yet.{" "}
-              <Link className="link" to="/logistics/pack-templates">
+              <Link
+                className="link"
+                to="/logistics/pack-templates"
+                target="_blank"
+                rel="noopener"
+              >
                 Create one
-              </Link>
-              .
+              </Link>{" "}
+              (opens a new tab; this list stays as it is and the new template
+              shows up here right away).
             </p>
           ) : (
             <ul className="mt-2 grid gap-2">
