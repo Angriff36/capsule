@@ -4064,8 +4064,8 @@ const COMMAND_DISPATCH = {
     params: ["docId","vendorOrderLineId","vendorOrderId","vendorId","ingredientId","billNumber","billedQuantity","billedUnitPrice","receivedQuantity","receiptUnitPrice","unit","matchState","matchSequence","reason","version","idempotencyKey"] as const,
     paramMeta: [{"name":"docId","type":"string","required":true},{"name":"vendorOrderLineId","type":"uuid","required":true},{"name":"vendorOrderId","type":"uuid","required":true},{"name":"vendorId","type":"uuid","required":true},{"name":"ingredientId","type":"uuid","required":true},{"name":"billNumber","type":"string","required":true},{"name":"billedQuantity","type":"decimal","required":true},{"name":"billedUnitPrice","type":"money","required":true},{"name":"receivedQuantity","type":"decimal","required":true},{"name":"receiptUnitPrice","type":"money","required":true},{"name":"unit","type":"UnitOfMeasure","required":true},{"name":"matchState","type":"VendorBillMatchState","required":true},{"name":"matchSequence","type":"int","required":true},{"name":"reason","type":"string","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
-  "VendorBillMatch.review": {
-    ref: api.mutations.VendorBillMatch_review,
+  "VendorBillMatch.recordDecision": {
+    ref: api.mutations.VendorBillMatch_recordDecision,
     params: ["docId","decision","note","version","idempotencyKey"] as const,
     paramMeta: [{"name":"docId","type":"string","required":true},{"name":"decision","type":"VendorBillReviewState","required":true},{"name":"note","type":"string","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },

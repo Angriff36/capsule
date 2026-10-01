@@ -11882,13 +11882,13 @@ export const VendorBillMatchRecordParamsSchema = z.object({
 
 export type VendorBillMatchRecordParams = z.infer<typeof VendorBillMatchRecordParamsSchema>;
 
-// Command: review on VendorBillMatch
-export const VendorBillMatchReviewParamsSchema = z.object({
+// Command: recordDecision on VendorBillMatch
+export const VendorBillMatchRecordDecisionParamsSchema = z.object({
   decision: z.enum(["open", "accepted", "disputed"]),
   note: z.string(),
 });
 
-export type VendorBillMatchReviewParams = z.infer<typeof VendorBillMatchReviewParamsSchema>;
+export type VendorBillMatchRecordDecisionParams = z.infer<typeof VendorBillMatchRecordDecisionParamsSchema>;
 
 // Command: add on VendorContact
 export const VendorContactAddParamsSchema = z.object({

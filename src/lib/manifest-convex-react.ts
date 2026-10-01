@@ -807,8 +807,8 @@ import {
   VehicleUpdateInsuranceParamsSchema,
   VehicleUpdateOperationalStatusParamsSchema,
   VehicleUpdateRegistrationParamsSchema,
+  VendorBillMatchRecordDecisionParamsSchema,
   VendorBillMatchRecordParamsSchema,
-  VendorBillMatchReviewParamsSchema,
   VendorContactAddParamsSchema,
   VendorContactRemoveParamsSchema,
   VendorContactUpdateParamsSchema,
@@ -12272,12 +12272,12 @@ export function useVendorBillMatchRecord() {
   };
 }
 
-/** Mutation hook for VendorBillMatch.review. */
-export function useVendorBillMatchReview() {
-  const mutate = useMutation(api.mutations.VendorBillMatch_review);
+/** Mutation hook for VendorBillMatch.recordDecision. */
+export function useVendorBillMatchRecordDecision() {
+  const mutate = useMutation(api.mutations.VendorBillMatch_recordDecision);
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
-    const parsed = VendorBillMatchReviewParamsSchema.parse(params) as Record<string, unknown>;
+    const parsed = VendorBillMatchRecordDecisionParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }

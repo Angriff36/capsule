@@ -1219,7 +1219,7 @@ entity VendorBillMatch mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command review(decision: VendorBillReviewState, note: string) {
+  command recordDecision(decision: VendorBillReviewState, note: string) {
     guard self.deletedAt == null
     guard self.matchedAt != null and self.matchState != "matched"
     mutate reviewState = decision
@@ -1849,7 +1849,7 @@ on VendorOrderLineBillMatched run VendorBillMatch.record
     reason: payload.reason
   }
 
-on VendorOrderLineBillReviewed run VendorBillMatch.review
+on VendorOrderLineBillReviewed run VendorBillMatch.recordDecision
   match vendorOrderLineId = payload.vendorOrderLineId, matchSequence = payload.matchSequence
   params {
     decision: payload.decision

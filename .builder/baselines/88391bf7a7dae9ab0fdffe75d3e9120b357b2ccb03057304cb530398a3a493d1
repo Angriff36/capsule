@@ -64064,7 +64064,7 @@ export const VendorBillMatch_record = mutation({
   },
 });
 
-async function __runVendorBillMatchReview(ctx: MutationCtx, { docId, decision, note, version }: any, __creation = false) {
+async function __runVendorBillMatchRecordDecision(ctx: MutationCtx, { docId, decision, note, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -64086,14 +64086,14 @@ async function __runVendorBillMatchReview(ctx: MutationCtx, { docId, decision, n
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorBillMatchId: docId, tenantId: __after.tenantId, _subject: { entity: "VendorBillMatch", command: "review", id: docId } };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorBillMatchId: docId, tenantId: __after.tenantId, _subject: { entity: "VendorBillMatch", command: "recordDecision", id: docId } };
     const __manifestEvent0 = { type: "VendorBillMatchReviewed", entity: "VendorBillMatch", entityId: docId, payload: { vendorBillMatchId: docId, tenantId: __after.tenantId }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
-    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "review", emitIndex: 0 });
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "recordDecision", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 
-export const VendorBillMatch_review = mutation({
+export const VendorBillMatch_recordDecision = mutation({
   args: {
     docId: v.id("vendorBillMatches"),
     decision: v.any(),
@@ -64102,14 +64102,14 @@ export const VendorBillMatch_review = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
-    const __idem = args.idempotencyKey === undefined ? null : await __commandIdempotencyScope(ctx, "VendorBillMatch_review", args.idempotencyKey as string);
+    const __idem = args.idempotencyKey === undefined ? null : await __commandIdempotencyScope(ctx, "VendorBillMatch_recordDecision", args.idempotencyKey as string);
     if (__idem !== null) {
       const __hit = await __lookupCommandIdempotency(ctx, __idem, args.idempotencyKey as string);
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
     await __assertOwnWorkspaceLinks(ctx, args, [{"name":"vendorOrderLineId","table":"vendorOrderLines"},{"name":"vendorOrderId","table":"vendorOrders"},{"name":"vendorId","table":"vendors"},{"name":"ingredientId","table":"ingredients"}]);
-    const __result = await __runVendorBillMatchReview(ctx, args);
+    const __result = await __runVendorBillMatchRecordDecision(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
     }
@@ -67220,7 +67220,7 @@ async function __runVendorOrderLineReviewBillDifference(ctx: MutationCtx, { docI
     const __match0_raw = await ctx.db.query("vendorBillMatches").withIndex("by_vendorOrderLineId", (q) => q.eq("vendorOrderLineId", payload.vendorOrderLineId)).collect();
     const __match0_rows = __match0_raw.filter((d) => (d as any).vendorOrderLineId === payload.vendorOrderLineId && (d as any).matchSequence === payload.matchSequence && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
     const __match0_id = __match0_rows.length > 0 ? (__match0_rows[0] as any)._id : null;
-    if (__match0_id) await __runVendorBillMatchReview(ctx, { docId: __match0_id, decision: payload.decision, note: payload.note } as any);
+    if (__match0_id) await __runVendorBillMatchRecordDecision(ctx, { docId: __match0_id, decision: payload.decision, note: payload.note } as any);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "reviewBillDifference", emitIndex: 0 });
     return { ...doc, ...updates };
 }

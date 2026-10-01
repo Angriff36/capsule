@@ -1617,91 +1617,91 @@ Screens (157): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: IngredientAllergensClassified
-  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 32 more
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 34 more
 - `mutations.Ingredient_configureSubstitutes` (Ingredient.configureSubstitutes)
   - inputs from the screen: substituteIngredientIds; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: IngredientSubstitutesConfigured
-  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 32 more
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 34 more
 - `mutations.Ingredient_createViaIntroduce` (Ingredient.introduce)
   - inputs from the screen: name, unit, costPerUnit, allergens, category, preferredVendorId, isGlutenFree; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "Give this ingredient a name."; and 1 more
   - effects: IngredientIntroduced
-  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 32 more
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 34 more
 - `mutations.Ingredient_discontinue` (Ingredient.discontinue)
   - inputs from the screen: reason; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
   - effects: IngredientDiscontinued
-  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 32 more
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 34 more
 - `mutations.Ingredient_mergeInto` (Ingredient.mergeInto)
   - inputs from the screen: targetIngredientId, reason; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
   - effects: IngredientMerged
-  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 32 more
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 34 more
 - `mutations.Ingredient_purge` (Ingredient.purge)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: IngredientPurged
-  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 32 more
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 34 more
 - `mutations.Ingredient_reinstate` (Ingredient.reinstate)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: IngredientReinstated
-  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 32 more
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 34 more
 - `mutations.Ingredient_setNutrition` (Ingredient.setNutrition)
   - inputs from the screen: caloriesPerUnit, proteinGramsPerUnit, carbsGramsPerUnit, fatGramsPerUnit, fiberGramsPerUnit, sugarGramsPerUnit, sodiumMgPerUnit, calciumMgPerUnit, ironMgPerUnit; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "This ingredient's calories can't be negative. Use zero or more."; and 10 more
   - effects: IngredientNutritionSet
-  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 32 more
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 34 more
 - `mutations.Ingredient_setPreferredVendors` (Ingredient.setPreferredVendors)
   - inputs from the screen: preferredVendorIds, preferredVendorId; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: IngredientPreferredVendorsSet
-  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 32 more
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 34 more
 - `mutations.Ingredient_setPrimaryImage` (Ingredient.setPrimaryImage)
   - inputs from the screen: storageId, fileName; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "Add a photo before you set it as the main picture."; and 2 more
   - effects: IngredientPrimaryImageSet
-  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 32 more
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 34 more
 - `mutations.Ingredient_setStorage` (Ingredient.setStorage)
   - inputs from the screen: shelfLifeDays, storageInstructions; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Shelf life can't be negative. Use zero or more days."; "ConcurrencyConflict:"; and 1 more
   - effects: IngredientStorageSet
-  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 32 more
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 34 more
 - `mutations.Ingredient_updateCosting` (Ingredient.updateCosting)
   - inputs from the screen: costPerUnit; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
   - effects: IngredientCostingUpdated
-  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 32 more
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 34 more
 - `mutations.Ingredient_updateDetails` (Ingredient.updateDetails)
   - inputs from the screen: name, unit, category; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "Give this ingredient a name."; and 2 more
   - effects: IngredientDetailsUpdated
-  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 32 more
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 34 more
 - `mutations.InventoryReservation_createViaReserve` (InventoryReservation.reserve)
   - inputs from the screen: inventoryItemId, eventId, ingredientId, quantity, inventoryLotId; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
@@ -2065,14 +2065,14 @@ Screens (157): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Procurement and managers may see vendor order lines"; "Procurement and managers may update vendor order lines"; "Procurement and managers may change vendor order lines"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 8 more
   - effects: VendorOrderLineAdded
-  - refresh: live reads update by themselves; reads affected: VendorOrderLine.list, VendorOrderLine.get, Ingredient.list, Ingredient.get, IngredientDemand.list, IngredientDemand.get, IngredientPriceObservation.list, IngredientPriceObservation.get and 12 more
+  - refresh: live reads update by themselves; reads affected: VendorOrderLine.list, VendorOrderLine.get, Ingredient.list, Ingredient.get, IngredientDemand.list, IngredientDemand.get, IngredientPriceObservation.list, IngredientPriceObservation.get and 14 more
 - `mutations.VendorOrder_createViaOpen` (VendorOrder.open)
   - inputs from the screen: vendorId, eventId, sourceRangeStart, sourceRangeEnd, orderNumber, notes; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Procurement and managers may see vendor orders"; "Procurement and managers may update vendor orders"; "Procurement and managers may change vendor orders"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
   - effects: VendorOrderOpened
-  - refresh: live reads update by themselves; reads affected: VendorOrder.list, VendorOrder.get, Event.list, Event.get, IngredientPriceObservation.list, IngredientPriceObservation.get, InventoryLot.list, InventoryLot.get and 12 more
+  - refresh: live reads update by themselves; reads affected: VendorOrder.list, VendorOrder.get, Event.list, Event.get, IngredientPriceObservation.list, IngredientPriceObservation.get, InventoryLot.list, InventoryLot.get and 14 more
 
 ### Authored reads and steps
 
@@ -3664,7 +3664,7 @@ Screens (19): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Procurement staff and event managers may see vendors"; "Procurement staff may update vendors"; "Procurement staff may change vendors"; "Guard 0 failed"; "Guard 1 failed"; "Give this vendor a name."; and 2 more
   - effects: VendorOnboarded
-  - refresh: live reads update by themselves; reads affected: Vendor.list, Vendor.get, Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, IngredientPriceObservation.list, IngredientPriceObservation.get and 16 more
+  - refresh: live reads update by themselves; reads affected: Vendor.list, Vendor.get, Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, IngredientPriceObservation.list, IngredientPriceObservation.get and 18 more
 
 ### Authored reads and steps
 

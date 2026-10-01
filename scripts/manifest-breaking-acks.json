@@ -2022,6 +2022,114 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-01",
       "reason": "PL-CATALOGS AC-221/AC-222: optional; unset = the template is for any service style, which is what every saved template is today. No backfill."
+    },
+    {
+      "path": "VendorOrderLine.billNumber",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENDOR-INVOICE-MATCH AC-456: optional; unset = no vendor bill matched yet, which is true of every stored line. No backfill."
+    },
+    {
+      "path": "VendorOrderLine.billedQuantity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENDOR-INVOICE-MATCH AC-456: optional; set only by matchBill / correctBillMatch. No backfill."
+    },
+    {
+      "path": "VendorOrderLine.billedUnitPrice",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENDOR-INVOICE-MATCH AC-456: optional; set only by matchBill / correctBillMatch. No backfill."
+    },
+    {
+      "path": "VendorOrderLine.billMatchState",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENDOR-INVOICE-MATCH AC-456: optional; unset = no bill matched. No backfill."
+    },
+    {
+      "path": "VendorOrderLine.billReviewState",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENDOR-INVOICE-MATCH AC-456: optional; set only when a bill differs. No backfill."
+    },
+    {
+      "path": "VendorOrderLine.billReviewNote",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENDOR-INVOICE-MATCH AC-456: optional buyer note. No backfill."
+    },
+    {
+      "path": "VendorOrderLine.billMatchCount",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENDOR-INVOICE-MATCH AC-456: optional; unset reads as zero matches. No backfill."
+    },
+    {
+      "path": "Component.coolingInstructions",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-452: optional; blank reads 'Not on file'. No backfill."
+    },
+    {
+      "path": "Component.equipmentNotes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-452: optional; blank reads 'Not on file'. No backfill."
+    },
+    {
+      "path": "Component.holdingInstructions",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-452: optional; blank reads 'Not on file'. No backfill."
+    },
+    {
+      "path": "Component.platingInstructions",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-452: optional; blank reads 'Not on file'. No backfill."
+    },
+    {
+      "path": "Component.primaryImageFileName",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-453: optional recipe photo. No backfill."
+    },
+    {
+      "path": "Component.primaryImageStorageId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-453: optional recipe photo. No backfill."
+    },
+    {
+      "path": "Component.reheatInstructions",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-452: optional; blank reads 'Not on file'. No backfill."
+    },
+    {
+      "path": "Component.substitutionNotes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-452: optional approved swaps. No backfill."
+    },
+    {
+      "path": "Component.videoUrl",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-453: optional video link. No backfill."
+    },
+    {
+      "path": "Ingredient.shelfLifeDays",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-452: optional; blank = not on file. No backfill."
+    },
+    {
+      "path": "Ingredient.storageInstructions",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-452: optional; blank = not on file. No backfill."
     }
   ]
 }
