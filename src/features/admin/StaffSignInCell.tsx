@@ -1,9 +1,28 @@
 import type { TeamPerson } from "./TeamPerson";
 
+/** The saved state of the newest sign-in email for this person. */
+export type SignInEmailState = {
+  state: string;
+  problem: string | null;
+};
+
+function emailStateNote(email: SignInEmailState | undefined): string | null {
+  if (!email) return null;
+  if (email.state === "terminal_failed" || email.state === "retryable_failed") {
+    return `Sign-in email not sent. ${email.problem ?? ""}`.trim();
+  }
+  if (email.state === "uncertain") {
+    return "Not sure the sign-in email went out. Email it again to be sure.";
+  }
+  if (email.state === "processing") return "Sending the sign-in email…";
+  return null;
+}
+
 export function StaffSignInCell({
   person,
   canEdit,
   busy,
+  emailState,
   onSendSignIn,
   onUnlink,
   onPause,
@@ -12,6 +31,7 @@ export function StaffSignInCell({
   person: TeamPerson;
   canEdit: boolean;
   busy: boolean;
+  emailState?: SignInEmailState;
   onSendSignIn: (person: TeamPerson) => Promise<void>;
   onUnlink: (person: TeamPerson) => Promise<void>;
   /** Absent on your own row. */
@@ -20,6 +40,7 @@ export function StaffSignInCell({
 }>) {
   const linked = Boolean(person.authSubjectId);
   const paused = person.status === "inactive";
+  const emailNote = paused ? null : emailStateNote(emailState);
   return (
     <div className="grid gap-1">
       <span className={linked && !paused ? "text-ink-2" : "text-warn"}>
@@ -29,6 +50,7 @@ export function StaffSignInCell({
             ? "Can open the app"
             : "No sign-in yet"}
       </span>
+      {emailNote ? <span className="text-warn">{emailNote}</span> : null}
       {canEdit ? (
         <div className="flex flex-wrap items-center gap-2">
           {paused ? (

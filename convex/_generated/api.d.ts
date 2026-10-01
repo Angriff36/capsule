@@ -238,6 +238,7 @@ import type * as smsAlerts from "../smsAlerts.js";
 import type * as sourceProvenance from "../sourceProvenance.js";
 import type * as staffSelfReviews from "../staffSelfReviews.js";
 import type * as staffShiftSwaps from "../staffShiftSwaps.js";
+import type * as staffSignInEmail from "../staffSignInEmail.js";
 import type * as stripeConnect from "../stripeConnect.js";
 import type * as teamChat from "../teamChat.js";
 import type * as teamChatCursor from "../teamChatCursor.js";
@@ -494,6 +495,7 @@ declare const fullApi: ApiFromModules<{
   sourceProvenance: typeof sourceProvenance;
   staffSelfReviews: typeof staffSelfReviews;
   staffShiftSwaps: typeof staffShiftSwaps;
+  staffSignInEmail: typeof staffSignInEmail;
   stripeConnect: typeof stripeConnect;
   teamChat: typeof teamChat;
   teamChatCursor: typeof teamChatCursor;

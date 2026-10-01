@@ -5,7 +5,7 @@ import { PersonEmailField } from "./PersonEmailField";
 import { PersonEmployeeNumberField } from "./PersonEmployeeNumberField";
 import { PersonIdentityField } from "./PersonIdentityField";
 import { PersonRoleDirectory } from "./PersonRoleDirectory";
-import { StaffSignInCell } from "./StaffSignInCell";
+import { StaffSignInCell, type SignInEmailState } from "./StaffSignInCell";
 import type { TeamPerson } from "./TeamPerson";
 
 export function TeamRolesTable({
@@ -17,6 +17,7 @@ export function TeamRolesTable({
   onSetPayRate,
   rateByPersonId,
   onSendSignIn,
+  signInEmailByPersonId,
   onUnlinkAccount,
   myPersonId,
   onPauseAccess,
@@ -33,6 +34,8 @@ export function TeamRolesTable({
   onSetPayRate: (person: TeamPerson, hourlyRate: number) => Promise<void>;
   rateByPersonId: ReadonlyMap<string, number | null>;
   onSendSignIn: (person: TeamPerson) => Promise<void>;
+  /** Saved state of each person's newest sign-in email. */
+  signInEmailByPersonId?: ReadonlyMap<string, SignInEmailState>;
   onUnlinkAccount: (person: TeamPerson) => Promise<void>;
   /** The signed-in person; their own row has no Pause (it would lock them out). */
   myPersonId: string | null;
@@ -127,6 +130,7 @@ export function TeamRolesTable({
                   person={person}
                   canEdit={canEdit}
                   busy={busy === person._id}
+                  emailState={signInEmailByPersonId?.get(person._id)}
                   onSendSignIn={onSendSignIn}
                   onUnlink={onUnlinkAccount}
                   onPause={

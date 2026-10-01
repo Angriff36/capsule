@@ -8,6 +8,7 @@ import { getAuthContext } from "./lib/authContext";
 import { ClerkStaffAccountDirectory } from "./lib/clerkStaffAccount";
 import { decrypt } from "./lib/encryption";
 import { StaffSignInPasswordFactory } from "./lib/staffSignInPassword";
+import { signInEmailErrorClass } from "./staffSignInEmail";
 
 const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
 const CAN_PROVISION = new Set([...ADMIN_ROLES, "workforce_manager"]);
@@ -159,6 +160,23 @@ export const provisionStaffSignIn = action({
       }
     }
 
+    // Saved before and after the send, so a failed or lost email stays on the
+    // team row as "not sent" and a manager can send it again. Sending again
+    // is safe: the sign-in service replaces this person's pending invitation.
+    const attemptId = crypto.randomUUID();
+    const record = (
+      outcome: "started" | "succeeded" | "failed",
+      errorClass?: string,
+    ) =>
+      ctx.runMutation(internal.staffSignInEmail.recordSignInEmail, {
+        tenantId: person.tenantId,
+        personId,
+        attemptId,
+        outcome,
+        requestedBy: auth.id,
+        ...(errorClass ? { errorClass } : {}),
+      });
+    await record("started");
     let emailed: boolean;
     try {
       emailed = await directory.sendOrganizationInvitation({
@@ -166,7 +184,9 @@ export const provisionStaffSignIn = action({
         email: person.email,
         appUrl,
       });
+      await record("succeeded");
     } catch (error) {
+      await record("failed", signInEmailErrorClass(error));
       throw new ConvexError(
         error instanceof Error
           ? error.message
