@@ -60,6 +60,7 @@ import { enforceOneOnly } from "./oneOnlyRules";
 import { recordCommandAudit } from "./commandAudit";
 import { queueRouteRefresh } from "./routeFollowUp";
 import { queueTimingRecalculation } from "./timingFollowUp";
+import { queueAutoStage } from "./autoStageFollowUp";
 import { handleTravelLegEvent } from "./travelLegEvents";
 import { validateEventVehicleAssignment, validateRigLoadForLine } from "./eventRouteLegRead";
 import { assertSignInUnclaimed } from "./personAuthPick";
@@ -78,6 +79,7 @@ export async function handleManifestEvent(
   await enforceOneOnly(ctx, event);
   await queueRouteRefresh(ctx, event);
   await queueTimingRecalculation(ctx, event);
+  await queueAutoStage(ctx, event);
   // Pack lines follow every event fact that asks for equipment (spec §13.2).
   const packEventId = packFactEventId(event);
   if (packEventId) await reconcileEventPackRules(ctx, packEventId);

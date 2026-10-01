@@ -2564,6 +2564,7 @@ export const OrganizationSchema = z.object({
   timingLoadBaselineMinutes: z.number().int().nullable().optional(),
   timingLoadRulesJson: z.string().nullable().optional(),
   planningChecksJson: z.string().nullable().optional(),
+  stageMovesByHandJson: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -8905,6 +8906,13 @@ export const OrganizationConfigureRoutePolicyParamsSchema = z.object({
 });
 
 export type OrganizationConfigureRoutePolicyParams = z.infer<typeof OrganizationConfigureRoutePolicyParamsSchema>;
+
+// Command: configureStageMoves on Organization
+export const OrganizationConfigureStageMovesParamsSchema = z.object({
+  byHandJson: z.string().optional(),
+});
+
+export type OrganizationConfigureStageMovesParams = z.infer<typeof OrganizationConfigureStageMovesParamsSchema>;
 
 // Command: configureTimingPolicy on Organization
 export const OrganizationConfigureTimingPolicyParamsSchema = z.object({

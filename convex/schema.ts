@@ -2352,6 +2352,7 @@ export default defineSchema({
     timingLoadBaselineMinutes: v.optional(v.union(v.number(), v.null())),
     timingLoadRulesJson: v.optional(v.union(v.string(), v.null())),
     planningChecksJson: v.optional(v.union(v.string(), v.null())),
+    stageMovesByHandJson: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),
