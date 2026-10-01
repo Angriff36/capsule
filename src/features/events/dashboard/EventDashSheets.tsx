@@ -9,6 +9,7 @@ import { EventInvoiceCard } from "../EventInvoiceCard";
 import { EventMapPanel } from "../EventMapPanel";
 import { EventOverviewRail } from "../EventOverviewRail";
 import { EventReadinessCard } from "../EventReadinessCard";
+import { EventAutomaticWhyCard } from "../EventAutomaticWhyCard";
 import { EventSetupProgress } from "../EventSetupProgress";
 import { EventStageActionsCard } from "../EventStageActionsCard";
 import { EventTimelineCommentsPanel } from "../EventTimelineCommentsPanel";
@@ -144,6 +145,7 @@ export function EventDashSheetBody({
           <div className="evd-sheet-body">
             <EventSetupProgress eventId={eventId} event={event} />
             <EventReadinessCard eventId={eventId} />
+            <EventAutomaticWhyCard eventId={eventId} />
           </div>
         </>
       );
