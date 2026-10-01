@@ -35,7 +35,7 @@ describe("stable failure codes from real server messages", () => {
       "PROVIDER_ACTION_REQUIRED",
     ],
     [
-      "Reconcile dish editions and merges before reclassifying this dish",
+      "This dish has other versions or was merged with another dish. Sort those out first, then try again.",
       "RECONCILIATION_REQUIRED",
     ],
     [

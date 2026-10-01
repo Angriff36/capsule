@@ -102,8 +102,10 @@ function normalizeCommandError(error: unknown): NormalizedCommandError {
   const operation = raw.match(/mutations:([A-Za-z0-9_]+)/)?.[1];
   const requestId = raw.match(/\[Request ID:\s*([^\]]+)\]/i)?.[1];
   // WebCrypto failures arrive as OperationError, not Error — must not drop them.
+  // [ \t]* not \s*: an empty server message must stay empty, not borrow the
+  // first stack line below it.
   const uncaught = raw.match(
-    /Uncaught (?:DOMException|OperationError|Error):\s*([^\r\n]+)/i,
+    /Uncaught (?:DOMException|OperationError|Error):[ \t]*([^\r\n]*)/i,
   )?.[1];
   const argumentValidation = raw.match(
     /ArgumentValidationError:\s*([^\r\n]+)/i,
@@ -111,7 +113,12 @@ function normalizeCommandError(error: unknown): NormalizedCommandError {
   const schemaValidation = raw.match(
     /(?:DocumentDoesNotMatchSchema|does not match the schema):\s*([^\r\n]+)/i,
   )?.[1];
-  const detail = (uncaught ?? argumentValidation ?? schemaValidation ?? raw)
+  const detail = (
+    (uncaught?.trim() ? uncaught : undefined) ??
+    argumentValidation ??
+    schemaValidation ??
+    (uncaught !== undefined ? "" : raw)
+  )
     .replace(/^\[CONVEX [^\]]+\]\s*/, "")
     .replace(/\[Request ID:\s*[^\]]+\]\s*/gi, "")
     .replace(/^Server Error\s*/i, "")
@@ -185,7 +192,7 @@ function failureCode(
   )
     return "PROVIDER_ACTION_REQUIRED";
   if (
-    /^reconcile\b|\breconcile [^.]{0,60}\bbefore\b|until reviewed|review (it|this|them) first/i.test(
+    /^reconcile\b|\breconcile [^.]{0,60}\bbefore\b|until reviewed|review (it|this|them) first|sort (those|that|it|them) out first/i.test(
       detail,
     )
   )
@@ -311,14 +318,42 @@ function classifyWithoutCode(error: unknown): Omit<CommandFailure, "code"> {
     return {
       category: "guard_blocked",
       title: `${subject[0]?.toUpperCase() ?? "R"}${subject.slice(1)} wasn't created`,
-      detail: `The ${subject} could not be created because one of its requirements was not met. Nothing was saved.${requestId ? ` Request ID: ${requestId}.` : ""}`,
+      detail: `Something about this new ${subject}, or what it belongs to, isn't allowed right now. Nothing was saved. Check the details, then try again.`,
     };
   }
   if (/Guard \d+ failed|Invalid state transition/i.test(detail)) {
     return {
       category: "guard_blocked",
-      title: "Action could not be completed",
-      detail: `One of this action's requirements was not met. No changes were saved.${requestId ? ` Request ID: ${requestId}.` : ""}`,
+      title: "Not allowed right now",
+      detail:
+        "That change isn't allowed for this one right now. Nothing was saved. Check its details, then try again.",
+    };
+  }
+  if (/rate limit|retry after \d/i.test(detail)) {
+    return {
+      category: "unexpected",
+      title: "Too many at once",
+      detail:
+        "That was a lot of changes at once. Nothing is lost. Wait a few seconds, then try again.",
+    };
+  }
+  if (
+    /Validator error|ArgumentValidation|does not match the schema|Invalid argument/i.test(
+      detail,
+    )
+  ) {
+    return {
+      category: "validation",
+      title: "Check the entered details",
+      detail:
+        "One of the values isn't the right kind (for example a date where a number goes). Check what you entered, then try again.",
+    };
+  }
+  if (DENIED_TEXT.test(detail)) {
+    return {
+      category: "denied",
+      title: "You can't do this",
+      detail: `${sentence(detail)} Ask someone who can to make this change.`,
     };
   }
   if (
@@ -337,14 +372,32 @@ function classifyWithoutCode(error: unknown): Omit<CommandFailure, "code"> {
       category: "unexpected",
       title: "Action failed unexpectedly",
       detail: requestId
-        ? `This didn't go through, and no reason came back (Request ID: ${requestId}). Make sure you're signed in, refresh, and try again. If it keeps happening, send that request ID to the office.`
-        : "This didn't go through, and no reason came back. Refresh and try again.",
+        ? `Something went wrong on our side and nothing was saved. It is safe to refresh and try again. If it keeps happening, tell the office this code: ${requestId}.`
+        : "Something went wrong on our side and nothing was saved. It is safe to refresh and try again.",
       action: REFRESH_ACTION,
     };
   }
+  // A plain sentence written for people by the server: show it as it is,
+  // with the next step when the sentence does not already give one.
+  const text = sentence(detail);
+  const hasNextStep =
+    /\b(try again|use |add |give |pick |choose |lower |raise |turn |ask |sort |fill |set |change |remove |move |enter )/i.test(
+      text,
+    );
+  const nextStep = hasNextStep
+    ? ""
+    : /\bmissing\b|\bneeds?\b/i.test(text)
+      ? " Fill that in, then try again."
+      : " Nothing was saved. Fix that, then try again.";
   return {
     category: "unexpected",
-    title: "Action failed unexpectedly",
-    detail: requestId ? `${detail} (Request ID: ${requestId})` : detail,
+    title: "Couldn't save this",
+    detail: `${text}${nextStep}`,
   };
+}
+
+/** End a server sentence with a full stop. */
+function sentence(text: string): string {
+  const trimmed = text.trim();
+  return /[.!?]$/.test(trimmed) ? trimmed : `${trimmed}.`;
 }
