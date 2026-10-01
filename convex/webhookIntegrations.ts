@@ -8,6 +8,14 @@ import {
   query,
 } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
+import {
+  classifyDeliveryError,
+  DEFAULT_DELIVERY_POLICY,
+  isDue,
+  summarizeDelivery,
+  type DeliveryAttemptRow,
+  type DeliveryErrorClass,
+} from "./lib/deliveryState";
 import { decrypt, encrypt } from "./lib/encryption";
 
 // Outbound webhook integrations. Operators register HTTP endpoints that receive
@@ -88,18 +96,6 @@ export interface EndpointView {
   registeredBy: string;
 }
 
-export interface DeliveryView {
-  deliveryId: string;
-  endpointId: string;
-  endpointLabel: string;
-  eventType: string;
-  status: "succeeded" | "failed";
-  attempt: number;
-  httpStatus: number | null;
-  error: string | null;
-  deliveredAt: number;
-}
-
 interface EndpointLogRow {
   type: string;
   payload: unknown;
@@ -113,10 +109,18 @@ interface CandidateEvent {
   payload: unknown;
 }
 
+export interface DeliveryHistory {
+  key: string;
+  endpointId: string;
+  sourceEventId: string;
+  eventType: string;
+  occurredAt: number;
+  rows: DeliveryAttemptRow[];
+}
+
 interface DispatchContext {
   endpoints: EndpointRecord[];
-  succeededKeys: string[];
-  attemptCounts: Array<{ key: string; attempts: number }>;
+  history: DeliveryHistory[];
   successWatermarkByEndpoint: Array<{ endpointId: string; watermark: number }>;
   lastTickAt: number | null;
   currentChainId: string | null;
@@ -132,7 +136,7 @@ function canManage(role: string): boolean {
   );
 }
 
-function requireManager(role: string): void {
+export function requireManager(role: string): void {
   if (!canManage(role)) {
     throw new ConvexError(
       "Only an organization manager can configure outbound webhooks.",
@@ -247,7 +251,7 @@ function latestEndpointState(rows: EndpointLogRow[]): EndpointRecord | null {
   return null;
 }
 
-function activeEndpointsFor(
+export function activeEndpointsFor(
   rows: EndpointLogRow[],
   tenantId: string,
 ): EndpointRecord[] {
@@ -267,6 +271,79 @@ function activeEndpointsFor(
   }
   return endpoints;
 }
+
+export function deliveryKey(
+  endpointId: string,
+  sourceEventId: string,
+  eventType: string,
+): string {
+  return `${endpointId}:${sourceEventId}:${eventType}`;
+}
+
+const DELIVERY_ERROR_CLASSES = new Set<string>([
+  "timeout",
+  "throttled",
+  "not_authorized",
+  "not_found",
+  "rejected",
+  "provider_down",
+  "network",
+  "not_set_up",
+  "unknown",
+]);
+
+/** Group the tenant's webhook ledger rows into one history per delivery. */
+export function deliveryHistoryFor(
+  rows: ReadonlyArray<{ payload: unknown; createdAt: number }>,
+  tenantId: string,
+): DeliveryHistory[] {
+  const byKey = new Map<string, DeliveryHistory>();
+  for (const row of rows) {
+    const payload = asRecord(row.payload);
+    if (payload.tenantId !== tenantId) continue;
+    const endpointId = stringValue(payload.endpointId);
+    const sourceEventId = stringValue(payload.sourceEventId);
+    const eventType = stringValue(payload.eventType);
+    const status = stringValue(payload.status);
+    if (!endpointId || !sourceEventId || !eventType) continue;
+    if (
+      status !== "succeeded" &&
+      status !== "failed" &&
+      status !== "retry_requested"
+    ) {
+      continue;
+    }
+    const key = deliveryKey(endpointId, sourceEventId, eventType);
+    const entry = byKey.get(key) ?? {
+      key,
+      endpointId,
+      sourceEventId,
+      eventType,
+      occurredAt: numberValue(payload.occurredAt) ?? row.createdAt,
+      rows: [],
+    };
+    const httpStatus = numberValue(payload.httpStatus);
+    const storedClass = stringValue(payload.errorClass);
+    entry.rows.push({
+      outcome: status,
+      at: row.createdAt,
+      httpStatus,
+      errorClass:
+        status !== "failed"
+          ? null
+          : storedClass && DELIVERY_ERROR_CLASSES.has(storedClass)
+            ? (storedClass as DeliveryErrorClass)
+            : classifyDeliveryError({ httpStatus, networkFailure: true }),
+    });
+    byKey.set(key, entry);
+  }
+  return [...byKey.values()];
+}
+
+export const WEBHOOK_DELIVERY_POLICY = {
+  ...DEFAULT_DELIVERY_POLICY,
+  maxAttempts: MAX_ATTEMPTS,
+};
 
 export const getCatalog = query({
   args: {},
@@ -288,64 +365,6 @@ export const listEndpoints = query({
     return endpoints
       .map(toView)
       .sort((left, right) => left.registeredAt - right.registeredAt);
-  },
-});
-
-export const listDeliveries = query({
-  args: { limit: v.optional(v.number()) },
-  handler: async (ctx, args): Promise<DeliveryView[]> => {
-    const auth = await getAuthContext(ctx);
-    if (!auth.tenantId) return [];
-    const limit = Math.max(1, Math.min(50, args.limit ?? 20));
-    const [deliveryRows, endpointRows] = await Promise.all([
-      ctx.db
-        .query("manifestEvents")
-        .withIndex("by_entity", (q) => q.eq("entity", DELIVERY_ENTITY))
-        .order("desc")
-        .take(limit * 4),
-      ctx.db
-        .query("manifestEvents")
-        .withIndex("by_entity", (q) => q.eq("entity", ENDPOINT_ENTITY))
-        .collect(),
-    ]);
-    const labelByEndpoint = new Map<string, string>();
-    for (const row of endpointRows) {
-      const payload = asRecord(row.payload);
-      if (payload.tenantId !== auth.tenantId) continue;
-      const endpointId = stringValue(payload.endpointId);
-      if (!endpointId) continue;
-      if (
-        row.type === "WebhookEndpointRegistered" &&
-        !labelByEndpoint.has(endpointId)
-      ) {
-        const state = parseEndpoint(row.payload);
-        if (state) labelByEndpoint.set(endpointId, state.label || state.url);
-      }
-    }
-    const deliveries: DeliveryView[] = [];
-    for (const row of deliveryRows) {
-      const payload = asRecord(row.payload);
-      if (payload.tenantId !== auth.tenantId) continue;
-      const status = stringValue(payload.status);
-      if (status !== "succeeded" && status !== "failed") continue;
-      const endpointId = stringValue(payload.endpointId);
-      const eventType = stringValue(payload.eventType);
-      if (!endpointId || !eventType) continue;
-      deliveries.push({
-        deliveryId:
-          stringValue(payload.deliveryId) ?? `${endpointId}:${eventType}`,
-        endpointId,
-        endpointLabel: labelByEndpoint.get(endpointId) ?? endpointId,
-        eventType,
-        status,
-        attempt: numberValue(payload.attempt) ?? 1,
-        httpStatus: numberValue(payload.httpStatus),
-        error: stringValue(payload.error),
-        deliveredAt: row.createdAt,
-      });
-      if (deliveries.length >= limit) break;
-    }
-    return deliveries;
   },
 });
 
@@ -476,22 +495,25 @@ export const sendTest = action({
       tenantId,
     };
     const secret = await revealSecret(endpoint, ctx);
+    const sourceEventId = `test:${Date.now()}`;
     const result = await postToEndpoint(
       endpoint.url,
       payload,
       "WebhookTest",
       secret,
+      deliveryKey(args.endpointId, sourceEventId, "WebhookTest"),
     );
     await ctx.runMutation(internal.webhookIntegrations.recordDelivery, {
       tenantId,
       deliveryId: crypto.randomUUID(),
       endpointId: args.endpointId,
-      sourceEventId: `test:${Date.now()}`,
+      sourceEventId,
       eventType: "WebhookTest",
       status: result.ok ? "succeeded" : "failed",
       attempt: 1,
       httpStatus: result.httpStatus,
       error: result.error,
+      errorClass: result.errorClass ?? undefined,
       occurredAt: Date.now(),
       deliveredAt: Date.now(),
     });
@@ -557,6 +579,27 @@ export const loadCandidateEvents = internalQuery({
   },
 });
 
+export const loadSourceEvent = internalQuery({
+  args: {
+    tenantId: v.string(),
+    sourceEventId: v.string(),
+    eventType: v.string(),
+  },
+  handler: async (ctx, args): Promise<CandidateEvent | null> => {
+    const id = ctx.db.normalizeId("manifestEvents", args.sourceEventId);
+    if (!id) return null;
+    const row = await ctx.db.get(id);
+    if (!row || row.type !== args.eventType) return null;
+    if (asRecord(row.payload).tenantId !== args.tenantId) return null;
+    return {
+      sourceEventId: String(row._id),
+      eventType: row.type,
+      occurredAt: row.createdAt,
+      payload: row.payload,
+    };
+  },
+});
+
 export const loadDispatchContext = internalQuery({
   args: { tenantId: v.string() },
   handler: async (ctx, args): Promise<DispatchContext> => {
@@ -584,28 +627,17 @@ export const loadDispatchContext = internalQuery({
       args.tenantId,
     );
 
-    const attemptCounts = new Map<string, number>();
-    const succeededKeys: string[] = [];
+    const history = deliveryHistoryFor(deliveryRows, args.tenantId);
     const successWatermarkByEndpoint = new Map<string, number>();
-    for (const row of deliveryRows) {
-      const payload = asRecord(row.payload);
-      if (payload.tenantId !== args.tenantId) continue;
-      const endpointId = stringValue(payload.endpointId);
-      const sourceEventId = stringValue(payload.sourceEventId);
-      const eventType = stringValue(payload.eventType);
-      if (!endpointId || !sourceEventId || !eventType) continue;
-      const key = `${endpointId}:${sourceEventId}:${eventType}`;
-      const status = stringValue(payload.status);
-      if (status === "succeeded") {
-        succeededKeys.push(key);
-        const occurredAt = numberValue(payload.occurredAt) ?? row.createdAt;
-        successWatermarkByEndpoint.set(
-          endpointId,
-          Math.max(successWatermarkByEndpoint.get(endpointId) ?? 0, occurredAt),
-        );
-      } else {
-        attemptCounts.set(key, (attemptCounts.get(key) ?? 0) + 1);
-      }
+    for (const entry of history) {
+      if (!entry.rows.some((row) => row.outcome === "succeeded")) continue;
+      successWatermarkByEndpoint.set(
+        entry.endpointId,
+        Math.max(
+          successWatermarkByEndpoint.get(entry.endpointId) ?? 0,
+          entry.occurredAt,
+        ),
+      );
     }
 
     let lastTickAt: number | null = null;
@@ -623,11 +655,7 @@ export const loadDispatchContext = internalQuery({
 
     return {
       endpoints,
-      succeededKeys,
-      attemptCounts: [...attemptCounts.entries()].map(([key, attempts]) => ({
-        key,
-        attempts,
-      })),
+      history,
       successWatermarkByEndpoint: [...successWatermarkByEndpoint.entries()].map(
         ([endpointId, watermark]) => ({ endpointId, watermark }),
       ),
@@ -653,6 +681,7 @@ interface PostResult {
   ok: boolean;
   httpStatus: number | null;
   error: string | null;
+  errorClass: DeliveryErrorClass | null;
 }
 
 async function postToEndpoint(
@@ -660,15 +689,21 @@ async function postToEndpoint(
   payload: unknown,
   eventType: string,
   secret: string | null,
+  deliveryId: string,
 ): Promise<PostResult> {
   const body = JSON.stringify({
     eventType,
+    deliveryId,
     occurredAt: Date.now(),
     data: payload,
   });
+  // The delivery id is the same on every try of one event to one endpoint, so
+  // a receiver that got a send whose answer Capsule never saw can drop the
+  // repeat instead of acting twice.
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     "X-Capsule-Event": eventType,
+    "X-Capsule-Delivery-Id": deliveryId,
   };
   if (secret) {
     headers["X-Capsule-Signature"] = await signBody(body, secret);
@@ -682,21 +717,27 @@ async function postToEndpoint(
       body,
       signal: controller.signal,
     });
+    const ok = response.status >= 200 && response.status < 300;
     return {
-      ok: response.status >= 200 && response.status < 300,
+      ok,
       httpStatus: response.status,
-      error: response.ok ? null : `Endpoint returned ${response.status}.`,
+      error: ok ? null : `Endpoint returned ${response.status}.`,
+      errorClass: ok
+        ? null
+        : classifyDeliveryError({ httpStatus: response.status }),
     };
   } catch (cause) {
+    const timedOut =
+      cause instanceof DOMException && cause.name === "AbortError";
     return {
       ok: false,
       httpStatus: null,
-      error:
-        cause instanceof DOMException && cause.name === "AbortError"
-          ? "Endpoint timed out."
-          : cause instanceof Error
-            ? cause.message
-            : "Endpoint delivery failed.",
+      // Only fixed words: a fetch error message can repeat the URL and its
+      // query string, which may hold the receiver's token.
+      error: timedOut
+        ? "Endpoint timed out."
+        : "Endpoint could not be reached.",
+      errorClass: classifyDeliveryError({ timedOut, networkFailure: true }),
     };
   } finally {
     clearTimeout(timer);
@@ -771,6 +812,7 @@ export const recordDelivery = internalMutation({
     attempt: v.number(),
     httpStatus: v.union(v.number(), v.null()),
     error: v.union(v.string(), v.null()),
+    errorClass: v.optional(v.string()),
     occurredAt: v.number(),
     deliveredAt: v.number(),
   },
@@ -792,6 +834,7 @@ export const recordDelivery = internalMutation({
         attempt: args.attempt,
         httpStatus: args.httpStatus,
         error: args.error,
+        ...(args.errorClass ? { errorClass: args.errorClass } : {}),
         occurredAt: args.occurredAt,
       },
       createdAt: args.deliveredAt,
@@ -882,9 +925,8 @@ export const dispatchPending = internalAction({
       return { delivered: 0, attempted: 0 };
     }
 
-    const succeeded = new Set(context.succeededKeys);
-    const attemptCounts = new Map<string, number>(
-      context.attemptCounts.map((entry) => [entry.key, entry.attempts]),
+    const historyByKey = new Map(
+      context.history.map((entry) => [entry.key, entry]),
     );
     const successWatermarkByEndpoint = new Map<string, number>(
       context.successWatermarkByEndpoint.map((entry) => [
@@ -901,43 +943,83 @@ export const dispatchPending = internalAction({
         successWatermarkByEndpoint.get(endpoint.endpointId) ??
         endpoint.registeredAt;
       const secret = await revealSecret(endpoint, ctx);
+      const candidates: CandidateEvent[] = [];
       for (const eventType of endpoint.events) {
-        const candidates = await ctx.runQuery(
-          internal.webhookIntegrations.loadCandidateEvents,
-          { tenantId: args.tenantId, eventType, since },
+        candidates.push(
+          ...(await ctx.runQuery(
+            internal.webhookIntegrations.loadCandidateEvents,
+            { tenantId: args.tenantId, eventType, since },
+          )),
         );
-        for (const candidate of candidates) {
-          const key = `${endpoint.endpointId}:${candidate.sourceEventId}:${candidate.eventType}`;
-          if (succeeded.has(key)) continue;
-          const priorAttempts = attemptCounts.get(key) ?? 0;
-          if (priorAttempts >= MAX_ATTEMPTS) continue;
-          attempted += 1;
-          const result = await postToEndpoint(
-            endpoint.url,
-            candidate.payload,
+      }
+      // Failures older than the success watermark (a later event got through
+      // first) or reopened by a person's "Try again" are not in the window
+      // above; send them by id.
+      const seen = new Set(
+        candidates.map((candidate) =>
+          deliveryKey(
+            endpoint.endpointId,
+            candidate.sourceEventId,
             candidate.eventType,
-            secret,
-          );
-          await ctx.runMutation(internal.webhookIntegrations.recordDelivery, {
+          ),
+        ),
+      );
+      for (const entry of context.history) {
+        if (entry.endpointId !== endpoint.endpointId) continue;
+        if (seen.has(entry.key)) continue;
+        if (!endpoint.events.includes(entry.eventType)) continue;
+        const summary = summarizeDelivery(
+          entry.rows,
+          now,
+          WEBHOOK_DELIVERY_POLICY,
+        );
+        if (!isDue(summary, now)) continue;
+        const source = await ctx.runQuery(
+          internal.webhookIntegrations.loadSourceEvent,
+          {
             tenantId: args.tenantId,
-            deliveryId: crypto.randomUUID(),
-            endpointId: endpoint.endpointId,
-            sourceEventId: candidate.sourceEventId,
-            eventType: candidate.eventType,
-            status: result.ok ? "succeeded" : "failed",
-            attempt: priorAttempts + 1,
-            httpStatus: result.httpStatus,
-            error: result.error,
-            occurredAt: candidate.occurredAt,
-            deliveredAt: now,
-          });
-          if (result.ok) {
-            succeeded.add(key);
-            delivered += 1;
-          } else {
-            attemptCounts.set(key, priorAttempts + 1);
-          }
-        }
+            sourceEventId: entry.sourceEventId,
+            eventType: entry.eventType,
+          },
+        );
+        if (source) candidates.push(source);
+      }
+
+      for (const candidate of candidates) {
+        const key = deliveryKey(
+          endpoint.endpointId,
+          candidate.sourceEventId,
+          candidate.eventType,
+        );
+        const summary = summarizeDelivery(
+          historyByKey.get(key)?.rows ?? [],
+          now,
+          WEBHOOK_DELIVERY_POLICY,
+        );
+        if (!isDue(summary, now)) continue;
+        attempted += 1;
+        const result = await postToEndpoint(
+          endpoint.url,
+          candidate.payload,
+          candidate.eventType,
+          secret,
+          key,
+        );
+        await ctx.runMutation(internal.webhookIntegrations.recordDelivery, {
+          tenantId: args.tenantId,
+          deliveryId: crypto.randomUUID(),
+          endpointId: endpoint.endpointId,
+          sourceEventId: candidate.sourceEventId,
+          eventType: candidate.eventType,
+          status: result.ok ? "succeeded" : "failed",
+          attempt: summary.attemptCount + 1,
+          httpStatus: result.httpStatus,
+          error: result.error,
+          errorClass: result.errorClass ?? undefined,
+          occurredAt: candidate.occurredAt,
+          deliveredAt: now,
+        });
+        if (result.ok) delivered += 1;
       }
     }
 

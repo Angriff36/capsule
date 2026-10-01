@@ -1,4 +1,4 @@
-import { useAction, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { useState, type FormEvent } from "react";
 import { api } from "../../lib/api";
 import { EmptyState, ErrorState, Section, Skeleton } from "../../ui/primitives";
@@ -13,15 +13,38 @@ function formatWhen(value: number | null | undefined): string {
       }).format(value);
 }
 
+function deliveryStateLabel(delivery: {
+  state: string;
+  attemptCount: number;
+  maxAttempts: number;
+  nextRetryAt: number | null;
+}): string {
+  switch (delivery.state) {
+    case "delivered":
+      return "Delivered";
+    case "retryable_failed":
+      return `Will try again ${formatWhen(delivery.nextRetryAt)} (try ${delivery.attemptCount} of ${delivery.maxAttempts})`;
+    case "terminal_failed":
+      return `Stopped after ${delivery.attemptCount} ${delivery.attemptCount === 1 ? "try" : "tries"}`;
+    case "uncertain":
+      return "Not sure it arrived";
+    case "processing":
+      return "Sending";
+    default:
+      return "Waiting to send";
+  }
+}
+
 export function WebhooksSection({ canManage }: { canManage: boolean }) {
   const catalog = useQuery(api.webhookIntegrations.getCatalog, {});
   const endpoints = useQuery(api.webhookIntegrations.listEndpoints, {});
-  const deliveries = useQuery(api.webhookIntegrations.listDeliveries, {
+  const deliveries = useQuery(api.webhookDeliveries.listDeliveryStates, {
     limit: 12,
   });
   const registerEndpoint = useAction(api.webhookIntegrations.registerEndpoint);
   const removeEndpoint = useAction(api.webhookIntegrations.removeEndpoint);
   const sendTest = useAction(api.webhookIntegrations.sendTest);
+  const retryDelivery = useMutation(api.webhookDeliveries.retryDelivery);
 
   const [url, setUrl] = useState("");
   const [label, setLabel] = useState("");
@@ -107,6 +130,32 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "Test delivery failed.",
+      );
+    } finally {
+      setPendingId(null);
+    }
+  }
+
+  async function tryAgain(delivery: {
+    key: string;
+    endpointId: string;
+    sourceEventId: string;
+    eventType: string;
+  }) {
+    if (!canManage) return;
+    setPendingId(delivery.key);
+    setError(null);
+    setNotice(null);
+    try {
+      await retryDelivery({
+        endpointId: delivery.endpointId,
+        sourceEventId: delivery.sourceEventId,
+        eventType: delivery.eventType,
+      });
+      setNotice("Capsule will send it again within a minute.");
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "Could not send it again.",
       );
     } finally {
       setPendingId(null);
@@ -311,31 +360,47 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
             ) : (
               <ul className="mt-3 divide-y divide-line text-sm">
                 {deliveries.map((delivery) => (
-                  <li key={delivery.deliveryId} className="py-2">
+                  <li key={delivery.key} className="py-2">
                     <div className="flex items-center justify-between gap-3">
                       <span className="font-mono text-xs text-ink-3">
                         {delivery.eventType}
                       </span>
                       <span
                         className={
-                          delivery.status === "succeeded"
+                          delivery.state === "delivered"
                             ? "font-semibold text-ok"
-                            : "font-semibold text-danger"
+                            : delivery.state === "terminal_failed" ||
+                                delivery.state === "uncertain"
+                              ? "font-semibold text-danger"
+                              : "font-semibold text-ink-2"
                         }
                       >
-                        {delivery.status === "succeeded"
-                          ? "Delivered"
-                          : `Failed (attempt ${delivery.attempt})`}
+                        {deliveryStateLabel(delivery)}
                       </span>
                     </div>
                     <div className="mt-0.5 flex items-center justify-between gap-3 text-ink-3">
                       <span className="truncate">{delivery.endpointLabel}</span>
-                      <span>{formatWhen(delivery.deliveredAt)}</span>
+                      <span>{formatWhen(delivery.lastAttemptAt)}</span>
                     </div>
-                    {delivery.error ? (
+                    {delivery.problem && delivery.state !== "delivered" ? (
                       <p className="mt-0.5 text-xs text-danger">
-                        {delivery.error}
+                        {delivery.problem}
+                        {delivery.lastHttpStatus != null
+                          ? ` (code ${delivery.lastHttpStatus})`
+                          : ""}
                       </p>
+                    ) : null}
+                    {delivery.state === "terminal_failed" &&
+                    delivery.eventType !== "WebhookTest" &&
+                    delivery.endpointLabel !== "Removed endpoint" ? (
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm mt-1"
+                        disabled={!canManage || pendingId === delivery.key}
+                        onClick={() => void tryAgain(delivery)}
+                      >
+                        Try again
+                      </button>
                     ) : null}
                   </li>
                 ))}

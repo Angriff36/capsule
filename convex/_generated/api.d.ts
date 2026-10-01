@@ -88,6 +88,7 @@ import type * as lib_culinaryModel_tppImport from "../lib/culinaryModel/tppImpor
 import type * as lib_culinaryModel_units from "../lib/culinaryModel/units.js";
 import type * as lib_culinaryModel_unresolvedText from "../lib/culinaryModel/unresolvedText.js";
 import type * as lib_culinaryOperations from "../lib/culinaryOperations.js";
+import type * as lib_deliveryState from "../lib/deliveryState.js";
 import type * as lib_demandReconciliation from "../lib/demandReconciliation.js";
 import type * as lib_dishRecipeRepair from "../lib/dishRecipeRepair.js";
 import type * as lib_encryption from "../lib/encryption.js";
@@ -252,6 +253,7 @@ import type * as tppReports_general from "../tppReports/general.js";
 import type * as tppReports_options from "../tppReports/options.js";
 import type * as tppReports_shared from "../tppReports/shared.js";
 import type * as vehicleAssignment from "../vehicleAssignment.js";
+import type * as webhookDeliveries from "../webhookDeliveries.js";
 import type * as webhookIntegrations from "../webhookIntegrations.js";
 import type * as workforceScheduling from "../workforceScheduling.js";
 
@@ -342,6 +344,7 @@ declare const fullApi: ApiFromModules<{
   "lib/culinaryModel/units": typeof lib_culinaryModel_units;
   "lib/culinaryModel/unresolvedText": typeof lib_culinaryModel_unresolvedText;
   "lib/culinaryOperations": typeof lib_culinaryOperations;
+  "lib/deliveryState": typeof lib_deliveryState;
   "lib/demandReconciliation": typeof lib_demandReconciliation;
   "lib/dishRecipeRepair": typeof lib_dishRecipeRepair;
   "lib/encryption": typeof lib_encryption;
@@ -506,6 +509,7 @@ declare const fullApi: ApiFromModules<{
   "tppReports/options": typeof tppReports_options;
   "tppReports/shared": typeof tppReports_shared;
   vehicleAssignment: typeof vehicleAssignment;
+  webhookDeliveries: typeof webhookDeliveries;
   webhookIntegrations: typeof webhookIntegrations;
   workforceScheduling: typeof workforceScheduling;
 }>;
