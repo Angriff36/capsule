@@ -18,6 +18,7 @@ import { useRentalVendorChoices } from "../facilities/equipmentCheckout";
 import { ADD_NEW_CHOICE, findByName } from "../inventory/inlineCatalogChoice";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { rentalAvailability } from "../logistics/eventRequirements";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 type RentalRow = {
   _id: string;
@@ -433,11 +434,11 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
             </label>
             <label className="field-label">
               Drop-off by
-              <input name="deliverBy" className="input" type="datetime-local" />
+              <BoundedDateTimeLocalInput name="deliverBy" className="input" />
             </label>
             <label className="field-label">
               Pick-up
-              <input name="pickupAt" className="input" type="datetime-local" />
+              <BoundedDateTimeLocalInput name="pickupAt" className="input" />
             </label>
           </div>
           <div className="supply-row-actions">

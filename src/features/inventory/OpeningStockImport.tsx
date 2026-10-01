@@ -4,6 +4,7 @@ import { useState, type ChangeEvent } from "react";
 import { useImportStockFile } from "../facilities/openingStock";
 import { readOpeningStockRow } from "../../lib/openingStock";
 import { parseCsv } from "../../lib/tppMenuCsv";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const CHUNK_SIZE = 500;
 
@@ -88,8 +89,7 @@ export function OpeningStockImport() {
       <div className="flex flex-wrap items-end gap-3 p-4">
         <label className="field-label">
           Count date for rows with no date
-          <input
-            type="date"
+          <BoundedDateInput
             className="input"
             value={countDate}
             onChange={(event) => setCountDate(event.target.value)}

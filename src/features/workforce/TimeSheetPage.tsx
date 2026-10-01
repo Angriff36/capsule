@@ -33,7 +33,6 @@ import {
   persistClockOut,
   persistPrimaryTimeRecord,
   timeRecordLedgerState,
-  toEpoch,
   type TimeRecordLedgerRow,
 } from "./timeRecordEntry";
 import { useWorkingEventId } from "../events/workingEvent";
@@ -345,15 +344,16 @@ export function TimeSheetPage() {
     const data = new FormData(form);
     void run("clock-in", async () => {
       const personId = String(data.get("personId"));
+      // Match the shift at the typed clock-in time, not the moment of saving.
+      const typedIn = toEpoch(data.get("clockInAt"));
       await persistPrimaryTimeRecord(timeApi, {
         personId,
         eventId: String(data.get("eventId") || "") || undefined,
         notes: String(data.get("notes") || "") || undefined,
-        // Match the shift at the typed clock-in time, not the moment of saving.
         shift: currentShiftFor(
           personId,
           shifts,
-          toEpoch(data.get("clockInAt")) ?? Date.now(),
+          Number.isFinite(typedIn) ? typedIn : Date.now(),
         ),
         clockInAt: data.get("clockInAt"),
         clockOutAt: data.get("clockOutAt"),

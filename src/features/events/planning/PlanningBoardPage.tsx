@@ -65,6 +65,7 @@ import { eventDetailPath } from "../eventRoutes";
 import { FailureBanner } from "../FailureBanner";
 import { PlanningSchedule } from "./PlanningSchedule";
 import { usePlanSnapshot } from "./usePlanSnapshot";
+import { BoundedDateInput } from "../../../ui/BoundedDateInputs";
 import "./PlanningBoard.css";
 
 type View = "month" | "week" | "day" | "schedule";
@@ -822,8 +823,7 @@ export function PlanningBoardPage() {
                 </button>
               ))}
             </div>
-            <input
-              type="date"
+            <BoundedDateInput
               className="input w-auto"
               aria-label="Go to date"
               value={dateInputValue(anchor)}

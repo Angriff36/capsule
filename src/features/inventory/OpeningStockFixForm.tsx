@@ -8,6 +8,7 @@ import {
   type OpeningStockKind,
 } from "../../lib/openingStock";
 import { unitOptionsFor } from "../kitchen/import/UnitOfMeasureMapper";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 type Named = { _id: string; name: string };
 
@@ -181,8 +182,7 @@ export function OpeningStockFixForm({
       </label>
       <label className="field-label">
         Counted on
-        <input
-          type="date"
+        <BoundedDateInput
           className="input"
           value={asOf}
           onChange={(event) => setAsOf(event.target.value)}
