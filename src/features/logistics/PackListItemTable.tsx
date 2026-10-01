@@ -56,7 +56,14 @@ export interface PackListItemTableProps {
   onToggleItem: (id: string, on: boolean) => void;
   onToggleAll: (on: boolean) => void;
   selectableCount: number;
-  failedItem?: { id: string; message: string } | null;
+  failedItem?: {
+    id: string;
+    message: string;
+    /** What went wrong and what to do next, in plain words. */
+    detail?: string;
+    /** The row action that failed; the row offers it again in place. */
+    retryKey?: string | null;
+  } | null;
   /** View-specific line buttons (the truck-load view adds "Truck"). */
   extraActions?: (
     item: PackListItemRow,
@@ -180,6 +187,22 @@ export function PackListItemTable({
                 {failedItem?.id === item._id ? (
                   <small className="block text-danger" role="alert">
                     {failedItem.message}
+                    {failedItem.detail ? ` ${failedItem.detail}` : ""}
+                    {failedItem.retryKey ? (
+                      <>
+                        {" "}
+                        <button
+                          type="button"
+                          className="btn-link btn-link-compact"
+                          disabled={busy != null}
+                          onClick={() =>
+                            onInvokeItem(item, failedItem.retryKey!)
+                          }
+                        >
+                          Try again
+                        </button>
+                      </>
+                    ) : null}
                   </small>
                 ) : null}
               </td>

@@ -155,6 +155,8 @@ export function PackListDetailPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [failureItemId, setFailureItemId] = useState<string | null>(null);
+  // The row action that failed, so the row can offer "Try again" in place.
+  const [failureRetryKey, setFailureRetryKey] = useState<string | null>(null);
   const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
   const { loadingTooLong } = useSlowQuery(packList);
@@ -238,6 +240,7 @@ export function PackListDetailPage() {
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
     setFailureItemId(null);
+    setFailureRetryKey(null);
     setNotice(null);
     setBusy(key);
     try {
@@ -248,6 +251,9 @@ export function PackListDetailPage() {
       // error can render next to it, not only in the page-top banner (#118).
       setFailureItemId(
         key.includes(":") ? key.slice(0, key.indexOf(":")) : null,
+      );
+      setFailureRetryKey(
+        key.includes(":") ? key.slice(key.indexOf(":") + 1) : null,
       );
     } finally {
       setBusy(null);
@@ -1202,6 +1208,8 @@ export function PackListDetailPage() {
               ? {
                   id: failureItemId,
                   message: classifyCommandFailure(failure).title,
+                  detail: classifyCommandFailure(failure).detail,
+                  retryKey: failureRetryKey,
                 }
               : null
           }

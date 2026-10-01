@@ -33,6 +33,7 @@ import {
   persistClockOut,
   persistPrimaryTimeRecord,
   timeRecordLedgerState,
+  toEpoch,
   type TimeRecordLedgerRow,
 } from "./timeRecordEntry";
 import { useWorkingEventId } from "../events/workingEvent";
@@ -348,7 +349,12 @@ export function TimeSheetPage() {
         personId,
         eventId: String(data.get("eventId") || "") || undefined,
         notes: String(data.get("notes") || "") || undefined,
-        shift: currentShiftFor(personId, shifts),
+        // Match the shift at the typed clock-in time, not the moment of saving.
+        shift: currentShiftFor(
+          personId,
+          shifts,
+          toEpoch(data.get("clockInAt")) ?? Date.now(),
+        ),
         clockInAt: data.get("clockInAt"),
         clockOutAt: data.get("clockOutAt"),
       });
