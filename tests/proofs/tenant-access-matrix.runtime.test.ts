@@ -312,6 +312,7 @@ const LINK_TABLE: Record<string, string> = {
   sourceDishIngredientId: "dishIngredients",
   sourceEventId: "events",
   sourceImportRunId: "importRuns",
+  sourceRowsStorageId: "@file",
   sourceIngredientId: "ingredients",
   sourceInventoryItemId: "inventoryItems",
   sourceInvoiceId: "invoices",
