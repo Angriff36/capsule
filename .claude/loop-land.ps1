@@ -59,6 +59,20 @@ function Release($h, $reviewer) {
   else { Set-Content $pending $reviewer; Record $h 'RELEASE-FAIL' "production release did not pass: $(if ($result) { $result } else { ($rel -split "`n" | Select-Object -Last 3) -join ' | ' }) - see loop-land.log" }
 }
 
+function ReviewVerdict($text) {
+  # Only the reviewer's final VERDICT line counts, so error text quoted in its findings changes nothing.
+  # A reviewer whose shell would not start says NONE, or (older habit) REJECT with a final reason that
+  # opens "could not inspect / the diff could not be inspected" and names the shell or sandbox.
+  # That is no verdict on the change. Every other REJECT stays a REJECT.
+  $v = [regex]::Matches("$text", '(?m)^VERDICT: (APPROVE|REJECT|NONE)(.*)$') | Select-Object -Last 1
+  if (-not $v) { return $null }
+  $verdict = $v.Groups[1].Value; $reason = $v.Groups[2].Value.Trim(" -`r")
+  if ($verdict -eq 'REJECT' -and $reason -match '(?i)^(the )?((repository |repo )?(diff|change|changes|repository|repo) (could not|cannot|can''t|was not|were not) (be )?(inspected|read|reviewed)|(could not|cannot|can''t|unable to) (inspect|read|review|run git))' -and $reason -match '(?i)\b(shell|sandbox)\b') {
+    $verdict = 'NONE'
+  }
+  return @{ verdict = $verdict; reason = $reason }
+}
+
 function Review($wt, $target, $base = 'origin/main', $extra = '') {
   $prompt = @"
 You are the independent reviewer for an automated fix. In this directory run ``git diff $base HEAD --stat`` and then ``git diff $base HEAD`` (everything this change adds) (skip the bodies of .builder/, convex/_generated/, src/generated/ and schemas/ - only confirm those were regenerated, not hand-edited). Fix target: $target
@@ -67,23 +81,32 @@ $extra
 If the diff touches authored UI (src/app, src/features, src/ui, src/styles): DESIGN.md in this directory is the presentation authority for this repo. Read it, then compare these changes against it directly. (1) List every DESIGN.md rule the diff violates - quote the rule and point at the line that breaks it; check the front-matter colors, type faces, and radii against src/styles/app.css, and the Components, Do's and Don'ts, Responsive, and Accessibility sections against the markup. (2) Distinguish a usability improvement made WITHIN the established visual language from a REPLACEMENT of the visual language. (3) REJECT any replacement of the visual language that changes implementation only; a visual-language change is acceptable ONLY if this same diff also amends DESIGN.md to match and cites the owner's explicit approval. (4) Adding a token to design-contract-exceptions.json to make new work pass is a REJECT.
 On REJECT give numbered reasons with file and line, and say concretely what a passing fix must do - the maker's next attempt is built from your text.
 End your answer with exactly one line: VERDICT: APPROVE   or   VERDICT: REJECT - <main reason>
+If your shell or sandbox fails so you cannot run git diff and read the change, do not judge it: end instead with exactly one line: VERDICT: NONE - <the error>
 "@
   $out = Join-Path $wt '.loop-verdict.txt'
-  Remove-Item $out -Force -ErrorAction SilentlyContinue
-  # Ryan 2026-09-22: "I don't think it needs highest reasoning" - xhigh made each round take 20-40 minutes.
-  codex exec -s read-only -m gpt-5.6-sol -c model_reasoning_effort="high" -C $wt -o $out $prompt *> $null
+  # The Codex Windows sandbox can fail to start any shell (its "setup refresh" error). A review that could
+  # not read the change (ReviewVerdict says NONE): try Codex once more, then grok, judged the same way;
+  # if no reviewer can read it, it is NOREVIEW (kept, no strike).
   $reviewer = 'gpt-5.6-sol'
-  $text = if (Test-Path $out) { Get-Content $out -Raw } else { '' }
-  if ($text -notmatch '(?m)^VERDICT: (APPROVE|REJECT)') {
-    # Codex gave no verdict (quota / outage) - grok via Cursor CLI is also a different provider than the maker.
+  $r = $null
+  foreach ($try in 1..2) {
+    Remove-Item $out -Force -ErrorAction SilentlyContinue
+    # Ryan 2026-09-22: "I don't think it needs highest reasoning" - xhigh made each round take 20-40 minutes.
+    codex exec -s read-only -m gpt-5.6-sol -c model_reasoning_effort="high" -C $wt -o $out $prompt *> $null
+    $text = if (Test-Path $out) { Get-Content $out -Raw } else { '' }
+    $r = ReviewVerdict $text
+    if (-not $r -or $r.verdict -ne 'NONE') { break }
+    Say "gpt-5.6-sol could not read the change (try $try): $($r.reason)"
+  }
+  if (-not $r -or $r.verdict -eq 'NONE') {
+    # Codex gave no verdict (quota / outage / broken shell) - grok via Cursor CLI is also a different provider than the maker.
     $reviewer = 'cursor-grok-4.5-high-fast'
     $text = (& "$env:LOCALAPPDATA\cursor-agent\agent.ps1" -p --trust --model cursor-grok-4.5-high-fast --workspace $wt $prompt 2>$null) -join "`n"
+    $r = ReviewVerdict $text
   }
   Remove-Item $out -Force -ErrorAction SilentlyContinue
-  $m = [regex]::Matches($text, '(?m)^VERDICT: (APPROVE|REJECT)(.*)$')
-  if ($m.Count -eq 0) { return @{ reviewer = 'none'; verdict = 'NONE'; reason = 'no reviewer produced a verdict'; full = $text } }
-  $last = $m[$m.Count - 1]
-  return @{ reviewer = $reviewer; verdict = $last.Groups[1].Value; reason = $last.Groups[2].Value.Trim(' -'); full = $text }
+  if (-not $r -or $r.verdict -eq 'NONE') { return @{ reviewer = 'none'; verdict = 'NONE'; reason = 'no reviewer produced a verdict'; full = $text } }
+  return @{ reviewer = $reviewer; verdict = $r.verdict; reason = $r.reason; full = $text }
 }
 
 if (-not (Test-Path $handoffDir)) { exit 0 }

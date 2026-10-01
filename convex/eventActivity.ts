@@ -15,10 +15,12 @@
  */
 import { v } from "convex/values";
 import { api } from "./_generated/api";
+import type { Doc } from "./_generated/dataModel";
 import { query, type QueryCtx } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 
-const MAX_RECORDS = 200;
+/** Most day-of records of one kind read for one event. */
+const MAX_RECORDS = 1000;
 const MAX_ROWS = 250;
 
 const TEXT: Record<string, string> = {
@@ -173,6 +175,48 @@ async function personNameOf(
   return null;
 }
 
+/**
+ * The newest ledger rows across many records, newest first. Each record's
+ * rows are read newest first and merged one row at a time, so a record with
+ * a recent change is never left out because other records came first, and
+ * no more rows are read than are shown (plus one per record).
+ */
+async function newestAcross(
+  ctx: QueryCtx,
+  entityIds: string[],
+  limit: number,
+): Promise<{ rows: Doc<"manifestEvents">[]; more: boolean }> {
+  const streams = entityIds.map((entityId) =>
+    ctx.db
+      .query("manifestEvents")
+      .withIndex("by_entityId", (q) => q.eq("entityId", entityId))
+      .order("desc")
+      [Symbol.asyncIterator](),
+  );
+  const heads = await Promise.all(streams.map((stream) => stream.next()));
+  const rows: Doc<"manifestEvents">[] = [];
+  while (rows.length < limit) {
+    let best = -1;
+    for (let index = 0; index < heads.length; index += 1) {
+      const head = heads[index];
+      if (head.done) continue;
+      const top = best < 0 ? null : heads[best];
+      if (
+        !top ||
+        top.done ||
+        head.value._creationTime > top.value._creationTime
+      )
+        best = index;
+    }
+    if (best < 0) break;
+    const head = heads[best];
+    if (head.done) break;
+    rows.push(head.value);
+    heads[best] = await streams[best].next();
+  }
+  return { rows, more: heads.some((head) => !head.done) };
+}
+
 export const listEventActivity = query({
   args: { eventId: v.string() },
   handler: async (ctx, { eventId }) => {
@@ -190,7 +234,8 @@ export const listEventActivity = query({
     if (readable == null) return null;
     const tenantId = auth.tenantId;
 
-    // The event's day-of records, read by event and kept to this workspace.
+    // The event's day-of records, newest first (so a cut keeps the newest),
+    // read by event and kept to this workspace.
     const own = <T extends { tenantId: string }>(rows: T[]) =>
       rows.filter((row) => row.tenantId === tenantId);
     const byEvent = { eventId: id as never };
@@ -211,52 +256,79 @@ export const listEventActivity = query({
       ctx.db
         .query("eventAssignments")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
-        .collect(),
+        .order("desc")
+        .take(MAX_RECORDS),
       ctx.db
         .query("eventStaffNeeds")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
-        .collect(),
+        .order("desc")
+        .take(MAX_RECORDS),
       ctx.db
         .query("eventVehicleAssignments")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
-        .collect(),
+        .order("desc")
+        .take(MAX_RECORDS),
       ctx.db
         .query("vehicleTripChecks")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
-        .collect(),
+        .order("desc")
+        .take(MAX_RECORDS),
       ctx.db
         .query("packLists")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
-        .collect(),
+        .order("desc")
+        .take(MAX_RECORDS),
       ctx.db
         .query("equipmentReservations")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
-        .collect(),
+        .order("desc")
+        .take(MAX_RECORDS),
       ctx.db
         .query("deliveries")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
-        .collect(),
+        .order("desc")
+        .take(MAX_RECORDS),
       ctx.db
         .query("departureOverrides")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
-        .collect(),
+        .order("desc")
+        .take(MAX_RECORDS),
       ctx.db
         .query("planningOverrides")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
-        .collect(),
+        .order("desc")
+        .take(MAX_RECORDS),
       ctx.db
         .query("eventPlanNeeds")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
-        .collect(),
+        .order("desc")
+        .take(MAX_RECORDS),
       ctx.db
         .query("eventTasks")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
-        .collect(),
+        .order("desc")
+        .take(MAX_RECORDS),
       ctx.db
         .query("eventTimelineActivities")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
-        .collect(),
+        .order("desc")
+        .take(MAX_RECORDS),
     ]);
+    const kinds: Array<Array<{ _id: string; tenantId: string }>> = [
+      assignments,
+      needs,
+      rigs,
+      tripChecks,
+      packLists,
+      holds,
+      deliveries,
+      leaveReasons,
+      planReasons,
+      planNeeds,
+      tasks,
+      blocks,
+    ];
+    let cut = kinds.some((rows) => rows.length >= MAX_RECORDS);
 
     // Pack lines: only the ones somebody counted, marked or left off.
     const lists = own(packLists);
@@ -265,7 +337,9 @@ export const listEventActivity = query({
       const lines = await ctx.db
         .query("packListItems")
         .withIndex("by_packListId", (q) => q.eq("packListId", list._id))
-        .collect();
+        .order("desc")
+        .take(MAX_RECORDS);
+      if (lines.length >= MAX_RECORDS) cut = true;
       for (const line of lines) {
         if (line.tenantId !== tenantId) continue;
         if (
@@ -281,37 +355,10 @@ export const listEventActivity = query({
 
     const ids = [
       String(id),
-      ...[
-        own(assignments),
-        own(needs),
-        own(rigs),
-        own(tripChecks),
-        lists,
-        own(holds),
-        own(deliveries),
-        own(leaveReasons),
-        own(planReasons),
-        own(planNeeds),
-        own(tasks),
-        own(blocks),
-      ].flatMap((rows) => rows.map((row) => String(row._id))),
+      ...kinds.flatMap((rows) => own(rows).map((row) => String(row._id))),
       ...touched,
     ];
-    const truncated = ids.length > MAX_RECORDS;
-
-    const ledger = (
-      await Promise.all(
-        ids.slice(0, MAX_RECORDS).map((entityId) =>
-          ctx.db
-            .query("manifestEvents")
-            .withIndex("by_entityId", (q) => q.eq("entityId", entityId))
-            .collect(),
-        ),
-      )
-    ).flat();
-    const newest = ledger
-      .sort((a, b) => b.createdAt - a.createdAt)
-      .slice(0, MAX_ROWS);
+    const { rows: newest, more } = await newestAcross(ctx, ids, MAX_ROWS);
 
     const rows = await Promise.all(
       newest.map(async (row) => ({
@@ -323,6 +370,6 @@ export const listEventActivity = query({
         person: await personNameOf(ctx, tenantId, row.payload),
       })),
     );
-    return { rows, truncated: truncated || ledger.length > MAX_ROWS };
+    return { rows, truncated: cut || more };
   },
 });

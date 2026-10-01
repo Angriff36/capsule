@@ -326,6 +326,7 @@ const LINK_TABLE: Record<string, string> = {
   storageIds: "@file",
   subjectId: "clientContacts",
   substituteIngredientIds: "ingredients",
+  takenOverByPersonId: "people",
   targetDishComponentId: "dishComponents",
   targetDishContainerId: "dishContainers",
   targetDishId: "dishes",

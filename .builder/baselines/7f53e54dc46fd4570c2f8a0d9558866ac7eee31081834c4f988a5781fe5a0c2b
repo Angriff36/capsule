@@ -2724,6 +2724,8 @@ export const PackSectionClaimSchema = z.object({
   personName: z.string().optional().default(""),
   claimedAt: z.coerce.date().nullable().optional(),
   releasedAt: z.coerce.date().nullable().optional(),
+  takenOverByPersonId: z.string().uuid().nullable().optional(),
+  takenOverByName: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -9276,6 +9278,11 @@ export const PackSectionClaimTakeParamsSchema = z.object({
 });
 
 export type PackSectionClaimTakeParams = z.infer<typeof PackSectionClaimTakeParamsSchema>;
+
+// Command: takeOver on PackSectionClaim
+export const PackSectionClaimTakeOverParamsSchema = z.object({});
+
+export type PackSectionClaimTakeOverParams = z.infer<typeof PackSectionClaimTakeOverParamsSchema>;
 
 // Command: beginProcessing on Payment
 export const PaymentBeginProcessingParamsSchema = z.object({});

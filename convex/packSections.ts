@@ -1,8 +1,8 @@
 /**
  * AUTHOR SEAM — one packer for each section of a pack list.
  *
- * Taking a section gives back whoever had it and takes it for the caller in
- * one transaction, so a section is never left with nobody after a failed
+ * Taking a section ends whoever had it (their claim keeps who took it over)
+ * and takes it for the caller in one transaction, so a section is never left with nobody after a failed
  * take-over and never has two packers after two people press at the same
  * moment (the second press sees the first one's row and replaces it).
  * Both steps are the generated PackSectionClaim commands; their rules and
@@ -31,7 +31,7 @@ export const take = mutation({
         row.releasedAt == null,
     );
     for (const row of live)
-      await ctx.runMutation(api.mutations.PackSectionClaim_release, {
+      await ctx.runMutation(api.mutations.PackSectionClaim_takeOver, {
         docId: row._id,
       });
     await ctx.runMutation(api.mutations.PackSectionClaim_createViaTake, {

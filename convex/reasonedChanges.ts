@@ -70,6 +70,36 @@ export const assignPersonWithReason = mutation({
   },
 });
 
+/** Put a truck or trailer on an event with an open item, and keep why. */
+export const assignRigWithReason = mutation({
+  args: {
+    eventId: v.id("events"),
+    vehicleId: v.optional(v.id("vehicles")),
+    trailerId: v.optional(v.id("trailers")),
+    driverId: v.optional(v.id("people")),
+    action: v.string(),
+    ...reasonArgs,
+  },
+  handler: async (ctx, args): Promise<null> => {
+    await ctx.runMutation(
+      api.mutations.EventVehicleAssignment_createViaAssign,
+      {
+        eventId: args.eventId,
+        vehicleId: args.vehicleId,
+        trailerId: args.trailerId,
+        driverId: args.driverId,
+      },
+    );
+    await ctx.runMutation(api.mutations.PlanningOverride_createViaRecord, {
+      eventId: args.eventId,
+      action: args.action,
+      reason: args.reason,
+      openItems: args.openItems,
+    });
+    return null;
+  },
+});
+
 /**
  * Hold equipment for an event with an open item, and keep why. With
  * `bookOutOfService` the reason is also the manager's reason for booking a
@@ -132,6 +162,7 @@ export const acceptSuggestion = mutation({
     endsAt: v.optional(v.number()),
     /** The earlier answer this one replaces, when there is one. */
     receiptId: v.optional(v.id("planningReceipts")),
+    /** Required with receiptId: the version the board showed. */
     receiptVersion: v.optional(v.number()),
   },
   handler: async (ctx, args): Promise<null> => {
@@ -152,6 +183,19 @@ export const acceptSuggestion = mutation({
       throw new ConvexError(
         "Someone already answered this suggestion. The board shows the new answer.",
       );
+    if (args.receiptId) {
+      // The earlier answer must be this suggestion's, on this event, and
+      // still the one the board showed; checked before anything is added.
+      const receipt = answered.find((row) => row._id === args.receiptId);
+      if (!receipt)
+        throw new ConvexError(
+          "That earlier answer is not for this suggestion. Reload the board and try again.",
+        );
+      if (receipt.version !== args.receiptVersion)
+        throw new ConvexError(
+          "Someone changed this answer. The board shows the new answer.",
+        );
+    }
 
     if (args.kind === "equipment") {
       const equipmentId = ctx.db.normalizeId("equipments", args.target);

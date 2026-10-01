@@ -663,15 +663,24 @@ export function EventTodosTab({
                         className="btn btn-ghost btn-sm"
                         disabled={busy != null}
                         onClick={() =>
-                          void run(
-                            `${task._id}:remove`,
-                            () =>
-                              remove({
-                                docId: task._id,
-                                version: task.version,
-                              }),
-                            "To-do removed",
-                          )
+                          void (async () => {
+                            const confirmed = await prompt.askConfirm({
+                              title: "Remove this to-do",
+                              description: `"${task.title}" comes off this event's list.`,
+                              confirmLabel: "Remove",
+                              tone: "danger",
+                            });
+                            if (!confirmed) return;
+                            await run(
+                              `${task._id}:remove`,
+                              () =>
+                                remove({
+                                  docId: task._id,
+                                  version: task.version,
+                                }),
+                              "To-do removed",
+                            );
+                          })()
                         }
                       >
                         Remove
