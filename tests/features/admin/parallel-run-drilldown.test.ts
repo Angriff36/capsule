@@ -4,11 +4,16 @@
 // Convex is mocked at the hook layer; the comparison itself, the saved
 // assignment and the next day's clear/reopen are proven at runtime in
 // tests/proofs/parallel-run-comparison.runtime.test.ts.
+// When the scratch folder .artifacts/llm-review exists, the rendered list and
+// period result are written there for the AC-632 llm-review judgment.
+import { existsSync, writeFileSync } from "node:fs";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ParallelRunDifferences } from "../../../src/features/admin/import/ParallelRunDifferences";
+import { ParallelRunPeriodCheck } from "../../../src/features/admin/import/ParallelRunPeriodCheck";
+import { newSummary } from "../../../src/lib/parallelRunCompare";
 import type { ParallelRunDifferenceRow } from "../../../convex/parallelRun";
 
 (
@@ -185,5 +190,69 @@ describe("parallel run drill-down (AC-286)", () => {
       field: "stage",
       note: "TPP keeps its own stages",
     });
+  });
+
+  it("a failed period check says each reason in plain words", async () => {
+    const summary = newSummary(
+      new Date(2025, 0, 1).getTime(),
+      new Date(2025, 11, 31).getTime(),
+    );
+    summary.tpp.events = 212;
+    summary.tpp.revenue = 1048200;
+    summary.capsule.events = 213;
+    summary.capsule.revenue = 1048250;
+    const verdict = {
+      passed: false,
+      reasons: [
+        "1 Capsule event(s) in this period are not in TPP. Check for doubles or wrong dates.",
+        "Prices differ by $50.00 in total (allowed: 1 cent per event).",
+        "2 difference(s) for events in this period are not settled yet.",
+      ],
+    };
+    await act(async () =>
+      root.render(
+        createElement(
+          MemoryRouter,
+          null,
+          createElement(ParallelRunDifferences, {
+            differences: [
+              row("d-stage", "stage"),
+              row("d-price", "price", {
+                sourceValue: "$5000.00",
+                capsuleValue: "$4500.00",
+                assignedToPersonId: "person-kim",
+              }),
+              row("d-style", "service_style", {
+                status: "accepted",
+                sourceValue: "plated",
+                capsuleValue: "Buffet",
+                resolutionNote: "TPP had the old style",
+              }),
+            ],
+            total: 3,
+          }),
+          createElement(ParallelRunPeriodCheck, {
+            last: {
+              comparedAt: Date.now(),
+              from: summary.windowStart,
+              to: summary.windowEnd!,
+              verdict,
+              summary,
+            },
+          }),
+        ),
+      ),
+    );
+    expect(container.textContent).toContain("Does not agree yet");
+    for (const reason of verdict.reasons) {
+      expect(container.textContent).toContain(reason);
+    }
+    expect(container.textContent).not.toMatch(/\b(tenant|null|undefined)\b/);
+    if (existsSync(".artifacts/llm-review")) {
+      writeFileSync(
+        ".artifacts/llm-review/AC-632-rendered.html",
+        container.innerHTML,
+      );
+    }
   });
 });
