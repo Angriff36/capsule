@@ -19,6 +19,8 @@ import { readCurrentPacket } from "./lib/eventPacket/reconcileNative";
 import { readFinalLockInput } from "./lib/eventPacket/finalLockInput";
 import { evaluateFinalLock } from "../src/lib/eventPacket/finalLock/evaluate";
 import { readEventRouteStatus } from "./eventRoutes";
+import { canRead } from "./search";
+import { hasManagementAccess } from "./lib/eventPacket/commands";
 
 const live = (row: { deletedAt?: unknown }) => row.deletedAt == null;
 
@@ -225,6 +227,34 @@ export const getEventReadiness = query({
       reconciliationFlags,
     };
 
-    return projectEventReadiness(facts);
+    // Same read rules as each record's own list read (AC-637): every issue
+    // stays visible, but a record id the caller could not open is left out.
+    const unreadable = new Set<string>();
+    const hide = (rows: any[], allowed: boolean) => {
+      if (!allowed) for (const row of rows) unreadable.add(String(row._id));
+    };
+    hide(prepTasks, canRead(auth, ["kitchenAccess", "manageAccess"]));
+    hide(purchaseNeeds, canRead(auth, ["inventoryAccess", "manageAccess"]));
+    hide(packLists, canRead(auth, ["staffAccess"]));
+    hide(deliveries, canRead(auth, ["logisticsAccess", "manageAccess"]));
+    hide(eventCloseouts, canRead(auth, ["financeAccess", "eventManageAccess"]));
+    hide(invoices, canRead(auth, ["financeAccess", "manageAccess"]));
+    hide(proposals, canRead(auth, ["salesAccess"]));
+    const packetAllowed = hasManagementAccess(auth);
+    hide(eventPacketIssues, packetAllowed);
+    hide(packetRevisions, packetAllowed);
+
+    const projection = projectEventReadiness(facts);
+    if (unreadable.size === 0) return projection;
+    return {
+      ...projection,
+      domains: projection.domains.map((domain) => ({
+        ...domain,
+        issues: domain.issues.map((issue) => ({
+          ...issue,
+          affectedIds: issue.affectedIds.filter((id) => !unreadable.has(id)),
+        })),
+      })),
+    };
   },
 });
