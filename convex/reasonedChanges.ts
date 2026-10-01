@@ -162,6 +162,7 @@ export const acceptSuggestion = mutation({
     endsAt: v.optional(v.number()),
     /** The earlier answer this one replaces, when there is one. */
     receiptId: v.optional(v.id("planningReceipts")),
+    /** Required with receiptId: the version the board showed. */
     receiptVersion: v.optional(v.number()),
   },
   handler: async (ctx, args): Promise<null> => {
@@ -190,11 +191,7 @@ export const acceptSuggestion = mutation({
         throw new ConvexError(
           "That earlier answer is not for this suggestion. Reload the board and try again.",
         );
-      if (
-        args.receiptVersion != null &&
-        receipt.version != null &&
-        receipt.version !== args.receiptVersion
-      )
+      if (receipt.version !== args.receiptVersion)
         throw new ConvexError(
           "Someone changed this answer. The board shows the new answer.",
         );

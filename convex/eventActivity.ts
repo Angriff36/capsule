@@ -234,7 +234,8 @@ export const listEventActivity = query({
     if (readable == null) return null;
     const tenantId = auth.tenantId;
 
-    // The event's day-of records, read by event and kept to this workspace.
+    // The event's day-of records, newest first (so a cut keeps the newest),
+    // read by event and kept to this workspace.
     const own = <T extends { tenantId: string }>(rows: T[]) =>
       rows.filter((row) => row.tenantId === tenantId);
     const byEvent = { eventId: id as never };
@@ -255,50 +256,62 @@ export const listEventActivity = query({
       ctx.db
         .query("eventAssignments")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
+        .order("desc")
         .take(MAX_RECORDS),
       ctx.db
         .query("eventStaffNeeds")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
+        .order("desc")
         .take(MAX_RECORDS),
       ctx.db
         .query("eventVehicleAssignments")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
+        .order("desc")
         .take(MAX_RECORDS),
       ctx.db
         .query("vehicleTripChecks")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
+        .order("desc")
         .take(MAX_RECORDS),
       ctx.db
         .query("packLists")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
+        .order("desc")
         .take(MAX_RECORDS),
       ctx.db
         .query("equipmentReservations")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
+        .order("desc")
         .take(MAX_RECORDS),
       ctx.db
         .query("deliveries")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
+        .order("desc")
         .take(MAX_RECORDS),
       ctx.db
         .query("departureOverrides")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
+        .order("desc")
         .take(MAX_RECORDS),
       ctx.db
         .query("planningOverrides")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
+        .order("desc")
         .take(MAX_RECORDS),
       ctx.db
         .query("eventPlanNeeds")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
+        .order("desc")
         .take(MAX_RECORDS),
       ctx.db
         .query("eventTasks")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
+        .order("desc")
         .take(MAX_RECORDS),
       ctx.db
         .query("eventTimelineActivities")
         .withIndex("by_eventId", (q) => q.eq("eventId", byEvent.eventId))
+        .order("desc")
         .take(MAX_RECORDS),
     ]);
     const kinds: Array<Array<{ _id: string; tenantId: string }>> = [
@@ -324,6 +337,7 @@ export const listEventActivity = query({
       const lines = await ctx.db
         .query("packListItems")
         .withIndex("by_packListId", (q) => q.eq("packListId", list._id))
+        .order("desc")
         .take(MAX_RECORDS);
       if (lines.length >= MAX_RECORDS) cut = true;
       for (const line of lines) {

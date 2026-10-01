@@ -4,9 +4,10 @@
  *   (on two runs or in the shop) are saved together with the reason, both or
  *   neither;
  * - event history keeps the newest change when the event has more than 200
- *   records;
+ *   records, and past 1,000 records keeps the newest and says it is cut;
  * - a retired checklist cannot be put on an event;
- * - a planning answer from another event cannot be rewritten;
+ * - a planning answer from another event cannot be rewritten, nor one
+ *   answered again without the version the board showed;
  * - only the packer gives a section back; "Take over" keeps who took it.
  * Synthetic workspace.
  */
@@ -140,6 +141,84 @@ describe("event-day review fixes", () => {
     ).toBe(true);
     const times = history.rows.map((row) => row.at);
     expect(times).toEqual([...times].sort((a, b) => b - a));
+  });
+
+  it("keeps the newest record's change and says the history is cut past 1,000 records", async () => {
+    const { t, owner, event } = await timingWorld();
+    // 1,000 older to-dos, then one new one: the read keeps the newest 1,000.
+    await t.run(async (ctx) => {
+      for (let index = 0; index < 1000; index += 1)
+        await ctx.db.insert("eventTasks", {
+          tenantId: TIMING_TENANT,
+          eventId: event,
+          title: `Old to-do ${index + 1}`,
+          priority: "medium",
+          status: "open",
+          version: 1,
+        });
+    });
+    const newest = (
+      (await owner.mutation(M.EventTask_createViaAdd, {
+        eventId: event,
+        title: "Newest proof to-do",
+      })) as { docId: Id<"eventTasks"> }
+    ).docId;
+    await owner.mutation(M.EventTask_start, { docId: newest });
+
+    const history = (await owner.query(api.eventActivity.listEventActivity, {
+      eventId: event,
+    }))!;
+    expect(history.truncated).toBe(true);
+    expect(history.rows[0].type).toBe("EventTaskStarted");
+    expect(
+      history.rows.some(
+        (row) =>
+          row.type === "EventTaskAdded" &&
+          row.detail?.includes("Newest proof to-do"),
+      ),
+    ).toBe(true);
+  });
+
+  it("refuses to answer again without the version the board showed, or with an old one", async () => {
+    const { t, owner, event } = await timingWorld();
+    const receipt = (
+      (await owner.mutation(M.PlanningReceipt_createViaRecord, {
+        eventId: event,
+        suggestionKey: "task:ice",
+        quantity: 0,
+        declined: true,
+      })) as { docId: Id<"planningReceipts"> }
+    ).docId;
+    const stored = await t.run(async (ctx) => ctx.db.get(receipt));
+    const accept = (receiptVersion?: number) =>
+      owner.mutation(api.reasonedChanges.acceptSuggestion, {
+        eventId: event,
+        suggestionKey: "task:ice",
+        kind: "task",
+        target: "Ice",
+        add: 1,
+        wanted: 1,
+        receiptId: receipt,
+        receiptVersion,
+      });
+
+    expect(await refused(() => accept())).toBe(true);
+    expect(await refused(() => accept(stored!.version + 1))).toBe(true);
+    const after = await t.run(async (ctx) => ({
+      tasks: (await ctx.db.query("eventTasks").collect()).length,
+      receipt: await ctx.db.get(receipt),
+    }));
+    expect(after.tasks).toBe(0);
+    expect(after.receipt?.declined).toBe(true);
+    expect(after.receipt?.version).toBe(stored!.version);
+
+    await accept(stored!.version);
+    const taken = await t.run(async (ctx) => ({
+      tasks: (await ctx.db.query("eventTasks").collect()).length,
+      receipt: await ctx.db.get(receipt),
+    }));
+    expect(taken.tasks).toBe(1);
+    expect(taken.receipt?.declined).toBe(false);
   });
 
   it("refuses a retired checklist, even from a page that still shows it", async () => {
