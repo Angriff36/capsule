@@ -2476,8 +2476,8 @@ const COMMAND_DISPATCH = {
   },
   "PackListItem.recordLoaded": {
     ref: api.mutations.PackListItem_recordLoaded,
-    params: ["docId","loadedQuantity","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"loadedQuantity","type":"decimal","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","loadedQuantity","loadAssignmentId","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"loadedQuantity","type":"decimal","required":true},{"name":"loadAssignmentId","type":"uuid","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "PackListItem.recordPackedCount": {
     ref: api.mutations.PackListItem_recordPackedCount,

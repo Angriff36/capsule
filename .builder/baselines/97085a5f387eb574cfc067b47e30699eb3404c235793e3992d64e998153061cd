@@ -38818,7 +38818,7 @@ export const PackListItem_recordChecked = mutation({
   },
 });
 
-async function __runPackListItemRecordLoaded(ctx: MutationCtx, { docId, loadedQuantity, version }: any, __creation = false) {
+async function __runPackListItemRecordLoaded(ctx: MutationCtx, { docId, loadedQuantity, loadAssignmentId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -38839,14 +38839,15 @@ async function __runPackListItemRecordLoaded(ctx: MutationCtx, { docId, loadedQu
     }
     const updates = {
       loadedQuantity: loadedQuantity,
+      loadAssignmentId: ((loadAssignmentId != null) ? loadAssignmentId : doc.loadAssignmentId),
       lineLoadedAt: Date.now(),
       lineLoadedByPersonId: user.personId,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, packListItemId: docId, tenantId: __after.tenantId, packListId: __after.packListId, loadedQuantity: loadedQuantity, _subject: { entity: "PackListItem", command: "recordLoaded", id: docId } };
-    const __manifestEvent0 = { type: "PackListItemLoaded", entity: "PackListItem", entityId: docId, payload: { packListItemId: docId, tenantId: __after.tenantId, packListId: __after.packListId, loadedQuantity: loadedQuantity }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, packListItemId: docId, tenantId: __after.tenantId, packListId: __after.packListId, loadedQuantity: loadedQuantity, loadAssignmentId: loadAssignmentId, _subject: { entity: "PackListItem", command: "recordLoaded", id: docId } };
+    const __manifestEvent0 = { type: "PackListItemLoaded", entity: "PackListItem", entityId: docId, payload: { packListItemId: docId, tenantId: __after.tenantId, packListId: __after.packListId, loadedQuantity: loadedQuantity, loadAssignmentId: loadAssignmentId }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "recordLoaded", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -38856,6 +38857,7 @@ export const PackListItem_recordLoaded = mutation({
   args: {
     docId: v.id("packListItems"),
     loadedQuantity: v.number(),
+    loadAssignmentId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },

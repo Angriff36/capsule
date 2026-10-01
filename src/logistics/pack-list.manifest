@@ -923,8 +923,11 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   }
 
   // How much of this line is on the truck. Zero is kept: it says nothing of
-  // this line went out, which is not the same as "not counted".
-  command recordLoaded(loadedQuantity: decimal(12, 4)) {
+  // this line went out, which is not the same as "not counted". A truck given
+  // here puts the line on that truck in the same step (the scan's "Truck being
+  // loaded"); left out, the line keeps the truck it has. The seam
+  // (convex/lib/operationalEvents.ts) checks the truck is on the event.
+  command recordLoaded(loadedQuantity: decimal(12, 4), optional loadAssignmentId: uuid) {
     guard self.deletedAt == null and self.listedAt != null
     guard self.packList != null and self.packList.status != "cancelled"
     constraint loadedNotNegative: loadedQuantity >= 0 "The loaded amount can't be negative. Use zero or more."
@@ -932,6 +935,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     // A saved return count stays true: what went out can't drop below it.
     constraint loadedCoversReturn: self.returnCountedAt == null or loadedQuantity >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
     mutate loadedQuantity = loadedQuantity
+    mutate loadAssignmentId = loadAssignmentId != null ? loadAssignmentId : self.loadAssignmentId
     mutate lineLoadedAt = now()
     mutate lineLoadedByPersonId = user.personId
     emit PackListItemLoaded {
@@ -939,6 +943,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       packListId: self.packListId
       loadedQuantity: loadedQuantity
+      loadAssignmentId: loadAssignmentId
     }
   }
 
@@ -1203,6 +1208,7 @@ event PackListItemLoaded: "pack_list_item.loaded" {
   tenantId: string
   packListId: string
   loadedQuantity: decimal(12, 4)
+  loadAssignmentId: string?
 }
 
 event PackListItemReturnCounted: "pack_list_item.return_counted" {

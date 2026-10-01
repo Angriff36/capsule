@@ -152,10 +152,17 @@ export function PackScanPanel({
           `${name}: checked ${change.checkedQuantity} of ${line.packedQuantity}`,
         );
       } else if (change.step === "load") {
-        await recordLoaded({ ...args, loadedQuantity: change.loadedQuantity });
+        // The picked truck is saved with the count, so a line on no truck
+        // yet is put on the one being loaded.
+        await recordLoaded({
+          ...args,
+          loadedQuantity: change.loadedQuantity,
+          loadAssignmentId: truckId || undefined,
+        });
+        const truck = rigs.find((rig) => rig.id === truckId)?.label;
         say(
           true,
-          `${name}: ${change.loadedQuantity} of ${line.packedQuantity} on the truck`,
+          `${name}: ${change.loadedQuantity} of ${line.packedQuantity} on ${truck ?? "the truck"}`,
         );
       } else {
         await recordReturn({
