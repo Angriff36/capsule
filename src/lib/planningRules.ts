@@ -130,7 +130,7 @@ export type RuleReceipt = {
 };
 
 export type PlanSuggestion = {
-  /** Stable for one event: the rule and the line in it, or the part. */
+  /** Stable for one event: the rule and what its line asks for, or the part. */
   key: string;
   kind: RuleActionKind;
   target: string;
@@ -230,8 +230,15 @@ export function suggestionsForEvent(input: SuggestionInput): PlanSuggestion[] {
       rule.trigger === "every_event"
         ? `${rule.name}: ${input.guests} guests`
         : `${rule.name}: ${units} on the event, ${input.guests} guests`;
-    parseRuleActions(rule.actionsJson).forEach((action, index) => {
-      const key = `rule:${rule._id}:${index}`;
+    // A line is known by what it asks for, not by where it sits: changing
+    // its kind or target makes a new suggestion, so an old answer or to-do
+    // never stands in for it. A second line asking the same thing counts on.
+    const seen = new Map<string, number>();
+    parseRuleActions(rule.actionsJson).forEach((action) => {
+      const meaning = `${action.kind}:${encodeURIComponent(action.target.toLowerCase())}`;
+      const nth = (seen.get(meaning) ?? 0) + 1;
+      seen.set(meaning, nth);
+      const key = `rule:${rule._id}:${meaning}${nth > 1 ? `:${nth}` : ""}`;
       const wanted = Math.ceil(
         action.base +
           action.perGuest * input.guests +
