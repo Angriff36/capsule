@@ -296,6 +296,7 @@ import {
   EventUpdateTaskBreakdownParamsSchema,
   EventUseCompanyTimingRuleParamsSchema,
   EventVehicleAssignmentAssignParamsSchema,
+  EventVehicleAssignmentAttachTrailerParamsSchema,
   EventVehicleAssignmentClearPreloadedParamsSchema,
   EventVehicleAssignmentMarkPreloadedParamsSchema,
   EventVehicleAssignmentPlanLegParamsSchema,
@@ -5052,6 +5053,16 @@ export function useEventVehicleAssignmentAssign() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventVehicleAssignmentAssignParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventVehicleAssignment.attachTrailer. */
+export function useEventVehicleAssignmentAttachTrailer() {
+  const mutate = useMutation(api.mutations.EventVehicleAssignment_attachTrailer);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventVehicleAssignmentAttachTrailerParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -13173,4 +13184,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1395 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1396 as const;

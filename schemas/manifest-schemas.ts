@@ -7428,6 +7428,14 @@ export const EventVehicleAssignmentAssignParamsSchema = z.object({
 
 export type EventVehicleAssignmentAssignParams = z.infer<typeof EventVehicleAssignmentAssignParamsSchema>;
 
+// Command: attachTrailer on EventVehicleAssignment
+export const EventVehicleAssignmentAttachTrailerParamsSchema = z.object({
+  trailerId: z.string().min(1),
+  bookedTwiceReason: z.string().optional(),
+});
+
+export type EventVehicleAssignmentAttachTrailerParams = z.infer<typeof EventVehicleAssignmentAttachTrailerParamsSchema>;
+
 // Command: clearPreloaded on EventVehicleAssignment
 export const EventVehicleAssignmentClearPreloadedParamsSchema = z.object({});
 

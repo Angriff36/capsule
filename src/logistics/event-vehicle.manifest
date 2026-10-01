@@ -12,10 +12,11 @@
 // already in the vehicle. Rows stay correctable up to and during the event:
 // trucks break down and drivers call out.
 //
-// A rig's truck, trailer and driver are set when the row is made and never
-// patched: an update command cannot check a NEW id against the caller's
-// workspace (relations read the saved row). To change one, the tracker attaches
-// the corrected rig and releases the old one.
+// A rig's truck and driver are set when the row is made. To change one, the
+// tracker attaches the corrected rig and releases the old one. A trailer can
+// be hitched to a rig already on the event (attachTrailer): the generated
+// command checks the new trailer id against the caller's workspace, and the
+// rig keeps its riders, its loaded pack lines and its preload record.
 
 use "../foundation/base.manifest"
 
@@ -182,6 +183,28 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
       eventVehicleAssignmentId: self.id
       tenantId: self.tenantId
       eventId: self.eventId
+    }
+  }
+
+  // Hitch a trailer to this truck's run. The same checks as a new rig run
+  // again (trailer in service, fits the truck, not on another run at the same
+  // time unless a reason is given), and the crew's times are planned again.
+  command attachTrailer(trailerId: uuid, optional bookedTwiceReason: string) {
+    guard self.assignedAt != null
+    guard self.releasedAt == null
+    guard self.deletedAt == null
+    guard self.activeEventId != null
+    constraint attachTrailerHasTruck: self.vehicleId != null "Pick a truck on this event to pull the trailer."
+    constraint attachTrailerFree: self.trailerId == null "This truck already pulls a trailer. Take that trailer off first."
+    mutate trailerId = trailerId
+    mutate bookedTwiceReason = bookedTwiceReason != null and length(trim(bookedTwiceReason)) > 0 ? trim(bookedTwiceReason) : self.bookedTwiceReason
+    emit EventVehicleAssigned {
+      eventVehicleAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      vehicleId: self.vehicleId
+      trailerId: trailerId
+      driverId: self.driverId
     }
   }
 
