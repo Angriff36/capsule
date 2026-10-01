@@ -67,21 +67,33 @@ $extra
 If the diff touches authored UI (src/app, src/features, src/ui, src/styles): DESIGN.md in this directory is the presentation authority for this repo. Read it, then compare these changes against it directly. (1) List every DESIGN.md rule the diff violates - quote the rule and point at the line that breaks it; check the front-matter colors, type faces, and radii against src/styles/app.css, and the Components, Do's and Don'ts, Responsive, and Accessibility sections against the markup. (2) Distinguish a usability improvement made WITHIN the established visual language from a REPLACEMENT of the visual language. (3) REJECT any replacement of the visual language that changes implementation only; a visual-language change is acceptable ONLY if this same diff also amends DESIGN.md to match and cites the owner's explicit approval. (4) Adding a token to design-contract-exceptions.json to make new work pass is a REJECT.
 On REJECT give numbered reasons with file and line, and say concretely what a passing fix must do - the maker's next attempt is built from your text.
 End your answer with exactly one line: VERDICT: APPROVE   or   VERDICT: REJECT - <main reason>
+If your shell or sandbox fails so you cannot run git diff and read the change, do not judge it: end instead with exactly one line: VERDICT: NONE - <the error>
 "@
   $out = Join-Path $wt '.loop-verdict.txt'
-  Remove-Item $out -Force -ErrorAction SilentlyContinue
-  # Ryan 2026-09-22: "I don't think it needs highest reasoning" - xhigh made each round take 20-40 minutes.
-  codex exec -s read-only -m gpt-5.6-sol -c model_reasoning_effort="high" -C $wt -o $out $prompt *> $null
+  # The Codex Windows sandbox can fail to start any shell (its "setup refresh" error). The reviewer then
+  # cannot read the change and has still written "VERDICT: REJECT". That is no verdict on the change:
+  # try Codex once more, then grok; if no reviewer can read it, it is NOREVIEW (kept, no strike).
+  # The phrases are split so this file's own diff, quoted in a review, never matches them.
+  $toolFault = '(?i)setup refresh had ' + 'errors|helper_unknown' + '_error|shell failed before ' + 'process creation'
   $reviewer = 'gpt-5.6-sol'
-  $text = if (Test-Path $out) { Get-Content $out -Raw } else { '' }
-  if ($text -notmatch '(?m)^VERDICT: (APPROVE|REJECT)') {
-    # Codex gave no verdict (quota / outage) - grok via Cursor CLI is also a different provider than the maker.
+  foreach ($try in 1..2) {
+    Remove-Item $out -Force -ErrorAction SilentlyContinue
+    # Ryan 2026-09-22: "I don't think it needs highest reasoning" - xhigh made each round take 20-40 minutes.
+    codex exec -s read-only -m gpt-5.6-sol -c model_reasoning_effort="high" -C $wt -o $out $prompt *> $null
+    $text = if (Test-Path $out) { Get-Content $out -Raw } else { '' }
+    $v = [regex]::Matches("$text", '(?m)^VERDICT: (APPROVE|REJECT|NONE)') | Select-Object -Last 1
+    $couldNotRead = $v -and ($v.Groups[1].Value -eq 'NONE' -or ($v.Groups[1].Value -eq 'REJECT' -and $text -match $toolFault))
+    if (-not $couldNotRead) { break }
+    Say "gpt-5.6-sol could not read the change (try $try): $($v.Value)"
+  }
+  if (-not $v -or $couldNotRead) {
+    # Codex gave no verdict (quota / outage / broken shell) - grok via Cursor CLI is also a different provider than the maker.
     $reviewer = 'cursor-grok-4.5-high-fast'
     $text = (& "$env:LOCALAPPDATA\cursor-agent\agent.ps1" -p --trust --model cursor-grok-4.5-high-fast --workspace $wt $prompt 2>$null) -join "`n"
   }
   Remove-Item $out -Force -ErrorAction SilentlyContinue
-  $m = [regex]::Matches($text, '(?m)^VERDICT: (APPROVE|REJECT)(.*)$')
-  if ($m.Count -eq 0) { return @{ reviewer = 'none'; verdict = 'NONE'; reason = 'no reviewer produced a verdict'; full = $text } }
+  $m = [regex]::Matches("$text", '(?m)^VERDICT: (APPROVE|REJECT|NONE)(.*)$')
+  if ($m.Count -eq 0 -or $m[$m.Count - 1].Groups[1].Value -eq 'NONE') { return @{ reviewer = 'none'; verdict = 'NONE'; reason = 'no reviewer produced a verdict'; full = $text } }
   $last = $m[$m.Count - 1]
   return @{ reviewer = $reviewer; verdict = $last.Groups[1].Value; reason = $last.Groups[2].Value.Trim(' -'); full = $text }
 }
