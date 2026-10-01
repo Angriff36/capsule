@@ -189,12 +189,59 @@ export interface SideTotals {
 
 export interface ComparisonSummary {
   windowStart: number;
+  /** Last moment included; null = no end (the daily check). */
+  windowEnd?: number | null;
   tpp: SideTotals;
   capsule: SideTotals;
   /** TPP events in the window with no Capsule event yet. */
   onlyInTpp: number;
   /** Capsule events in the window TPP does not have (made in Capsule). */
   onlyInCapsule: number;
+  /** Set on a period check (test year, full history), with its verdict. */
+  period?: { from: number; to: number; verdict: ReconcileVerdict };
+}
+
+export interface ReconcileVerdict {
+  passed: boolean;
+  /** Plain words for each tolerance the period misses. */
+  reasons: string[];
+}
+
+/**
+ * The documented tolerances (codex-plans/production-readiness-next/
+ * migration-reconciliation.md): no TPP event without its Capsule event, no
+ * Capsule-only event, money within one cent per event, no open difference.
+ */
+export function reconcileVerdict(
+  summary: ComparisonSummary,
+  openInWindow: number,
+): ReconcileVerdict {
+  const reasons: string[] = [];
+  if (summary.onlyInTpp > 0) {
+    reasons.push(
+      `${summary.onlyInTpp} TPP event(s) have no Capsule event yet. Finish them on the match-up page.`,
+    );
+  }
+  if (summary.onlyInCapsule > 0) {
+    reasons.push(
+      `${summary.onlyInCapsule} Capsule event(s) in this period are not in TPP. Check for doubles or wrong dates.`,
+    );
+  }
+  const centsOff = Math.abs(
+    Math.round(summary.capsule.revenue * 100) -
+      Math.round(summary.tpp.revenue * 100),
+  );
+  if (centsOff > summary.tpp.events) {
+    reasons.push(
+      `Prices differ by $${(centsOff / 100).toFixed(2)} in total (allowed: 1 cent per event).`,
+    );
+  }
+  if (openInWindow > 0) {
+    reasons.push(
+      `${openInWindow} difference(s) for events in this period are not settled yet.`,
+    );
+  }
+  return { passed: reasons.length === 0, reasons };
 }
 
 function emptyTotals(): SideTotals {
@@ -245,9 +292,13 @@ export function addCapsuleEvent(totals: SideTotals, event: CapsuleEventSide) {
   bump(totals.byVenue, slug(event.venueName) || NOT_SET);
 }
 
-export function newSummary(windowStart: number): ComparisonSummary {
+export function newSummary(
+  windowStart: number,
+  windowEnd: number | null = null,
+): ComparisonSummary {
   return {
     windowStart,
+    windowEnd,
     tpp: emptyTotals(),
     capsule: emptyTotals(),
     onlyInTpp: 0,

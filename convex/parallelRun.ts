@@ -14,6 +14,7 @@ import {
   mutation,
   query,
   type MutationCtx,
+  type QueryCtx,
 } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
 import { insertStepEvent } from "./lib/commandAudit";
@@ -25,6 +26,7 @@ import {
   compareEventPair,
   newSummary,
   nextDifferenceStatus,
+  reconcileVerdict,
   tppEventFromRaw,
   type CapsuleEventSide,
   type ComparisonSummary,
@@ -71,12 +73,15 @@ async function runComparison(
   ctx: MutationCtx,
   tenantId: string,
   now: number,
+  window: { from: number; to: number | null },
 ): Promise<{
   summary: ComparisonSummary;
   comparedCount: number;
   openCount: number;
   newCount: number;
   clearedCount: number;
+  /** Differences still open for events inside the window. */
+  openInWindow: number;
 }> {
   const links = (
     await ctx.db
@@ -110,8 +115,9 @@ async function runComparison(
     venue: (tppId) => venueByTpp.get(tppId),
   };
 
-  const windowStart = now - WINDOW_MS;
-  const summary = newSummary(windowStart);
+  const inWindow = (at: number) =>
+    at >= window.from && (window.to == null || at <= window.to);
+  const summary = newSummary(window.from, window.to);
   const found = new Map<
     string,
     {
@@ -127,7 +133,7 @@ async function runComparison(
     if (link.recordType !== "event") continue;
     if (link.capsuleId) linkedEventIds.add(link.capsuleId);
     const tpp = tppEventFromRaw(link.rawSourceData);
-    if (!tpp || tpp.startsAt == null || tpp.startsAt < windowStart) continue;
+    if (!tpp || tpp.startsAt == null || !inWindow(tpp.startsAt)) continue;
     addTppEvent(summary.tpp, tpp, lookups);
     if (!link.capsuleId) {
       // Still on the match-up page; nothing to compare yet.
@@ -154,7 +160,7 @@ async function runComparison(
     .collect();
   for (const event of events) {
     if (event.deletedAt != null) continue;
-    if (event.startsAt == null || event.startsAt < windowStart) continue;
+    if (event.startsAt == null || !inWindow(event.startsAt)) continue;
     addCapsuleEvent(summary.capsule, await capsuleSide(ctx, tenantId, event));
     if (!linkedEventIds.has(String(event._id))) summary.onlyInCapsule += 1;
   }
@@ -167,6 +173,7 @@ async function runComparison(
   ).filter((row) => row.deletedAt == null);
   let newCount = 0;
   let clearedCount = 0;
+  let openInWindow = 0;
   const seen = new Set<string>();
   for (const row of saved) {
     const key = `${row.externalRecordLinkId}|${row.field}`;
@@ -182,6 +189,7 @@ async function runComparison(
         today.mine === row.capsuleValue,
       today != null,
     );
+    if (today && status === "open") openInWindow += 1;
     if (status === "cleared" && row.status === "cleared") continue;
     if (status === "cleared") clearedCount += 1;
     const reopened = status === "open" && row.status !== "open";
@@ -220,6 +228,7 @@ async function runComparison(
       version: 0,
     });
     newCount += 1;
+    openInWindow += 1;
   }
   const openCount = (
     await ctx.db
@@ -233,15 +242,28 @@ async function runComparison(
     openCount,
     newCount,
     clearedCount,
+    openInWindow,
   };
 }
 
-async function newestComparison(ctx: MutationCtx, tenantId: string) {
-  return await ctx.db
+function isPeriodCheck(row: Doc<"parallelRunComparisons">): boolean {
+  try {
+    return (
+      (JSON.parse(row.summary ?? "{}") as ComparisonSummary).period != null
+    );
+  } catch {
+    return false;
+  }
+}
+
+/** The newest daily comparison (a period check is not one). */
+async function newestComparison(ctx: QueryCtx, tenantId: string) {
+  const rows = await ctx.db
     .query("parallelRunComparisons")
     .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
     .order("desc")
-    .first();
+    .take(50);
+  return rows.find((row) => !isPeriodCheck(row)) ?? null;
 }
 
 /**
@@ -254,7 +276,10 @@ export const compareTenant = internalMutation({
     const now = Date.now();
     const decision = await cutoverDecisionOf(ctx.db, tenantId);
     const switched = decision?.status === "go";
-    const result = await runComparison(ctx, tenantId, now);
+    const result = await runComparison(ctx, tenantId, now, {
+      from: now - WINDOW_MS,
+      to: null,
+    });
     let nextRunAt: number | null = null;
     if (book && !switched) {
       nextRunAt = now + DAY_MS;
@@ -391,6 +416,68 @@ export interface ParallelRunDifferenceRow {
   lastSeenAt: number | null;
 }
 
+function readSummary(
+  row: Doc<"parallelRunComparisons"> | null,
+): ComparisonSummary | null {
+  if (!row?.summary) return null;
+  try {
+    return JSON.parse(row.summary) as ComparisonSummary;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Check one period (the test year, then the whole history) against the
+ * documented tolerances. Its differences join the same list, so people
+ * settle them the same way; the result is kept as a comparison row.
+ */
+export const reconcilePeriod = mutation({
+  args: { from: v.number(), to: v.number() },
+  handler: async (ctx, { from, to }) => {
+    const auth = await getAuthContext(ctx);
+    const tenantId = requireTenant(auth);
+    requireImportAccess(auth);
+    if (!(to > from)) {
+      throw new ConvexError("The last day must come after the first day.");
+    }
+    const now = Date.now();
+    const result = await runComparison(ctx, tenantId, now, { from, to });
+    const verdict = reconcileVerdict(result.summary, result.openInWindow);
+    const summary: ComparisonSummary = {
+      ...result.summary,
+      period: { from, to, verdict },
+    };
+    const id = await ctx.db.insert("parallelRunComparisons", {
+      tenantId,
+      comparedAt: now,
+      comparedCount: result.comparedCount,
+      openCount: result.openCount,
+      newCount: result.newCount,
+      clearedCount: result.clearedCount,
+      summary: JSON.stringify(summary),
+      nextRunAt: null,
+      createdAt: now,
+      updatedAt: now,
+      version: 0,
+    });
+    await insertStepEvent(ctx, {
+      type: "parallel_run.period_checked",
+      entity: "ParallelRunComparison",
+      entityId: String(id),
+      payload: {
+        parallelRunComparisonId: String(id),
+        tenantId,
+        from,
+        to,
+        passed: verdict.passed,
+      },
+      createdAt: now,
+    });
+    return { comparisonId: id, verdict, summary };
+  },
+});
+
 /** The newest comparison and every difference not cleared yet. */
 export const overview = query({
   args: {},
@@ -398,11 +485,14 @@ export const overview = query({
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
     if (!canRead(auth, ["importAccess"])) return null;
-    const newest = await ctx.db
-      .query("parallelRunComparisons")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .order("desc")
-      .first();
+    const newest = await newestComparison(ctx, tenantId);
+    const lastPeriod = (
+      await ctx.db
+        .query("parallelRunComparisons")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .order("desc")
+        .take(50)
+    ).find(isPeriodCheck);
     const rows = (
       await ctx.db
         .query("parallelRunDifferences")
@@ -458,15 +548,19 @@ export const overview = query({
         lastSeenAt: row.lastSeenAt ?? null,
       });
     }
-    let summary: ComparisonSummary | null = null;
-    if (newest?.summary) {
-      try {
-        summary = JSON.parse(newest.summary) as ComparisonSummary;
-      } catch {
-        summary = null;
-      }
-    }
+    const summary = readSummary(newest);
+    const periodSummary = readSummary(lastPeriod ?? null);
     return {
+      periodCheck:
+        lastPeriod && periodSummary?.period
+          ? {
+              comparedAt: lastPeriod.comparedAt,
+              from: periodSummary.period.from,
+              to: periodSummary.period.to,
+              verdict: periodSummary.period.verdict,
+              summary: periodSummary,
+            }
+          : null,
       comparison: newest
         ? {
             comparedAt: newest.comparedAt,

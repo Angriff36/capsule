@@ -20,6 +20,7 @@ import { Link } from "react-router-dom";
 import { importRunDetailPath } from "./importRoutes";
 import { eventDetailPath } from "../../../features/events/eventRoutes";
 import { ParallelRunDifferences } from "./ParallelRunDifferences";
+import { ParallelRunPeriodCheck } from "./ParallelRunPeriodCheck";
 import { useActionFailure } from "../../../ui/action-result";
 import { classifyCommandFailure } from "../../events/CommandFailure";
 import { FailureBanner } from "../../events/FailureBanner";
@@ -535,6 +536,7 @@ export function ParallelRunDashboardPage() {
               total={overview.totalDifferences}
             />
           )}
+          {overview && <ParallelRunPeriodCheck last={overview.periodCheck} />}
 
           {/* Menu catalog comparison */}
           <section className="working-ledger mt-6">
