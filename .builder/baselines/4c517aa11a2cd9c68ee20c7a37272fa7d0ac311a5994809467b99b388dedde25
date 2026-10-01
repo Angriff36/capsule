@@ -1476,8 +1476,8 @@ const COMMAND_DISPATCH = {
   },
   "EventVehicleAssignment.assign": {
     ref: api.mutations.EventVehicleAssignment_createViaAssign,
-    params: ["eventId","vehicleId","trailerId","driverId","notes","preloaded","vendorName","arriveBeforeServeMinutes","loadMinutes","leaveAfterMinutes","loadingZone","idempotencyKey"] as const,
-    paramMeta: [{"name":"eventId","type":"uuid","required":true},{"name":"vehicleId","type":"uuid","required":false},{"name":"trailerId","type":"uuid","required":false},{"name":"driverId","type":"uuid","required":false},{"name":"notes","type":"string","required":false},{"name":"preloaded","type":"boolean","required":false},{"name":"vendorName","type":"string","required":false},{"name":"arriveBeforeServeMinutes","type":"float","required":false},{"name":"loadMinutes","type":"float","required":false},{"name":"leaveAfterMinutes","type":"float","required":false},{"name":"loadingZone","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["eventId","vehicleId","trailerId","driverId","notes","preloaded","vendorName","arriveBeforeServeMinutes","loadMinutes","leaveAfterMinutes","loadingZone","bookedTwiceReason","idempotencyKey"] as const,
+    paramMeta: [{"name":"eventId","type":"uuid","required":true},{"name":"vehicleId","type":"uuid","required":false},{"name":"trailerId","type":"uuid","required":false},{"name":"driverId","type":"uuid","required":false},{"name":"notes","type":"string","required":false},{"name":"preloaded","type":"boolean","required":false},{"name":"vendorName","type":"string","required":false},{"name":"arriveBeforeServeMinutes","type":"float","required":false},{"name":"loadMinutes","type":"float","required":false},{"name":"leaveAfterMinutes","type":"float","required":false},{"name":"loadingZone","type":"string","required":false},{"name":"bookedTwiceReason","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "EventVehicleAssignment.clearPreloaded": {
     ref: api.mutations.EventVehicleAssignment_clearPreloaded,

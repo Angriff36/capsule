@@ -7,8 +7,9 @@
  * trailer, and releases the old one, in one transaction:
  * - the old rig is released first, so the new one is not refused as the
  *   same truck on two runs at once;
- * - the crew riding the old rig and the pack lines loaded on it move to the
- *   new one, so nobody is left riding a released truck;
+ * - the crew still on the event riding the old rig, and the pack lines
+ *   loaded on it, move to the new one, and the crew's times are planned
+ *   again for it;
  * - a reason for a "fix first" item is kept in the same save;
  * - when any step is refused, nothing is kept.
  * Releasing and making the rig, and moving pack lines, are the generated
@@ -21,6 +22,7 @@ import { api } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { mutation } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
+import { reconcileEventStaffing } from "./lib/eventStaffingOperations";
 
 export const hitchTrailer = mutation({
   args: {
@@ -66,11 +68,22 @@ export const hitchTrailer = mutation({
         loadMinutes: rig.loadMinutes ?? undefined,
         leaveAfterMinutes: rig.leaveAfterMinutes ?? undefined,
         loadingZone: rig.loadingZone ?? undefined,
+        // A reason given on the board lets a trailer that is on another run
+        // at the same time through; the old rig's own reason carries over.
+        bookedTwiceReason:
+          args.reason?.trim() || rig.bookedTwiceReason?.trim() || undefined,
       },
     )) as { docId: string };
     const newRigId = made.docId as Id<"eventVehicleAssignments">;
     const now = Date.now();
 
+    // Only people still on the event ride the new rig; an unassigned,
+    // no-show or cancelled row keeps the rig it had, as history.
+    const riding = {
+      eventAssignments: ["assigned", "confirmed", "checked_in"],
+      eventStaffNeeds: ["open", "claimed", "filled"],
+    } as const;
+    let moved = false;
     for (const table of ["eventAssignments", "eventStaffNeeds"] as const) {
       const riders = await ctx.db
         .query(table)
@@ -79,13 +92,24 @@ export const hitchTrailer = mutation({
         )
         .collect();
       for (const row of riders)
-        if (row.tenantId === tenantId && row.deletedAt == null)
+        if (
+          row.tenantId === tenantId &&
+          row.deletedAt == null &&
+          (riding[table] as readonly string[]).includes(String(row.status))
+        ) {
           await ctx.db.patch(row._id, {
             rideVehicleAssignmentId: newRigId,
             updatedAt: now,
             version: (row.version ?? 0) + 1,
           });
+          moved = true;
+        }
     }
+    // The crew's times follow the truck they ride: plan them again now that
+    // the riders are on the new rig, as a travel choice does.
+    const event = await ctx.db.get(rig.eventId);
+    if (moved && event && event.stage !== "cancelled")
+      await reconcileEventStaffing(ctx, rig.eventId);
 
     const loaded = await ctx.db
       .query("packListItems")

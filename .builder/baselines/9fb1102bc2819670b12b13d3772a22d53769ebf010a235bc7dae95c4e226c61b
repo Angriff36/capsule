@@ -24015,7 +24015,7 @@ export const EventTimelineComment_remove = mutation({
   },
 });
 
-async function __runEventVehicleAssignmentAssign(ctx: MutationCtx, { docId, eventId, vehicleId, trailerId, driverId, notes, preloaded, vendorName, arriveBeforeServeMinutes, loadMinutes, leaveAfterMinutes, loadingZone, version }: any, __creation = false) {
+async function __runEventVehicleAssignmentAssign(ctx: MutationCtx, { docId, eventId, vehicleId, trailerId, driverId, notes, preloaded, vendorName, arriveBeforeServeMinutes, loadMinutes, leaveAfterMinutes, loadingZone, bookedTwiceReason, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -24057,6 +24057,7 @@ async function __runEventVehicleAssignmentAssign(ctx: MutationCtx, { docId, even
       loadMinutes: loadMinutes,
       leaveAfterMinutes: leaveAfterMinutes,
       loadingZone: loadingZone,
+      bookedTwiceReason: (((bookedTwiceReason != null) && (((bookedTwiceReason).trim()).length > 0)) ? (bookedTwiceReason).trim() : null),
       preloadedAt: ((preloaded === true) ? Date.now() : null),
       preloadedByPersonId: ((preloaded === true) ? user.personId : null),
       assignedAt: Date.now(),
@@ -24085,6 +24086,7 @@ export const EventVehicleAssignment_assign = mutation({
     loadMinutes: v.optional(v.number()),
     leaveAfterMinutes: v.optional(v.number()),
     loadingZone: v.optional(v.string()),
+    bookedTwiceReason: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -24117,6 +24119,7 @@ export const EventVehicleAssignment_createViaAssign = mutation({
     loadMinutes: v.optional(v.number()),
     leaveAfterMinutes: v.optional(v.number()),
     loadingZone: v.optional(v.string()),
+    bookedTwiceReason: v.optional(v.string()),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -24129,12 +24132,13 @@ export const EventVehicleAssignment_createViaAssign = mutation({
     await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"},{"name":"vehicleId","table":"vehicles"},{"name":"trailerId","table":"trailers"},{"name":"driverId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { eventId, vehicleId, trailerId, driverId, notes, preloaded, vendorName, arriveBeforeServeMinutes, loadMinutes, leaveAfterMinutes, loadingZone } = args;
+    const { eventId, vehicleId, trailerId, driverId, notes, preloaded, vendorName, arriveBeforeServeMinutes, loadMinutes, leaveAfterMinutes, loadingZone, bookedTwiceReason } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
       arriveBeforeServeMinutes: args.arriveBeforeServeMinutes,
+      bookedTwiceReason: args.bookedTwiceReason,
       driverId: args.driverId,
       eventId: args.eventId,
       leaveAfterMinutes: args.leaveAfterMinutes,
@@ -24177,6 +24181,7 @@ export const EventVehicleAssignment_createViaAssign = mutation({
     doc.loadMinutes = loadMinutes;
     doc.leaveAfterMinutes = leaveAfterMinutes;
     doc.loadingZone = loadingZone;
+    doc.bookedTwiceReason = (((bookedTwiceReason != null) && (((bookedTwiceReason).trim()).length > 0)) ? (bookedTwiceReason).trim() : null);
     doc.preloadedAt = ((preloaded === true) ? Date.now() : null);
     doc.preloadedByPersonId = ((preloaded === true) ? user.personId : null);
     doc.assignedAt = Date.now();

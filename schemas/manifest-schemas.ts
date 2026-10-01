@@ -1666,6 +1666,7 @@ export const EventVehicleAssignmentSchema = z.object({
   loadMinutes: z.number().nullable().optional(),
   leaveAfterMinutes: z.number().nullable().optional(),
   loadingZone: z.string().nullable().optional(),
+  bookedTwiceReason: z.string().nullable().optional(),
   preloadedByPersonId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
@@ -7422,6 +7423,7 @@ export const EventVehicleAssignmentAssignParamsSchema = z.object({
   loadMinutes: z.number().optional(),
   leaveAfterMinutes: z.number().optional(),
   loadingZone: z.string().optional(),
+  bookedTwiceReason: z.string().optional(),
 });
 
 export type EventVehicleAssignmentAssignParams = z.infer<typeof EventVehicleAssignmentAssignParamsSchema>;

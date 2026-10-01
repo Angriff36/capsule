@@ -88,6 +88,8 @@ export const assignRigWithReason = mutation({
         vehicleId: args.vehicleId,
         trailerId: args.trailerId,
         driverId: args.driverId,
+        // The reason lets the run through the same-time check.
+        bookedTwiceReason: args.reason,
       },
     );
     await ctx.runMutation(api.mutations.PlanningOverride_createViaRecord, {

@@ -1535,6 +1535,7 @@ export default defineSchema({
     loadMinutes: v.optional(v.union(v.number(), v.null())),
     leaveAfterMinutes: v.optional(v.union(v.number(), v.null())),
     loadingZone: v.optional(v.union(v.string(), v.null())),
+    bookedTwiceReason: v.optional(v.union(v.string(), v.null())),
     preloadedByPersonId: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),

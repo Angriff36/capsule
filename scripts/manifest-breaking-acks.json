@@ -1932,6 +1932,12 @@
       "category": "property-added",
       "acknowledgedAt": "2026-09-30",
       "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
+    },
+    {
+      "path": "EventVehicleAssignment.bookedTwiceReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Optional reason that lets a planned truck run through the same-time check; saved rigs need no backfill."
     }
   ]
 }
