@@ -321,6 +321,25 @@ function withSourceRow(normalized: object, sourceRow: unknown): string {
   return JSON.stringify({ ...normalized, sourceRow: sourceRow ?? null });
 }
 
+/** The client a merged client now lives on (itself when never merged). */
+export const survivingClientId = internalQuery({
+  args: { tenantId: v.string(), clientId: v.string() },
+  handler: async (ctx, args): Promise<string> => {
+    let id = ctx.db.normalizeId("clients", args.clientId);
+    if (!id) return args.clientId;
+    let surviving: string = args.clientId;
+    const seen = new Set<string>();
+    while (id && !seen.has(id)) {
+      seen.add(id);
+      const row: Doc<"clients"> | null = await ctx.db.get(id);
+      if (!row || row.tenantId !== args.tenantId) break;
+      surviving = id;
+      id = row.mergedIntoClientId ?? null;
+    }
+    return surviving;
+  },
+});
+
 /** Insert or update the link for a (tenant, source, recordType, externalId) key. */
 export const upsertLink = internalMutation({
   args: {
@@ -1130,7 +1149,12 @@ export const commitImportRun = action({
           pending += 1;
           continue;
         }
-        const clientId: string = clientLink.capsuleId;
+        // AC-181: a client merged since its import hands its events to the
+        // client it was merged into.
+        const clientId: string = await ctx.runQuery(
+          internal.importCommit.survivingClientId,
+          { tenantId, clientId: clientLink.capsuleId },
+        );
 
         // Venue is optional on Event; resolve if the TPP VenueID was imported.
         let venueId: string | undefined;
